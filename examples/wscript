@@ -1,0 +1,29 @@
+# -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+
+def build(bld):
+    obj = bld.create_ns3_program('simple-lorawan-network-example', ['lorawan'])
+    obj.source = 'simple-lorawan-network-example.cc'
+
+    obj = bld.create_ns3_program('network-server-example', ['lorawan'])
+    obj.source = 'network-server-example.cc'
+
+    obj = bld.create_ns3_program('complete-lorawan-network-example', ['lorawan'])
+    obj.source = 'complete-lorawan-network-example.cc'
+
+    obj = bld.create_ns3_program('header-test', ['lorawan'])
+    obj.source = 'header-test.cc'
+
+    obj = bld.create_ns3_program('receive-path-test', ['lorawan'])
+    obj.source = 'receive-path-test.cc'
+
+    obj = bld.create_ns3_program('channel-test', ['lorawan'])
+    obj.source = 'channel-test.cc'
+
+    obj = bld.create_ns3_program('phy-communication-test', ['lorawan'])
+    obj.source = 'phy-communication-test.cc'
+
+    obj = bld.create_ns3_program('time-on-air-test', ['lorawan'])
+    obj.source = 'time-on-air-test.cc'
+
+    obj = bld.create_ns3_program('lora-mac-test', ['lorawan'])
+    obj.source = 'lora-mac-test.cc'
