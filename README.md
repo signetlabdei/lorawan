@@ -1,6 +1,7 @@
 # LoRaWAN ns-3 module #
 
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/ns-3-lorawan)
+[![Build Status](https://travis-ci.org/DvdMgr/lorawan.svg?branch=master)](https://travis-ci.org/DvdMgr/lorawan)
 
 This is an [ns-3](https://www.nsnam.org "ns-3 Website") module that can be used
 to perform simulations of a [LoRaWAN](http://www.lora-alliance.org/technology
