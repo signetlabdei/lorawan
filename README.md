@@ -1,17 +1,42 @@
 # LoRaWAN ns-3 module #
 
-An [ns-3](https://www.nsnam.org "ns-3 Website") module that can be used to
-perform simulations of a [LoRaWAN](http://www.lora-alliance.org/technology "LoRa
-Alliance") network.
+This is an [ns-3](https://www.nsnam.org "ns-3 Website") module that can be used
+to perform simulations of a [LoRaWAN](http://www.lora-alliance.org/technology
+"LoRa Alliance") network.
 
 ## Getting started ##
 
 ### Prerequisites ###
 
 To run simulations using this module, you will need to install ns-3, and clone
-this repository inside the `src` directory. Assuming you have mercurial
-installed, the procedure to install both ns-3 and the lorawan module is the
-following:
+this repository inside the `src` directory. Required dependencies include
+mercurial and a build environment.
+
+#### Installing dependencies ####
+
+On Ubuntu, run the following to install all the required packets:
+
+```bash
+sudo apt install git mercurial build-essential
+```
+
+On macOS, you can install the command line tools with:
+
+```bash
+xcode-select --install
+```
+
+while Mercurial and git can be installed via [Homebrew](https://brew.sh/ "Homebrew
+homepage"):
+
+```bash
+brew install mercurial git
+```
+
+#### Downloading #####
+
+Assuming you have mercurial installed, the procedure to get both ns-3 and the
+`lorawan` module is the following:
 
 ```bash
 hg clone http://code.nsnam.org/ns-3-dev
@@ -81,6 +106,6 @@ that is used by ns-3). See the LICENSE.md file for more details.
 
 ## Acknowledgments ##
 
-This code was developed as part of a master's thesis at the University of
-Padova, under the supervision of Prof. Lorenzo Vangelista and Prof. Michele
-Zorzi and with the help of Marco Centenaro.
+This code was developed as part of a master's thesis at the [University of
+Padova](https://unipd.it "Unipd homepage"), under the supervision of Prof.
+Lorenzo Vangelista, Prof. Michele Zorzi and with the help of Marco Centenaro.
