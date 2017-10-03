@@ -22,4 +22,4 @@ before_install:
 script:
   - cd ns-3-dev/
   - printf "#! /usr/bin/env python \n modules_enabled = ['lorawan']" > .ns3rc
-  - ./waf configure --enable-examples --enable-tests && ./waf build && ./test.py
+  - ./waf configure --enable-examples --enable-tests && ./waf build && ./test.py -s lorawan
