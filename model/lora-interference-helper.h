@@ -214,12 +214,6 @@ private:
    */
   static Time oldEventThreshold;
 
-  /**
-   * The interval after which, periodically, old events are removed from the
-   * events list.
-   */
-  static Time cleanOldEventsInterval;
-
 };
 
 /**

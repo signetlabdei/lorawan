@@ -127,9 +127,6 @@ LoraInterferenceHelper::GetTypeId (void)
 LoraInterferenceHelper::LoraInterferenceHelper ()
 {
   NS_LOG_FUNCTION (this);
-
-  // Set the first periodic cleaning event
-  Simulator::Schedule (cleanOldEventsInterval, &LoraInterferenceHelper::CleanOldEvents, this);
 }
 
 LoraInterferenceHelper::~LoraInterferenceHelper ()
@@ -167,7 +164,6 @@ const double LoraInterferenceHelper::collisionSnir[6][6] =
 };
 
 Time LoraInterferenceHelper::oldEventThreshold = Seconds (2);
-Time LoraInterferenceHelper::cleanOldEventsInterval = Minutes (20);
 
 Ptr<LoraInterferenceHelper::Event>
 LoraInterferenceHelper::Add (Time duration, double rxPower,
@@ -186,6 +182,12 @@ LoraInterferenceHelper::Add (Time duration, double rxPower,
   // Add the event to the list
   m_events.push_back (event);
 
+  // Clean the event list
+  if (m_events.size () > 100)
+    {
+      CleanOldEvents ();
+    }
+
   return event;
 }
 
@@ -203,9 +205,6 @@ LoraInterferenceHelper::CleanOldEvents (void)
         }
       it++;
     }
-
-  // Schedule a new cleaning event
-  Simulator::Schedule (cleanOldEventsInterval, &LoraInterferenceHelper::CleanOldEvents, this);
 }
 
 std::list<Ptr<LoraInterferenceHelper::Event> >
