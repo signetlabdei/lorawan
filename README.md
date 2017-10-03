@@ -1,5 +1,7 @@
 # LoRaWAN ns-3 module #
 
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/ns-3-lorawan)
+
 This is an [ns-3](https://www.nsnam.org "ns-3 Website") module that can be used
 to perform simulations of a [LoRaWAN](http://www.lora-alliance.org/technology
 "LoRa Alliance") network.
@@ -94,6 +96,11 @@ For a complete description of the module, refer to `doc/lorawan.rst`.
 - [ns-3 manual](https://www.nsnam.org/docs/manual/html "ns-3 Manual")
 - The LoRaWAN specification can be requested at the [LoRa Alliance
   website](http://www.lora-alliance.org)
+
+## Getting help ##
+
+To discuss and get help on how to use this module, you can write to us on [our
+gitter chat](https://gitter.im/ns-3-lorawan "lorawan Gitter chat").
 
 ## Authors ##
 
