@@ -83,8 +83,8 @@ Examples can be run via the `./waf --run example-name` command.
 
 ## Contributing ##
 
-Refer to the [contribution guidelines](CONTRIBUTING.md) for information about
-how to contribute to this module.
+Refer to the [contribution guidelines](.github/CONTRIBUTING.md) for information
+about how to contribute to this module.
 
 ## Documentation ##
 
