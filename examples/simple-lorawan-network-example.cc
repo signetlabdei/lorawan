@@ -1,7 +1,6 @@
 /*
- * This script simulates a complex scenario with multiple gateways and end
- * devices. The metric of interest for this script is the throughput of the
- * network.
+ * This script simulates a simple network in which one end device sends one
+ * packet to the gateway.
  */
 
 #include "ns3/end-device-lora-phy.h"
