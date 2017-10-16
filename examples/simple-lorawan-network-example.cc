@@ -130,6 +130,12 @@ int main (int argc, char *argv[])
 
   oneShotSenderHelper.Install (endDevices);
 
+  /******************
+   * Set Data Rates *
+   ******************/
+
+  macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
+
   /****************
   *  Simulation  *
   ****************/
