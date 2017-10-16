@@ -80,6 +80,7 @@ EndDeviceLoraMac::EndDeviceLoraMac () :
   m_closeWindow (EventId ()),               // Initialize as the default eventId
   // m_secondReceiveWindow (EventId ()),       // Initialize as the default eventId
   // m_secondReceiveWindowDataRate (0),        // LoraWAN default
+  m_address (LoraDeviceAddress (0)),
   m_rx1DrOffset (0),                         // LoraWAN default
   m_lastKnownLinkMargin (0),
   m_lastKnownGatewayCount (0),
