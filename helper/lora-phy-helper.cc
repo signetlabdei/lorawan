@@ -44,10 +44,10 @@ LoraPhyHelper::SetDeviceType (enum DeviceType dt)
   switch (dt)
     {
     case GW:
-      m_phy.SetTypeId ("ns3::GatewayLoraPhy");
+      m_phy.SetTypeId ("ns3::SimpleGatewayLoraPhy");
       break;
     case ED:
-      m_phy.SetTypeId ("ns3::EndDeviceLoraPhy");
+      m_phy.SetTypeId ("ns3::SimpleEndDeviceLoraPhy");
       break;
     }
 }
@@ -69,7 +69,7 @@ LoraPhyHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
 
   // Configuration is different based on the kind of device we have to create
   std::string typeId = m_phy.GetTypeId ().GetName ();
-  if (typeId == "ns3::GatewayLoraPhy")
+  if (typeId == "ns3::SimpleGatewayLoraPhy")
     {
       // Inform the channel of the presence of this PHY
       m_channel->Add (phy);
@@ -95,13 +95,13 @@ LoraPhyHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
         {
           if (it == frequencies.end ())
             it = frequencies.begin ();
-          phy->GetObject<GatewayLoraPhy> ()->AddReceptionPath (*it);
+          phy->GetObject<SimpleGatewayLoraPhy> ()->AddReceptionPath (*it);
           ++it;
           receptionPaths++;
         }
 
     }
-  else if (typeId == "ns3::EndDeviceLoraPhy")
+  else if (typeId == "ns3::SimpleEndDeviceLoraPhy")
     {
       // The line below can be commented to speed up uplink-only simulations.
       // This implies that the LoraChannel instance will only know about

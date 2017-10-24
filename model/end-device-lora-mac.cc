@@ -173,7 +173,6 @@ EndDeviceLoraMac::Send (Ptr<Packet> packet)
 
       // Make sure we can transmit at the current power on this channel
       NS_ASSERT (m_txPower <= m_channelHelper.GetTxPowerForChannel (txChannel));
-      m_phy->GetObject<EndDeviceLoraPhy> ()->SwitchToStandby ();
       m_phy->Send (packet, params, txChannel->GetFrequency (), m_txPower);
 
       //////////////////////////////////////////////

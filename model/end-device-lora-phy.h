@@ -15,7 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Davide Magrin <magrinda@dei.unipd.it>
+ * Authors: Davide Magrin <magrinda@dei.unipd.it>,
+ *          Michele Luvisotto <michele.luvisotto@dei.unipd.it>
+ *          Stefano Romagnolo <romagnolostefano93@gmail.com>
  */
 
 #ifndef END_DEVICE_LORA_PHY_H
@@ -34,6 +36,51 @@ namespace ns3 {
 class LoraChannel;
 
 /**
+ * Receive notifications about PHY events.
+ */
+class EndDeviceLoraPhyListener
+{
+public:
+  virtual ~EndDeviceLoraPhyListener ();
+
+  /**
+   * We have received the first bit of a packet. We decided
+   * that we could synchronize on this packet. It does not mean
+   * we will be able to successfully receive completely the
+   * whole packet. It means that we will report a BUSY status until
+   * one of the following happens:
+   *   - NotifyRxEndOk
+   *   - NotifyRxEndError
+   *   - NotifyTxStart
+   *
+   * \param duration the expected duration of the packet reception.
+   */
+  virtual void NotifyRxStart () = 0;
+
+  /**
+   * We are about to send the first bit of the packet.
+   * We do not send any event to notify the end of
+   * transmission. Listeners should assume that the
+   * channel implicitely reverts to the idle state
+   * unless they have received a cca busy report.
+   *
+   * \param duration the expected transmission duration.
+   * \param txPowerDbm the nominal tx power in dBm
+   */
+  virtual void NotifyTxStart (double txPowerDbm) = 0;
+
+  /**
+   * Notify listeners that we went to sleep
+   */
+  virtual void NotifySleep (void) = 0;
+
+  /**
+   * Notify listeners that we woke up
+   */
+  virtual void NotifyStandby (void) = 0;
+};
+
+/**
  * Class representing a LoRa transceiver.
  *
  * This class inherits some functionality by LoraPhy, like the GetOnAirTime
@@ -48,6 +95,10 @@ class LoraChannel;
  * is delegateed to an upper layer, which can modify the state of the device
  * through the public SwitchToSleep and SwitchToStandby methods. In SLEEP
  * mode, the device cannot lock on a packet and start reception.
+ *
+ * Peculiarities about the error model and about how errors are handled are
+ * supposed to be handled by classes extending this one, like
+ * SimpleEndDeviceLoraPhy or SpectrumEndDeviceLoraPhy. These classes need to
  */
 class EndDeviceLoraPhy : public LoraPhy
 {
@@ -96,15 +147,15 @@ public:
 
   // Implementation of LoraPhy's pure virtual functions
   virtual void StartReceive (Ptr<Packet> packet, double rxPowerDbm,
-                             uint8_t sf, Time duration, double frequencyMHz);
+                             uint8_t sf, Time duration, double frequencyMHz) = 0;
 
   // Implementation of LoraPhy's pure virtual functions
   virtual void EndReceive (Ptr<Packet> packet,
-                           Ptr<LoraInterferenceHelper::Event> event);
+                           Ptr<LoraInterferenceHelper::Event> event) = 0;
 
   // Implementation of LoraPhy's pure virtual functions
   virtual void Send (Ptr<Packet> packet, LoraTxParameters txParams,
-                     double frequencyMHz, double txPowerDbm);
+                     double frequencyMHz, double txPowerDbm) = 0;
 
   // Implementation of LoraPhy's pure virtual functions
   virtual bool IsOnFrequency (double frequencyMHz);
@@ -156,16 +207,33 @@ public:
    */
   void SwitchToSleep (void);
 
-private:
+  /**
+   * Add the input listener to the list of objects to be notified of PHY-level
+   * events.
+   *
+   * \param listener the new listener
+   */
+  void RegisterListener (EndDeviceLoraPhyListener *listener);
+
+  /**
+   * Remove the input listener from the list of objects to be notified of
+   * PHY-level events.
+   *
+   * \param listener the listener to be unregistered
+   */
+  void UnregisterListener (EndDeviceLoraPhyListener *listener);
+
+
+protected:
   /**
    * Switch to the RX state
    */
-  void SwitchToRx (void);
+  void SwitchToRx ();
 
   /**
    * Switch to the TX state
    */
-  void SwitchToTx (void);
+  void SwitchToTx (double txPowerDbm);
 
   /**
    * Trace source for when a packet is lost because it was using a SF different from
@@ -188,6 +256,16 @@ private:
 
   uint8_t m_sf; //!< The Spreading Factor this device is listening for
 
+  /**
+   * typedef for a list of EndDeviceLoraPhyListener
+   */
+  typedef std::vector<EndDeviceLoraPhyListener *> Listeners;
+  /**
+   * typedef for a list of EndDeviceLoraPhyListener iterator
+   */
+  typedef std::vector<EndDeviceLoraPhyListener *>::iterator ListenersI;
+
+  Listeners m_listeners; //!< PHY listeners
 };
 
 } /* namespace ns3 */

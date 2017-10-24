@@ -54,13 +54,13 @@ public:
   virtual ~GatewayLoraPhy();
 
   virtual void StartReceive (Ptr<Packet> packet, double rxPowerDbm, uint8_t sf,
-                             Time duration, double frequencyMHz);
+                             Time duration, double frequencyMHz) = 0;
 
   virtual void EndReceive (Ptr<Packet> packet,
-                           Ptr<LoraInterferenceHelper::Event> event);
+                           Ptr<LoraInterferenceHelper::Event> event) = 0;
 
   virtual void Send (Ptr<Packet> packet, LoraTxParameters txParams,
-                     double frequencyMHz, double txPowerDbm);
+                     double frequencyMHz, double txPowerDbm) = 0;
 
   virtual void TxFinished (Ptr<Packet> packet);
 
@@ -88,7 +88,7 @@ public:
    */
   static const double sensitivity[6];
 
-private:
+protected:
 
   /**
    * This class represents a configurable reception path.
