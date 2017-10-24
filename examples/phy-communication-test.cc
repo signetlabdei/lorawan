@@ -1,7 +1,7 @@
 #include "ns3/log.h"
 #include "ns3/command-line.h"
 #include "ns3/lora-channel.h"
-#include "ns3/end-device-lora-phy.h"
+#include "ns3/simple-end-device-lora-phy.h"
 #include "ns3/constant-position-mobility-model.h"
 #include <cstdlib>
 
@@ -10,9 +10,9 @@ using namespace ns3;
 NS_LOG_COMPONENT_DEFINE ("PhyCommunicationTest");
 
 Ptr<LoraChannel> channel;
-Ptr<EndDeviceLoraPhy> edPhy1;
-Ptr<EndDeviceLoraPhy> edPhy2;
-Ptr<EndDeviceLoraPhy> edPhy3;
+Ptr<SimpleEndDeviceLoraPhy> edPhy1;
+Ptr<SimpleEndDeviceLoraPhy> edPhy2;
+Ptr<SimpleEndDeviceLoraPhy> edPhy3;
 
 Ptr<Packet> m_latestReceivedPacket;
 int m_receivedPacketCalls = 0;
@@ -93,9 +93,9 @@ void Reset (void)
   channel = CreateObject<LoraChannel> (loss, delay);
 
   // Connect PHYs
-  edPhy1 = CreateObject<EndDeviceLoraPhy> ();
-  edPhy2 = CreateObject<EndDeviceLoraPhy> ();
-  edPhy3 = CreateObject<EndDeviceLoraPhy> ();
+  edPhy1 = CreateObject<SimpleEndDeviceLoraPhy> ();
+  edPhy2 = CreateObject<SimpleEndDeviceLoraPhy> ();
+  edPhy3 = CreateObject<SimpleEndDeviceLoraPhy> ();
 
   edPhy1->SetFrequency (868.1);
   edPhy2->SetFrequency (868.1);
@@ -150,7 +150,7 @@ int main (int argc, char *argv[])
 
   LogComponentEnable ("PhyCommunicationTest", LOG_LEVEL_ALL);
   LogComponentEnable ("LoraChannel", LOG_LEVEL_ALL);
-  LogComponentEnable ("EndDeviceLoraPhy", LOG_LEVEL_ALL);
+  LogComponentEnable ("SimpleEndDeviceLoraPhy", LOG_LEVEL_ALL);
 
   // Setup
   ////////
@@ -168,7 +168,7 @@ int main (int argc, char *argv[])
   // Basic packet delivery test
   /////////////////////////////
 
-  Simulator::Schedule (Seconds (2), &EndDeviceLoraPhy::Send, edPhy1, packet,
+  Simulator::Schedule (Seconds (2), &SimpleEndDeviceLoraPhy::Send, edPhy1, packet,
                        txParams, 868.1, 14);
 
   Simulator::Stop (Hours (2)); Simulator::Run (); Simulator::Destroy ();
@@ -181,7 +181,7 @@ int main (int argc, char *argv[])
 
   edPhy2->SwitchToSleep ();
 
-  Simulator::Schedule (Seconds (2), &EndDeviceLoraPhy::Send, edPhy1, packet,
+  Simulator::Schedule (Seconds (2), &SimpleEndDeviceLoraPhy::Send, edPhy1, packet,
                        txParams, 868.1, 14);
 
   Simulator::Stop (Hours (2)); Simulator::Run (); Simulator::Destroy ();
@@ -196,7 +196,7 @@ int main (int argc, char *argv[])
   edPhy2->GetMobility ()->GetObject<ConstantPositionMobilityModel>
     ()->SetPosition (Vector (2990, 0, 0));
 
-  Simulator::Schedule (Seconds (2), &EndDeviceLoraPhy::Send, edPhy1, packet,
+  Simulator::Schedule (Seconds (2), &SimpleEndDeviceLoraPhy::Send, edPhy1, packet,
                        txParams, 868.1, 14);
 
   Simulator::Stop (Hours (2)); Simulator::Run (); Simulator::Destroy ();
@@ -209,7 +209,7 @@ int main (int argc, char *argv[])
   txParams.sf = 8;
   edPhy2->GetMobility ()->GetObject<ConstantPositionMobilityModel> ()->SetPosition (Vector (2990, 0, 0));
 
-  Simulator::Schedule (Seconds (2), &EndDeviceLoraPhy::Send, edPhy1, packet,
+  Simulator::Schedule (Seconds (2), &SimpleEndDeviceLoraPhy::Send, edPhy1, packet,
                        txParams, 868.1, 14);
 
   Simulator::Stop (Hours (2)); Simulator::Run (); Simulator::Destroy ();
@@ -222,9 +222,9 @@ int main (int argc, char *argv[])
 
   txParams.sf = 7;
 
-  Simulator::Schedule (Seconds (2), &EndDeviceLoraPhy::Send, edPhy1, packet,
+  Simulator::Schedule (Seconds (2), &SimpleEndDeviceLoraPhy::Send, edPhy1, packet,
                        txParams, 868.1, 14);
-  Simulator::Schedule (Seconds (2), &EndDeviceLoraPhy::Send, edPhy3, packet,
+  Simulator::Schedule (Seconds (2), &SimpleEndDeviceLoraPhy::Send, edPhy3, packet,
                        txParams, 868.1, 14);
 
   Simulator::Stop (Hours (2)); Simulator::Run (); Simulator::Destroy ();
@@ -235,7 +235,7 @@ int main (int argc, char *argv[])
 
   // Packets can be lost because the PHY is not listening on the right frequency
 
-  Simulator::Schedule (Seconds (2), &EndDeviceLoraPhy::Send, edPhy1, packet,
+  Simulator::Schedule (Seconds (2), &SimpleEndDeviceLoraPhy::Send, edPhy1, packet,
                        txParams, 868.3, 14);
 
   Simulator::Stop (Hours (2)); Simulator::Run (); Simulator::Destroy ();
@@ -248,7 +248,7 @@ int main (int argc, char *argv[])
   /////////////////////
 
   // The very same packet arrives at the other PHY
-  Simulator::Schedule (Seconds (2), &EndDeviceLoraPhy::Send, edPhy1, packet,
+  Simulator::Schedule (Seconds (2), &SimpleEndDeviceLoraPhy::Send, edPhy1, packet,
                        txParams, 868.1, 14);
 
   Simulator::Stop (Hours (2)); Simulator::Run (); Simulator::Destroy ();
@@ -262,13 +262,13 @@ int main (int argc, char *argv[])
 
   // PHY switches to STANDBY after TX and RX
 
-  Simulator::Schedule (Seconds (2), &EndDeviceLoraPhy::Send, edPhy1, packet,
+  Simulator::Schedule (Seconds (2), &SimpleEndDeviceLoraPhy::Send, edPhy1, packet,
                        txParams, 868.1, 14);
 
   Simulator::Stop (Hours (2)); Simulator::Run (); Simulator::Destroy ();
 
-  NS_ASSERT (edPhy1->GetState () == EndDeviceLoraPhy::STANDBY);
-  NS_ASSERT (edPhy2->GetState () == EndDeviceLoraPhy::STANDBY);
+  NS_ASSERT (edPhy1->GetState () == SimpleEndDeviceLoraPhy::STANDBY);
+  NS_ASSERT (edPhy2->GetState () == SimpleEndDeviceLoraPhy::STANDBY);
 
   return 0;
 }

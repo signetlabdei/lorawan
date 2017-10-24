@@ -25,8 +25,8 @@
 #include "ns3/net-device.h"
 #include "ns3/lora-channel.h"
 #include "ns3/lora-phy.h"
-#include "ns3/end-device-lora-phy.h"
-#include "ns3/gateway-lora-phy.h"
+#include "ns3/simple-end-device-lora-phy.h"
+#include "ns3/simple-gateway-lora-phy.h"
 #include "ns3/lora-mac.h"
 
 namespace ns3 {

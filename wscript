@@ -7,7 +7,7 @@
 #     conf.check_nonfatal(header_name='stdint.h', define_name='HAVE_STDINT_H')
 
 def build(bld):
-    module = bld.create_ns3_module('lorawan', ['core', 'network', 'propagation', 'mobility', 'point-to-point'])
+    module = bld.create_ns3_module('lorawan', ['core', 'network', 'propagation', 'mobility', 'point-to-point', 'energy'])
     module.source = [
         'model/lora-net-device.cc',
         'model/lora-mac.cc',
@@ -18,6 +18,8 @@ def build(bld):
         'model/end-device-lora-mac.cc',
         'model/gateway-lora-phy.cc',
         'model/end-device-lora-phy.cc',
+        'model/simple-end-device-lora-phy.cc',
+        'model/simple-gateway-lora-phy.cc',
         'model/sub-band.cc',
         'model/logical-lora-channel.cc',
         'model/logical-lora-channel-helper.cc',
@@ -63,6 +65,8 @@ def build(bld):
         'model/end-device-lora-mac.h',
         'model/gateway-lora-phy.h',
         'model/end-device-lora-phy.h',
+        'model/simple-end-device-lora-phy.h',
+        'model/simple-gateway-lora-phy.h',
         'model/sub-band.h',
         'model/logical-lora-channel.h',
         'model/logical-lora-channel-helper.h',
