@@ -272,7 +272,7 @@ SimpleNetworkServer::SendOnSecondWindow (LoraDeviceAddress address)
       Ptr<Packet> replyPacket = m_deviceStatuses.at (address).GetReplyPacket ();
       NS_LOG_DEBUG ("Packet size: " << replyPacket->GetSize ());
 
-      // Tag the packet so that the Gateway sends it according to the first
+      // Tag the packet so that the Gateway sends it according to the second
       // receive window parameters
       LoraTag replyPacketTag;
       uint8_t dataRate = m_deviceStatuses.at (address).GetSecondReceiveWindowDataRate ();
