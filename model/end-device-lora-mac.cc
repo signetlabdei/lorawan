@@ -675,6 +675,7 @@ EndDeviceLoraMac::OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
   if (sf == 0 || bw == 0)
     {
       dataRateOk = false;
+      NS_LOG_DEBUG ("Data rate non valid")
     }
 
   // We need to know we can use it in at least one of the enabled channels
@@ -698,6 +699,7 @@ EndDeviceLoraMac::OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
       if (!foundAvailableChannel)
         {
           dataRateOk = false;
+          NS_LOG_DEBUG ("Available channel not found");
         }
     }
 

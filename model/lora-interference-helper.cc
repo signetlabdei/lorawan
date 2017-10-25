@@ -267,7 +267,7 @@ LoraInterferenceHelper::IsDestroyedByInterference
       // event if it's the same that we want to analyze.
       if (!(interferer->GetFrequency () == frequency) || interferer == event)
         {
-          NS_LOG_DEBUG ("Different channel");
+          NS_LOG_DEBUG ("Different channel or same event");
           it++;
           continue;   // Continues from the first line inside the for cycle
         }
@@ -325,7 +325,7 @@ LoraInterferenceHelper::IsDestroyedByInterference
       if (snir >= snirIsolation)
         {
           // Move on and check the rest of the interferers
-          NS_LOG_DEBUG ("Packet survived interference");
+          NS_LOG_DEBUG ("Packet survived interference with SF " << currentSf);
         }
       else
         {
@@ -364,6 +364,35 @@ LoraInterferenceHelper::GetOverlapTime (Ptr<LoraInterferenceHelper::Event> event
   Time s2 = event2->GetStartTime ();
   Time e1 = event1->GetEndTime ();   // End times
   Time e2 = event2->GetEndTime ();
+
+  // Non-overlapping events
+  if (e1 <= s2 || e2 <= s1)
+    {
+      overlap = Seconds (0);
+    }
+  // event1 before event2
+  else if (s1 < s2)
+    {
+      overlap = e1 - s2;
+    }
+  // event2 before event1 or they start at the same time (s1 = s2)
+  else
+    {
+      if (e1 < e2)
+        {
+          overlap = e1 - s1;
+        }
+      else
+        {
+          overlap = e2 - s1;
+        }
+    }
+   
+  return overlap;
+}
+}
+/*
+  ----------------------------------------------------------------------------
 
   // Event1 starts before Event2
   if (s1 < s2)
@@ -406,3 +435,4 @@ LoraInterferenceHelper::GetOverlapTime (Ptr<LoraInterferenceHelper::Event> event
   return overlap;
 }
 }
+*/
