@@ -179,9 +179,10 @@ private:
 
   LoraDeviceAddress m_address;   //!< The address of this device
 
-  std::map<Address, double> m_gateways;   //!< The gateways that received a
-                                          //!packet from the device represented
-                                          //!by this DeviceStatus
+  std::map<Address, double> m_gateways;   //!< The gateways that received a packet from the device 
+                                          //! represented by this DeviceStatus.
+                                          //! Address= address of the gateway, 
+                                          //! double value= power with which the packet has been received from that gateway
 
   struct Reply m_reply; //!< Structure containing the next reply meant for this
                         //!device

@@ -61,7 +61,7 @@ LoraPhyHelper::Set (std::string name, const AttributeValue &v)
 Ptr<LoraPhy>
 LoraPhyHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
 {
-  NS_LOG_FUNCTION (this << node << device);
+  NS_LOG_FUNCTION (this << node->GetId() << device);
 
   // Create the PHY and set its channel
   Ptr<LoraPhy> phy = m_phy.Create<LoraPhy> ();
