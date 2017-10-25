@@ -47,12 +47,12 @@ public:
   void SetAddress (Address address);
 
   /**
-   * Get the NetDevice through which it's possible to contact this gateway.
+   * Get the NetDevice through which it's possible to contact this gateway from the server.
    */
   Ptr<NetDevice> GetNetDevice ();
 
   /**
-   * Set the NetDevice through which it's possible to contact this gateway.
+   * Set the NetDevice through which it's possible to contact this gateway from the server.
    */
   void SetNetDevice (Ptr<NetDevice> netDevice);
 
@@ -83,7 +83,7 @@ private:
 
   Address m_address; //!< The Address of the P2PNetDevice of this gateway
 
-  Ptr<NetDevice> m_netDevice;   //!< The NetDevice through which to reach this gateway
+  Ptr<NetDevice> m_netDevice;   //!< The NetDevice through which to reach this gateway from the server
 
   Ptr<GatewayLoraMac> m_gatewayMac;   //!< The Mac layer of the gateway
 

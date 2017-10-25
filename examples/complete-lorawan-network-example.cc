@@ -342,19 +342,11 @@ int main (int argc, char *argv[])
   gateways.Create (nGateways);
 
   Ptr<ListPositionAllocator> allocator = CreateObject<ListPositionAllocator> ();
-  allocator->Add (Vector (0.0, 0.0, 0.0));
+  // Make it so that nodes are at a certain height > 0
+  allocator->Add (Vector (0.0, 0.0, 15.0));    
   mobility.SetPositionAllocator (allocator);
   mobility.Install (gateways);
 
-  // Make it so that nodes are at a certain height > 0
-  for (NodeContainer::Iterator j = gateways.Begin ();
-       j != gateways.End (); ++j)
-    {
-      Ptr<MobilityModel> mobility = (*j)->GetObject<MobilityModel> ();
-      Vector position = mobility->GetPosition ();
-      position.z = 15;
-      mobility->SetPosition (position);
-    }
 
   // Create a netdevice for each gateway
   phyHelper.SetDeviceType (LoraPhyHelper::GW);
@@ -376,11 +368,6 @@ int main (int argc, char *argv[])
       NS_ASSERT (loraNetDevice != 0);
       Ptr<GatewayLoraPhy> gwPhy = loraNetDevice->GetPhy ()->GetObject<GatewayLoraPhy> ();
 
-      // Set up height of the gateway
-      Ptr<MobilityModel> gwMob = (*j)->GetObject<MobilityModel> ();
-      Vector position = gwMob->GetPosition ();
-      position.z = 15;
-      gwMob->SetPosition (position);
 
       // Global callbacks (every gateway)
       gwPhy->TraceConnectWithoutContext ("ReceivedPacket",
