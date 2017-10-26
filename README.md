@@ -106,14 +106,26 @@ gitter chat](https://gitter.im/ns-3-lorawan "lorawan Gitter chat").
 ## Authors ##
 
 - Davide Magrin
+- Stefano Romagnolo
+- Michele Luvisotto
+- Martina Capuzzo
 
 ## License ##
 
 This software is licensed under the terms of the GNU GPLv2 (the same license
 that is used by ns-3). See the LICENSE.md file for more details.
 
-## Acknowledgments ##
+## Acknowledgments and relevant publications ##
 
-This code was developed as part of a master's thesis at the [University of
-Padova](https://unipd.it "Unipd homepage"), under the supervision of Prof.
-Lorenzo Vangelista, Prof. Michele Zorzi and with the help of Marco Centenaro.
+The initial version of this code was developed as part of a master's thesis at
+the [University of Padova](https://unipd.it "Unipd homepage"), under the
+supervision of Prof. Lorenzo Vangelista, Prof. Michele Zorzi and with the help
+of Marco Centenaro.
+
+Publications:
+- D. Magrin, M. Centenaro and L. Vangelista, "Performance evaluation of LoRa
+  networks in a smart city scenario," 2017 IEEE International Conference On
+  Communications (ICC), Paris, 2017. Available:
+  http://ieeexplore.ieee.org/document/7996384/
+- Network level performances of a LoRa system (Master thesis). Available:
+  http://tesi.cab.unipd.it/53740/1/dissertation.pdf
