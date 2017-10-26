@@ -130,7 +130,7 @@ LoraMacHelper::ConfigureForEuRegion (Ptr<EndDeviceLoraMac> edMac) const
   /////////////////////////////////////////////////////
   // TxPower -> Transmission power in dBm conversion //
   /////////////////////////////////////////////////////
-  edMac->SetTxDbmForTxPower (std::vector<double> {20,14,11,8,5,2});
+  edMac->SetTxDbmForTxPower (std::vector<double> {16, 14, 12, 10, 8, 6, 4, 2});
 
   ////////////////////////////////////////////////////////////
   // Matrix to know which DataRate the GW will respond with //
