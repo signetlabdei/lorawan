@@ -73,7 +73,7 @@ OneShotSenderHelper::Install (NodeContainer c) const
 Ptr<Application>
 OneShotSenderHelper::InstallPriv (Ptr<Node> node) const
 {
-  NS_LOG_FUNCTION (this << node);
+  NS_LOG_FUNCTION (this << node->GetId());
 
   Ptr<OneShotSender> app = m_factory.Create<OneShotSender> ();
 

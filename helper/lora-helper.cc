@@ -65,7 +65,7 @@ LoraHelper::Install ( const LoraPhyHelper &phyHelper,
 
       node->AddDevice (device);
       devices.Add (device);
-      NS_LOG_DEBUG ("node=" << node << ", mob=" << node->GetObject<MobilityModel> ());
+      NS_LOG_DEBUG ("node=" << node << ", mob=" << node->GetObject<MobilityModel> ()-> GetPosition());
     }
   return devices;
 }
