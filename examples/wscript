@@ -30,3 +30,6 @@ def build(bld):
 
     obj = bld.create_ns3_program('lora-energy-model-example', ['lorawan'])
     obj.source = 'lora-energy-model-example.cc'
+
+    obj = bld.create_ns3_program('simple-mac-command-example', ['lorawan'])
+    obj.source = 'simple-mac-command-example.cc'
