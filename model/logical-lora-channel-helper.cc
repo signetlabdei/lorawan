@@ -62,6 +62,29 @@ LogicalLoraChannelHelper::GetChannelList (void)
   return vector;
 }
 
+
+std::vector<Ptr <LogicalLoraChannel>>
+LogicalLoraChannelHelper::GetEnabledChannelList (void)
+{
+  NS_LOG_FUNCTION (this);
+
+  // Make a copy of the channel vector
+  std::vector<Ptr<LogicalLoraChannel>> vector;
+  vector.reserve (m_channelList.size ());
+  std::copy (m_channelList.begin (), m_channelList.end (), std::back_inserter
+               (vector));   // Working on a copy 
+
+  std::vector<Ptr <LogicalLoraChannel>> channels;
+  std::vector<Ptr <LogicalLoraChannel>>::iterator it;
+  for (it = vector.begin(); it != vector.end(); it++)
+    if ((*it)->IsEnabledForUplink())
+    {
+     channels.push_back(*it);
+    }
+
+  return channels;
+}
+
 Ptr<SubBand>
 LogicalLoraChannelHelper::GetSubBandFromChannel (Ptr<LogicalLoraChannel>
                                                  channel)

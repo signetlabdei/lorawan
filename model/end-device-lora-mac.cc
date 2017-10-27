@@ -172,7 +172,8 @@ EndDeviceLoraMac::Send (Ptr<Packet> packet)
       // Wake up PHY layer and directly send the packet
 
       // Make sure we can transmit at the current power on this channel
-      NS_ASSERT (m_txPower <= m_channelHelper.GetTxPowerForChannel (txChannel));
+      NS_ASSERT_MSG (m_txPower <= m_channelHelper.GetTxPowerForChannel (txChannel), 
+                " The selected power is too hight to be supported by this channel ");
       m_phy->Send (packet, params, txChannel->GetFrequency (), m_txPower);
 
       //////////////////////////////////////////////
@@ -539,7 +540,7 @@ EndDeviceLoraMac::GetChannelForTx (void)
 
   // Pick a random channel to transmit on
   std::vector<Ptr<LogicalLoraChannel> > logicalChannels;
-  logicalChannels = m_channelHelper.GetChannelList (); // Use a separate list to do the shuffle
+  logicalChannels = m_channelHelper.GetEnabledChannelList (); // Use a separate list to do the shuffle
   logicalChannels = Shuffle (logicalChannels);
 
   // Try every channel
@@ -675,7 +676,7 @@ EndDeviceLoraMac::OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
   if (sf == 0 || bw == 0)
     {
       dataRateOk = false;
-      NS_LOG_DEBUG ("Data rate non valid")
+      NS_LOG_DEBUG ("Data rate non valid");
     }
 
   // We need to know we can use it in at least one of the enabled channels
@@ -726,10 +727,12 @@ EndDeviceLoraMac::OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
           if (std::find (enabledChannels.begin (), enabledChannels.end (), i) != enabledChannels.end ())
             {
               m_channelHelper.GetChannelList ().at (i)->SetEnabledForUplink ();
+              NS_LOG_DEBUG ("Channel " << i << " enabled");
             }
           else
             {
               m_channelHelper.GetChannelList ().at (i)->DisableForUplink ();
+              NS_LOG_DEBUG ("Channel " << i << " disabled");
             }
         }
 
