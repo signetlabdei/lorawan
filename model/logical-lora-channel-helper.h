@@ -88,6 +88,14 @@ public:
   std::vector<Ptr<LogicalLoraChannel> > GetChannelList (void);
 
   /**
+   * Get the list of LogicalLoraChannels currently registered on this helper 
+   * that have been enabled for Uplink transmission with the channel mask.
+   *
+   * \return A list of the managed channels enabled for Uplink transmission.
+   */
+  std::vector<Ptr<LogicalLoraChannel> > GetEnabledChannelList (void);
+
+  /**
    * Add a new channel to the list.
    *
    * \param frequency The frequency of the channel to create.
