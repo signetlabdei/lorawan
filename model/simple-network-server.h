@@ -42,11 +42,10 @@ namespace ns3 {
 class SimpleNetworkServer : public Application
 {
 public:
-
   static TypeId GetTypeId (void);
 
-  SimpleNetworkServer();
-  virtual ~SimpleNetworkServer();
+  SimpleNetworkServer ();
+  virtual ~SimpleNetworkServer ();
 
   /**
    * Parse and take action on the commands contained on the frameHeader
@@ -114,6 +113,16 @@ public:
    * it is called.
    */
   Address GetGatewayForReply (LoraDeviceAddress deviceAddress, double frequency);
+
+  /**
+   * Initialize the hasReply value of the device to the given value, so that the
+   * Reply can be overwritten.
+   *
+   * \param addr The address oh the device
+   * \param hasRep The new value of the hasReply field,
+   */
+  void InitializeReply (LoraDeviceAddress addr, bool hasRep);
+
 
 protected:
   std::map<LoraDeviceAddress,DeviceStatus> m_deviceStatuses;

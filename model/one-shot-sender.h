@@ -28,9 +28,9 @@
 
 namespace ns3 {
 
-class OneShotSender : public Application {
+class OneShotSender : public Application
+{
 public:
-
   OneShotSender ();
   OneShotSender (Time sendTime);
   ~OneShotSender ();
@@ -58,7 +58,6 @@ public:
   void StopApplication (void);
 
 private:
-
   /**
    * The time at which to send the packet.
    */

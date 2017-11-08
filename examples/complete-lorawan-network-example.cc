@@ -30,9 +30,9 @@ NS_LOG_COMPONENT_DEFINE ("ComplexLorawanNetworkExample");
 // Network settings
 int nDevices = 2000;
 int gatewayRings = 1;
-int nGateways = 3*gatewayRings*gatewayRings-3*gatewayRings+1;
+int nGateways = 3 * gatewayRings * gatewayRings - 3 * gatewayRings + 1;
 double radius = 7500;
-double gatewayRadius = 7500/((gatewayRings-1)*2+1);
+double gatewayRadius = 7500 / ((gatewayRings - 1) * 2 + 1);
 double simulationTime = 600;
 int appPeriodSeconds = 600;
 std::vector<int> sfQuantity (6);
@@ -50,7 +50,8 @@ bool buildingsEnabled = false;
  *  Global Callbacks  *
  **********************/
 
-enum PacketOutcome {
+enum PacketOutcome
+{
   RECEIVED,
   INTERFERED,
   NO_MORE_RECEIVERS,
@@ -58,7 +59,8 @@ enum PacketOutcome {
   UNSET
 };
 
-struct PacketStatus {
+struct PacketStatus
+{
   Ptr<Packet const> packet;
   uint32_t senderId;
   int outcomeNumber;
@@ -254,7 +256,7 @@ int main (int argc, char *argv[])
   ***********/
 
   // Compute the number of gateways
-  nGateways = 3*gatewayRings*gatewayRings-3*gatewayRings+1;
+  nGateways = 3 * gatewayRings * gatewayRings - 3 * gatewayRings + 1;
 
   // Create the time value from the period
   Time appPeriod = Seconds (appPeriodSeconds);
@@ -274,7 +276,7 @@ int main (int argc, char *argv[])
   // Create the lora channel object
   Ptr<LogDistancePropagationLossModel> loss = CreateObject<LogDistancePropagationLossModel> ();
   loss->SetPathLossExponent (3.76);
-  loss->SetReference (1, 8.1);
+  loss->SetReference (1, 7.7);
 
   Ptr<PropagationDelayModel> delay = CreateObject<ConstantSpeedPropagationDelayModel> ();
 
@@ -343,7 +345,7 @@ int main (int argc, char *argv[])
 
   Ptr<ListPositionAllocator> allocator = CreateObject<ListPositionAllocator> ();
   // Make it so that nodes are at a certain height > 0
-  allocator->Add (Vector (0.0, 0.0, 15.0));    
+  allocator->Add (Vector (0.0, 0.0, 15.0));
   mobility.SetPositionAllocator (allocator);
   mobility.Install (gateways);
 
@@ -384,7 +386,7 @@ int main (int argc, char *argv[])
   *  Set up the end device's spreading factor  *
   **********************************************/
 
-  macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
+  sfQuantity = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
 
   NS_LOG_DEBUG ("Completed configuration");
 
@@ -395,6 +397,8 @@ int main (int argc, char *argv[])
   Time appStopTime = Seconds (simulationTime);
   PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
   appHelper.SetPeriod (Seconds (appPeriodSeconds));
+  appHelper.SetPacketSize (23);
+  Ptr <RandomVariableStream> rv = CreateObjectWithAttributes<UniformRandomVariable> ("Min", DoubleValue (0), "Max", DoubleValue (10));
   ApplicationContainer appContainer = appHelper.Install (endDevices);
 
   appContainer.Start (Seconds (0));
@@ -424,15 +428,15 @@ int main (int argc, char *argv[])
   /*************
   *  Results  *
   *************/
-  double receivedProb = double(received)/nDevices;
-  double interferedProb = double(interfered)/nDevices;
-  double noMoreReceiversProb = double(noMoreReceivers)/nDevices;
-  double underSensitivityProb = double(underSensitivity)/nDevices;
+  double receivedProb = double(received) / nDevices;
+  double interferedProb = double(interfered) / nDevices;
+  double noMoreReceiversProb = double(noMoreReceivers) / nDevices;
+  double underSensitivityProb = double(underSensitivity) / nDevices;
 
-  double receivedProbGivenAboveSensitivity = double(received)/(nDevices - underSensitivity);
-  double interferedProbGivenAboveSensitivity = double(interfered)/(nDevices - underSensitivity);
-  double noMoreReceiversProbGivenAboveSensitivity = double(noMoreReceivers)/(nDevices - underSensitivity);
-  std::cout << nDevices << " " << double(nDevices)/simulationTime << " " << receivedProb << " " << interferedProb << " " << noMoreReceiversProb << " " << underSensitivityProb <<
+  double receivedProbGivenAboveSensitivity = double(received) / (nDevices - underSensitivity);
+  double interferedProbGivenAboveSensitivity = double(interfered) / (nDevices - underSensitivity);
+  double noMoreReceiversProbGivenAboveSensitivity = double(noMoreReceivers) / (nDevices - underSensitivity);
+  std::cout << nDevices << " " << double(nDevices) / simulationTime << " " << receivedProb << " " << interferedProb << " " << noMoreReceiversProb << " " << underSensitivityProb <<
   " " << receivedProbGivenAboveSensitivity << " " << interferedProbGivenAboveSensitivity << " " << noMoreReceiversProbGivenAboveSensitivity << std::endl;
 
   // Print the packetTracker contents

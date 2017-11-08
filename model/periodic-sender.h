@@ -28,9 +28,9 @@
 
 namespace ns3 {
 
-class PeriodicSender : public Application {
+class PeriodicSender : public Application
+{
 public:
-
   PeriodicSender ();
   ~PeriodicSender ();
 
@@ -52,6 +52,16 @@ public:
    * Set the initial delay of this application
    */
   void SetInitialDelay (Time delay);
+
+  /**
+   * Set packet size
+   */
+  void SetPacketSize (uint8_t size);
+
+  /**
+   * Set if using randomness in the packet size
+   */
+  void SetPacketSizeRandomVariable (Ptr <RandomVariableStream> rv);
 
   /**
    * Send a packet using the LoraNetDevice's Send method
@@ -90,14 +100,17 @@ private:
   Ptr<LoraMac> m_mac;
 
   /**
-   * The size of the packets this application sends
+   * The packet size.
    */
-  Ptr<RandomVariableStream> m_pktSize;
+  uint8_t m_basePktSize;
+
 
   /**
-   * Whether or not this application uses a random packet size.
+   * The random variable that adds bytes to the packet size
    */
-  bool m_randomPktSize;
+  Ptr<RandomVariableStream> m_pktSizeRV;
+
+
 };
 
 } //namespace ns3

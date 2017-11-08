@@ -33,3 +33,9 @@ def build(bld):
 
     obj = bld.create_ns3_program('simple-mac-command-example', ['lorawan'])
     obj.source = 'simple-mac-command-example.cc'
+
+    obj = bld.create_ns3_program('retransmissions-example', ['lorawan'])
+    obj.source = 'retransmissions-example.cc'
+
+
+

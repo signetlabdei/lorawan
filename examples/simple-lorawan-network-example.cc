@@ -58,7 +58,7 @@ int main (int argc, char *argv[])
   // Create the lora channel object
   Ptr<LogDistancePropagationLossModel> loss = CreateObject<LogDistancePropagationLossModel> ();
   loss->SetPathLossExponent (3.76);
-  loss->SetReference (1, 8.1);
+  loss->SetReference (1, 7.7);
 
   Ptr<PropagationDelayModel> delay = CreateObject<ConstantSpeedPropagationDelayModel> ();
 
@@ -125,15 +125,15 @@ int main (int argc, char *argv[])
   *********************************************/
 
   OneShotSenderHelper oneShotSenderHelper;
-  oneShotSenderHelper.SetSendTime (Seconds (10));
+  oneShotSenderHelper.SetSendTime (Seconds (2));
 
   oneShotSenderHelper.Install (endDevices);
 
   /******************
    * Set Data Rates *
    ******************/
-
-  macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
+  std::vector<int> sfQuantity (6);
+  sfQuantity = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
 
   /****************
   *  Simulation  *

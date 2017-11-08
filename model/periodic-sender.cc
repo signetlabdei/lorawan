@@ -42,18 +42,20 @@ PeriodicSender::GetTypeId (void)
                    TimeValue (Seconds (0)),
                    MakeTimeAccessor (&PeriodicSender::GetInterval,
                                      &PeriodicSender::SetInterval),
-                   MakeTimeChecker ())
-    .AddAttribute ("PacketSize", "The size of the packets this application sends, in bytes",
-                   StringValue ("ns3::ParetoRandomVariable[Bound=200,Shape=2.5]"),
-                   MakePointerAccessor (&PeriodicSender::m_pktSize),
-                   MakePointerChecker <RandomVariableStream>());
+                   MakeTimeChecker ());
+  // .AddAttribute ("PacketSizeRandomVariable", "The random variable that determines the shape of the packet size, in bytes",
+  //                StringValue ("ns3::UniformRandomVariable[Min=0,Max=10]"),
+  //                MakePointerAccessor (&PeriodicSender::m_pktSizeRV),
+  //                MakePointerChecker <RandomVariableStream>());
   return tid;
 }
 
-PeriodicSender::PeriodicSender () :
-  m_interval (Seconds (10)),
-  m_initialDelay (Seconds (1)),
-  m_randomPktSize (0)
+PeriodicSender::PeriodicSender ()
+  : m_interval (Seconds (10)),
+    m_initialDelay (Seconds (1)),
+    m_basePktSize (10),
+    m_pktSizeRV (0)
+
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
@@ -84,21 +86,36 @@ PeriodicSender::SetInitialDelay (Time delay)
   m_initialDelay = delay;
 }
 
+
+void
+PeriodicSender::SetPacketSizeRandomVariable (Ptr <RandomVariableStream> rv)
+{
+  m_pktSizeRV = rv;
+}
+
+
+void
+PeriodicSender::SetPacketSize (uint8_t size)
+{
+  m_basePktSize = size;
+}
+
+
 void
 PeriodicSender::SendPacket (void)
 {
   NS_LOG_FUNCTION (this);
 
   // Create and send a new packet
-  int size = m_pktSize->GetInteger ();
   Ptr<Packet> packet;
-  if (m_randomPktSize == true)
+  if (m_pktSizeRV)
     {
-      packet = Create<Packet>(10+size);
+      int randomsize = m_pktSizeRV->GetInteger ();
+      packet = Create<Packet> (m_basePktSize + randomsize);
     }
   else
     {
-      packet = Create<Packet>(10);
+      packet = Create<Packet> (m_basePktSize);
     }
   m_mac->Send (packet);
 

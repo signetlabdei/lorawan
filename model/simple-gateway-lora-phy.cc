@@ -280,18 +280,18 @@ SimpleGatewayLoraPhy::EndReceive (Ptr<Packet> packet,
       if (!m_rxOkCallback.IsNull ())
         {
           // Make a copy of the packet
-          Ptr<Packet> packetCopy = packet->Copy ();
+          // Ptr<Packet> packetCopy = packet->Copy ();
 
           // Set the receive power and frequency of this packet in the LoraTag: this
           // information can be useful for upper layers trying to control link
           // quality.
           LoraTag tag;
-          packetCopy->RemovePacketTag (tag);
+          packet->RemovePacketTag (tag);
           tag.SetReceivePower (event->GetRxPowerdBm ());
           tag.SetFrequency (event->GetFrequency ());
-          packetCopy->AddPacketTag (tag);
+          packet->AddPacketTag (tag);
 
-          m_rxOkCallback (packetCopy);
+          m_rxOkCallback (packet);
         }
 
     }
