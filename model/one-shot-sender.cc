@@ -47,8 +47,8 @@ OneShotSender::OneShotSender ()
   NS_LOG_FUNCTION_NOARGS ();
 }
 
-OneShotSender::OneShotSender (Time sendTime) :
-  m_sendTime (sendTime)
+OneShotSender::OneShotSender (Time sendTime)
+  : m_sendTime (sendTime)
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
@@ -72,9 +72,7 @@ OneShotSender::SendPacket (void)
   NS_LOG_FUNCTION (this);
 
   // Create and send a new packet
-  Ptr<Packet> packet = Create<Packet>(10);
-  m_mac->GetObject<EndDeviceLoraMac> ()->SetMType
-    (LoraMacHeader::CONFIRMED_DATA_UP);
+  Ptr<Packet> packet = Create<Packet> (10);
   m_mac->Send (packet);
 }
 

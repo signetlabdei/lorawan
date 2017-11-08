@@ -42,12 +42,12 @@ SimpleNetworkServer::GetTypeId (void)
   return tid;
 }
 
-SimpleNetworkServer::SimpleNetworkServer()
+SimpleNetworkServer::SimpleNetworkServer ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
 
-SimpleNetworkServer::~SimpleNetworkServer()
+SimpleNetworkServer::~SimpleNetworkServer ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
@@ -176,8 +176,8 @@ SimpleNetworkServer::Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
                                                                   rcvPower);
 
   // Determine whether the packet requires a reply
-  if (macHdr.GetMType () == LoraMacHeader::CONFIRMED_DATA_UP &&
-      !m_deviceStatuses.at (frameHdr.GetAddress ()).HasReply ())
+  if (macHdr.GetMType () == LoraMacHeader::CONFIRMED_DATA_UP
+      && !m_deviceStatuses.at (frameHdr.GetAddress ()).HasReply ())
     {
       NS_LOG_DEBUG ("Scheduling a reply for this device");
 
@@ -195,7 +195,8 @@ SimpleNetworkServer::Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
       replyFrameHdr.SetAck (true);
       reply.frameHeader = replyFrameHdr;
 
-      Ptr<Packet> replyPacket = Create<Packet> (10);
+      // The downlink packet carries 0 bytes of payload
+      Ptr<Packet> replyPacket = Create<Packet> (0);
       reply.packet = replyPacket;
 
       m_deviceStatuses.at (frameHdr.GetAddress ()).SetReply (reply);
@@ -204,6 +205,19 @@ SimpleNetworkServer::Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
       // Schedule a reply on the first receive window
       Simulator::Schedule (Seconds (1), &SimpleNetworkServer::SendOnFirstWindow,
                            this, frameHdr.GetAddress ());
+    }
+
+  else if (macHdr.GetMType () == LoraMacHeader::CONFIRMED_DATA_UP
+           && m_deviceStatuses.at (frameHdr.GetAddress ()).HasReply ())
+    {
+      NS_LOG_DEBUG ("There is already a reply for this device. Scheduling it and update frequency");
+
+      m_deviceStatuses.at (frameHdr.GetAddress ()).SetFirstReceiveWindowFrequency (tag.GetFrequency ());
+
+      // Schedule a reply on the first receive window
+      Simulator::Schedule (Seconds (1), &SimpleNetworkServer::SendOnFirstWindow,
+                           this, frameHdr.GetAddress ());
+
     }
 
   return true;
@@ -239,7 +253,9 @@ SimpleNetworkServer::SendOnFirstWindow (LoraDeviceAddress address)
 
       replyPacket->AddPacketTag (replyPacketTag);
 
-      NS_LOG_INFO ("Sending reply through the gateway with address " << gatewayForReply);
+      NS_LOG_INFO ("Sending reply through the gateway with address " << gatewayForReply << " and initialize the reply.");
+
+      InitializeReply (address, false);
 
       // Inform the gateway of the transmission
       m_gatewayStatuses.find (gatewayForReply)->second.GetNetDevice ()->
@@ -283,7 +299,9 @@ SimpleNetworkServer::SendOnSecondWindow (LoraDeviceAddress address)
       replyPacket->AddPacketTag (replyPacketTag);
 
       NS_LOG_INFO ("Sending reply through the gateway with address " <<
-                   gatewayForReply);
+                   gatewayForReply << " and initialize reply.");
+
+      InitializeReply (address, false);
 
       // Inform the gateway of the transmission
       m_gatewayStatuses.find (gatewayForReply)->second.GetNetDevice ()->
@@ -318,4 +336,14 @@ SimpleNetworkServer::GetGatewayForReply (LoraDeviceAddress deviceAddress,
 
   return Address ();
 }
+
+void
+SimpleNetworkServer::InitializeReply (LoraDeviceAddress addr, bool hasRep)
+{
+  DeviceStatus::Reply reply;
+  reply.hasReply = hasRep;
+
+  m_deviceStatuses.at (addr).SetReply (reply);
+}
+
 }

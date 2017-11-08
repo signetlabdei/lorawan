@@ -35,8 +35,8 @@ PeriodicSenderHelper::PeriodicSenderHelper ()
 {
   m_factory.SetTypeId ("ns3::PeriodicSender");
 
-  m_factory.Set ("PacketSize", StringValue
-                   ("ns3::ParetoRandomVariable[Bound=10|Shape=2.5]"));
+  // m_factory.Set ("PacketSizeRandomVariable", StringValue
+  //                  ("ns3::ParetoRandomVariable[Bound=10|Shape=2.5]"));
 
   m_initialDelay = CreateObject<UniformRandomVariable> ();
   m_initialDelay->SetAttribute ("Min", DoubleValue (0));
@@ -44,6 +44,9 @@ PeriodicSenderHelper::PeriodicSenderHelper ()
   m_intervalProb = CreateObject<UniformRandomVariable> ();
   m_intervalProb->SetAttribute ("Min", DoubleValue (0));
   m_intervalProb->SetAttribute ("Max", DoubleValue (1));
+
+  m_pktSize = 10;
+  m_pktSizeRV = 0;
 }
 
 PeriodicSenderHelper::~PeriodicSenderHelper ()
@@ -109,6 +112,11 @@ PeriodicSenderHelper::InstallPriv (Ptr<Node> node) const
                 interval.GetHours () << " hours");
 
   app->SetInitialDelay (Seconds (m_initialDelay->GetValue (0, interval.GetSeconds ())));
+  app -> SetPacketSize (m_pktSize);
+  if (m_pktSizeRV)
+  {
+    app -> SetPacketSizeRandomVariable (m_pktSizeRV);
+  }
 
   app->SetNode (node);
   node->AddApplication (app);
@@ -121,4 +129,17 @@ PeriodicSenderHelper::SetPeriod (Time period)
 {
   m_period = period;
 }
+
+ void
+ PeriodicSenderHelper::SetPacketSizeRandomVariable (Ptr <RandomVariableStream> rv)
+ {
+   m_pktSizeRV = rv;
+ }
+
+ void
+ PeriodicSenderHelper::SetPacketSize (uint8_t size)
+ {
+   m_pktSize = size;
+ }
+
 } // namespace ns3

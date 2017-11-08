@@ -255,6 +255,9 @@ SimpleEndDeviceLoraPhy::EndReceive (Ptr<Packet> packet,
 {
   NS_LOG_FUNCTION (this << packet << event);
 
+  // Automatically switch to Standby in either case
+  SwitchToStandby ();
+
   // Fire the trace source
   m_phyRxEndTrace (packet);
 
@@ -274,6 +277,13 @@ SimpleEndDeviceLoraPhy::EndReceive (Ptr<Packet> packet,
       else
         {
           m_interferedPacket (packet, 0);
+        }
+
+      // If there is one, perform the callback to inform the upper layer of the
+      // lost packet
+      if (!m_rxFailedCallback.IsNull ())
+        {
+          m_rxFailedCallback (packet);
         }
 
     }
@@ -297,7 +307,5 @@ SimpleEndDeviceLoraPhy::EndReceive (Ptr<Packet> packet,
         }
 
     }
-  // Automatically switch to Standby in either case
-  SwitchToStandby ();
 }
 }

@@ -88,6 +88,14 @@ public:
   typedef Callback<void, Ptr<const Packet> > RxOkCallback;
 
   /**
+   * Type definition for a callback for when a packet reception fails.
+   *
+   * This callback can be set by an upper layer that wishes to be informed of
+   * failed reception events.
+   */
+  typedef Callback<void, Ptr<const Packet> > RxFailedCallback;
+
+  /**
    * Type definition for a callback to call when a packet has finished sending.
    *
    * This callback is used by the MAC layer, to determine when to open a receive
@@ -161,6 +169,15 @@ public:
    * notified after the successful reception of a packet.
    */
   void SetReceiveOkCallback (RxOkCallback callback);
+
+  /**
+   * Set the callback to call upon failed reception of a packet we were
+   * previously locked on.
+   *
+   * This method is typically called by an upper MAC layer that wants to be
+   * notified after the failed reception of a packet.
+   */
+  void SetReceiveFailedCallback (RxFailedCallback callback);
 
   /**
    * Set the callback to call after transmission of a packet.
@@ -294,6 +311,11 @@ protected:
    * The callback to perform upon correct reception of a packet.
    */
   RxOkCallback m_rxOkCallback;
+
+  /**
+   * The callback to perform upon failed reception of a packet we were locked on.
+   */
+  RxFailedCallback m_rxFailedCallback;
 
   /**
    * The callback to perform upon the end of a transmission.

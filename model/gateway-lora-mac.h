@@ -45,6 +45,9 @@ public:
   virtual void Receive (Ptr<Packet const> packet);
 
   // Implementation of the LoraMac interface
+  virtual void FailedReception (Ptr<Packet const> packet);
+
+  // Implementation of the LoraMac interface
   virtual void TxFinished (Ptr<Packet const> packet);
 
   /**

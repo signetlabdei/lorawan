@@ -128,7 +128,7 @@ DeviceStatus::GetSortedGatewayAddresses (void)
 bool
 DeviceStatus::HasReply (void)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << m_reply.hasReply);
 
   return m_reply.hasReply;
 }

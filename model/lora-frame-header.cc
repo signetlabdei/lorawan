@@ -395,6 +395,7 @@ LoraFrameHeader::GetAdrAckReq (void) const
 void
 LoraFrameHeader::SetAck (bool ack)
 {
+  NS_LOG_FUNCTION (this << ack);
   m_ack = ack;
 }
 bool

@@ -113,12 +113,19 @@ GatewayLoraMac::Receive (Ptr<Packet const> packet)
   if (macHdr.IsUplink ())
     {
       m_device->GetObject<LoraNetDevice> ()->Receive (packetCopy);
+      NS_LOG_DEBUG ("Received packet: " << packet);
       m_receivedPacket (packet);
     }
   else
     {
       NS_LOG_DEBUG ("Not forwarding downlink message to NetDevice");
     }
+}
+
+void
+GatewayLoraMac::FailedReception (Ptr<Packet const> packet)
+{
+  NS_LOG_FUNCTION (this << packet);
 }
 
 void

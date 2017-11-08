@@ -142,6 +142,12 @@ LoraPhy::SetReceiveOkCallback (RxOkCallback callback)
 }
 
 void
+LoraPhy::SetReceiveFailedCallback (RxFailedCallback callback)
+{
+  m_rxFailedCallback = callback;
+}
+
+void
 LoraPhy::SetTxFinishedCallback (TxFinishedCallback callback)
 {
   m_txFinishedCallback = callback;

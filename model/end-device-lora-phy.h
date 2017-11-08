@@ -223,6 +223,8 @@ public:
    */
   void UnregisterListener (EndDeviceLoraPhyListener *listener);
 
+  static const double sensitivity[6]; //!< The sensitivity vector of this device to different SFs
+
 
 protected:
   /**
@@ -250,7 +252,7 @@ protected:
 
   TracedValue<State> m_state; //!< The state this PHY is currently in.
 
-  static const double sensitivity[6]; //!< The sensitivity vector of this device to different SFs
+  // static const double sensitivity[6]; //!< The sensitivity vector of this device to different SFs
 
   double m_frequency; //!< The frequency this device is listening on
 
