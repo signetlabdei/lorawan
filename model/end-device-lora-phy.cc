@@ -155,7 +155,7 @@ EndDeviceLoraPhy::SwitchToTx (double txPowerDbm)
   // Notify listeners of the state change
   for (Listeners::const_iterator i = m_listeners.begin (); i != m_listeners.end (); i++)
     {
-      (*i)->NotifyTxStart(txPowerDbm);
+      (*i)->NotifyTxStart (txPowerDbm);
     }
 }
 
