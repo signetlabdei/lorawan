@@ -60,7 +60,7 @@ EndDeviceLoraPhy::GetTypeId (void)
 // Initialize the device with some common settings.
 // These will then be changed by helpers.
 EndDeviceLoraPhy::EndDeviceLoraPhy () :
-  m_state (STANDBY),
+  m_state (SLEEP),
   m_frequency (868.1),
   m_sf (7)
 {
