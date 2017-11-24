@@ -67,7 +67,7 @@ EndDeviceLoraPhy::GetTypeId (void)
 // Initialize the device with some common settings.
 // These will then be changed by helpers.
 EndDeviceLoraPhy::EndDeviceLoraPhy () :
-  m_state (STANDBY),
+  m_state (SLEEP),
   m_frequency (868.1),
   m_sf (7)
 {
@@ -155,7 +155,7 @@ EndDeviceLoraPhy::SwitchToTx (double txPowerDbm)
   // Notify listeners of the state change
   for (Listeners::const_iterator i = m_listeners.begin (); i != m_listeners.end (); i++)
     {
-      (*i)->NotifyTxStart(txPowerDbm);
+      (*i)->NotifyTxStart (txPowerDbm);
     }
 }
 
