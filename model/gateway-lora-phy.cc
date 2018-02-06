@@ -101,6 +101,13 @@ GatewayLoraPhy::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::GatewayLoraPhy")
     .SetParent<LoraPhy> ()
     .SetGroupName ("lorawan")
+    .AddTraceSource ("NoReceptionBecauseTransmitting",
+                     "Trace source indicating a packet "
+                     "could not be correctly received because"
+                     "the GW is in transmission mode",
+                     MakeTraceSourceAccessor
+                     (&GatewayLoraPhy::m_noReceptionBecauseTransmitting),
+                     "ns3::Packet::TracedCallback")
     .AddTraceSource ("LostPacketBecauseNoMoreReceivers",
                      "Trace source indicating a packet "
                      "could not be correctly received because"

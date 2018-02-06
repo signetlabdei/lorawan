@@ -200,6 +200,14 @@ private:
    */
   TracedCallback<Ptr<const Packet>, uint32_t> m_noMoreDemodulators;
 
+  /**
+   * Trace source that is fired when a packet cannot be received because
+   * the Gateway is in transmission state.
+   *
+   * \see class CallBackTraceSource
+   */
+  TracedCallback<Ptr<const Packet>, uint32_t> m_noReceptionBecauseTransmitting;
+
   bool m_isTransmitting; //!< Flag indicating whether a transmission is going on
 };
 

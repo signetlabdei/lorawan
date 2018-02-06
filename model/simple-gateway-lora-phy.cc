@@ -112,6 +112,28 @@ SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
   Ptr<LoraInterferenceHelper::Event> event;
   event = m_interference.Add (duration, rxPowerDbm, sf, packet, frequencyMHz);
 
+  if (m_isTransmitting)
+    {
+      // If we get to this point, there are no demodulators we can use
+      NS_LOG_INFO ("Dropping packet reception of packet with sf = "
+                   << unsigned(sf) <<
+                   " because we are in TX mode");
+
+      m_phyRxEndTrace (packet);
+
+      // Fire the trace source
+      if (m_device)
+        {
+          m_noReceptionBecauseTransmitting (packet, m_device->GetNode ()->GetId ());
+        }
+      else
+        {
+          m_noReceptionBecauseTransmitting (packet, 0);
+        }
+
+      return;
+    }
+
   // Cycle over the receive paths to check availability to receive the packet
   std::list<Ptr<SimpleGatewayLoraPhy::ReceptionPath> >::iterator it;
 
