@@ -18,8 +18,8 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#ifndef BASIC_GATEWAY_LORA_PHY_H
-#define BASIC_GATEWAY_LORA_PHY_H
+#ifndef SIMPLE_GATEWAY_LORA_PHY_H
+#define SIMPLE_GATEWAY_LORA_PHY_H
 
 #include "ns3/object.h"
 #include "ns3/net-device.h"
@@ -60,4 +60,4 @@ private:
 
 } /* namespace ns3 */
 
-#endif /* BASIC_GATEWAY_LORA_PHY_H */
+#endif /* SIMPLE_GATEWAY_LORA_PHY_H */
