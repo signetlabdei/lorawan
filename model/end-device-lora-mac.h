@@ -170,14 +170,14 @@ public:
    *
    * \param rx1DrOffset The value to set for the offset.
    */
-  void SetRx1DrOffset (uint8_t rx1DrOffset);
+  // void SetRx1DrOffset (uint8_t rx1DrOffset);
 
   /**
    * Get the value of the RX1DROffset parameter.
    *
    * \return The value of the RX1DROffset parameter.
    */
-  uint8_t GetRx1DrOffset (void);
+  // uint8_t GetRx1DrOffset (void);
 
   /**
    * Get the aggregated duty cycle.
