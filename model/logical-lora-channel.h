@@ -70,7 +70,7 @@ public:
    *
    * \param frequencyMHz The center frequency this channel should be at.
    */
-  void SetFrequency (double frequencyMHz);
+  // void SetFrequency (double frequencyMHz);
 
   /**
    * Set the minimum Data Rate that is allowed on this channel.

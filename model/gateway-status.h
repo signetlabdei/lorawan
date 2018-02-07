@@ -64,7 +64,7 @@ public:
   /**
    * Set a pointer to this gateway's MAC instance.
    */
-  void SetGatewayMac (Ptr<GatewayLoraMac> gwMac);
+  // void SetGatewayMac (Ptr<GatewayLoraMac> gwMac);
 
   /**
    * Query whether or not this gateway is available for immediate transmission
@@ -77,7 +77,7 @@ public:
   bool IsAvailableForTransmission (double frequency);
 
   void SetNextTransmissionTime (Time nextTransmissionTime);
-  Time GetNextTransmissionTime (void);
+  // Time GetNextTransmissionTime (void);
 
 private:
 

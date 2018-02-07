@@ -51,7 +51,7 @@ public:
   /**
    * Parse and take action on the commands contained on the frameHeader
    */
-  void ParseCommands (LoraFrameHeader frameHeader);
+  // void ParseCommands (LoraFrameHeader frameHeader);
 
   /**
    * Start the NS application
@@ -100,7 +100,7 @@ public:
   /**
    * Check whether a reply to the device with a certain address already exists
    */
-  bool HasReply (LoraDeviceAddress address);
+  // bool HasReply (LoraDeviceAddress address);
 
   /**
    * Get the data rate that should be used when replying in the first receive window

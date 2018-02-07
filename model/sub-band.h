@@ -65,7 +65,7 @@ public:
    *
    * \return The lowest frequency of the SubBand.
    */
-  double GetLastFrequency (void);
+  // double GetLastFrequency (void);
 
   /**
    * Get the duty cycle of the subband.
