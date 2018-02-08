@@ -99,4 +99,4 @@ def build(bld):
         bld.recurse('examples')
 
     # Comment to disable python bindings
-    bld.ns3_python_bindings()
+    # bld.ns3_python_bindings()
