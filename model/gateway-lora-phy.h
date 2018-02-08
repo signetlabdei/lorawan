@@ -163,6 +163,18 @@ public:
      */
     Ptr<LoraInterferenceHelper::Event> GetEvent (void);
 
+    /**
+     * Get the EventId of the EndReceive call associated to this ReceptionPath's
+     * packet.
+     */
+    EventId GetEndReceive (void);
+
+    /**
+     * Set the EventId of the EndReceive call associated to this ReceptionPath's
+     * packet.
+     */
+    void SetEndReceive (EventId endReceiveEventId);
+
 private:
 
     /**
@@ -179,6 +191,12 @@ private:
      * The event this reception path is currently locked on.
      */
     Ptr< LoraInterferenceHelper::Event > m_event;
+
+    /**
+     * The EventId associated of the call to EndReceive that is scheduled to
+     * happen when the packet this ReceivePath is locked on finishes reception.
+     */
+    EventId m_endReceiveEventId;
   };
 
   /**

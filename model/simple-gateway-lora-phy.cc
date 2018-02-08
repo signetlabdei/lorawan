@@ -63,23 +63,36 @@ SimpleGatewayLoraPhy::Send (Ptr<Packet> packet, LoraTxParameters txParams,
   // Get the time a packet with these parameters will take to be transmitted
   Time duration = GetOnAirTime (packet, txParams);
 
-  /*
-   *  Differently from what is done in EndDevices, where packets cannot be
-   *  transmitted while in RX state, Gateway sending is assumed to have priority
-   *  over reception.
-   *
-   *  This different behaviour is motivated by the asymmetry in a typical
-   *  LoRaWAN network, where Downlink messages are more critical to network
-   *  performance than Uplink ones. Even if the gateway is receiving a packet
-   *  on the channel when it is asked to transmit by the upper layer, in order
-   *  not to miss the receive window of the end device, the gateway will still
-   *  need to send the packet. In order to model this fact, the send event is
-   *  registered in the gateway's InterferenceHelper as a received event.
-   *  While this may not destroy packets incoming on the same frequency, this
-   *  is almost always guaranteed to do so due to the fact that this event can
-   *  have a power up to 27 dBm.
-   */
-  m_interference.Add (duration, txPowerDbm, txParams.sf, packet, frequencyMHz);
+  // Interrupt all receive operations
+  std::list<Ptr<SimpleGatewayLoraPhy::ReceptionPath> >::iterator it;
+  for (it = m_receptionPaths.begin (); it != m_receptionPaths.end (); ++it)
+    {
+
+      Ptr<SimpleGatewayLoraPhy::ReceptionPath> currentPath = *it;
+
+      if (!currentPath->IsAvailable ()) // Reception path is occupied
+        {
+          // Call the callback for reception interrupted by transmission
+          // Fire the trace source
+          if (m_device)
+            {
+              m_noReceptionBecauseTransmitting (currentPath -> GetEvent() -> GetPacket(),
+                                                m_device -> GetNode () -> GetId ());
+
+            }
+          else
+            {
+              m_noReceptionBecauseTransmitting (currentPath->GetEvent()->GetPacket(), 0);
+            }
+
+          // Cancel the scheduled EndReceive call
+          Simulator::Cancel (currentPath->GetEndReceive ());
+
+          // Free it
+          // This also resets all parameters like packet and endReceive call
+          currentPath->Free ();
+        }
+    }
 
   // Send the packet in the channel
   m_channel->Send (this, packet, txPowerDbm, txParams, duration, frequencyMHz);
@@ -183,8 +196,12 @@ SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
               m_occupiedReceptionPaths++;
 
               // Schedule the end of the reception of the packet
-              Simulator::Schedule (duration, &LoraPhy::EndReceive, this,
-                                   packet, event);
+              EventId endReceiveEventId = Simulator::Schedule (duration,
+                                                            &LoraPhy::EndReceive,
+                                                            this, packet,
+                                                            event);
+
+              currentPath->SetEndReceive (endReceiveEventId);
 
               // Make sure we don't go on searching for other ReceivePaths
               return;
