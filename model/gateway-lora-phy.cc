@@ -35,7 +35,8 @@ NS_OBJECT_ENSURE_REGISTERED (GatewayLoraPhy);
 GatewayLoraPhy::ReceptionPath::ReceptionPath(double frequencyMHz) :
   m_frequencyMHz (frequencyMHz),
   m_available (1),
-  m_event (0)
+  m_event (0),
+  m_endReceiveEventId (EventId ())
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
@@ -62,6 +63,7 @@ GatewayLoraPhy::ReceptionPath::Free (void)
 {
   m_available = true;
   m_event = 0;
+  m_endReceiveEventId = EventId ();
 }
 
 void
@@ -89,6 +91,18 @@ void
 GatewayLoraPhy::ReceptionPath::SetFrequency (double frequencyMHz)
 {
   m_frequencyMHz = frequencyMHz;
+}
+
+EventId
+GatewayLoraPhy::ReceptionPath::GetEndReceive (void)
+{
+  return m_endReceiveEventId;
+}
+
+void
+GatewayLoraPhy::ReceptionPath::SetEndReceive (EventId endReceiveEventId)
+{
+  m_endReceiveEventId = endReceiveEventId;
 }
 
 /***********************************************************************
