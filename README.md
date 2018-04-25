@@ -12,47 +12,14 @@ to perform simulations of a [LoRaWAN](http://www.lora-alliance.org/technology
 ### Prerequisites ###
 
 To run simulations using this module, you will need to install ns-3, and clone
-this repository inside the `src` directory. Required dependencies include
-mercurial and a build environment.
-
-#### Installing dependencies ####
-
-On Ubuntu, run the following to install all the required packets:
-
-```bash
-sudo apt install git mercurial build-essential
-```
-
-On macOS, you can install the command line tools with:
-
-```bash
-xcode-select --install
-```
-
-while Mercurial and git can be installed via [Homebrew](https://brew.sh/ "Homebrew
-homepage"):
-
-```bash
-brew install mercurial git
-```
-
-#### Downloading #####
-
-Assuming you have mercurial installed, the procedure to get both ns-3 and the
-`lorawan` module is the following:
-
-```bash
-hg clone http://code.nsnam.org/ns-3-dev
-cd ns-3-dev/src
-git clone git@github.com:DvdMgr/lorawan
-```
+this repository inside the `src` directory.
 
 ### Compilation ###
 
 If you are interested in only compiling the `lorawan` module and its
-dependencies, copy the `.ns3rc` file from `ns-3-dev/utils` to `ns-3-dev`, and
-only enable the desired module by making sure the file contains the following
-line:
+dependencies, copy the `.ns3rc` file from `ns-3/utils` to `ns-3`, where `ns-3`
+is your ns-3 installation folder, and only enable the desired module by making 
+sure the file contains the following line:
 
 ```python
 modules_enabled = ['lorawan']
