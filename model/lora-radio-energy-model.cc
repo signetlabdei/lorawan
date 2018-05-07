@@ -284,6 +284,13 @@ LoraRadioEnergyModel::HandleEnergyDepletion (void)
 }
 
 void
+LoraRadioEnergyModel::HandleEnergyChanged (void)
+{
+  NS_LOG_FUNCTION (this);
+  NS_LOG_DEBUG ("LoraRadioEnergyModel:Energy changed!");
+}
+
+void
 LoraRadioEnergyModel::HandleEnergyRecharged (void)
 {
   NS_LOG_FUNCTION (this);
