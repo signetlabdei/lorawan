@@ -1,7 +1,7 @@
 # LoRaWAN ns-3 module #
 
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/ns-3-lorawan)
-[![Build Status](https://travis-ci.org/DvdMgr/lorawan.svg?branch=master)](https://travis-ci.org/DvdMgr/lorawan)
+[![Build Status](https://travis-ci.org/signetlabdei/lorawan.svg?branch=master)](https://travis-ci.org/signetlabdei/lorawan)
 
 This is an [ns-3](https://www.nsnam.org "ns-3 Website") module that can be used
 to perform simulations of a [LoRaWAN](http://www.lora-alliance.org/technology
@@ -18,7 +18,7 @@ this repository inside the `src` directory.
 
 If you are interested in only compiling the `lorawan` module and its
 dependencies, copy the `.ns3rc` file from `ns-3/utils` to `ns-3`, where `ns-3`
-is your ns-3 installation folder, and only enable the desired module by making 
+is your ns-3 installation folder, and only enable the desired module by making
 sure the file contains the following line:
 
 ```python
