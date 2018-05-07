@@ -263,6 +263,13 @@ public:
   /**
    * \brief Handles energy recharged.
    *
+   * Implements DeviceEnergyModel::HandleEnergyChanged
+   */
+  void HandleEnergyChanged (void);
+
+  /**
+   * \brief Handles energy recharged.
+   *
    * Implements DeviceEnergyModel::HandleEnergyRecharged
    */
   void HandleEnergyRecharged (void);
