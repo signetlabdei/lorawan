@@ -71,6 +71,6 @@ protected:
 
 #endif /* NETWORK_SERVER_H */
 
-std::map<LoraDeviceAddress,DeviceStatus> m_deviceStatuses;
+std::map<LoraDeviceAddress,EndDeviceStatus> m_endDeviceStatuses;
 
 std::map<Address,GatewayStatus> m_gatewayStatuses;
