@@ -86,7 +86,7 @@ public:
    */
   struct Reply
   {
-    Ptr<Packet> packet;   // The packet that will be sent as a reply.
+    Ptr<Packet> payload;   // The packet that will be sent as a reply.
     LoraMacHeader macHeader; // The MacHeader to attach to the reply packet.
     LoraFrameHeader frameHeader; // The FrameHeader to attach to the reply packet.
   };
@@ -154,7 +154,7 @@ public:
    */
   double GetFirstReceiveWindowFrequency (void);
 
-/**
+  /**
    * Get the spreading factor this device is using in the second receive window.
    *
    * \return An unsigned 8-bit integer containing the spreading factor.
@@ -184,33 +184,39 @@ public:
   bool NeedReply(void)
 
   /**
-  * Get the packet reply.
+   * Get the reply packet.
   *
   * \return A pointer to the packet reply.
   */
   Ptr<Packet> GetReply(void);
 
   /**
-   * Get the packet reply mac header.
+   * Get the reply packet mac header.
    *
    * \return The packet reply mac header.
    */
   LoraMacHeader GetReplyMacHeader(void);
 
   /**
-   * Get the packet reply frame header.
+   * Get the reply packet frame header.
    *
    * \return The packet reply frame header.
    */
   LoraFrameHeader GetReplyFrameHeader(void);
 
   /**
+   * Get the data of the reply packet.
+   *
+   * \return A pointer to the packet reply.
+   */
+  Ptr<Packet> GetReplyPayload(void);
+
+ /**
    * Get the received packet list.
    *
    * \return The received packet list.
    */
   ReceivedPacketList GetReceivedPacketList (void);
-
 
 
 
@@ -230,22 +236,22 @@ public:
   /**
    * Set the spreading factor this device is using in the first receive window.
    */
-  void SetFirstReceiveWindowSpreadingFactor (double frequency);
+  void SetFirstReceiveWindowSpreadingFactor (uint8_t sf);
 
   /**
   * Set the first window frequency of this device.
   */
-  void SetFirstReceiveWindowFrequency (void);
+  void SetFirstReceiveWindowFrequency (double frequency);
 
   /**
    * Set the spreading factor this device is using in the first receive window.
    */
-  void SetSecondReceiveWindowSpreadingFactor (double frequency);
+  void SetSecondReceiveWindowSpreadingFactor (uint8_t sf);
 
   /**
    * Set the second window frequency of this device.
    */
-  void SetSecondReceiveWindowFrequency (void);
+  void SetSecondReceiveWindowFrequency  (double frequency);
 
   /**
   * Set the packet reply.
@@ -258,23 +264,35 @@ public:
   void SetNeedReply (bool needReply);
 
   /**
-   * Set the packet mac header.
+   * Set the reply packet mac header.
    */
   void SetReplyMacHeader (LoraMacHeader macHeader);
 
   /**
-   * Set the packet frame header.
+   * Set the reply packet frame header.
    */
   void SetReplyFrameHeader (LoraFrameHeader frameHeader);
 
+  /**
+   * Set the reply packet payload.
+   */
+  void SetReplyPayload (Ptr<Packet> data);
+
+
+
   //////////////////////
-  //  Others methods  //
+  //  Other methods  //
   //////////////////////
 
   /**
   * Insert a received packet in the packet list.
   */
   void InsertReceivedPacket (Ptr<Packet> receivedPacket, struct ReceivedPacketInfo);
+
+  /**
+   * Initialize reply.
+   */
+  void InitializeReply (void);
 
 
 private:

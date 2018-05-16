@@ -51,10 +51,18 @@ EndDeviceStatus::EndDeviceStatus (Ptr<Packet> receivedPacket) :
 //  Getters  //
 ///////////////
 
+LoraDeviceAddress
+EndDeviceStatus::GetAddress ()
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_address;
+}
+
 uint8_t
 EndDeviceStatus::GetFirstReceiveWindowSpreadingFactor ()
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << m_firstReceiveWindowSpreadingFactor);
 
   return m_firstReceiveWindowSpreadingFactor;
 }
@@ -82,7 +90,7 @@ EndDeviceStatus::GetFirstReceiveWindowDataRate ()
 double
 EndDeviceStatus::GetFirstReceiveWindowFrequency ()
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << m_firstReceiveWindowFrequency);
 
   return m_firstReceiveWindowFrequency;
 }
@@ -90,7 +98,7 @@ EndDeviceStatus::GetFirstReceiveWindowFrequency ()
   uint8_t
   EndDeviceStatus::GetSecondReceiveWindowSpreadingFactor ()
   {
-    NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION (this << m_firstReceiveWindowSpreadingFactor);
 
     return m_secondReceiveWindowSpreadingFactor;
   }
@@ -118,78 +126,139 @@ EndDeviceStatus::GetSecondReceiveWindowDataRate ()
 double
 EndDeviceStatus::GetSecondReceiveWindowFrequency ()
 {
-  NS_LOG_FUNCTION (this);
-
+  NS_LOG_FUNCTION (this << m_secondReceiveWindowFrequency);
   return m_secondReceiveWindowFrequency;
 }
 
 bool needReply ()
 {
+  NS_LOG_FUNCTION (this << m_needReply);
   return m_needReply;
 }
 
 EndDeviceStatus::Reply
 EndDeviceStatus::GetReply ()
 {
+  NS_LOG_FUNCTION (this);
   return m_reply;
 }
 
 LoraMacHeader
 EndDeviceStatus::GetReplyMacHeader ()
 {
+  NS_LOG_FUNCTION (this);
   return m_reply.macHeader;
 }
   
 LoraFrameHeader
 EndDeviceStatus::GetReplyFrameHeader ()
 {
+  NS_LOG_FUNCTION (this);
   return m_reply.frameHeader;
 }
 
-EndDeviceStatus::ReceivedPacketList
-EndDeviceStatus::GetReceivedPacketList ();
+Ptr<Packet>
+EndDeviceStatus::GetReplyPayload (void)
 {
+  NS_LOG_FUNCTION (this);
+  return m_reply.payload;
+}
+
+EndDeviceStatus::ReceivedPacketList
+EndDeviceStatus::GetReceivedPacketList ()
+{
+  NS_LOG_FUNCTION (this);
   return m_receivedPacketList;
 }
 
 
-  /***********************************************************
-//////////////////
-//   Setters    //
-/////////////////
-*/
+  /////////////////
+  //   Setters   //
+  /////////////////
 
-LoraDeviceAddress
-EndDeviceStatus::GetAddress ()
+  void
+  EndDeviceStatus::SetFirstReceiveWindowSpreadingFactor (uint8_t sf);
+  {
+    NS_LOG_FUNCTION (this << sf);
+    m_firstReceiveWindowSpreadingFactor = sf;
+  }
+
+  void
+  EndDeviceStatus::SetFirstReceiveWindowFrequency (double frequency);
+  {
+    NS_LOG_FUNCTION (this << frequency);
+    m_firstReceiveWindowFrequency = frequency;
+  }
+
+  void
+  EndDeviceStatus::SetSecondReceiveWindowSpreadingFactor (uint8_t sf);
+  {
+    NS_LOG_FUNCTION (this << sf);
+    m_secondReceiveWindowSpreadingFactor = sf;
+  }
+
+  void
+  EndDeviceStatus::SetSecondReceiveWindowFrequency (double frequency);
+  {
+    NS_LOG_FUNCTION (this << frequency);
+    m_secondReceiveWindowFrequency = frequency;
+  }
+
+  void
+  EndDeviceStatus::SetReply (struct Reply reply)
+  {
+    NS_LOG_FUNCTION (this);
+    m_reply = reply;
+  }
+
+  void
+  EndDeviceStatus::SetNeedReply (bool needReply)
+  {
+    NS_LOG_FUNCTION (this << needReply);
+    m_needReply = needReply;
+  }
+
+  void
+  EndDeviceStatus::SetReplyMacHeader (LoraMacHeader macHeader)
+  {
+    NS_LOG_FUNCTION (this);
+    m_reply.macHeader = macHeader;
+  }
+
+  void
+  EndDeviceStatus::SetReplyFrameHeader (LoraFrameHeader frameHeader)
+  {
+    NS_LOG_FUNCTION (this);
+    m_reply.frameHeader = frameHeader;
+  }
+
+  void
+  EndDeviceStatus::SetReplyPayload (Ptr<Packet> data)
+  {
+    NS_LOG_FUNCTION (this);
+    m_reply.payload = data;
+  }
+
+
+  //////////////////////
+  //   Other method   //
+  //////////////////////
+
+void
+EndDeviceStatus::InsertReceivedPacket (Ptr<Packet> receivedPacket, struct ReceivedPacketInfo info)
 {
   NS_LOG_FUNCTION (this);
-
-  return m_address;
+  m_receivedPacketList.insert(std::pair<Ptr<Packet> const>, ReceivedPacketInfo info));
 }
 
 void
-EndDeviceStatus::SetAddress (LoraDeviceAddress address)
+EndDeviceStatus::InitializeReply ()
 {
   NS_LOG_FUNCTION (this);
-
-  m_address = address;
+  m_reply = Reply ();
 }
 
-void
-EndDeviceStatus::UpdateGatewayData (Address gwAddress, double rcvPower)
-{
-  NS_LOG_FUNCTION (this << gwAddress << rcvPower);
-
-  std::map<Address, double>::iterator it = m_gateways.find (gwAddress);
-  if (it != m_gateways.end ())
-    {
-      // Erase the existing entry
-      m_gateways.erase (it);
-    }
-  // Create a new entry
-  m_gateways.insert (std::pair<Address, double> (gwAddress, rcvPower));
-}
-
+  /*
 Address
 EndDeviceStatus::GetBestGatewayAddress (void)
 {
@@ -300,5 +369,7 @@ EndDeviceStatus::GetSecondReceiveWindowDataRate (void)
 
   return m_mac->GetSecondReceiveWindowDataRate ();
 }
+  */
+
 
 }
