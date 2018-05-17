@@ -1,4 +1,4 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -77,8 +77,6 @@ class EndDeviceStatus
 {
 public:
 
-  typedef std::map<Ptr<Packet>, ReceivedPacketInfo> ReceivedPacketList;
-  typedef std::map<Address, PacketInfoPerGw> GatewayList;
 
   /**
    * Structure representing the reply that the network server will send this
@@ -92,6 +90,7 @@ public:
   };
 
   //TODO write methods to write the following structures.
+
   /**
    * Structure saving information regarding the packet reception in
    * each gateway.
@@ -101,7 +100,9 @@ public:
   {
     Time receivedTime;   //!< Time at which the packet was received by this gateway.
     double rxPower;      //!< value of the reception power of the packet at this gateway.
-  }
+  };
+
+  typedef std::map<Address, PacketInfoPerGw> GatewayList;
 
   /**
    * Structure saving information regarding the packet reception.
@@ -114,13 +115,14 @@ public:
     int sf;                //!< Spreading factor that the packet used.
     double bw;             //!< Bandwidth that the packet used.
     double frequency;      //!< Frequency that the packet used.
-  }
+  };
 
+  typedef std::map<Ptr<Packet>, ReceivedPacketInfo> ReceivedPacketList;
 
   EndDeviceStatus();
   virtual ~EndDeviceStatus();
 
-  EndDeviceStatus(Ptr<Packet> receivedPacket);
+  //  EndDeviceStatus(Ptr<Packet> receivedPacket);
 
   //////////////////
   //   Getters
@@ -143,13 +145,6 @@ public:
   uint8_t GetFirstReceiveWindowSpreadingFactor (void);
 
   /**
-   * Get the data rate this device is using in the first receive window.
-   *
-   * \return An unsigned 8-bit integer containing the data rate.
-   */
-  uint8_t GetFirstReceiveWindowDataRate (void);
-
-  /**
    * Get the first window frequency of this device.
    */
   double GetFirstReceiveWindowFrequency (void);
@@ -159,14 +154,7 @@ public:
    *
    * \return An unsigned 8-bit integer containing the spreading factor.
    */
-  uint8_t GetSecondReceiveWindowSpreadingFactor (void);
-
-  /**
-   * Get the data rate this device is using in the second receive window.
-   *
-   * \return An unsigned 8-bit integer containing the data rate.
-   */
-  uint8_t GetSecondReceiveWindowDataRate (void);
+  uint8_t GetSecondReceiveWindowOffset (void);
 
   /**
   * Return the second window frequency of this device.
@@ -181,7 +169,7 @@ public:
    *
    * \return A boolean value signaling if the end device needs a reply.
    */
-  bool NeedReply (void)
+  bool NeedsReply (void);
 
   /**
    * Get the reply packet.
@@ -256,12 +244,12 @@ public:
   /**
   * Set the packet reply.
   */
-  void SetReply (struct Reply reply)
+  void SetReply (struct Reply reply);
 
   /**
    * Set whether the end device needs a reply.
    */
-  void SetNeedReply (bool needReply);
+  void SetNeedsReply (bool needReply);
 
   /**
    * Set the reply packet mac header.
@@ -278,7 +266,11 @@ public:
    */
   void SetReplyPayload (Ptr<Packet> data);
 
-
+  /**
+   * Set the payload size of the replay packet.
+   */
+  void SetPayloadSize (uint8_t payloadSize);
+  
 
   //////////////////////
   //  Other methods  //
@@ -287,7 +279,7 @@ public:
   /**
   * Insert a received packet in the packet list.
   */
-  void InsertReceivedPacket (Ptr<Packet> receivedPacket, struct ReceivedPacketInfo);
+  void InsertReceivedPacket (Ptr<Packet> receivedPacket, ReceivedPacketInfo);
 
   /**
    * Initialize reply.
@@ -297,24 +289,30 @@ public:
 
 private:
 
+  LoraDeviceAddress m_address;
 
-  uint8_t m_firstReceiveWindowSpreadingFactor; //!< Spreading Factor of the first
+  uint8_t m_firstReceiveWindowSpreadingFactor = 0; //!< Spreading Factor of the first
   //!receive window
 
-  double m_firstReceiveWindowFrequency; //!< Frequency at which the device will
+  double m_firstReceiveWindowFrequency = 0; //!< Frequency at which the device will
   //!open the first receive window
 
-  uint8_t m_secondReceiveWindowSpreadingFactor; //!< Spreading Factor of the second
+  uint8_t m_secondReceiveWindowOffset = 0; //!< Spreading Factor of the second
   //!receive window
 
-  double m_secondReceiveWindowFrequency; //!< Frequency at which the device will
+  double m_secondReceiveWindowFrequency = 0; //!< Frequency at which the device will
   //!open the second receive window
-  bool m_needReply;  //!< Whether this end device needs a reply
+
+  bool m_needsReply = false;  //!< Whether this end device needs a reply
+
+  bool m_hasReplyPayload = false;  //!< Whether this end device needs a reply
+
+  uint8_t m_payloadSize = 0;
 
   struct Reply m_reply; //!< Structure containing the next reply meant for this
   //!device
 
-  struct ReceivedPacketList m_receivedPacketList; //!< Structure containing the next
+  ReceivedPacketList m_receivedPacketList; //!< Structure containing the next
   //!reply meant for this device
 
 };

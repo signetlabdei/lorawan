@@ -22,6 +22,9 @@
 #include "ns3/lora-mac-header.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/log.h"
+#include "ns3/pointer.h"
+#include "ns3/command-line.h"
+#include "ns3/simulator.h"
 #include <algorithm>
 
 namespace ns3 {
@@ -37,16 +40,16 @@ EndDeviceStatus::~EndDeviceStatus ()
 {
   NS_LOG_FUNCTION (this);
   m_reply = EndDeviceStatus::Reply();
-  m_receivedPacketList = EndDeviceStatus::ReceivedPacketList();
+  m_receivedPacketList = ReceivedPacketList();
 }
 
-EndDeviceStatus::EndDeviceStatus (Ptr<Packet> receivedPacket) :
+  /* EndDeviceStatus::EndDeviceStatus (Ptr<Packet> receivedPacket, ReceivedPacketInfo packetInfo)
 {
   NS_LOG_FUNCTION (this);
-  //TODO sintassi?
   // Basta InserReceivedPacket (compila e prova! :) )
-  this->InsertReceivedPacket (receivedPacket);
+  InsertReceivedPacket (receivedPacket, packetInfo);
 }
+  */
 
 ///////////////
 //  Getters  //
@@ -68,26 +71,6 @@ EndDeviceStatus::GetFirstReceiveWindowSpreadingFactor ()
   return m_firstReceiveWindowSpreadingFactor;
 }
 
-uint8_t
-EndDeviceStatus::GetFirstReceiveWindowDataRate ()
-{
-  NS_LOG_FUNCTION (this);
-
-  sf1 = m_firstReceiveWindowSpreadingFactor;
-  if (sf1 == 7)
-    return 5;
-  else if (sf1 == 8)
-    return 4;
-  else if (sf1 == 9)
-    return 3;
-  else if (sf1 == 10)
-    return 2;
-  else if (sf1 == 11)
-    return 1;
-  else if (sf1 == 12)
-    return 0;
-}
-
 double
 EndDeviceStatus::GetFirstReceiveWindowFrequency ()
 {
@@ -97,32 +80,12 @@ EndDeviceStatus::GetFirstReceiveWindowFrequency ()
 }
 
   uint8_t
-  EndDeviceStatus::GetSecondReceiveWindowSpreadingFactor ()
+  EndDeviceStatus::GetSecondReceiveWindowOffset ()
   {
-    NS_LOG_FUNCTION (this << m_firstReceiveWindowSpreadingFactor);
+    NS_LOG_FUNCTION (this << m_secondReceiveWindowOffset);
 
-    return m_secondReceiveWindowSpreadingFactor;
+    return m_secondReceiveWindowOffset;
   }
-
-uint8_t
-EndDeviceStatus::GetSecondReceiveWindowDataRate ()
-{
-  NS_LOG_FUNCTION (this);
-
-  sf2 = m_secondReceiveWindowSpreadingFactor;
-  if (sf2 == 7)
-    return 5;
-  else if (sf2 == 8)
-    return 4;
-  else if (sf2 == 9)
-    return 3;
-  else if (sf2 == 10)
-    return 2;
-  else if (sf2 == 11)
-    return 1;
-  else if (sf2 == 12)
-    return 0;
-}
 
 double
 EndDeviceStatus::GetSecondReceiveWindowFrequency ()
@@ -131,17 +94,29 @@ EndDeviceStatus::GetSecondReceiveWindowFrequency ()
   return m_secondReceiveWindowFrequency;
 }
 
-bool needReply ()
+bool
+EndDeviceStatus::NeedsReply ()
 {
-  NS_LOG_FUNCTION (this << m_needReply);
-  return m_needReply;
+  NS_LOG_FUNCTION (this << m_needsReply);
+  return m_needsReply;
 }
 
-EndDeviceStatus::Reply
+Ptr<Packet>
 EndDeviceStatus::GetReply ()
 {
   NS_LOG_FUNCTION (this);
-  return m_reply;
+  Ptr<Packet> replyPacket;
+  if (m_hasReplyPayload)
+    {
+      replyPacket = m_reply.payload-> Copy();
+    }
+  else
+    {
+      replyPacket = Create<Packet> (m_payloadSize);
+    }
+  replyPacket -> AddHeader (m_reply.frameHeader);
+  replyPacket -> AddHeader(m_reply.macHeader);
+  return replyPacket;
 }
 
 LoraMacHeader
@@ -213,10 +188,10 @@ EndDeviceStatus::GetReceivedPacketList ()
   }
 
   void
-  EndDeviceStatus::SetNeedReply (bool needReply)
+  EndDeviceStatus::SetNeedsReply (bool needsReply)
   {
-    NS_LOG_FUNCTION (this << needReply);
-    m_needReply = needReply;
+    NS_LOG_FUNCTION (this << needsReply);
+    m_needsReply = needsReply;
   }
 
   void
@@ -240,16 +215,22 @@ EndDeviceStatus::GetReceivedPacketList ()
     m_reply.payload = data;
   }
 
-
+  void
+  EndDeviceStatus::SetPayloadSize (uint8_t payloadSize)
+  {
+    NS_LOG_FUNCTION (this << payloadSize);
+    m_payloadSize = payloadSize;
+  }
   //////////////////////
   //   Other method   //
   //////////////////////
 
 void
-EndDeviceStatus::InsertReceivedPacket (Ptr<Packet> receivedPacket, struct ReceivedPacketInfo info)
+EndDeviceStatus::InsertReceivedPacket (Ptr<Packet> receivedPacket, struct
+                                            ReceivedPacketInfo info)
 {
   NS_LOG_FUNCTION (this);
-  m_receivedPacketList.insert(std::pair<Ptr<Packet> const>, ReceivedPacketInfo info));
+  m_receivedPacketList.insert(std::pair<Ptr<Packet const>, ReceivedPacketInfo> (receivedPacket,info));
 }
 
 void
