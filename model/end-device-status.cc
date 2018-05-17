@@ -44,6 +44,7 @@ EndDeviceStatus::EndDeviceStatus (Ptr<Packet> receivedPacket) :
 {
   NS_LOG_FUNCTION (this);
   //TODO sintassi?
+  // Basta InserReceivedPacket (compila e prova! :) )
   this->InsertReceivedPacket (receivedPacket);
 }
 
@@ -149,7 +150,7 @@ EndDeviceStatus::GetReplyMacHeader ()
   NS_LOG_FUNCTION (this);
   return m_reply.macHeader;
 }
-  
+
 LoraFrameHeader
 EndDeviceStatus::GetReplyFrameHeader ()
 {
@@ -177,28 +178,28 @@ EndDeviceStatus::GetReceivedPacketList ()
   /////////////////
 
   void
-  EndDeviceStatus::SetFirstReceiveWindowSpreadingFactor (uint8_t sf);
+  EndDeviceStatus::SetFirstReceiveWindowSpreadingFactor (uint8_t sf)
   {
     NS_LOG_FUNCTION (this << sf);
     m_firstReceiveWindowSpreadingFactor = sf;
   }
 
   void
-  EndDeviceStatus::SetFirstReceiveWindowFrequency (double frequency);
+  EndDeviceStatus::SetFirstReceiveWindowFrequency (double frequency)
   {
     NS_LOG_FUNCTION (this << frequency);
     m_firstReceiveWindowFrequency = frequency;
   }
 
   void
-  EndDeviceStatus::SetSecondReceiveWindowSpreadingFactor (uint8_t sf);
+  EndDeviceStatus::SetSecondReceiveWindowSpreadingFactor (uint8_t sf)
   {
     NS_LOG_FUNCTION (this << sf);
     m_secondReceiveWindowSpreadingFactor = sf;
   }
 
   void
-  EndDeviceStatus::SetSecondReceiveWindowFrequency (double frequency);
+  EndDeviceStatus::SetSecondReceiveWindowFrequency (double frequency)
   {
     NS_LOG_FUNCTION (this << frequency);
     m_secondReceiveWindowFrequency = frequency;

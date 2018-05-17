@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Davide Magrin <magrinda@dei.unipd.it>
+ * Author: Martina Capuzzo <capuzzom@dei.unipd.it>
  */
 
 #ifndef END_DEVICE_STATUS_H
@@ -33,43 +33,43 @@ namespace ns3 {
  * This class represents the Network Server's knowledge about an End Device in
  * the LoRaWAN network it is administering.
  *
- * The Network Server contains a list of instances of this class, once for
+ * The Network Server contains a list of instances of this class, one for
  * each device in the network. Each instance contains all the parameters and
  * information of the end device and the packets received from it.
  * Furthermore, this class holds the reply packet that the
  * network server will send to this device at the first available receive
- * window. On new packet arrivals at the
+ * window. Upon new packet arrivals at the
  * Network Server, the OnReceivedPacket method is called to update the
  * information regarding the last received packet and its parameters.
  */
 
-  /* Diagram of the end-device-status data structure. One instance of this class
-   * for each ED, that will be identified by its address.
-  *
-  * Public Access:
-  *
-  *  (ED address) --- Current device parameters:
-  *                   - First Receive Window SF and DRRe
-  *                   - First Receive Window frequency
-  *                   - Second Window SF and DR
-  *                   - Second Receive Window frequency
-  *               --- Reply
-  *                   - Need for reply (true/false)
-  *                   - Updated reply
-  *               --- Received Packets
-  *                   - Received packets list (see below).
-  *
-  *
-  * Private Access:
-  *
-  *  (Received packets list) - List of gateways that received the packet (see below)
-  *                          - SF of the received packet
-  *                          - Frequency of the received packet
-  *                          - Bandwidth of the received packet
-  *
-  *  (Gateway list) - Time at which the packet was received
-  *                 - Reception power
-  */
+/* Diagram of the end-device-status data structure. One instance of this class
+* for each ED, that will be identified by its address.
+*
+* Public Access:
+*
+*  (ED address) --- Current device parameters:
+*                   - First Receive Window SF and DRRe
+*                   - First Receive Window frequency
+*                   - Second Window SF and DR
+*                   - Second Receive Window frequency
+*               --- Reply
+*                   - Need for reply (true/false)
+*                   - Updated reply
+*               --- Received Packets
+*                   - Received packets list (see below).
+*
+*
+* Private Access:
+*
+*  (Received packets list) - List of gateways that received the packet (see below)
+*                          - SF of the received packet
+*                          - Frequency of the received packet
+*                          - Bandwidth of the received packet
+*
+*  (Gateway list) - Time at which the packet was received
+*                 - Reception power
+*/
 
 
 
@@ -77,8 +77,8 @@ class EndDeviceStatus
 {
 public:
 
-  typedef std::map<Ptr<Packet>, ReceivedPacketInfo> ReceivedPacketList
-  typedef std::map<Address,PacketInfoPerGw> GatewayList
+  typedef std::map<Ptr<Packet>, ReceivedPacketInfo> ReceivedPacketList;
+  typedef std::map<Address, PacketInfoPerGw> GatewayList;
 
   /**
    * Structure representing the reply that the network server will send this
@@ -107,14 +107,14 @@ public:
    * Structure saving information regarding the packet reception.
    */
 
-    struct ReceivedPacketInfo
-    {
-      GatewayList gwlist;  //!< Pointer to the list of gateways that
-      //!  received this packet.
-      int sf;              //!< Spreading factor that the packet used.
-      double bw;           //!< Bandwidth that the packet used.
-      double frequency;    //!< Frequency that the packet used.
-    }
+  struct ReceivedPacketInfo
+  {
+    GatewayList gwlist;    //!< Pointer to the list of gateways that
+    //!  received this packet.
+    int sf;                //!< Spreading factor that the packet used.
+    double bw;             //!< Bandwidth that the packet used.
+    double frequency;      //!< Frequency that the packet used.
+  }
 
 
   EndDeviceStatus();
@@ -168,12 +168,12 @@ public:
    */
   uint8_t GetSecondReceiveWindowDataRate (void);
 
-   /**
-   * Return the second window frequency of this device.
-   *
-   * This value is _not_ memorized in this object, and instead it's queried
-   * using the pointer to the device's MAC layer.
-   */
+  /**
+  * Return the second window frequency of this device.
+  *
+  * This value is _not_ memorized in this object, and instead it's queried
+  * using the pointer to the device's MAC layer.
+  */
   double GetSecondReceiveWindowFrequency (void);
 
   /**
@@ -181,41 +181,41 @@ public:
    *
    * \return A boolean value signaling if the end device needs a reply.
    */
-  bool NeedReply(void)
+  bool NeedReply (void)
 
   /**
    * Get the reply packet.
   *
   * \return A pointer to the packet reply.
   */
-  Ptr<Packet> GetReply(void);
+  Ptr<Packet> GetReply (void);
 
   /**
    * Get the reply packet mac header.
    *
    * \return The packet reply mac header.
    */
-  LoraMacHeader GetReplyMacHeader(void);
+  LoraMacHeader GetReplyMacHeader (void);
 
   /**
    * Get the reply packet frame header.
    *
    * \return The packet reply frame header.
    */
-  LoraFrameHeader GetReplyFrameHeader(void);
+  LoraFrameHeader GetReplyFrameHeader (void);
 
   /**
    * Get the data of the reply packet.
    *
    * \return A pointer to the packet reply.
    */
-  Ptr<Packet> GetReplyPayload(void);
+  Ptr<Packet> GetReplyPayload (void);
 
- /**
-   * Get the received packet list.
-   *
-   * \return The received packet list.
-   */
+  /**
+    * Get the received packet list.
+    *
+    * \return The received packet list.
+    */
   ReceivedPacketList GetReceivedPacketList (void);
 
 
@@ -299,26 +299,25 @@ private:
 
 
   uint8_t m_firstReceiveWindowSpreadingFactor; //!< Spreading Factor of the first
-                                              //!receive window
+  //!receive window
 
   double m_firstReceiveWindowFrequency; //!< Frequency at which the device will
-                                        //!open the first receive window
+  //!open the first receive window
 
   uint8_t m_secondReceiveWindowSpreadingFactor; //!< Spreading Factor of the second
-                                              //!receive window
+  //!receive window
 
   double m_secondReceiveWindowFrequency; //!< Frequency at which the device will
-                                        //!open the second receive window
+  //!open the second receive window
   bool m_needReply;  //!< Whether this end device needs a reply
 
   struct Reply m_reply; //!< Structure containing the next reply meant for this
-                        //!device
+  //!device
 
   struct ReceivedPacketList m_receivedPacketList; //!< Structure containing the next
-                                                  //!reply meant for this device
+  //!reply meant for this device
 
 };
 }
 
 #endif /* DEVICE_STATUS_H */
- 
