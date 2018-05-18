@@ -1310,6 +1310,7 @@ LorawanTestSuite::LorawanTestSuite ()
   AddTestCase (new LogicalLoraChannelTest, TestCase::QUICK);
   AddTestCase (new TimeOnAirTest, TestCase::QUICK);
   AddTestCase (new PhyConnectivityTest, TestCase::QUICK);
+  AddTestCase (new EndDeviceStatusTest, TestCase::QUICK);
   // AddTestCase (new LoraMacTest, TestCase::QUICK); // Work in progress in lora-mac-test.cc
   // AddTestCase (new SimpleNetworkServerTest, TestCase::QUICK); // TODO
 }

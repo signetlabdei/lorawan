@@ -117,12 +117,11 @@ public:
     double frequency;      //!< Frequency that the packet used.
   };
 
-  typedef std::map<Ptr<Packet>, ReceivedPacketInfo> ReceivedPacketList;
+  typedef std::map<Ptr<Packet const>, ReceivedPacketInfo> ReceivedPacketList;
 
   EndDeviceStatus();
   virtual ~EndDeviceStatus();
 
-  //  EndDeviceStatus(Ptr<Packet> receivedPacket);
 
   //////////////////
   //   Getters
@@ -150,7 +149,8 @@ public:
   double GetFirstReceiveWindowFrequency (void);
 
   /**
-   * Get the spreading factor this device is using in the second receive window.
+   * Get the offset of spreading factor this device is using in the second
+   * receive window with respect to the first receive window.
    *
    * \return An unsigned 8-bit integer containing the spreading factor.
    */
@@ -159,8 +159,6 @@ public:
   /**
   * Return the second window frequency of this device.
   *
-  * This value is _not_ memorized in this object, and instead it's queried
-  * using the pointer to the device's MAC layer.
   */
   double GetSecondReceiveWindowFrequency (void);
 
@@ -174,7 +172,7 @@ public:
   /**
    * Get the reply packet.
   *
-  * \return A pointer to the packet reply.
+  * \return A pointer to the packet reply (data + headers).
   */
   Ptr<Packet> GetReply (void);
 
@@ -234,7 +232,7 @@ public:
   /**
    * Set the spreading factor this device is using in the first receive window.
    */
-  void SetSecondReceiveWindowSpreadingFactor (uint8_t sf);
+  void SetSecondReceiveWindowOffset (uint8_t offset);
 
   /**
    * Set the second window frequency of this device.
@@ -279,7 +277,7 @@ public:
   /**
   * Insert a received packet in the packet list.
   */
-  void InsertReceivedPacket (Ptr<Packet> receivedPacket, ReceivedPacketInfo);
+  void InsertReceivedPacket (Ptr<Packet const> receivedPacket, ReceivedPacketInfo);
 
   /**
    * Initialize reply.

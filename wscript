@@ -54,6 +54,7 @@ def build(bld):
     module_test = bld.create_ns3_module_test_library('lorawan')
     module_test.source = [
         'test/lorawan-test-suite.cc',
+        'test/end-device-status-test.cc',
         ]
 
     headers = bld(features='ns3header')

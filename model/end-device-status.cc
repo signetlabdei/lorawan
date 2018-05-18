@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Davide Magrin <magrinda@dei.unipd.it>
+ * Author: Martina Capuzzo <capuzzom@dei.unipd.it>
  */
 
 #include "ns3/end-device-status.h"
@@ -167,10 +167,10 @@ EndDeviceStatus::GetReceivedPacketList ()
   }
 
   void
-  EndDeviceStatus::SetSecondReceiveWindowSpreadingFactor (uint8_t sf)
+  EndDeviceStatus::SetSecondReceiveWindowOffset (uint8_t offset)
   {
-    NS_LOG_FUNCTION (this << sf);
-    m_secondReceiveWindowSpreadingFactor = sf;
+    NS_LOG_FUNCTION (this << offset);
+    m_secondReceiveWindowOffset = offset;
   }
 
   void
@@ -185,6 +185,7 @@ EndDeviceStatus::GetReceivedPacketList ()
   {
     NS_LOG_FUNCTION (this);
     m_reply = reply;
+    this->SetNeedsReply(true);
   }
 
   void
@@ -199,6 +200,8 @@ EndDeviceStatus::GetReceivedPacketList ()
   {
     NS_LOG_FUNCTION (this);
     m_reply.macHeader = macHeader;
+    this->SetNeedsReply(true);
+    
   }
 
   void
@@ -206,6 +209,7 @@ EndDeviceStatus::GetReceivedPacketList ()
   {
     NS_LOG_FUNCTION (this);
     m_reply.frameHeader = frameHeader;
+    this->SetNeedsReply(true);
   }
 
   void
@@ -221,13 +225,13 @@ EndDeviceStatus::GetReceivedPacketList ()
     NS_LOG_FUNCTION (this << payloadSize);
     m_payloadSize = payloadSize;
   }
-  //////////////////////
-  //   Other method   //
-  //////////////////////
+  ///////////////////////
+  //   Other methods   //
+  ///////////////////////
 
 void
-EndDeviceStatus::InsertReceivedPacket (Ptr<Packet> receivedPacket, struct
-                                            ReceivedPacketInfo info)
+EndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket,
+                                       ReceivedPacketInfo info)
 {
   NS_LOG_FUNCTION (this);
   m_receivedPacketList.insert(std::pair<Ptr<Packet const>, ReceivedPacketInfo> (receivedPacket,info));
@@ -238,120 +242,8 @@ EndDeviceStatus::InitializeReply ()
 {
   NS_LOG_FUNCTION (this);
   m_reply = Reply ();
+  m_needsReply = false;
 }
 
-  /*
-Address
-EndDeviceStatus::GetBestGatewayAddress (void)
-{
-  NS_LOG_FUNCTION (this);
-
-  return (*(std::max_element (m_gateways.begin (), m_gateways.end (),
-                              [] (const std::pair<Address, double>&p1,
-                                  const std::pair<Address, double>&p2)
-                              { return p1.second > p2.second; }
-                              ))).first;
-}
-
-std::list<Address>
-EndDeviceStatus::GetSortedGatewayAddresses (void)
-{
-  NS_LOG_FUNCTION (this);
-
-  // Copy the map pairs into a vector
-  std::vector<std::pair<Address, double> > pairs;
-  for (auto it = m_gateways.begin (); it != m_gateways.end (); ++it)
-    {
-      pairs.push_back (*it);
-    }
-
-  // Sort the vector
-  std::sort (pairs.begin (), pairs.end (),
-             [] (const std::pair<Address, double>&p1,
-                 const std::pair<Address, double>&p2)
-             { return p1.second > p2.second; }
-             );
-
-  // Create a new array with only the addresses
-  std::list<Address> addresses;
-  for (auto it = pairs.begin (); it != pairs.end (); ++it)
-    {
-      addresses.push_back ((*it).first);
-    }
-
-  // Return the list
-  return addresses;
-}
-
-bool
-EndDeviceStatus::HasReply (void)
-{
-  NS_LOG_FUNCTION (this << m_reply.hasReply);
-
-  return m_reply.hasReply;
-}
-
-void
-EndDeviceStatus::SetReply (struct Reply reply)
-{
-  NS_LOG_FUNCTION (this);
-
-  m_reply = reply;
-}
-
-Ptr<Packet>
-EndDeviceStatus::GetReplyPacket (void)
-{
-  NS_LOG_FUNCTION (this);
-
-  // Add headers to the packet
-  Ptr<Packet> replyPacket = m_reply.packet->Copy ();
-  replyPacket->AddHeader (m_reply.frameHeader);
-  replyPacket->AddHeader (m_reply.macHeader);
-
-  return replyPacket;
-}
-
-void
-EndDeviceStatus::SetFirstReceiveWindowFrequency (double frequency)
-{
-  NS_LOG_FUNCTION (this << frequency);
-
-  m_firstReceiveWindowFrequency = frequency;
-}
-
-double
-EndDeviceStatus::GetFirstReceiveWindowFrequency (void)
-{
-  NS_LOG_FUNCTION (this);
-
-  return m_firstReceiveWindowFrequency;
-}
-
-double
-EndDeviceStatus::GetSecondReceiveWindowFrequency (void)
-{
-  NS_LOG_FUNCTION (this);
-
-  return m_mac->GetSecondReceiveWindowFrequency ();
-}
-
-uint8_t
-EndDeviceStatus::GetFirstReceiveWindowDataRate (void)
-{
-  NS_LOG_FUNCTION (this);
-
-  return m_mac->GetFirstReceiveWindowDataRate ();
-}
-
-uint8_t
-EndDeviceStatus::GetSecondReceiveWindowDataRate (void)
-{
-  NS_LOG_FUNCTION (this);
-
-  return m_mac->GetSecondReceiveWindowDataRate ();
-}
-  */
-
-
+  
 }
