@@ -8,6 +8,7 @@
 #include "ns3/mobility-helper.h"
 #include "ns3/one-shot-sender-helper.h"
 #include "ns3/constant-position-mobility-model.h"
+#include "end-device-status-test.h"
 
 // An essential include is test.h
 #include "ns3/test.h"

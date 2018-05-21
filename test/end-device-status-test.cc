@@ -5,6 +5,7 @@
 #include "ns3/lora-mac-header.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/end-device-status.h"
+#include "end-device-status-test.h"
 
 // An essential include is test.h
 #include "ns3/test.h"
@@ -12,20 +13,6 @@
 using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("EndDeviceStatusTest");
-
-/***********************
- * EndDeviceStatusTest *
- **********************/
-
-class EndDeviceStatusTest : public TestCase
-{
-public:
-  EndDeviceStatusTest ();
-  virtual ~EndDeviceStatusTest();
-
-private:
-  virtual void DoRun (void);
-};
 
 // Add some help text to this case to describe what it is intended to test
 EndDeviceStatusTest::EndDeviceStatusTest ()
@@ -101,7 +88,7 @@ EndDeviceStatusTest::DoRun (void)
   // testing methods changing some fields of the reply
   LoraFrameHeader frameHeader;
   frameHeader.SetAck(true);
-  edStatus.SetReplyFrameHeader
+  edStatus.SetReplyFrameHeader(frameHeader);
     NS_TEST_EXPECT_MSG_EQ (edStatus.NeedsReply(),true, "Setting and getting the reply frame header didn't give the expected result on the boolean \"has reply\" value.");
   NS_TEST_EXPECT_MSG_EQ (edStatus.GetReplyFrameHeader().GetAck(),false, "Setting and getting the reply frame header didn't give the expected result");
 
