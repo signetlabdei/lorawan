@@ -55,7 +55,7 @@ public:
   void AddGateway (Ptr<Node> gateway, Address& address);
 
   /**
-   * Receive a packet from a gateway.
+   * Update network status on the received packet. 
    * \param packet the received packet
    */
   bool Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
@@ -65,12 +65,11 @@ protected:
   Ptr<NetworkStatusScheduler> m_scheduler;
   Ptr<NetworkStatusController> m_controller;
   Ptr<NetworkStatus> m_status;
+  std::map<LoraDeviceAddress,EndDeviceStatus> m_endDeviceStatuses;
+  std::map<Address,Ptr<GatewayStatus>> m_gatewayStatuses;
+
 };
 
 } /* namespace ns3 */
 
 #endif /* NETWORK_SERVER_H */
-
-std::map<LoraDeviceAddress,EndDeviceStatus> m_endDeviceStatuses;
-
-std::map<Address,GatewayStatus> m_gatewayStatuses;
