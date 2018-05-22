@@ -109,7 +109,7 @@ LoraMacHeader::Print (std::ostream &os) const
 void
 LoraMacHeader::SetMType (enum MType mtype)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << mtype);
 
   m_mtype = mtype;
 }

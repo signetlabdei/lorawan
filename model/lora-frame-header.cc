@@ -373,6 +373,7 @@ LoraFrameHeader::GetAddress (void) const
 void
 LoraFrameHeader::SetAdr (bool adr)
 {
+  NS_LOG_FUNCTION(this << adr);
   m_adr = adr;
 }
 bool

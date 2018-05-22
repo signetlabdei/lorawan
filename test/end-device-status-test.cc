@@ -49,53 +49,58 @@ EndDeviceStatusTest::DoRun (void)
 
   edStatus.SetSecondReceiveWindowFrequency(differentFrequency);
   NS_TEST_EXPECT_MSG_EQ (edStatus.GetSecondReceiveWindowFrequency(),868.3, "Setting of second receive window frequency didn't give the expected result");
-  
+
   edStatus.SetSecondReceiveWindowOffset(offset);
   NS_TEST_EXPECT_MSG_EQ (edStatus.GetSecondReceiveWindowOffset(),1, "Setting of second receive window spreading factor didn't give the expected result");
-
-  // Testing reply
-  EndDeviceStatus::Reply reply;
-  reply.payload = Create<Packet> (23);
+  
+  // Testing reply setters and getters
+  Ptr<Packet> replyPayload = Create<Packet> (23);
   LoraMacHeader macHdr;
-  macHdr.SetMType(LoraMacHeader::UNCONFIRMED_DATA_DOWN);
+  macHdr.SetMType(LoraMacHeader::CONFIRMED_DATA_DOWN);
   LoraFrameHeader frameHdr;
   frameHdr.SetAdr(true);
-  reply.payload->AddHeader(frameHdr);
-  reply.payload->AddHeader(macHdr);
 
-  edStatus.SetReply(reply);
-  edStatus.SetNeedsReply(true);
+  edStatus.SetReplyPayload(replyPayload);
+  edStatus.SetReplyFrameHeader(frameHdr);
+  edStatus.SetReplyMacHeader(macHdr);
+  Ptr<Packet> reply= edStatus.GetReply();
 
-  LoraMacHeader savedMacHeader;
-  LoraFrameHeader savedFrameHeader;
 
-  edStatus.GetReply()-> RemoveHeader(savedMacHeader);
-  edStatus.GetReply()-> RemoveHeader(savedFrameHeader);
+  NS_TEST_EXPECT_MSG_EQ (edStatus.NeedsReply(),true, "Setting and getting the reply frame header didn't give the expected result on the boolean \"has reply\" value.");
+  NS_TEST_EXPECT_MSG_EQ (reply->GetSize(),32, "Setting and getting the reply frame header didn't give the expected result on the reply size.");
 
-  //TODO non c'è un modo per togliere l'header dal pacchetto restituito da GetReply e ispezionarlo?
-  // (dato un pacchetto, rimuovere l'header e ispezionarlo indipendentemente da come è stato costruito il pacchetto)
-  NS_TEST_EXPECT_MSG_EQ ((savedMacHeader.GetMType () == LoraMacHeader::CONFIRMED_DATA_DOWN), true, "Setting and getting the reply didn't give the expected result");
-  NS_TEST_EXPECT_MSG_EQ (savedFrameHeader.GetAdr(),true, "Setting and getting the reply didn't give the expected result");
-  NS_TEST_EXPECT_MSG_EQ (savedFrameHeader.GetAck(),false, "Setting and getting the reply didn't give the expected result");
-  NS_TEST_EXPECT_MSG_EQ (edStatus.NeedsReply(),true, "Setting and getting the reply didn't give the expected result on the boolean \"has reply\" value.");
-  // packet size should be payload + 1 byte (macHdr) + 8 byes (frame header without Opts)
-  NS_TEST_EXPECT_MSG_EQ (edStatus.GetReply()->GetSize(),32, "Setting and getting the reply didn't give the expected result on the packet size.");
+  // Checking that headers have been correctly setted with methods provided by Packet class
+  LoraFrameHeader replyFrameheader;
+  LoraMacHeader replyMacheader;
+  reply->RemoveHeader(replyMacheader);
+  reply->RemoveHeader(replyFrameheader);
+  NS_TEST_EXPECT_MSG_EQ (replyFrameheader.GetAck(),false, "Setting the reply frame header didn't give the expected result");
+  NS_TEST_EXPECT_MSG_EQ (replyFrameheader.GetAdr(),true, "Setting the reply frame header didn't give the expected result");
+
+
+  NS_TEST_EXPECT_MSG_EQ ((replyMacheader.GetMType() == LoraMacHeader::CONFIRMED_DATA_DOWN),true, "Setting the reply mac header didn't give the expected result");
+
 
   // testing initialize reply and building reply payload
   edStatus.InitializeReply();
   NS_TEST_EXPECT_MSG_EQ (edStatus.NeedsReply(),false, "Reply initialization didn't give the expected result on the boolean \"has reply\" value.");
+  NS_TEST_EXPECT_MSG_EQ (edStatus.GetReplyFrameHeader().GetAdr(),false, "Reply initialization didn't give the expected result");
 
   // testing methods changing some fields of the reply
   LoraFrameHeader frameHeader;
   frameHeader.SetAck(true);
   edStatus.SetReplyFrameHeader(frameHeader);
-    NS_TEST_EXPECT_MSG_EQ (edStatus.NeedsReply(),true, "Setting and getting the reply frame header didn't give the expected result on the boolean \"has reply\" value.");
-  NS_TEST_EXPECT_MSG_EQ (edStatus.GetReplyFrameHeader().GetAck(),false, "Setting and getting the reply frame header didn't give the expected result");
+  NS_TEST_EXPECT_MSG_EQ (edStatus.NeedsReply(),true, "Setting and getting the reply frame header didn't give the expected result on the boolean \"has reply\" value.");
+  NS_TEST_EXPECT_MSG_EQ (edStatus.GetReplyFrameHeader().GetAck(),true, "Setting and getting the reply frame header didn't give the expected result");
 
   edStatus.InitializeReply();
   LoraMacHeader macHeader;
   macHeader.SetMType(LoraMacHeader::CONFIRMED_DATA_DOWN);
-  NS_TEST_EXPECT_MSG_EQ ((edStatus.GetReplyMacHeader().GetMType() == LoraMacHeader::UNCONFIRMED_DATA_DOWN),true, "Setting and getting the reply mac header didn't give the expected result");
+  NS_TEST_EXPECT_MSG_EQ ((edStatus.GetReplyMacHeader().GetMType() == LoraMacHeader::CONFIRMED_DATA_DOWN),false, "Setting and getting the reply mac header didn't give the expected result");
+
+  edStatus.SetReplyMacHeader(macHeader);
+  NS_TEST_EXPECT_MSG_EQ ((edStatus.GetReplyMacHeader().GetMType() == LoraMacHeader::CONFIRMED_DATA_DOWN),true, "Setting and getting the reply mac header didn't give the expected result");
+
   NS_TEST_EXPECT_MSG_EQ (edStatus.GetReply()->GetSize(),9, "Setting and getting the reply mac header didn't give the expected result on the packet size.");
 
   edStatus.InitializeReply();
@@ -109,12 +114,3 @@ EndDeviceStatusTest::DoRun (void)
   // - getReceivedPacketList and its inspection
 
 }
-
-
-
-
-/**************
- * Test Suite *
- **************/
-
-// defined in lorawan-test-suite.cc

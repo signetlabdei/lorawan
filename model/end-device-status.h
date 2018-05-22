@@ -26,6 +26,7 @@
 #include "ns3/lora-device-address.h"
 #include "ns3/lora-mac-header.h"
 #include "ns3/lora-frame-header.h"
+#include "ns3/pointer.h"
 
 namespace ns3 {
 
@@ -84,7 +85,7 @@ public:
    */
   struct Reply
   {
-    Ptr<Packet> payload;   // The packet that will be sent as a reply.
+    Ptr<Packet const> payload;   // The packet that will be sent as a reply.
     LoraMacHeader macHeader; // The MacHeader to attach to the reply packet.
     LoraFrameHeader frameHeader; // The FrameHeader to attach to the reply packet.
   };
@@ -134,7 +135,7 @@ public:
    *
    * \return The address.
    */
-  LoraDeviceAddress GetAddress (void);
+  // LoraDeviceAddress GetAddress (void);
 
   /**
    * Get the spreading factor this device is using in the first receive window.
@@ -217,7 +218,7 @@ public:
    *
    * \param address The device's address to set.
    */
-  void SetAddress (LoraDeviceAddress address);
+  // void SetAddress (LoraDeviceAddress address);
 
   /**
    * Set the spreading factor this device is using in the first receive window.
@@ -240,11 +241,6 @@ public:
   void SetSecondReceiveWindowFrequency  (double frequency);
 
   /**
-  * Set the packet reply.
-  */
-  void SetReply (struct Reply reply);
-
-  /**
    * Set whether the end device needs a reply.
    */
   void SetNeedsReply (bool needReply);
@@ -260,9 +256,9 @@ public:
   void SetReplyFrameHeader (LoraFrameHeader frameHeader);
 
   /**
-   * Set the reply packet payload.
+   * Set the packet reply payload.
    */
-  void SetReplyPayload (Ptr<Packet> data);
+  void SetReplyPayload (Ptr<Packet const> replyPayload);
 
   /**
    * Set the payload size of the replay packet.
@@ -287,7 +283,7 @@ public:
 
 private:
 
-  LoraDeviceAddress m_address;
+  // LoraDeviceAddress m_address;
 
   uint8_t m_firstReceiveWindowSpreadingFactor = 0; //!< Spreading Factor of the first
   //!receive window

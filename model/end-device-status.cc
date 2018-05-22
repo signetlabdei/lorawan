@@ -29,55 +29,57 @@
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("EndDeviceStatus");
+  NS_LOG_COMPONENT_DEFINE ("EndDeviceStatus");
 
-EndDeviceStatus::EndDeviceStatus ()
-{
-  NS_LOG_FUNCTION (this);
-}
+  EndDeviceStatus::EndDeviceStatus ()
+  {
+    NS_LOG_FUNCTION (this);
+  }
 
-EndDeviceStatus::~EndDeviceStatus ()
-{
-  NS_LOG_FUNCTION (this);
-  m_reply = EndDeviceStatus::Reply();
-  m_receivedPacketList = ReceivedPacketList();
-}
+  EndDeviceStatus::~EndDeviceStatus ()
+  {
+    NS_LOG_FUNCTION (this);
+    m_reply = EndDeviceStatus::Reply();
+    m_receivedPacketList = ReceivedPacketList();
+  }
 
   /* EndDeviceStatus::EndDeviceStatus (Ptr<Packet> receivedPacket, ReceivedPacketInfo packetInfo)
-{
-  NS_LOG_FUNCTION (this);
-  // Basta InserReceivedPacket (compila e prova! :) )
-  InsertReceivedPacket (receivedPacket, packetInfo);
-}
+     {
+     NS_LOG_FUNCTION (this);
+     // Basta InserReceivedPacket (compila e prova! :) )
+     InsertReceivedPacket (receivedPacket, packetInfo);
+     }
   */
 
-///////////////
-//  Getters  //
-///////////////
+  ///////////////
+  //  Getters  //
+  ///////////////
 
-LoraDeviceAddress
-EndDeviceStatus::GetAddress ()
-{
-  NS_LOG_FUNCTION (this);
+  /*
+    LoraDeviceAddress
+  EndDeviceStatus::GetAddress ()
+  {
+    NS_LOG_FUNCTION (this);
 
-  return m_address;
-}
+    return m_address;
+  }
+  */
 
-uint8_t
-EndDeviceStatus::GetFirstReceiveWindowSpreadingFactor ()
-{
-  NS_LOG_FUNCTION (this << m_firstReceiveWindowSpreadingFactor);
+  uint8_t
+  EndDeviceStatus::GetFirstReceiveWindowSpreadingFactor ()
+  {
+    NS_LOG_FUNCTION (this << m_firstReceiveWindowSpreadingFactor);
 
-  return m_firstReceiveWindowSpreadingFactor;
-}
+    return m_firstReceiveWindowSpreadingFactor;
+  }
 
-double
-EndDeviceStatus::GetFirstReceiveWindowFrequency ()
-{
-  NS_LOG_FUNCTION (this << m_firstReceiveWindowFrequency);
+  double
+  EndDeviceStatus::GetFirstReceiveWindowFrequency ()
+  {
+    NS_LOG_FUNCTION (this << m_firstReceiveWindowFrequency);
 
-  return m_firstReceiveWindowFrequency;
-}
+    return m_firstReceiveWindowFrequency;
+  }
 
   uint8_t
   EndDeviceStatus::GetSecondReceiveWindowOffset ()
@@ -87,65 +89,67 @@ EndDeviceStatus::GetFirstReceiveWindowFrequency ()
     return m_secondReceiveWindowOffset;
   }
 
-double
-EndDeviceStatus::GetSecondReceiveWindowFrequency ()
-{
-  NS_LOG_FUNCTION (this << m_secondReceiveWindowFrequency);
-  return m_secondReceiveWindowFrequency;
-}
+  double
+  EndDeviceStatus::GetSecondReceiveWindowFrequency ()
+  {
+    NS_LOG_FUNCTION (this << m_secondReceiveWindowFrequency);
+    return m_secondReceiveWindowFrequency;
+  }
 
-bool
-EndDeviceStatus::NeedsReply ()
-{
-  NS_LOG_FUNCTION (this << m_needsReply);
-  return m_needsReply;
-}
+  bool
+  EndDeviceStatus::NeedsReply ()
+  {
+    NS_LOG_FUNCTION (this << m_needsReply);
+    return m_needsReply;
+  }
 
-Ptr<Packet>
-EndDeviceStatus::GetReply ()
-{
-  NS_LOG_FUNCTION (this);
-  Ptr<Packet> replyPacket;
-  if (m_hasReplyPayload)
-    {
-      replyPacket = m_reply.payload-> Copy();
-    }
-  else
-    {
-      replyPacket = Create<Packet> (m_payloadSize);
-    }
-  replyPacket -> AddHeader (m_reply.frameHeader);
-  replyPacket -> AddHeader(m_reply.macHeader);
-  return replyPacket;
-}
+  Ptr<Packet>
+  EndDeviceStatus::GetReply ()
+  {
+    NS_LOG_FUNCTION (this << m_hasReplyPayload);
+    Ptr<Packet> replyPacket;
+    if (m_hasReplyPayload)
+      {
+        replyPacket = m_reply.payload-> Copy();
+        NS_LOG_DEBUG ("End device status reply has already a payload");
+        
+      }
+    else
+      {
+        replyPacket = Create<Packet> (m_payloadSize);
+      }
+    replyPacket -> AddHeader (m_reply.frameHeader);
+    replyPacket -> AddHeader(m_reply.macHeader);
+    return replyPacket;
+  }
 
-LoraMacHeader
-EndDeviceStatus::GetReplyMacHeader ()
-{
-  NS_LOG_FUNCTION (this);
-  return m_reply.macHeader;
-}
+  LoraMacHeader
+  EndDeviceStatus::GetReplyMacHeader ()
+  {
+    NS_LOG_FUNCTION (this);
+    return m_reply.macHeader;
+  }
 
-LoraFrameHeader
-EndDeviceStatus::GetReplyFrameHeader ()
-{
-  NS_LOG_FUNCTION (this);
-  return m_reply.frameHeader;
-}
+  LoraFrameHeader
+  EndDeviceStatus::GetReplyFrameHeader ()
+  {
+    NS_LOG_FUNCTION (this);
+    return m_reply.frameHeader;
+  }
 
-Ptr<Packet>
-EndDeviceStatus::GetReplyPayload (void)
-{
-  NS_LOG_FUNCTION (this);
-  return m_reply.payload;
-}
+  Ptr<Packet>
+  EndDeviceStatus::GetReplyPayload (void)
+  {
+    NS_LOG_FUNCTION (this);
+    return m_reply.payload-> Copy();
+  }
 
-EndDeviceStatus::ReceivedPacketList
-EndDeviceStatus::GetReceivedPacketList ()
-{
-  NS_LOG_FUNCTION (this);
-  return m_receivedPacketList;
-}
+  EndDeviceStatus::ReceivedPacketList
+  EndDeviceStatus::GetReceivedPacketList ()
+  {
+    NS_LOG_FUNCTION (this);
+    return m_receivedPacketList;
+  }
 
 
   /////////////////
@@ -155,7 +159,7 @@ EndDeviceStatus::GetReceivedPacketList ()
   void
   EndDeviceStatus::SetFirstReceiveWindowSpreadingFactor (uint8_t sf)
   {
-    NS_LOG_FUNCTION (this << sf);
+    NS_LOG_FUNCTION (this << double(sf));
     m_firstReceiveWindowSpreadingFactor = sf;
   }
 
@@ -169,7 +173,7 @@ EndDeviceStatus::GetReceivedPacketList ()
   void
   EndDeviceStatus::SetSecondReceiveWindowOffset (uint8_t offset)
   {
-    NS_LOG_FUNCTION (this << offset);
+    NS_LOG_FUNCTION (this << double(offset));
     m_secondReceiveWindowOffset = offset;
   }
 
@@ -180,13 +184,7 @@ EndDeviceStatus::GetReceivedPacketList ()
     m_secondReceiveWindowFrequency = frequency;
   }
 
-  void
-  EndDeviceStatus::SetReply (struct Reply reply)
-  {
-    NS_LOG_FUNCTION (this);
-    m_reply = reply;
-    this->SetNeedsReply(true);
-  }
+  
 
   void
   EndDeviceStatus::SetNeedsReply (bool needsReply)
@@ -201,7 +199,7 @@ EndDeviceStatus::GetReceivedPacketList ()
     NS_LOG_FUNCTION (this);
     m_reply.macHeader = macHeader;
     this->SetNeedsReply(true);
-    
+
   }
 
   void
@@ -213,10 +211,12 @@ EndDeviceStatus::GetReceivedPacketList ()
   }
 
   void
-  EndDeviceStatus::SetReplyPayload (Ptr<Packet> data)
+  EndDeviceStatus::SetReplyPayload(Ptr<Packet const> replyPayload)
   {
     NS_LOG_FUNCTION (this);
-    m_reply.payload = data;
+    m_reply.payload = replyPayload;
+    m_hasReplyPayload= true;
+    this->SetNeedsReply(true);
   }
 
   void
@@ -229,21 +229,23 @@ EndDeviceStatus::GetReceivedPacketList ()
   //   Other methods   //
   ///////////////////////
 
-void
-EndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket,
-                                       ReceivedPacketInfo info)
-{
-  NS_LOG_FUNCTION (this);
-  m_receivedPacketList.insert(std::pair<Ptr<Packet const>, ReceivedPacketInfo> (receivedPacket,info));
-}
+  void
+  EndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket,
+                                         ReceivedPacketInfo info)
+  {
+    NS_LOG_FUNCTION (this);
+    m_receivedPacketList.insert(std::pair<Ptr<Packet const>, ReceivedPacketInfo> (receivedPacket,info));
+  }
 
-void
-EndDeviceStatus::InitializeReply ()
-{
-  NS_LOG_FUNCTION (this);
-  m_reply = Reply ();
-  m_needsReply = false;
-}
+  void
+  EndDeviceStatus::InitializeReply ()
+  {
+    NS_LOG_FUNCTION (this);
+    m_reply = Reply ();
+    m_needsReply = false;
+    m_hasReplyPayload= false;
+    
+  }
 
-  
+
 }
