@@ -24,6 +24,3 @@ def build(bld):
 
     obj = bld.create_ns3_program('time-on-air-test', ['lorawan'])
     obj.source = 'time-on-air-test.cc'
-
-    obj = bld.create_ns3_program('lora-mac-test', ['lorawan'])
-    obj.source = 'lora-mac-test.cc'
