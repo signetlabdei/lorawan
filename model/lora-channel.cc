@@ -92,14 +92,14 @@ LoraChannel::Remove (Ptr<LoraPhy> phy)
   m_phyList.erase (find (m_phyList.begin (), m_phyList.end (), phy));
 }
 
-uint32_t
+std::size_t
 LoraChannel::GetNDevices (void) const
 {
   return m_phyList.size ();
 }
 
 Ptr<NetDevice>
-LoraChannel::GetDevice (uint32_t i) const
+LoraChannel::GetDevice (std::size_t i) const
 {
   return m_phyList[i]->GetDevice ()->GetObject<NetDevice> ();
 }
