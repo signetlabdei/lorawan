@@ -27,6 +27,8 @@
 #include "ns3/lora-mac-header.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/pointer.h"
+#include "ns3/lora-mac-header.h"
+#include "ns3/lora-frame-header.h"
 
 namespace ns3 {
 
@@ -36,7 +38,11 @@ namespace ns3 {
  *
  * The Network Server contains a list of instances of this class, one for
  * each device in the network. Each instance contains all the parameters and
- * information of the end device and the packets received from it.
+ * information of the end device aMartina Capuzzo
+
+Department of Information Engineering (DEI)
+University of Padova
+Italynd the packets received from it.
  * Furthermore, this class holds the reply packet that the
  * network server will send to this device at the first available receive
  * window. Upon new packet arrivals at the
@@ -88,6 +94,7 @@ public:
     Ptr<Packet const> payload;   // The packet that will be sent as a reply.
     LoraMacHeader macHeader; // The MacHeader to attach to the reply packet.
     LoraFrameHeader frameHeader; // The FrameHeader to attach to the reply packet.
+    std::list<Ptr<MacCommand>> macCommandList; // list of the MAC commands that will be applied.
   };
 
   //TODO write methods to write the following structures.
@@ -114,7 +121,7 @@ public:
     GatewayList gwlist;    //!< Pointer to the list of gateways that
     //!  received this packet.
     int sf;                //!< Spreading factor that the packet used.
-    double bw;             //!< Bandwidth that the packet used.
+    // double bw;             //!< Bandwidth that the packet used.
     double frequency;      //!< Frequency that the packet used.
   };
 
@@ -205,6 +212,11 @@ public:
     */
   ReceivedPacketList GetReceivedPacketList (void);
 
+  /**
+   * get the list of gateways that received this packet.
+   */
+  GatewayList GetGatewayList (Ptr<Packet const> packet);
+
 
 
   /////////////////
@@ -273,12 +285,23 @@ public:
   /**
   * Insert a received packet in the packet list.
   */
-  void InsertReceivedPacket (Ptr<Packet const> receivedPacket, ReceivedPacketInfo);
+  void InsertReceivedPacket (Ptr<Packet const> receivedPacket, ReceivedPacketInfo info,
+                             const Address& gwAddress, double rcvPower);
 
   /**
    * Initialize reply.
    */
   void InitializeReply (void);
+
+  /**
+   * Add MAC command to the list.
+   */
+  void AddMACCommand (Ptr<MacCommand> macCommand);
+
+  /**
+   * Update Gateway data when more then one gateway receive the same packet.
+   */
+  void UpdateGatewayData (GatewayList gwList, Address gwAddress, double rcvPower);
 
 
 private:
@@ -294,7 +317,7 @@ private:
   uint8_t m_secondReceiveWindowOffset = 0; //!< Spreading Factor of the second
   //!receive window
 
-  double m_secondReceiveWindowFrequency = 0; //!< Frequency at which the device will
+  double m_secondReceiveWindowFrequency = 868.625; //!< Frequency at which the device will
   //!open the second receive window
 
   bool m_needsReply = false;  //!< Whether this end device needs a reply
@@ -302,6 +325,9 @@ private:
   bool m_hasReplyPayload = false;  //!< Whether this end device needs a reply
 
   uint8_t m_payloadSize = 0;
+
+  Ptr<Packet const> m_lastReceivedPacket = 0; //The last packet that has been received
+                                        // from this device.
 
   struct Reply m_reply; //!< Structure containing the next reply meant for this
   //!device

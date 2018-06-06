@@ -95,7 +95,7 @@ namespace ns3 {
 
 
   //TODO che parametri prende? servirebbe la lista di GW che l'hanno ricevuto
-  Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
+  NetworkStatus::InsertReceivedPacket (Ptr<NetDevice> device, Ptr<const Packet> packet,
                 uint16_t protocol, const Address& gwAddress)
   {
     NS_LOG_FUNCTION (this << packet << protocol << address);
@@ -108,15 +108,14 @@ namespace ns3 {
     myPacket->RemoveHeader (macHdr);
 
     LoraFrameHeader frameHdr;
-    frameHdr.SetAsUplink ();
     myPacket->RemoveHeader (frameHdr);
     LoraDeviceAddress edAddr= frameHdr.GetAddress();
 
     // Update current parameters
     LoraTag tag;
     myPacket->RemovePacketTag (tag);
-    m_endDeviceStatuses.at(edAddr.SetFirstReceiveWindowSpreadingFactor(tag.GetSpreadingFactor()));
-    m_endDeviceStatuses.at(edAddr.SetFirstReceiveWindowFrequency(tag.GetFrequency()));
+    m_endDeviceStatuses.at(edAddr).SetFirstReceiveWindowSpreadingFactor(tag.GetSpreadingFactor());
+  m_endDeviceStatuses.at(edAddr).SetFirstReceiveWindowFrequency(tag.GetFrequency());
     //TODO extract BW
 
     // Update Information on the received packet
@@ -126,7 +125,8 @@ namespace ns3 {
     // info.bw
     //info.gwlist
 
-    m_endDeviceStatuses.at.InsertReceivedPacket(packet, info));
+    double rcvPower = tag.GetReceivePower();
+    m_endDeviceStatuses.at.InsertReceivedPacket(packet, info, gwAddress, rcvPower));
 
 
 

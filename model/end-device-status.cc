@@ -19,6 +19,7 @@
  */
 
 #include "ns3/end-device-status.h"
+#include "ns3/simulator.h"
 #include "ns3/lora-mac-header.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/log.h"
@@ -151,6 +152,13 @@ namespace ns3 {
     return m_receivedPacketList;
   }
 
+  EndDeviceStatus::GatewayList
+  EndDeviceStatus::GetGatewayList (Ptr<Packet const> packet)
+  {
+    ReceivedPacketInfo info= m_receivedPacketList.find(packet)-> second;
+    return info.gwlist;
+  }
+
 
   /////////////////
   //   Setters   //
@@ -231,10 +239,23 @@ namespace ns3 {
 
   void
   EndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket,
-                                         ReceivedPacketInfo info)
+                                         ReceivedPacketInfo info, const Address& gwAddress,
+                                         double rcvPower)
   {
     NS_LOG_FUNCTION (this);
-    m_receivedPacketList.insert(std::pair<Ptr<Packet const>, ReceivedPacketInfo> (receivedPacket,info));
+    std::map<Ptr<const ns3::Packet>, ns3::EndDeviceStatus::ReceivedPacketInfo>::iterator it = m_receivedPacketList.find(receivedPacket);
+    if (it != m_receivedPacketList.end())
+      {
+        m_receivedPacketList.insert(std::pair<Ptr<Packet const>, ReceivedPacketInfo>
+                                    (receivedPacket,info));
+      }
+    else
+      {
+        ReceivedPacketInfo savedInfo = it -> second;
+        GatewayList savedGwList = savedInfo.gwlist;
+        UpdateGatewayData (savedGwList, gwAddress, rcvPower);
+      }
+    m_lastReceivedPacket = receivedPacket;
   }
 
   void
@@ -247,5 +268,28 @@ namespace ns3 {
     
   }
 
+  void
+  EndDeviceStatus::AddMACCommand (Ptr<MacCommand> macCommand)
+  {
+    m_reply.macCommandList.push_back (macCommand);
+  }
+
+  void
+  EndDeviceStatus::UpdateGatewayData (GatewayList gwList, Address gwAddress, double rcvPower)
+  {  NS_LOG_FUNCTION (this << gwAddress << rcvPower);
+
+    std::map<Address, PacketInfoPerGw>::iterator it = gwList.find (gwAddress);
+    if (it != gwList.end ())
+      {
+        // Erase the existing entry
+        gwList.erase (it);
+      }
+    // Create a new entry
+    PacketInfoPerGw gwInfo;
+    gwInfo.receivedTime = Simulator::Now();
+    gwInfo.rxPower= rcvPower;
+    gwList.insert (std::pair<Address, PacketInfoPerGw> (gwAddress, gwInfo));
+
+  }
 
 }
