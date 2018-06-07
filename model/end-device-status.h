@@ -285,8 +285,8 @@ public:
   /**
   * Insert a received packet in the packet list.
   */
-  void InsertReceivedPacket (Ptr<Packet const> receivedPacket, ReceivedPacketInfo info,
-                             const Address& gwAddress, double rcvPower);
+  void InsertReceivedPacket (Ptr<Packet const> receivedPacket,
+                             const Address& gwAddress);
 
   /**
    * Initialize reply.

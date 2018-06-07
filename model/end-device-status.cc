@@ -27,6 +27,8 @@
 #include "ns3/command-line.h"
 #include "ns3/simulator.h"
 #include <algorithm>
+#include "ns3/packet.h"
+#include "ns3/lora-tag.h"
 
 namespace ns3 {
 
@@ -239,16 +241,43 @@ namespace ns3 {
 
   void
   EndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket,
-                                         ReceivedPacketInfo info, const Address& gwAddress,
-                                         double rcvPower)
+                                         const Address& gwAddress)
   {
     NS_LOG_FUNCTION (this);
-    std::map<Ptr<const ns3::Packet>, ns3::EndDeviceStatus::ReceivedPacketInfo>::iterator it = m_receivedPacketList.find(receivedPacket);
+
+    // Create a copy of the packet
+    Ptr<Packet> myPacket = receivedPacket->Copy ();
+
+    // Extract the headers
+    LoraMacHeader macHdr;
+    myPacket->RemoveHeader (macHdr);
+
+    LoraFrameHeader frameHdr;
+    myPacket->RemoveHeader (frameHdr);
+
+    // Update current parameters
+    LoraTag tag;
+    myPacket->RemovePacketTag (tag);
+    SetFirstReceiveWindowSpreadingFactor(tag.GetSpreadingFactor());
+    SetFirstReceiveWindowFrequency(tag.GetFrequency());
+    //TODO extract BW
+
+    // Update Information on the received packet
+    ReceivedPacketInfo info;
+    info.sf = tag.GetSpreadingFactor();
+    info.frequency= tag.GetFrequency();
+
+    double rcvPower = tag.GetReceivePower();
+
+    std::map<Ptr<const ns3::Packet>, ns3::EndDeviceStatus::ReceivedPacketInfo>::iterator
+      it = m_receivedPacketList.find(receivedPacket);
     if (it != m_receivedPacketList.end())
       {
         m_receivedPacketList.insert(std::pair<Ptr<Packet const>, ReceivedPacketInfo>
                                     (receivedPacket,info));
       }
+    // this packet had already been received from another gateway:
+    // adding this gateway's reception information.
     else
       {
         ReceivedPacketInfo savedInfo = it -> second;
@@ -256,6 +285,21 @@ namespace ns3 {
         UpdateGatewayData (savedGwList, gwAddress, rcvPower);
       }
     m_lastReceivedPacket = receivedPacket;
+
+    // Determine whether the packet requires a reply
+    if (macHdr.GetMType () == LoraMacHeader::CONFIRMED_DATA_UP)
+      {
+        NS_LOG_DEBUG ("Scheduling a reply for this device");
+
+        m_needsReply = true;
+
+        LoraFrameHeader replyFrameHdr = LoraFrameHeader ();
+        replyFrameHdr.SetAsDownlink ();
+        // replyFrameHdr.SetAddress (frameHdr.GetAddress ());
+        replyFrameHdr.SetAck (true);
+        m_reply.frameHeader = replyFrameHdr;
+
+      }
   }
 
   void

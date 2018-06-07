@@ -23,7 +23,11 @@
 #define NETWORK_STATUS_H
 
 #include "ns3/device-status.h"
+#include "ns3/end-device-status.h"
 #include "ns3/gateway-status.h"
+#include "ns3/lora-device-address.h"
+#include "ns3/network-server-controller.h"
+#include "ns3/network-server-scheduler.h"
 
 namespace ns3 {
 
@@ -33,7 +37,7 @@ namespace ns3 {
  * one containing DeviceStatus objects, and the other containing GatewayStatus
  * objects.
  */
-class NetworkStatus
+  class NetworkStatus : public Object
 {
 public:
   static TypeId GetTypeId (void);
@@ -42,34 +46,32 @@ public:
   virtual ~NetworkStatus ();
 
   /**
-   * Inform the NetworkStatus that this node is connected to the network.
-   * This method will create a DeviceStatus object for the new node (if it
-   * doesn't already exist).
    */
-  void AddNode (Ptr<Node> node);
+  void AddNode (LoraDeviceAddress edAddress);
 
   /**
    * Add this gateway to the list of gateways connected to the network.
    * Each GW is identified by its Address in the NS-GWs network.
    */
-  void AddGateway (Ptr<Node> gateway, Address& address);
+  void AddGateway (Address& address, GatewayStatus gwStatus);
 
   /**
    * Update network status on the received packet. 
    * \param packet the received packet
    */
-  bool Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
+  void Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
                 uint16_t protocol, const Address& address);
 
+  void InsertReceivedPacket (Ptr<const Packet> packet, const Address& gwaddress);
 protected:
-  Ptr<NetworkStatusScheduler> m_scheduler;
-  Ptr<NetworkStatusController> m_controller;
+  // Ptr<NetworkServerScheduler> m_scheduler;
+  Ptr<NetworkServerController> m_controller;
   Ptr<NetworkStatus> m_status;
-  std::map<LoraDeviceAddress,EndDeviceStatus> m_endDeviceStatuses;
-  std::map<Address,Ptr<GatewayStatus>> m_gatewayStatuses;
+  std::map<LoraDeviceAddress, EndDeviceStatus> m_endDeviceStatuses;
+  std::map<Address, GatewayStatus> m_gatewayStatuses;
 
 };
 
 } /* namespace ns3 */
 
-#endif /* NETWORK_SERVER_H */
+#endif /* NETWORK_STATUS_H */
