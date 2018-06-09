@@ -17,7 +17,7 @@ compiler:
   - gcc
 before_install:
   - eval "${COMPILER_VERSION}"
-  - git clone --depth=1 https://github.com/nsnam/ns-3-dev-git ns-3-dev
+  - git clone --depth=1 --branch ns-3.28 https://github.com/nsnam/ns-3-dev-git ns-3-dev
   - git clone --depth=1 https://github.com/signetlabdei/lorawan ns-3-dev/src/lorawan
 script:
   - cd ns-3-dev/
