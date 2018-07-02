@@ -18,8 +18,8 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#include "ns3/network-server-helper.h"
-#include "ns3/network-server.h"
+#include "ns3/simple-network-server-helper.h"
+#include "ns3/simple-network-server.h"
 #include "ns3/double.h"
 #include "ns3/string.h"
 #include "ns3/trace-source-accessor.h"
@@ -28,45 +28,45 @@
 
 namespace ns3 {
 
-  NS_LOG_COMPONENT_DEFINE ("NetworkServerHelper");
+  NS_LOG_COMPONENT_DEFINE ("SimpleNetworkServerHelper");
 
-  NetworkServerHelper::NetworkServerHelper ()
+  SimpleNetworkServerHelper::SimpleNetworkServerHelper ()
   {
-    m_factory.SetTypeId ("ns3::NetworkServer");
+    m_factory.SetTypeId ("ns3::SimpleNetworkServer");
     p2pHelper.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
     p2pHelper.SetChannelAttribute ("Delay", StringValue ("2ms"));
   }
 
-  NetworkServerHelper::~NetworkServerHelper ()
+  SimpleNetworkServerHelper::~SimpleNetworkServerHelper ()
   {
   }
 
   void
-  NetworkServerHelper::SetAttribute (std::string name, const AttributeValue &value)
+  SimpleNetworkServerHelper::SetAttribute (std::string name, const AttributeValue &value)
   {
     m_factory.Set (name, value);
   }
 
   void
-  NetworkServerHelper::SetGateways (NodeContainer gateways)
+  SimpleNetworkServerHelper::SetGateways (NodeContainer gateways)
   {
     m_gateways = gateways;
   }
 
   void
-  NetworkServerHelper::SetEndDevices (NodeContainer endDevices)
+  SimpleNetworkServerHelper::SetEndDevices (NodeContainer endDevices)
   {
     m_endDevices = endDevices;
   }
 
   ApplicationContainer
-  NetworkServerHelper::Install (Ptr<Node> node)
+  SimpleNetworkServerHelper::Install (Ptr<Node> node)
   {
     return ApplicationContainer (InstallPriv (node));
   }
 
   ApplicationContainer
-  NetworkServerHelper::Install (NodeContainer c)
+  SimpleNetworkServerHelper::Install (NodeContainer c)
   {
     ApplicationContainer apps;
     for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
@@ -78,11 +78,11 @@ namespace ns3 {
   }
 
   Ptr<Application>
-  NetworkServerHelper::InstallPriv (Ptr<Node> node)
+  SimpleNetworkServerHelper::InstallPriv (Ptr<Node> node)
   {
     NS_LOG_FUNCTION (this << node);
 
-    Ptr<NetworkServer> app = m_factory.Create<NetworkServer> ();
+    Ptr<SimpleNetworkServer> app = m_factory.Create<SimpleNetworkServer> ();
 
     app->SetNode (node);
     node->AddApplication (app);
@@ -100,18 +100,18 @@ namespace ns3 {
         app->AddGateway (*i, container.Get (0));
       }
 
-    // Link the NetworkServer to its NetDevices
+    // Link the SimpleNetworkServer to its NetDevices
     for (uint32_t i = 0; i < node->GetNDevices (); i++)
       {
         Ptr<NetDevice> currentNetDevice = node->GetDevice (i);
         currentNetDevice->SetReceiveCallback (MakeCallback
-                                              (&NetworkServer::Receive,
+                                              (&SimpleNetworkServer::Receive,
                                                app));
       }
 
     // Add the end devices
     app->AddNodes (m_endDevices);
 
-  return app;
-}
+    return app;
+  }
 } // namespace ns3

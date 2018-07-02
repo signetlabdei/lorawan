@@ -81,10 +81,6 @@ int main (int argc, char *argv[])
   positionAllocEd->Add (Vector (6000.0, 0.0, 0.0));
   positionAllocEd->Add (Vector (0.0, 100.0, 0.0));
   mobilityEd.SetPositionAllocator (positionAllocEd);
-  // mobilityEd.SetPositionAllocator ("ns3::UniformDiscPositionAllocator",
-  //                                "rho", DoubleValue (7500),
-  //                                "X", DoubleValue (0.0),
-  //                                "Y", DoubleValue (0.0));
   mobilityEd.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
 
   // Gateway mobility

@@ -51,6 +51,7 @@ def build(bld):
         'helper/one-shot-sender-helper.cc',
         'helper/forwarder-helper.cc',
         'helper/network-server-helper.cc',
+        'helper/simple-network-server-helper.cc',
         ]
 
     module_test = bld.create_ns3_module_test_library('lorawan')
@@ -106,6 +107,7 @@ def build(bld):
         'helper/one-shot-sender-helper.h',
         'helper/forwarder-helper.h',
         'helper/network-server-helper.h',
+        'helper/simple-network-server-helper.h',
         ]
 
     if bld.env.ENABLE_EXAMPLES:

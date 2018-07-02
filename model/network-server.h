@@ -82,13 +82,13 @@ public:
    * Add this gateway to the list of gateways connected to this NS.
    * Each GW is identified by its Address in the NS-GWs network.
    */
-  void AddGateway (Ptr<Node> gateway, Ptr<NetDevice> netDevice, Address& address);
+  void AddGateway (Ptr<Node> gateway, Ptr<NetDevice> netDevice);
 
   /**
    * Receive a packet from a gateway.
    * \param packet the received packet
    */
-  void Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
+  bool Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
                 uint16_t protocol, const Address& address);
 
 
