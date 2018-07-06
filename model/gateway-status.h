@@ -87,9 +87,6 @@ private:
 
   Ptr<GatewayLoraMac> m_gatewayMac;   //!< The Mac layer of the gateway
 
-  bool m_isTransmitting; //!< Whether this gateway is already booked for
-                         //!transmission or not
-
   Time m_nextTransmissionTime; //!< This gateway's next transmission time
 };
 }
