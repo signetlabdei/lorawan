@@ -65,10 +65,11 @@ namespace ns3 {
     if (m_endDeviceStatuses.find (edAddress) == m_endDeviceStatuses.end ())
       {
         // The device doesn't exist. Create new EndDeviceStatus
-        EndDeviceStatus edStatus = EndDeviceStatus ();
+        Ptr<EndDeviceStatus> edStatus = CreateObject<EndDeviceStatus>
+          (edAddress, edMac->GetObject<EndDeviceLoraMac>());
 
         // Add it to the map
-        m_endDeviceStatuses.insert (std::pair<LoraDeviceAddress, EndDeviceStatus>
+        m_endDeviceStatuses.insert (std::pair<LoraDeviceAddress, Ptr<EndDeviceStatus>>
                                     (edAddress, edStatus));
         NS_LOG_DEBUG ("Added to the list a device with address " <<
                       edAddress.Print ());
@@ -76,7 +77,7 @@ namespace ns3 {
   }
 
   void
-  NetworkStatus::AddGateway (Address& address, GatewayStatus gwStatus)
+  NetworkStatus::AddGateway (Address& address, Ptr<GatewayStatus> gwStatus)
   {
     NS_LOG_FUNCTION (this);
 
@@ -86,7 +87,7 @@ namespace ns3 {
         // The device doesn't exist.
 
         // Add it to the map
-        m_gatewayStatuses.insert (std::pair<Address,GatewayStatus>
+        m_gatewayStatuses.insert (std::pair<Address, Ptr<GatewayStatus> >
                                   (address, gwStatus));
         NS_LOG_DEBUG ("Added to the list a gateway with address " << address);
       }
@@ -96,7 +97,7 @@ namespace ns3 {
   NetworkStatus::OnReceivedPacket (Ptr<const Packet> packet,
                                    const Address& gwAddress)
   {
-    // NS_LOG_FUNCTION (this << packet << protocol << address);
+    NS_LOG_FUNCTION (this << packet << gwAddress);
 
     // Create a copy of the packet
     Ptr<Packet> myPacket = packet->Copy ();
@@ -104,13 +105,68 @@ namespace ns3 {
     // Extract the headers
     LoraMacHeader macHdr;
     myPacket->RemoveHeader (macHdr);
-
     LoraFrameHeader frameHdr;
     myPacket->RemoveHeader (frameHdr);
+
+    // Update the correct EndDeviceStatus object
     LoraDeviceAddress edAddr= frameHdr.GetAddress();
-
-    m_endDeviceStatuses.at(edAddr).InsertReceivedPacket(packet, gwAddress);
-
+    m_endDeviceStatuses.at(edAddr)->InsertReceivedPacket(packet, gwAddress);
   }
 
+  bool
+  NetworkStatus::NeedsReply(LoraDeviceAddress deviceAddress)
+  {
+    // Throws out of range if no device is found
+    return m_endDeviceStatuses.at(deviceAddress)->NeedsReply ();
+  }
+
+  Address
+  NetworkStatus::GetBestGatewayForDevice(LoraDeviceAddress deviceAddress)
+  {
+    // Get the endDeviceStatus we are interested in
+    Ptr<EndDeviceStatus> edStatus = m_endDeviceStatuses.at(deviceAddress);
+
+    // Get the list of gateways that this device can reach
+    // NOTE: At this point, we could also take into account the whole network to
+    // identify the best gateway according to various metrics. For now, we just
+    // ask the EndDeviceStatus to pick the best gateway for us via its method.
+    Address bestGwAddress = edStatus->GetBestGatewayForReply ();
+
+    return bestGwAddress;
+  }
+
+  void
+  NetworkStatus::SendThroughGateway(Ptr<Packet> packet, Address gwAddress)
+  {
+    NS_LOG_FUNCTION (packet << gwAddress);
+
+    m_gatewayStatuses.find(gwAddress)->second->GetNetDevice()->Send(packet,
+                                                                    gwAddress,
+                                                                    0x0800);
+  }
+
+  Ptr<Packet>
+  NetworkStatus::GetReplyForDevice (LoraDeviceAddress edAddress, int windowNumber)
+  {
+    // Get the reply packet
+    Ptr<EndDeviceStatus> edStatus = m_endDeviceStatuses.find(edAddress)->second;
+    Ptr<Packet> packet = edStatus->GetReply();
+
+    // Apply the appropriate tag
+    LoraTag tag;
+    switch (windowNumber)
+      {
+      case 1:
+        tag.SetDataRate(edStatus->GetMac()->GetFirstReceiveWindowDataRate ());
+        tag.SetFrequency(edStatus->GetFirstReceiveWindowFrequency ());
+        break;
+      case 2:
+        tag.SetDataRate(edStatus->GetMac()->GetSecondReceiveWindowDataRate ());
+        tag.SetFrequency(edStatus->GetSecondReceiveWindowFrequency ());
+        break;
+      }
+
+    packet->AddPacketTag (tag);
+    return packet;
+  }
 }

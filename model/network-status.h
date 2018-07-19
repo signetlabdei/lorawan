@@ -24,10 +24,11 @@
 
 #include "ns3/device-status.h"
 #include "ns3/end-device-status.h"
+#include "ns3/end-device-lora-mac.h"
 #include "ns3/gateway-status.h"
 #include "ns3/lora-device-address.h"
 #include "ns3/network-server-controller.h"
-#include "ns3/network-server-scheduler.h"
+#include "ns3/network-scheduler.h"
 
 namespace ns3 {
 
@@ -58,7 +59,7 @@ namespace ns3 {
      *
      * Each GW is identified by its Address in the NS-GW network.
      */
-    void AddGateway (Address& address, GatewayStatus gwStatus);
+    void AddGateway (Address& address, Ptr<GatewayStatus> gwStatus);
 
     /**
      * Update network status on the received packet.
@@ -68,11 +69,39 @@ namespace ns3 {
      */
     void OnReceivedPacket (Ptr<const Packet> packet, const Address& gwaddress);
 
+    /**
+     * Return whether the specified device needs a reply.
+     *
+     * \param deviceAddress the address of the device we are interested in.
+     */
+    bool NeedsReply (LoraDeviceAddress deviceAddress);
+
+    /**
+     * Return whether we have a gateway that is available to send a reply to the
+     * specified device.
+     *
+     * \param deviceAddress the address of the device we are interested in.
+     */
+    Address GetBestGatewayForDevice (LoraDeviceAddress deviceAddress);
+
+    /**
+     * Send a packet through a Gateway.
+     *
+     * This function assumes that the packet is already tagged with a LoraTag
+     * that will inform the gateway of the parameters to use for the
+     * transmission.
+     */
+    void SendThroughGateway (Ptr<Packet> packet, Address gwAddress);
+
+    /**
+     * Get the reply for the specified device address.
+     */
+    Ptr<Packet> GetReplyForDevice(LoraDeviceAddress edAddress, int windowNumber);
+
+
   protected:
-    // Ptr<NetworkServerScheduler> m_scheduler;
-    Ptr<NetworkServerController> m_controller;
-    std::map<LoraDeviceAddress, EndDeviceStatus> m_endDeviceStatuses;
-    std::map<Address, GatewayStatus> m_gatewayStatuses;
+    std::map<LoraDeviceAddress, Ptr<EndDeviceStatus> > m_endDeviceStatuses;
+    std::map<Address, Ptr<GatewayStatus>> m_gatewayStatuses;
   };
 
 } /* namespace ns3 */

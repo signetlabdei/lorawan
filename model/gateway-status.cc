@@ -23,98 +23,108 @@
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("GatewayStatus");
+  NS_LOG_COMPONENT_DEFINE ("GatewayStatus");
 
-GatewayStatus::GatewayStatus ()
-{
-  NS_LOG_FUNCTION (this);
-}
+  TypeId
+  GatewayStatus::GetTypeId (void)
+  {
+    static TypeId tid = TypeId ("ns3::GatewayStatus")
+      .AddConstructor<GatewayStatus> ()
+      .SetGroupName ("lorawan");
+    return tid;
+  }
 
-GatewayStatus::~GatewayStatus ()
-{
-  NS_LOG_FUNCTION (this);
-}
 
-GatewayStatus::GatewayStatus (Address address, Ptr<NetDevice> netDevice,
-                              Ptr<GatewayLoraMac> gwMac) :
-  m_address (address),
-  m_netDevice (netDevice),
-  m_gatewayMac (gwMac),
-  m_nextTransmissionTime (Seconds (0))
-{
-  NS_LOG_FUNCTION (this);
-}
+  GatewayStatus::GatewayStatus ()
+  {
+    NS_LOG_FUNCTION (this);
+  }
 
-Address
-GatewayStatus::GetAddress ()
-{
-  NS_LOG_FUNCTION (this);
+  GatewayStatus::~GatewayStatus ()
+  {
+    NS_LOG_FUNCTION (this);
+  }
 
-  return m_address;
-}
+  GatewayStatus::GatewayStatus (Address address, Ptr<NetDevice> netDevice,
+                                Ptr<GatewayLoraMac> gwMac) :
+    m_address (address),
+    m_netDevice (netDevice),
+    m_gatewayMac (gwMac),
+    m_nextTransmissionTime (Seconds (0))
+  {
+    NS_LOG_FUNCTION (this);
+  }
 
-void
-GatewayStatus::SetAddress (Address address)
-{
-  NS_LOG_FUNCTION (this);
+  Address
+  GatewayStatus::GetAddress ()
+  {
+    NS_LOG_FUNCTION (this);
 
-  m_address = address;
-}
+    return m_address;
+  }
 
-Ptr<NetDevice>
-GatewayStatus::GetNetDevice ()
-{
-  return m_netDevice;
-}
+  void
+  GatewayStatus::SetAddress (Address address)
+  {
+    NS_LOG_FUNCTION (this);
 
-void
-GatewayStatus::SetNetDevice (Ptr<NetDevice> netDevice)
-{
-  m_netDevice = netDevice;
-}
+    m_address = address;
+  }
 
-Ptr<GatewayLoraMac>
-GatewayStatus::GetGatewayMac (void)
-{
-  return m_gatewayMac;
-}
+  Ptr<NetDevice>
+  GatewayStatus::GetNetDevice ()
+  {
+    return m_netDevice;
+  }
 
-bool
-GatewayStatus::IsAvailableForTransmission (double frequency)
-{
-  // We can't send multiple packets at once, see SX1301 V2.01 page 29
+  void
+  GatewayStatus::SetNetDevice (Ptr<NetDevice> netDevice)
+  {
+    m_netDevice = netDevice;
+  }
 
-  // Check that the gateway was not already "booked"
-  if (m_nextTransmissionTime > Simulator::Now () - MilliSeconds (1))
-    {
-      NS_LOG_INFO ("This gateway is already booked for a transmission");
-      return false;
-    }
+  Ptr<GatewayLoraMac>
+  GatewayStatus::GetGatewayMac (void)
+  {
+    return m_gatewayMac;
+  }
 
-  // Check that the gateway is not already in TX mode
-  if (m_gatewayMac->IsTransmitting ())
-    {
-      NS_LOG_INFO ("This gateway is currently transmitting");
-      return false;
-    }
+  bool
+  GatewayStatus::IsAvailableForTransmission (double frequency)
+  {
+    // We can't send multiple packets at once, see SX1301 V2.01 page 29
 
-  // Check that the gateway is not constrained by the duty cycle
-  Time waitingTime = m_gatewayMac->GetWaitingTime (frequency);
-  if (waitingTime > Seconds (0))
-    {
-      NS_LOG_INFO ("Gateway cannot be used because of duty cycle");
-      NS_LOG_INFO ("Waiting time at current GW: " << waitingTime.GetSeconds ()
-                                                  << " seconds");
+    // Check that the gateway was not already "booked"
+    if (m_nextTransmissionTime > Simulator::Now () - MilliSeconds (1))
+      {
+        NS_LOG_INFO ("This gateway is already booked for a transmission");
+        return false;
+      }
 
-      return false;
-    }
+    // Check that the gateway is not already in TX mode
+    if (m_gatewayMac->IsTransmitting ())
+      {
+        NS_LOG_INFO ("This gateway is currently transmitting");
+        return false;
+      }
 
-  return true;
-}
+    // Check that the gateway is not constrained by the duty cycle
+    Time waitingTime = m_gatewayMac->GetWaitingTime (frequency);
+    if (waitingTime > Seconds (0))
+      {
+        NS_LOG_INFO ("Gateway cannot be used because of duty cycle");
+        NS_LOG_INFO ("Waiting time at current GW: " << waitingTime.GetSeconds ()
+                     << " seconds");
 
-void
-GatewayStatus::SetNextTransmissionTime (Time nextTransmissionTime)
-{
-  m_nextTransmissionTime = nextTransmissionTime;
-}
+        return false;
+      }
+
+    return true;
+  }
+
+  void
+  GatewayStatus::SetNextTransmissionTime (Time nextTransmissionTime)
+  {
+    m_nextTransmissionTime = nextTransmissionTime;
+  }
 }

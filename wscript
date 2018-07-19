@@ -40,6 +40,7 @@ def build(bld):
         'model/simple-network-server.cc',
         'model/network-server.cc',
         'model/network-status.cc',
+        'model/network-scheduler.cc',
         'model/device-status.cc',
         'model/end-device-status.cc',
         'model/gateway-status.cc',
@@ -62,6 +63,7 @@ def build(bld):
     module_test.source = [
         'test/lorawan-test-suite.cc',
         'test/network-status-test-suite.cc',
+        'test/network-scheduler-test-suite.cc',
         'test/network-server-test-suite.cc',
         ]
 
@@ -96,8 +98,8 @@ def build(bld):
         'model/simple-network-server.h',
         'model/network-server.h',
         'model/network-status.h',
-        'model/network-server-controller.h',
-        'model/network-server-scheduler.h',
+        'model/network-controller.h',
+        'model/network-scheduler.h',
         'model/device-status.h',
         'model/end-device-status.h',
         'model/gateway-status.h',

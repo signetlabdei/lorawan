@@ -31,9 +31,9 @@
 #include "ns3/device-status.h"
 #include "ns3/gateway-status.h"
 #include "ns3/network-status.h"
+#include "ns3/network-scheduler.h"
+#include "ns3/network-controller.h"
 #include "ns3/node-container.h"
-#include "ns3/network-server-scheduler.h"
-#include "ns3/network-server-controller.h"
 #include "ns3/log.h"
 #include "ns3/end-device-lora-mac.h"
 
@@ -153,9 +153,9 @@ namespace ns3 {
                           uint8_t maxDataRate);
 
   protected:
-    Ptr<NetworkServerScheduler> m_scheduler;
-    Ptr<NetworkServerController> m_controller;
-    Ptr<NetworkStatus> m_networkStatus;
+    Ptr<NetworkStatus> m_status;
+    Ptr<NetworkScheduler> m_scheduler;
+    Ptr<NetworkController> m_controller;
 
     TracedCallback<Ptr<const Packet> > m_receivedPacket;
   };

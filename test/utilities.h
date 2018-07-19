@@ -23,6 +23,8 @@
 #include "ns3/lora-helper.h"
 #include "ns3/mobility-helper.h"
 #include "ns3/position-allocator.h"
+#include "ns3/forwarder-helper.h"
+#include "ns3/network-server-helper.h"
 
 namespace ns3 {
 
@@ -30,6 +32,7 @@ namespace ns3 {
     Ptr<LoraChannel> channel;
     NodeContainer endDevices;
     NodeContainer gateways;
+    Ptr<Node> nsNode;
   };
 
   Ptr<LoraChannel> CreateChannel (void);

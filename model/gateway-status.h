@@ -28,67 +28,69 @@
 
 namespace ns3 {
 
-class GatewayStatus
-{
-public:
+  class GatewayStatus : public Object
+  {
+  public:
 
-  GatewayStatus ();
-  virtual ~GatewayStatus ();
-  GatewayStatus (Address address, Ptr<NetDevice> netDevice, Ptr<GatewayLoraMac> gwMac);
+    static TypeId GetTypeId (void);
 
-  /**
-   * Get this gateway's P2P link address.
-   */
-  Address GetAddress ();
+    GatewayStatus ();
+    GatewayStatus (Address address, Ptr<NetDevice> netDevice, Ptr<GatewayLoraMac> gwMac);
+    virtual ~GatewayStatus ();
 
-  /**
-   * Set this gateway's P2P link address.
-   */
-  void SetAddress (Address address);
+    /**
+     * Get this gateway's P2P link address.
+     */
+    Address GetAddress ();
 
-  /**
-   * Get the NetDevice through which it's possible to contact this gateway from the server.
-   */
-  Ptr<NetDevice> GetNetDevice ();
+    /**
+     * Set this gateway's P2P link address.
+     */
+    void SetAddress (Address address);
 
-  /**
-   * Set the NetDevice through which it's possible to contact this gateway from the server.
-   */
-  void SetNetDevice (Ptr<NetDevice> netDevice);
+    /**
+     * Get the NetDevice through which it's possible to contact this gateway from the server.
+     */
+    Ptr<NetDevice> GetNetDevice ();
 
-  /**
-   * Get a pointer to this gateway's MAC instance.
-   */
-  Ptr<GatewayLoraMac> GetGatewayMac (void);
+    /**
+     * Set the NetDevice through which it's possible to contact this gateway from the server.
+     */
+    void SetNetDevice (Ptr<NetDevice> netDevice);
 
-  /**
-   * Set a pointer to this gateway's MAC instance.
-   */
-  // void SetGatewayMac (Ptr<GatewayLoraMac> gwMac);
+    /**
+     * Get a pointer to this gateway's MAC instance.
+     */
+    Ptr<GatewayLoraMac> GetGatewayMac (void);
 
-  /**
-   * Query whether or not this gateway is available for immediate transmission
-   * on this frequency.
-   *
-   * \param frequency The frequency at which the gateway's availability should
-   * be queried.
-   * \return True if the gateway's available, false otherwise.
-   */
-  bool IsAvailableForTransmission (double frequency);
+    /**
+     * Set a pointer to this gateway's MAC instance.
+     */
+    // void SetGatewayMac (Ptr<GatewayLoraMac> gwMac);
 
-  void SetNextTransmissionTime (Time nextTransmissionTime);
-  // Time GetNextTransmissionTime (void);
+    /**
+     * Query whether or not this gateway is available for immediate transmission
+     * on this frequency.
+     *
+     * \param frequency The frequency at which the gateway's availability should
+     * be queried.
+     * \return True if the gateway's available, false otherwise.
+     */
+    bool IsAvailableForTransmission (double frequency);
 
-private:
+    void SetNextTransmissionTime (Time nextTransmissionTime);
+    // Time GetNextTransmissionTime (void);
 
-  Address m_address; //!< The Address of the P2PNetDevice of this gateway
+  private:
 
-  Ptr<NetDevice> m_netDevice;   //!< The NetDevice through which to reach this gateway from the server
+    Address m_address; //!< The Address of the P2PNetDevice of this gateway
 
-  Ptr<GatewayLoraMac> m_gatewayMac;   //!< The Mac layer of the gateway
+    Ptr<NetDevice> m_netDevice;   //!< The NetDevice through which to reach this gateway from the server
 
-  Time m_nextTransmissionTime; //!< This gateway's next transmission time
-};
+    Ptr<GatewayLoraMac> m_gatewayMac;   //!< The Mac layer of the gateway
+
+    Time m_nextTransmissionTime; //!< This gateway's next transmission time
+  };
 }
 
 #endif /* DEVICE_STATUS_H */

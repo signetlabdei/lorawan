@@ -53,7 +53,8 @@ namespace ns3 {
   }
 
   NetworkServer::NetworkServer () :
-    m_networkStatus (Create<NetworkStatus> ())
+    m_status (Create<NetworkStatus> ()),
+    m_scheduler (Create<NetworkScheduler> (m_status))
   {
     NS_LOG_FUNCTION_NOARGS ();
   }
@@ -101,9 +102,11 @@ namespace ns3 {
     Address gatewayAddress = p2pNetDevice->GetAddress ();
 
     // Create new gatewayStatus
-    GatewayStatus gwStatus = GatewayStatus (gatewayAddress, netDevice, gwMac);
+    Ptr<GatewayStatus> gwStatus = Create<GatewayStatus> (gatewayAddress,
+                                                         netDevice,
+                                                         gwMac);
 
-    m_networkStatus->AddGateway(gatewayAddress, gwStatus);
+    m_status->AddGateway(gatewayAddress, gwStatus);
   }
 
   void
@@ -140,7 +143,8 @@ namespace ns3 {
     Ptr<EndDeviceLoraMac> edLoraMac =
       loraNetDevice->GetMac()->GetObject<EndDeviceLoraMac> ();
 
-    m_networkStatus->AddNode (edLoraMac);
+    // Update the NetworkStatus about the existence of this node
+    m_status->AddNode (edLoraMac);
   }
 
   bool
@@ -154,6 +158,15 @@ namespace ns3 {
 
     // Fire the trace source
     m_receivedPacket (packet);
+
+    // Inform the scheduler of the newly arrived packet
+    m_scheduler->OnReceivedPacket (packet);
+
+    // Inform the status of the newly arrived packet
+    m_status->OnReceivedPacket (packet, address);
+
+    // Inform the controller of the newly arrived packet
+    // m_controller->OnNewPacket ();
 
     return true;
   }

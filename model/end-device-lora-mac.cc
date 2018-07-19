@@ -351,6 +351,8 @@ EndDeviceLoraMac::Receive (Ptr<Packet const> packet)
   LoraMacHeader mHdr;
   packetCopy->RemoveHeader (mHdr);
 
+  NS_LOG_DEBUG ("Mac Header: " << mHdr);
+
   // Only keep analyzing the packet if it's downlink
   if (!mHdr.IsUplink ())
     {
@@ -360,6 +362,8 @@ EndDeviceLoraMac::Receive (Ptr<Packet const> packet)
       LoraFrameHeader fHdr;
       fHdr.SetAsDownlink ();
       packetCopy->RemoveHeader (fHdr);
+
+      NS_LOG_DEBUG ("Frame Header: " << fHdr);
 
       // Determine whether this packet is for us
       bool messageForUs = (m_address == fHdr.GetAddress ());

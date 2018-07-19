@@ -36,9 +36,29 @@ namespace ns3 {
 
   NS_LOG_COMPONENT_DEFINE ("EndDeviceStatus");
 
+  TypeId
+  EndDeviceStatus::GetTypeId (void)
+  {
+    static TypeId tid = TypeId ("ns3::EndDeviceStatus")
+      .SetParent<Object> ()
+      .AddConstructor<EndDeviceStatus> ()
+      .SetGroupName ("lorawan");
+    return tid;
+  }
+
+  EndDeviceStatus::EndDeviceStatus (LoraDeviceAddress endDeviceAddress,
+                                    Ptr<EndDeviceLoraMac> endDeviceMac) :
+    m_reply (EndDeviceStatus::Reply()),
+    m_receivedPacketList (ReceivedPacketList()),
+    m_endDeviceAddress (endDeviceAddress),
+    m_mac (endDeviceMac)
+  {
+    NS_LOG_FUNCTION (endDeviceAddress);
+  }
+
   EndDeviceStatus::EndDeviceStatus ()
   {
-    NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION_NOARGS ();
 
     // Initialize data structure
     m_reply = EndDeviceStatus::Reply();
@@ -47,7 +67,7 @@ namespace ns3 {
 
   EndDeviceStatus::~EndDeviceStatus ()
   {
-    NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION_NOARGS ();
   }
 
   ///////////////
@@ -57,7 +77,7 @@ namespace ns3 {
   uint8_t
   EndDeviceStatus::GetFirstReceiveWindowSpreadingFactor ()
   {
-    NS_LOG_FUNCTION (this << m_firstReceiveWindowSpreadingFactor);
+    NS_LOG_FUNCTION_NOARGS ();
 
     return m_firstReceiveWindowSpreadingFactor;
   }
@@ -65,7 +85,7 @@ namespace ns3 {
   double
   EndDeviceStatus::GetFirstReceiveWindowFrequency ()
   {
-    NS_LOG_FUNCTION (this << m_firstReceiveWindowFrequency);
+    NS_LOG_FUNCTION_NOARGS ();
 
     return m_firstReceiveWindowFrequency;
   }
@@ -73,7 +93,7 @@ namespace ns3 {
   uint8_t
   EndDeviceStatus::GetSecondReceiveWindowOffset ()
   {
-    NS_LOG_FUNCTION (this << m_secondReceiveWindowOffset);
+    NS_LOG_FUNCTION_NOARGS ();
 
     return m_secondReceiveWindowOffset;
   }
@@ -81,14 +101,14 @@ namespace ns3 {
   double
   EndDeviceStatus::GetSecondReceiveWindowFrequency ()
   {
-    NS_LOG_FUNCTION (this << m_secondReceiveWindowFrequency);
+    NS_LOG_FUNCTION_NOARGS ();
     return m_secondReceiveWindowFrequency;
   }
 
   Ptr<Packet>
   EndDeviceStatus::GetReply ()
   {
-    NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION_NOARGS ();
 
     // Start from reply payload
     Ptr<Packet> replyPacket;
@@ -104,17 +124,18 @@ namespace ns3 {
       }
 
     // Add headers
+    // Make sure the MAC header is set as downlink
+    m_reply.macHeader.SetMType(LoraMacHeader::CONFIRMED_DATA_DOWN);
     replyPacket->AddHeader (m_reply.frameHeader);
     replyPacket->AddHeader (m_reply.macHeader);
 
     return replyPacket;
   }
 
-
   bool
   EndDeviceStatus::NeedsReply (void)
   {
-    NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION_NOARGS ();
 
     return m_reply.needsReply;
   }
@@ -122,56 +143,62 @@ namespace ns3 {
   LoraMacHeader
   EndDeviceStatus::GetReplyMacHeader ()
   {
-    NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION_NOARGS ();
     return m_reply.macHeader;
   }
 
   LoraFrameHeader
   EndDeviceStatus::GetReplyFrameHeader ()
   {
-    NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION_NOARGS ();
     return m_reply.frameHeader;
   }
 
   Ptr<Packet>
   EndDeviceStatus::GetReplyPayload (void)
   {
-    NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION_NOARGS ();
     return m_reply.payload-> Copy();
+  }
+
+  Ptr<EndDeviceLoraMac>
+  EndDeviceStatus::GetMac(void)
+  {
+    return m_mac;
   }
 
   EndDeviceStatus::ReceivedPacketList
   EndDeviceStatus::GetReceivedPacketList ()
   {
-    NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION_NOARGS ();
     return m_receivedPacketList;
   }
 
   void
   EndDeviceStatus::SetFirstReceiveWindowSpreadingFactor (uint8_t sf)
   {
-    NS_LOG_FUNCTION (this << double(sf));
+    NS_LOG_FUNCTION_NOARGS ();
     m_firstReceiveWindowSpreadingFactor = sf;
   }
 
   void
   EndDeviceStatus::SetFirstReceiveWindowFrequency (double frequency)
   {
-    NS_LOG_FUNCTION (this << frequency);
+    NS_LOG_FUNCTION_NOARGS ();
     m_firstReceiveWindowFrequency = frequency;
   }
 
   void
   EndDeviceStatus::SetSecondReceiveWindowOffset (uint8_t offset)
   {
-    NS_LOG_FUNCTION (this << double(offset));
+    NS_LOG_FUNCTION_NOARGS ();
     m_secondReceiveWindowOffset = offset;
   }
 
   void
   EndDeviceStatus::SetSecondReceiveWindowFrequency (double frequency)
   {
-    NS_LOG_FUNCTION (this << frequency);
+    NS_LOG_FUNCTION_NOARGS ();
     m_secondReceiveWindowFrequency = frequency;
   }
 
@@ -180,21 +207,21 @@ namespace ns3 {
   void
   EndDeviceStatus::SetReplyMacHeader (LoraMacHeader macHeader)
   {
-    NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION_NOARGS ();
     m_reply.macHeader = macHeader;
   }
 
   void
   EndDeviceStatus::SetReplyFrameHeader (LoraFrameHeader frameHeader)
   {
-    NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION_NOARGS ();
     m_reply.frameHeader = frameHeader;
   }
 
   void
   EndDeviceStatus::SetReplyPayload(Ptr<Packet> replyPayload)
   {
-    NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION_NOARGS ();
     m_reply.payload = replyPayload;
   }
 
@@ -206,10 +233,10 @@ namespace ns3 {
   EndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket,
                                          const Address& gwAddress)
   {
-    NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION_NOARGS ();
 
     // Create a copy of the packet
-    Ptr<Packet> myPacket = receivedPacket->Copy ();
+    Ptr<Packet> myPacket = receivedPacket->Copy();
 
     // Extract the headers
     LoraMacHeader macHdr;
@@ -223,28 +250,45 @@ namespace ns3 {
     myPacket->RemovePacketTag (tag);
     SetFirstReceiveWindowSpreadingFactor(tag.GetSpreadingFactor());
     SetFirstReceiveWindowFrequency(tag.GetFrequency());
-    //TODO extract BW
 
     // Update Information on the received packet
     ReceivedPacketInfo info;
     info.sf = tag.GetSpreadingFactor();
     info.frequency= tag.GetFrequency();
+    info.packet = receivedPacket;
 
     double rcvPower = tag.GetReceivePower();
 
-    auto it = m_receivedPacketList.find(receivedPacket);
-    if (it != m_receivedPacketList.end())
+    // Perform insertion in list, also checking that the packet isn't already in
+    // the list (it could have been received by another GW already)
+
+    // Start searching from the end
+    auto it = m_receivedPacketList.rbegin();
+    for (; it != m_receivedPacketList.rend(); it++)
       {
-        m_receivedPacketList.insert(std::pair<Ptr<Packet const>, ReceivedPacketInfo>
-                                    (receivedPacket,info));
+        if ((*it).first == receivedPacket) // Found the packet!
+          {
+            // This packet had already been received from another gateway:
+            // add this gateway's reception information.
+            GatewayList gwList = it -> second.gwList;
+
+            PacketInfoPerGw gwInfo;
+            gwInfo.receivedTime = Simulator::Now();
+            gwInfo.rxPower= rcvPower;
+            gwList.insert (std::pair<Address, PacketInfoPerGw> (gwAddress, gwInfo));
+
+            break; // Exit from the cycle
+          }
       }
-    // this packet had already been received from another gateway:
-    //   adding this gateway's reception information.
-    else
+    if (it == m_receivedPacketList.rend())
       {
-        ReceivedPacketInfo savedInfo = it -> second;
-        GatewayList savedGwList = savedInfo.gwlist;
-        UpdateGatewayData (savedGwList, gwAddress, rcvPower);
+        PacketInfoPerGw gwInfo;
+        gwInfo.receivedTime = Simulator::Now();
+        gwInfo.rxPower = rcvPower;
+        gwInfo.gwAddress = gwAddress;
+        info.gwList.insert(std::pair<Address, PacketInfoPerGw> (gwAddress, gwInfo));
+        m_receivedPacketList.push_back(std::pair<Ptr<Packet const>, ReceivedPacketInfo>
+                                       (receivedPacket, info));
       }
 
     // Determine whether the packet requires a reply
@@ -256,7 +300,7 @@ namespace ns3 {
 
         LoraFrameHeader replyFrameHdr = LoraFrameHeader ();
         replyFrameHdr.SetAsDownlink ();
-        // replyFrameHdr.SetAddress (frameHdr.GetAddress ());
+        replyFrameHdr.SetAddress (m_endDeviceAddress);
         replyFrameHdr.SetAck (true);
         m_reply.frameHeader = replyFrameHdr;
 
@@ -266,7 +310,7 @@ namespace ns3 {
   void
   EndDeviceStatus::InitializeReply ()
   {
-    NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION_NOARGS ();
     m_reply = Reply ();
     m_reply.needsReply = false;
   }
@@ -277,22 +321,33 @@ namespace ns3 {
     m_reply.macCommandList.push_back (macCommand);
   }
 
-  void
-  EndDeviceStatus::UpdateGatewayData (GatewayList gwList, Address gwAddress, double rcvPower)
-  {  NS_LOG_FUNCTION (this << gwAddress << rcvPower);
+  Address
+  EndDeviceStatus::GetBestGatewayForReply(void)
+  {
+    // Cycle gateways that received the last packet.
+    // Pick the one that received it with the highest power.
+    // If it is available for transmission, return that one. Else, check the
+    // second best one.
+    ReceivedPacketInfo info = m_receivedPacketList.back().second;
 
-    std::map<Address, PacketInfoPerGw>::iterator it = gwList.find (gwAddress);
-    if (it != gwList.end ())
+    GatewayList gwList = info.gwList;
+
+
+    Address bestGwAddress = Address();
+    double bestRxPower = -1000;
+
+    for (auto it = gwList.begin(); it != gwList.end(); it++)
       {
-        // Erase the existing entry
-        gwList.erase (it);
+        Address currentGwAddress = (*it).first;
+        double currentRxPower = (*it).second.rxPower;
+
+        if (currentRxPower > bestRxPower)
+          {
+            bestRxPower = currentRxPower;
+            bestGwAddress = currentGwAddress;
+          }
       }
-    // Create a new entry
-    PacketInfoPerGw gwInfo;
-    gwInfo.receivedTime = Simulator::Now();
-    gwInfo.rxPower= rcvPower;
-    gwList.insert (std::pair<Address, PacketInfoPerGw> (gwAddress, gwInfo));
 
+    return bestGwAddress;
   }
-
 }

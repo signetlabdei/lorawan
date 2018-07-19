@@ -70,6 +70,23 @@ namespace ns3 {
     return gateways;
   }
 
+  Ptr<Node>
+  CreateNetworkServer (NodeContainer endDevices, NodeContainer gateways)
+  {
+    // Create the NetworkServer
+    NetworkServerHelper networkServerHelper = NetworkServerHelper();
+    networkServerHelper.SetEndDevices (endDevices);
+    networkServerHelper.SetGateways (gateways);
+    Ptr<Node> nsNode = CreateObject<Node> ();
+    networkServerHelper.Install (nsNode); // This connects NS and GWs
+
+    // Install a forwarder on the gateways
+    ForwarderHelper forwarderHelper;
+    forwarderHelper.Install (gateways);
+
+    return nsNode;
+  }
+
   NetworkComponents
   InitializeNetwork (int nDevices, int nGateways)
   {
@@ -91,7 +108,9 @@ namespace ns3 {
 
     LoraMacHelper ().SetSpreadingFactorsUp (endDevices, gateways, channel);
 
-    return {channel, endDevices, gateways};
+    Ptr<Node> nsNode = CreateNetworkServer (endDevices, gateways);
+
+    return {channel, endDevices, gateways, nsNode};
   }
 
 }

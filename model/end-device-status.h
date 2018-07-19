@@ -25,6 +25,7 @@
 #include "ns3/lora-net-device.h"
 #include "ns3/lora-device-address.h"
 #include "ns3/lora-mac-header.h"
+#include "ns3/end-device-lora-mac.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/pointer.h"
 #include "ns3/lora-mac-header.h"
@@ -76,10 +77,10 @@ namespace ns3 {
    *                 - Reception power
    */
 
-  class EndDeviceStatus {
+  class EndDeviceStatus : public Object
+  {
 
   public:
-
 
     /********************/
     /* Reply management */
@@ -170,19 +171,24 @@ namespace ns3 {
     {
       // Members
       Ptr<Packet const> packet = 0; //!< The received packet
-      GatewayList gwlist;    //!< List of gateways that received this packet.
+      GatewayList gwList;    //!< List of gateways that received this packet.
       uint8_t sf;
       double frequency;
     };
 
-    typedef std::map<Ptr<Packet const>, ReceivedPacketInfo> ReceivedPacketList;
+    typedef std::list<std::pair<Ptr<Packet const>, ReceivedPacketInfo> >
+      ReceivedPacketList;
 
 
     /*******************************************/
     /* Proper EndDeviceStatus class definition */
     /*******************************************/
 
+    static TypeId GetTypeId (void);
+
     EndDeviceStatus();
+    EndDeviceStatus(LoraDeviceAddress endDeviceAddress,
+                    Ptr<EndDeviceLoraMac> endDeviceMac);
     virtual ~EndDeviceStatus();
 
     /**
@@ -253,6 +259,8 @@ namespace ns3 {
      */
     void SetReplyPayload (Ptr<Packet> replyPayload);
 
+    Ptr<EndDeviceLoraMac> GetMac (void);
+
     //////////////////////
     //  Other methods  //
     //////////////////////
@@ -278,6 +286,12 @@ namespace ns3 {
      */
     void UpdateGatewayData (GatewayList gwList, Address gwAddress, double rcvPower);
 
+    /**
+     * Return the best gateway that:
+     * - Can reach this device
+     * - Is available to send a packet
+     */
+    Address GetBestGatewayForReply (void);
 
   private:
 
@@ -291,6 +305,11 @@ namespace ns3 {
 
     ReceivedPacketList m_receivedPacketList; //<! List of received packets
 
+    LoraDeviceAddress m_endDeviceAddress; //<! The address of this device
+
+    // NOTE Using this attribute is 'cheating', since we are assuming perfect
+    // synchronization between the info at the device and at the network server
+    Ptr<EndDeviceLoraMac> m_mac; //!< Pointer to the MAC layer of this device
   };
 }
 

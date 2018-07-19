@@ -291,7 +291,7 @@ namespace ns3 {
         // Tag the packet so that the Gateway sends it according to the second
         // receive window parameters
         LoraTag replyPacketTag;
-        uint8_t dataRate = m_deviceStatuses.at (address).GetSecondReceiveWindowDataRate ();
+        uint8_t dataRate = m_deviceStatuses.at (address).GetSecondReceiveWindowDataRate  ();
         double frequency = m_deviceStatuses.at (address).GetSecondReceiveWindowFrequency ();
         replyPacketTag.SetDataRate (dataRate);
         replyPacketTag.SetFrequency (frequency);
