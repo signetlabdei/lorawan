@@ -7,7 +7,10 @@
 #     conf.check_nonfatal(header_name='stdint.h', define_name='HAVE_STDINT_H')
 
 def build(bld):
-    module = bld.create_ns3_module('lorawan', ['core', 'network', 'propagation', 'mobility', 'point-to-point', 'energy', 'buildings'])
+    module = bld.create_ns3_module('lorawan', ['core', 'network',
+                                               'propagation', 'mobility',
+                                               'point-to-point', 'energy',
+                                               'buildings'])
     module.source = [
         'model/lora-net-device.cc',
         'model/lora-mac.cc',
@@ -52,13 +55,14 @@ def build(bld):
         'helper/forwarder-helper.cc',
         'helper/network-server-helper.cc',
         'helper/simple-network-server-helper.cc',
+        'test/utilities.cc',
         ]
 
     module_test = bld.create_ns3_module_test_library('lorawan')
     module_test.source = [
         'test/lorawan-test-suite.cc',
+        'test/network-status-test-suite.cc',
         'test/network-server-test-suite.cc',
-        'test/end-device-status-test.cc',
         ]
 
     headers = bld(features='ns3header')
@@ -109,6 +113,7 @@ def build(bld):
         'helper/forwarder-helper.h',
         'helper/network-server-helper.h',
         'helper/simple-network-server-helper.h',
+        'test/utilities.h',
         ]
 
     if bld.env.ENABLE_EXAMPLES:

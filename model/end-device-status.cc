@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Martina Capuzzo <capuzzom@dei.unipd.it>
+ * Authors: Martina Capuzzo <capuzzom@dei.unipd.it>
+ *          Davide Magrin <magrinda@dei.unipd.it>
  */
 
 #include "ns3/end-device-status.h"
@@ -26,9 +27,10 @@
 #include "ns3/pointer.h"
 #include "ns3/command-line.h"
 #include "ns3/simulator.h"
-#include <algorithm>
 #include "ns3/packet.h"
 #include "ns3/lora-tag.h"
+
+#include <algorithm>
 
 namespace ns3 {
 
@@ -37,36 +39,20 @@ namespace ns3 {
   EndDeviceStatus::EndDeviceStatus ()
   {
     NS_LOG_FUNCTION (this);
+
+    // Initialize data structure
+    m_reply = EndDeviceStatus::Reply();
+    m_receivedPacketList = ReceivedPacketList();
   }
 
   EndDeviceStatus::~EndDeviceStatus ()
   {
     NS_LOG_FUNCTION (this);
-    m_reply = EndDeviceStatus::Reply();
-    m_receivedPacketList = ReceivedPacketList();
   }
-
-  /* EndDeviceStatus::EndDeviceStatus (Ptr<Packet> receivedPacket, ReceivedPacketInfo packetInfo)
-     {
-     NS_LOG_FUNCTION (this);
-     // Basta InserReceivedPacket (compila e prova! :) )
-     InsertReceivedPacket (receivedPacket, packetInfo);
-     }
-  */
 
   ///////////////
   //  Getters  //
   ///////////////
-
-  /*
-    LoraDeviceAddress
-  EndDeviceStatus::GetAddress ()
-  {
-    NS_LOG_FUNCTION (this);
-
-    return m_address;
-  }
-  */
 
   uint8_t
   EndDeviceStatus::GetFirstReceiveWindowSpreadingFactor ()
@@ -99,31 +85,38 @@ namespace ns3 {
     return m_secondReceiveWindowFrequency;
   }
 
-  bool
-  EndDeviceStatus::NeedsReply ()
-  {
-    NS_LOG_FUNCTION (this << m_needsReply);
-    return m_needsReply;
-  }
-
   Ptr<Packet>
   EndDeviceStatus::GetReply ()
   {
-    NS_LOG_FUNCTION (this << m_hasReplyPayload);
+    NS_LOG_FUNCTION (this);
+
+    // Start from reply payload
     Ptr<Packet> replyPacket;
-    if (m_hasReplyPayload)
+    if (m_reply.payload) // If it has APP data to send
       {
+        NS_LOG_DEBUG ("Crafting reply packet from existing payload");
         replyPacket = m_reply.payload-> Copy();
-        NS_LOG_DEBUG ("End device status reply has already a payload");
-        
       }
-    else
+    else // If no APP data needs to be sent, use an empty payload
       {
-        replyPacket = Create<Packet> (m_payloadSize);
+        NS_LOG_DEBUG ("Crafting reply packet using an empty payload");
+        replyPacket = Create<Packet> (0);
       }
-    replyPacket -> AddHeader (m_reply.frameHeader);
-    replyPacket -> AddHeader(m_reply.macHeader);
+
+    // Add headers
+    replyPacket->AddHeader (m_reply.frameHeader);
+    replyPacket->AddHeader (m_reply.macHeader);
+
     return replyPacket;
+  }
+
+
+  bool
+  EndDeviceStatus::NeedsReply (void)
+  {
+    NS_LOG_FUNCTION (this);
+
+    return m_reply.needsReply;
   }
 
   LoraMacHeader
@@ -154,18 +147,6 @@ namespace ns3 {
     return m_receivedPacketList;
   }
 
-  EndDeviceStatus::GatewayList
-  EndDeviceStatus::GetGatewayList (Ptr<Packet const> packet)
-  {
-    ReceivedPacketInfo info= m_receivedPacketList.find(packet)-> second;
-    return info.gwlist;
-  }
-
-
-  /////////////////
-  //   Setters   //
-  /////////////////
-
   void
   EndDeviceStatus::SetFirstReceiveWindowSpreadingFactor (uint8_t sf)
   {
@@ -194,22 +175,13 @@ namespace ns3 {
     m_secondReceiveWindowFrequency = frequency;
   }
 
-  
 
-  void
-  EndDeviceStatus::SetNeedsReply (bool needsReply)
-  {
-    NS_LOG_FUNCTION (this << needsReply);
-    m_needsReply = needsReply;
-  }
 
   void
   EndDeviceStatus::SetReplyMacHeader (LoraMacHeader macHeader)
   {
     NS_LOG_FUNCTION (this);
     m_reply.macHeader = macHeader;
-    this->SetNeedsReply(true);
-
   }
 
   void
@@ -217,24 +189,15 @@ namespace ns3 {
   {
     NS_LOG_FUNCTION (this);
     m_reply.frameHeader = frameHeader;
-    this->SetNeedsReply(true);
   }
 
   void
-  EndDeviceStatus::SetReplyPayload(Ptr<Packet const> replyPayload)
+  EndDeviceStatus::SetReplyPayload(Ptr<Packet> replyPayload)
   {
     NS_LOG_FUNCTION (this);
     m_reply.payload = replyPayload;
-    m_hasReplyPayload= true;
-    this->SetNeedsReply(true);
   }
 
-  void
-  EndDeviceStatus::SetPayloadSize (uint8_t payloadSize)
-  {
-    NS_LOG_FUNCTION (this << payloadSize);
-    m_payloadSize = payloadSize;
-  }
   ///////////////////////
   //   Other methods   //
   ///////////////////////
@@ -269,29 +232,27 @@ namespace ns3 {
 
     double rcvPower = tag.GetReceivePower();
 
-    std::map<Ptr<const ns3::Packet>, ns3::EndDeviceStatus::ReceivedPacketInfo>::iterator
-      it = m_receivedPacketList.find(receivedPacket);
+    auto it = m_receivedPacketList.find(receivedPacket);
     if (it != m_receivedPacketList.end())
       {
         m_receivedPacketList.insert(std::pair<Ptr<Packet const>, ReceivedPacketInfo>
                                     (receivedPacket,info));
       }
     // this packet had already been received from another gateway:
-    // adding this gateway's reception information.
+    //   adding this gateway's reception information.
     else
       {
         ReceivedPacketInfo savedInfo = it -> second;
         GatewayList savedGwList = savedInfo.gwlist;
         UpdateGatewayData (savedGwList, gwAddress, rcvPower);
       }
-    m_lastReceivedPacket = receivedPacket;
 
     // Determine whether the packet requires a reply
     if (macHdr.GetMType () == LoraMacHeader::CONFIRMED_DATA_UP)
       {
         NS_LOG_DEBUG ("Scheduling a reply for this device");
 
-        m_needsReply = true;
+        m_reply.needsReply = true;
 
         LoraFrameHeader replyFrameHdr = LoraFrameHeader ();
         replyFrameHdr.SetAsDownlink ();
@@ -307,9 +268,7 @@ namespace ns3 {
   {
     NS_LOG_FUNCTION (this);
     m_reply = Reply ();
-    m_needsReply = false;
-    m_hasReplyPayload= false;
-    
+    m_reply.needsReply = false;
   }
 
   void

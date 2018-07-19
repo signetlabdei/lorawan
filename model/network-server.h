@@ -39,122 +39,126 @@
 
 namespace ns3 {
 
-/**
- * The NetworkServer is an application standing on top of a node equipped with
- * links that connect it with the gateways.
- *
- * This version of the NetworkServer attempts to closely mimic an actual Network
- * Server, by providing as much functionality as possible.
- */
-class NetworkServer : public Application
-{
-public:
-  static TypeId GetTypeId (void);
-
-  NetworkServer ();
-  virtual ~NetworkServer ();
-
   /**
-   * Start the NS application
-   */
-  void StartApplication (void);
-
-  /**
-   * Stop the NS application
-   */
-  void StopApplication (void);
-
-  /**
-   * Inform the NetworkServer that these nodes are connected to the network.
-   * This method will create a DeviceStatus object for each new node, and add it
-   * to the list.
-   */
-  void AddNodes (NodeContainer nodes);
-
-  /**
-   * Inform the NetworkServer that this node is connected to the network.
-   * This method will create a DeviceStatus object for the new node (if it
-   * doesn't already exist).
-   */
-  void AddNode (Ptr<Node> node);
-
-  /**
-   * Add this gateway to the list of gateways connected to this NS.
-   * Each GW is identified by its Address in the NS-GWs network.
-   */
-  void AddGateway (Ptr<Node> gateway, Ptr<NetDevice> netDevice);
-
-  /**
-   * Receive a packet from a gateway.
-   * \param packet the received packet
-   */
-  bool Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
-                uint16_t protocol, const Address& address);
-
-
-  /**
-   * Parse packet frame header commands
-   */
-  void ParseCommands (LoraFrameHeader frameHeader);
-
-/**
-   * Perform the actions that need to be taken when receiving a LinkCheckAns command.
+   * The NetworkServer is an application standing on top of a node equipped with
+   * links that connect it with the gateways.
    *
-   * \param margin The margin value of the command.
-   * \param gwCnt The gateway count value of the command.
+   * This version of the NetworkServer attempts to closely mimic an actual
+   * Network Server, by providing as much functionality as possible.
    */
-  void OnLinkCheckAns (uint8_t margin, uint8_t gwCnt);
+  class NetworkServer : public Application
+  {
+  public:
+    static TypeId GetTypeId (void);
 
-  /**
-   * Perform the actions that need to be taken when receiving a LinkAdrReq command.
-   *
-   * \param dataRate The data rate value of the command.
-   * \param txPower The transmission power value of the command.
-   * \param enabledChannels A list of the enabled channels.
-   * \param repetitions The number of repetitions prescribed by the command.
-   */
-  void OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
-                     std::list<int> enabledChannels, int repetitions);
+    NetworkServer ();
+    virtual ~NetworkServer ();
 
-  /**
-   * Perform the actions that need to be taken when receiving a DutyCycleReq command.
-   *
-   * \param dutyCycle The aggregate duty cycle prescribed by the command, in
-   * fraction form.
-   */
-  void OnDutyCycleReq (double dutyCycle);
+    /**
+     * Start the NS application.
+     */
+    void StartApplication (void);
 
-  /**
-   * Perform the actions that need to be taken when receiving a RxParamSetupReq command.
-   *
-   * \param rx1DrOffset The offset to set.
-   * \param rx2DataRate The data rate to use for the second receive window.
-   * \param frequency The frequency to use for the second receive window.
-   */
-  void OnRxParamSetupReq (uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency);
+    /**
+     * Stop the NS application.
+     */
+    void StopApplication (void);
 
-  /**
-   * Perform the actions that need to be taken when receiving a DevStatusReq command.
-   */
-  void OnDevStatusReq (void);
+    /**
+     * Inform the NetworkServer that these nodes are connected to the network.
+     *
+     * This method will create a DeviceStatus object for each new node, and add
+     * it to the list.
+     */
+    void AddNodes (NodeContainer nodes);
 
-  /**
-   * Perform the actions that need to be taken when receiving a NewChannelReq command.
-   */
-  void OnNewChannelReq (uint8_t chIndex, double frequency, uint8_t minDataRate,
-                        uint8_t maxDataRate);
+    /**
+     * Inform the NetworkServer that this node is connected to the network.
+     * This method will create a DeviceStatus object for the new node (if it
+     * doesn't already exist).
+     */
+    void AddNode (Ptr<Node> node);
 
+    /**
+     * Add this gateway to the list of gateways connected to this NS.
+     * Each GW is identified by its Address in the NS-GWs network.
+     */
+    void AddGateway (Ptr<Node> gateway, Ptr<NetDevice> netDevice);
 
-
-
+    /**
+     * Receive a packet from a gateway.
+     * \param packet the received packet
+     */
+    bool Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
+                  uint16_t protocol, const Address& address);
 
 
+    /**
+     * Parse packet frame header commands
+     */
+    void ParseCommands (LoraFrameHeader frameHeader);
 
-    protected:
-  Ptr<NetworkServerScheduler> m_scheduler;
-  Ptr<NetworkServerController> m_controller;
-  Ptr<NetworkStatus> m_networkStatus;
-};
+    /**
+     * Perform the actions that need to be taken when receiving a LinkCheckAns
+     * command.
+     *
+     * \param margin The margin value of the command.
+     * \param gwCnt The gateway count value of the command.
+     */
+    void OnLinkCheckAns (uint8_t margin, uint8_t gwCnt);
+
+    /**
+     * Perform the actions that need to be taken when receiving a LinkAdrReq
+     * command.
+     *
+     * \param dataRate The data rate value of the command.
+     * \param txPower The transmission power value of the command.
+     * \param enabledChannels A list of the enabled channels.
+     * \param repetitions The number of repetitions prescribed by the command.
+     */
+    void OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
+                       std::list<int> enabledChannels, int repetitions);
+
+    /**
+     * Perform the actions that need to be taken when receiving a DutyCycleReq
+     * command.
+     *
+     * \param dutyCycle The aggregate duty cycle prescribed by the command, in
+     * fraction form.
+     */
+    void OnDutyCycleReq (double dutyCycle);
+
+    /**
+     * Perform the actions that need to be taken when receiving a
+     * RxParamSetupReq command.
+     *
+     * \param rx1DrOffset The offset to set.
+     * \param rx2DataRate The data rate to use for the second receive window.
+     * \param frequency The frequency to use for the second receive window.
+     */
+    void OnRxParamSetupReq (uint8_t rx1DrOffset, uint8_t rx2DataRate,
+                            double frequency);
+
+    /**
+     * Perform the actions that need to be taken when receiving a DevStatusReq
+     * command.
+     */
+    void OnDevStatusReq (void);
+
+    /**
+     * Perform the actions that need to be taken when receiving a NewChannelReq
+     * command.
+     */
+    void OnNewChannelReq (uint8_t chIndex, double frequency, uint8_t minDataRate,
+                          uint8_t maxDataRate);
+
+  protected:
+    Ptr<NetworkServerScheduler> m_scheduler;
+    Ptr<NetworkServerController> m_controller;
+    Ptr<NetworkStatus> m_networkStatus;
+
+    TracedCallback<Ptr<const Packet> > m_receivedPacket;
+  };
 
 } /* namespace ns3 */
 

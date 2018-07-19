@@ -15,8 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: Davide Magrin <magrinda@dei.unipd.it>
- *          Martina Capuzzo <capuzzom@dei.unipd.it>
+ * Authors: Martina Capuzzo <capuzzom@dei.unipd.it>
+ *          Davide Magrin <magrinda@dei.unipd.it>
  */
 
 #ifndef NETWORK_STATUS_H
@@ -31,46 +31,49 @@
 
 namespace ns3 {
 
-/**
- * This class represents the knowledge about the state of the network that is
- * available at the Network Server. It is essentially a collection of two maps:
- * one containing DeviceStatus objects, and the other containing GatewayStatus
- * objects.
- */
+  /**
+   * This class represents the knowledge about the state of the network that is
+   * available at the Network Server. It is essentially a collection of two maps:
+   * one containing DeviceStatus objects, and the other containing GatewayStatus
+   * objects.
+   *
+   * This class is meant to be queried by NetworkController components, which
+   * can decide to take action based on the current status of the network.
+   */
   class NetworkStatus : public Object
-{
-public:
-  static TypeId GetTypeId (void);
+  {
+  public:
+    static TypeId GetTypeId (void);
 
-  NetworkStatus ();
-  virtual ~NetworkStatus ();
+    NetworkStatus ();
+    virtual ~NetworkStatus ();
 
-  /**
-   */
-  void AddNode (LoraDeviceAddress edAddress);
+    /**
+     * Add a device to the ones that are tracked by this NetworkStatus object.
+     */
+    void AddNode (Ptr<EndDeviceLoraMac> edMac);
 
-  /**
-   * Add this gateway to the list of gateways connected to the network.
-   * Each GW is identified by its Address in the NS-GWs network.
-   */
-  void AddGateway (Address& address, GatewayStatus gwStatus);
+    /**
+     * Add this gateway to the list of gateways connected to the network.
+     *
+     * Each GW is identified by its Address in the NS-GW network.
+     */
+    void AddGateway (Address& address, GatewayStatus gwStatus);
 
-  /**
-   * Update network status on the received packet. 
-   * \param packet the received packet
-   */
-  void Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
-                uint16_t protocol, const Address& address);
+    /**
+     * Update network status on the received packet.
+     *
+     * \param packet the received packet.
+     * \param address the gateway this packet was received from.
+     */
+    void OnReceivedPacket (Ptr<const Packet> packet, const Address& gwaddress);
 
-  void InsertReceivedPacket (Ptr<const Packet> packet, const Address& gwaddress);
-protected:
-  // Ptr<NetworkServerScheduler> m_scheduler;
-  Ptr<NetworkServerController> m_controller;
-  Ptr<NetworkStatus> m_status;
-  std::map<LoraDeviceAddress, EndDeviceStatus> m_endDeviceStatuses;
-  std::map<Address, GatewayStatus> m_gatewayStatuses;
-
-};
+  protected:
+    // Ptr<NetworkServerScheduler> m_scheduler;
+    Ptr<NetworkServerController> m_controller;
+    std::map<LoraDeviceAddress, EndDeviceStatus> m_endDeviceStatuses;
+    std::map<Address, GatewayStatus> m_gatewayStatuses;
+  };
 
 } /* namespace ns3 */
 

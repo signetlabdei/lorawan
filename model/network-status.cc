@@ -20,8 +20,9 @@
  */
 
 #include "ns3/network-status.h"
-#include "ns3/gateway-status.h"
 #include "ns3/end-device-status.h"
+#include "ns3/gateway-status.h"
+
 #include "ns3/net-device.h"
 #include "ns3/packet.h"
 #include "ns3/lora-device-address.h"
@@ -55,15 +56,17 @@ namespace ns3 {
   }
 
   void
-  NetworkStatus::AddNode (LoraDeviceAddress edAddress)
+  NetworkStatus::AddNode (Ptr<EndDeviceLoraMac> edMac)
   {
-    NS_LOG_FUNCTION (this << edAddress);
+    NS_LOG_FUNCTION (this << edMac);
 
-    // Check whether this device already exists
+    // Check whether this device already exists in our list
+    LoraDeviceAddress edAddress = edMac->GetDeviceAddress ();
     if (m_endDeviceStatuses.find (edAddress) == m_endDeviceStatuses.end ())
       {
         // The device doesn't exist. Create new EndDeviceStatus
         EndDeviceStatus edStatus = EndDeviceStatus ();
+
         // Add it to the map
         m_endDeviceStatuses.insert (std::pair<LoraDeviceAddress, EndDeviceStatus>
                                     (edAddress, edStatus));
@@ -90,8 +93,8 @@ namespace ns3 {
   }
 
   void
-  NetworkStatus::InsertReceivedPacket (Ptr<const Packet> packet,
-                const Address& gwAddress)
+  NetworkStatus::OnReceivedPacket (Ptr<const Packet> packet,
+                                   const Address& gwAddress)
   {
     // NS_LOG_FUNCTION (this << packet << protocol << address);
 

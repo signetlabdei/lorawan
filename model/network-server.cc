@@ -44,6 +44,10 @@ namespace ns3 {
     static TypeId tid = TypeId ("ns3::NetworkServer")
       .SetParent<Application> ()
       .AddConstructor<NetworkServer> ()
+      .AddTraceSource("ReceivedPacket",
+                      "Trace source that is fired when a packet arrives at the Network Server",
+                      MakeTraceSourceAccessor (&NetworkServer::m_receivedPacket),
+                      "ns3::Packet::TracedCallback")
       .SetGroupName ("lorawan");
     return tid;
   }
@@ -131,13 +135,12 @@ namespace ns3 {
             break;
           }
       }
+
     // Get the MAC
-    Ptr<EndDeviceLoraMac> edLoraMac = loraNetDevice->GetMac ()->GetObject<EndDeviceLoraMac> ();
+    Ptr<EndDeviceLoraMac> edLoraMac =
+      loraNetDevice->GetMac()->GetObject<EndDeviceLoraMac> ();
 
-    // Get the Address
-    LoraDeviceAddress deviceAddress = edLoraMac->GetDeviceAddress ();
-
-    m_networkStatus->AddNode (deviceAddress);
+    m_networkStatus->AddNode (edLoraMac);
   }
 
   bool
@@ -148,7 +151,10 @@ namespace ns3 {
 
     // Create a copy of the packet
     Ptr<Packet> myPacket = packet->Copy ();
-    //TODO
+
+    // Fire the trace source
+    m_receivedPacket (packet);
+
     return true;
   }
 

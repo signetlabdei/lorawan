@@ -85,6 +85,12 @@ public:
   void Send (Ptr<Packet> packet);
 
   /**
+   * This function is implemented to achieve compliance with the NetDevice
+   * interface. Note that the dest and protocolNumber args are ignored.
+   */
+  bool Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
+
+  /**
    * Callback the Mac layer calls whenever a packet arrives and needs to be
    * forwarded up the stack.
    *
@@ -114,7 +120,6 @@ public:
   virtual Address GetMulticast (Ipv6Address addr) const;
   virtual bool IsBridge (void) const;
   virtual bool IsPointToPoint (void) const;
-  virtual bool Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
   virtual bool SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber);
   virtual bool NeedsArp (void) const;
   virtual void SetPromiscReceiveCallback (PromiscReceiveCallback cb);

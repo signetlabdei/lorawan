@@ -8,14 +8,13 @@
 #include "ns3/mobility-helper.h"
 #include "ns3/one-shot-sender-helper.h"
 #include "ns3/constant-position-mobility-model.h"
-#include "end-device-status-test.h"
 
 // An essential include is test.h
 #include "ns3/test.h"
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("LorawanTest");
+NS_LOG_COMPONENT_DEFINE ("LorawanTestSuite");
 
 /********************
  * InterferenceTest *
@@ -1302,7 +1301,7 @@ public:
 LorawanTestSuite::LorawanTestSuite ()
   : TestSuite ("lorawan", UNIT)
 {
-  LogComponentEnable ("LorawanTest", LOG_LEVEL_DEBUG);
+  LogComponentEnable ("LorawanTestSuite", LOG_LEVEL_DEBUG);
   // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
   AddTestCase (new InterferenceTest, TestCase::QUICK);
   AddTestCase (new AddressTest, TestCase::QUICK);
@@ -1311,9 +1310,6 @@ LorawanTestSuite::LorawanTestSuite ()
   AddTestCase (new LogicalLoraChannelTest, TestCase::QUICK);
   AddTestCase (new TimeOnAirTest, TestCase::QUICK);
   AddTestCase (new PhyConnectivityTest, TestCase::QUICK);
-  AddTestCase (new EndDeviceStatusTest, TestCase::QUICK);
-  // AddTestCase (new LoraMacTest, TestCase::QUICK); // Work in progress in lora-mac-test.cc
-  // AddTestCase (new SimpleNetworkServerTest, TestCase::QUICK); // TODO
 }
 
 // Do not forget to allocate an instance of this TestSuite
