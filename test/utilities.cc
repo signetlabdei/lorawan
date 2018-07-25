@@ -97,7 +97,7 @@ namespace ns3 {
 
     MobilityHelper mobility;
     mobility.SetPositionAllocator ("ns3::UniformDiscPositionAllocator",
-                                   "rho", DoubleValue (6300),
+                                   "rho", DoubleValue (1000),
                                    "X", DoubleValue (0.0),
                                    "Y", DoubleValue (0.0));
     mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");

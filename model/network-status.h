@@ -27,7 +27,6 @@
 #include "ns3/end-device-lora-mac.h"
 #include "ns3/gateway-status.h"
 #include "ns3/lora-device-address.h"
-#include "ns3/network-server-controller.h"
 #include "ns3/network-scheduler.h"
 
 namespace ns3 {
@@ -98,8 +97,12 @@ namespace ns3 {
      */
     Ptr<Packet> GetReplyForDevice(LoraDeviceAddress edAddress, int windowNumber);
 
+    /**
+     * Get the EndDeviceStatus for the device that sent a packet.
+     */
+    Ptr<EndDeviceStatus> GetEndDeviceStatus(Ptr<Packet const> packet);
 
-  protected:
+  public:
     std::map<LoraDeviceAddress, Ptr<EndDeviceStatus> > m_endDeviceStatuses;
     std::map<Address, Ptr<GatewayStatus>> m_gatewayStatuses;
   };

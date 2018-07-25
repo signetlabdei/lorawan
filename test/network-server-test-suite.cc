@@ -212,7 +212,7 @@ NetworkServerTestSuite::NetworkServerTestSuite ()
   LogComponentEnableAll (LOG_PREFIX_TIME);
 
   // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
-  // AddTestCase (new UplinkPacketTest, TestCase::QUICK);
+  AddTestCase (new UplinkPacketTest, TestCase::QUICK);
   AddTestCase (new DownlinkPacketTest, TestCase::QUICK);
 }
 

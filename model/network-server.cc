@@ -54,7 +54,8 @@ namespace ns3 {
 
   NetworkServer::NetworkServer () :
     m_status (Create<NetworkStatus> ()),
-    m_scheduler (Create<NetworkScheduler> (m_status))
+    m_scheduler (Create<NetworkScheduler> (m_status)),
+    m_controller (Create<NetworkController> (m_status))
   {
     NS_LOG_FUNCTION_NOARGS ();
   }
@@ -166,110 +167,8 @@ namespace ns3 {
     m_status->OnReceivedPacket (packet, address);
 
     // Inform the controller of the newly arrived packet
-    // m_controller->OnNewPacket ();
+    m_controller->OnNewPacket (packet);
 
     return true;
   }
-
-  void
-  NetworkServer::ParseCommands (LoraFrameHeader frameHeader)
-  {
-    NS_LOG_FUNCTION (this << frameHeader);
-
-    std::list<Ptr<MacCommand> > commands = frameHeader.GetCommands ();
-    std::list<Ptr<MacCommand> >::iterator it;
-    for (it = commands.begin (); it != commands.end (); it++)
-      {
-        NS_LOG_DEBUG ("Iterating over the MAC commands...");
-        enum MacCommandType type = (*it)->GetCommandType ();
-        switch (type)
-          {
-          case (LINK_CHECK_ANS):
-            {
-              NS_LOG_DEBUG ("Detected a LinkCheckAns command.");
-
-              // Cast the command
-              Ptr<LinkCheckAns> linkCheckAns = (*it)->GetObject<LinkCheckAns> ();
-
-              // TODO Call the appropriate function to take action
-
-              break;
-            }
-          case (LINK_ADR_REQ):
-            {
-              NS_LOG_DEBUG ("Detected a LinkAdrReq command.");
-
-              // Cast the command
-              Ptr<LinkAdrReq> linkAdrReq = (*it)->GetObject<LinkAdrReq> ();
-
-              // TODO Call the appropriate function to take action
-
-              break;
-            }
-          case (DUTY_CYCLE_REQ):
-            {
-              NS_LOG_DEBUG ("Detected a DutyCycleReq command.");
-
-              // Cast the command
-              Ptr<DutyCycleReq> dutyCycleReq = (*it)->GetObject<DutyCycleReq> ();
-
-              // TODO Call the appropriate function to take action
-
-              break;
-            }
-          case (RX_PARAM_SETUP_REQ):
-            {
-              NS_LOG_DEBUG ("Detected a RxParamSetupReq command.");
-
-              // Cast the command
-              Ptr<RxParamSetupReq> rxParamSetupReq = (*it)->GetObject<RxParamSetupReq> ();
-
-              // TODO Call the appropriate function to take action
-
-              break;
-            }
-          case (DEV_STATUS_REQ):
-            {
-              NS_LOG_DEBUG ("Detected a DevStatusReq command.");
-
-              // Cast the command
-              Ptr<DevStatusReq> devStatusReq = (*it)->GetObject<DevStatusReq> ();
-
-              // TODO Call the appropriate function to take action
-
-              break;
-            }
-          case (NEW_CHANNEL_REQ):
-            {
-              NS_LOG_DEBUG ("Detected a NewChannelReq command.");
-
-              // Cast the command
-              Ptr<NewChannelReq> newChannelReq = (*it)->GetObject<NewChannelReq> ();
-
-              // TODO Call the appropriate function to take action
-
-              break;
-            }
-          case (RX_TIMING_SETUP_REQ):
-            {
-              break;
-            }
-          case (TX_PARAM_SETUP_REQ):
-            {
-              break;
-            }
-          case (DL_CHANNEL_REQ):
-            {
-              break;
-            }
-          default:
-            {
-              NS_LOG_ERROR ("CID not recognized");
-              break;
-            }
-          }
-
-      }
-  }
-
 }

@@ -150,7 +150,7 @@ namespace ns3 {
   {
     // Get the reply packet
     Ptr<EndDeviceStatus> edStatus = m_endDeviceStatuses.find(edAddress)->second;
-    Ptr<Packet> packet = edStatus->GetReply();
+    Ptr<Packet> packet = edStatus->GetCompleteReplyPacket ();
 
     // Apply the appropriate tag
     LoraTag tag;
@@ -168,5 +168,28 @@ namespace ns3 {
 
     packet->AddPacketTag (tag);
     return packet;
+  }
+
+  Ptr<EndDeviceStatus>
+  NetworkStatus::GetEndDeviceStatus(Ptr<Packet const> packet)
+  {
+    NS_LOG_FUNCTION (this << packet);
+
+    // Get the address
+    LoraMacHeader mHdr;
+    LoraFrameHeader fHdr;
+    Ptr<Packet> myPacket = packet->Copy();
+    myPacket->RemoveHeader(mHdr);
+    myPacket->RemoveHeader(fHdr);
+    auto it = m_endDeviceStatuses.find(fHdr.GetAddress());
+    if (it != m_endDeviceStatuses.end())
+      {
+        return (*it).second;
+      }
+    else
+      {
+        NS_LOG_ERROR("EndDeviceStatus not found");
+        return 0;
+      }
   }
 }

@@ -105,8 +105,15 @@ namespace ns3 {
     return m_secondReceiveWindowFrequency;
   }
 
+
+  EndDeviceStatus::Reply&
+  EndDeviceStatus::GetReply (void)
+  {
+    return m_reply;
+  }
+
   Ptr<Packet>
-  EndDeviceStatus::GetReply ()
+  EndDeviceStatus::GetCompleteReplyPacket (void)
   {
     NS_LOG_FUNCTION_NOARGS ();
 
@@ -318,7 +325,7 @@ namespace ns3 {
   void
   EndDeviceStatus::AddMACCommand (Ptr<MacCommand> macCommand)
   {
-    m_reply.macCommandList.push_back (macCommand);
+    m_reply.frameHeader.AddCommand (macCommand);
   }
 
   Address

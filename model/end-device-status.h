@@ -101,9 +101,6 @@ namespace ns3 {
       // The data packet that will be sent as a reply.
       Ptr<Packet> payload;
 
-      // List of the MAC commands that will be applied.
-      std::list<Ptr<MacCommand> > macCommandList;
-
       // Whether or not this device needs a reply
       bool needsReply = false;
     };
@@ -123,7 +120,7 @@ namespace ns3 {
      *
      * \return A pointer to the packet reply (data + headers).
      */
-    Ptr<Packet> GetReply (void);
+    Ptr<Packet> GetCompleteReplyPacket (void);
 
     /**
      * Get the reply packet mac header.
@@ -190,6 +187,11 @@ namespace ns3 {
     EndDeviceStatus(LoraDeviceAddress endDeviceAddress,
                     Ptr<EndDeviceLoraMac> endDeviceMac);
     virtual ~EndDeviceStatus();
+
+    /**
+     * Return a reference to the Reply structure.
+     */
+    struct Reply& GetReply (void);
 
     /**
      * Get the spreading factor this device is using in the first receive window.

@@ -66,13 +66,14 @@ int main (int argc, char *argv[])
   edStatus.SetReplyPayload(replyPayload);
   edStatus.SetReplyFrameHeader(frameHdr);
   edStatus.SetReplyMacHeader(macHdr);
-  Ptr<Packet> reply= edStatus.GetReply();
+  Ptr<Packet> reply= edStatus.GetCompleteReplyPacket ();
 
 
   NS_LOG_INFO("edStatus needs reply: " << edStatus.NeedsReply());
 
   // packet size should be payload + 1 byte (macHdr) + 8 byes (frame header without Opts)
-  NS_LOG_INFO ("Packet size is: " << double(edStatus.GetReply()->GetSize()));
+  NS_LOG_INFO ("Packet size is: " << double(edStatus.GetCompleteReplyPacket
+                                            ()->GetSize()));
 
   LoraFrameHeader replyFrameheader;
   LoraMacHeader replyMacheader;
@@ -93,7 +94,7 @@ int main (int argc, char *argv[])
   frameHeader.SetAck(true);
   edStatus.SetReplyFrameHeader(frameHeader);
   NS_LOG_INFO ("After setting only the frame header: edStatus needsReply= " << edStatus.NeedsReply());
-  NS_LOG_INFO ("Packet size is: " << double(edStatus.GetReply()->GetSize()));
+  NS_LOG_INFO ("Packet size is: " << double(edStatus.GetCompleteReplyPacket ()->GetSize()));
   NS_LOG_INFO ("Ack bit of reply is (1):  " << edStatus.GetReplyFrameHeader().GetAck());
   NS_LOG_INFO ("MType of reply is:  " << unsigned(edStatus.GetReplyMacHeader().GetMType()));
 

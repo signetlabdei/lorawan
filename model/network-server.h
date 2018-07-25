@@ -92,66 +92,6 @@ namespace ns3 {
     bool Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
                   uint16_t protocol, const Address& address);
 
-
-    /**
-     * Parse packet frame header commands
-     */
-    void ParseCommands (LoraFrameHeader frameHeader);
-
-    /**
-     * Perform the actions that need to be taken when receiving a LinkCheckAns
-     * command.
-     *
-     * \param margin The margin value of the command.
-     * \param gwCnt The gateway count value of the command.
-     */
-    void OnLinkCheckAns (uint8_t margin, uint8_t gwCnt);
-
-    /**
-     * Perform the actions that need to be taken when receiving a LinkAdrReq
-     * command.
-     *
-     * \param dataRate The data rate value of the command.
-     * \param txPower The transmission power value of the command.
-     * \param enabledChannels A list of the enabled channels.
-     * \param repetitions The number of repetitions prescribed by the command.
-     */
-    void OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
-                       std::list<int> enabledChannels, int repetitions);
-
-    /**
-     * Perform the actions that need to be taken when receiving a DutyCycleReq
-     * command.
-     *
-     * \param dutyCycle The aggregate duty cycle prescribed by the command, in
-     * fraction form.
-     */
-    void OnDutyCycleReq (double dutyCycle);
-
-    /**
-     * Perform the actions that need to be taken when receiving a
-     * RxParamSetupReq command.
-     *
-     * \param rx1DrOffset The offset to set.
-     * \param rx2DataRate The data rate to use for the second receive window.
-     * \param frequency The frequency to use for the second receive window.
-     */
-    void OnRxParamSetupReq (uint8_t rx1DrOffset, uint8_t rx2DataRate,
-                            double frequency);
-
-    /**
-     * Perform the actions that need to be taken when receiving a DevStatusReq
-     * command.
-     */
-    void OnDevStatusReq (void);
-
-    /**
-     * Perform the actions that need to be taken when receiving a NewChannelReq
-     * command.
-     */
-    void OnNewChannelReq (uint8_t chIndex, double frequency, uint8_t minDataRate,
-                          uint8_t maxDataRate);
-
   protected:
     Ptr<NetworkStatus> m_status;
     Ptr<NetworkScheduler> m_scheduler;

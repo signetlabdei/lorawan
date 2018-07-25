@@ -21,15 +21,42 @@
 #ifndef NETWORK_CONTROLLER_H
 #define NETWORK_CONTROLLER_H
 
+#include "ns3/object.h"
+#include "ns3/packet.h"
+#include "ns3/network-status.h"
+#include "ns3/network-controller-components.h"
+
 namespace ns3 {
+
+  /**
+   * This class collects a series of components that deal with various aspects
+   * of managing the network, and queries them for action when a new packet is
+   * received or other events occur in the network.
+   */
   class NetworkController : public Object
   {
   public:
     static TypeId GetTypeId (void);
 
     NetworkController();
+    NetworkController(Ptr<NetworkStatus> networkStatus);
     virtual ~NetworkController();
 
+    /**
+     * Add a new NetworkControllerComponent
+     */
+    void Install(Ptr<NetworkControllerComponent> component);
+
+    /**
+     * Method that is called by the NetworkServer when a new packet is received.
+     *
+     * \param packet The newly received packet.
+     */
+    void OnNewPacket (Ptr<Packet const> packet);
+
+  private:
+    Ptr<NetworkStatus> m_status;
+    std::list<Ptr<NetworkControllerComponent> > m_components;
   };
 
 } /* namespace ns3 */
