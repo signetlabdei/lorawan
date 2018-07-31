@@ -201,6 +201,8 @@ NetworkServerTestSuite::NetworkServerTestSuite ()
   LogComponentEnable ("NetworkServer", LOG_LEVEL_ALL);
   LogComponentEnable ("NetworkStatus", LOG_LEVEL_ALL);
   LogComponentEnable ("NetworkScheduler", LOG_LEVEL_ALL);
+  LogComponentEnable ("NetworkController", LOG_LEVEL_ALL);
+  LogComponentEnable ("NetworkControllerComponent", LOG_LEVEL_ALL);
   LogComponentEnable ("LoraNetDevice", LOG_LEVEL_ALL);
   LogComponentEnable ("GatewayLoraMac", LOG_LEVEL_ALL);
   LogComponentEnable ("EndDeviceLoraMac", LOG_LEVEL_ALL);

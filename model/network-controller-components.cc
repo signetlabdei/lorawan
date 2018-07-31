@@ -57,25 +57,134 @@ namespace ns3 {
 
   void
   ConfirmedMessagesComponent::OnReceivedPacket (Ptr<const Packet> packet,
+                                                Ptr<EndDeviceStatus> status,
                                                 Ptr<NetworkStatus> networkStatus)
   {
-    NS_LOG_FUNCTION (this << packet << networkStatus);
+    NS_LOG_FUNCTION (this->GetTypeId() << packet << networkStatus);
 
     // Check whether the received packet requires an acknowledgment.
     LoraMacHeader mHdr;
-    packet->Copy()->RemoveHeader(mHdr);
-    NS_LOG_INFO ("Mac Header: " << mHdr);
+    LoraFrameHeader fHdr;
+    Ptr<Packet> myPacket = packet->Copy();
+    myPacket->RemoveHeader(mHdr);
+    myPacket->RemoveHeader(fHdr);
+
+    NS_LOG_INFO ("Received packet Mac Header: " << mHdr);
+    NS_LOG_INFO ("Received packet Frame Header: " << fHdr);
 
     if (mHdr.GetMType() == LoraMacHeader::CONFIRMED_DATA_UP)
       {
         NS_LOG_INFO ("Packet requires confirmation");
 
         // Set up the ACK bit on the reply
-        Ptr<EndDeviceStatus> edStatus =
-          networkStatus->GetEndDeviceStatus(packet);
+        EndDeviceStatus::Reply r = status->GetReply();
+        r.frameHeader.SetAsDownlink ();
+        r.frameHeader.SetAck (true);
+        r.frameHeader.SetAddress (fHdr.GetAddress ());
+        r.needsReply = true;
 
-        edStatus->GetReply().frameHeader.SetAck (true);
-
+        // Note that the acknowledgment procedure dies here: "Acknowledgments
+        // are only snt in response to the latest message received and are never
+        // retransmitted". We interpret this to mean that only the current
+        // reception window can be used, and that the Ack field should be
+        // emptied in case transmission cannot be performed in the current
+        // window. Because of this, in this component's OnFailedReply method we
+        // void the ack bits.
       }
+  }
+
+  void
+  ConfirmedMessagesComponent::OnFailedReply (Ptr<EndDeviceStatus> status,
+                                             Ptr<NetworkStatus> networkStatus)
+  {
+    NS_LOG_FUNCTION (this << networkStatus);
+
+    // Empty the Ack bit.
+    status->GetReply().frameHeader.SetAck(false);
+  }
+
+  ////////////////////////
+  // LinkCheckComponent //
+  ////////////////////////
+  TypeId
+  LinkCheckComponent::GetTypeId (void)
+  {
+    static TypeId tid = TypeId ("ns3::LinkCheckComponent")
+      .AddConstructor<LinkCheckComponent> ()
+      .SetGroupName ("lorawan");
+    return tid;
+  }
+
+  LinkCheckComponent::LinkCheckComponent () {}
+  LinkCheckComponent::~LinkCheckComponent () {}
+
+  void
+  LinkCheckComponent::OnReceivedPacket (Ptr<const Packet> packet,
+                                        Ptr<EndDeviceStatus> status,
+                                        Ptr<NetworkStatus> networkStatus)
+  {
+    NS_LOG_FUNCTION (this->GetTypeId() << packet << networkStatus);
+
+    // We will only act just before reply, when all Gateways will have received
+    // the packet.
+  }
+
+  void
+  LinkCheckComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
+                                          Ptr<NetworkStatus> networkStatus)
+  {
+    // TODO Check if the uplink packet (now the last element of the list)
+    // contains a LinkCheckReq command
+    status.Get
+      Ptr<Packet> myPacket = packet->Copy();
+    LoraMacHeader mHdr;
+    LoraFrameHeader fHdr;
+    myPacket->RemoveHeader(mHdr);
+    myPacket->RemoveHeader(fHdr);
+
+    Ptr<LinkCheckReq> command = fHdr.GetMacCommand<LinkCheckReq> ();
+    if (command)
+      {
+        EndDeviceStatus::Reply r = status->GetReply ();
+
+        // TODO Update or create the reply
+
+        Ptr<LinkCheckAns> replyCommand = Create<LinkCheckAns> ();
+        r.frameHeader.AddCommand(replyCommand);
+      }
+  }
+
+  void
+  LinkCheckComponent::UpdateLinkCheckAns (Ptr<Packet const> packet,
+                                          Ptr<EndDeviceStatus> status)
+  {
+    NS_LOG_FUNCTION (this);
+
+    // Go over all gateways that received this packet
+    EndDeviceStatus::ReceivedPacketList list = status->GetReceivedPacketList ();
+    auto it = list.begin();
+    for (; it != list.end(); ++it)
+      {
+        // Find the packet
+        if (it->first->GetUid () == packet->GetUid ())
+          {
+            EndDeviceStatus::GatewayList gwList = it->second.gwList;
+
+            int nGws = 0;
+            double bestRxPower = -10000;
+
+            auto gwIt = gwList.begin();
+            for (; gwIt != gwList.end(); ++it)
+              {
+              }
+          }
+      }
+  }
+
+  void
+  LinkCheckComponent::OnFailedReply (Ptr<EndDeviceStatus> status,
+                                     Ptr<NetworkStatus> networkStatus)
+  {
+    NS_LOG_FUNCTION (this->GetTypeId() << networkStatus);
   }
 }

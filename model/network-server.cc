@@ -171,4 +171,12 @@ namespace ns3 {
 
     return true;
   }
+
+  void
+  NetworkServer::AddComponent (Ptr<NetworkControllerComponent> component)
+  {
+    NS_LOG_FUNCTION (this << component);
+
+    m_controller->Install(component);
+  }
 }

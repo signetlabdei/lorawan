@@ -62,14 +62,16 @@ namespace ns3 {
   NetworkController::OnNewPacket (Ptr<Packet const> packet)
   {
     NS_LOG_FUNCTION (this << packet);
-    // NOTE As a future optimizations, we can allow components to register their
+
+    // NOTE As a future optimization, we can allow components to register their
     // callbacks and only be called in case a certain MAC command is contained.
     // For now, we call all components.
 
     // Inform each component about the new packet
     for (auto it = m_components.begin(); it != m_components.end(); ++it)
       {
-        (*it)->OnReceivedPacket(packet, m_status);
+        (*it)->OnReceivedPacket(packet, m_status->GetEndDeviceStatus (packet),
+                                m_status);
       }
 
   }

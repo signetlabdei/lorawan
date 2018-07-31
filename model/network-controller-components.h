@@ -56,7 +56,21 @@ namespace ns3 {
      * \param networkStatus A pointer to the NetworkStatus object
      */
     virtual void OnReceivedPacket (Ptr<const Packet> packet,
+                                   Ptr<EndDeviceStatus> status,
                                    Ptr<NetworkStatus> networkStatus) = 0;
+
+    void BeforeSendingReply (Ptr<EndDeviceStatus> status,
+                             Ptr<NetworkStatus> networkStatus) = 0;
+
+    /**
+     * Method that is called when a packet cannot be sent in the downlink.
+     *
+     * \param status The EndDeviceStatus of the device to which it was
+     *               impossible to send a reply.
+     * \param networkStatus A pointer to the NetworkStatus object
+     */
+    virtual void OnFailedReply (Ptr<EndDeviceStatus> status,
+                                Ptr<NetworkStatus> networkStatus) = 0;
   };
 
   ///////////////////////////////
@@ -81,9 +95,52 @@ namespace ns3 {
      * \param networkStatus A pointer to the NetworkStatus object
      */
     void OnReceivedPacket (Ptr<const Packet> packet,
+                           Ptr<EndDeviceStatus> status,
                            Ptr<NetworkStatus> networkStatus);
+
+    void BeforeSendingReply (Ptr<EndDeviceStatus> status,
+                             Ptr<NetworkStatus> networkStatus);
+
+    void OnFailedReply (Ptr<EndDeviceStatus> status,
+                        Ptr<NetworkStatus> networkStatus);
   };
 
+  ///////////////////////////////////
+  // LinkCheck commands management //
+  ///////////////////////////////////
+
+  class LinkCheckComponent : public NetworkControllerComponent
+  {
+  public:
+
+    static TypeId GetTypeId (void);
+
+    // Constructor and destructor
+    LinkCheckComponent();
+    virtual ~LinkCheckComponent();
+
+    /**
+     * This method checks whether the received packet requires an acknowledgment
+     * and sets up the appropriate reply in case it does.
+     *
+     * \param packet The newly received packet
+     * \param networkStatus A pointer to the NetworkStatus object
+     */
+    void OnReceivedPacket (Ptr<const Packet> packet,
+                           Ptr<EndDeviceStatus> status,
+                           Ptr<NetworkStatus> networkStatus);
+
+    void BeforeSendingReply (Ptr<EndDeviceStatus> status,
+                             Ptr<NetworkStatus> networkStatus);
+
+    void OnFailedReply (Ptr<EndDeviceStatus> status,
+                        Ptr<NetworkStatus> networkStatus);
+
+  private:
+
+    void UpdateLinkCheckAns (Ptr<Packet const> packet,
+                             Ptr<EndDeviceStatus> status);
+};
 }
 
 #endif

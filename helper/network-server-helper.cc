@@ -19,7 +19,7 @@
  */
 
 #include "ns3/network-server-helper.h"
-#include "ns3/network-server.h"
+#include "ns3/network-controller-components.h"
 #include "ns3/double.h"
 #include "ns3/string.h"
 #include "ns3/trace-source-accessor.h"
@@ -112,6 +112,25 @@ namespace ns3 {
     // Add the end devices
     app->AddNodes (m_endDevices);
 
-  return app;
+    // Add components to the NetworkServer
+    InstallComponents(app);
+
+    return app;
 }
+
+  void
+  NetworkServerHelper::InstallComponents (Ptr<NetworkServer> netServer)
+  {
+    NS_LOG_FUNCTION (this << netServer);
+
+    // Add Confirmed Messages support
+    Ptr<ConfirmedMessagesComponent> ackSupport =
+      Create<ConfirmedMessagesComponent> ();
+    netServer->AddComponent (ackSupport);
+
+    // Add LinkCheck support
+    Ptr<LinkCheckComponent> linkCheckSupport = Create<LinkCheckComponent> ();
+    netServer->AddComponent (linkCheckSupport);
+
+  }
 } // namespace ns3

@@ -86,6 +86,11 @@ namespace ns3 {
     void AddGateway (Ptr<Node> gateway, Ptr<NetDevice> netDevice);
 
     /**
+     * A NetworkControllerComponent to this NetworkServer instance.
+     */
+    void AddComponent (Ptr<NetworkControllerComponent> component);
+
+    /**
      * Receive a packet from a gateway.
      * \param packet the received packet
      */
