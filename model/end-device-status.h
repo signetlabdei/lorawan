@@ -189,11 +189,6 @@ namespace ns3 {
     virtual ~EndDeviceStatus();
 
     /**
-     * Return a reference to the Reply structure.
-     */
-    struct Reply& GetReply (void);
-
-    /**
      * Get the spreading factor this device is using in the first receive window.
      *
      * \return An unsigned 8-bit integer containing the spreading factor.
@@ -279,6 +274,12 @@ namespace ns3 {
     Ptr<Packet const> GetLastPacketReceivedFromDevice (void);
 
     /**
+     * Return the information about the last packet that was received from the
+     * device.
+     */
+    EndDeviceStatus::ReceivedPacketInfo GetLastReceivedPacketInfo (void);
+
+    /**
      * Initialize reply.
      */
     void InitializeReply (void);
@@ -300,6 +301,8 @@ namespace ns3 {
      */
     Address GetBestGatewayForReply (void);
 
+    struct Reply m_reply; //<! Next reply intended for this device
+
   private:
 
     // Receive window data
@@ -307,8 +310,6 @@ namespace ns3 {
     double m_firstReceiveWindowFrequency = 0;
     uint8_t m_secondReceiveWindowOffset = 0;
     double m_secondReceiveWindowFrequency = 868.625;
-
-    struct Reply m_reply; //<! Next reply intended for this device
 
     ReceivedPacketList m_receivedPacketList; //<! List of received packets
 

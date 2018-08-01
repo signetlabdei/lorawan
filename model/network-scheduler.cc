@@ -21,8 +21,10 @@ namespace ns3 {
 
   NetworkScheduler::NetworkScheduler() {}
 
-  NetworkScheduler::NetworkScheduler(Ptr<NetworkStatus> status) :
-    m_status (status)
+  NetworkScheduler::NetworkScheduler(Ptr<NetworkStatus> status,
+                                     Ptr<NetworkController> controller) :
+    m_status (status),
+    m_controller (controller)
   {
   }
 
@@ -70,8 +72,8 @@ namespace ns3 {
       NS_LOG_INFO ("A reply is needed");
     }
 
-  // Check whether we can send a reply to the device, again by using
-  // NetworkStatus
+    // Check whether we can send a reply to the device, again by using
+    // NetworkStatus
     Address gwAddress = m_status->GetBestGatewayForDevice (deviceAddress);
 
     NS_LOG_DEBUG ("Found available gateway with address: " << gwAddress);
@@ -82,8 +84,10 @@ namespace ns3 {
       }
     else
       {
+        m_controller->BeforeSendingReply (m_status->GetEndDeviceStatus
+                                          (deviceAddress));
         // Send the reply through that gateway
-        m_status->SendThroughGateway (m_status->GetReplyForDevice
+          m_status->SendThroughGateway (m_status->GetReplyForDevice
                                       (deviceAddress, window),
                                       gwAddress);
       }

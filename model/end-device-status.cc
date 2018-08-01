@@ -106,12 +106,6 @@ namespace ns3 {
   }
 
 
-  EndDeviceStatus::Reply&
-  EndDeviceStatus::GetReply (void)
-  {
-    return m_reply;
-  }
-
   Ptr<Packet>
   EndDeviceStatus::GetCompleteReplyPacket (void)
   {
@@ -131,8 +125,8 @@ namespace ns3 {
       }
 
     // Add headers
-    // Make sure the MAC header is set as downlink
-    m_reply.macHeader.SetMType(LoraMacHeader::CONFIRMED_DATA_DOWN);
+    NS_LOG_DEBUG ("Adding MAC header" << m_reply.macHeader);
+    NS_LOG_DEBUG ("Adding frame header" << m_reply.frameHeader);
     replyPacket->AddHeader (m_reply.frameHeader);
     replyPacket->AddHeader (m_reply.macHeader);
 
@@ -295,19 +289,20 @@ namespace ns3 {
         m_receivedPacketList.push_back(std::pair<Ptr<Packet const>, ReceivedPacketInfo>
                                        (receivedPacket, info));
       }
+  }
 
-    // Determine whether the packet requires a reply
-    if (macHdr.GetMType () == LoraMacHeader::CONFIRMED_DATA_UP)
+  EndDeviceStatus::ReceivedPacketInfo
+  EndDeviceStatus::GetLastReceivedPacketInfo (void)
+  {
+    NS_LOG_FUNCTION_NOARGS ();
+    auto it = m_receivedPacketList.rbegin();
+    if (it != m_receivedPacketList.rend())
       {
-        NS_LOG_DEBUG ("Scheduling a reply for this device");
-
-        m_reply.needsReply = true;
-
-        LoraFrameHeader replyFrameHdr = LoraFrameHeader ();
-        replyFrameHdr.SetAsDownlink ();
-        replyFrameHdr.SetAddress (m_endDeviceAddress);
-        replyFrameHdr.SetAck (true);
-        m_reply.frameHeader = replyFrameHdr;
+        return it->second;
+      }
+    else
+      {
+        return EndDeviceStatus::ReceivedPacketInfo ();
       }
   }
 
@@ -324,7 +319,7 @@ namespace ns3 {
       {
         return 0;
       }
-        }
+  }
 
   void
   EndDeviceStatus::InitializeReply ()

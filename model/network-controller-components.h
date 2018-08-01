@@ -28,6 +28,8 @@
 
 namespace ns3 {
 
+  class NetworkStatus;
+
   ////////////////
   // Base class //
   ////////////////

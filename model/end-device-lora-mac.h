@@ -364,13 +364,19 @@ public:
   void AddSubBand (double startFrequency, double endFrequency, double dutyCycle,
                    double maxTxPowerDbm);
 
+  /**
+   * Add a MAC command to the list of those that will be sent out in the next
+   * packet.
+   */
+  void AddMacCommand (Ptr<MacCommand> macCommand);
+
 private:
   /**
-  * Structure representing the parameters that will be used in the
-  * retransmission procedure.
-  */
+   * Structure representing the parameters that will be used in the
+   * retransmission procedure.
+   */
   struct LoraRetxParameters
-  {
+     {
     Time firstAttempt;
     Ptr<Packet> packet = 0;
     bool waitingAck = false;

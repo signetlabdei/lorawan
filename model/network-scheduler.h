@@ -27,11 +27,13 @@
 #include "ns3/lora-device-address.h"
 #include "ns3/lora-mac-header.h"
 #include "ns3/lora-frame-header.h"
+#include "ns3/network-controller.h"
 #include "ns3/network-status.h"
 
 namespace ns3 {
 
   class NetworkStatus; // Forward declaration
+  class NetworkController; // Forward declaration
 
   class NetworkScheduler : public Object
   {
@@ -39,7 +41,8 @@ namespace ns3 {
     static TypeId GetTypeId (void);
 
     NetworkScheduler();
-    NetworkScheduler(Ptr<NetworkStatus> status);
+    NetworkScheduler(Ptr<NetworkStatus> status,
+                     Ptr<NetworkController> controller);
     virtual ~NetworkScheduler();
 
     /**
@@ -58,6 +61,7 @@ namespace ns3 {
   private:
     TracedCallback<Ptr<const Packet> > m_receiveWindowOpened;
     Ptr<NetworkStatus> m_status;
+    Ptr<NetworkController> m_controller;
   };
 
 } /* namespace ns3 */

@@ -99,8 +99,8 @@ namespace ns3 {
 
   protected:
     Ptr<NetworkStatus> m_status;
-    Ptr<NetworkScheduler> m_scheduler;
     Ptr<NetworkController> m_controller;
+    Ptr<NetworkScheduler> m_scheduler;
 
     TracedCallback<Ptr<const Packet> > m_receivedPacket;
   };

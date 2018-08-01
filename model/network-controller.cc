@@ -73,7 +73,18 @@ namespace ns3 {
         (*it)->OnReceivedPacket(packet, m_status->GetEndDeviceStatus (packet),
                                 m_status);
       }
+  }
 
+  void
+  NetworkController::BeforeSendingReply (Ptr<EndDeviceStatus> endDeviceStatus)
+  {
+    NS_LOG_FUNCTION (this);
+
+    // Inform each component about the imminent reply
+    for (auto it = m_components.begin(); it != m_components.end(); ++it)
+      {
+        (*it)->BeforeSendingReply(endDeviceStatus, m_status);
+      }
   }
 
 }

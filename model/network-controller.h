@@ -28,6 +28,9 @@
 
 namespace ns3 {
 
+  class NetworkStatus;
+  class NetworkControllerComponent;
+
   /**
    * This class collects a series of components that deal with various aspects
    * of managing the network, and queries them for action when a new packet is
@@ -53,6 +56,12 @@ namespace ns3 {
      * \param packet The newly received packet.
      */
     void OnNewPacket (Ptr<Packet const> packet);
+
+    /**
+     * Method that is called by the NetworkScheduler just before sending a reply
+     * to a certain End Device.
+     */
+    void BeforeSendingReply (Ptr<EndDeviceStatus> endDeviceStatus);
 
   private:
     Ptr<NetworkStatus> m_status;

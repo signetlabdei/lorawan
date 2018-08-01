@@ -102,6 +102,11 @@ namespace ns3 {
      */
     Ptr<EndDeviceStatus> GetEndDeviceStatus(Ptr<Packet const> packet);
 
+    /**
+     * Get the EndDeviceStatus corresponding to a LoraDeviceAddress.
+     */
+    Ptr<EndDeviceStatus> GetEndDeviceStatus(LoraDeviceAddress address);
+
   public:
     std::map<LoraDeviceAddress, Ptr<EndDeviceStatus> > m_endDeviceStatuses;
     std::map<Address, Ptr<GatewayStatus>> m_gatewayStatuses;

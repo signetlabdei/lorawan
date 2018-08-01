@@ -179,6 +179,93 @@ DownlinkPacketTest::DoRun (void)
   NS_ASSERT (m_receivedPacketAtEd);
 }
 
+//////////////////////////
+// LinkCheckSupportTest //
+//////////////////////////
+
+class LinkCheckTest : public TestCase
+{
+public:
+  LinkCheckTest ();
+  virtual ~LinkCheckTest ();
+
+  void LastKnownGatewayCount (int newValue, int oldValue);
+
+  void SendPacket (Ptr<Node> endDevice, bool requestAck);
+
+private:
+  virtual void DoRun (void);
+  bool m_receivedPacketAtEd = false;
+  int m_numberOfGatewaysThatReceivedPacket = 0;
+};
+
+// Add some help text to this case to describe what it is intended to test
+LinkCheckTest::LinkCheckTest ()
+  : TestCase ("Verify that the NetworkServer correctly responds to "
+              "LinkCheck requests")
+{
+}
+
+// Reminder that the test case should clean up after itself
+LinkCheckTest::~LinkCheckTest ()
+{
+}
+
+void
+LinkCheckTest::LastKnownGatewayCount (int newValue,
+                                      int oldValue)
+{
+  NS_LOG_DEBUG ("Updated Gateway Count");
+  m_receivedPacketAtEd = true;
+
+  m_numberOfGatewaysThatReceivedPacket = newValue;
+}
+
+void
+LinkCheckTest::SendPacket (Ptr<Node> endDevice, bool requestAck)
+{
+  Ptr<EndDeviceLoraMac> macLayer = endDevice->GetDevice
+    (0)->GetObject<LoraNetDevice> ()->GetMac ()->GetObject<EndDeviceLoraMac> ();
+
+  if (requestAck)
+    {
+      macLayer->SetMType (LoraMacHeader::CONFIRMED_DATA_UP);
+    }
+
+  macLayer->AddMacCommand(Create<LinkCheckReq> ());
+
+  endDevice->GetDevice(0)->Send(Create<Packet> (20), Address(), 0);
+}
+
+// This method is the pure virtual method from class TestCase that every
+// TestCase must implement
+void
+LinkCheckTest::DoRun (void)
+{
+  NS_LOG_DEBUG ("LinkCheckTest");
+
+  // Create a bunch of actual devices
+  NetworkComponents components = InitializeNetwork(1, 1);
+
+  Ptr<LoraChannel> channel = components.channel;
+  NodeContainer endDevices = components.endDevices;
+  NodeContainer gateways = components.gateways;
+  Ptr<Node> nsNode = components.nsNode;
+
+  // Connect the ED's trace source for Last known Gateway Count
+  endDevices.Get(0)->GetDevice(0)->GetObject<LoraNetDevice>()->GetMac()->GetObject<EndDeviceLoraMac>()->TraceConnectWithoutContext("LastKnownGatewayCount", MakeCallback (&LinkCheckTest::LastKnownGatewayCount, this));
+
+  // Send a packet in uplink
+  Simulator::Schedule(Seconds(1), &LinkCheckTest::SendPacket, this,
+                      endDevices.Get(0), true);
+
+  Simulator::Stop(Seconds(10)); // Allow for time to receive a downlink packet
+  Simulator::Run();
+  Simulator::Destroy();
+
+  NS_ASSERT (m_receivedPacketAtEd);
+}
+
 /**************
  * Test Suite *
  **************/
@@ -214,8 +301,9 @@ NetworkServerTestSuite::NetworkServerTestSuite ()
   LogComponentEnableAll (LOG_PREFIX_TIME);
 
   // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
-  AddTestCase (new UplinkPacketTest, TestCase::QUICK);
-  AddTestCase (new DownlinkPacketTest, TestCase::QUICK);
+  // AddTestCase (new UplinkPacketTest, TestCase::QUICK);
+  // AddTestCase (new DownlinkPacketTest, TestCase::QUICK);
+  AddTestCase (new LinkCheckTest, TestCase::QUICK);
 }
 
 // Do not forget to allocate an instance of this TestSuite

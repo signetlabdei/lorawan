@@ -65,6 +65,7 @@ namespace ns3 {
     // Check whether the received packet requires an acknowledgment.
     LoraMacHeader mHdr;
     LoraFrameHeader fHdr;
+    fHdr.SetAsDownlink ();
     Ptr<Packet> myPacket = packet->Copy();
     myPacket->RemoveHeader(mHdr);
     myPacket->RemoveHeader(fHdr);
@@ -77,11 +78,11 @@ namespace ns3 {
         NS_LOG_INFO ("Packet requires confirmation");
 
         // Set up the ACK bit on the reply
-        EndDeviceStatus::Reply r = status->GetReply();
-        r.frameHeader.SetAsDownlink ();
-        r.frameHeader.SetAck (true);
-        r.frameHeader.SetAddress (fHdr.GetAddress ());
-        r.needsReply = true;
+        status->m_reply.frameHeader.SetAsDownlink ();
+        status->m_reply.frameHeader.SetAck (true);
+        status->m_reply.frameHeader.SetAddress (fHdr.GetAddress ());
+        status->m_reply.macHeader.SetMType(LoraMacHeader::UNCONFIRMED_DATA_DOWN);
+        status->m_reply.needsReply = true;
 
         // Note that the acknowledgment procedure dies here: "Acknowledgments
         // are only snt in response to the latest message received and are never
@@ -108,7 +109,7 @@ namespace ns3 {
     NS_LOG_FUNCTION (this << networkStatus);
 
     // Empty the Ack bit.
-    status->GetReply().frameHeader.SetAck(false);
+    status->m_reply.frameHeader.SetAck(false);
   }
 
   ////////////////////////
@@ -141,24 +142,36 @@ namespace ns3 {
   LinkCheckComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
                                           Ptr<NetworkStatus> networkStatus)
   {
-    // TODO Check if the uplink packet (now the last element of the list)
-    // contains a LinkCheckReq command
+    NS_LOG_FUNCTION (this << status << networkStatus);
+
     Ptr<Packet> myPacket = status->GetLastPacketReceivedFromDevice ()->Copy();
     LoraMacHeader mHdr;
     LoraFrameHeader fHdr;
+    fHdr.SetAsUplink ();
     myPacket->RemoveHeader(mHdr);
     myPacket->RemoveHeader(fHdr);
 
     Ptr<LinkCheckReq> command = fHdr.GetMacCommand<LinkCheckReq> ();
+
+    // GetMacCommand returns 0 if no command is found
     if (command)
-        {
-          EndDeviceStatus::Reply r = status->GetReply ();
+      {
+        status->m_reply.needsReply = true;
 
-          // TODO Update or create the reply
+        // Get the number of gateways that received the packet and the best
+        // margin
+        uint8_t gwCount = status->GetLastReceivedPacketInfo ().gwList.size();
 
-          Ptr<LinkCheckAns> replyCommand = Create<LinkCheckAns> ();
-          r.frameHeader.AddCommand(replyCommand);
-        }
+        Ptr<LinkCheckAns> replyCommand = Create<LinkCheckAns> ();
+        replyCommand->SetGwCnt (gwCount);
+        status->m_reply.frameHeader.SetAsDownlink ();
+        status->m_reply.frameHeader.AddCommand(replyCommand);
+        status->m_reply.macHeader.SetMType (LoraMacHeader::UNCONFIRMED_DATA_DOWN);
+      }
+    else
+      {
+        // Do nothing
+      }
   }
 
   void

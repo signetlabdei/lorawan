@@ -54,8 +54,8 @@ namespace ns3 {
 
   NetworkServer::NetworkServer () :
     m_status (Create<NetworkStatus> ()),
-    m_scheduler (Create<NetworkScheduler> (m_status)),
-    m_controller (Create<NetworkController> (m_status))
+    m_controller (Create<NetworkController> (m_status)),
+    m_scheduler (Create<NetworkScheduler> (m_status, m_controller))
   {
     NS_LOG_FUNCTION_NOARGS ();
   }

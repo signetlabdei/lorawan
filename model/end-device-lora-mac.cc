@@ -1265,4 +1265,12 @@ EndDeviceLoraMac::GetAggregatedDutyCycle (void)
 
   return m_aggregatedDutyCycle;
 }
+
+void
+EndDeviceLoraMac::AddMacCommand (Ptr<MacCommand> macCommand)
+{
+  NS_LOG_FUNCTION (this << macCommand);
+
+  m_macCommandList.push_back (macCommand);
+}
 }

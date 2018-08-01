@@ -192,4 +192,21 @@ namespace ns3 {
         return 0;
       }
   }
+
+  Ptr<EndDeviceStatus>
+  NetworkStatus::GetEndDeviceStatus(LoraDeviceAddress address)
+  {
+    NS_LOG_FUNCTION (this << address);
+
+    auto it = m_endDeviceStatuses.find(address);
+    if (it != m_endDeviceStatuses.end())
+      {
+        return (*it).second;
+      }
+    else
+      {
+        NS_LOG_ERROR("EndDeviceStatus not found");
+        return 0;
+      }
+  }
 }
