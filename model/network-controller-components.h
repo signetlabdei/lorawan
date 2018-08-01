@@ -59,8 +59,8 @@ namespace ns3 {
                                    Ptr<EndDeviceStatus> status,
                                    Ptr<NetworkStatus> networkStatus) = 0;
 
-    void BeforeSendingReply (Ptr<EndDeviceStatus> status,
-                             Ptr<NetworkStatus> networkStatus) = 0;
+    virtual void BeforeSendingReply (Ptr<EndDeviceStatus> status,
+                                     Ptr<NetworkStatus> networkStatus) = 0;
 
     /**
      * Method that is called when a packet cannot be sent in the downlink.

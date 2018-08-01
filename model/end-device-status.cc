@@ -209,8 +209,6 @@ namespace ns3 {
     m_secondReceiveWindowFrequency = frequency;
   }
 
-
-
   void
   EndDeviceStatus::SetReplyMacHeader (LoraMacHeader macHeader)
   {
@@ -310,9 +308,23 @@ namespace ns3 {
         replyFrameHdr.SetAddress (m_endDeviceAddress);
         replyFrameHdr.SetAck (true);
         m_reply.frameHeader = replyFrameHdr;
-
       }
   }
+
+  Ptr<Packet const>
+  EndDeviceStatus::GetLastPacketReceivedFromDevice (void)
+  {
+    NS_LOG_FUNCTION_NOARGS ();
+    auto it = m_receivedPacketList.rbegin();
+    if (it != m_receivedPacketList.rend())
+      {
+        return it->first;
+      }
+        else
+      {
+        return 0;
+      }
+        }
 
   void
   EndDeviceStatus::InitializeReply ()

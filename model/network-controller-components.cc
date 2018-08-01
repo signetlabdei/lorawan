@@ -94,6 +94,14 @@ namespace ns3 {
   }
 
   void
+  ConfirmedMessagesComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
+                                                  Ptr<NetworkStatus> networkStatus)
+  {
+    NS_LOG_FUNCTION (this << status << networkStatus);
+    // Nothing to do in this case
+  }
+
+  void
   ConfirmedMessagesComponent::OnFailedReply (Ptr<EndDeviceStatus> status,
                                              Ptr<NetworkStatus> networkStatus)
   {
@@ -135,8 +143,7 @@ namespace ns3 {
   {
     // TODO Check if the uplink packet (now the last element of the list)
     // contains a LinkCheckReq command
-    status.Get
-      Ptr<Packet> myPacket = packet->Copy();
+    Ptr<Packet> myPacket = status->GetLastPacketReceivedFromDevice ()->Copy();
     LoraMacHeader mHdr;
     LoraFrameHeader fHdr;
     myPacket->RemoveHeader(mHdr);
@@ -144,41 +151,14 @@ namespace ns3 {
 
     Ptr<LinkCheckReq> command = fHdr.GetMacCommand<LinkCheckReq> ();
     if (command)
-      {
-        EndDeviceStatus::Reply r = status->GetReply ();
+        {
+          EndDeviceStatus::Reply r = status->GetReply ();
 
-        // TODO Update or create the reply
+          // TODO Update or create the reply
 
-        Ptr<LinkCheckAns> replyCommand = Create<LinkCheckAns> ();
-        r.frameHeader.AddCommand(replyCommand);
-      }
-  }
-
-  void
-  LinkCheckComponent::UpdateLinkCheckAns (Ptr<Packet const> packet,
-                                          Ptr<EndDeviceStatus> status)
-  {
-    NS_LOG_FUNCTION (this);
-
-    // Go over all gateways that received this packet
-    EndDeviceStatus::ReceivedPacketList list = status->GetReceivedPacketList ();
-    auto it = list.begin();
-    for (; it != list.end(); ++it)
-      {
-        // Find the packet
-        if (it->first->GetUid () == packet->GetUid ())
-          {
-            EndDeviceStatus::GatewayList gwList = it->second.gwList;
-
-            int nGws = 0;
-            double bestRxPower = -10000;
-
-            auto gwIt = gwList.begin();
-            for (; gwIt != gwList.end(); ++it)
-              {
-              }
-          }
-      }
+          Ptr<LinkCheckAns> replyCommand = Create<LinkCheckAns> ();
+          r.frameHeader.AddCommand(replyCommand);
+        }
   }
 
   void

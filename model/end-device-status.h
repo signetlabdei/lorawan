@@ -274,6 +274,11 @@ namespace ns3 {
                                const Address& gwAddress);
 
     /**
+     * Return the last packet that was received from this device.
+     */
+    Ptr<Packet const> GetLastPacketReceivedFromDevice (void);
+
+    /**
      * Initialize reply.
      */
     void InitializeReply (void);
