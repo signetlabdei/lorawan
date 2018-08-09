@@ -81,13 +81,15 @@ namespace ns3 {
     if (gwAddress == Address ())
       {
         // No suitable GW was found
+        // TODO Schedule other receive window
       }
     else
       {
         m_controller->BeforeSendingReply (m_status->GetEndDeviceStatus
                                           (deviceAddress));
+
         // Send the reply through that gateway
-          m_status->SendThroughGateway (m_status->GetReplyForDevice
+        m_status->SendThroughGateway (m_status->GetReplyForDevice
                                       (deviceAddress, window),
                                       gwAddress);
       }

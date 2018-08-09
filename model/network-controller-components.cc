@@ -65,7 +65,7 @@ namespace ns3 {
     // Check whether the received packet requires an acknowledgment.
     LoraMacHeader mHdr;
     LoraFrameHeader fHdr;
-    fHdr.SetAsDownlink ();
+    fHdr.SetAsUplink ();
     Ptr<Packet> myPacket = packet->Copy();
     myPacket->RemoveHeader(mHdr);
     myPacket->RemoveHeader(fHdr);

@@ -70,7 +70,8 @@ namespace ns3 {
     // Inform each component about the new packet
     for (auto it = m_components.begin(); it != m_components.end(); ++it)
       {
-        (*it)->OnReceivedPacket(packet, m_status->GetEndDeviceStatus (packet),
+        (*it)->OnReceivedPacket(packet,
+                                m_status->GetEndDeviceStatus (packet),
                                 m_status);
       }
   }

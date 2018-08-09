@@ -131,6 +131,5 @@ namespace ns3 {
     // Add LinkCheck support
     Ptr<LinkCheckComponent> linkCheckSupport = Create<LinkCheckComponent> ();
     netServer->AddComponent (linkCheckSupport);
-
   }
 } // namespace ns3
