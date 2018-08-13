@@ -303,6 +303,8 @@ namespace ns3 {
 
     struct Reply m_reply; //<! Next reply intended for this device
 
+    LoraDeviceAddress m_endDeviceAddress; //<! The address of this device
+
   private:
 
     // Receive window data
@@ -312,8 +314,6 @@ namespace ns3 {
     double m_secondReceiveWindowFrequency = 868.625;
 
     ReceivedPacketList m_receivedPacketList; //<! List of received packets
-
-    LoraDeviceAddress m_endDeviceAddress; //<! The address of this device
 
     // NOTE Using this attribute is 'cheating', since we are assuming perfect
     // synchronization between the info at the device and at the network server
