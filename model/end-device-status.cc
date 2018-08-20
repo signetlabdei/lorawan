@@ -49,8 +49,8 @@ namespace ns3 {
   EndDeviceStatus::EndDeviceStatus (LoraDeviceAddress endDeviceAddress,
                                     Ptr<EndDeviceLoraMac> endDeviceMac) :
     m_reply (EndDeviceStatus::Reply()),
-    m_receivedPacketList (ReceivedPacketList()),
     m_endDeviceAddress (endDeviceAddress),
+    m_receivedPacketList (ReceivedPacketList()),
     m_mac (endDeviceMac)
   {
     NS_LOG_FUNCTION (endDeviceAddress);
