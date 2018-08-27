@@ -179,4 +179,11 @@ namespace ns3 {
 
     m_controller->Install(component);
   }
+
+  Ptr<NetworkStatus>
+  NetworkServer::GetNetworkStatus (void)
+  {
+    return m_status;
+  }
+
 }

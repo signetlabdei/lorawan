@@ -97,6 +97,8 @@ namespace ns3 {
     bool Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
                   uint16_t protocol, const Address& address);
 
+    Ptr<NetworkStatus> GetNetworkStatus (void);
+
   protected:
     Ptr<NetworkStatus> m_status;
     Ptr<NetworkController> m_controller;
