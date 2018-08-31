@@ -18,7 +18,7 @@ Ptr<Packet> m_latestReceivedPacket;
 int m_receivedPacketCalls = 0;
 int m_underSensitivityCalls = 0;
 int m_interferenceCalls = 0;
-int m_noMoreDemodulatorsCalls = 0;
+int m_wrongFrequencyCalls = 0;
 
 void ReceivedPacket (Ptr<const Packet> packet, uint32_t node)
 {
@@ -43,11 +43,11 @@ void Interference (Ptr<const Packet> packet, uint32_t node)
   m_interferenceCalls++;
 }
 
-void NoMoreDemodulators (Ptr<const Packet> packet, uint32_t node)
+void WrongFrequency (Ptr<const Packet> packet, uint32_t node)
 {
   NS_LOG_FUNCTION (packet << node);
 
-  m_noMoreDemodulatorsCalls++;
+  m_wrongFrequencyCalls++;
 }
 
 bool HaveSamePacketContents (Ptr<Packet> packet1, Ptr<Packet> packet2)
@@ -137,9 +137,9 @@ void Reset (void)
   edPhy2->TraceConnectWithoutContext ("LostPacketBecauseInterference", MakeCallback (&Interference));
   edPhy3->TraceConnectWithoutContext ("LostPacketBecauseInterference", MakeCallback (&Interference));
 
-  edPhy1->TraceConnectWithoutContext ("LostPacketBecauseNoMoreReceivers", MakeCallback (&NoMoreDemodulators));
-  edPhy2->TraceConnectWithoutContext ("LostPacketBecauseNoMoreReceivers", MakeCallback (&NoMoreDemodulators));
-  edPhy3->TraceConnectWithoutContext ("LostPacketBecauseNoMoreReceivers", MakeCallback (&NoMoreDemodulators));
+  edPhy1->TraceConnectWithoutContext ("LostPacketBecauseWrongFrequency", MakeCallback (&WrongFrequency));
+  edPhy2->TraceConnectWithoutContext ("LostPacketBecauseWrongFrequency", MakeCallback (&WrongFrequency));
+  edPhy3->TraceConnectWithoutContext ("LostPacketBecauseWrongFrequency", MakeCallback (&WrongFrequency));
 }
 
 int main (int argc, char *argv[])
@@ -158,7 +158,7 @@ int main (int argc, char *argv[])
   Reset ();
 
   LoraTxParameters txParams;
-  txParams.sf = 12;
+  txParams.sf = 7;
 
   Ptr<Packet> packet = Create<Packet> (10);
 
@@ -220,7 +220,7 @@ int main (int argc, char *argv[])
 
   // Packets can be destroyed by interference
 
-  txParams.sf = 8;
+  txParams.sf = 7;
 
   Simulator::Schedule (Seconds (2), &EndDeviceLoraPhy::Send, edPhy1, packet,
                        txParams, 868.1, 14);
@@ -240,7 +240,7 @@ int main (int argc, char *argv[])
 
   Simulator::Stop (Hours (2)); Simulator::Run (); Simulator::Destroy ();
 
-  NS_ASSERT (m_noMoreDemodulatorsCalls == 2);
+  NS_ASSERT (m_wrongFrequencyCalls == 2);
 
   Reset ();
 
