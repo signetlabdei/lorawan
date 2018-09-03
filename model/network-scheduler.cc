@@ -78,13 +78,30 @@ namespace ns3 {
 
     NS_LOG_DEBUG ("Found available gateway with address: " << gwAddress);
 
-    if (gwAddress == Address ())
+    if (gwAddress == Address () && window == 1)
       {
         // No suitable GW was found
-        // TODO Schedule other receive window
+        // Schedule OnReceiveWindowOpportunity event
+        Simulator::Schedule (Seconds(1),
+                             &NetworkScheduler::OnReceiveWindowOpportunity,
+                             this,
+                             deviceAddress,
+                             2); // This will be the second receive window
+      }
+    else if (gwAddress == Address () && window == 2)
+      {
+        // No suitable GW was found
+        // Simply give up.
+        NS_LOG_INFO ("Giving up on reply: no suitable gateway was found " <<
+                     "on the second receive window");
+
+        // Reset the reply
+        // XXX Should we reset it here or keep it for the next opportunity?
+        m_status->GetEndDeviceStatus (deviceAddress)->InitializeReply ();
       }
     else
       {
+        // A gateway was found
         m_controller->BeforeSendingReply (m_status->GetEndDeviceStatus
                                           (deviceAddress));
 
@@ -92,6 +109,9 @@ namespace ns3 {
         m_status->SendThroughGateway (m_status->GetReplyForDevice
                                       (deviceAddress, window),
                                       gwAddress);
+
+        // Reset the reply
+        m_status->GetEndDeviceStatus (deviceAddress)->InitializeReply ();
       }
   }
 }
