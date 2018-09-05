@@ -194,10 +194,6 @@ namespace ns3 {
      *
      * \return An unsigned 8-bit integer containing the spreading factor.
      */
-<<<<<<< HEAD
-=======
-
->>>>>>> 18f8c29... Fix buggy insertion of duplicate packets
     uint8_t GetFirstReceiveWindowSpreadingFactor (void);
 
     /**
