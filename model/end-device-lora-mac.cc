@@ -231,7 +231,8 @@ EndDeviceLoraMac::DoSend (Ptr<Packet> packet)
       // Reset retransmission parameters
       resetRetransmissionParameters ();
 
-      // If this is the first transmission of a confirmed packet, save parameters for the (possible) next retransmissions.
+      // If this is the first transmission of a confirmed packet, save
+      // parameters for the (possible) next retransmissions.
       if (m_mType == LoraMacHeader::CONFIRMED_DATA_UP)
         {
           m_retxParams.packet = packet->Copy ();
@@ -269,6 +270,9 @@ EndDeviceLoraMac::DoSend (Ptr<Packet> packet)
           SendToPhy (m_retxParams.packet);
         }
     }
+
+  // Reset MAC command list
+  m_macCommandList.clear ();
 
 }
 
