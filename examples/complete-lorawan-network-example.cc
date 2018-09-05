@@ -318,6 +318,12 @@ int main (int argc, char *argv[])
     }
 
   // Create the LoraNetDevices of the end devices
+  uint8_t nwkId = 54;
+  uint32_t nwkAddr = 1864;
+  Ptr<LoraDeviceAddressGenerator> addrGen = CreateObject<LoraDeviceAddressGenerator> (nwkId,nwkAddr);
+
+  // Create the LoraNetDevices of the end devices
+  macHelper.SetAddressGenerator (addrGen);
   phyHelper.SetDeviceType (LoraPhyHelper::ED);
   macHelper.SetDeviceType (LoraMacHelper::ED);
   helper.Install (phyHelper, macHelper, endDevices);
