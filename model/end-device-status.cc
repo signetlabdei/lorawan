@@ -234,6 +234,8 @@ namespace ns3 {
   {
     NS_LOG_FUNCTION_NOARGS ();
 
+    NS_LOG_DEBUG (*this);
+
     // Create a copy of the packet
     Ptr<Packet> myPacket = receivedPacket->Copy();
 
@@ -242,6 +244,7 @@ namespace ns3 {
     myPacket->RemoveHeader (macHdr);
 
     LoraFrameHeader frameHdr;
+    frameHdr.SetAsUplink ();
     myPacket->RemoveHeader (frameHdr);
 
     // Update current parameters
@@ -265,22 +268,42 @@ namespace ns3 {
     auto it = m_receivedPacketList.rbegin();
     for (; it != m_receivedPacketList.rend(); it++)
       {
-        if ((*it).first == receivedPacket) // Found the packet!
+        // Get the frame counter of the current packet to compare it with the
+        // newly received one
+        Ptr<Packet> packetCopy = ((*it).first)->Copy();
+        LoraMacHeader currentMacHdr;
+        packetCopy->RemoveHeader (currentMacHdr);
+        LoraFrameHeader currentFrameHdr;
+        frameHdr.SetAsUplink ();
+        packetCopy->RemoveHeader (currentFrameHdr);
+
+        NS_LOG_DEBUG ("Received packet's frame counter: " <<
+                      unsigned(frameHdr.GetFCnt ()) <<
+                      "\nCurrent packet's frame counter: " <<
+                      unsigned(currentFrameHdr.GetFCnt ()));
+
+        if (frameHdr.GetFCnt () == currentFrameHdr.GetFCnt ())
           {
+            NS_LOG_INFO ("Packet was already received by another gateway");
+
             // This packet had already been received from another gateway:
             // add this gateway's reception information.
-            GatewayList gwList = it -> second.gwList;
+            GatewayList& gwList = it -> second.gwList;
 
             PacketInfoPerGw gwInfo;
             gwInfo.receivedTime = Simulator::Now();
             gwInfo.rxPower= rcvPower;
+            gwInfo.gwAddress = gwAddress;
             gwList.insert (std::pair<Address, PacketInfoPerGw> (gwAddress, gwInfo));
+
+            NS_LOG_DEBUG ("Size of gateway list: " << gwList.size ());
 
             break; // Exit from the cycle
           }
       }
     if (it == m_receivedPacketList.rend())
       {
+        NS_LOG_INFO ("Packet was received for the first time");
         PacketInfoPerGw gwInfo;
         gwInfo.receivedTime = Simulator::Now();
         gwInfo.rxPower = rcvPower;
@@ -315,7 +338,7 @@ namespace ns3 {
       {
         return it->first;
       }
-        else
+    else
       {
         return 0;
       }
@@ -363,5 +386,29 @@ namespace ns3 {
       }
 
     return bestGwAddress;
+  }
+
+  std::ostream&
+  operator<<(std::ostream& os, const EndDeviceStatus& status)
+  {
+    os << "Total packets received: " << status.m_receivedPacketList.size () << std::endl;
+
+    for (auto j = status.m_receivedPacketList.begin ();
+         j != status.m_receivedPacketList.end ();
+         j++)
+      {
+        ns3::EndDeviceStatus::ReceivedPacketInfo info = (*j).second;
+        ns3::EndDeviceStatus::GatewayList gatewayList = info.gwList;
+        Ptr<Packet const> pkt=(*j).first;
+        os << pkt <<" "<<gatewayList.size()<< std::endl;
+        for (ns3::EndDeviceStatus::GatewayList::iterator k = gatewayList.begin (); k != gatewayList.end (); k++)
+          {
+            ns3::EndDeviceStatus::PacketInfoPerGw infoPerGw = (*k).second;
+            os << "  " << infoPerGw.gwAddress << " " << infoPerGw.rxPower << std::endl;
+          }
+      }
+
+    return os;
+
   }
 }

@@ -557,6 +557,8 @@ TracedValue<uint8_t> m_requiredTx;
    */
   struct LoraRetxParameters m_retxParams;
 
+  uint8_t m_currentFCnt;
+
   /////////////////
   //  Callbacks  //
   /////////////////

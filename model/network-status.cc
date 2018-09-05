@@ -106,10 +106,12 @@ namespace ns3 {
     LoraMacHeader macHdr;
     myPacket->RemoveHeader (macHdr);
     LoraFrameHeader frameHdr;
+    frameHdr.SetAsUplink ();
     myPacket->RemoveHeader (frameHdr);
 
     // Update the correct EndDeviceStatus object
     LoraDeviceAddress edAddr= frameHdr.GetAddress();
+    NS_LOG_DEBUG ("Node address: " << edAddr);
     m_endDeviceStatuses.at(edAddr)->InsertReceivedPacket(packet, gwAddress);
   }
 

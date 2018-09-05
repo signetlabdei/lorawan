@@ -30,6 +30,7 @@
 #include "ns3/pointer.h"
 #include "ns3/lora-mac-header.h"
 #include "ns3/lora-frame-header.h"
+#include <iostream>
 
 namespace ns3 {
 
@@ -193,6 +194,10 @@ namespace ns3 {
      *
      * \return An unsigned 8-bit integer containing the spreading factor.
      */
+<<<<<<< HEAD
+=======
+
+>>>>>>> 18f8c29... Fix buggy insertion of duplicate packets
     uint8_t GetFirstReceiveWindowSpreadingFactor (void);
 
     /**
@@ -304,6 +309,8 @@ namespace ns3 {
     struct Reply m_reply; //<! Next reply intended for this device
 
     LoraDeviceAddress m_endDeviceAddress; //<! The address of this device
+
+    friend std::ostream& operator<< (std::ostream& os, const EndDeviceStatus& status);
 
   private:
 
