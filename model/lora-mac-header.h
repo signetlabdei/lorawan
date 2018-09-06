@@ -118,6 +118,8 @@ public:
    */
   bool IsUplink (void) const;
 
+  bool IsConfirmed (void) const;
+
 private:
   /**
    * The Message Type.

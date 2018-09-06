@@ -58,6 +58,7 @@ def build(bld):
         'helper/forwarder-helper.cc',
         'helper/network-server-helper.cc',
         'helper/simple-network-server-helper.cc',
+        'helper/lora-packet-tracker.cc',
         'test/utilities.cc',
         ]
 
@@ -118,6 +119,7 @@ def build(bld):
         'helper/forwarder-helper.h',
         'helper/network-server-helper.h',
         'helper/simple-network-server-helper.h',
+        'helper/lora-packet-tracker.h',
         'test/utilities.h',
         ]
 

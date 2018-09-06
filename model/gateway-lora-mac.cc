@@ -113,8 +113,13 @@ GatewayLoraMac::Receive (Ptr<Packet const> packet)
   if (macHdr.IsUplink ())
     {
       m_device->GetObject<LoraNetDevice> ()->Receive (packetCopy);
+
       NS_LOG_DEBUG ("Received packet: " << packet);
-      m_receivedPacket (packet);
+
+      if (macHdr.IsConfirmed()) // Only fire the callback if it's confirmed
+        {
+          m_receivedPacket (packet);
+        }
     }
   else
     {

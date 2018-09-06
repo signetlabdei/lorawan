@@ -27,6 +27,9 @@
 #include "ns3/net-device-container.h"
 #include "ns3/net-device.h"
 #include "ns3/lora-net-device.h"
+#include "ns3/lora-packet-tracker.h"
+
+#include <ctime>
 
 namespace ns3 {
 
@@ -68,6 +71,27 @@ public:
   virtual NetDeviceContainer Install (const LoraPhyHelper &phyHelper,
                                       const LoraMacHelper &macHelper,
                                       Ptr<Node> node) const;
+
+  /**
+   * Enable tracking of packets via trace sources
+   *
+   * This method automatically connects to trace sources and computes relevant
+   * metrics.
+   */
+  void EnablePacketTracking (std::string filename);
+
+  void EnableSimulationTimePrinting (void);
+
+  void PrintSimulationTime (void);
+
+  void PrintPerformance (Time start, Time stop);
+
+  void PrintEndDevices (NodeContainer endDevices, NodeContainer gateways,
+                        std::string filename);
+
+  LoraPacketTracker *m_packetTracker = 0;
+
+  time_t m_oldtime;
 };
 
 } //namespace ns3

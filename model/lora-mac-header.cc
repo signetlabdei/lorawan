@@ -149,4 +149,13 @@ LoraMacHeader::IsUplink (void) const
          (m_mtype == UNCONFIRMED_DATA_UP) ||
          (m_mtype == CONFIRMED_DATA_UP);
 }
+
+  bool
+  LoraMacHeader::IsConfirmed (void) const
+  {
+    NS_LOG_FUNCTION_NOARGS ();
+
+    return (m_mtype == CONFIRMED_DATA_DOWN) ||
+      (m_mtype == CONFIRMED_DATA_UP);
+  }
 }
