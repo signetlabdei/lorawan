@@ -127,6 +127,13 @@ EndDeviceStatus::GetCompleteReplyPacket (void)
 
   // Add headers
   m_reply.frameHeader.SetAddress (m_endDeviceAddress);
+  Ptr<Packet> lastPacket = GetLastPacketReceivedFromDevice ()->Copy ();
+  LoraMacHeader mHdr;
+  LoraFrameHeader fHdr;
+  fHdr.SetAsUplink ();
+  lastPacket->RemoveHeader (mHdr);
+  lastPacket->RemoveHeader (fHdr);
+  m_reply.frameHeader.SetFCnt (fHdr.GetFCnt ());
   m_reply.macHeader.SetMType (LoraMacHeader::UNCONFIRMED_DATA_DOWN);
   replyPacket->AddHeader (m_reply.frameHeader);
   replyPacket->AddHeader (m_reply.macHeader);
@@ -362,34 +369,26 @@ EndDeviceStatus::AddMACCommand (Ptr<MacCommand> macCommand)
   m_reply.frameHeader.AddCommand (macCommand);
 }
 
-Address
-EndDeviceStatus::GetBestGatewayForReply (void)
+std::map<double, Address>
+EndDeviceStatus::GetPowerGatewayMap (void)
 {
-  // Cycle gateways that received the last packet.
-  // Pick the one that received it with the highest power.
-  // If it is available for transmission, return that one. Else, check the
-  // second best one.
+  // Create a map of the gateways
+  // Key: received power
+  // Value: address of the corresponding gateway
   ReceivedPacketInfo info = m_receivedPacketList.back ().second;
-
   GatewayList gwList = info.gwList;
 
-
-  Address bestGwAddress = Address ();
-  double bestRxPower = -1000;
+  std::map<double, Address> gatewayPowers;
 
   for (auto it = gwList.begin (); it != gwList.end (); it++)
     {
       Address currentGwAddress = (*it).first;
       double currentRxPower = (*it).second.rxPower;
-
-      if (currentRxPower > bestRxPower)
-        {
-          bestRxPower = currentRxPower;
-          bestGwAddress = currentGwAddress;
-        }
+      gatewayPowers.insert(std::pair<double, Address> (currentRxPower,
+                                                       currentGwAddress));
     }
 
-  return bestGwAddress;
+  return gatewayPowers;
 }
 
 std::ostream&

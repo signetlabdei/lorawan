@@ -364,8 +364,9 @@ LinkAdrReq::GetEnabledChannelsList (void)
   std::list<int> channelIndices;
   for (int i = 0; i < 16; i++)
     {
-      if ((m_channelMask & (0b1 << i)) >> i)     // Take channel mask's i-th bit
+      if (m_channelMask & (0b1 << i))     // Take channel mask's i-th bit
         {
+          NS_LOG_DEBUG ("Adding channel index " << i);
           channelIndices.push_back (i);
         }
     }

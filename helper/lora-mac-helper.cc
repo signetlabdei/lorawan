@@ -23,6 +23,7 @@
 #include "ns3/end-device-lora-phy.h"
 #include "ns3/lora-net-device.h"
 #include "ns3/log.h"
+#include "ns3/random-variable-stream.h"
 
 namespace ns3 {
 namespace lorawan {
@@ -373,6 +374,82 @@ LoraMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer ga
 
         }
         */
+
+    } // end loop on nodes
+
+  return sfQuantity;
+
+} //  end function
+
+std::vector<int>
+LoraMacHelper::SetSpreadingFactorsGivenDistribution (NodeContainer endDevices,
+                                                     NodeContainer gateways,
+                                                     std::vector<double> distribution)
+{
+  NS_LOG_FUNCTION_NOARGS ();
+
+  std::vector<int> sfQuantity (7,0);
+  Ptr<UniformRandomVariable> uniformRV = CreateObject<UniformRandomVariable> ();
+  std::vector<double> cumdistr(6);
+  cumdistr[0] = distribution[0];
+  for (int i=1; i<7; ++i)
+    {
+      cumdistr[i] = distribution[i] + cumdistr[i-1];
+    }
+
+  NS_LOG_DEBUG ("Distribution: " << distribution[0] <<
+                " " << distribution[1] << " " << distribution[2] <<
+                " " << distribution[3] << " " << distribution[4] <<
+                " " << distribution[5]);
+  NS_LOG_DEBUG ("Cumulative distribution: " << cumdistr[0] <<
+                " " << cumdistr[1] << " " << cumdistr[2] <<
+                " " << cumdistr[3] << " " << cumdistr[4] <<
+                " " << cumdistr[5]);
+
+  for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j)
+    {
+      Ptr<Node> object = *j;
+      Ptr<MobilityModel> position = object->GetObject<MobilityModel> ();
+      NS_ASSERT (position != 0);
+      Ptr<NetDevice> netDevice = object->GetDevice (0);
+      Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+      NS_ASSERT (loraNetDevice != 0);
+      Ptr<EndDeviceLoraMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLoraMac> ();
+      NS_ASSERT (mac != 0);
+
+      double prob = uniformRV->GetValue(0,1);
+
+      // NS_LOG_DEBUG ("Probability: " << prob);
+      if (prob < cumdistr[0])
+        {
+          mac->SetDataRate (5);
+          sfQuantity[0] = sfQuantity[0] + 1;
+        }
+      else if (prob > cumdistr[0] && prob < cumdistr[1])
+        {
+          mac->SetDataRate (4);
+          sfQuantity[1] = sfQuantity[1] + 1;
+        }
+      else if (prob > cumdistr[1] && prob < cumdistr[2])
+        {
+          mac->SetDataRate (3);
+          sfQuantity[2] = sfQuantity[2] + 1;
+        }
+      else if (prob > cumdistr[2] && prob < cumdistr[3])
+        {
+          mac->SetDataRate (2);
+          sfQuantity[3] = sfQuantity[3] + 1;
+        }
+      else if (prob > cumdistr[3] && prob < cumdistr[4])
+        {
+          mac->SetDataRate (1);
+          sfQuantity[4] = sfQuantity[4] + 1;
+        }
+      else
+        {
+          mac->SetDataRate (0);
+          sfQuantity[5] = sfQuantity[5] + 1;
+        }
 
     } // end loop on nodes
 

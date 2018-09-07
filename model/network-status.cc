@@ -67,11 +67,11 @@ NetworkStatus::AddNode (Ptr<EndDeviceLoraMac> edMac)
     {
       // The device doesn't exist. Create new EndDeviceStatus
       Ptr<EndDeviceStatus> edStatus = CreateObject<EndDeviceStatus>
-          (edAddress, edMac->GetObject<EndDeviceLoraMac>());
+        (edAddress, edMac->GetObject<EndDeviceLoraMac>());
 
       // Add it to the map
       m_endDeviceStatuses.insert (std::pair<LoraDeviceAddress, Ptr<EndDeviceStatus> >
-                                    (edAddress, edStatus));
+                                  (edAddress, edStatus));
       NS_LOG_DEBUG ("Added to the list a device with address " <<
                     edAddress.Print ());
     }
@@ -89,14 +89,14 @@ NetworkStatus::AddGateway (Address& address, Ptr<GatewayStatus> gwStatus)
 
       // Add it to the map
       m_gatewayStatuses.insert (std::pair<Address, Ptr<GatewayStatus> >
-                                  (address, gwStatus));
+                                (address, gwStatus));
       NS_LOG_DEBUG ("Added to the list a gateway with address " << address);
     }
 }
 
 void
 NetworkStatus::OnReceivedPacket (Ptr<const Packet> packet,
-                                 const Address& gwAddress)
+                                  const Address& gwAddress)
 {
   NS_LOG_FUNCTION (this << packet << gwAddress);
 
@@ -124,16 +124,43 @@ NetworkStatus::NeedsReply (LoraDeviceAddress deviceAddress)
 }
 
 Address
-NetworkStatus::GetBestGatewayForDevice (LoraDeviceAddress deviceAddress)
+NetworkStatus::GetBestGatewayForDevice (LoraDeviceAddress deviceAddress, int window)
 {
   // Get the endDeviceStatus we are interested in
   Ptr<EndDeviceStatus> edStatus = m_endDeviceStatuses.at (deviceAddress);
+  double replyFrequency;
+  if (window == 1)
+    {
+      replyFrequency = edStatus->GetFirstReceiveWindowFrequency();
+    }
+  else if (window == 2)
+    {
+      replyFrequency = edStatus->GetSecondReceiveWindowFrequency();
+    }
+  else
+    {
+      NS_ABORT_MSG ("Invalid window value");
+    }
 
   // Get the list of gateways that this device can reach
   // NOTE: At this point, we could also take into account the whole network to
   // identify the best gateway according to various metrics. For now, we just
   // ask the EndDeviceStatus to pick the best gateway for us via its method.
-  Address bestGwAddress = edStatus->GetBestGatewayForReply ();
+  std::map<double, Address> gwAddresses = edStatus->GetPowerGatewayMap ();
+
+  // By iterating on the map in reverse, we go from the 'best'
+  // gateway, i.e. the one with the highest received power, to the
+  // worst.
+  Address bestGwAddress;
+  for (auto it = gwAddresses.rbegin(); it != gwAddresses.rend(); it++)
+    {
+      bool isAvailable = m_gatewayStatuses.find(it->second)->second->IsAvailableForTransmission (replyFrequency);
+      if (isAvailable)
+        {
+          bestGwAddress = it->second;
+          break;
+        }
+    }
 
   return bestGwAddress;
 }
@@ -144,8 +171,8 @@ NetworkStatus::SendThroughGateway (Ptr<Packet> packet, Address gwAddress)
   NS_LOG_FUNCTION (packet << gwAddress);
 
   m_gatewayStatuses.find (gwAddress)->second->GetNetDevice ()->Send (packet,
-                                                                     gwAddress,
-                                                                     0x0800);
+                                                                      gwAddress,
+                                                                      0x0800);
 }
 
 Ptr<Packet>
@@ -211,6 +238,14 @@ NetworkStatus::GetEndDeviceStatus (LoraDeviceAddress address)
       NS_LOG_ERROR ("EndDeviceStatus not found");
       return 0;
     }
+}
+
+int
+NetworkStatus::CountEndDevices (void)
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_endDeviceStatuses.size ();
 }
 }
 }

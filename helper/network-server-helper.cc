@@ -20,6 +20,7 @@
 
 #include "ns3/network-server-helper.h"
 #include "ns3/network-controller-components.h"
+#include "ns3/adr-component.h"
 #include "ns3/double.h"
 #include "ns3/string.h"
 #include "ns3/trace-source-accessor.h"
@@ -36,6 +37,7 @@ NetworkServerHelper::NetworkServerHelper ()
   m_factory.SetTypeId ("ns3::NetworkServer");
   p2pHelper.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
   p2pHelper.SetChannelAttribute ("Delay", StringValue ("2ms"));
+  SetAdr ("ns3::AdrComponent");
 }
 
 NetworkServerHelper::~NetworkServerHelper ()
@@ -120,6 +122,23 @@ NetworkServerHelper::InstallPriv (Ptr<Node> node)
 }
 
 void
+NetworkServerHelper::EnableAdr (bool enableAdr)
+{
+  NS_LOG_FUNCTION (this << enableAdr);
+
+  m_adrEnabled = enableAdr;
+}
+
+void
+NetworkServerHelper::SetAdr (std::string type)
+{
+  NS_LOG_FUNCTION (this << type);
+
+  m_adrSupportFactory = ObjectFactory ();
+  m_adrSupportFactory.SetTypeId (type);
+}
+
+void
 NetworkServerHelper::InstallComponents (Ptr<NetworkServer> netServer)
 {
   NS_LOG_FUNCTION (this << netServer);
@@ -132,6 +151,12 @@ NetworkServerHelper::InstallComponents (Ptr<NetworkServer> netServer)
   // Add LinkCheck support
   Ptr<LinkCheckComponent> linkCheckSupport = CreateObject<LinkCheckComponent> ();
   netServer->AddComponent (linkCheckSupport);
+
+  // Add Adr support
+  if (m_adrEnabled)
+    {
+      netServer->AddComponent (m_adrSupportFactory.Create<NetworkControllerComponent> ());
+    }
 }
 }
 } // namespace ns3

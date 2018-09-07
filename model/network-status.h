@@ -29,6 +29,8 @@
 #include "ns3/lora-device-address.h"
 #include "ns3/network-scheduler.h"
 
+#include <iterator>
+
 namespace ns3 {
 namespace lorawan {
 
@@ -82,7 +84,7 @@ public:
    *
    * \param deviceAddress the address of the device we are interested in.
    */
-  Address GetBestGatewayForDevice (LoraDeviceAddress deviceAddress);
+  Address GetBestGatewayForDevice (LoraDeviceAddress deviceAddress, int window);
 
   /**
    * Send a packet through a Gateway.
@@ -107,6 +109,11 @@ public:
    * Get the EndDeviceStatus corresponding to a LoraDeviceAddress.
    */
   Ptr<EndDeviceStatus> GetEndDeviceStatus (LoraDeviceAddress address);
+
+  /**
+   * Return the number of end devices currently managed by the server.
+   */
+  int CountEndDevices (void);
 
 public:
   std::map<LoraDeviceAddress, Ptr<EndDeviceStatus> > m_endDeviceStatuses;

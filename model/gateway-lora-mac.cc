@@ -67,6 +67,14 @@ GatewayLoraMac::Send (Ptr<Packet> packet)
   NS_LOG_DEBUG ("Freq: " << frequency << " MHz");
   packet->AddPacketTag (tag);
 
+  // Make sure we can transmit this packet
+  if (m_channelHelper.GetWaitingTime(CreateObject<LogicalLoraChannel> (frequency)) > 0)
+    {
+      // We cannot send now!
+      NS_LOG_WARN ("Trying to send a packet but Duty Cycle won't allow it. Aborting.");
+      return;
+    }
+
   LoraTxParameters params;
   params.sf = GetSfFromDataRate (dataRate);
   params.headerDisabled = false;
@@ -91,6 +99,8 @@ GatewayLoraMac::Send (Ptr<Packet> packet)
 
   // Send the packet to the PHY layer to send it on the channel
   m_phy->Send (packet, params, frequency, sendingPower);
+
+  m_sentNewPacket (packet);
 }
 
 bool
@@ -117,10 +127,7 @@ GatewayLoraMac::Receive (Ptr<Packet const> packet)
 
       NS_LOG_DEBUG ("Received packet: " << packet);
 
-      if (macHdr.IsConfirmed ())    // Only fire the callback if it's confirmed
-        {
-          m_receivedPacket (packet);
-        }
+      m_receivedPacket (packet);
     }
   else
     {
