@@ -370,6 +370,8 @@ public:
    */
   void AddMacCommand (Ptr<MacCommand> macCommand);
 
+  uint8_t GetTransmissionPower (void);
+
 private:
   /**
    * Structure representing the parameters that will be used in the
