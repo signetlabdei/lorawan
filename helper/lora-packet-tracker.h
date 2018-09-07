@@ -102,6 +102,8 @@ namespace ns3
                                macPacketTracker, RetransmissionData reTransmissionTracker,
                                PhyPacketData packetTracker);
 
+    void CountPhyPackets (Time startTime, Time stopTime);
+
     void PrintVector (std::vector<int> vector);
 
     void PrintSumRetransmissions (std::vector<int> reTxVector);
@@ -112,6 +114,8 @@ namespace ns3
     void PrintPerformance (Time start, Time stop);
 
   private:
+    void DoCountPhyPackets (Time startTime, Time stopTime, PhyPacketData packetTracker);
+
     std::list<PhyOutcome> m_phyPacketOutcomes;
 
     std::string m_outputFilename;

@@ -86,6 +86,8 @@ public:
 
   void PrintPerformance (Time start, Time stop);
 
+  void CountPhyPackets (Time start, Time stop);
+
   void PrintEndDevices (NodeContainer endDevices, NodeContainer gateways,
                         std::string filename);
 

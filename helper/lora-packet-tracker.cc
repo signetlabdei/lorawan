@@ -1,6 +1,7 @@
 #include "lora-packet-tracker.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
+#include "ns3/lora-mac-header.h"
 #include <iostream>
 #include <fstream>
 
@@ -165,9 +166,16 @@ namespace ns3
   {
     NS_LOG_FUNCTION (this);
 
-    // Statistics ignoring transient
     CountRetransmissions (start, stop, m_macPacketTracker,
                           m_reTransmissionTracker, m_packetTracker);
+  }
+
+  void
+  LoraPacketTracker::CountPhyPackets (Time start, Time stop)
+  {
+    NS_LOG_FUNCTION (this);
+
+    DoCountPhyPackets (start, stop, m_packetTracker);
   }
 
   void
@@ -329,6 +337,61 @@ namespace ns3
     std::cout << " | ";
     PrintSumRetransmissions (totalReTxAmounts);
     std::cout << " || ";
+    PrintVector (performancesAmounts);
+    std::cout << std::endl;
+  }
+
+  void
+  LoraPacketTracker::DoCountPhyPackets (Time startTime, Time stopTime,
+                                        PhyPacketData packetTracker)
+  {
+    // Sum PHY outcomes
+    //////////////////////////////////
+    // vector performanceAmounts will contain - for the interval given in the
+    // input of the function, the following fields:
+    // totPacketsSent receivedPackets interferedPackets noMoreGwPackets underSensitivityPackets
+    std::vector<int> performancesAmounts (6, 0);
+    for (auto itPhy = m_phyPacketOutcomes.begin(); itPhy != m_phyPacketOutcomes.end(); ++itPhy)
+      {
+        if ((*itPhy).first >= startTime && (*itPhy).first <= stopTime)
+          {
+            performancesAmounts.at(0)++;
+
+            switch ((*itPhy).second)
+              {
+              case RECEIVED:
+                {
+                  performancesAmounts.at(1)++;
+                  break;
+                }
+              case INTERFERED:
+                {
+                  performancesAmounts.at(2)++;
+                  break;
+                }
+              case NO_MORE_RECEIVERS:
+                {
+                  performancesAmounts.at(3)++;
+                  break;
+                }
+              case UNDER_SENSITIVITY:
+                {
+                  performancesAmounts.at(4)++;
+                  break;
+                }
+              case LOST_BECAUSE_TX:
+                {
+                  performancesAmounts.at(5)++;
+                  break;
+                }
+              case UNSET:
+                {
+                  break;
+                }
+              }   //end switch
+          }
+      }
+
     PrintVector (performancesAmounts);
     std::cout << std::endl;
   }

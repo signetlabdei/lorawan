@@ -175,6 +175,13 @@ namespace ns3 {
   }
 
   void
+  LoraHelper::CountPhyPackets (Time start, Time stop)
+  {
+    // Statistics in considered time frame
+    m_packetTracker->CountPhyPackets (start, stop);
+  }
+
+  void
   LoraHelper::PrintEndDevices (NodeContainer endDevices, NodeContainer gateways,
                                std::string filename)
   {
