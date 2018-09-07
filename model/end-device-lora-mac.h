@@ -171,6 +171,13 @@ public:
   uint8_t GetDataRate (void);
 
   /**
+   * Get the transmission power this end device is set to use.
+   *
+   * \return The transmission power this device uses when transmitting.
+   */
+  uint8_t GetTransmissionPower (void);
+
+  /**
    * Set the network address of this device.
    *
    * \param address The address to set.
@@ -371,8 +378,6 @@ public:
    */
   void AddMacCommand (Ptr<MacCommand> macCommand);
 
-  uint8_t GetTransmissionPower (void);
-
 private:
   /**
    * Structure representing the parameters that will be used in the
@@ -434,6 +439,11 @@ private:
    * The DataRate this device is using to transmit.
    */
   uint8_t m_dataRate;
+
+  /**
+   * Whether this device's data rate should be controlled by the NS.
+   */
+  bool m_controlDataRate;
 
   /**
    * The transmission power this device is using to transmit.

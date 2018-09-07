@@ -29,6 +29,7 @@
 #include "ns3/end-device-lora-mac.h"
 #include "ns3/gateway-lora-mac.h"
 #include "ns3/node-container.h"
+#include "ns3/random-variable-stream.h"
 
 namespace ns3 {
 namespace lorawan {
@@ -113,6 +114,12 @@ public:
   static std::vector<int> SetSpreadingFactorsUp (NodeContainer endDevices,
                                                  NodeContainer gateways,
                                                  Ptr<LoraChannel> channel);
+  /**
+   * Set up the end device's data rates according to the given distribution.
+   */
+  static std::vector<int> SetSpreadingFactorsGivenDistribution (NodeContainer endDevices,
+                                                                NodeContainer gateways,
+                                                                std::vector<double> distribution);
 
 private:
   /**

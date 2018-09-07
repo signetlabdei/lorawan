@@ -296,11 +296,9 @@ public:
   void UpdateGatewayData (GatewayList gwList, Address gwAddress, double rcvPower);
 
   /**
-   * Return the best gateway that:
-   * - Can reach this device
-   * - Is available to send a packet
+   * Return an ordered list of the best gateways.
    */
-  Address GetBestGatewayForReply (void);
+  std::map<double, Address> GetPowerGatewayMap (void);
 
   struct Reply m_reply;   //<! Next reply intended for this device
 
@@ -313,7 +311,7 @@ private:
   uint8_t m_firstReceiveWindowSpreadingFactor = 0;
   double m_firstReceiveWindowFrequency = 0;
   uint8_t m_secondReceiveWindowOffset = 0;
-  double m_secondReceiveWindowFrequency = 868.625;
+  double m_secondReceiveWindowFrequency = 869.525;
 
   ReceivedPacketList m_receivedPacketList;   //<! List of received packets
 

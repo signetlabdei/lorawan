@@ -135,101 +135,102 @@ LoraInterferenceHelper::~LoraInterferenceHelper ()
   NS_LOG_FUNCTION (this);
 }
 
-// This collision matrix can be used for comparisons with the performance of Aloha
-// systems, where collisions imply the loss of both packets.
-// double inf = std::numeric_limits<double>::max();
-// const double LoraInterferenceHelper::collisionSnir[6][6] =
-// {
-// //   7   8   9  10  11  12
-// {inf, inf, inf, inf, inf, inf},  // SF7
-// {inf, inf, inf, inf, inf, inf},  // SF8
-// {inf, inf, inf, inf, inf, inf},  // SF9
-// {inf, inf, inf, inf, inf, inf},  // SF10
-// {inf, inf, inf, inf, inf, inf},  // SF11
-// {inf, inf, inf, inf, inf, inf}   // SF12
-// };
-
-// LoRa Collision Matrix (Goursaud)
-// Values are inverted w.r.t. the paper since here we interpret this as an
-// _isolation_ matrix instead of a cochannel _rejection_ matrix like in
-// Goursaud's paper.
-const double LoraInterferenceHelper::collisionSnir[6][6] =
-{
-  // SF7  SF8  SF9  SF10 SF11 SF12
-  {  6, -16, -18, -19, -19, -20},       // SF7
-  {-24,   6, -20, -22, -22, -22},       // SF8
-  {-27, -27,   6, -23, -25, -25},       // SF9
-  {-30, -30, -30,   6, -26, -28},       // SF10
-  {-33, -33, -33, -33,   6, -29},       // SF11
-  {-36, -36, -36, -36, -36,   6}        // SF12
-};
-
-Time LoraInterferenceHelper::oldEventThreshold = Seconds (2);
-
-Ptr<LoraInterferenceHelper::Event>
-LoraInterferenceHelper::Add (Time duration, double rxPower,
-                             uint8_t spreadingFactor, Ptr<Packet> packet,
-                             double frequencyMHz)
-{
-
-  NS_LOG_FUNCTION (this << duration.GetSeconds () << rxPower << unsigned
-                   (spreadingFactor) << packet << frequencyMHz);
-
-  // Create an event based on the parameters
-  Ptr<LoraInterferenceHelper::Event> event =
-    Create<LoraInterferenceHelper::Event> (duration, rxPower, spreadingFactor,
-                                           packet, frequencyMHz);
-
-  // Add the event to the list
-  m_events.push_back (event);
-
-  // Clean the event list
-  if (m_events.size () > 100)
+  // This collision matrix can be used for comparisons with the performance of Aloha
+  // systems, where collisions imply the loss of both packets.
+  double inf = std::numeric_limits<double>::max();
+  double minf = std::numeric_limits<double>::min();
+  const double LoraInterferenceHelper::collisionSnir[6][6] =
     {
-      CleanOldEvents ();
-    }
+      //   7   8   9  10  11  12
+      {inf, minf, minf, minf, minf, minf},  // SF7
+      {minf, inf, minf, minf, minf, minf},  // SF8
+      {minf, minf, inf, minf, minf, minf},  // SF9
+      {minf, minf, minf, inf, minf, minf},  // SF10
+      {minf, minf, minf, minf, inf, minf},  // SF11
+      {minf, minf, minf, minf, minf, inf}   // SF12
+    };
 
-  return event;
-}
+  // LoRa Collision Matrix (Goursaud)
+  // Values are inverted w.r.t. the paper since here we interpret this as an
+  // _isolation_ matrix instead of a cochannel _rejection_ matrix like in
+  // Goursaud's paper.
+  // const double LoraInterferenceHelper::collisionSnir[6][6] =
+  //   {
+  //     // SF7  SF8  SF9  SF10 SF11 SF12
+  //     {  6, -16, -18, -19, -19, -20},       // SF7
+  //     {-24,   6, -20, -22, -22, -22},       // SF8
+  //     {-27, -27,   6, -23, -25, -25},       // SF9
+  //     {-30, -30, -30,   6, -26, -28},       // SF10
+  //     {-33, -33, -33, -33,   6, -29},       // SF11
+  //     {-36, -36, -36, -36, -36,   6}        // SF12
+  //   };
 
-void
-LoraInterferenceHelper::CleanOldEvents (void)
-{
-  NS_LOG_FUNCTION (this);
+  Time LoraInterferenceHelper::oldEventThreshold = Seconds (2);
 
-  // Cycle the events, and clean up if an event is old.
-  for (auto it = m_events.begin (); it != m_events.end ();)
-    {
-      if ((*it)->GetEndTime () + oldEventThreshold < Simulator::Now ())
-        {
-          it = m_events.erase (it);
-        }
-      it++;
-    }
-}
+  Ptr<LoraInterferenceHelper::Event>
+  LoraInterferenceHelper::Add (Time duration, double rxPower,
+                               uint8_t spreadingFactor, Ptr<Packet> packet,
+                               double frequencyMHz)
+  {
 
-std::list<Ptr<LoraInterferenceHelper::Event> >
-LoraInterferenceHelper::GetInterferers ()
-{
-  return m_events;
-}
+    NS_LOG_FUNCTION (this << duration.GetSeconds () << rxPower << unsigned
+                     (spreadingFactor) << packet << frequencyMHz);
 
-void
-LoraInterferenceHelper::PrintEvents (std::ostream &stream)
-{
-  NS_LOG_FUNCTION_NOARGS ();
+    // Create an event based on the parameters
+    Ptr<LoraInterferenceHelper::Event> event =
+      Create<LoraInterferenceHelper::Event> (duration, rxPower, spreadingFactor,
+                                             packet, frequencyMHz);
 
-  stream << "Currently registered events:" << std::endl;
+    // Add the event to the list
+    m_events.push_back (event);
 
-  for (auto it = m_events.begin (); it != m_events.end (); it++)
-    {
-      (*it)->Print (stream);
-      stream << std::endl;
-    }
-}
+    // Clean the event list
+    if (m_events.size () > 100)
+      {
+        CleanOldEvents ();
+      }
 
-uint8_t
-LoraInterferenceHelper::IsDestroyedByInterference
+    return event;
+  }
+
+  void
+  LoraInterferenceHelper::CleanOldEvents (void)
+  {
+    NS_LOG_FUNCTION (this);
+
+    // Cycle the events, and clean up if an event is old.
+    for (auto it = m_events.begin (); it != m_events.end ();)
+      {
+        if ((*it)->GetEndTime () + oldEventThreshold < Simulator::Now ())
+          {
+            it = m_events.erase (it);
+          }
+        it++;
+      }
+  }
+
+  std::list<Ptr<LoraInterferenceHelper::Event> >
+  LoraInterferenceHelper::GetInterferers ()
+  {
+    return m_events;
+  }
+
+  void
+  LoraInterferenceHelper::PrintEvents (std::ostream &stream)
+  {
+    NS_LOG_FUNCTION_NOARGS ();
+
+    stream << "Currently registered events:" << std::endl;
+
+    for (auto it = m_events.begin (); it != m_events.end (); it++)
+      {
+        (*it)->Print (stream);
+        stream << std::endl;
+      }
+  }
+
+  uint8_t
+  LoraInterferenceHelper::IsDestroyedByInterference
   (Ptr<LoraInterferenceHelper::Event> event)
 {
   NS_LOG_FUNCTION (this << event);

@@ -41,18 +41,39 @@ NetworkScheduler::OnReceivedPacket (Ptr<const Packet> packet)
 {
   NS_LOG_FUNCTION (packet);
 
-  // Create a copy of the packet
-  Ptr<Packet> myPacket = packet->Copy ();
+  // Get the current packet's frame counter
+  Ptr<Packet> packetCopy = packet->Copy ();
+  LoraMacHeader receivedMacHdr;
+  packetCopy->RemoveHeader (receivedMacHdr);
+  LoraFrameHeader receivedFrameHdr;
+  receivedFrameHdr.SetAsUplink ();
+  packetCopy->RemoveHeader (receivedFrameHdr);
+  uint8_t currentFrameCounter = receivedFrameHdr.GetFCnt ();
 
-  // TODO Check if this packet is a duplicate:
+  // Get the saved packet's frame counter
+  Ptr<const Packet> savedPacket = m_status->GetEndDeviceStatus
+      (packet)->GetLastReceivedPacketInfo ().packet;
+  if (savedPacket)
+    {
+      Ptr<Packet> savedPacketCopy = savedPacket->Copy ();
+      LoraMacHeader savedMacHdr;
+      savedPacketCopy->RemoveHeader (savedMacHdr);
+      LoraFrameHeader savedFrameHdr;
+      savedFrameHdr.SetAsUplink ();
+      savedPacketCopy->RemoveHeader (savedFrameHdr);
+      uint8_t savedFrameCounter = savedFrameHdr.GetFCnt ();
+
+      if (currentFrameCounter == savedFrameCounter)
+        {
+          NS_LOG_DEBUG ("Packet was already received by another gateway.");
+          return;
+        }
+    }
+
   // It's possible that we already received the same packet from another
   // gateway.
   // - Extract the address
-  LoraMacHeader macHeader;
-  LoraFrameHeader frameHeader;
-  myPacket->RemoveHeader (macHeader);
-  myPacket->RemoveHeader (frameHeader);
-  LoraDeviceAddress deviceAddress = frameHeader.GetAddress ();
+  LoraDeviceAddress deviceAddress = receivedFrameHdr.GetAddress ();
 
   // Schedule OnReceiveWindowOpportunity event
   Simulator::Schedule (Seconds (1),
@@ -72,12 +93,14 @@ NetworkScheduler::OnReceiveWindowOpportunity (LoraDeviceAddress deviceAddress, i
 
   // Check whether we can send a reply to the device, again by using
   // NetworkStatus
-  Address gwAddress = m_status->GetBestGatewayForDevice (deviceAddress);
+  Address gwAddress = m_status->GetBestGatewayForDevice (deviceAddress, window);
 
   NS_LOG_DEBUG ("Found available gateway with address: " << gwAddress);
 
   if (gwAddress == Address () && window == 1)
     {
+      NS_LOG_DEBUG ("No suitable gateway found.");
+
       // No suitable GW was found
       // Schedule OnReceiveWindowOpportunity event
       Simulator::Schedule (Seconds (1),

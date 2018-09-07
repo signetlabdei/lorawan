@@ -42,69 +42,70 @@ SubBand::SubBand ()
   NS_LOG_FUNCTION (this);
 }
 
-SubBand::SubBand (double firstFrequency, double lastFrequency, double dutyCycle,
-                  double maxTxPowerDbm) :
-  m_firstFrequency (firstFrequency),
-  m_lastFrequency (lastFrequency),
-  m_dutyCycle (dutyCycle),
-  m_maxTxPowerDbm (maxTxPowerDbm)
-{
-  NS_LOG_FUNCTION (this << firstFrequency << lastFrequency << dutyCycle <<
-                   maxTxPowerDbm);
-}
+  SubBand::SubBand (double firstFrequency, double lastFrequency, double dutyCycle,
+                    double maxTxPowerDbm) :
+    m_firstFrequency (firstFrequency),
+    m_lastFrequency (lastFrequency),
+    m_dutyCycle (dutyCycle),
+    m_nextTransmissionTime (Seconds (0)),
+    m_maxTxPowerDbm (maxTxPowerDbm)
+  {
+    NS_LOG_FUNCTION (this << firstFrequency << lastFrequency << dutyCycle <<
+                     maxTxPowerDbm);
+  }
 
-SubBand::~SubBand ()
-{
-  NS_LOG_FUNCTION (this);
-}
+  SubBand::~SubBand ()
+  {
+    NS_LOG_FUNCTION (this);
+  }
 
-double
-SubBand::GetFirstFrequency (void)
-{
-  return m_firstFrequency;
-}
+  double
+  SubBand::GetFirstFrequency (void)
+  {
+    return m_firstFrequency;
+  }
 
-double
-SubBand::GetDutyCycle (void)
-{
-  return m_dutyCycle;
-}
+  double
+  SubBand::GetDutyCycle (void)
+  {
+    return m_dutyCycle;
+  }
 
-bool
-SubBand::BelongsToSubBand (double frequency)
-{
-  return (frequency > m_firstFrequency) && (frequency < m_lastFrequency);
-}
+  bool
+  SubBand::BelongsToSubBand (double frequency)
+  {
+    return (frequency > m_firstFrequency) && (frequency < m_lastFrequency);
+  }
 
-bool
-SubBand::BelongsToSubBand (Ptr<LogicalLoraChannel> logicalChannel)
-{
-  double frequency = logicalChannel->GetFrequency ();
-  return BelongsToSubBand (frequency);
-}
+  bool
+  SubBand::BelongsToSubBand (Ptr<LogicalLoraChannel> logicalChannel)
+  {
+    double frequency = logicalChannel->GetFrequency ();
+    return BelongsToSubBand (frequency);
+  }
 
-void
-SubBand::SetNextTransmissionTime (Time nextTime)
-{
-  m_nextTransmissionTime = nextTime;
-}
+  void
+  SubBand::SetNextTransmissionTime (Time nextTime)
+  {
+    m_nextTransmissionTime = nextTime;
+  }
 
-Time
-SubBand::GetNextTransmissionTime (void)
-{
-  return m_nextTransmissionTime;
-}
+  Time
+  SubBand::GetNextTransmissionTime (void)
+  {
+    return m_nextTransmissionTime;
+  }
 
-void
-SubBand::SetMaxTxPowerDbm (double maxTxPowerDbm)
-{
-  m_maxTxPowerDbm = maxTxPowerDbm;
-}
+  void
+  SubBand::SetMaxTxPowerDbm (double maxTxPowerDbm)
+  {
+    m_maxTxPowerDbm = maxTxPowerDbm;
+  }
 
-double
-SubBand::GetMaxTxPowerDbm (void)
-{
-  return m_maxTxPowerDbm;
-}
+  double
+  SubBand::GetMaxTxPowerDbm (void)
+  {
+    return m_maxTxPowerDbm;
+  }
 }
 }

@@ -150,7 +150,7 @@ int main (int argc, char *argv[])
 
   // Create the LoraHelper
   LoraHelper helper = LoraHelper ();
-  helper.EnablePacketTracking ("performance"); // Output filename
+  helper.EnablePacketTracking (); // Output filename
   // helper.EnableSimulationTimePrinting ();
 
   //Create the NetworkServerHelper
@@ -310,15 +310,6 @@ int main (int argc, char *argv[])
   //Create a forwarder for each gateway
   forHelper.Install (gateways);
 
-  /**********************
-   * Print output files *
-   *********************/
-  if (print)
-    {
-      helper.PrintEndDevices (endDevices, gateways,
-                              "endDevices.dat");
-    }
-
   ////////////////
   // Simulation //
   ////////////////
@@ -334,7 +325,7 @@ int main (int argc, char *argv[])
   // Print results to file //
   ///////////////////////////
   NS_LOG_INFO ("Computing performance metrics...");
-  helper.PrintPerformance (transientPeriods * appPeriod, appStopTime);
+  // helper.PrintPerformance (transientPeriods * appPeriod, appStopTime);
 
   return 0;
 }
