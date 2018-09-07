@@ -308,8 +308,8 @@ namespace ns3
           }
       }
 
-    double avgDelay;
-    double avgAckDelay;
+    double avgDelay = 0;
+    double avgAckDelay = 0;
     if (packetsOutsideTransient != 0)
       {
         avgDelay = (delaySum / packetsOutsideTransient).GetSeconds ();
