@@ -125,10 +125,13 @@ namespace ns3 {
       }
 
     // Add headers
-    NS_LOG_DEBUG ("Adding MAC header" << m_reply.macHeader);
-    NS_LOG_DEBUG ("Adding frame header" << m_reply.frameHeader);
+    m_reply.frameHeader.SetAddress(m_endDeviceAddress);
+    m_reply.macHeader.SetMType(LoraMacHeader::UNCONFIRMED_DATA_DOWN);
     replyPacket->AddHeader (m_reply.frameHeader);
     replyPacket->AddHeader (m_reply.macHeader);
+
+    NS_LOG_DEBUG ("Added MAC header" << m_reply.macHeader);
+    NS_LOG_DEBUG ("Added frame header" << m_reply.frameHeader);
 
     return replyPacket;
   }
