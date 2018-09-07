@@ -220,6 +220,8 @@ namespace ns3 {
         ApplyNecessaryOptions (macHdr);
         packet->AddHeader (macHdr);
 
+        // Reset MAC command list
+        m_macCommandList.clear ();
 
         if (m_retxParams.waitingAck)
           {
@@ -1187,88 +1189,94 @@ namespace ns3 {
     SetLogicalChannel (chIndex, frequency, minDataRate, maxDataRate);
 
     NS_LOG_INFO ("Adding NewChannelAns reply");
-  m_macCommandList.push_back (CreateObject<NewChannelAns> (dataRateRangeOk,
-                                                           channelFrequencyOk));
-}
+    m_macCommandList.push_back (CreateObject<NewChannelAns> (dataRateRangeOk,
+                                                             channelFrequencyOk));
+  }
 
-void
-EndDeviceLoraMac::AddLogicalChannel (double frequency)
-{
-  NS_LOG_FUNCTION (this << frequency);
+  void
+  EndDeviceLoraMac::AddLogicalChannel (double frequency)
+  {
+    NS_LOG_FUNCTION (this << frequency);
 
-  m_channelHelper.AddChannel (frequency);
-}
+    m_channelHelper.AddChannel (frequency);
+  }
 
-void
-EndDeviceLoraMac::AddLogicalChannel (Ptr<LogicalLoraChannel> logicalChannel)
-{
-  NS_LOG_FUNCTION (this << logicalChannel);
+  void
+  EndDeviceLoraMac::AddLogicalChannel (Ptr<LogicalLoraChannel> logicalChannel)
+  {
+    NS_LOG_FUNCTION (this << logicalChannel);
 
-  m_channelHelper.AddChannel (logicalChannel);
-}
+    m_channelHelper.AddChannel (logicalChannel);
+  }
 
-void
-EndDeviceLoraMac::SetLogicalChannel (uint8_t chIndex, double frequency,
-                                     uint8_t minDataRate, uint8_t maxDataRate)
-{
-  NS_LOG_FUNCTION (this << unsigned (chIndex) << frequency <<
-                   unsigned (minDataRate) << unsigned(maxDataRate));
+  void
+  EndDeviceLoraMac::SetLogicalChannel (uint8_t chIndex, double frequency,
+                                       uint8_t minDataRate, uint8_t maxDataRate)
+  {
+    NS_LOG_FUNCTION (this << unsigned (chIndex) << frequency <<
+                     unsigned (minDataRate) << unsigned(maxDataRate));
 
-  m_channelHelper.SetChannel (chIndex, CreateObject<LogicalLoraChannel>
+    m_channelHelper.SetChannel (chIndex, CreateObject<LogicalLoraChannel>
                                 (frequency, minDataRate, maxDataRate));
-}
+  }
 
-void
-EndDeviceLoraMac::AddSubBand (double startFrequency, double endFrequency, double dutyCycle, double maxTxPowerDbm)
-{
-  NS_LOG_FUNCTION_NOARGS ();
+  void
+  EndDeviceLoraMac::AddSubBand (double startFrequency, double endFrequency, double dutyCycle, double maxTxPowerDbm)
+  {
+    NS_LOG_FUNCTION_NOARGS ();
 
-  m_channelHelper.AddSubBand (startFrequency, endFrequency, dutyCycle, maxTxPowerDbm);
-}
+    m_channelHelper.AddSubBand (startFrequency, endFrequency, dutyCycle, maxTxPowerDbm);
+  }
 
-uint8_t
-EndDeviceLoraMac::GetFirstReceiveWindowDataRate (void)
-{
-  return m_replyDataRateMatrix.at (m_dataRate).at (m_rx1DrOffset);
-}
+  uint8_t
+  EndDeviceLoraMac::GetFirstReceiveWindowDataRate (void)
+  {
+    return m_replyDataRateMatrix.at (m_dataRate).at (m_rx1DrOffset);
+  }
 
-void
-EndDeviceLoraMac::SetSecondReceiveWindowDataRate (uint8_t dataRate)
-{
-  m_secondReceiveWindowDataRate = dataRate;
-}
+  void
+  EndDeviceLoraMac::SetSecondReceiveWindowDataRate (uint8_t dataRate)
+  {
+    m_secondReceiveWindowDataRate = dataRate;
+  }
 
-uint8_t
-EndDeviceLoraMac::GetSecondReceiveWindowDataRate (void)
-{
-  return m_secondReceiveWindowDataRate;
-}
+  uint8_t
+  EndDeviceLoraMac::GetSecondReceiveWindowDataRate (void)
+  {
+    return m_secondReceiveWindowDataRate;
+  }
 
-void
-EndDeviceLoraMac::SetSecondReceiveWindowFrequency (double frequencyMHz)
-{
-  m_secondReceiveWindowFrequency = frequencyMHz;
-}
+  void
+  EndDeviceLoraMac::SetSecondReceiveWindowFrequency (double frequencyMHz)
+  {
+    m_secondReceiveWindowFrequency = frequencyMHz;
+  }
 
-double
-EndDeviceLoraMac::GetSecondReceiveWindowFrequency (void)
-{
-  return m_secondReceiveWindowFrequency;
-}
+  double
+  EndDeviceLoraMac::GetSecondReceiveWindowFrequency (void)
+  {
+    return m_secondReceiveWindowFrequency;
+  }
 
-double
-EndDeviceLoraMac::GetAggregatedDutyCycle (void)
-{
-  NS_LOG_FUNCTION_NOARGS ();
+  double
+  EndDeviceLoraMac::GetAggregatedDutyCycle (void)
+  {
+    NS_LOG_FUNCTION_NOARGS ();
 
-  return m_aggregatedDutyCycle;
-}
+    return m_aggregatedDutyCycle;
+  }
 
-void
-EndDeviceLoraMac::AddMacCommand (Ptr<MacCommand> macCommand)
-{
-  NS_LOG_FUNCTION (this << macCommand);
+  void
+  EndDeviceLoraMac::AddMacCommand (Ptr<MacCommand> macCommand)
+  {
+    NS_LOG_FUNCTION (this << macCommand);
 
-  m_macCommandList.push_back (macCommand);
-}
+    m_macCommandList.push_back (macCommand);
+  }
+
+  uint8_t
+  EndDeviceLoraMac::GetTransmissionPower (void)
+  {
+    return m_txPower;
+  }
 }
