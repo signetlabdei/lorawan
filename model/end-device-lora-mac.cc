@@ -924,8 +924,10 @@ namespace ns3 {
     m_retxParams.retxLeft = m_maxNumbTx;
     m_retxParams.packet = 0;
     m_retxParams.firstAttempt = Seconds (0);
-  }
 
+    // Cancel next retransmissions, if any
+    Simulator::Cancel(m_nextTx);
+  }
 
   void
   EndDeviceLoraMac::SetDataRateAdaptation (bool adapt)
