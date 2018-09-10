@@ -47,6 +47,7 @@ namespace ns3 {
   ConfirmedMessagesComponent::GetTypeId (void)
   {
     static TypeId tid = TypeId ("ns3::ConfirmedMessagesComponent")
+      .SetParent<NetworkControllerComponent> ()
       .AddConstructor<ConfirmedMessagesComponent> ()
       .SetGroupName ("lorawan");
     return tid;
@@ -119,6 +120,7 @@ namespace ns3 {
   LinkCheckComponent::GetTypeId (void)
   {
     static TypeId tid = TypeId ("ns3::LinkCheckComponent")
+      .SetParent<NetworkControllerComponent> ()
       .AddConstructor<LinkCheckComponent> ()
       .SetGroupName ("lorawan");
     return tid;
