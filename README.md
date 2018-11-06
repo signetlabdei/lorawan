@@ -12,7 +12,20 @@ to perform simulations of a [LoRaWAN](http://www.lora-alliance.org/technology
 ### Prerequisites ###
 
 To run simulations using this module, you will need to install ns-3, and clone
-this repository inside the `src` directory.
+this repository inside the `src` directory:
+
+```bash
+git clone https://github.com/nsnam/ns-3-dev-git ns-3
+git clone https://github.com/signetlabdei/lorawan ns-3/src/lorawan
+```
+
+If you are interested in having the latest features (and more bug-prone code),
+you can check out the develop branch:
+
+```bash
+cd ns-3/src/lorawan
+git checkout develop
+```
 
 ### Compilation ###
 
@@ -73,9 +86,9 @@ gitter chat](https://gitter.im/ns-3-lorawan "lorawan Gitter chat").
 ## Authors ##
 
 - Davide Magrin
+- Martina Capuzzo
 - Stefano Romagnolo
 - Michele Luvisotto
-- Martina Capuzzo
 
 ## License ##
 
@@ -94,5 +107,9 @@ Publications:
   networks in a smart city scenario," 2017 IEEE International Conference On
   Communications (ICC), Paris, 2017. Available:
   http://ieeexplore.ieee.org/document/7996384/
+- M. Capuzzo, D. Magrin and A. Zanella, "Confirmed traffic in LoRaWAN: Pitfalls
+  and countermeasures," 2018 17th Annual Mediterranean Ad Hoc Networking
+  Workshop (Med-Hoc-Net), Capri, 2018. Available:
+  https://ieeexplore.ieee.org/abstract/document/8407095
 - Network level performances of a LoRa system (Master thesis). Available:
   http://tesi.cab.unipd.it/53740/1/dissertation.pdf
