@@ -25,14 +25,14 @@
 #include <string>
 
 namespace ns3 {
+namespace lorawan {
 
 /**
-  * Class representing the NetworkId component of a LoraDeviceAddress (7 bits).
-  */
+ * Class representing the NetworkId component of a LoraDeviceAddress (7 bits).
+ */
 class NwkID
 {
 public:
-
   NwkID (uint8_t nwkId = 0);
 
   /**
@@ -54,18 +54,16 @@ public:
   uint8_t Get (void) const;
 
 private:
-
-  uint8_t m_nwkId;   //!< 8-bit integer representation of the network id
+  uint8_t m_nwkId;       //!< 8-bit integer representation of the network id
 };
 
 /**
-  * Class representing the Network Address component of a LoraDeviceAddress (25
-  * bits)
-  */
+ * Class representing the Network Address component of a LoraDeviceAddress (25
+ * bits)
+ */
 class NwkAddr
 {
 public:
-
   NwkAddr (uint32_t nwkId = 0);
 
   /**
@@ -87,8 +85,7 @@ public:
   uint32_t Get (void) const;
 
 private:
-
-  uint32_t m_nwkAddr;   //!< 8-bit integer representation of the network id
+  uint32_t m_nwkAddr;       //!< 8-bit integer representation of the network id
 };
 
 /**
@@ -97,7 +94,6 @@ private:
 class LoraDeviceAddress
 {
 public:
-
   LoraDeviceAddress ();
 
   /**
@@ -218,5 +214,6 @@ private:
  */
 std::ostream& operator<< (std::ostream& os, const LoraDeviceAddress &address);
 
+}
 }
 #endif

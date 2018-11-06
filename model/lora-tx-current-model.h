@@ -20,6 +20,7 @@
 #include "ns3/object.h"
 
 namespace ns3 {
+namespace lorawan {
 
 /**
  * \ingroup energy
@@ -30,7 +31,6 @@ namespace ns3 {
 class LoraTxCurrentModel : public Object
 {
 public:
-
   static TypeId GetTypeId (void);
 
   LoraTxCurrentModel ();
@@ -52,7 +52,6 @@ public:
 class LinearLoraTxCurrentModel : public LoraTxCurrentModel
 {
 public:
-
   static TypeId GetTypeId (void);
 
   LinearLoraTxCurrentModel ();
@@ -97,9 +96,9 @@ public:
   double CalcTxCurrent (double txPowerDbm) const;
 
 private:
-  double m_eta; //!< ETA
-  double m_voltage; //!< Voltage
-  double m_idleCurrent; //!< Standby current
+  double m_eta;     //!< ETA
+  double m_voltage;     //!< Voltage
+  double m_idleCurrent;     //!< Standby current
 };
 
 class ConstantLoraTxCurrentModel : public LoraTxCurrentModel
@@ -135,4 +134,5 @@ private:
 
 } // namespace ns3
 
+}
 #endif /* LORA_TX_CURRENT_MODEL_H */

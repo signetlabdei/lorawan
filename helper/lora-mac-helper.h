@@ -31,6 +31,7 @@
 #include "ns3/node-container.h"
 
 namespace ns3 {
+namespace lorawan {
 
 class LoraMacHelper
 {
@@ -138,4 +139,5 @@ private:
 
 } //namespace ns3
 
+}
 #endif /* LORA_PHY_HELPER_H */

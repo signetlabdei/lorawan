@@ -32,6 +32,7 @@
 #include <ctime>
 
 namespace ns3 {
+namespace lorawan {
 
 /**
  * Helps to create LoraNetDevice objects
@@ -98,4 +99,5 @@ public:
 
 } //namespace ns3
 
+}
 #endif /* LORA_HELPER_H */

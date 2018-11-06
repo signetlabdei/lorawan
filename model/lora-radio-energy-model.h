@@ -23,6 +23,7 @@
 #include "lora-tx-current-model.h"
 
 namespace ns3 {
+namespace lorawan {
 
 /**
  * \ingroup energy
@@ -330,4 +331,5 @@ private:
 
 } // namespace ns3
 
+}
 #endif /* LORA_RADIO_ENERGY_MODEL_H */

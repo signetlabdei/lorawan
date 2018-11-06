@@ -27,6 +27,7 @@
 #include "ns3/log.h"
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("OneShotSenderHelper");
 
@@ -73,7 +74,7 @@ OneShotSenderHelper::Install (NodeContainer c) const
 Ptr<Application>
 OneShotSenderHelper::InstallPriv (Ptr<Node> node) const
 {
-  NS_LOG_FUNCTION (this << node->GetId());
+  NS_LOG_FUNCTION (this << node->GetId ());
 
   Ptr<OneShotSender> app = m_factory.Create<OneShotSender> ();
 
@@ -83,5 +84,6 @@ OneShotSenderHelper::InstallPriv (Ptr<Node> node) const
   node->AddApplication (app);
 
   return app;
+}
 }
 } // namespace ns3

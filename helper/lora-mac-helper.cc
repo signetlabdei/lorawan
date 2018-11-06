@@ -25,6 +25,7 @@
 #include "ns3/log.h"
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("LoraMacHelper");
 
@@ -379,4 +380,5 @@ LoraMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer ga
 
 } //  end function
 
+}
 } //end class

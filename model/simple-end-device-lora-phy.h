@@ -30,6 +30,7 @@
 #include "ns3/end-device-lora-phy.h"
 
 namespace ns3 {
+namespace lorawan {
 
 class LoraChannel;
 
@@ -40,7 +41,6 @@ class LoraChannel;
 class SimpleEndDeviceLoraPhy : public EndDeviceLoraPhy
 {
 public:
-
   static TypeId GetTypeId (void);
 
   // Constructor and destructor
@@ -60,9 +60,9 @@ public:
                      double frequencyMHz, double txPowerDbm);
 
 private:
-
 };
 
 } /* namespace ns3 */
 
+}
 #endif /* SIMPLE_END_DEVICE_LORA_PHY_H */

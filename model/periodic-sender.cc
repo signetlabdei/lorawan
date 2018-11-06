@@ -26,6 +26,7 @@
 #include "ns3/lora-net-device.h"
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("PeriodicSender");
 
@@ -52,9 +53,9 @@ PeriodicSender::GetTypeId (void)
 
 PeriodicSender::PeriodicSender ()
   : m_interval (Seconds (10)),
-    m_initialDelay (Seconds (1)),
-    m_basePktSize (10),
-    m_pktSizeRV (0)
+  m_initialDelay (Seconds (1)),
+  m_basePktSize (10),
+  m_pktSizeRV (0)
 
 {
   NS_LOG_FUNCTION_NOARGS ();
@@ -157,4 +158,5 @@ PeriodicSender::StopApplication (void)
   Simulator::Cancel (m_sendEvent);
 }
 
+}
 }

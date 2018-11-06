@@ -31,6 +31,7 @@
 #include <list>
 
 namespace ns3 {
+namespace lorawan {
 
 class LoraChannel;
 
@@ -40,11 +41,10 @@ class LoraChannel;
 class SimpleGatewayLoraPhy : public GatewayLoraPhy
 {
 public:
-
   static TypeId GetTypeId (void);
 
-  SimpleGatewayLoraPhy();
-  virtual ~SimpleGatewayLoraPhy();
+  SimpleGatewayLoraPhy ();
+  virtual ~SimpleGatewayLoraPhy ();
 
   virtual void StartReceive (Ptr<Packet> packet, double rxPowerDbm, uint8_t sf,
                              Time duration, double frequencyMHz);
@@ -60,4 +60,5 @@ private:
 
 } /* namespace ns3 */
 
+}
 #endif /* SIMPLE_GATEWAY_LORA_PHY_H */

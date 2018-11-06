@@ -32,6 +32,7 @@
 #include "ns3/lora-phy.h"
 
 namespace ns3 {
+namespace lorawan {
 
 class LoraChannel;
 
@@ -272,4 +273,5 @@ protected:
 
 } /* namespace ns3 */
 
+}
 #endif /* END_DEVICE_LORA_PHY_H */

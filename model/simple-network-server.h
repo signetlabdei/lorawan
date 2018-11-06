@@ -31,6 +31,7 @@
 #include "ns3/node-container.h"
 
 namespace ns3 {
+namespace lorawan {
 
 /**
  * A SimpleNetworkServer is an application standing on top of a node equipped with
@@ -132,4 +133,5 @@ protected:
 
 } /* namespace ns3 */
 
+}
 #endif /* SIMPLE_NETWORK_SERVER_H */

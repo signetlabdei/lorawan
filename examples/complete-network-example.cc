@@ -30,6 +30,7 @@
 #include <ctime>
 
 using namespace ns3;
+using namespace lorawan;
 
 NS_LOG_COMPONENT_DEFINE ("ComplexLorawanNetworkExample");
 
@@ -118,18 +119,18 @@ int main (int argc, char *argv[])
   loss->SetPathLossExponent (3.76);
   loss->SetReference (1, 8.1);
 
-  if(realisticChannelModel)
+  if (realisticChannelModel)
     {
       // Create the correlated shadowing component
       Ptr<CorrelatedShadowingPropagationLossModel> shadowing = CreateObject<CorrelatedShadowingPropagationLossModel> ();
 
       // Aggregate shadowing to the logdistance loss
-      loss->SetNext(shadowing);
+      loss->SetNext (shadowing);
 
       // Add the effect to the channel propagation loss
       Ptr<BuildingPenetrationLoss> buildingLoss = CreateObject<BuildingPenetrationLoss> ();
 
-      shadowing->SetNext(buildingLoss);
+      shadowing->SetNext (buildingLoss);
     }
 
   Ptr<PropagationDelayModel> delay = CreateObject<ConstantSpeedPropagationDelayModel> ();
@@ -229,8 +230,8 @@ int main (int argc, char *argv[])
   double deltaX = 32;
   double yLength = 64;
   double deltaY = 17;
-  int gridWidth = 2*radius/(xLength+deltaX);
-  int gridHeight = 2*radius/(yLength+deltaY);
+  int gridWidth = 2 * radius / (xLength + deltaX);
+  int gridHeight = 2 * radius / (yLength + deltaY);
   if (realisticChannelModel == false)
     {
       gridWidth = 0;
@@ -247,8 +248,8 @@ int main (int argc, char *argv[])
   gridBuildingAllocator->SetBuildingAttribute ("NRoomsX", UintegerValue (2));
   gridBuildingAllocator->SetBuildingAttribute ("NRoomsY", UintegerValue (4));
   gridBuildingAllocator->SetBuildingAttribute ("NFloors", UintegerValue (2));
-  gridBuildingAllocator->SetAttribute ("MinX", DoubleValue (-gridWidth*(xLength+deltaX)/2+deltaX/2));
-  gridBuildingAllocator->SetAttribute ("MinY", DoubleValue (-gridHeight*(yLength+deltaY)/2+deltaY/2));
+  gridBuildingAllocator->SetAttribute ("MinX", DoubleValue (-gridWidth * (xLength + deltaX) / 2 + deltaX / 2));
+  gridBuildingAllocator->SetAttribute ("MinY", DoubleValue (-gridHeight * (yLength + deltaY) / 2 + deltaY / 2));
   BuildingContainer bContainer = gridBuildingAllocator->Create (gridWidth * gridHeight);
 
   BuildingsHelper::Install (endDevices);
@@ -267,7 +268,7 @@ int main (int argc, char *argv[])
           Box boundaries = (*it)->GetBoundaries ();
           myfile << "set object " << j << " rect from " << boundaries.xMin << "," << boundaries.yMin << " to " << boundaries.xMax << "," << boundaries.yMax << std::endl;
         }
-      myfile.close();
+      myfile.close ();
 
     }
 
@@ -307,7 +308,7 @@ int main (int argc, char *argv[])
   nsHelper.Install (networkServer);
 
   //Create a forwarder for each gateway
-  forHelper.Install(gateways);
+  forHelper.Install (gateways);
 
   /**********************
    * Print output files *
@@ -333,7 +334,7 @@ int main (int argc, char *argv[])
   // Print results to file //
   ///////////////////////////
   NS_LOG_INFO ("Computing performance metrics...");
-  helper.PrintPerformance(transientPeriods * appPeriod, appStopTime);
+  helper.PrintPerformance (transientPeriods * appPeriod, appStopTime);
 
   return 0;
 }

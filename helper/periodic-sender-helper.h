@@ -32,6 +32,7 @@
 #include <string>
 
 namespace ns3 {
+namespace lorawan {
 
 /**
  * This class can be used to install PeriodicSender applications on a wide
@@ -85,4 +86,5 @@ private:
 
 } // namespace ns3
 
+}
 #endif /* PERIODIC_SENDER_HELPER_H */

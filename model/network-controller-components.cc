@@ -21,165 +21,179 @@
 #include "ns3/network-controller-components.h"
 
 namespace ns3 {
+namespace lorawan {
 
-  NS_LOG_COMPONENT_DEFINE ("NetworkControllerComponent");
+NS_LOG_COMPONENT_DEFINE ("NetworkControllerComponent");
 
-  NS_OBJECT_ENSURE_REGISTERED (NetworkControllerComponent);
+NS_OBJECT_ENSURE_REGISTERED (NetworkControllerComponent);
 
-  TypeId
-  NetworkControllerComponent::GetTypeId (void)
-  {
-    static TypeId tid = TypeId ("ns3::NetworkControllerComponent")
-      .SetParent<Object> ()
-      .SetGroupName ("lorawan")
-      ;
-    return tid;
-  }
+TypeId
+NetworkControllerComponent::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::NetworkControllerComponent")
+    .SetParent<Object> ()
+    .SetGroupName ("lorawan")
+  ;
+  return tid;
+}
 
-  // Constructor and destructor
-  NetworkControllerComponent::NetworkControllerComponent () {}
-  NetworkControllerComponent::~NetworkControllerComponent () {}
+// Constructor and destructor
+NetworkControllerComponent::NetworkControllerComponent ()
+{
+}
+NetworkControllerComponent::~NetworkControllerComponent ()
+{
+}
 
-  ////////////////////////////////
-  // ConfirmedMessagesComponent //
-  ////////////////////////////////
-  TypeId
-  ConfirmedMessagesComponent::GetTypeId (void)
-  {
-    static TypeId tid = TypeId ("ns3::ConfirmedMessagesComponent")
-      .SetParent<NetworkControllerComponent> ()
-      .AddConstructor<ConfirmedMessagesComponent> ()
-      .SetGroupName ("lorawan");
-    return tid;
-  }
+////////////////////////////////
+// ConfirmedMessagesComponent //
+////////////////////////////////
+TypeId
+ConfirmedMessagesComponent::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::ConfirmedMessagesComponent")
+    .SetParent<NetworkControllerComponent> ()
+    .AddConstructor<ConfirmedMessagesComponent> ()
+    .SetGroupName ("lorawan");
+  return tid;
+}
 
-  ConfirmedMessagesComponent::ConfirmedMessagesComponent () {}
-  ConfirmedMessagesComponent::~ConfirmedMessagesComponent () {}
+ConfirmedMessagesComponent::ConfirmedMessagesComponent ()
+{
+}
+ConfirmedMessagesComponent::~ConfirmedMessagesComponent ()
+{
+}
 
-  void
-  ConfirmedMessagesComponent::OnReceivedPacket (Ptr<const Packet> packet,
-                                                Ptr<EndDeviceStatus> status,
+void
+ConfirmedMessagesComponent::OnReceivedPacket (Ptr<const Packet> packet,
+                                              Ptr<EndDeviceStatus> status,
+                                              Ptr<NetworkStatus> networkStatus)
+{
+  NS_LOG_FUNCTION (this->GetTypeId () << packet << networkStatus);
+
+  // Check whether the received packet requires an acknowledgment.
+  LoraMacHeader mHdr;
+  LoraFrameHeader fHdr;
+  fHdr.SetAsUplink ();
+  Ptr<Packet> myPacket = packet->Copy ();
+  myPacket->RemoveHeader (mHdr);
+  myPacket->RemoveHeader (fHdr);
+
+  NS_LOG_INFO ("Received packet Mac Header: " << mHdr);
+  NS_LOG_INFO ("Received packet Frame Header: " << fHdr);
+
+  if (mHdr.GetMType () == LoraMacHeader::CONFIRMED_DATA_UP)
+    {
+      NS_LOG_INFO ("Packet requires confirmation");
+
+      // Set up the ACK bit on the reply
+      status->m_reply.frameHeader.SetAsDownlink ();
+      status->m_reply.frameHeader.SetAck (true);
+      status->m_reply.frameHeader.SetAddress (fHdr.GetAddress ());
+      status->m_reply.macHeader.SetMType (LoraMacHeader::UNCONFIRMED_DATA_DOWN);
+      status->m_reply.needsReply = true;
+
+      // Note that the acknowledgment procedure dies here: "Acknowledgments
+      // are only snt in response to the latest message received and are never
+      // retransmitted". We interpret this to mean that only the current
+      // reception window can be used, and that the Ack field should be
+      // emptied in case transmission cannot be performed in the current
+      // window. Because of this, in this component's OnFailedReply method we
+      // void the ack bits.
+    }
+}
+
+void
+ConfirmedMessagesComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
                                                 Ptr<NetworkStatus> networkStatus)
-  {
-    NS_LOG_FUNCTION (this->GetTypeId() << packet << networkStatus);
+{
+  NS_LOG_FUNCTION (this << status << networkStatus);
+  // Nothing to do in this case
+}
 
-    // Check whether the received packet requires an acknowledgment.
-    LoraMacHeader mHdr;
-    LoraFrameHeader fHdr;
-    fHdr.SetAsUplink ();
-    Ptr<Packet> myPacket = packet->Copy();
-    myPacket->RemoveHeader(mHdr);
-    myPacket->RemoveHeader(fHdr);
+void
+ConfirmedMessagesComponent::OnFailedReply (Ptr<EndDeviceStatus> status,
+                                           Ptr<NetworkStatus> networkStatus)
+{
+  NS_LOG_FUNCTION (this << networkStatus);
 
-    NS_LOG_INFO ("Received packet Mac Header: " << mHdr);
-    NS_LOG_INFO ("Received packet Frame Header: " << fHdr);
+  // Empty the Ack bit.
+  status->m_reply.frameHeader.SetAck (false);
+}
 
-    if (mHdr.GetMType() == LoraMacHeader::CONFIRMED_DATA_UP)
-      {
-        NS_LOG_INFO ("Packet requires confirmation");
+////////////////////////
+// LinkCheckComponent //
+////////////////////////
+TypeId
+LinkCheckComponent::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::LinkCheckComponent")
+    .SetParent<NetworkControllerComponent> ()
+    .AddConstructor<LinkCheckComponent> ()
+    .SetGroupName ("lorawan");
+  return tid;
+}
 
-        // Set up the ACK bit on the reply
-        status->m_reply.frameHeader.SetAsDownlink ();
-        status->m_reply.frameHeader.SetAck (true);
-        status->m_reply.frameHeader.SetAddress (fHdr.GetAddress ());
-        status->m_reply.macHeader.SetMType(LoraMacHeader::UNCONFIRMED_DATA_DOWN);
-        status->m_reply.needsReply = true;
+LinkCheckComponent::LinkCheckComponent ()
+{
+}
+LinkCheckComponent::~LinkCheckComponent ()
+{
+}
 
-        // Note that the acknowledgment procedure dies here: "Acknowledgments
-        // are only snt in response to the latest message received and are never
-        // retransmitted". We interpret this to mean that only the current
-        // reception window can be used, and that the Ack field should be
-        // emptied in case transmission cannot be performed in the current
-        // window. Because of this, in this component's OnFailedReply method we
-        // void the ack bits.
-      }
-  }
+void
+LinkCheckComponent::OnReceivedPacket (Ptr<const Packet> packet,
+                                      Ptr<EndDeviceStatus> status,
+                                      Ptr<NetworkStatus> networkStatus)
+{
+  NS_LOG_FUNCTION (this->GetTypeId () << packet << networkStatus);
 
-  void
-  ConfirmedMessagesComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
-                                                  Ptr<NetworkStatus> networkStatus)
-  {
-    NS_LOG_FUNCTION (this << status << networkStatus);
-    // Nothing to do in this case
-  }
+  // We will only act just before reply, when all Gateways will have received
+  // the packet.
+}
 
-  void
-  ConfirmedMessagesComponent::OnFailedReply (Ptr<EndDeviceStatus> status,
-                                             Ptr<NetworkStatus> networkStatus)
-  {
-    NS_LOG_FUNCTION (this << networkStatus);
-
-    // Empty the Ack bit.
-    status->m_reply.frameHeader.SetAck(false);
-  }
-
-  ////////////////////////
-  // LinkCheckComponent //
-  ////////////////////////
-  TypeId
-  LinkCheckComponent::GetTypeId (void)
-  {
-    static TypeId tid = TypeId ("ns3::LinkCheckComponent")
-      .SetParent<NetworkControllerComponent> ()
-      .AddConstructor<LinkCheckComponent> ()
-      .SetGroupName ("lorawan");
-    return tid;
-  }
-
-  LinkCheckComponent::LinkCheckComponent () {}
-  LinkCheckComponent::~LinkCheckComponent () {}
-
-  void
-  LinkCheckComponent::OnReceivedPacket (Ptr<const Packet> packet,
-                                        Ptr<EndDeviceStatus> status,
+void
+LinkCheckComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
                                         Ptr<NetworkStatus> networkStatus)
-  {
-    NS_LOG_FUNCTION (this->GetTypeId() << packet << networkStatus);
+{
+  NS_LOG_FUNCTION (this << status << networkStatus);
 
-    // We will only act just before reply, when all Gateways will have received
-    // the packet.
-  }
+  Ptr<Packet> myPacket = status->GetLastPacketReceivedFromDevice ()->Copy ();
+  LoraMacHeader mHdr;
+  LoraFrameHeader fHdr;
+  fHdr.SetAsUplink ();
+  myPacket->RemoveHeader (mHdr);
+  myPacket->RemoveHeader (fHdr);
 
-  void
-  LinkCheckComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
-                                          Ptr<NetworkStatus> networkStatus)
-  {
-    NS_LOG_FUNCTION (this << status << networkStatus);
+  Ptr<LinkCheckReq> command = fHdr.GetMacCommand<LinkCheckReq> ();
 
-    Ptr<Packet> myPacket = status->GetLastPacketReceivedFromDevice ()->Copy();
-    LoraMacHeader mHdr;
-    LoraFrameHeader fHdr;
-    fHdr.SetAsUplink ();
-    myPacket->RemoveHeader(mHdr);
-    myPacket->RemoveHeader(fHdr);
+  // GetMacCommand returns 0 if no command is found
+  if (command)
+    {
+      status->m_reply.needsReply = true;
 
-    Ptr<LinkCheckReq> command = fHdr.GetMacCommand<LinkCheckReq> ();
+      // Get the number of gateways that received the packet and the best
+      // margin
+      uint8_t gwCount = status->GetLastReceivedPacketInfo ().gwList.size ();
 
-    // GetMacCommand returns 0 if no command is found
-    if (command)
-      {
-        status->m_reply.needsReply = true;
+      Ptr<LinkCheckAns> replyCommand = Create<LinkCheckAns> ();
+      replyCommand->SetGwCnt (gwCount);
+      status->m_reply.frameHeader.SetAsDownlink ();
+      status->m_reply.frameHeader.AddCommand (replyCommand);
+      status->m_reply.macHeader.SetMType (LoraMacHeader::UNCONFIRMED_DATA_DOWN);
+    }
+  else
+    {
+      // Do nothing
+    }
+}
 
-        // Get the number of gateways that received the packet and the best
-        // margin
-        uint8_t gwCount = status->GetLastReceivedPacketInfo ().gwList.size();
-
-        Ptr<LinkCheckAns> replyCommand = Create<LinkCheckAns> ();
-        replyCommand->SetGwCnt (gwCount);
-        status->m_reply.frameHeader.SetAsDownlink ();
-        status->m_reply.frameHeader.AddCommand(replyCommand);
-        status->m_reply.macHeader.SetMType (LoraMacHeader::UNCONFIRMED_DATA_DOWN);
-      }
-    else
-      {
-        // Do nothing
-      }
-  }
-
-  void
-  LinkCheckComponent::OnFailedReply (Ptr<EndDeviceStatus> status,
-                                     Ptr<NetworkStatus> networkStatus)
-  {
-    NS_LOG_FUNCTION (this->GetTypeId() << networkStatus);
-  }
+void
+LinkCheckComponent::OnFailedReply (Ptr<EndDeviceStatus> status,
+                                   Ptr<NetworkStatus> networkStatus)
+{
+  NS_LOG_FUNCTION (this->GetTypeId () << networkStatus);
+}
+}
 }

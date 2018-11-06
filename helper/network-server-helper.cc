@@ -27,109 +27,111 @@
 #include "ns3/log.h"
 
 namespace ns3 {
+namespace lorawan {
 
-  NS_LOG_COMPONENT_DEFINE ("NetworkServerHelper");
+NS_LOG_COMPONENT_DEFINE ("NetworkServerHelper");
 
-  NetworkServerHelper::NetworkServerHelper ()
-  {
-    m_factory.SetTypeId ("ns3::NetworkServer");
-    p2pHelper.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
-    p2pHelper.SetChannelAttribute ("Delay", StringValue ("2ms"));
-  }
-
-  NetworkServerHelper::~NetworkServerHelper ()
-  {
-  }
-
-  void
-  NetworkServerHelper::SetAttribute (std::string name, const AttributeValue &value)
-  {
-    m_factory.Set (name, value);
-  }
-
-  void
-  NetworkServerHelper::SetGateways (NodeContainer gateways)
-  {
-    m_gateways = gateways;
-  }
-
-  void
-  NetworkServerHelper::SetEndDevices (NodeContainer endDevices)
-  {
-    m_endDevices = endDevices;
-  }
-
-  ApplicationContainer
-  NetworkServerHelper::Install (Ptr<Node> node)
-  {
-    return ApplicationContainer (InstallPriv (node));
-  }
-
-  ApplicationContainer
-  NetworkServerHelper::Install (NodeContainer c)
-  {
-    ApplicationContainer apps;
-    for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
-      {
-        apps.Add (InstallPriv (*i));
-      }
-
-    return apps;
-  }
-
-  Ptr<Application>
-  NetworkServerHelper::InstallPriv (Ptr<Node> node)
-  {
-    NS_LOG_FUNCTION (this << node);
-
-    Ptr<NetworkServer> app = m_factory.Create<NetworkServer> ();
-
-    app->SetNode (node);
-    node->AddApplication (app);
-
-    // Cycle on each gateway
-    for (NodeContainer::Iterator i = m_gateways.Begin ();
-         i != m_gateways.End ();
-         i++)
-      {
-        // Add the connections with the gateway
-        // Create a PointToPoint link between gateway and NS
-        NetDeviceContainer container = p2pHelper.Install (node, *i);
-
-        // Add the gateway to the NS list
-        app->AddGateway (*i, container.Get (0));
-      }
-
-    // Link the NetworkServer to its NetDevices
-    for (uint32_t i = 0; i < node->GetNDevices (); i++)
-      {
-        Ptr<NetDevice> currentNetDevice = node->GetDevice (i);
-        currentNetDevice->SetReceiveCallback (MakeCallback
-                                              (&NetworkServer::Receive,
-                                               app));
-      }
-
-    // Add the end devices
-    app->AddNodes (m_endDevices);
-
-    // Add components to the NetworkServer
-    InstallComponents(app);
-
-    return app;
+NetworkServerHelper::NetworkServerHelper ()
+{
+  m_factory.SetTypeId ("ns3::NetworkServer");
+  p2pHelper.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
+  p2pHelper.SetChannelAttribute ("Delay", StringValue ("2ms"));
 }
 
-  void
-  NetworkServerHelper::InstallComponents (Ptr<NetworkServer> netServer)
-  {
-    NS_LOG_FUNCTION (this << netServer);
+NetworkServerHelper::~NetworkServerHelper ()
+{
+}
 
-    // Add Confirmed Messages support
-    Ptr<ConfirmedMessagesComponent> ackSupport =
-      CreateObject<ConfirmedMessagesComponent> ();
-    netServer->AddComponent (ackSupport);
+void
+NetworkServerHelper::SetAttribute (std::string name, const AttributeValue &value)
+{
+  m_factory.Set (name, value);
+}
 
-    // Add LinkCheck support
-    Ptr<LinkCheckComponent> linkCheckSupport = CreateObject<LinkCheckComponent> ();
-    netServer->AddComponent (linkCheckSupport);
-  }
+void
+NetworkServerHelper::SetGateways (NodeContainer gateways)
+{
+  m_gateways = gateways;
+}
+
+void
+NetworkServerHelper::SetEndDevices (NodeContainer endDevices)
+{
+  m_endDevices = endDevices;
+}
+
+ApplicationContainer
+NetworkServerHelper::Install (Ptr<Node> node)
+{
+  return ApplicationContainer (InstallPriv (node));
+}
+
+ApplicationContainer
+NetworkServerHelper::Install (NodeContainer c)
+{
+  ApplicationContainer apps;
+  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
+    {
+      apps.Add (InstallPriv (*i));
+    }
+
+  return apps;
+}
+
+Ptr<Application>
+NetworkServerHelper::InstallPriv (Ptr<Node> node)
+{
+  NS_LOG_FUNCTION (this << node);
+
+  Ptr<NetworkServer> app = m_factory.Create<NetworkServer> ();
+
+  app->SetNode (node);
+  node->AddApplication (app);
+
+  // Cycle on each gateway
+  for (NodeContainer::Iterator i = m_gateways.Begin ();
+       i != m_gateways.End ();
+       i++)
+    {
+      // Add the connections with the gateway
+      // Create a PointToPoint link between gateway and NS
+      NetDeviceContainer container = p2pHelper.Install (node, *i);
+
+      // Add the gateway to the NS list
+      app->AddGateway (*i, container.Get (0));
+    }
+
+  // Link the NetworkServer to its NetDevices
+  for (uint32_t i = 0; i < node->GetNDevices (); i++)
+    {
+      Ptr<NetDevice> currentNetDevice = node->GetDevice (i);
+      currentNetDevice->SetReceiveCallback (MakeCallback
+                                              (&NetworkServer::Receive,
+                                              app));
+    }
+
+  // Add the end devices
+  app->AddNodes (m_endDevices);
+
+  // Add components to the NetworkServer
+  InstallComponents (app);
+
+  return app;
+}
+
+void
+NetworkServerHelper::InstallComponents (Ptr<NetworkServer> netServer)
+{
+  NS_LOG_FUNCTION (this << netServer);
+
+  // Add Confirmed Messages support
+  Ptr<ConfirmedMessagesComponent> ackSupport =
+    CreateObject<ConfirmedMessagesComponent> ();
+  netServer->AddComponent (ackSupport);
+
+  // Add LinkCheck support
+  Ptr<LinkCheckComponent> linkCheckSupport = CreateObject<LinkCheckComponent> ();
+  netServer->AddComponent (linkCheckSupport);
+}
+}
 } // namespace ns3

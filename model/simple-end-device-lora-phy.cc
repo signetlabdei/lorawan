@@ -25,6 +25,7 @@
 #include "ns3/log.h"
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("SimpleEndDeviceLoraPhy");
 
@@ -163,7 +164,7 @@ SimpleEndDeviceLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
         bool canLockOnPacket = true;
 
         // Save needed sensitivity
-        double sensitivity = EndDeviceLoraPhy::sensitivity[unsigned(sf)-7];
+        double sensitivity = EndDeviceLoraPhy::sensitivity[unsigned(sf) - 7];
 
         // Check frequency
         //////////////////
@@ -307,5 +308,6 @@ SimpleEndDeviceLoraPhy::EndReceive (Ptr<Packet> packet,
         }
 
     }
+}
 }
 }

@@ -1,116 +1,120 @@
 #include "utilities.h"
 
 namespace ns3 {
+namespace lorawan {
 
-  Ptr<LoraChannel>
-  CreateChannel (void)
-  {
-    // Create the lora channel object
-    Ptr<LogDistancePropagationLossModel> loss = CreateObject<LogDistancePropagationLossModel> ();
-    loss->SetPathLossExponent (3.76);
-    loss->SetReference (1, 7.7);
+Ptr<LoraChannel>
+CreateChannel (void)
+{
+  // Create the lora channel object
+  Ptr<LogDistancePropagationLossModel> loss = CreateObject<LogDistancePropagationLossModel> ();
+  loss->SetPathLossExponent (3.76);
+  loss->SetReference (1, 7.7);
 
-    Ptr<PropagationDelayModel> delay = CreateObject<ConstantSpeedPropagationDelayModel> ();
+  Ptr<PropagationDelayModel> delay = CreateObject<ConstantSpeedPropagationDelayModel> ();
 
-    return CreateObject<LoraChannel> (loss, delay);
-  }
+  return CreateObject<LoraChannel> (loss, delay);
+}
 
-  NodeContainer
-  CreateEndDevices (int nDevices, MobilityHelper mobility, Ptr<LoraChannel> channel)
-  {
-    // Create the LoraPhyHelper
-    LoraPhyHelper phyHelper = LoraPhyHelper ();
-    phyHelper.SetChannel (channel);
+NodeContainer
+CreateEndDevices (int nDevices, MobilityHelper mobility, Ptr<LoraChannel> channel)
+{
+  // Create the LoraPhyHelper
+  LoraPhyHelper phyHelper = LoraPhyHelper ();
+  phyHelper.SetChannel (channel);
 
-    // Create the LoraMacHelper
-    LoraMacHelper macHelper = LoraMacHelper ();
+  // Create the LoraMacHelper
+  LoraMacHelper macHelper = LoraMacHelper ();
 
-    // Create the LoraHelper
-    LoraHelper helper = LoraHelper ();
+  // Create the LoraHelper
+  LoraHelper helper = LoraHelper ();
 
-    // Create a set of nodes
-    NodeContainer endDevices;
-    endDevices.Create (nDevices);
+  // Create a set of nodes
+  NodeContainer endDevices;
+  endDevices.Create (nDevices);
 
-    // Assign a mobility model to the node
-    mobility.Install (endDevices);
+  // Assign a mobility model to the node
+  mobility.Install (endDevices);
 
-    // Create the LoraNetDevices of the end devices
-    phyHelper.SetDeviceType (LoraPhyHelper::ED);
-    macHelper.SetDeviceType (LoraMacHelper::ED);
-    helper.Install (phyHelper, macHelper, endDevices);
+  // Create the LoraNetDevices of the end devices
+  phyHelper.SetDeviceType (LoraPhyHelper::ED);
+  macHelper.SetDeviceType (LoraMacHelper::ED);
+  helper.Install (phyHelper, macHelper, endDevices);
 
-    return endDevices;
-  }
+  return endDevices;
+}
 
-  NodeContainer
-  CreateGateways (int nGateways, MobilityHelper mobility, Ptr<LoraChannel> channel)
-  {
-    // Create the LoraPhyHelper
-    LoraPhyHelper phyHelper = LoraPhyHelper ();
-    phyHelper.SetChannel (channel);
+NodeContainer
+CreateGateways (int nGateways, MobilityHelper mobility, Ptr<LoraChannel> channel)
+{
+  // Create the LoraPhyHelper
+  LoraPhyHelper phyHelper = LoraPhyHelper ();
+  phyHelper.SetChannel (channel);
 
-    // Create the LoraMacHelper
-    LoraMacHelper macHelper = LoraMacHelper ();
+  // Create the LoraMacHelper
+  LoraMacHelper macHelper = LoraMacHelper ();
 
-    // Create the LoraHelper
-    LoraHelper helper = LoraHelper ();
+  // Create the LoraHelper
+  LoraHelper helper = LoraHelper ();
 
-    // Create the gateways
-    NodeContainer gateways;
-    gateways.Create (nGateways);
+  // Create the gateways
+  NodeContainer gateways;
+  gateways.Create (nGateways);
 
-    mobility.Install (gateways);
+  mobility.Install (gateways);
 
-    // Create a netdevice for each gateway
-    phyHelper.SetDeviceType (LoraPhyHelper::GW);
-    macHelper.SetDeviceType (LoraMacHelper::GW);
-    helper.Install (phyHelper, macHelper, gateways);
+  // Create a netdevice for each gateway
+  phyHelper.SetDeviceType (LoraPhyHelper::GW);
+  macHelper.SetDeviceType (LoraMacHelper::GW);
+  helper.Install (phyHelper, macHelper, gateways);
 
-    return gateways;
-  }
+  return gateways;
+}
 
-  Ptr<Node>
-  CreateNetworkServer (NodeContainer endDevices, NodeContainer gateways)
-  {
-    // Create the NetworkServer
-    NetworkServerHelper networkServerHelper = NetworkServerHelper();
-    networkServerHelper.SetEndDevices (endDevices);
-    networkServerHelper.SetGateways (gateways);
-    Ptr<Node> nsNode = CreateObject<Node> ();
-    networkServerHelper.Install (nsNode); // This connects NS and GWs
+Ptr<Node>
+CreateNetworkServer (NodeContainer endDevices, NodeContainer gateways)
+{
+  // Create the NetworkServer
+  NetworkServerHelper networkServerHelper = NetworkServerHelper ();
+  networkServerHelper.SetEndDevices (endDevices);
+  networkServerHelper.SetGateways (gateways);
+  Ptr<Node> nsNode = CreateObject<Node> ();
+  networkServerHelper.Install (nsNode);     // This connects NS and GWs
 
-    // Install a forwarder on the gateways
-    ForwarderHelper forwarderHelper;
-    forwarderHelper.Install (gateways);
+  // Install a forwarder on the gateways
+  ForwarderHelper forwarderHelper;
+  forwarderHelper.Install (gateways);
 
-    return nsNode;
-  }
+  return nsNode;
+}
 
-  NetworkComponents
-  InitializeNetwork (int nDevices, int nGateways)
-  {
-    // This function sets up a network with some devices and some gateways, and
-    // returns the created nodes through a NetworkComponents struct.
+NetworkComponents
+InitializeNetwork (int nDevices, int nGateways)
+{
+  // This function sets up a network with some devices and some gateways, and
+  // returns the created nodes through a NetworkComponents struct.
 
-    Ptr<LoraChannel> channel = CreateChannel ();
+  Ptr<LoraChannel> channel = CreateChannel ();
 
-    MobilityHelper mobility;
-    mobility.SetPositionAllocator ("ns3::UniformDiscPositionAllocator",
-                                   "rho", DoubleValue (1000),
-                                   "X", DoubleValue (0.0),
-                                   "Y", DoubleValue (0.0));
-    mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
+  MobilityHelper mobility;
+  mobility.SetPositionAllocator ("ns3::UniformDiscPositionAllocator",
+                                 "rho", DoubleValue (1000),
+                                 "X", DoubleValue (0.0),
+                                 "Y", DoubleValue (0.0));
+  mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
 
-    NodeContainer endDevices = CreateEndDevices (nDevices, mobility, channel);
+  NodeContainer endDevices = CreateEndDevices (nDevices, mobility, channel);
 
-    NodeContainer gateways = CreateGateways (nGateways, mobility, channel);
+  NodeContainer gateways = CreateGateways (nGateways, mobility, channel);
 
-    LoraMacHelper ().SetSpreadingFactorsUp (endDevices, gateways, channel);
+  LoraMacHelper ().SetSpreadingFactorsUp (endDevices, gateways, channel);
 
-    Ptr<Node> nsNode = CreateNetworkServer (endDevices, gateways);
+  Ptr<Node> nsNode = CreateNetworkServer (endDevices, gateways);
 
-    return {channel, endDevices, gateways, nsNode};
-  }
+  return {
+           channel, endDevices, gateways, nsNode
+  };
+}
 
+}
 }

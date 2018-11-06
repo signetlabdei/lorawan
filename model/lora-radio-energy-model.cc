@@ -22,6 +22,7 @@
 
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("LoraRadioEnergyModel");
 
@@ -36,25 +37,25 @@ LoraRadioEnergyModel::GetTypeId (void)
     .AddConstructor<LoraRadioEnergyModel> ()
     .AddAttribute ("StandbyCurrentA",
                    "The default radio Standby current in Ampere.",
-                   DoubleValue (0.0014),  // idle mode = 1.4mA
+                   DoubleValue (0.0014),      // idle mode = 1.4mA
                    MakeDoubleAccessor (&LoraRadioEnergyModel::SetStandbyCurrentA,
                                        &LoraRadioEnergyModel::GetStandbyCurrentA),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("TxCurrentA",
                    "The radio Tx current in Ampere.",
-                   DoubleValue (0.028),    // transmit at 0dBm = 28mA
+                   DoubleValue (0.028),        // transmit at 0dBm = 28mA
                    MakeDoubleAccessor (&LoraRadioEnergyModel::SetTxCurrentA,
                                        &LoraRadioEnergyModel::GetTxCurrentA),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("RxCurrentA",
                    "The radio Rx current in Ampere.",
-                   DoubleValue (0.0112),    // receive mode = 11.2mA
+                   DoubleValue (0.0112),        // receive mode = 11.2mA
                    MakeDoubleAccessor (&LoraRadioEnergyModel::SetRxCurrentA,
                                        &LoraRadioEnergyModel::GetRxCurrentA),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("SleepCurrentA",
                    "The radio Sleep current in Ampere.",
-                   DoubleValue (0.0000015),  // sleep mode = 1.5microA
+                   DoubleValue (0.0000015),      // sleep mode = 1.5microA
                    MakeDoubleAccessor (&LoraRadioEnergyModel::SetSleepCurrentA,
                                        &LoraRadioEnergyModel::GetSleepCurrentA),
                    MakeDoubleChecker<double> ())
@@ -73,7 +74,7 @@ LoraRadioEnergyModel::GetTypeId (void)
 LoraRadioEnergyModel::LoraRadioEnergyModel ()
 {
   NS_LOG_FUNCTION (this);
-  m_currentState = EndDeviceLoraPhy::SLEEP;  // initially STANDBY
+  m_currentState = EndDeviceLoraPhy::SLEEP;      // initially STANDBY
   m_lastUpdateTime = Seconds (0.0);
   m_nPendingChangeState = 0;
   m_isSupersededChangeState = false;
@@ -215,7 +216,7 @@ LoraRadioEnergyModel::ChangeState (int newState)
   NS_LOG_FUNCTION (this << newState);
 
   Time duration = Simulator::Now () - m_lastUpdateTime;
-  NS_ASSERT (duration.GetNanoSeconds () >= 0); // check if duration is valid
+  NS_ASSERT (duration.GetNanoSeconds () >= 0);     // check if duration is valid
 
   // energy to decrease = current * voltage * time
   double energyToDecrease = 0.0;
@@ -459,4 +460,5 @@ LoraRadioEnergyModelPhyListener::SwitchToStandby (void)
   m_changeStateCallback (EndDeviceLoraPhy::STANDBY);
 }
 
+}
 } // namespace ns3

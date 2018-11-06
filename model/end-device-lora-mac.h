@@ -30,10 +30,11 @@
 #include "ns3/traced-value.h"
 
 namespace ns3 {
+namespace lorawan {
 
 /**
-  * Class representing the MAC layer of a LoRaWAN device.
-  */
+ * Class representing the MAC layer of a LoRaWAN device.
+ */
 class EndDeviceLoraMac : public LoraMac
 {
 public:
@@ -378,7 +379,7 @@ private:
    * retransmission procedure.
    */
   struct LoraRetxParameters
-     {
+  {
     Time firstAttempt;
     Ptr<Packet> packet = 0;
     bool waitingAck = false;
@@ -577,4 +578,5 @@ TracedValue<uint8_t> m_requiredTx;
 
 } /* namespace ns3 */
 
+}
 #endif /* END_DEVICE_LORA_MAC_H */

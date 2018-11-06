@@ -24,6 +24,7 @@
 #include "ns3/log.h"
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("SimpleGatewayLoraPhy");
 
@@ -70,19 +71,19 @@ SimpleGatewayLoraPhy::Send (Ptr<Packet> packet, LoraTxParameters txParams,
 
       Ptr<SimpleGatewayLoraPhy::ReceptionPath> currentPath = *it;
 
-      if (!currentPath->IsAvailable ()) // Reception path is occupied
+      if (!currentPath->IsAvailable ())     // Reception path is occupied
         {
           // Call the callback for reception interrupted by transmission
           // Fire the trace source
           if (m_device)
             {
-              m_noReceptionBecauseTransmitting (currentPath -> GetEvent() -> GetPacket(),
-                                                m_device -> GetNode () -> GetId ());
+              m_noReceptionBecauseTransmitting (currentPath->GetEvent ()->GetPacket (),
+                                                m_device->GetNode ()->GetId ());
 
             }
           else
             {
-              m_noReceptionBecauseTransmitting (currentPath->GetEvent()->GetPacket(), 0);
+              m_noReceptionBecauseTransmitting (currentPath->GetEvent ()->GetPacket (), 0);
             }
 
           // Cancel the scheduled EndReceive call
@@ -159,14 +160,14 @@ SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
 
       // If the receive path is available and listening on the channel of
       // interest, we have a candidate
-      if (currentPath->GetFrequency () == frequencyMHz &&
-          currentPath->IsAvailable ())
+      if (currentPath->GetFrequency () == frequencyMHz
+          && currentPath->IsAvailable ())
         {
           // See whether the reception power is above or below the sensitivity
           // for that spreading factor
-          double sensitivity = SimpleGatewayLoraPhy::sensitivity[unsigned(sf)-7];
+          double sensitivity = SimpleGatewayLoraPhy::sensitivity[unsigned(sf) - 7];
 
-          if (rxPowerDbm < sensitivity)   // Packet arrived below sensitivity
+          if (rxPowerDbm < sensitivity)       // Packet arrived below sensitivity
             {
               NS_LOG_INFO ("Dropping packet reception of packet with sf = "
                            << unsigned(sf) <<
@@ -186,7 +187,7 @@ SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
               // search for another ReceivePath
               return;
             }
-          else    // We have sufficient sensitivity to start receiving
+          else        // We have sufficient sensitivity to start receiving
             {
               NS_LOG_INFO ("Scheduling reception of a packet, " <<
                            "occupying one demodulator");
@@ -197,9 +198,9 @@ SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
 
               // Schedule the end of the reception of the packet
               EventId endReceiveEventId = Simulator::Schedule (duration,
-                                                            &LoraPhy::EndReceive,
-                                                            this, packet,
-                                                            event);
+                                                               &LoraPhy::EndReceive,
+                                                               this, packet,
+                                                               event);
 
               currentPath->SetEndReceive (endReceiveEventId);
 
@@ -260,7 +261,7 @@ SimpleGatewayLoraPhy::EndReceive (Ptr<Packet> packet,
           m_interferedPacket (packet, 0);
         }
     }
-  else   // Reception was correct
+  else       // Reception was correct
     {
       NS_LOG_INFO ("Packet with SF " <<
                    unsigned(event->GetSpreadingFactor ()) <<
@@ -313,4 +314,5 @@ SimpleGatewayLoraPhy::EndReceive (Ptr<Packet> packet,
     }
 }
 
+}
 }

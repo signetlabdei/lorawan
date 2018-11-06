@@ -31,184 +31,186 @@
 #include "ns3/pointer.h"
 
 namespace ns3 {
+namespace lorawan {
 
-  NS_LOG_COMPONENT_DEFINE ("NetworkStatus");
+NS_LOG_COMPONENT_DEFINE ("NetworkStatus");
 
-  NS_OBJECT_ENSURE_REGISTERED (NetworkStatus);
+NS_OBJECT_ENSURE_REGISTERED (NetworkStatus);
 
-  TypeId
-  NetworkStatus::GetTypeId (void)
-  {
-    static TypeId tid = TypeId ("ns3::NetworkStatus")
-      .AddConstructor<NetworkStatus> ()
-      .SetGroupName ("lorawan");
-    return tid;
-  }
+TypeId
+NetworkStatus::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::NetworkStatus")
+    .AddConstructor<NetworkStatus> ()
+    .SetGroupName ("lorawan");
+  return tid;
+}
 
-  NetworkStatus::NetworkStatus ()
-  {
-    NS_LOG_FUNCTION_NOARGS ();
-  }
+NetworkStatus::NetworkStatus ()
+{
+  NS_LOG_FUNCTION_NOARGS ();
+}
 
-  NetworkStatus::~NetworkStatus ()
-  {
-    NS_LOG_FUNCTION_NOARGS ();
-  }
+NetworkStatus::~NetworkStatus ()
+{
+  NS_LOG_FUNCTION_NOARGS ();
+}
 
-  void
-  NetworkStatus::AddNode (Ptr<EndDeviceLoraMac> edMac)
-  {
-    NS_LOG_FUNCTION (this << edMac);
+void
+NetworkStatus::AddNode (Ptr<EndDeviceLoraMac> edMac)
+{
+  NS_LOG_FUNCTION (this << edMac);
 
-    // Check whether this device already exists in our list
-    LoraDeviceAddress edAddress = edMac->GetDeviceAddress ();
-    if (m_endDeviceStatuses.find (edAddress) == m_endDeviceStatuses.end ())
-      {
-        // The device doesn't exist. Create new EndDeviceStatus
-        Ptr<EndDeviceStatus> edStatus = CreateObject<EndDeviceStatus>
+  // Check whether this device already exists in our list
+  LoraDeviceAddress edAddress = edMac->GetDeviceAddress ();
+  if (m_endDeviceStatuses.find (edAddress) == m_endDeviceStatuses.end ())
+    {
+      // The device doesn't exist. Create new EndDeviceStatus
+      Ptr<EndDeviceStatus> edStatus = CreateObject<EndDeviceStatus>
           (edAddress, edMac->GetObject<EndDeviceLoraMac>());
 
-        // Add it to the map
-        m_endDeviceStatuses.insert (std::pair<LoraDeviceAddress, Ptr<EndDeviceStatus>>
+      // Add it to the map
+      m_endDeviceStatuses.insert (std::pair<LoraDeviceAddress, Ptr<EndDeviceStatus> >
                                     (edAddress, edStatus));
-        NS_LOG_DEBUG ("Added to the list a device with address " <<
-                      edAddress.Print ());
-      }
-  }
+      NS_LOG_DEBUG ("Added to the list a device with address " <<
+                    edAddress.Print ());
+    }
+}
 
-  void
-  NetworkStatus::AddGateway (Address& address, Ptr<GatewayStatus> gwStatus)
-  {
-    NS_LOG_FUNCTION (this);
+void
+NetworkStatus::AddGateway (Address& address, Ptr<GatewayStatus> gwStatus)
+{
+  NS_LOG_FUNCTION (this);
 
-    // Check whether this device already exists in the list
-    if (m_gatewayStatuses.find (address) == m_gatewayStatuses.end ())
-      {
-        // The device doesn't exist.
+  // Check whether this device already exists in the list
+  if (m_gatewayStatuses.find (address) == m_gatewayStatuses.end ())
+    {
+      // The device doesn't exist.
 
-        // Add it to the map
-        m_gatewayStatuses.insert (std::pair<Address, Ptr<GatewayStatus> >
+      // Add it to the map
+      m_gatewayStatuses.insert (std::pair<Address, Ptr<GatewayStatus> >
                                   (address, gwStatus));
-        NS_LOG_DEBUG ("Added to the list a gateway with address " << address);
-      }
-  }
+      NS_LOG_DEBUG ("Added to the list a gateway with address " << address);
+    }
+}
 
-  void
-  NetworkStatus::OnReceivedPacket (Ptr<const Packet> packet,
-                                   const Address& gwAddress)
-  {
-    NS_LOG_FUNCTION (this << packet << gwAddress);
+void
+NetworkStatus::OnReceivedPacket (Ptr<const Packet> packet,
+                                 const Address& gwAddress)
+{
+  NS_LOG_FUNCTION (this << packet << gwAddress);
 
-    // Create a copy of the packet
-    Ptr<Packet> myPacket = packet->Copy ();
+  // Create a copy of the packet
+  Ptr<Packet> myPacket = packet->Copy ();
 
-    // Extract the headers
-    LoraMacHeader macHdr;
-    myPacket->RemoveHeader (macHdr);
-    LoraFrameHeader frameHdr;
-    frameHdr.SetAsUplink ();
-    myPacket->RemoveHeader (frameHdr);
+  // Extract the headers
+  LoraMacHeader macHdr;
+  myPacket->RemoveHeader (macHdr);
+  LoraFrameHeader frameHdr;
+  frameHdr.SetAsUplink ();
+  myPacket->RemoveHeader (frameHdr);
 
-    // Update the correct EndDeviceStatus object
-    LoraDeviceAddress edAddr= frameHdr.GetAddress();
-    NS_LOG_DEBUG ("Node address: " << edAddr);
-    m_endDeviceStatuses.at(edAddr)->InsertReceivedPacket(packet, gwAddress);
-  }
+  // Update the correct EndDeviceStatus object
+  LoraDeviceAddress edAddr = frameHdr.GetAddress ();
+  NS_LOG_DEBUG ("Node address: " << edAddr);
+  m_endDeviceStatuses.at (edAddr)->InsertReceivedPacket (packet, gwAddress);
+}
 
-  bool
-  NetworkStatus::NeedsReply(LoraDeviceAddress deviceAddress)
-  {
-    // Throws out of range if no device is found
-    return m_endDeviceStatuses.at(deviceAddress)->NeedsReply ();
-  }
+bool
+NetworkStatus::NeedsReply (LoraDeviceAddress deviceAddress)
+{
+  // Throws out of range if no device is found
+  return m_endDeviceStatuses.at (deviceAddress)->NeedsReply ();
+}
 
-  Address
-  NetworkStatus::GetBestGatewayForDevice(LoraDeviceAddress deviceAddress)
-  {
-    // Get the endDeviceStatus we are interested in
-    Ptr<EndDeviceStatus> edStatus = m_endDeviceStatuses.at(deviceAddress);
+Address
+NetworkStatus::GetBestGatewayForDevice (LoraDeviceAddress deviceAddress)
+{
+  // Get the endDeviceStatus we are interested in
+  Ptr<EndDeviceStatus> edStatus = m_endDeviceStatuses.at (deviceAddress);
 
-    // Get the list of gateways that this device can reach
-    // NOTE: At this point, we could also take into account the whole network to
-    // identify the best gateway according to various metrics. For now, we just
-    // ask the EndDeviceStatus to pick the best gateway for us via its method.
-    Address bestGwAddress = edStatus->GetBestGatewayForReply ();
+  // Get the list of gateways that this device can reach
+  // NOTE: At this point, we could also take into account the whole network to
+  // identify the best gateway according to various metrics. For now, we just
+  // ask the EndDeviceStatus to pick the best gateway for us via its method.
+  Address bestGwAddress = edStatus->GetBestGatewayForReply ();
 
-    return bestGwAddress;
-  }
+  return bestGwAddress;
+}
 
-  void
-  NetworkStatus::SendThroughGateway(Ptr<Packet> packet, Address gwAddress)
-  {
-    NS_LOG_FUNCTION (packet << gwAddress);
+void
+NetworkStatus::SendThroughGateway (Ptr<Packet> packet, Address gwAddress)
+{
+  NS_LOG_FUNCTION (packet << gwAddress);
 
-    m_gatewayStatuses.find(gwAddress)->second->GetNetDevice()->Send(packet,
-                                                                    gwAddress,
-                                                                    0x0800);
-  }
+  m_gatewayStatuses.find (gwAddress)->second->GetNetDevice ()->Send (packet,
+                                                                     gwAddress,
+                                                                     0x0800);
+}
 
-  Ptr<Packet>
-  NetworkStatus::GetReplyForDevice (LoraDeviceAddress edAddress, int windowNumber)
-  {
-    // Get the reply packet
-    Ptr<EndDeviceStatus> edStatus = m_endDeviceStatuses.find(edAddress)->second;
-    Ptr<Packet> packet = edStatus->GetCompleteReplyPacket ();
+Ptr<Packet>
+NetworkStatus::GetReplyForDevice (LoraDeviceAddress edAddress, int windowNumber)
+{
+  // Get the reply packet
+  Ptr<EndDeviceStatus> edStatus = m_endDeviceStatuses.find (edAddress)->second;
+  Ptr<Packet> packet = edStatus->GetCompleteReplyPacket ();
 
-    // Apply the appropriate tag
-    LoraTag tag;
-    switch (windowNumber)
-      {
-      case 1:
-        tag.SetDataRate(edStatus->GetMac()->GetFirstReceiveWindowDataRate ());
-        tag.SetFrequency(edStatus->GetFirstReceiveWindowFrequency ());
-        break;
-      case 2:
-        tag.SetDataRate(edStatus->GetMac()->GetSecondReceiveWindowDataRate ());
-        tag.SetFrequency(edStatus->GetSecondReceiveWindowFrequency ());
-        break;
-      }
+  // Apply the appropriate tag
+  LoraTag tag;
+  switch (windowNumber)
+    {
+    case 1:
+      tag.SetDataRate (edStatus->GetMac ()->GetFirstReceiveWindowDataRate ());
+      tag.SetFrequency (edStatus->GetFirstReceiveWindowFrequency ());
+      break;
+    case 2:
+      tag.SetDataRate (edStatus->GetMac ()->GetSecondReceiveWindowDataRate ());
+      tag.SetFrequency (edStatus->GetSecondReceiveWindowFrequency ());
+      break;
+    }
 
-    packet->AddPacketTag (tag);
-    return packet;
-  }
+  packet->AddPacketTag (tag);
+  return packet;
+}
 
-  Ptr<EndDeviceStatus>
-  NetworkStatus::GetEndDeviceStatus(Ptr<Packet const> packet)
-  {
-    NS_LOG_FUNCTION (this << packet);
+Ptr<EndDeviceStatus>
+NetworkStatus::GetEndDeviceStatus (Ptr<Packet const> packet)
+{
+  NS_LOG_FUNCTION (this << packet);
 
-    // Get the address
-    LoraMacHeader mHdr;
-    LoraFrameHeader fHdr;
-    Ptr<Packet> myPacket = packet->Copy();
-    myPacket->RemoveHeader(mHdr);
-    myPacket->RemoveHeader(fHdr);
-    auto it = m_endDeviceStatuses.find(fHdr.GetAddress());
-    if (it != m_endDeviceStatuses.end())
-      {
-        return (*it).second;
-      }
-    else
-      {
-        NS_LOG_ERROR("EndDeviceStatus not found");
-        return 0;
-      }
-  }
+  // Get the address
+  LoraMacHeader mHdr;
+  LoraFrameHeader fHdr;
+  Ptr<Packet> myPacket = packet->Copy ();
+  myPacket->RemoveHeader (mHdr);
+  myPacket->RemoveHeader (fHdr);
+  auto it = m_endDeviceStatuses.find (fHdr.GetAddress ());
+  if (it != m_endDeviceStatuses.end ())
+    {
+      return (*it).second;
+    }
+  else
+    {
+      NS_LOG_ERROR ("EndDeviceStatus not found");
+      return 0;
+    }
+}
 
-  Ptr<EndDeviceStatus>
-  NetworkStatus::GetEndDeviceStatus(LoraDeviceAddress address)
-  {
-    NS_LOG_FUNCTION (this << address);
+Ptr<EndDeviceStatus>
+NetworkStatus::GetEndDeviceStatus (LoraDeviceAddress address)
+{
+  NS_LOG_FUNCTION (this << address);
 
-    auto it = m_endDeviceStatuses.find(address);
-    if (it != m_endDeviceStatuses.end())
-      {
-        return (*it).second;
-      }
-    else
-      {
-        NS_LOG_ERROR("EndDeviceStatus not found");
-        return 0;
-      }
-  }
+  auto it = m_endDeviceStatuses.find (address);
+  if (it != m_endDeviceStatuses.end ())
+    {
+      return (*it).second;
+    }
+  else
+    {
+      NS_LOG_ERROR ("EndDeviceStatus not found");
+      return 0;
+    }
+}
+}
 }

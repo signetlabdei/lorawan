@@ -28,6 +28,7 @@
 #include "ns3/attribute.h"
 
 namespace ns3 {
+namespace lorawan {
 
 /**
  * This application forwards packets between NetDevices:
@@ -36,7 +37,6 @@ namespace ns3 {
 class Forwarder : public Application
 {
 public:
-
   Forwarder ();
   ~Forwarder ();
 
@@ -89,10 +89,11 @@ private:
   Ptr<LoraNetDevice> m_loraNetDevice; //!< Pointer to the node's LoraNetDevice
 
   Ptr<PointToPointNetDevice> m_pointToPointNetDevice; //!< Pointer to the
-                                                      //!P2PNetDevice we use to
-                                                      //!communicate with the NS
+  //!P2PNetDevice we use to
+  //!communicate with the NS
 };
 
 } //namespace ns3
 
+}
 #endif /* FORWARDER */

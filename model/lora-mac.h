@@ -28,24 +28,24 @@
 #include <array>
 
 namespace ns3 {
+namespace lorawan {
 
 class LoraPhy;
 
 /**
-  * Class representing the LoRaWAN MAC layer.
-  *
-  * This class is meant to be extended differently based on whether the layer
-  * belongs to an End Device or a Gateway, while holding some functionality that
-  * is common to both.
-  */
+ * Class representing the LoRaWAN MAC layer.
+ *
+ * This class is meant to be extended differently based on whether the layer
+ * belongs to an End Device or a Gateway, while holding some functionality that
+ * is common to both.
+ */
 class LoraMac : public Object
 {
 public:
-
   static TypeId GetTypeId (void);
 
-  LoraMac();
-  virtual ~LoraMac();
+  LoraMac ();
+  virtual ~LoraMac ();
 
   typedef std::array<std::array<uint8_t, 6>, 8> ReplyDataRateMatrix;
 
@@ -280,4 +280,5 @@ protected:
 
 } /* namespace ns3 */
 
+}
 #endif /* LORA_MAC_H */

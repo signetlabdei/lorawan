@@ -25,6 +25,7 @@
 #include "ns3/sub-band.h"
 
 namespace ns3 {
+namespace lorawan {
 
 class SubBand;
 
@@ -40,11 +41,10 @@ class SubBand;
 class LogicalLoraChannel : public Object
 {
 public:
-
   static TypeId GetTypeId (void);
 
-  LogicalLoraChannel();
-  virtual ~LogicalLoraChannel();
+  LogicalLoraChannel ();
+  virtual ~LogicalLoraChannel ();
 
   LogicalLoraChannel (double frequency);
 
@@ -141,4 +141,5 @@ bool operator!= (const Ptr<LogicalLoraChannel>& first, const Ptr<LogicalLoraChan
 
 }
 
+}
 #endif /* LOGICAL_LORA_CHANNEL_H */

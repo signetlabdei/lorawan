@@ -24,6 +24,7 @@
 #include "ns3/tag.h"
 
 namespace ns3 {
+namespace lorawan {
 
 /**
  * Tag used to save various data about a packet, like its Spreading Factor and
@@ -127,8 +128,9 @@ private:
   uint8_t m_destroyedBy; //!< The Spreading Factor that destroyed the packet.
   double m_receivePower; //!< The reception power of this packet.
   uint8_t m_dataRate; //!< The Data Rate that needs to be used to send this
-                      //!packet.
+  //!packet.
   double m_frequency; //!< The frequency of this packet
 };
 } // namespace ns3
+}
 #endif

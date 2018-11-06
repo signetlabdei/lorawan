@@ -22,6 +22,7 @@
 #include "ns3/log.h"
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("LoraMac");
 
@@ -56,7 +57,8 @@ LoraMac::LoraMac ()
   NS_LOG_FUNCTION (this);
 }
 
-LoraMac::~LoraMac () {
+LoraMac::~LoraMac ()
+{
   NS_LOG_FUNCTION (this);
 }
 
@@ -183,5 +185,6 @@ void
 LoraMac::SetReplyDataRateMatrix (ReplyDataRateMatrix replyDataRateMatrix)
 {
   m_replyDataRateMatrix = replyDataRateMatrix;
+}
 }
 }

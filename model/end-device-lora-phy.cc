@@ -25,6 +25,7 @@
 #include "ns3/log.h"
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("EndDeviceLoraPhy");
 
@@ -199,4 +200,5 @@ EndDeviceLoraPhy::UnregisterListener (EndDeviceLoraPhyListener *listener)
     }
 }
 
+}
 }

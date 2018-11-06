@@ -23,6 +23,7 @@
 #include "ns3/end-device-lora-phy.h"
 
 namespace ns3 {
+namespace lorawan {
 
 LoraRadioEnergyModelHelper::LoraRadioEnergyModelHelper ()
 {
@@ -103,4 +104,5 @@ LoraRadioEnergyModelHelper::DoInstall (Ptr<NetDevice> device,
   return model;
 }
 
+}
 } // namespace ns3

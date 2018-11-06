@@ -24,6 +24,7 @@
 #include <algorithm>
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("LoraPhy");
 
@@ -113,7 +114,7 @@ LoraPhy::GetMobility (void)
     {
       return m_mobility;
     }
-  else // Else, take it from the node
+  else     // Else, take it from the node
     {
       return m_device->GetNode ()->GetObject<MobilityModel> ();
     }
@@ -171,7 +172,7 @@ LoraPhy::GetOnAirTime (Ptr<Packet> packet, LoraTxParameters txParams)
   double tPreamble = (double(txParams.nPreamble) + 4.25) * tSym;
 
   // Payload size
-  uint32_t pl = packet->GetSize ();  // Size in bytes
+  uint32_t pl = packet->GetSize ();      // Size in bytes
   NS_LOG_DEBUG ("Packet of size " << pl << " bytes");
 
   // This step is needed since the formula deals with double values.
@@ -203,14 +204,15 @@ LoraPhy::GetOnAirTime (Ptr<Packet> packet, LoraTxParameters txParams)
 std::ostream &operator << (std::ostream &os, const LoraTxParameters &params)
 {
   os << "SF: " << unsigned(params.sf) <<
-  ", headerDisabled: " << params.headerDisabled <<
-  ", codingRate: " << unsigned(params.codingRate) <<
-  ", bandwidthHz: " << params.bandwidthHz <<
-  ", nPreamble: " << params.nPreamble <<
-  ", crcEnabled: " << params.crcEnabled <<
-  ", lowDataRateOptimizationEnabled: " << params.lowDataRateOptimizationEnabled <<
-  ")";
+    ", headerDisabled: " << params.headerDisabled <<
+    ", codingRate: " << unsigned(params.codingRate) <<
+    ", bandwidthHz: " << params.bandwidthHz <<
+    ", nPreamble: " << params.nPreamble <<
+    ", crcEnabled: " << params.crcEnabled <<
+    ", lowDataRateOptimizationEnabled: " << params.lowDataRateOptimizationEnabled <<
+    ")";
 
   return os;
+}
 }
 }

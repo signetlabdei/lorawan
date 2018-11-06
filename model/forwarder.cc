@@ -22,6 +22,7 @@
 #include "ns3/log.h"
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("Forwarder");
 
@@ -109,4 +110,5 @@ Forwarder::StopApplication (void)
   // TODO Get rid of callbacks
 }
 
+}
 }

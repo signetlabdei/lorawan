@@ -31,6 +31,7 @@
 #include <list>
 
 namespace ns3 {
+namespace lorawan {
 
 class LoraChannel;
 
@@ -47,11 +48,10 @@ class LoraChannel;
 class GatewayLoraPhy : public LoraPhy
 {
 public:
-
   static TypeId GetTypeId (void);
 
-  GatewayLoraPhy();
-  virtual ~GatewayLoraPhy();
+  GatewayLoraPhy ();
+  virtual ~GatewayLoraPhy ();
 
   virtual void StartReceive (Ptr<Packet> packet, double rxPowerDbm, uint8_t sf,
                              Time duration, double frequencyMHz) = 0;
@@ -89,7 +89,6 @@ public:
   static const double sensitivity[6];
 
 protected:
-
   /**
    * This class represents a configurable reception path.
    *
@@ -101,7 +100,6 @@ protected:
   {
 
 public:
-
     /**
      * Constructor.
      *
@@ -109,7 +107,7 @@ public:
      */
     ReceptionPath (double frequencyMHz);
 
-    ~ReceptionPath();
+    ~ReceptionPath ();
 
     /**
      * Getter for the operating frequency.
@@ -176,7 +174,6 @@ public:
     void SetEndReceive (EventId endReceiveEventId);
 
 private:
-
     /**
      * The frequency this path is currently listening on, in MHz.
      */
@@ -231,4 +228,5 @@ private:
 
 } /* namespace ns3 */
 
+}
 #endif /* GATEWAY_LORA_PHY_H */

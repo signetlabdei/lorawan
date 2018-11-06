@@ -27,6 +27,7 @@
 #include "ns3/lora-net-device.h"
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("OneShotSender");
 
@@ -102,5 +103,6 @@ OneShotSender::StopApplication (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
   Simulator::Cancel (m_sendEvent);
+}
 }
 }

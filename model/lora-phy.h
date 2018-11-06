@@ -33,22 +33,23 @@
 #include <list>
 
 namespace ns3 {
+namespace lorawan {
 
 class LoraChannel;
 
 /**
-  * Structure to collect all parameters that are used to compute the duration of
-  * a packet (excluding payload length).
-  */
+ * Structure to collect all parameters that are used to compute the duration of
+ * a packet (excluding payload length).
+ */
 struct LoraTxParameters
 {
-  uint8_t sf = 7; //!< Spreading Factor
-  bool headerDisabled = 0; //!< Whether to use implicit header mode
-  uint8_t codingRate = 1; //!< Code rate (obtained as 4/(codingRate+4))
-  double bandwidthHz = 125000; //!< Bandwidth in Hz
-  uint32_t nPreamble = 8; //!< Number of preamble symbols
-  bool crcEnabled = 1; //!< Whether Cyclic Redundancy Check is enabled
-  bool lowDataRateOptimizationEnabled = 0; //!< Whether Low Data Rate Optimization is enabled
+  uint8_t sf = 7;     //!< Spreading Factor
+  bool headerDisabled = 0;     //!< Whether to use implicit header mode
+  uint8_t codingRate = 1;     //!< Code rate (obtained as 4/(codingRate+4))
+  double bandwidthHz = 125000;     //!< Bandwidth in Hz
+  uint32_t nPreamble = 8;     //!< Number of preamble symbols
+  bool crcEnabled = 1;     //!< Whether Cyclic Redundancy Check is enabled
+  bool lowDataRateOptimizationEnabled = 0;     //!< Whether Low Data Rate Optimization is enabled
 };
 
 /**
@@ -256,7 +257,7 @@ protected:
   Ptr<LoraChannel> m_channel; //!< The channel this PHY transmits on.
 
   LoraInterferenceHelper m_interference; //!< The LoraInterferenceHelper
-                                         //!associated to this PHY.
+  //!associated to this PHY.
 
   // Trace sources
 
@@ -325,4 +326,5 @@ protected:
 
 } /* namespace ns3 */
 
+}
 #endif /* LORA_PHY_H */

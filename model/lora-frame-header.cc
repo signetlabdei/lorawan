@@ -23,6 +23,7 @@
 #include <bitset>
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("LoraFrameHeader");
 
@@ -83,10 +84,10 @@ LoraFrameHeader::Serialize (Buffer::Iterator start) const
 
   // fCtrl field
   uint8_t fCtrl = 0;
-  fCtrl |= uint8_t (m_adr<<6 & 0b1000000);
-  fCtrl |= uint8_t (m_adrAckReq<<5 & 0b100000);
-  fCtrl |= uint8_t (m_ack<<4 & 0b10000);
-  fCtrl |= uint8_t (m_fPending<<3 & 0b1000);
+  fCtrl |= uint8_t (m_adr << 6 & 0b1000000);
+  fCtrl |= uint8_t (m_adrAckReq << 5 & 0b100000);
+  fCtrl |= uint8_t (m_ack << 4 & 0b10000);
+  fCtrl |= uint8_t (m_fPending << 3 & 0b1000);
   fCtrl |= m_fOptsLen & 0b111;
   start.WriteU8 (fCtrl);
 
@@ -306,7 +307,7 @@ LoraFrameHeader::Deserialize (Buffer::Iterator start)
 
   m_fPort = uint8_t (start.ReadU8 ());
 
-  return 8 + m_fOptsLen;   // the number of bytes consumed.
+  return 8 + m_fOptsLen;       // the number of bytes consumed.
 }
 
 void
@@ -373,7 +374,7 @@ LoraFrameHeader::GetAddress (void) const
 void
 LoraFrameHeader::SetAdr (bool adr)
 {
-  NS_LOG_FUNCTION(this << adr);
+  NS_LOG_FUNCTION (this << adr);
   m_adr = adr;
 }
 bool
@@ -593,4 +594,5 @@ LoraFrameHeader::AddCommand (Ptr<MacCommand> macCommand)
   m_fOptsLen += macCommand->GetSerializedSize ();
 }
 
+}
 }

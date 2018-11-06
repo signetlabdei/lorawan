@@ -27,6 +27,7 @@
 #include "ns3/attribute.h"
 
 namespace ns3 {
+namespace lorawan {
 
 class OneShotSender : public Application
 {
@@ -76,4 +77,5 @@ private:
 
 } //namespace ns3
 
+}
 #endif /* ONE_SHOT_APPLICATION */

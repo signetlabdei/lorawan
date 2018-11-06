@@ -27,6 +27,7 @@
 #include "ns3/lora-mac.h"
 
 namespace ns3 {
+namespace lorawan {
 
 class LoraChannel;
 class LoraPhy;
@@ -126,7 +127,6 @@ public:
   virtual bool SupportsSendFrom (void) const;
 
 protected:
-
   /**
    * Receive a packet from the lower layer and pass the
    * packet up the stack.
@@ -138,7 +138,6 @@ protected:
   void ForwardUp (Ptr<Packet> packet, Mac48Address from, Mac48Address to);
 
 private:
-
   /**
    * Return the LoraChannel this device is connected to.
    */
@@ -164,4 +163,5 @@ private:
 
 } //namespace ns3
 
+}
 #endif /* LORA_NET_DEVICE_H */

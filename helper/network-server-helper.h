@@ -33,6 +33,7 @@
 #include <string>
 
 namespace ns3 {
+namespace lorawan {
 
 /**
  * This class can install Network Server applications on multiple nodes at once.
@@ -61,7 +62,6 @@ public:
   void SetEndDevices (NodeContainer endDevices);
 
 private:
-
   void InstallComponents (Ptr<NetworkServer> netServer);
   Ptr<Application> InstallPriv (Ptr<Node> node);
 
@@ -76,4 +76,5 @@ private:
 
 } // namespace ns3
 
+}
 #endif /* NETWORK_SERVER_HELPER_H */

@@ -26,11 +26,13 @@
 #include "ns3/buffer.h"
 
 namespace ns3 {
+namespace lorawan {
 
 /**
-  * Enum for every possible command type
-  */
-enum MacCommandType {
+ * Enum for every possible command type
+ */
+enum MacCommandType
+{
   INVALID,
   LINK_CHECK_REQ,
   LINK_CHECK_ANS,
@@ -62,11 +64,10 @@ enum MacCommandType {
 class MacCommand : public Object
 {
 public:
-
   static TypeId GetTypeId (void);
 
-  MacCommand();
-  virtual ~MacCommand();
+  MacCommand ();
+  virtual ~MacCommand ();
 
   /**
    * Serialize the contents of this MAC command into a buffer, according to the
@@ -113,7 +114,6 @@ public:
   static uint8_t GetCIDFromMacCommand (enum MacCommandType commandType);
 
 protected:
-
   /**
    * The type of this command.
    */
@@ -127,14 +127,13 @@ protected:
 };
 
 /**
-  * Implementation of the LinkCheckReq LoRaWAN MAC command.
-  *
-  * This command holds no variables, and just consists in the CID.
-  */
+ * Implementation of the LinkCheckReq LoRaWAN MAC command.
+ *
+ * This command holds no variables, and just consists in the CID.
+ */
 class LinkCheckReq : public MacCommand
 {
 public:
-
   LinkCheckReq ();
   ~LinkCheckReq ();
   virtual void Serialize (Buffer::Iterator &start) const;
@@ -143,15 +142,14 @@ public:
 };
 
 /**
-  * Implementation of the LinkCheckAns LoRaWAN MAC command.
-  *
-  * This command contains the demodulation margin and the number of receiving
-  * gateways of the packet containing the LinkCheckReq command.
-  */
+ * Implementation of the LinkCheckAns LoRaWAN MAC command.
+ *
+ * This command contains the demodulation margin and the number of receiving
+ * gateways of the packet containing the LinkCheckReq command.
+ */
 class LinkCheckAns : public MacCommand
 {
 public:
-
   LinkCheckAns ();
   LinkCheckAns (uint8_t margin, uint8_t gwCnt);
 
@@ -193,7 +191,6 @@ public:
   void IncrementGwCnt (void);
 
 private:
-
   /**
    * This MAC command's demodulation margin value.
    */
@@ -206,16 +203,15 @@ private:
 };
 
 /**
-  * Implementation of the LinkAdrReq LoRaWAN MAC command.
-  *
-  * With this command, the network server can request a device to change its
-  * data rate, transmission power and the channel it uses for uplink
-  * transmissions.
-  */
+ * Implementation of the LinkAdrReq LoRaWAN MAC command.
+ *
+ * With this command, the network server can request a device to change its
+ * data rate, transmission power and the channel it uses for uplink
+ * transmissions.
+ */
 class LinkAdrReq : public MacCommand
 {
 public:
-
   LinkAdrReq ();
 
   LinkAdrReq (uint8_t dataRate, uint8_t txPower, uint16_t channelMask,
@@ -289,12 +285,12 @@ private:
 };
 
 /**
-  * Implementation of the DutyCycleReq LoRaWAN MAC command.
-  *
-  * With this command, the network server can limit the maximum aggregated
-  * transmit duty cycle of an end device. The aggregate duty cycle is computed
-  * as the duty cycle among all sub bands.
-  */
+ * Implementation of the DutyCycleReq LoRaWAN MAC command.
+ *
+ * With this command, the network server can limit the maximum aggregated
+ * transmit duty cycle of an end device. The aggregate duty cycle is computed
+ * as the duty cycle among all sub bands.
+ */
 class DutyCycleReq : public MacCommand
 {
 public:
@@ -337,8 +333,8 @@ public:
 };
 
 /**
-  * Implementation of the RxParamSetupReq LoRaWAN MAC command.
-  */
+ * Implementation of the RxParamSetupReq LoRaWAN MAC command.
+ */
 class RxParamSetupReq : public MacCommand
 {
 public:
@@ -381,7 +377,7 @@ public:
 private:
   uint8_t m_rx1DrOffset;
   uint8_t m_rx2DataRate;
-  double m_frequency; //!< The frequency _in Hz_
+  double m_frequency;     //!< The frequency _in Hz_
 };
 
 /**
@@ -615,4 +611,5 @@ private:
 };
 }
 
+}
 #endif /* DEVICE_STATUS_H */

@@ -24,6 +24,7 @@
 #include <cmath>
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("MacCommand");
 
@@ -149,7 +150,7 @@ LinkCheckReq::Serialize (Buffer::Iterator &start) const
   // Write the CID and we're done
   uint8_t cid = GetCIDFromMacCommand (m_commandType);
   start.WriteU8 (cid);
-  NS_LOG_DEBUG ("Serialized LinkCheckReq: "<< unsigned (cid));
+  NS_LOG_DEBUG ("Serialized LinkCheckReq: " << unsigned (cid));
 }
 
 uint8_t
@@ -363,7 +364,7 @@ LinkAdrReq::GetEnabledChannelsList (void)
   std::list<int> channelIndices;
   for (int i = 0; i < 16; i++)
     {
-      if ((m_channelMask & (0b1 << i)) >> i) // Take channel mask's i-th bit
+      if ((m_channelMask & (0b1 << i)) >> i)     // Take channel mask's i-th bit
         {
           channelIndices.push_back (i);
         }
@@ -509,7 +510,7 @@ DutyCycleReq::GetMaximumAllowedDutyCycle (void) const
       return 1;
     }
 
-  return 1/std::pow (2,double(m_maxDCycle));
+  return 1 / std::pow (2,double(m_maxDCycle));
 }
 
 //////////////////
@@ -594,12 +595,12 @@ RxParamSetupReq::Serialize (Buffer::Iterator &start) const
   start.WriteU8 (GetCIDFromMacCommand (m_commandType));
   // Data serialization
   start.WriteU8 ((m_rx1DrOffset & 0b111) << 4 | (m_rx2DataRate & 0b1111));
-  uint32_t encodedFrequency = uint32_t (m_frequency/100);
+  uint32_t encodedFrequency = uint32_t (m_frequency / 100);
   NS_LOG_DEBUG (unsigned (encodedFrequency));
   NS_LOG_DEBUG (std::bitset<32> (encodedFrequency));
-  start.WriteU8 ((encodedFrequency & 0xff0000) >> 16); // Most significant byte
-  start.WriteU8 ((encodedFrequency & 0xff00) >> 8); // Middle byte
-  start.WriteU8 (encodedFrequency & 0xff); // Least significant byte
+  start.WriteU8 ((encodedFrequency & 0xff0000) >> 16);     // Most significant byte
+  start.WriteU8 ((encodedFrequency & 0xff00) >> 8);     // Middle byte
+  start.WriteU8 (encodedFrequency & 0xff);     // Least significant byte
 }
 
 uint8_t
@@ -868,7 +869,7 @@ NewChannelReq::Serialize (Buffer::Iterator &start) const
   start.WriteU8 (GetCIDFromMacCommand (m_commandType));
 
   start.WriteU8 (m_chIndex);
-  uint32_t encodedFrequency = uint32_t (m_frequency/100);
+  uint32_t encodedFrequency = uint32_t (m_frequency / 100);
   start.WriteU8 ((encodedFrequency & 0xff0000) >> 16);
   start.WriteU8 ((encodedFrequency & 0xff00) >> 8);
   start.WriteU8 (encodedFrequency & 0xff);
@@ -1219,4 +1220,5 @@ TxParamSetupAns::Print (std::ostream &os) const
   os << "TxParamSetupAns" << std::endl;
 }
 
+}
 }

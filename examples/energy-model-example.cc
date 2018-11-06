@@ -24,6 +24,7 @@
 #include <ctime>
 
 using namespace ns3;
+using namespace lorawan;
 
 NS_LOG_COMPONENT_DEFINE ("LoraEnergyModelExample");
 

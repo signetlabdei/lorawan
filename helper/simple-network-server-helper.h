@@ -32,12 +32,13 @@
 #include <string>
 
 namespace ns3 {
+namespace lorawan {
 
 /**
  * This class can install Network Server applications on multiple nodes at once.
  */
-  class SimpleNetworkServerHelper
-  {
+class SimpleNetworkServerHelper
+{
 public:
   SimpleNetworkServerHelper ();
 
@@ -73,4 +74,5 @@ private:
 
 } // namespace ns3
 
+}
 #endif /* SIMPLE_NETWORK_SERVER_HELPER_H */

@@ -27,47 +27,49 @@
 #include "ns3/network-controller-components.h"
 
 namespace ns3 {
+namespace lorawan {
 
-  class NetworkStatus;
-  class NetworkControllerComponent;
+class NetworkStatus;
+class NetworkControllerComponent;
+
+/**
+ * This class collects a series of components that deal with various aspects
+ * of managing the network, and queries them for action when a new packet is
+ * received or other events occur in the network.
+ */
+class NetworkController : public Object
+{
+public:
+  static TypeId GetTypeId (void);
+
+  NetworkController ();
+  NetworkController (Ptr<NetworkStatus> networkStatus);
+  virtual ~NetworkController ();
 
   /**
-   * This class collects a series of components that deal with various aspects
-   * of managing the network, and queries them for action when a new packet is
-   * received or other events occur in the network.
+   * Add a new NetworkControllerComponent
    */
-  class NetworkController : public Object
-  {
-  public:
-    static TypeId GetTypeId (void);
+  void Install (Ptr<NetworkControllerComponent> component);
 
-    NetworkController();
-    NetworkController(Ptr<NetworkStatus> networkStatus);
-    virtual ~NetworkController();
+  /**
+   * Method that is called by the NetworkServer when a new packet is received.
+   *
+   * \param packet The newly received packet.
+   */
+  void OnNewPacket (Ptr<Packet const> packet);
 
-    /**
-     * Add a new NetworkControllerComponent
-     */
-    void Install(Ptr<NetworkControllerComponent> component);
+  /**
+   * Method that is called by the NetworkScheduler just before sending a reply
+   * to a certain End Device.
+   */
+  void BeforeSendingReply (Ptr<EndDeviceStatus> endDeviceStatus);
 
-    /**
-     * Method that is called by the NetworkServer when a new packet is received.
-     *
-     * \param packet The newly received packet.
-     */
-    void OnNewPacket (Ptr<Packet const> packet);
-
-    /**
-     * Method that is called by the NetworkScheduler just before sending a reply
-     * to a certain End Device.
-     */
-    void BeforeSendingReply (Ptr<EndDeviceStatus> endDeviceStatus);
-
-  private:
-    Ptr<NetworkStatus> m_status;
-    std::list<Ptr<NetworkControllerComponent> > m_components;
-  };
+private:
+  Ptr<NetworkStatus> m_status;
+  std::list<Ptr<NetworkControllerComponent> > m_components;
+};
 
 } /* namespace ns3 */
 
+}
 #endif /* NETWORK_CONTROLLER_H */

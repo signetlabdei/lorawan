@@ -28,6 +28,7 @@
 #include "ns3/log.h"
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("PeriodicSenderHelper");
 
@@ -103,20 +104,26 @@ PeriodicSenderHelper::InstallPriv (Ptr<Node> node) const
         {
           interval = Hours (1);
         }
-      else interval = Minutes (30);
+      else
+        {
+          interval = Minutes (30);
+        }
     }
-  else interval = m_period;
+  else
+    {
+      interval = m_period;
+    }
 
   app->SetInterval (interval);
   NS_LOG_DEBUG ("Created an application with interval = " <<
                 interval.GetHours () << " hours");
 
   app->SetInitialDelay (Seconds (m_initialDelay->GetValue (0, interval.GetSeconds ())));
-  app -> SetPacketSize (m_pktSize);
+  app->SetPacketSize (m_pktSize);
   if (m_pktSizeRV)
-  {
-    app -> SetPacketSizeRandomVariable (m_pktSizeRV);
-  }
+    {
+      app->SetPacketSizeRandomVariable (m_pktSizeRV);
+    }
 
   app->SetNode (node);
   node->AddApplication (app);
@@ -130,16 +137,17 @@ PeriodicSenderHelper::SetPeriod (Time period)
   m_period = period;
 }
 
- void
- PeriodicSenderHelper::SetPacketSizeRandomVariable (Ptr <RandomVariableStream> rv)
- {
-   m_pktSizeRV = rv;
- }
+void
+PeriodicSenderHelper::SetPacketSizeRandomVariable (Ptr <RandomVariableStream> rv)
+{
+  m_pktSizeRV = rv;
+}
 
- void
- PeriodicSenderHelper::SetPacketSize (uint8_t size)
- {
-   m_pktSize = size;
- }
+void
+PeriodicSenderHelper::SetPacketSize (uint8_t size)
+{
+  m_pktSize = size;
+}
 
+}
 } // namespace ns3

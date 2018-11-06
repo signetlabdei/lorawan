@@ -32,6 +32,7 @@
 #include <string>
 
 namespace ns3 {
+namespace lorawan {
 
 /**
  * This class can be used to install Forwarder applications on a set of
@@ -58,4 +59,5 @@ private:
 
 } // namespace ns3
 
+}
 #endif /* FORWARDER_HELPER_H */

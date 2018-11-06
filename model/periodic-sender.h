@@ -27,6 +27,7 @@
 #include "ns3/attribute.h"
 
 namespace ns3 {
+namespace lorawan {
 
 class PeriodicSender : public Application
 {
@@ -115,5 +116,5 @@ private:
 
 } //namespace ns3
 
+}
 #endif /* SENDER_APPLICATION */
-

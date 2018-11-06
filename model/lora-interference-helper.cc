@@ -23,6 +23,7 @@
 #include <limits>
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("LoraInterferenceHelper");
 
@@ -97,8 +98,8 @@ void
 LoraInterferenceHelper::Event::Print (std::ostream &stream) const
 {
   stream << "(" << m_startTime.GetSeconds () << " s - " <<
-  m_endTime.GetSeconds () << " s), SF" << unsigned(m_sf) << ", " <<
-  m_rxPowerdBm << " dBm, "<< m_frequencyMHz << " MHz";
+    m_endTime.GetSeconds () << " s), SF" << unsigned(m_sf) << ", " <<
+    m_rxPowerdBm << " dBm, " << m_frequencyMHz << " MHz";
 }
 
 std::ostream &operator << (std::ostream &os, const LoraInterferenceHelper::Event &event)
@@ -154,13 +155,13 @@ LoraInterferenceHelper::~LoraInterferenceHelper ()
 // Goursaud's paper.
 const double LoraInterferenceHelper::collisionSnir[6][6] =
 {
-// SF7  SF8  SF9  SF10 SF11 SF12
-  {  6, -16, -18, -19, -19, -20},  // SF7
-  {-24,   6, -20, -22, -22, -22},  // SF8
-  {-27, -27,   6, -23, -25, -25},  // SF9
-  {-30, -30, -30,   6, -26, -28},  // SF10
-  {-33, -33, -33, -33,   6, -29},  // SF11
-  {-36, -36, -36, -36, -36,   6}   // SF12
+  // SF7  SF8  SF9  SF10 SF11 SF12
+  {  6, -16, -18, -19, -19, -20},       // SF7
+  {-24,   6, -20, -22, -22, -22},       // SF8
+  {-27, -27,   6, -23, -25, -25},       // SF9
+  {-30, -30, -30,   6, -26, -28},       // SF10
+  {-33, -33, -33, -33,   6, -29},       // SF11
+  {-36, -36, -36, -36, -36,   6}        // SF12
 };
 
 Time LoraInterferenceHelper::oldEventThreshold = Seconds (2);
@@ -269,7 +270,7 @@ LoraInterferenceHelper::IsDestroyedByInterference
         {
           NS_LOG_DEBUG ("Different channel or same event");
           it++;
-          continue;   // Continues from the first line inside the for cycle
+          continue;       // Continues from the first line inside the for cycle
         }
 
       NS_LOG_DEBUG ("Interferer on same channel");
@@ -293,10 +294,10 @@ LoraInterferenceHelper::IsDestroyedByInterference
       // Compute the equivalent energy of the interference
       // Power [mW] = 10^(Power[dBm]/10)
       // Power [W] = Power [mW] / 1000
-      double interfererPowerW = pow (10, interfererPower/10) / 1000;
+      double interfererPowerW = pow (10, interfererPower / 10) / 1000;
       // Energy [J] = Time [s] * Power [W]
       double interferenceEnergy = overlap.GetSeconds () * interfererPowerW;
-      cumulativeInterferenceEnergy.at (unsigned(interfererSf)-7) += interferenceEnergy;
+      cumulativeInterferenceEnergy.at (unsigned(interfererSf) - 7) += interferenceEnergy;
       NS_LOG_DEBUG ("Interferer power in W: " << interfererPowerW);
       NS_LOG_DEBUG ("Interference energy: " << interferenceEnergy);
       it++;
@@ -306,20 +307,20 @@ LoraInterferenceHelper::IsDestroyedByInterference
   for (uint8_t currentSf = uint8_t (7); currentSf <= uint8_t (12); currentSf++)
     {
       NS_LOG_DEBUG ("Cumulative Interference Energy: " <<
-                    cumulativeInterferenceEnergy.at (unsigned(currentSf)-7));
+                    cumulativeInterferenceEnergy.at (unsigned(currentSf) - 7));
 
       // Use the computed cumulativeInterferenceEnergy to determine whether the
       // interference with this SF destroys the packet
-      double signalPowerW = pow (10, rxPowerDbm/10) / 1000;
+      double signalPowerW = pow (10, rxPowerDbm / 10) / 1000;
       double signalEnergy = duration.GetSeconds () * signalPowerW;
       NS_LOG_DEBUG ("Signal power in W: " << signalPowerW);
       NS_LOG_DEBUG ("Signal energy: " << signalEnergy);
 
       // Check whether the packet survives the interference of this SF
-      double snirIsolation = collisionSnir [unsigned(sf)-7][unsigned(currentSf)-7];
+      double snirIsolation = collisionSnir [unsigned(sf) - 7][unsigned(currentSf) - 7];
       NS_LOG_DEBUG ("The needed isolation to survive is "
                     << snirIsolation << " dB");
-      double snir = 10*log10 (signalEnergy/cumulativeInterferenceEnergy.at (unsigned(currentSf)-7));
+      double snir = 10 * log10 (signalEnergy / cumulativeInterferenceEnergy.at (unsigned(currentSf) - 7));
       NS_LOG_DEBUG ("The current SNIR is " << snir << " dB");
 
       if (snir >= snirIsolation)
@@ -360,9 +361,9 @@ LoraInterferenceHelper::GetOverlapTime (Ptr<LoraInterferenceHelper::Event> event
   Time overlap;
 
   // Get handy values
-  Time s1 = event1->GetStartTime (); // Start times
+  Time s1 = event1->GetStartTime ();     // Start times
   Time s2 = event2->GetStartTime ();
-  Time e1 = event1->GetEndTime ();   // End times
+  Time e1 = event1->GetEndTime ();       // End times
   Time e2 = event2->GetEndTime ();
 
   // Non-overlapping events
@@ -387,8 +388,9 @@ LoraInterferenceHelper::GetOverlapTime (Ptr<LoraInterferenceHelper::Event> event
           overlap = e2 - s1;
         }
     }
-   
+
   return overlap;
+}
 }
 }
 /*
@@ -396,43 +398,44 @@ LoraInterferenceHelper::GetOverlapTime (Ptr<LoraInterferenceHelper::Event> event
 
   // Event1 starts before Event2
   if (s1 < s2)
-    {
-      // Non-overlapping events
-      if (e1 < s2)
-        {
-          overlap = Seconds (0);
-        }
-      // event1 contains event2
-      else if (e1 >= e2)
-        {
-          overlap = e2 - s2;
-        }
-      // Partially overlapping events
-      else
-        {
-          overlap = e1 - s2;
-        }
-    }
+  {
+  // Non-overlapping events
+  if (e1 < s2)
+  {
+  overlap = Seconds (0);
+  }
+  // event1 contains event2
+  else if (e1 >= e2)
+  {
+  overlap = e2 - s2;
+  }
+  // Partially overlapping events
+  else
+  {
+  overlap = e1 - s2;
+  }
+  }
   // Event2 starts before Event1
   else
-    {
-      // Non-overlapping events
-      if (e2 < s1)
-        {
-          overlap = Seconds (0);
-        }
-      // event2 contains event1
-      else if (e2 >= e1)
-        {
-          overlap = e1 - s1;
-        }
-      // Partially overlapping events
-      else
-        {
-          overlap = e2 - s1;
-        }
-    }
+  {
+  // Non-overlapping events
+  if (e2 < s1)
+  {
+  overlap = Seconds (0);
+  }
+  // event2 contains event1
+  else if (e2 >= e1)
+  {
+  overlap = e1 - s1;
+  }
+  // Partially overlapping events
+  else
+  {
+  overlap = e2 - s1;
+  }
+  }
   return overlap;
-}
-}
+  }
+  }
+  }
 */

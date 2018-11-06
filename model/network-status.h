@@ -30,88 +30,90 @@
 #include "ns3/network-scheduler.h"
 
 namespace ns3 {
+namespace lorawan {
+
+/**
+ * This class represents the knowledge about the state of the network that is
+ * available at the Network Server. It is essentially a collection of two maps:
+ * one containing DeviceStatus objects, and the other containing GatewayStatus
+ * objects.
+ *
+ * This class is meant to be queried by NetworkController components, which
+ * can decide to take action based on the current status of the network.
+ */
+class NetworkStatus : public Object
+{
+public:
+  static TypeId GetTypeId (void);
+
+  NetworkStatus ();
+  virtual ~NetworkStatus ();
 
   /**
-   * This class represents the knowledge about the state of the network that is
-   * available at the Network Server. It is essentially a collection of two maps:
-   * one containing DeviceStatus objects, and the other containing GatewayStatus
-   * objects.
-   *
-   * This class is meant to be queried by NetworkController components, which
-   * can decide to take action based on the current status of the network.
+   * Add a device to the ones that are tracked by this NetworkStatus object.
    */
-  class NetworkStatus : public Object
-  {
-  public:
-    static TypeId GetTypeId (void);
+  void AddNode (Ptr<EndDeviceLoraMac> edMac);
 
-    NetworkStatus ();
-    virtual ~NetworkStatus ();
+  /**
+   * Add this gateway to the list of gateways connected to the network.
+   *
+   * Each GW is identified by its Address in the NS-GW network.
+   */
+  void AddGateway (Address& address, Ptr<GatewayStatus> gwStatus);
 
-    /**
-     * Add a device to the ones that are tracked by this NetworkStatus object.
-     */
-    void AddNode (Ptr<EndDeviceLoraMac> edMac);
+  /**
+   * Update network status on the received packet.
+   *
+   * \param packet the received packet.
+   * \param address the gateway this packet was received from.
+   */
+  void OnReceivedPacket (Ptr<const Packet> packet, const Address& gwaddress);
 
-    /**
-     * Add this gateway to the list of gateways connected to the network.
-     *
-     * Each GW is identified by its Address in the NS-GW network.
-     */
-    void AddGateway (Address& address, Ptr<GatewayStatus> gwStatus);
+  /**
+   * Return whether the specified device needs a reply.
+   *
+   * \param deviceAddress the address of the device we are interested in.
+   */
+  bool NeedsReply (LoraDeviceAddress deviceAddress);
 
-    /**
-     * Update network status on the received packet.
-     *
-     * \param packet the received packet.
-     * \param address the gateway this packet was received from.
-     */
-    void OnReceivedPacket (Ptr<const Packet> packet, const Address& gwaddress);
+  /**
+   * Return whether we have a gateway that is available to send a reply to the
+   * specified device.
+   *
+   * \param deviceAddress the address of the device we are interested in.
+   */
+  Address GetBestGatewayForDevice (LoraDeviceAddress deviceAddress);
 
-    /**
-     * Return whether the specified device needs a reply.
-     *
-     * \param deviceAddress the address of the device we are interested in.
-     */
-    bool NeedsReply (LoraDeviceAddress deviceAddress);
+  /**
+   * Send a packet through a Gateway.
+   *
+   * This function assumes that the packet is already tagged with a LoraTag
+   * that will inform the gateway of the parameters to use for the
+   * transmission.
+   */
+  void SendThroughGateway (Ptr<Packet> packet, Address gwAddress);
 
-    /**
-     * Return whether we have a gateway that is available to send a reply to the
-     * specified device.
-     *
-     * \param deviceAddress the address of the device we are interested in.
-     */
-    Address GetBestGatewayForDevice (LoraDeviceAddress deviceAddress);
+  /**
+   * Get the reply for the specified device address.
+   */
+  Ptr<Packet> GetReplyForDevice (LoraDeviceAddress edAddress, int windowNumber);
 
-    /**
-     * Send a packet through a Gateway.
-     *
-     * This function assumes that the packet is already tagged with a LoraTag
-     * that will inform the gateway of the parameters to use for the
-     * transmission.
-     */
-    void SendThroughGateway (Ptr<Packet> packet, Address gwAddress);
+  /**
+   * Get the EndDeviceStatus for the device that sent a packet.
+   */
+  Ptr<EndDeviceStatus> GetEndDeviceStatus (Ptr<Packet const> packet);
 
-    /**
-     * Get the reply for the specified device address.
-     */
-    Ptr<Packet> GetReplyForDevice(LoraDeviceAddress edAddress, int windowNumber);
+  /**
+   * Get the EndDeviceStatus corresponding to a LoraDeviceAddress.
+   */
+  Ptr<EndDeviceStatus> GetEndDeviceStatus (LoraDeviceAddress address);
 
-    /**
-     * Get the EndDeviceStatus for the device that sent a packet.
-     */
-    Ptr<EndDeviceStatus> GetEndDeviceStatus(Ptr<Packet const> packet);
-
-    /**
-     * Get the EndDeviceStatus corresponding to a LoraDeviceAddress.
-     */
-    Ptr<EndDeviceStatus> GetEndDeviceStatus(LoraDeviceAddress address);
-
-  public:
-    std::map<LoraDeviceAddress, Ptr<EndDeviceStatus> > m_endDeviceStatuses;
-    std::map<Address, Ptr<GatewayStatus>> m_gatewayStatuses;
-  };
+public:
+  std::map<LoraDeviceAddress, Ptr<EndDeviceStatus> > m_endDeviceStatuses;
+  std::map<Address, Ptr<GatewayStatus> > m_gatewayStatuses;
+};
 
 } /* namespace ns3 */
 
+}
 #endif /* NETWORK_STATUS_H */

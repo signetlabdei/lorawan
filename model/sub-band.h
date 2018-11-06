@@ -26,6 +26,7 @@
 #include "ns3/nstime.h"
 
 namespace ns3 {
+namespace lorawan {
 
 class LogicalLoraChannel;
 
@@ -36,7 +37,6 @@ class LogicalLoraChannel;
 class SubBand : public Object
 {
 public:
-
   static TypeId GetTypeId (void);
 
   SubBand ();
@@ -128,7 +128,6 @@ public:
   double GetMaxTxPowerDbm (void);
 
 private:
-
   double m_firstFrequency;   //!< Starting frequency of the subband, in MHz
   double m_lastFrequency;   //!< Ending frequency of the subband, in MHz
   double m_dutyCycle;   //!< The duty cycle that needs to be enforced on this subband
@@ -136,4 +135,5 @@ private:
   double m_maxTxPowerDbm;   //!< The maximum transmission power that is admitted on this subband
 };
 } /* namespace ns3 */
+}
 #endif /* SUB_BAND_H */

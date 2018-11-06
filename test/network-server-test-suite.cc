@@ -20,6 +20,7 @@
 #include "ns3/test.h"
 
 using namespace ns3;
+using namespace lorawan;
 
 NS_LOG_COMPONENT_DEFINE ("NetworkServerTestSuite");
 
@@ -63,7 +64,7 @@ UplinkPacketTest::ReceivedPacket (Ptr<Packet const> packet)
 void
 UplinkPacketTest::SendPacket (Ptr<Node> endDevice)
 {
-  endDevice->GetDevice(0)->Send(Create<Packet> (20), Address(), 0);
+  endDevice->GetDevice (0)->Send (Create<Packet> (20), Address (), 0);
 }
 
 // This method is the pure virtual method from class TestCase that every
@@ -74,7 +75,7 @@ UplinkPacketTest::DoRun (void)
   NS_LOG_DEBUG ("UplinkPacketTest");
 
   // Create a bunch of actual devices
-  NetworkComponents components = InitializeNetwork(1, 1);
+  NetworkComponents components = InitializeNetwork (1, 1);
 
   Ptr<LoraChannel> channel = components.channel;
   NodeContainer endDevices = components.endDevices;
@@ -82,19 +83,19 @@ UplinkPacketTest::DoRun (void)
   Ptr<Node> nsNode = components.nsNode;
 
   // Connect the trace source for received packets
-  nsNode->GetApplication (0)-> TraceConnectWithoutContext
+  nsNode->GetApplication (0)->TraceConnectWithoutContext
     ("ReceivedPacket",
-     MakeCallback
-     (&UplinkPacketTest::ReceivedPacket,
+    MakeCallback
+      (&UplinkPacketTest::ReceivedPacket,
       this));
 
   // Send a packet
-  Simulator::Schedule(Seconds(1), &UplinkPacketTest::SendPacket, this,
-                      endDevices.Get(0));
+  Simulator::Schedule (Seconds (1), &UplinkPacketTest::SendPacket, this,
+                       endDevices.Get (0));
 
-  Simulator::Stop(Seconds(5));
-  Simulator::Run();
-  Simulator::Destroy();
+  Simulator::Stop (Seconds (5));
+  Simulator::Run ();
+  Simulator::Destroy ();
 
   // Check that we received the packet
   NS_ASSERT (m_receivedPacket == true);
@@ -147,7 +148,7 @@ DownlinkPacketTest::SendPacket (Ptr<Node> endDevice, bool requestAck)
         ()->GetObject<EndDeviceLoraMac> ()->SetMType
         (LoraMacHeader::CONFIRMED_DATA_UP);
     }
-  endDevice->GetDevice(0)->Send(Create<Packet> (20), Address(), 0);
+  endDevice->GetDevice (0)->Send (Create<Packet> (20), Address (), 0);
 }
 
 // This method is the pure virtual method from class TestCase that every
@@ -158,7 +159,7 @@ DownlinkPacketTest::DoRun (void)
   NS_LOG_DEBUG ("DownlinkPacketTest");
 
   // Create a bunch of actual devices
-  NetworkComponents components = InitializeNetwork(1, 1);
+  NetworkComponents components = InitializeNetwork (1, 1);
 
   Ptr<LoraChannel> channel = components.channel;
   NodeContainer endDevices = components.endDevices;
@@ -166,15 +167,15 @@ DownlinkPacketTest::DoRun (void)
   Ptr<Node> nsNode = components.nsNode;
 
   // Connect the ED's trace source for received packets
-  endDevices.Get(0)->GetDevice(0)->GetObject<LoraNetDevice>()->GetMac()->GetObject<EndDeviceLoraMac>()->TraceConnectWithoutContext("RequiredTransmissions", MakeCallback (&DownlinkPacketTest::ReceivedPacketAtEndDevice, this));
+  endDevices.Get (0)->GetDevice (0)->GetObject<LoraNetDevice>()->GetMac ()->GetObject<EndDeviceLoraMac>()->TraceConnectWithoutContext ("RequiredTransmissions", MakeCallback (&DownlinkPacketTest::ReceivedPacketAtEndDevice, this));
 
   // Send a packet in uplink
-  Simulator::Schedule(Seconds(1), &DownlinkPacketTest::SendPacket, this,
-                      endDevices.Get(0), true);
+  Simulator::Schedule (Seconds (1), &DownlinkPacketTest::SendPacket, this,
+                       endDevices.Get (0), true);
 
-  Simulator::Stop(Seconds(10)); // Allow for time to receive a downlink packet
-  Simulator::Run();
-  Simulator::Destroy();
+  Simulator::Stop (Seconds (10)); // Allow for time to receive a downlink packet
+  Simulator::Run ();
+  Simulator::Destroy ();
 
   NS_ASSERT (m_receivedPacketAtEd);
 }
@@ -225,16 +226,16 @@ void
 LinkCheckTest::SendPacket (Ptr<Node> endDevice, bool requestAck)
 {
   Ptr<EndDeviceLoraMac> macLayer = endDevice->GetDevice
-    (0)->GetObject<LoraNetDevice> ()->GetMac ()->GetObject<EndDeviceLoraMac> ();
+      (0)->GetObject<LoraNetDevice> ()->GetMac ()->GetObject<EndDeviceLoraMac> ();
 
   if (requestAck)
     {
       macLayer->SetMType (LoraMacHeader::CONFIRMED_DATA_UP);
     }
 
-  macLayer->AddMacCommand(Create<LinkCheckReq> ());
+  macLayer->AddMacCommand (Create<LinkCheckReq> ());
 
-  endDevice->GetDevice(0)->Send(Create<Packet> (20), Address(), 0);
+  endDevice->GetDevice (0)->Send (Create<Packet> (20), Address (), 0);
 }
 
 // This method is the pure virtual method from class TestCase that every
@@ -245,7 +246,7 @@ LinkCheckTest::DoRun (void)
   NS_LOG_DEBUG ("LinkCheckTest");
 
   // Create a bunch of actual devices
-  NetworkComponents components = InitializeNetwork(1, 1);
+  NetworkComponents components = InitializeNetwork (1, 1);
 
   Ptr<LoraChannel> channel = components.channel;
   NodeContainer endDevices = components.endDevices;
@@ -253,15 +254,15 @@ LinkCheckTest::DoRun (void)
   Ptr<Node> nsNode = components.nsNode;
 
   // Connect the ED's trace source for Last known Gateway Count
-  endDevices.Get(0)->GetDevice(0)->GetObject<LoraNetDevice>()->GetMac()->GetObject<EndDeviceLoraMac>()->TraceConnectWithoutContext("LastKnownGatewayCount", MakeCallback (&LinkCheckTest::LastKnownGatewayCount, this));
+  endDevices.Get (0)->GetDevice (0)->GetObject<LoraNetDevice>()->GetMac ()->GetObject<EndDeviceLoraMac>()->TraceConnectWithoutContext ("LastKnownGatewayCount", MakeCallback (&LinkCheckTest::LastKnownGatewayCount, this));
 
   // Send a packet in uplink
-  Simulator::Schedule(Seconds(1), &LinkCheckTest::SendPacket, this,
-                      endDevices.Get(0), true);
+  Simulator::Schedule (Seconds (1), &LinkCheckTest::SendPacket, this,
+                       endDevices.Get (0), true);
 
-  Simulator::Stop(Seconds(10)); // Allow for time to receive a downlink packet
-  Simulator::Run();
-  Simulator::Destroy();
+  Simulator::Stop (Seconds (10)); // Allow for time to receive a downlink packet
+  Simulator::Run ();
+  Simulator::Destroy ();
 
   NS_ASSERT (m_receivedPacketAtEd);
 }

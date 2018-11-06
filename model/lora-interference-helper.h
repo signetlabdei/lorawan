@@ -31,14 +31,15 @@
 #include <list>
 
 namespace ns3 {
+namespace lorawan {
 
 /**
-  * Helper for LoraPhy that manages interference calculations.
-  *
-  * This class keeps a list of signals that are impinging on the antenna of the
-  * device, in order to compute which ones can be correctly received and which
-  * ones are lost due to interference.
-  */
+ * Helper for LoraPhy that manages interference calculations.
+ *
+ * This class keeps a list of signals that are impinging on the antenna of the
+ * device, in order to compute which ones can be correctly received and which
+ * ones are lost due to interference.
+ */
 class LoraInterferenceHelper
 {
 public:
@@ -52,7 +53,6 @@ public:
   {
 
 public:
-
     Event (Time duration, double rxPowerdBm, uint8_t spreadingFactor,
            Ptr<Packet> packet, double frequencyMHz);
     ~Event ();
@@ -98,7 +98,6 @@ public:
     void Print (std::ostream &stream) const;
 
 private:
-
     /**
      * The time this signal begins (at the device).
      */
@@ -133,8 +132,8 @@ private:
 
   static TypeId GetTypeId (void);
 
-  LoraInterferenceHelper();
-  virtual ~LoraInterferenceHelper();
+  LoraInterferenceHelper ();
+  virtual ~LoraInterferenceHelper ();
 
   /**
    * Add an event to the InterferenceHelper
@@ -197,7 +196,6 @@ private:
   void CleanOldEvents (void);
 
 private:
-
   /**
    * A list of the events this LoraInterferenceHelper is keeping track of.
    */
@@ -223,4 +221,5 @@ std::ostream &operator << (std::ostream &os, const
                            LoraInterferenceHelper::Event &event);
 }
 
+}
 #endif /* LORA_INTERFERENCE_HELPER_H */

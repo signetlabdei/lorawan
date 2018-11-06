@@ -30,14 +30,14 @@
 #include "ns3/lora-mac.h"
 
 namespace ns3 {
+namespace lorawan {
 
 /**
-  * Helper to install LoraPhy instances on multiple Nodes.
-  */
+ * Helper to install LoraPhy instances on multiple Nodes.
+ */
 class LoraPhyHelper
 {
 public:
-
   /**
    * Enum for the type of device: End Device (ED) or Gateway (GW)
    */
@@ -105,7 +105,6 @@ public:
 
 
 private:
-
   /**
    * The PHY layer factory object.
    */
@@ -128,6 +127,7 @@ private:
 
 };
 
-} //namespace ns3
+}   //namespace ns3
 
+}
 #endif /* LORA_PHY_HELPER_H */

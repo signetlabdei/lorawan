@@ -19,6 +19,7 @@
 #include "lora-utils.h"
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("LoraTxCurrentModel");
 
@@ -34,11 +35,11 @@ LoraTxCurrentModel::GetTypeId (void)
   return tid;
 }
 
-LoraTxCurrentModel::LoraTxCurrentModel()
+LoraTxCurrentModel::LoraTxCurrentModel ()
 {
 }
 
-LoraTxCurrentModel::~LoraTxCurrentModel()
+LoraTxCurrentModel::~LoraTxCurrentModel ()
 {
 }
 
@@ -63,7 +64,7 @@ LinearLoraTxCurrentModel::GetTypeId (void)
                                        &LinearLoraTxCurrentModel::GetVoltage),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("StandbyCurrent", "The current in the STANDBY state (in Watts).",
-                   DoubleValue (0.0014),  // idle mode = 1.4mA
+                   DoubleValue (0.0014),      // idle mode = 1.4mA
                    MakeDoubleAccessor (&LinearLoraTxCurrentModel::SetStandbyCurrent,
                                        &LinearLoraTxCurrentModel::GetStandbyCurrent),
                    MakeDoubleChecker<double> ())
@@ -76,7 +77,7 @@ LinearLoraTxCurrentModel::LinearLoraTxCurrentModel ()
   NS_LOG_FUNCTION (this);
 }
 
-LinearLoraTxCurrentModel::~LinearLoraTxCurrentModel()
+LinearLoraTxCurrentModel::~LinearLoraTxCurrentModel ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -139,7 +140,7 @@ ConstantLoraTxCurrentModel::GetTypeId (void)
     .AddConstructor<ConstantLoraTxCurrentModel> ()
     .AddAttribute ("TxCurrent",
                    "The radio Tx current in Ampere.",
-                   DoubleValue (0.028),    // transmit at 0dBm = 28mA
+                   DoubleValue (0.028),        // transmit at 0dBm = 28mA
                    MakeDoubleAccessor (&ConstantLoraTxCurrentModel::SetTxCurrent,
                                        &ConstantLoraTxCurrentModel::GetTxCurrent),
                    MakeDoubleChecker<double> ())
@@ -152,7 +153,7 @@ ConstantLoraTxCurrentModel::ConstantLoraTxCurrentModel ()
   NS_LOG_FUNCTION (this);
 }
 
-ConstantLoraTxCurrentModel::~ConstantLoraTxCurrentModel()
+ConstantLoraTxCurrentModel::~ConstantLoraTxCurrentModel ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -177,4 +178,5 @@ ConstantLoraTxCurrentModel::CalcTxCurrent (double txPowerDbm) const
   return m_txCurrent;
 }
 
+}
 } // namespace ns3

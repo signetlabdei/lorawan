@@ -26,6 +26,7 @@
 #include "ns3/mac-command.h"
 
 namespace ns3 {
+namespace lorawan {
 
 /**
  * This class represents the Frame header (FHDR) used in a LoraWAN network.
@@ -42,7 +43,6 @@ namespace ns3 {
 class LoraFrameHeader : public Header
 {
 public:
-
   LoraFrameHeader ();
   ~LoraFrameHeader ();
 
@@ -91,11 +91,11 @@ public:
   void SetAsUplink (void);
 
   /**
-  * State that this is a downlink message.
-  *
-  * This method needs to be called at least once before any serialization or
-  * deserialization.
-  */
+   * State that this is a downlink message.
+   *
+   * This method needs to be called at least once before any serialization or
+   * deserialization.
+   */
   void SetAsDownlink (void);
 
   /**
@@ -296,7 +296,6 @@ public:
   void AddCommand (Ptr<MacCommand> macCommand);
 
 private:
-
   uint8_t m_fPort;
 
   LoraDeviceAddress m_address;
@@ -340,4 +339,5 @@ LoraFrameHeader::GetMacCommand ()
 }
 }
 
+}
 #endif

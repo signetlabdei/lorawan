@@ -24,6 +24,7 @@
 #include "ns3/log.h"
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("GatewayLoraPhy");
 
@@ -32,7 +33,7 @@ NS_OBJECT_ENSURE_REGISTERED (GatewayLoraPhy);
 /**************************************
  *    ReceptionPath implementation    *
  **************************************/
-GatewayLoraPhy::ReceptionPath::ReceptionPath(double frequencyMHz) :
+GatewayLoraPhy::ReceptionPath::ReceptionPath (double frequencyMHz) :
   m_frequencyMHz (frequencyMHz),
   m_available (1),
   m_event (0),
@@ -41,7 +42,7 @@ GatewayLoraPhy::ReceptionPath::ReceptionPath(double frequencyMHz) :
   NS_LOG_FUNCTION_NOARGS ();
 }
 
-GatewayLoraPhy::ReceptionPath::~ReceptionPath(void)
+GatewayLoraPhy::ReceptionPath::~ReceptionPath (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
@@ -120,7 +121,7 @@ GatewayLoraPhy::GetTypeId (void)
                      "could not be correctly received because"
                      "the GW is in transmission mode",
                      MakeTraceSourceAccessor
-                     (&GatewayLoraPhy::m_noReceptionBecauseTransmitting),
+                       (&GatewayLoraPhy::m_noReceptionBecauseTransmitting),
                      "ns3::Packet::TracedCallback")
     .AddTraceSource ("LostPacketBecauseNoMoreReceivers",
                      "Trace source indicating a packet "
@@ -204,5 +205,6 @@ GatewayLoraPhy::IsOnFrequency (double frequencyMHz)
         }
     }
   return false;
+}
 }
 }

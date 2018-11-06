@@ -29,6 +29,7 @@
 #include "ns3/end-device-lora-mac.h"
 
 namespace ns3 {
+namespace lorawan {
 
 /**
  * This class represents the Network Server's knowledge about an End Device in
@@ -48,7 +49,6 @@ namespace ns3 {
 class DeviceStatus
 {
 public:
-
   /**
    * Structure representing the reply that the network server will send this
    * device at the first opportunity.
@@ -61,10 +61,10 @@ public:
     LoraFrameHeader frameHeader; // The FrameHeader to attach to the reply packet.
   };
 
-  DeviceStatus();
-  virtual ~DeviceStatus();
+  DeviceStatus ();
+  virtual ~DeviceStatus ();
 
-  DeviceStatus(Ptr<EndDeviceLoraMac> endDeviceMac);
+  DeviceStatus (Ptr<EndDeviceLoraMac> endDeviceMac);
 
   /**
    * Get the data rate this device is using
@@ -174,25 +174,25 @@ public:
   uint8_t GetSecondReceiveWindowDataRate (void);
 
 private:
-
   Ptr<EndDeviceLoraMac> m_mac;   //!< Pointer to the device
 
   LoraDeviceAddress m_address;   //!< The address of this device
 
-  std::map<Address, double> m_gateways;   //!< The gateways that received a packet from the device 
-                                          //! represented by this DeviceStatus.
-                                          //! Address= address of the gateway, 
-                                          //! double value= power with which the packet has been received from that gateway
+  std::map<Address, double> m_gateways;   //!< The gateways that received a packet from the device
+  //! represented by this DeviceStatus.
+  //! Address= address of the gateway,
+  //! double value= power with which the packet has been received from that gateway
 
   struct Reply m_reply; //!< Structure containing the next reply meant for this
-                        //!device
+  //!device
 
   double m_firstReceiveWindowFrequency; //!< Frequency at which the device will
-                                        //!open the first receive window
+  //!open the first receive window
 
   // TODO Add missing information:
   // - Up/Down frame counters
 };
 }
 
+}
 #endif /* DEVICE_STATUS_H */

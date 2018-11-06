@@ -25,6 +25,7 @@
 #include "ns3/log.h"
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("GatewayLoraMac");
 
@@ -116,7 +117,7 @@ GatewayLoraMac::Receive (Ptr<Packet const> packet)
 
       NS_LOG_DEBUG ("Received packet: " << packet);
 
-      if (macHdr.IsConfirmed()) // Only fire the callback if it's confirmed
+      if (macHdr.IsConfirmed ())    // Only fire the callback if it's confirmed
         {
           m_receivedPacket (packet);
         }
@@ -146,5 +147,6 @@ GatewayLoraMac::GetWaitingTime (double frequency)
 
   return m_channelHelper.GetWaitingTime (CreateObject<LogicalLoraChannel>
                                            (frequency));
+}
 }
 }

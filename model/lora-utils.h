@@ -20,6 +20,7 @@
 #include "ns3/uinteger.h"
 
 namespace ns3 {
+namespace lorawan {
 
 /**
  * Convert from dBm to Watts.
@@ -54,6 +55,7 @@ double WToDbm (double w);
  */
 double RatioToDb (double ratio);
 
-} // namespace ns3
+}   // namespace ns3
 
+}
 #endif /* LORA_UTILS_H */

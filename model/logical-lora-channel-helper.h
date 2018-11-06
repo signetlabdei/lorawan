@@ -31,6 +31,7 @@
 #include <vector>
 
 namespace ns3 {
+namespace lorawan {
 
 /**
  * This class supports LoraMac instances by managing a list of the logical
@@ -44,11 +45,10 @@ namespace ns3 {
 class LogicalLoraChannelHelper : public Object
 {
 public:
-
   static TypeId GetTypeId (void);
 
-  LogicalLoraChannelHelper();
-  virtual ~LogicalLoraChannelHelper();
+  LogicalLoraChannelHelper ();
+  virtual ~LogicalLoraChannelHelper ();
 
   /**
    * Get the time it is necessary to wait before transmitting again, according
@@ -88,7 +88,7 @@ public:
   std::vector<Ptr<LogicalLoraChannel> > GetChannelList (void);
 
   /**
-   * Get the list of LogicalLoraChannels currently registered on this helper 
+   * Get the list of LogicalLoraChannels currently registered on this helper
    * that have been enabled for Uplink transmission with the channel mask.
    *
    * \return A list of the managed channels enabled for Uplink transmission.
@@ -189,15 +189,16 @@ private:
   std::vector<Ptr <LogicalLoraChannel> > m_channelList;
 
   Time m_nextAggregatedTransmissionTime; //!< The next time at which
-                                         //!transmission will be possible
-                                         //!according to the aggregated
-                                         //!transmission timer
+  //!transmission will be possible
+  //!according to the aggregated
+  //!transmission timer
 
   double m_aggregatedDutyCycle; //!< The next time at which
-                                //!transmission will be possible
-                                //!according to the aggregated
-                                //!transmission timer
+  //!transmission will be possible
+  //!according to the aggregated
+  //!transmission timer
 };
 }
 
+}
 #endif /* LOGICAL_LORA_CHANNEL_HELPER_H */

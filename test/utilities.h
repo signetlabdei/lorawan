@@ -27,30 +27,33 @@
 #include "ns3/network-server-helper.h"
 
 namespace ns3 {
+namespace lorawan {
 
-  struct NetworkComponents {
-    Ptr<LoraChannel> channel;
-    NodeContainer endDevices;
-    NodeContainer gateways;
-    Ptr<Node> nsNode;
-  };
+struct NetworkComponents
+{
+  Ptr<LoraChannel> channel;
+  NodeContainer endDevices;
+  NodeContainer gateways;
+  Ptr<Node> nsNode;
+};
 
-  Ptr<LoraChannel> CreateChannel (void);
+Ptr<LoraChannel> CreateChannel (void);
 
-  NodeContainer CreateEndDevices (int nDevices, MobilityHelper mobility,
-                                  Ptr<LoraChannel> channel);
-
-  NodeContainer CreateGateways (int nGateways, MobilityHelper mobility,
+NodeContainer CreateEndDevices (int nDevices, MobilityHelper mobility,
                                 Ptr<LoraChannel> channel);
 
-  template <typename T>
-  Ptr<T>
-  GetMacLayerFromNode (Ptr<Node> n)
-  {
-    return n->GetDevice (0)->GetObject<LoraNetDevice> ()->GetMac ()->GetObject<T> ();
-  }
+NodeContainer CreateGateways (int nGateways, MobilityHelper mobility,
+                              Ptr<LoraChannel> channel);
 
-  NetworkComponents InitializeNetwork (int nDevices, int nGateways);
+template <typename T>
+Ptr<T>
+GetMacLayerFromNode (Ptr<Node> n)
+{
+  return n->GetDevice (0)->GetObject<LoraNetDevice> ()->GetMac ()->GetObject<T> ();
 }
 
+NetworkComponents InitializeNetwork (int nDevices, int nGateways);
+}
+
+}
 #endif

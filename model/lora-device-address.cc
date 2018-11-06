@@ -23,6 +23,7 @@
 #include <bitset>
 
 namespace ns3 {
+namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("LoraDeviceAddress");
 
@@ -41,7 +42,7 @@ NwkID::Set (uint8_t nwkId)
     {
       NS_LOG_WARN ("Attempting to set too big a network ID. Will only consider the 7 least significant bits.");
     }
-  m_nwkId = nwkId & 0x7F; // 0x7f = ob01111111
+  m_nwkId = nwkId & 0x7F;     // 0x7f = ob01111111
 }
 
 uint8_t
@@ -178,7 +179,7 @@ LoraDeviceAddress::Get (void) const
   uint32_t address = 0;
   uint32_t nwkId = uint32_t (m_nwkId.Get () << 25);
   address |= (m_nwkAddr.Get () | nwkId);
-  NS_LOG_DEBUG ("m_nwkId + m_nwkAddr = " << std::bitset<32>(address));
+  NS_LOG_DEBUG ("m_nwkId + m_nwkAddr = " << std::bitset<32> (address));
 
   return address;
 }
@@ -188,8 +189,8 @@ LoraDeviceAddress::Set (uint32_t address)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
-  m_nwkId.Set (address >> 25); // Only leave the 7 most significant bits
-  m_nwkAddr.Set (address & 0x1FFFFFF); // Only consider the 25 least significant bits
+  m_nwkId.Set (address >> 25);     // Only leave the 7 most significant bits
+  m_nwkAddr.Set (address & 0x1FFFFFF);     // Only consider the 25 least significant bits
 }
 
 uint8_t
@@ -230,9 +231,9 @@ LoraDeviceAddress::Print (void) const
   NS_LOG_FUNCTION_NOARGS ();
 
   std::string result;
-  result += std::bitset<7>(m_nwkId.Get ()).to_string ();
+  result += std::bitset<7> (m_nwkId.Get ()).to_string ();
   result += "|";
-  result += std::bitset<25>(m_nwkAddr.Get ()).to_string ();
+  result += std::bitset<25> (m_nwkAddr.Get ()).to_string ();
   return result;
 }
 
@@ -264,5 +265,6 @@ std::ostream& operator<< (std::ostream& os, const LoraDeviceAddress &address)
 {
   os << address.Print ();
   return os;
+}
 }
 }

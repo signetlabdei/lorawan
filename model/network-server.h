@@ -38,75 +38,77 @@
 #include "ns3/end-device-lora-mac.h"
 
 namespace ns3 {
+namespace lorawan {
+
+/**
+ * The NetworkServer is an application standing on top of a node equipped with
+ * links that connect it with the gateways.
+ *
+ * This version of the NetworkServer attempts to closely mimic an actual
+ * Network Server, by providing as much functionality as possible.
+ */
+class NetworkServer : public Application
+{
+public:
+  static TypeId GetTypeId (void);
+
+  NetworkServer ();
+  virtual ~NetworkServer ();
 
   /**
-   * The NetworkServer is an application standing on top of a node equipped with
-   * links that connect it with the gateways.
-   *
-   * This version of the NetworkServer attempts to closely mimic an actual
-   * Network Server, by providing as much functionality as possible.
+   * Start the NS application.
    */
-  class NetworkServer : public Application
-  {
-  public:
-    static TypeId GetTypeId (void);
+  void StartApplication (void);
 
-    NetworkServer ();
-    virtual ~NetworkServer ();
+  /**
+   * Stop the NS application.
+   */
+  void StopApplication (void);
 
-    /**
-     * Start the NS application.
-     */
-    void StartApplication (void);
+  /**
+   * Inform the NetworkServer that these nodes are connected to the network.
+   *
+   * This method will create a DeviceStatus object for each new node, and add
+   * it to the list.
+   */
+  void AddNodes (NodeContainer nodes);
 
-    /**
-     * Stop the NS application.
-     */
-    void StopApplication (void);
+  /**
+   * Inform the NetworkServer that this node is connected to the network.
+   * This method will create a DeviceStatus object for the new node (if it
+   * doesn't already exist).
+   */
+  void AddNode (Ptr<Node> node);
 
-    /**
-     * Inform the NetworkServer that these nodes are connected to the network.
-     *
-     * This method will create a DeviceStatus object for each new node, and add
-     * it to the list.
-     */
-    void AddNodes (NodeContainer nodes);
+  /**
+   * Add this gateway to the list of gateways connected to this NS.
+   * Each GW is identified by its Address in the NS-GWs network.
+   */
+  void AddGateway (Ptr<Node> gateway, Ptr<NetDevice> netDevice);
 
-    /**
-     * Inform the NetworkServer that this node is connected to the network.
-     * This method will create a DeviceStatus object for the new node (if it
-     * doesn't already exist).
-     */
-    void AddNode (Ptr<Node> node);
+  /**
+   * A NetworkControllerComponent to this NetworkServer instance.
+   */
+  void AddComponent (Ptr<NetworkControllerComponent> component);
 
-    /**
-     * Add this gateway to the list of gateways connected to this NS.
-     * Each GW is identified by its Address in the NS-GWs network.
-     */
-    void AddGateway (Ptr<Node> gateway, Ptr<NetDevice> netDevice);
+  /**
+   * Receive a packet from a gateway.
+   * \param packet the received packet
+   */
+  bool Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
+                uint16_t protocol, const Address& address);
 
-    /**
-     * A NetworkControllerComponent to this NetworkServer instance.
-     */
-    void AddComponent (Ptr<NetworkControllerComponent> component);
+  Ptr<NetworkStatus> GetNetworkStatus (void);
 
-    /**
-     * Receive a packet from a gateway.
-     * \param packet the received packet
-     */
-    bool Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
-                  uint16_t protocol, const Address& address);
+protected:
+  Ptr<NetworkStatus> m_status;
+  Ptr<NetworkController> m_controller;
+  Ptr<NetworkScheduler> m_scheduler;
 
-    Ptr<NetworkStatus> GetNetworkStatus (void);
-
-  protected:
-    Ptr<NetworkStatus> m_status;
-    Ptr<NetworkController> m_controller;
-    Ptr<NetworkScheduler> m_scheduler;
-
-    TracedCallback<Ptr<const Packet> > m_receivedPacket;
-  };
+  TracedCallback<Ptr<const Packet> > m_receivedPacket;
+};
 
 } /* namespace ns3 */
 
+}
 #endif /* NETWORK_SERVER_H */

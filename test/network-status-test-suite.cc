@@ -18,6 +18,7 @@
 #include "ns3/test.h"
 
 using namespace ns3;
+using namespace lorawan;
 
 NS_LOG_COMPONENT_DEFINE ("NetworkStatusTestSuite");
 
@@ -54,7 +55,7 @@ EndDeviceStatusTest::DoRun (void)
   NS_LOG_DEBUG ("EndDeviceStatusTest");
 
   // Create an EndDeviceStatus object
-  EndDeviceStatus eds = EndDeviceStatus();
+  EndDeviceStatus eds = EndDeviceStatus ();
 }
 
 /////////////////////////////
@@ -67,7 +68,7 @@ public:
   NetworkStatusTest ();
   virtual ~NetworkStatusTest ();
 
-    private:
+private:
   virtual void DoRun (void);
 };
 
@@ -91,16 +92,16 @@ NetworkStatusTest::DoRun (void)
   NS_LOG_DEBUG ("NetworkStatusTest");
 
   // Create a NetworkStatus object
-  NetworkStatus ns = NetworkStatus();
+  NetworkStatus ns = NetworkStatus ();
 
   // Create a bunch of actual devices
-  NetworkComponents components = InitializeNetwork(1, 1);
+  NetworkComponents components = InitializeNetwork (1, 1);
 
   Ptr<LoraChannel> channel = components.channel;
   NodeContainer endDevices = components.endDevices;
   NodeContainer gateways = components.gateways;
 
-  ns.AddNode(GetMacLayerFromNode<EndDeviceLoraMac>(endDevices.Get(0)));
+  ns.AddNode (GetMacLayerFromNode<EndDeviceLoraMac> (endDevices.Get (0)));
 }
 
 /**************

@@ -24,21 +24,22 @@
 #include "ns3/header.h"
 
 namespace ns3 {
+namespace lorawan {
 
 /**
-  * This class represents the Mac header of a LoRaWAN packet.
-  */
+ * This class represents the Mac header of a LoRaWAN packet.
+ */
 class LoraMacHeader : public Header
 {
 public:
-
   /**
    * The message type.
    *
    * The enum value corresponds to the value that will be written in the header
    * by the Serialize method.
    */
-  enum MType {
+  enum MType
+  {
     JOIN_REQUEST = 0,
     JOIN_ACCEPT = 1,
     UNCONFIRMED_DATA_UP = 2,
@@ -133,4 +134,5 @@ private:
 };
 }
 
+}
 #endif

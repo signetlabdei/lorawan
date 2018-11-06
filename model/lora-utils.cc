@@ -17,6 +17,7 @@
 #include <cmath>
 
 namespace ns3 {
+namespace lorawan {
 
 double
 DbToRatio (double dB)
@@ -44,4 +45,5 @@ RatioToDb (double ratio)
   return 10.0 * std::log10 (ratio);
 }
 
+}
 } //namespace ns3
