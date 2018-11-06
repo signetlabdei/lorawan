@@ -32,7 +32,7 @@ int main (int argc, char *argv[])
 
   // Set up logging
   LogComponentEnable ("LoraEnergyModelExample", LOG_LEVEL_ALL);
-  LogComponentEnable ("LoraRadioEnergyModel", LOG_LEVEL_ALL);
+  // LogComponentEnable ("LoraRadioEnergyModel", LOG_LEVEL_ALL);
   // LogComponentEnable ("LoraChannel", LOG_LEVEL_INFO);
   // LogComponentEnable ("LoraPhy", LOG_LEVEL_ALL);
   // LogComponentEnable ("EndDeviceLoraPhy", LOG_LEVEL_ALL);
@@ -77,7 +77,7 @@ int main (int argc, char *argv[])
 
   MobilityHelper mobility;
   Ptr<ListPositionAllocator> allocator = CreateObject<ListPositionAllocator> ();
-  allocator->Add (Vector (1000,0,0));
+  allocator->Add (Vector (100,0,0));
   allocator->Add (Vector (0,0,0));
   mobility.SetPositionAllocator (allocator);
   mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
@@ -125,6 +125,8 @@ int main (int argc, char *argv[])
   phyHelper.SetDeviceType (LoraPhyHelper::GW);
   macHelper.SetDeviceType (LoraMacHelper::GW);
   helper.Install (phyHelper, macHelper, gateways);
+
+  macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
 
   /*********************************************
    *  Install applications on the end devices  *
@@ -179,7 +181,7 @@ int main (int argc, char *argv[])
   *  Simulation  *
   ****************/
 
-  Simulator::Stop (Minutes (30));
+  Simulator::Stop (Hours (24));
 
   Simulator::Run ();
 

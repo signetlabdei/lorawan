@@ -35,20 +35,16 @@ NS_LOG_COMPONENT_DEFINE ("ComplexLorawanNetworkExample");
 
 // Network settings
 int nDevices = 200;
-int gatewayRings = 1;
-int nGateways = 3 * gatewayRings * gatewayRings - 3 * gatewayRings + 1;
+int nGateways = 1;
 double radius = 7500;
-double gatewayRadius = 7500 / ((gatewayRings - 1) * 2 + 1);
 double simulationTime = 600;
 
 // Channel model
-bool shadowingEnabled = false;
-bool buildingsEnabled = false;
+bool realisticChannelModel = false;
 
 int appPeriodSeconds = 600;
 int periodsToSimulate = 1;
 int transientPeriods = 0;
-std::vector<int> sfQuantity (6);
 
 // Output control
 bool print = true;
@@ -60,24 +56,12 @@ int main (int argc, char *argv[])
   cmd.AddValue ("nDevices",
                 "Number of end devices to include in the simulation",
                 nDevices);
-  cmd.AddValue ("gatewayRings",
-                "Number of gateway rings to include",
-                gatewayRings);
   cmd.AddValue ("radius",
                 "The radius of the area to simulate",
                 radius);
-  cmd.AddValue ("gatewayRadius",
-                "The distance between two gateways",
-                gatewayRadius);
   cmd.AddValue ("simulationTime",
                 "The time for which to simulate",
                 simulationTime);
-  cmd.AddValue ("shadowingEnabled",
-                "Whether to enable shadowing in the channel",
-                shadowingEnabled);
-  cmd.AddValue ("buildingsEnabled",
-                "Whether to enable buildings",
-                buildingsEnabled);
   cmd.AddValue ("appPeriod",
                 "The period in seconds to be used by periodically transmitting applications",
                 appPeriodSeconds);
@@ -114,9 +98,6 @@ int main (int argc, char *argv[])
    *  Setup  *
    ***********/
 
-  // Compute the number of gateways
-  nGateways = 3 * gatewayRings * gatewayRings - 3 * gatewayRings + 1;
-
   // Create the time value from the period
   Time appPeriod = Seconds (appPeriodSeconds);
 
@@ -137,7 +118,7 @@ int main (int argc, char *argv[])
   loss->SetPathLossExponent (3.76);
   loss->SetReference (1, 8.1);
 
-  if(shadowingEnabled)
+  if(realisticChannelModel)
     {
       // Create the correlated shadowing component
       Ptr<CorrelatedShadowingPropagationLossModel> shadowing = CreateObject<CorrelatedShadowingPropagationLossModel> ();
@@ -156,8 +137,8 @@ int main (int argc, char *argv[])
   Ptr<LoraChannel> channel = CreateObject<LoraChannel> (loss, delay);
 
   /************************
-  *  Create the helpers  *
-  ************************/
+   *  Create the helpers  *
+   ************************/
 
   // Create the LoraPhyHelper
   LoraPhyHelper phyHelper = LoraPhyHelper ();
@@ -178,8 +159,8 @@ int main (int argc, char *argv[])
   ForwarderHelper forHelper = ForwarderHelper ();
 
   /************************
-  *  Create End Devices  *
-  ************************/
+   *  Create End Devices  *
+   ************************/
 
   // Create a set of nodes
   NodeContainer endDevices;
@@ -221,8 +202,8 @@ int main (int argc, char *argv[])
     }
 
   /*********************
-  *  Create Gateways  *
-  *********************/
+   *  Create Gateways  *
+   *********************/
 
   // Create the gateway nodes (allocate them uniformely on the disc)
   NodeContainer gateways;
@@ -250,7 +231,7 @@ int main (int argc, char *argv[])
   double deltaY = 17;
   int gridWidth = 2*radius/(xLength+deltaX);
   int gridHeight = 2*radius/(yLength+deltaY);
-  if (buildingsEnabled == false)
+  if (realisticChannelModel == false)
     {
       gridWidth = 0;
       gridHeight = 0;
@@ -294,7 +275,7 @@ int main (int argc, char *argv[])
    *  Set up the end device's spreading factor  *
    **********************************************/
 
-  sfQuantity = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
+  macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
 
   NS_LOG_DEBUG ("Completed configuration");
 
@@ -334,14 +315,14 @@ int main (int argc, char *argv[])
   if (print)
     {
       helper.PrintEndDevices (endDevices, gateways,
-                              "src/lorawan/examples/endDevices.dat");
+                              "endDevices.dat");
     }
 
   ////////////////
   // Simulation //
   ////////////////
 
-  Simulator::Stop (appStopTime + Hours (1000));
+  Simulator::Stop (appStopTime + Hours (1));
 
   NS_LOG_INFO ("Running simulation...");
   Simulator::Run ();
