@@ -269,8 +269,8 @@ public:
   void SetMType (LoraMacHeader::MType mType);
 
   /**
- * Get the message type to send when the Send method is called.
- */
+   * Get the message type to send when the Send method is called.
+   */
   LoraMacHeader::MType GetMType (void);
 
   /**
@@ -404,8 +404,8 @@ private:
   std::vector<Ptr<LogicalLoraChannel> > Shuffle (std::vector<Ptr<LogicalLoraChannel> > vector);
 
   /**
-    * Find the minimum waiting time before the next possible transmission.
-    */
+   * Find the minimum waiting time before the next possible transmission.
+   */
   Time GetNextTransmissionDelay (void);
 
 
@@ -423,17 +423,17 @@ private:
   Ptr<UniformRandomVariable> m_uniformRV;
 
 
-/**
+  /**
    * The total number of transmissions required.
    */
-/*
-TracedValue<uint8_t> m_requiredTx;
-*/
+  /*
+    TracedValue<uint8_t> m_requiredTx;
+  */
 
   /**
    * The DataRate this device is using to transmit.
    */
-  TracedValue<uint8_t> m_dataRate;
+  uint8_t m_dataRate;
 
   /**
    * The transmission power this device is using to transmit.

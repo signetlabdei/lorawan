@@ -43,11 +43,11 @@ EndDeviceLoraMac::GetTypeId (void)
                      MakeTraceSourceAccessor
                        (&EndDeviceLoraMac::m_requiredTxCallback),
                      "ns3::TracedValueCallback::uint8_t")
-    .AddTraceSource ("DataRate",
-                     "Data Rate currently employed by this end device",
-                     MakeTraceSourceAccessor
-                       (&EndDeviceLoraMac::m_dataRate),
-                     "ns3::TracedValueCallback::uint8_t")
+    .AddAttribute ("DataRate",
+                   "Data Rate currently employed by this end device",
+                   UintegerValue (0),
+                   MakeUintegerAccessor (&EndDeviceLoraMac::m_dataRate),
+                   MakeUintegerChecker<uint8_t> (0, 5))
     .AddTraceSource ("TxPower",
                      "Transmission power currently employed by this end device",
                      MakeTraceSourceAccessor
@@ -243,7 +243,7 @@ EndDeviceLoraMac::DoSend (Ptr<Packet> packet)
           m_retxParams.retxLeft = m_maxNumbTx;
           m_retxParams.waitingAck = true;
           m_retxParams.firstAttempt = Simulator::Now ();
-          m_retxParams.retxLeft = m_retxParams.retxLeft - 1;   // decreasing the number of retransmissions
+          m_retxParams.retxLeft = m_retxParams.retxLeft - 1;       // decreasing the number of retransmissions
 
           NS_LOG_DEBUG ("Message type is " << m_mType);
           NS_LOG_DEBUG ("It is a confirmed packet. Setting retransmission parameters and decreasing the number of transmissions left.");
@@ -268,7 +268,7 @@ EndDeviceLoraMac::DoSend (Ptr<Packet> packet)
     {
       if (m_retxParams.waitingAck)
         {
-          m_retxParams.retxLeft = m_retxParams.retxLeft - 1;   // decreasing the number of retransmissions
+          m_retxParams.retxLeft = m_retxParams.retxLeft - 1;       // decreasing the number of retransmissions
           NS_LOG_DEBUG ("Retransmitting an old packet.");
 
           SendToPhy (m_retxParams.packet);
@@ -405,7 +405,7 @@ EndDeviceLoraMac::Receive (Ptr<Packet const> packet)
                   // Reset retransmission parameters
                   resetRetransmissionParameters ();
                 }
-              else   // Reschedule
+              else       // Reschedule
                 {
                   this->Send (m_retxParams.packet);
                   NS_LOG_INFO ("We have " << unsigned(m_retxParams.retxLeft) << " retransmissions left: rescheduling transmission.");
@@ -601,10 +601,10 @@ EndDeviceLoraMac::ApplyNecessaryOptions (LoraFrameHeader& frameHeader)
   NS_LOG_FUNCTION_NOARGS ();
 
   frameHeader.SetAsUplink ();
-  frameHeader.SetFPort (1);             // TODO Use an appropriate frame port based on the application
+  frameHeader.SetFPort (1);                 // TODO Use an appropriate frame port based on the application
   frameHeader.SetAddress (m_address);
-  frameHeader.SetAdr (0);             // TODO Set ADR if a member variable is true
-  frameHeader.SetAdrAckReq (0);             // TODO Set ADRACKREQ if a member variable is true
+  frameHeader.SetAdr (0);                 // TODO Set ADR if a member variable is true
+  frameHeader.SetAdrAckReq (0);                 // TODO Set ADRACKREQ if a member variable is true
   if (m_mType == LoraMacHeader::CONFIRMED_DATA_UP)
     {
       frameHeader.SetAck (1);
@@ -827,7 +827,7 @@ EndDeviceLoraMac::GetNextTransmissionDelay (void)
 
   // Pick a random channel to transmit on
   std::vector<Ptr<LogicalLoraChannel> > logicalChannels;
-  logicalChannels = m_channelHelper.GetEnabledChannelList ();             // Use a separate list to do the shuffle
+  logicalChannels = m_channelHelper.GetEnabledChannelList ();                 // Use a separate list to do the shuffle
   //logicalChannels = Shuffle (logicalChannels);
 
   NS_LOG_DEBUG ("lungh lista " << logicalChannels.size ());
@@ -873,7 +873,7 @@ EndDeviceLoraMac::GetChannelForTx (void)
 
   // Pick a random channel to transmit on
   std::vector<Ptr<LogicalLoraChannel> > logicalChannels;
-  logicalChannels = m_channelHelper.GetEnabledChannelList ();             // Use a separate list to do the shuffle
+  logicalChannels = m_channelHelper.GetEnabledChannelList ();                 // Use a separate list to do the shuffle
   logicalChannels = Shuffle (logicalChannels);
 
   // Try every channel
@@ -903,7 +903,7 @@ EndDeviceLoraMac::GetChannelForTx (void)
                         "the current channel because of duty cycle limitations.");
         }
     }
-  return 0;             // In this case, no suitable channel was found
+  return 0;                 // In this case, no suitable channel was found
 }
 
 
@@ -1056,7 +1056,7 @@ EndDeviceLoraMac::OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
   // We need to know we can use it in at least one of the enabled channels
   // Cycle through available channels, stop when at least one is enabled for the
   // specified dataRate.
-  if (dataRateOk && channelMaskOk)             // If false, skip the check
+  if (dataRateOk && channelMaskOk)                 // If false, skip the check
     {
       bool foundAvailableChannel = false;
       for (auto it = enabledChannels.begin (); it != enabledChannels.end (); it++)
