@@ -122,10 +122,6 @@ SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
   // Fire the trace source
   m_phyRxBeginTrace (packet);
 
-  // Add the event to the LoraInterferenceHelper
-  Ptr<LoraInterferenceHelper::Event> event;
-  event = m_interference.Add (duration, rxPowerDbm, sf, packet, frequencyMHz);
-
   if (m_isTransmitting)
     {
       // If we get to this point, there are no demodulators we can use
@@ -147,6 +143,10 @@ SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
 
       return;
     }
+
+  // Add the event to the LoraInterferenceHelper
+  Ptr<LoraInterferenceHelper::Event> event;
+  event = m_interference.Add (duration, rxPowerDbm, sf, packet, frequencyMHz);
 
   // Cycle over the receive paths to check availability to receive the packet
   std::list<Ptr<SimpleGatewayLoraPhy::ReceptionPath> >::iterator it;
