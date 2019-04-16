@@ -374,7 +374,14 @@ LoraInterferenceHelper::GetOverlapTime (Ptr<LoraInterferenceHelper::Event> event
   // event1 before event2
   else if (s1 < s2)
     {
-      overlap = e1 - s2;
+      if (e2 < e1)
+        {
+          overlap = e2 - s2;
+        }
+      else
+        {
+          overlap = e1 - s2;
+        }
     }
   // event2 before event1 or they start at the same time (s1 = s2)
   else
