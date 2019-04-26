@@ -89,7 +89,7 @@ EndDeviceLoraMac::EndDeviceLoraMac ()
   // LoraWAN default
   m_receiveDelay2 (Seconds (2)),
   // LoraWAN default
-  m_receiveWindowDuration (Seconds (0.01)),
+  m_receiveWindowDurationInSymbols (5),
   m_address (LoraDeviceAddress (0)),
   m_rx1DrOffset (0),
   // LoraWAN default
@@ -676,11 +676,14 @@ EndDeviceLoraMac::OpenFirstReceiveWindow (void)
   // Set Phy in Standby mode
   m_phy->GetObject<EndDeviceLoraPhy> ()->SwitchToStandby ();
 
+  //Calculate the duration of a single symbol for the first receive window DR
+  double tSym = pow (2, GetSfFromDataRate (GetFirstReceiveWindowDataRate ())) / GetBandwidthFromDataRate ( GetFirstReceiveWindowDataRate ());
+  
   // Schedule return to sleep after "at least the time required by the end
   // device's radio transceiver to effectively detect a downlink preamble"
   // (LoraWAN specification)
-  m_closeFirstWindow = Simulator::Schedule (m_receiveWindowDuration,
-                                            &EndDeviceLoraMac::CloseFirstReceiveWindow, this);
+  m_closeFirstWindow = Simulator::Schedule (Seconds (m_receiveWindowDurationInSymbols*tSym),
+                                            &EndDeviceLoraMac::CloseFirstReceiveWindow, this); //m_receiveWindowDuration
 }
 
 void
@@ -739,11 +742,14 @@ EndDeviceLoraMac::OpenSecondReceiveWindow (void)
     (m_secondReceiveWindowFrequency);
   m_phy->GetObject<EndDeviceLoraPhy> ()->SetSpreadingFactor (GetSfFromDataRate
                                                                (m_secondReceiveWindowDataRate));
-
+  
+  //Calculate the duration of a single symbol for the second receive window DR
+  double tSym = pow (2, GetSfFromDataRate (GetSecondReceiveWindowDataRate ())) / GetBandwidthFromDataRate ( GetSecondReceiveWindowDataRate ());
+    
   // Schedule return to sleep after "at least the time required by the end
   // device's radio transceiver to effectively detect a downlink preamble"
   // (LoraWAN specification)
-  m_closeSecondWindow = Simulator::Schedule (m_receiveWindowDuration,
+  m_closeSecondWindow = Simulator::Schedule (Seconds (m_receiveWindowDurationInSymbols*tSym),
                                              &EndDeviceLoraMac::CloseSecondReceiveWindow, this);
 }
 
@@ -849,7 +855,11 @@ EndDeviceLoraMac::GetNextTransmissionDelay (void)
     {
       NS_LOG_WARN ("Attempting to send when there are receive windows:" <<
                    " Transmission postponed.");
-      Time endSecondRxWindow = (m_receiveDelay2 + m_receiveWindowDuration);
+      
+      //Calculate the duration of a single symbol for the second receive window DR
+      double tSym = pow (2, GetSfFromDataRate (GetSecondReceiveWindowDataRate ())) / GetBandwidthFromDataRate ( GetSecondReceiveWindowDataRate ());
+      
+      Time endSecondRxWindow = (m_receiveDelay2 + Seconds (m_receiveWindowDurationInSymbols*tSym));
       waitingTime = std::max (waitingTime, endSecondRxWindow);
     }
 
