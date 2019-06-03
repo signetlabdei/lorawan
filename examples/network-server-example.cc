@@ -41,7 +41,7 @@ int main (int argc, char *argv[])
   //////////
 
   LogComponentEnable ("NetworkServerExample", LOG_LEVEL_ALL);
-  LogComponentEnable ("SimpleNetworkServer", LOG_LEVEL_ALL);
+  LogComponentEnable ("NetworkServer", LOG_LEVEL_ALL);
   LogComponentEnable ("GatewayLoraMac", LOG_LEVEL_ALL);
   // LogComponentEnable("LoraFrameHeader", LOG_LEVEL_ALL);
   // LogComponentEnable("LoraMacHeader", LOG_LEVEL_ALL);
@@ -161,7 +161,7 @@ int main (int argc, char *argv[])
   NodeContainer networkServers;
   networkServers.Create (1);
 
-  // Install the SimpleNetworkServer application on the network server
+  // Install the NetworkServer application on the network server
   NetworkServerHelper networkServerHelper;
   networkServerHelper.SetGateways (gateways);
   networkServerHelper.SetEndDevices (endDevices);

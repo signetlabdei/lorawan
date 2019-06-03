@@ -292,7 +292,7 @@ other one.
 The Network Server
 ==================
 
-The ``SimpleNetworkServer`` is an application which is running on a node that is
+The ``NetworkServer`` is an application which is running on a node that is
 connected to the simulation GWs. The GWs forward incoming LoRa packets to the
 NS, and expect to be given packets to transmit in the downlink to EDs by the NS.
 In order to keep track of all players in the network, the NS keeps two lists of
@@ -310,6 +310,8 @@ possible, and the second receive window is used only when no more resources are
 available to leverage the first chance to respond to the device. More complex
 and realistic NS behaviors are definitely possible, however they also come at a
 complexity cost that is non-negligible.
+
+.. TODO Expand on this
 
 Scope and Limitations
 *********************
