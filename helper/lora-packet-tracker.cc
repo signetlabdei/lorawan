@@ -323,21 +323,25 @@ LoraPacketTracker::CountRetransmissions (Time transient, Time simulationTime, Ma
       avgAckDelay = ((ackDelaySum) / packetsOutsideTransient).GetSeconds ();
     }
 
-  // Print legend
-  std::cout <<
-    "Successful with 1 | Successful with 2 | Successful with 3 | Successful with 4 | Successful with 5 | Successful with 6 | Successful with 7 | Successful with 8 | Failed after 1 | Failed after 2 | Failed after 3 | Failed after 4 | Failed after 5 | Failed after 6 | Failed after 7 | Failed after 8 | Average Delay | Average ACK Delay | Total Retransmission amounts || PHY Total | PHY Successful | PHY Interfered | PHY No More Receivers | PHY Under Sensitivity | PHY Lost Because TX" <<
-    std::endl;
-  PrintVector (successfulReTxAmounts);
-  std::cout << " | ";
-  PrintVector (failedReTxAmounts);
-  std::cout << " | ";
-  std::cout << avgDelay << " ";
-  std::cout << avgAckDelay << " ";
-  std::cout << " | ";
-  PrintSumRetransmissions (totalReTxAmounts);
-  std::cout << " || ";
-  PrintVector (performancesAmounts);
+  // Print PHY
+  std::cout << std::endl << "PHY" << std::endl << "---" << std::endl;
+
+  std::vector<std::string> meanings = {"TOT:  ", "SUCC: ", "INT:  ", "NMR:  ", "US:   ", "GWTX: "};
+  for (int i = 0; i < int(performancesAmounts.size ()); i++)
+    {
+      // NS_LOG_INFO ("i: " << i);
+      std::cout << meanings.at(i) << "\t" << performancesAmounts.at (i) << std::endl;
+    }
+
   std::cout << std::endl;
+
+  // Print MAC packet data
+  std::cout << "MAC Confirmed" << std::endl << "-------------" << std::endl;
+
+  std::cout << "Successes: "; PrintVector (successfulReTxAmounts); std::cout << std::endl;
+  std::cout << "Failures:  "; PrintVector (failedReTxAmounts); std::cout << std::endl;
+  std::cout << "Delays:    " << avgDelay << " " << avgAckDelay << std::endl;
+  std::cout << "Totals:    "; PrintSumRetransmissions (totalReTxAmounts); std::cout << std::endl;
 }
 
 void

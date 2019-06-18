@@ -1,7 +1,6 @@
 /*
- * This script simulates a complex scenario with multiple gateways and end
- * devices. The metric of interest for this script is the throughput of the
- * network.
+ * This script simulates a complete LoRaWAN scenario with a single gateway and
+ * multiple end devices. Metrics of interest are printed in the standard output.
  */
 
 #include "ns3/end-device-lora-phy.h"
@@ -32,20 +31,18 @@
 using namespace ns3;
 using namespace lorawan;
 
-NS_LOG_COMPONENT_DEFINE ("ComplexLorawanNetworkExample");
+NS_LOG_COMPONENT_DEFINE ("CompleteLorawanNetworkExample");
 
 // Network settings
 int nDevices = 200;
 int nGateways = 1;
-double radius = 7500;
-double simulationTime = 600;
+double radius = 6300;
 
 // Channel model
-bool realisticChannelModel = false;
+bool addBuildings = false;
 
 int appPeriodSeconds = 600;
 int periodsToSimulate = 1;
-int transientPeriods = 0;
 
 // Output control
 bool print = true;
@@ -57,22 +54,25 @@ int main (int argc, char *argv[])
   cmd.AddValue ("nDevices",
                 "Number of end devices to include in the simulation",
                 nDevices);
+  cmd.AddValue ("addBuildings",
+                "Whether to employ a realistic channel model "
+                "featuring shadowing and buildings",
+                addBuildings);
   cmd.AddValue ("radius",
                 "The radius of the area to simulate",
                 radius);
-  cmd.AddValue ("simulationTime",
-                "The time for which to simulate",
-                simulationTime);
   cmd.AddValue ("appPeriod",
-                "The period in seconds to be used by periodically transmitting applications",
+                "The period in seconds to be used by periodically "
+                "transmitting applications",
                 appPeriodSeconds);
+  cmd.AddValue ("MType", "ns3::EndDeviceLoraMac::MType");
   cmd.AddValue ("print",
-                "Whether or not to print various informations",
+                "Whether or not to print various info",
                 print);
   cmd.Parse (argc, argv);
 
   // Set up logging
-  LogComponentEnable ("ComplexLorawanNetworkExample", LOG_LEVEL_ALL);
+  LogComponentEnable ("CompleteLorawanNetworkExample", LOG_LEVEL_ALL);
   // LogComponentEnable("LoraChannel", LOG_LEVEL_INFO);
   // LogComponentEnable("LoraPhy", LOG_LEVEL_ALL);
   // LogComponentEnable("EndDeviceLoraPhy", LOG_LEVEL_ALL);
@@ -119,7 +119,7 @@ int main (int argc, char *argv[])
   loss->SetPathLossExponent (3.76);
   loss->SetReference (1, 7.7);
 
-  if (realisticChannelModel)
+  if (addBuildings)
     {
       // Create the correlated shadowing component
       Ptr<CorrelatedShadowingPropagationLossModel> shadowing = CreateObject<CorrelatedShadowingPropagationLossModel> ();
@@ -133,7 +133,8 @@ int main (int argc, char *argv[])
       shadowing->SetNext (buildingLoss);
     }
 
-  Ptr<PropagationDelayModel> delay = CreateObject<ConstantSpeedPropagationDelayModel> ();
+  Ptr<PropagationDelayModel> delay =
+    CreateObject<ConstantSpeedPropagationDelayModel> ();
 
   Ptr<LoraChannel> channel = CreateObject<LoraChannel> (loss, delay);
 
@@ -150,8 +151,7 @@ int main (int argc, char *argv[])
 
   // Create the LoraHelper
   LoraHelper helper = LoraHelper ();
-  helper.EnablePacketTracking ("performance"); // Output filename
-  // helper.EnableSimulationTimePrinting ();
+  helper.EnablePacketTracking ("performance.txt"); // Output filename
 
   //Create the NetworkServerHelper
   NetworkServerHelper nsHelper = NetworkServerHelper ();
@@ -170,16 +170,6 @@ int main (int argc, char *argv[])
   // Assign a mobility model to each node
   mobility.Install (endDevices);
 
-  // Make it so that nodes are at a certain height > 0
-  for (NodeContainer::Iterator j = endDevices.Begin ();
-       j != endDevices.End (); ++j)
-    {
-      Ptr<MobilityModel> mobility = (*j)->GetObject<MobilityModel> ();
-      Vector position = mobility->GetPosition ();
-      position.z = 1.2;
-      mobility->SetPosition (position);
-    }
-
   // Create the LoraNetDevices of the end devices
   uint8_t nwkId = 54;
   uint32_t nwkAddr = 1864;
@@ -190,17 +180,7 @@ int main (int argc, char *argv[])
   phyHelper.SetDeviceType (LoraPhyHelper::ED);
   macHelper.SetDeviceType (LoraMacHelper::ED);
   helper.Install (phyHelper, macHelper, endDevices);
-
   // Now end devices are connected to the channel
-
-  // Connect trace sources
-  for (NodeContainer::Iterator j = endDevices.Begin ();
-       j != endDevices.End (); ++j)
-    {
-      Ptr<Node> node = *j;
-      Ptr<LoraNetDevice> loraNetDevice = node->GetDevice (0)->GetObject<LoraNetDevice> ();
-      Ptr<LoraPhy> phy = loraNetDevice->GetPhy ();
-    }
 
   /*********************
    *  Create Gateways  *
@@ -213,9 +193,12 @@ int main (int argc, char *argv[])
   Ptr<ListPositionAllocator> allocator = CreateObject<ListPositionAllocator> ();
   // Make it so that nodes are at a certain height > 0
   allocator->Add (Vector (0.0, 0.0, 15.0));
+  allocator->Add (Vector (0.0, 3000.0, 15.0));
+  allocator->Add (Vector (3000.0, 0.0, 15.0));
+  allocator->Add (Vector (0.0, -3000.0, 15.0));
+  allocator->Add (Vector (-3000.0, 0.0, 15.0));
   mobility.SetPositionAllocator (allocator);
   mobility.Install (gateways);
-
 
   // Create a netdevice for each gateway
   phyHelper.SetDeviceType (LoraPhyHelper::GW);
@@ -232,7 +215,7 @@ int main (int argc, char *argv[])
   double deltaY = 17;
   int gridWidth = 2 * radius / (xLength + deltaX);
   int gridHeight = 2 * radius / (yLength + deltaY);
-  if (realisticChannelModel == false)
+  if (addBuildings == false)
     {
       gridWidth = 0;
       gridHeight = 0;
@@ -278,17 +261,14 @@ int main (int argc, char *argv[])
 
   macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
 
-  NS_LOG_DEBUG ("Completed configuration");
-
   /*********************************************
    *  Install applications on the end devices  *
    *********************************************/
 
-  Time appStopTime = Seconds (simulationTime);
+  Time appStopTime = appPeriod;
   PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
   appHelper.SetPeriod (Seconds (appPeriodSeconds));
   appHelper.SetPacketSize (23);
-  Ptr <RandomVariableStream> rv = CreateObjectWithAttributes<UniformRandomVariable> ("Min", DoubleValue (0), "Max", DoubleValue (10));
   ApplicationContainer appContainer = appHelper.Install (endDevices);
 
   appContainer.Start (Seconds (0));
@@ -334,7 +314,7 @@ int main (int argc, char *argv[])
   // Print results to file //
   ///////////////////////////
   NS_LOG_INFO ("Computing performance metrics...");
-  helper.PrintPerformance (transientPeriods * appPeriod, appStopTime);
+  helper.PrintPerformance (Seconds (0), appStopTime + Hours(1));
 
   return 0;
 }

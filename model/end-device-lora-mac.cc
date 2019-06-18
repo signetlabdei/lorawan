@@ -72,6 +72,14 @@ EndDeviceLoraMac::GetTypeId (void)
                      MakeTraceSourceAccessor
                        (&EndDeviceLoraMac::m_aggregatedDutyCycle),
                      "ns3::TracedValueCallback::Double")
+    .AddAttribute ("MType",
+                   "Specify type of message will be sent by this ED.",
+                   EnumValue (LoraMacHeader::UNCONFIRMED_DATA_UP),
+                   MakeEnumAccessor (&EndDeviceLoraMac::m_mType),
+                   MakeEnumChecker (LoraMacHeader::UNCONFIRMED_DATA_UP,
+                                    "Unconfirmed",
+                                    LoraMacHeader::CONFIRMED_DATA_UP,
+                                    "Confirmed"))
     .AddConstructor<EndDeviceLoraMac> ();
   return tid;
 }
@@ -678,7 +686,7 @@ EndDeviceLoraMac::OpenFirstReceiveWindow (void)
 
   //Calculate the duration of a single symbol for the first receive window DR
   double tSym = pow (2, GetSfFromDataRate (GetFirstReceiveWindowDataRate ())) / GetBandwidthFromDataRate ( GetFirstReceiveWindowDataRate ());
-  
+
   // Schedule return to sleep after "at least the time required by the end
   // device's radio transceiver to effectively detect a downlink preamble"
   // (LoraWAN specification)
@@ -742,10 +750,10 @@ EndDeviceLoraMac::OpenSecondReceiveWindow (void)
     (m_secondReceiveWindowFrequency);
   m_phy->GetObject<EndDeviceLoraPhy> ()->SetSpreadingFactor (GetSfFromDataRate
                                                                (m_secondReceiveWindowDataRate));
-  
+
   //Calculate the duration of a single symbol for the second receive window DR
   double tSym = pow (2, GetSfFromDataRate (GetSecondReceiveWindowDataRate ())) / GetBandwidthFromDataRate ( GetSecondReceiveWindowDataRate ());
-    
+
   // Schedule return to sleep after "at least the time required by the end
   // device's radio transceiver to effectively detect a downlink preamble"
   // (LoraWAN specification)
@@ -855,10 +863,10 @@ EndDeviceLoraMac::GetNextTransmissionDelay (void)
     {
       NS_LOG_WARN ("Attempting to send when there are receive windows:" <<
                    " Transmission postponed.");
-      
+
       //Calculate the duration of a single symbol for the second receive window DR
       double tSym = pow (2, GetSfFromDataRate (GetSecondReceiveWindowDataRate ())) / GetBandwidthFromDataRate ( GetSecondReceiveWindowDataRate ());
-      
+
       Time endSecondRxWindow = (m_receiveDelay2 + Seconds (m_receiveWindowDurationInSymbols*tSym));
       waitingTime = std::max (waitingTime, endSecondRxWindow);
     }
