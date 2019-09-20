@@ -41,18 +41,18 @@ TypeId
 EndDeviceStatus::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::EndDeviceStatus")
-    .SetParent<Object> ()
-    .AddConstructor<EndDeviceStatus> ()
-    .SetGroupName ("lorawan");
+                          .SetParent<Object> ()
+                          .AddConstructor<EndDeviceStatus> ()
+                          .SetGroupName ("lorawan");
   return tid;
 }
 
 EndDeviceStatus::EndDeviceStatus (LoraDeviceAddress endDeviceAddress,
-                                  Ptr<EndDeviceLoraMac> endDeviceMac) :
-  m_reply (EndDeviceStatus::Reply ()),
-  m_endDeviceAddress (endDeviceAddress),
-  m_receivedPacketList (ReceivedPacketList ()),
-  m_mac (endDeviceMac)
+                                  Ptr<EndDeviceLoraMac> endDeviceMac)
+    : m_reply (EndDeviceStatus::Reply ()),
+      m_endDeviceAddress (endDeviceAddress),
+      m_receivedPacketList (ReceivedPacketList ()),
+      m_mac (endDeviceMac)
 {
   NS_LOG_FUNCTION (endDeviceAddress);
 }
@@ -106,7 +106,6 @@ EndDeviceStatus::GetSecondReceiveWindowFrequency ()
   return m_secondReceiveWindowFrequency;
 }
 
-
 Ptr<Packet>
 EndDeviceStatus::GetCompleteReplyPacket (void)
 {
@@ -114,12 +113,12 @@ EndDeviceStatus::GetCompleteReplyPacket (void)
 
   // Start from reply payload
   Ptr<Packet> replyPacket;
-  if (m_reply.payload)     // If it has APP data to send
+  if (m_reply.payload) // If it has APP data to send
     {
       NS_LOG_DEBUG ("Crafting reply packet from existing payload");
       replyPacket = m_reply.payload->Copy ();
     }
-  else     // If no APP data needs to be sent, use an empty payload
+  else // If no APP data needs to be sent, use an empty payload
     {
       NS_LOG_DEBUG ("Crafting reply packet using an empty payload");
       replyPacket = Create<Packet> (0);
@@ -240,12 +239,9 @@ EndDeviceStatus::SetReplyPayload (Ptr<Packet> replyPayload)
 ///////////////////////
 
 void
-EndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket,
-                                       const Address& gwAddress)
+EndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket, const Address &gwAddress)
 {
   NS_LOG_FUNCTION_NOARGS ();
-
-  NS_LOG_DEBUG (*this);
 
   // Create a copy of the packet
   Ptr<Packet> myPacket = receivedPacket->Copy ();
@@ -288,10 +284,9 @@ EndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket,
       frameHdr.SetAsUplink ();
       packetCopy->RemoveHeader (currentFrameHdr);
 
-      NS_LOG_DEBUG ("Received packet's frame counter: " <<
-                    unsigned(frameHdr.GetFCnt ()) <<
-                    "\nCurrent packet's frame counter: " <<
-                    unsigned(currentFrameHdr.GetFCnt ()));
+      NS_LOG_DEBUG ("Received packet's frame counter: " << unsigned(frameHdr.GetFCnt ())
+                                                        << "\nCurrent packet's frame counter: "
+                                                        << unsigned(currentFrameHdr.GetFCnt ()));
 
       if (frameHdr.GetFCnt () == currentFrameHdr.GetFCnt ())
         {
@@ -299,7 +294,7 @@ EndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket,
 
           // This packet had already been received from another gateway:
           // add this gateway's reception information.
-          GatewayList& gwList = it->second.gwList;
+          GatewayList &gwList = it->second.gwList;
 
           PacketInfoPerGw gwInfo;
           gwInfo.receivedTime = Simulator::Now ();
@@ -309,7 +304,7 @@ EndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket,
 
           NS_LOG_DEBUG ("Size of gateway list: " << gwList.size ());
 
-          break;     // Exit from the cycle
+          break; // Exit from the cycle
         }
     }
   if (it == m_receivedPacketList.rend ())
@@ -320,9 +315,10 @@ EndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket,
       gwInfo.rxPower = rcvPower;
       gwInfo.gwAddress = gwAddress;
       info.gwList.insert (std::pair<Address, PacketInfoPerGw> (gwAddress, gwInfo));
-      m_receivedPacketList.push_back (std::pair<Ptr<Packet const>, ReceivedPacketInfo>
-                                        (receivedPacket, info));
+      m_receivedPacketList.push_back (
+          std::pair<Ptr<Packet const>, ReceivedPacketInfo> (receivedPacket, info));
     }
+  NS_LOG_DEBUG (*this);
 }
 
 EndDeviceStatus::ReceivedPacketInfo
@@ -384,27 +380,25 @@ EndDeviceStatus::GetPowerGatewayMap (void)
     {
       Address currentGwAddress = (*it).first;
       double currentRxPower = (*it).second.rxPower;
-      gatewayPowers.insert(std::pair<double, Address> (currentRxPower,
-                                                       currentGwAddress));
+      gatewayPowers.insert (std::pair<double, Address> (currentRxPower, currentGwAddress));
     }
 
   return gatewayPowers;
 }
 
-std::ostream&
-operator<< (std::ostream& os, const EndDeviceStatus& status)
+std::ostream &
+operator<< (std::ostream &os, const EndDeviceStatus &status)
 {
   os << "Total packets received: " << status.m_receivedPacketList.size () << std::endl;
 
-  for (auto j = status.m_receivedPacketList.begin ();
-       j != status.m_receivedPacketList.end ();
-       j++)
+  for (auto j = status.m_receivedPacketList.begin (); j != status.m_receivedPacketList.end (); j++)
     {
       EndDeviceStatus::ReceivedPacketInfo info = (*j).second;
       EndDeviceStatus::GatewayList gatewayList = info.gwList;
       Ptr<Packet const> pkt = (*j).first;
       os << pkt << " " << gatewayList.size () << std::endl;
-      for (EndDeviceStatus::GatewayList::iterator k = gatewayList.begin (); k != gatewayList.end (); k++)
+      for (EndDeviceStatus::GatewayList::iterator k = gatewayList.begin (); k != gatewayList.end ();
+           k++)
         {
           EndDeviceStatus::PacketInfoPerGw infoPerGw = (*k).second;
           os << "  " << infoPerGw.gwAddress << " " << infoPerGw.rxPower << std::endl;
@@ -412,7 +406,6 @@ operator<< (std::ostream& os, const EndDeviceStatus& status)
     }
 
   return os;
-
 }
-}
-}
+} // namespace lorawan
+} // namespace ns3
