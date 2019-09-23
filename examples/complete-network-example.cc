@@ -325,7 +325,9 @@ int main (int argc, char *argv[])
   // Print results to file //
   ///////////////////////////
   NS_LOG_INFO ("Computing performance metrics...");
-  // helper.PrintPerformance (transientPeriods * appPeriod, appStopTime);
+
+  LoraPacketTracker& tracker = helper.GetPacketTracker ();
+  std::cout << tracker.CountMacPacketsGlobally(Seconds(0), appStopTime + Hours (1)) << std::endl;
 
   return 0;
 }
