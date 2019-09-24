@@ -110,94 +110,94 @@ LoraPacketTracker::MacGwReceptionCallback (Ptr<Packet const> packet)
 /////////////////
 
 void
-LoraPacketTracker::TransmissionCallback (Ptr<Packet const> packet, uint32_t systemId)
+LoraPacketTracker::TransmissionCallback (Ptr<Packet const> packet, uint32_t edId)
 {
   if (IsUplink (packet))
     {
       NS_LOG_INFO ("PHY packet " << packet
                                  << " was transmitted by device "
-                                 << systemId);
+                                 << edId);
       // Create a packetStatus
       PacketStatus status;
       status.packet = packet;
       status.sendTime = Simulator::Now ();
-      status.senderId = systemId;
+      status.senderId = edId;
 
       m_packetTracker.insert (std::pair<Ptr<Packet const>, PacketStatus> (packet, status));
     }
 }
 
 void
-LoraPacketTracker::PacketReceptionCallback (Ptr<Packet const> packet, uint32_t systemId)
+LoraPacketTracker::PacketReceptionCallback (Ptr<Packet const> packet, uint32_t gwId)
 {
   if (IsUplink (packet))
     {
       // Remove the successfully received packet from the list of sent ones
       NS_LOG_INFO ("PHY packet " << packet
                                  << " was successfully received at gateway "
-                                 << systemId);
+                                 << gwId);
 
       std::map<Ptr<Packet const>, PacketStatus>::iterator it = m_packetTracker.find (packet);
-      (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (systemId,
+      (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (gwId,
                                                                            RECEIVED));
     }
 }
 
 void
-LoraPacketTracker::InterferenceCallback (Ptr<Packet const> packet, uint32_t systemId)
+LoraPacketTracker::InterferenceCallback (Ptr<Packet const> packet, uint32_t gwId)
 {
   if (IsUplink (packet))
     {
       NS_LOG_INFO ("PHY packet " << packet
                                  << " was interfered at gateway "
-                                 << systemId);
+                                 << gwId);
 
       std::map<Ptr<Packet const>, PacketStatus>::iterator it = m_packetTracker.find (packet);
-      (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (systemId,
+      (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (gwId,
                                                                            INTERFERED));
     }
 }
 
 void
-LoraPacketTracker::NoMoreReceiversCallback (Ptr<Packet const> packet, uint32_t systemId)
+LoraPacketTracker::NoMoreReceiversCallback (Ptr<Packet const> packet, uint32_t gwId)
 {
   if (IsUplink (packet))
     {
       NS_LOG_INFO ("PHY packet " << packet
                                  << " was lost because no more receivers at gateway "
-                                 << systemId);
+                                 << gwId);
       std::map<Ptr<Packet const>, PacketStatus>::iterator it = m_packetTracker.find (packet);
-      (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (systemId,
+      (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (gwId,
                                                                            NO_MORE_RECEIVERS));
     }
 }
 
 void
-LoraPacketTracker::UnderSensitivityCallback (Ptr<Packet const> packet, uint32_t systemId)
+LoraPacketTracker::UnderSensitivityCallback (Ptr<Packet const> packet, uint32_t gwId)
 {
   if (IsUplink (packet))
     {
       NS_LOG_INFO ("PHY packet " << packet
                                  << " was lost because under sensitivity at gateway "
-                                 << systemId);
+                                 << gwId);
 
       std::map<Ptr<Packet const>, PacketStatus>::iterator it = m_packetTracker.find (packet);
-      (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (systemId,
+      (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (gwId,
                                                                            UNDER_SENSITIVITY));
     }
 }
 
 void
-LoraPacketTracker::LostBecauseTxCallback (Ptr<Packet const> packet, uint32_t systemId)
+LoraPacketTracker::LostBecauseTxCallback (Ptr<Packet const> packet, uint32_t gwId)
 {
   if (IsUplink (packet))
     {
       NS_LOG_INFO ("PHY packet " << packet
                                  << " was lost because of GW transmission at gateway "
-                                 << systemId);
+                                 << gwId);
 
       std::map<Ptr<Packet const>, PacketStatus>::iterator it = m_packetTracker.find (packet);
-      (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (systemId,
+      (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (gwId,
                                                                            LOST_BECAUSE_TX));
     }
 }
@@ -219,7 +219,7 @@ LoraPacketTracker::IsUplink (Ptr<Packet const> packet)
 
 std::vector<int>
 LoraPacketTracker::CountPhyPacketsPerGw (Time startTime, Time stopTime,
-                                         int systemId)
+                                         int gwId)
 {
   // Vector packetCounts will contain - for the interval given in the input of
   // the function, the following fields: totPacketsSent receivedPackets
@@ -239,9 +239,9 @@ LoraPacketTracker::CountPhyPacketsPerGw (Time startTime, Time stopTime,
           NS_LOG_DEBUG ("This packet was received by " <<
                         (*itPhy).second.outcomes.size () << " gateways");
 
-          if ((*itPhy).second.outcomes.count (systemId) > 0)
+          if ((*itPhy).second.outcomes.count (gwId) > 0)
             {
-              switch ((*itPhy).second.outcomes.at (systemId))
+              switch ((*itPhy).second.outcomes.at (gwId))
                 {
                 case RECEIVED:
                   {
@@ -281,7 +281,7 @@ LoraPacketTracker::CountPhyPacketsPerGw (Time startTime, Time stopTime,
 }
 std::string
 LoraPacketTracker::PrintPhyPacketsPerGw (Time startTime, Time stopTime,
-                                         int systemId)
+                                         int gwId)
 {
   // Vector packetCounts will contain - for the interval given in the input of
   // the function, the following fields: totPacketsSent receivedPackets
@@ -301,9 +301,9 @@ LoraPacketTracker::PrintPhyPacketsPerGw (Time startTime, Time stopTime,
           NS_LOG_DEBUG ("This packet was received by " <<
                         (*itPhy).second.outcomes.size () << " gateways");
 
-          if ((*itPhy).second.outcomes.count (systemId) > 0)
+          if ((*itPhy).second.outcomes.count (gwId) > 0)
             {
-              switch ((*itPhy).second.outcomes.at (systemId))
+              switch ((*itPhy).second.outcomes.at (gwId))
                 {
                 case RECEIVED:
                   {
