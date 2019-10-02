@@ -45,7 +45,7 @@ public:
   /**
    * Define the operational region.
    */
-  enum Regions { EU, US, China, EU433MHz, Australia, CN, AS923MHz, SouthKorea, ALOHA };
+  enum Regions { EU868, US915, China, EU433MHz, Australia, CN, AS923MHz, SouthKorea, ALOHA };
 
   /**
    * Create a mac helper without any parameter set. The user must set
@@ -110,18 +110,18 @@ private:
   /**
    * Perform region-specific configurations for the 868 MHz EU band.
    */
-  void ConfigureForEuRegion (Ptr<ClassAEndDeviceLorawanMac> edMac) const;
+  void ConfigureForEu868Region (Ptr<ClassAEndDeviceLorawanMac> edMac) const;
 
   /**
    * Perform region-specific configurations for the 868 MHz EU band.
    */
-  void ConfigureForEuRegion (Ptr<GatewayLorawanMac> gwMac) const;
+  void ConfigureForEu868Region (Ptr<GatewayLorawanMac> gwMac) const;
 
   /**
    * Apply configurations that are common both for the GatewayLorawanMac and the
    * ClassAEndDeviceLorawanMac classes.
    */
-  void ApplyCommonEuConfigurations (Ptr<LorawanMac> lorawanMac) const;
+  void ApplyCommonEu868Configurations (Ptr<LorawanMac> lorawanMac) const;
 
   /**
    * Perform region-specific configurations for the ALOHA band.
@@ -138,6 +138,22 @@ private:
    * ClassAEndDeviceLorawanMac classes.
    */
   void ApplyCommonAlohaConfigurations (Ptr<LorawanMac> lorawanMac) const;
+
+  /**
+   * Perform region-specific configurations for the 915 MHz US band.
+   */
+  void ConfigureForUS915Region (Ptr<EndDeviceLorawanMac> edMac) const;
+
+  /**
+   * Perform region-specific configurations for the 915 MHz US band.
+   */
+  void ConfigureForUS915Region (Ptr<GatewayLorawanMac> gwMac) const;
+
+  /**
+   * Apply configurations that are common both for the GatewayLoraMac and the
+   * EndDeviceLoraMac classes.
+   */
+  void ApplyCommonUS915Configurations (Ptr<LorawanMac> loraMac) const;
 
   ObjectFactory m_mac;
   Ptr<LoraDeviceAddressGenerator> m_addrGen; //!< Pointer to the address generator to use

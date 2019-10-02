@@ -119,7 +119,7 @@ int main (int argc, char *argv[])
   phyHelper.SetDeviceType (LoraPhyHelper::ED);
   macHelper.SetDeviceType (LorawanMacHelper::ED_A);
   macHelper.SetAddressGenerator (addrGen);
-  macHelper.SetRegion (LorawanMacHelper::EU);
+  macHelper.SetRegion (LoraMacHelper::EU868);
   helper.Install (phyHelper, macHelper, endDevices);
 
   // Set message type (Default is unconfirmed)
@@ -153,7 +153,7 @@ int main (int argc, char *argv[])
   helper.Install (phyHelper, macHelper, gateways);
 
   // Set spreading factors up
-  macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
+  // macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
 
   ////////////
   // Create NS
