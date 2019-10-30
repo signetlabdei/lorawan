@@ -58,8 +58,8 @@ Otherwise, if tests fail or crash, consider filing an issue.
 
 The module includes the following examples:
 
-- `simple-lorawan-network-example`
-- `complete-lorawan-network-example`
+- `simple-network-example`
+- `complete-network-example`
 - `network-server-example`
 
 Examples can be run via the `./waf --run example-name` command.
