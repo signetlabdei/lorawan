@@ -51,7 +51,7 @@ LoraMacHelper::SetDeviceType (enum DeviceType dt)
       m_mac.SetTypeId ("ns3::GatewayLoraMac");
       break;
     case ED:
-      m_mac.SetTypeId ("ns3::EndDeviceLoraMac");
+      m_mac.SetTypeId ("ns3::EndDeviceLorawanMac");
       break;
     }
   m_deviceType = dt;
@@ -80,7 +80,7 @@ LoraMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
   // If we are operating on an end device, add an address to it
   if (m_deviceType == ED && m_addrGen != 0)
     {
-      mac->GetObject<EndDeviceLoraMac> ()->SetDeviceAddress
+      mac->GetObject<EndDeviceLorawanMac> ()->SetDeviceAddress
         (m_addrGen->NextAddress ());
     }
 
@@ -88,7 +88,7 @@ LoraMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
   // operating
   if (m_deviceType == ED)
     {
-      Ptr<EndDeviceLoraMac> edMac = mac->GetObject<EndDeviceLoraMac> ();
+      Ptr<EndDeviceLorawanMac> edMac = mac->GetObject<EndDeviceLorawanMac> ();
       switch (m_region)
         {
         case LoraMacHelper::EU:
@@ -124,7 +124,7 @@ LoraMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
 }
 
 void
-LoraMacHelper::ConfigureForEuRegion (Ptr<EndDeviceLoraMac> edMac) const
+LoraMacHelper::ConfigureForEuRegion (Ptr<EndDeviceLorawanMac> edMac) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -252,7 +252,7 @@ LoraMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer ga
       Ptr<NetDevice> netDevice = object->GetDevice (0);
       Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
       NS_ASSERT (loraNetDevice != 0);
-      Ptr<EndDeviceLoraMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLoraMac> ();
+      Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
       NS_ASSERT (mac != 0);
 
       // Try computing the distance from each gateway and find the best one
@@ -414,7 +414,7 @@ LoraMacHelper::SetSpreadingFactorsGivenDistribution (NodeContainer endDevices,
       Ptr<NetDevice> netDevice = object->GetDevice (0);
       Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
       NS_ASSERT (loraNetDevice != 0);
-      Ptr<EndDeviceLoraMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLoraMac> ();
+      Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
       NS_ASSERT (mac != 0);
 
       double prob = uniformRV->GetValue(0,1);
