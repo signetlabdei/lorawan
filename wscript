@@ -1,4 +1,4 @@
-# -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+end-device-lorawan-mac# -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
 # def options(opt):
 #     pass
@@ -20,7 +20,7 @@ def build(bld):
         'model/lora-channel.cc',
         'model/lora-interference-helper.cc',
         'model/gateway-lora-mac.cc',
-        'model/end-device-lora-mac.cc',
+        'model/end-device-lorawan-mac.cc',
         'model/gateway-lora-phy.cc',
         'model/end-device-lora-phy.cc',
         'model/simple-end-device-lora-phy.cc',
@@ -81,7 +81,7 @@ def build(bld):
         'model/lora-channel.h',
         'model/lora-interference-helper.h',
         'model/gateway-lora-mac.h',
-        'model/end-device-lora-mac.h',
+        'model/end-device-lorawan-mac.h',
         'model/gateway-lora-phy.h',
         'model/end-device-lora-phy.h',
         'model/simple-end-device-lora-phy.h',
