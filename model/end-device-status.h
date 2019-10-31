@@ -185,7 +185,7 @@ public:
 
   EndDeviceStatus ();
   EndDeviceStatus (LoraDeviceAddress endDeviceAddress,
-                   Ptr<EndDeviceLoraMac> endDeviceMac);
+                   Ptr<EndDeviceLorawanMac> endDeviceMac);
   virtual ~EndDeviceStatus ();
 
   /**
@@ -256,7 +256,7 @@ public:
    */
   void SetReplyPayload (Ptr<Packet> replyPayload);
 
-  Ptr<EndDeviceLoraMac> GetMac (void);
+  Ptr<EndDeviceLorawanMac> GetMac (void);
 
   //////////////////////
   //  Other methods  //
@@ -316,7 +316,7 @@ private:
 
   // NOTE Using this attribute is 'cheating', since we are assuming perfect
   // synchronization between the info at the device and at the network server
-  Ptr<EndDeviceLoraMac> m_mac;   //!< Pointer to the MAC layer of this device
+  Ptr<EndDeviceLorawanMac> m_mac;   //!< Pointer to the MAC layer of this device
 };
 }
 

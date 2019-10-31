@@ -57,7 +57,7 @@ NetworkStatus::~NetworkStatus ()
 }
 
 void
-NetworkStatus::AddNode (Ptr<EndDeviceLoraMac> edMac)
+NetworkStatus::AddNode (Ptr<EndDeviceLorawanMac> edMac)
 {
   NS_LOG_FUNCTION (this << edMac);
 
@@ -67,7 +67,7 @@ NetworkStatus::AddNode (Ptr<EndDeviceLoraMac> edMac)
     {
       // The device doesn't exist. Create new EndDeviceStatus
       Ptr<EndDeviceStatus> edStatus = CreateObject<EndDeviceStatus>
-        (edAddress, edMac->GetObject<EndDeviceLoraMac>());
+        (edAddress, edMac->GetObject<EndDeviceLorawanMac>());
 
       // Add it to the map
       m_endDeviceStatuses.insert (std::pair<LoraDeviceAddress, Ptr<EndDeviceStatus> >

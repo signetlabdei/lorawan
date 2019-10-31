@@ -64,7 +64,7 @@ public:
   DeviceStatus ();
   virtual ~DeviceStatus ();
 
-  DeviceStatus (Ptr<EndDeviceLoraMac> endDeviceMac);
+  DeviceStatus (Ptr<EndDeviceLorawanMac> endDeviceMac);
 
   /**
    * Get the data rate this device is using
@@ -174,7 +174,7 @@ public:
   uint8_t GetSecondReceiveWindowDataRate (void);
 
 private:
-  Ptr<EndDeviceLoraMac> m_mac;   //!< Pointer to the device
+  Ptr<EndDeviceLorawanMac> m_mac;   //!< Pointer to the device
 
   LoraDeviceAddress m_address;   //!< The address of this device
 

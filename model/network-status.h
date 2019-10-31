@@ -54,7 +54,7 @@ public:
   /**
    * Add a device to the ones that are tracked by this NetworkStatus object.
    */
-  void AddNode (Ptr<EndDeviceLoraMac> edMac);
+  void AddNode (Ptr<EndDeviceLorawanMac> edMac);
 
   /**
    * Add this gateway to the list of gateways connected to the network.
