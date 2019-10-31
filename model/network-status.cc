@@ -57,7 +57,7 @@ NetworkStatus::~NetworkStatus ()
 }
 
 void
-NetworkStatus::AddNode (Ptr<EndDeviceLoraMac> edMac)
+NetworkStatus::AddNode (Ptr<EndDeviceLorawanMac> edMac)
 {
   NS_LOG_FUNCTION (this << edMac);
 
@@ -67,7 +67,7 @@ NetworkStatus::AddNode (Ptr<EndDeviceLoraMac> edMac)
     {
       // The device doesn't exist. Create new EndDeviceStatus
       Ptr<EndDeviceStatus> edStatus = CreateObject<EndDeviceStatus>
-        (edAddress, edMac->GetObject<EndDeviceLoraMac>());
+        (edAddress, edMac->GetObject<EndDeviceLorawanMac>());
 
       // Add it to the map
       m_endDeviceStatuses.insert (std::pair<LoraDeviceAddress, Ptr<EndDeviceStatus> >
@@ -104,7 +104,7 @@ NetworkStatus::OnReceivedPacket (Ptr<const Packet> packet,
   Ptr<Packet> myPacket = packet->Copy ();
 
   // Extract the headers
-  LoraMacHeader macHdr;
+  LorawanMacHeader macHdr;
   myPacket->RemoveHeader (macHdr);
   LoraFrameHeader frameHdr;
   frameHdr.SetAsUplink ();
@@ -206,7 +206,7 @@ NetworkStatus::GetEndDeviceStatus (Ptr<Packet const> packet)
   NS_LOG_FUNCTION (this << packet);
 
   // Get the address
-  LoraMacHeader mHdr;
+  LorawanMacHeader mHdr;
   LoraFrameHeader fHdr;
   Ptr<Packet> myPacket = packet->Copy ();
   myPacket->RemoveHeader (mHdr);

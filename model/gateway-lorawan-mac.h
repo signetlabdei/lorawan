@@ -21,33 +21,33 @@
 #ifndef GATEWAY_LORA_MAC_H
 #define GATEWAY_LORA_MAC_H
 
-#include "ns3/lora-mac.h"
+#include "ns3/lorawan-mac.h"
 #include "ns3/lora-tag.h"
 
 namespace ns3 {
 namespace lorawan {
 
-class GatewayLoraMac : public LoraMac
+class GatewayLorawanMac : public LorawanMac
 {
 public:
   static TypeId GetTypeId (void);
 
-  GatewayLoraMac ();
-  virtual ~GatewayLoraMac ();
+  GatewayLorawanMac ();
+  virtual ~GatewayLorawanMac ();
 
-  // Implementation of the LoraMac interface
+  // Implementation of the LorawanMac interface
   virtual void Send (Ptr<Packet> packet);
 
-  // Implementation of the LoraMac interface
+  // Implementation of the LorawanMac interface
   bool IsTransmitting (void);
 
-  // Implementation of the LoraMac interface
+  // Implementation of the LorawanMac interface
   virtual void Receive (Ptr<Packet const> packet);
 
-  // Implementation of the LoraMac interface
+  // Implementation of the LorawanMac interface
   virtual void FailedReception (Ptr<Packet const> packet);
 
-  // Implementation of the LoraMac interface
+  // Implementation of the LorawanMac interface
   virtual void TxFinished (Ptr<Packet const> packet);
 
   /**

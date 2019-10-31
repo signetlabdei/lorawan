@@ -47,7 +47,7 @@ GatewayStatus::~GatewayStatus ()
 }
 
 GatewayStatus::GatewayStatus (Address address, Ptr<NetDevice> netDevice,
-                              Ptr<GatewayLoraMac> gwMac) :
+                              Ptr<GatewayLorawanMac> gwMac) :
   m_address (address),
   m_netDevice (netDevice),
   m_gatewayMac (gwMac),
@@ -84,7 +84,7 @@ GatewayStatus::SetNetDevice (Ptr<NetDevice> netDevice)
   m_netDevice = netDevice;
 }
 
-Ptr<GatewayLoraMac>
+Ptr<GatewayLorawanMac>
 GatewayStatus::GetGatewayMac (void)
 {
   return m_gatewayMac;

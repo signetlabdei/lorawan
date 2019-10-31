@@ -9,7 +9,7 @@
 #include "ns3/lora-channel.h"
 #include "ns3/mobility-helper.h"
 #include "ns3/lora-phy-helper.h"
-#include "ns3/lora-mac-helper.h"
+#include "ns3/lorawan-mac-helper.h"
 #include "ns3/lora-helper.h"
 #include "ns3/gateway-lora-phy.h"
 #include "ns3/periodic-sender.h"
@@ -63,8 +63,8 @@ int main (int argc, char *argv[])
   cmd.AddValue ("MultiplePacketsCombiningMethod",
                 "ns3::AdrComponent::MultiplePacketsCombiningMethod");
   cmd.AddValue ("HistoryRange", "ns3::AdrComponent::HistoryRange");
-  cmd.AddValue ("MType", "ns3::EndDeviceLoraMac::MType");
-  cmd.AddValue ("EDDRAdaptation", "ns3::EndDeviceLoraMac::EnableEDDataRateAdaptation");
+  cmd.AddValue ("MType", "ns3::EndDeviceLorawanMac::MType");
+  cmd.AddValue ("EDDRAdaptation", "ns3::EndDeviceLorawanMac::EnableEDDataRateAdaptation");
   cmd.AddValue ("ChangeTransmissionPower",
                 "ns3::AdrComponent::ChangeTransmissionPower");
    cmd.AddValue ("AdrEnabled", "Whether to enable ADR", adrEnabled);
@@ -92,7 +92,7 @@ int main (int argc, char *argv[])
                  "Maximum speed for mobile devices",
                  maxSpeed);
    cmd.AddValue ("MaxTransmissions",
-                 "ns3::EndDeviceLoraMac::MaxTransmissions");
+                 "ns3::EndDeviceLorawanMac::MaxTransmissions");
    cmd.Parse (argc, argv);
 
    int gatewayRings = 2 + (std::sqrt(2) * sideLength) / (gatewayDistance);
@@ -113,13 +113,13 @@ int main (int argc, char *argv[])
    // LogComponentEnable ("MacCommand", LOG_LEVEL_ALL);
    // LogComponentEnable ("AdrExploraSf", LOG_LEVEL_ALL);
    // LogComponentEnable ("AdrExploraAt", LOG_LEVEL_ALL);
-   // LogComponentEnable ("EndDeviceLoraMac", LOG_LEVEL_ALL);
+   // LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_ALL);
    LogComponentEnableAll (LOG_PREFIX_FUNC);
    LogComponentEnableAll (LOG_PREFIX_NODE);
    LogComponentEnableAll (LOG_PREFIX_TIME);
 
    // Set the EDs to require Data Rate control from the NS
-   Config::SetDefault ("ns3::EndDeviceLoraMac::DRControl", BooleanValue (true));
+   Config::SetDefault ("ns3::EndDeviceLorawanMac::DRControl", BooleanValue (true));
 
    // Create a simple wireless channel
    ///////////////////////////////////
@@ -171,8 +171,8 @@ int main (int argc, char *argv[])
    LoraPhyHelper phyHelper = LoraPhyHelper ();
    phyHelper.SetChannel (channel);
 
-   // Create the LoraMacHelper
-   LoraMacHelper macHelper = LoraMacHelper ();
+   // Create the LorawanMacHelper
+   LorawanMacHelper macHelper = LorawanMacHelper ();
 
    // Create the LoraHelper
    LoraHelper helper = LoraHelper ();
@@ -188,7 +188,7 @@ int main (int argc, char *argv[])
 
    // Create the LoraNetDevices of the gateways
    phyHelper.SetDeviceType (LoraPhyHelper::GW);
-   macHelper.SetDeviceType (LoraMacHelper::GW);
+   macHelper.SetDeviceType (LorawanMacHelper::GW);
    helper.Install (phyHelper, macHelper, gateways);
 
    // Create EDs
@@ -224,9 +224,9 @@ int main (int argc, char *argv[])
 
   // Create the LoraNetDevices of the end devices
   phyHelper.SetDeviceType (LoraPhyHelper::ED);
-  macHelper.SetDeviceType (LoraMacHelper::ED);
+  macHelper.SetDeviceType (LorawanMacHelper::ED);
   macHelper.SetAddressGenerator (addrGen);
-  macHelper.SetRegion (LoraMacHelper::EU);
+  macHelper.SetRegion (LorawanMacHelper::EU);
   helper.Install (phyHelper, macHelper, endDevices);
 
   // Install applications in EDs
@@ -261,9 +261,9 @@ int main (int argc, char *argv[])
   forwarderHelper.Install (gateways);
 
   // Connect our traces
-  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/0/$ns3::LoraNetDevice/Mac/$ns3::EndDeviceLoraMac/TxPower",
+  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/0/$ns3::LoraNetDevice/Mac/$ns3::EndDeviceLorawanMac/TxPower",
                                  MakeCallback (&OnTxPowerChange));
-  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/0/$ns3::LoraNetDevice/Mac/$ns3::EndDeviceLoraMac/DataRate",
+  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/0/$ns3::LoraNetDevice/Mac/$ns3::EndDeviceLorawanMac/DataRate",
                                  MakeCallback (&OnDataRateChange));
 
   // Activate printing of ED MAC parameters

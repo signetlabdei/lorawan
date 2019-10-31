@@ -23,13 +23,13 @@
 #include "ns3/net-device.h"
 #include "ns3/point-to-point-net-device.h"
 #include "ns3/packet.h"
-#include "ns3/lora-mac-header.h"
+#include "ns3/lorawan-mac-header.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/lora-device-address.h"
 #include "ns3/network-status.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/node-container.h"
-#include "ns3/end-device-lora-mac.h"
+#include "ns3/end-device-lorawan-mac.h"
 #include "ns3/mac-command.h"
 
 namespace ns3 {
@@ -96,8 +96,8 @@ NetworkServer::AddGateway (Ptr<Node> gateway, Ptr<NetDevice> netDevice)
     }
 
   // Get the gateway's LoRa MAC layer (assumes gateway's MAC is configured as first device)
-  Ptr<GatewayLoraMac> gwMac = gateway->GetDevice (0)->GetObject<LoraNetDevice> ()->
-    GetMac ()->GetObject<GatewayLoraMac> ();
+  Ptr<GatewayLorawanMac> gwMac = gateway->GetDevice (0)->GetObject<LoraNetDevice> ()->
+    GetMac ()->GetObject<GatewayLorawanMac> ();
   NS_ASSERT (gwMac != 0);
 
   // Get the Address
@@ -142,11 +142,11 @@ NetworkServer::AddNode (Ptr<Node> node)
     }
 
   // Get the MAC
-  Ptr<EndDeviceLoraMac> edLoraMac =
-    loraNetDevice->GetMac ()->GetObject<EndDeviceLoraMac> ();
+  Ptr<EndDeviceLorawanMac> edLorawanMac =
+    loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
 
   // Update the NetworkStatus about the existence of this node
-  m_status->AddNode (edLoraMac);
+  m_status->AddNode (edLorawanMac);
 }
 
 bool

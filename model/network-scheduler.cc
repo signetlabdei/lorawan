@@ -43,7 +43,7 @@ NetworkScheduler::OnReceivedPacket (Ptr<const Packet> packet)
 
   // Get the current packet's frame counter
   Ptr<Packet> packetCopy = packet->Copy ();
-  LoraMacHeader receivedMacHdr;
+  LorawanMacHeader receivedMacHdr;
   packetCopy->RemoveHeader (receivedMacHdr);
   LoraFrameHeader receivedFrameHdr;
   receivedFrameHdr.SetAsUplink ();
@@ -56,7 +56,7 @@ NetworkScheduler::OnReceivedPacket (Ptr<const Packet> packet)
   if (savedPacket)
     {
       Ptr<Packet> savedPacketCopy = savedPacket->Copy ();
-      LoraMacHeader savedMacHdr;
+      LorawanMacHeader savedMacHdr;
       savedPacketCopy->RemoveHeader (savedMacHdr);
       LoraFrameHeader savedFrameHdr;
       savedFrameHdr.SetAsUplink ();

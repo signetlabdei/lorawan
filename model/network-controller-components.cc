@@ -73,7 +73,7 @@ ConfirmedMessagesComponent::OnReceivedPacket (Ptr<const Packet> packet,
   NS_LOG_FUNCTION (this->GetTypeId () << packet << networkStatus);
 
   // Check whether the received packet requires an acknowledgment.
-  LoraMacHeader mHdr;
+  LorawanMacHeader mHdr;
   LoraFrameHeader fHdr;
   fHdr.SetAsUplink ();
   Ptr<Packet> myPacket = packet->Copy ();
@@ -83,7 +83,7 @@ ConfirmedMessagesComponent::OnReceivedPacket (Ptr<const Packet> packet,
   NS_LOG_INFO ("Received packet Mac Header: " << mHdr);
   NS_LOG_INFO ("Received packet Frame Header: " << fHdr);
 
-  if (mHdr.GetMType () == LoraMacHeader::CONFIRMED_DATA_UP)
+  if (mHdr.GetMType () == LorawanMacHeader::CONFIRMED_DATA_UP)
     {
       NS_LOG_INFO ("Packet requires confirmation");
 
@@ -91,7 +91,7 @@ ConfirmedMessagesComponent::OnReceivedPacket (Ptr<const Packet> packet,
       status->m_reply.frameHeader.SetAsDownlink ();
       status->m_reply.frameHeader.SetAck (true);
       status->m_reply.frameHeader.SetAddress (fHdr.GetAddress ());
-      status->m_reply.macHeader.SetMType (LoraMacHeader::UNCONFIRMED_DATA_DOWN);
+      status->m_reply.macHeader.SetMType (LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
       status->m_reply.needsReply = true;
 
       // Note that the acknowledgment procedure dies here: "Acknowledgments
@@ -160,7 +160,7 @@ LinkCheckComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
   NS_LOG_FUNCTION (this << status << networkStatus);
 
   Ptr<Packet> myPacket = status->GetLastPacketReceivedFromDevice ()->Copy ();
-  LoraMacHeader mHdr;
+  LorawanMacHeader mHdr;
   LoraFrameHeader fHdr;
   fHdr.SetAsUplink ();
   myPacket->RemoveHeader (mHdr);
@@ -181,7 +181,7 @@ LinkCheckComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
       replyCommand->SetGwCnt (gwCount);
       status->m_reply.frameHeader.SetAsDownlink ();
       status->m_reply.frameHeader.AddCommand (replyCommand);
-      status->m_reply.macHeader.SetMType (LoraMacHeader::UNCONFIRMED_DATA_DOWN);
+      status->m_reply.macHeader.SetMType (LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
     }
   else
     {

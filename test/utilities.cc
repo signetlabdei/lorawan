@@ -23,8 +23,8 @@ CreateEndDevices (int nDevices, MobilityHelper mobility, Ptr<LoraChannel> channe
   LoraPhyHelper phyHelper = LoraPhyHelper ();
   phyHelper.SetChannel (channel);
 
-  // Create the LoraMacHelper
-  LoraMacHelper macHelper = LoraMacHelper ();
+  // Create the LorawanMacHelper
+  LorawanMacHelper macHelper = LorawanMacHelper ();
 
   // Create the LoraHelper
   LoraHelper helper = LoraHelper ();
@@ -38,7 +38,7 @@ CreateEndDevices (int nDevices, MobilityHelper mobility, Ptr<LoraChannel> channe
 
   // Create the LoraNetDevices of the end devices
   phyHelper.SetDeviceType (LoraPhyHelper::ED);
-  macHelper.SetDeviceType (LoraMacHelper::ED);
+  macHelper.SetDeviceType (LorawanMacHelper::ED);
   helper.Install (phyHelper, macHelper, endDevices);
 
   return endDevices;
@@ -51,8 +51,8 @@ CreateGateways (int nGateways, MobilityHelper mobility, Ptr<LoraChannel> channel
   LoraPhyHelper phyHelper = LoraPhyHelper ();
   phyHelper.SetChannel (channel);
 
-  // Create the LoraMacHelper
-  LoraMacHelper macHelper = LoraMacHelper ();
+  // Create the LorawanMacHelper
+  LorawanMacHelper macHelper = LorawanMacHelper ();
 
   // Create the LoraHelper
   LoraHelper helper = LoraHelper ();
@@ -65,7 +65,7 @@ CreateGateways (int nGateways, MobilityHelper mobility, Ptr<LoraChannel> channel
 
   // Create a netdevice for each gateway
   phyHelper.SetDeviceType (LoraPhyHelper::GW);
-  macHelper.SetDeviceType (LoraMacHelper::GW);
+  macHelper.SetDeviceType (LorawanMacHelper::GW);
   helper.Install (phyHelper, macHelper, gateways);
 
   return gateways;
@@ -107,7 +107,7 @@ InitializeNetwork (int nDevices, int nGateways)
 
   NodeContainer gateways = CreateGateways (nGateways, mobility, channel);
 
-  LoraMacHelper ().SetSpreadingFactorsUp (endDevices, gateways, channel);
+  LorawanMacHelper ().SetSpreadingFactorsUp (endDevices, gateways, channel);
 
   Ptr<Node> nsNode = CreateNetworkServer (endDevices, gateways);
 

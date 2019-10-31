@@ -22,7 +22,7 @@
 #define LORA_HELPER_H
 
 #include "ns3/lora-phy-helper.h"
-#include "ns3/lora-mac-helper.h"
+#include "ns3/lorawan-mac-helper.h"
 #include "ns3/node-container.h"
 #include "ns3/net-device-container.h"
 #include "ns3/net-device.h"
@@ -57,7 +57,7 @@ public:
    * method.
    */
   virtual NetDeviceContainer Install (const LoraPhyHelper &phyHelper,
-                                      const LoraMacHelper &macHelper,
+                                      const LorawanMacHelper &macHelper,
                                       NodeContainer c) const;
 
   /**
@@ -70,7 +70,7 @@ public:
    * method.
    */
   virtual NetDeviceContainer Install (const LoraPhyHelper &phyHelper,
-                                      const LoraMacHelper &macHelper,
+                                      const LorawanMacHelper &macHelper,
                                       Ptr<Node> node) const;
 
   /**

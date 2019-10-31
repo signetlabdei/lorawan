@@ -96,7 +96,7 @@ AdrComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
   NS_LOG_FUNCTION (this << status << networkStatus);
 
   Ptr<Packet> myPacket = status->GetLastPacketReceivedFromDevice ()->Copy ();
-  LoraMacHeader mHdr;
+  LorawanMacHeader mHdr;
   LoraFrameHeader fHdr;
   fHdr.SetAsUplink ();
   myPacket->RemoveHeader (mHdr);
@@ -152,7 +152,7 @@ AdrComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
                                                          enabledChannels,
                                                          rep);
               status->m_reply.frameHeader.SetAsDownlink ();
-              status->m_reply.macHeader.SetMType (LoraMacHeader::UNCONFIRMED_DATA_DOWN);
+              status->m_reply.macHeader.SetMType (LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
 
               status->m_reply.needsReply = true;
             }

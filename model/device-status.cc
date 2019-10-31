@@ -37,7 +37,7 @@ DeviceStatus::~DeviceStatus ()
   NS_LOG_FUNCTION (this);
 }
 
-DeviceStatus::DeviceStatus (Ptr<EndDeviceLoraMac> endDeviceMac) :
+DeviceStatus::DeviceStatus (Ptr<EndDeviceLorawanMac> endDeviceMac) :
   m_mac (endDeviceMac)
 {
   NS_LOG_FUNCTION (this);

@@ -145,8 +145,8 @@ DownlinkPacketTest::SendPacket (Ptr<Node> endDevice, bool requestAck)
   if (requestAck)
     {
       endDevice->GetDevice (0)->GetObject<LoraNetDevice> ()->GetMac
-        ()->GetObject<EndDeviceLoraMac> ()->SetMType
-        (LoraMacHeader::CONFIRMED_DATA_UP);
+        ()->GetObject<EndDeviceLorawanMac> ()->SetMType
+        (LorawanMacHeader::CONFIRMED_DATA_UP);
     }
   endDevice->GetDevice (0)->Send (Create<Packet> (20), Address (), 0);
 }
@@ -167,7 +167,7 @@ DownlinkPacketTest::DoRun (void)
   Ptr<Node> nsNode = components.nsNode;
 
   // Connect the ED's trace source for received packets
-  endDevices.Get (0)->GetDevice (0)->GetObject<LoraNetDevice>()->GetMac ()->GetObject<EndDeviceLoraMac>()->TraceConnectWithoutContext ("RequiredTransmissions", MakeCallback (&DownlinkPacketTest::ReceivedPacketAtEndDevice, this));
+  endDevices.Get (0)->GetDevice (0)->GetObject<LoraNetDevice>()->GetMac ()->GetObject<EndDeviceLorawanMac>()->TraceConnectWithoutContext ("RequiredTransmissions", MakeCallback (&DownlinkPacketTest::ReceivedPacketAtEndDevice, this));
 
   // Send a packet in uplink
   Simulator::Schedule (Seconds (1), &DownlinkPacketTest::SendPacket, this,
@@ -225,12 +225,12 @@ LinkCheckTest::LastKnownGatewayCount (int newValue,
 void
 LinkCheckTest::SendPacket (Ptr<Node> endDevice, bool requestAck)
 {
-  Ptr<EndDeviceLoraMac> macLayer = endDevice->GetDevice
-      (0)->GetObject<LoraNetDevice> ()->GetMac ()->GetObject<EndDeviceLoraMac> ();
+  Ptr<EndDeviceLorawanMac> macLayer = endDevice->GetDevice
+      (0)->GetObject<LoraNetDevice> ()->GetMac ()->GetObject<EndDeviceLorawanMac> ();
 
   if (requestAck)
     {
-      macLayer->SetMType (LoraMacHeader::CONFIRMED_DATA_UP);
+      macLayer->SetMType (LorawanMacHeader::CONFIRMED_DATA_UP);
     }
 
   macLayer->AddMacCommand (Create<LinkCheckReq> ());
@@ -254,7 +254,7 @@ LinkCheckTest::DoRun (void)
   Ptr<Node> nsNode = components.nsNode;
 
   // Connect the ED's trace source for Last known Gateway Count
-  endDevices.Get (0)->GetDevice (0)->GetObject<LoraNetDevice>()->GetMac ()->GetObject<EndDeviceLoraMac>()->TraceConnectWithoutContext ("LastKnownGatewayCount", MakeCallback (&LinkCheckTest::LastKnownGatewayCount, this));
+  endDevices.Get (0)->GetDevice (0)->GetObject<LoraNetDevice>()->GetMac ()->GetObject<EndDeviceLorawanMac>()->TraceConnectWithoutContext ("LastKnownGatewayCount", MakeCallback (&LinkCheckTest::LastKnownGatewayCount, this));
 
   // Send a packet in uplink
   Simulator::Schedule (Seconds (1), &LinkCheckTest::SendPacket, this,
@@ -292,8 +292,8 @@ NetworkServerTestSuite::NetworkServerTestSuite ()
   LogComponentEnable ("NetworkController", LOG_LEVEL_ALL);
   LogComponentEnable ("NetworkControllerComponent", LOG_LEVEL_ALL);
   LogComponentEnable ("LoraNetDevice", LOG_LEVEL_ALL);
-  LogComponentEnable ("GatewayLoraMac", LOG_LEVEL_ALL);
-  LogComponentEnable ("EndDeviceLoraMac", LOG_LEVEL_ALL);
+  LogComponentEnable ("GatewayLorawanMac", LOG_LEVEL_ALL);
+  LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_ALL);
   LogComponentEnable ("EndDeviceLoraPhy", LOG_LEVEL_ALL);
   LogComponentEnable ("EndDeviceStatus", LOG_LEVEL_ALL);
 

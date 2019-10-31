@@ -243,7 +243,7 @@ private:
 
 // Add some help text to this case to describe what it is intended to test
 HeaderTest::HeaderTest ()
-  : TestCase ("Verify that LoraMacHeader and LoraFrameHeader work as expected")
+  : TestCase ("Verify that LorawanMacHeader and LoraFrameHeader work as expected")
 {
 }
 
@@ -260,10 +260,10 @@ HeaderTest::DoRun (void)
   NS_LOG_DEBUG ("HeaderTest");
 
   //////////////////////////////////
-  // Test the LoraMacHeader class //
+  // Test the LorawanMacHeader class //
   //////////////////////////////////
-  LoraMacHeader macHdr;
-  macHdr.SetMType (LoraMacHeader::CONFIRMED_DATA_DOWN);
+  LorawanMacHeader macHdr;
+  macHdr.SetMType (LorawanMacHeader::CONFIRMED_DATA_DOWN);
   macHdr.SetMajor (1);
 
   Buffer macBuf;
@@ -273,7 +273,7 @@ HeaderTest::DoRun (void)
 
   macHdr.Deserialize (macSerialized);
 
-  NS_TEST_EXPECT_MSG_EQ ((macHdr.GetMType () == LoraMacHeader::CONFIRMED_DATA_DOWN), true, "MType changes in the serialization/deserialization process");
+  NS_TEST_EXPECT_MSG_EQ ((macHdr.GetMType () == LorawanMacHeader::CONFIRMED_DATA_DOWN), true, "MType changes in the serialization/deserialization process");
   NS_TEST_EXPECT_MSG_EQ ((macHdr.GetMajor () == 1), true, "MType changes in the serialization/deserialization process");
 
   ////////////////////////////////////
@@ -318,7 +318,7 @@ HeaderTest::DoRun (void)
   //        = 10 + (8+3) + 1 = 22
   NS_TEST_EXPECT_MSG_EQ ((pkt->GetSize ()), 22, "Wrong size of packet + headers");
 
-  LoraMacHeader macHdr1;
+  LorawanMacHeader macHdr1;
 
   pkt->RemoveHeader (macHdr1);
 
@@ -1292,36 +1292,36 @@ PhyConnectivityTest::DoRun (void)
 }
 
 /*****************
- * LoraMacTest *
+ * LorawanMacTest *
  *****************/
 
-class LoraMacTest : public TestCase
+class LorawanMacTest : public TestCase
 {
 public:
-  LoraMacTest ();
-  virtual ~LoraMacTest ();
+  LorawanMacTest ();
+  virtual ~LorawanMacTest ();
 
 private:
   virtual void DoRun (void);
 };
 
 // Add some help text to this case to describe what it is intended to test
-LoraMacTest::LoraMacTest ()
+LorawanMacTest::LorawanMacTest ()
   : TestCase ("Verify that the MAC layer of EDs behaves as expected")
 {
 }
 
 // Reminder that the test case should clean up after itself
-LoraMacTest::~LoraMacTest ()
+LorawanMacTest::~LorawanMacTest ()
 {
 }
 
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-LoraMacTest::DoRun (void)
+LorawanMacTest::DoRun (void)
 {
-  NS_LOG_DEBUG ("LoraMacTest");
+  NS_LOG_DEBUG ("LorawanMacTest");
 
 }
 

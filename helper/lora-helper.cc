@@ -40,7 +40,7 @@ NS_LOG_COMPONENT_DEFINE ("LoraHelper");
 
   NetDeviceContainer
   LoraHelper::Install ( const LoraPhyHelper &phyHelper,
-                        const LoraMacHelper &macHelper,
+                        const LorawanMacHelper &macHelper,
                         NodeContainer c) const
   {
     NS_LOG_FUNCTION_NOARGS ();
@@ -103,7 +103,7 @@ NS_LOG_COMPONENT_DEFINE ("LoraHelper");
         }
 
       // Create the MAC
-      Ptr<LoraMac> mac = macHelper.Create (node, device);
+      Ptr<LorawanMac> mac = macHelper.Create (node, device);
       NS_ASSERT (mac != 0);
       mac->SetPhy (phy);
       NS_LOG_DEBUG ("Done creating the MAC");
@@ -148,7 +148,7 @@ NS_LOG_COMPONENT_DEFINE ("LoraHelper");
 
 NetDeviceContainer
 LoraHelper::Install ( const LoraPhyHelper &phy,
-                      const LoraMacHelper &mac,
+                      const LorawanMacHelper &mac,
                       Ptr<Node> node) const
 {
   return Install (phy, mac, NodeContainer (node));
@@ -221,7 +221,7 @@ LoraHelper::DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateway
       Ptr<NetDevice> netDevice = object->GetDevice (0);
       Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
       NS_ASSERT (loraNetDevice != 0);
-      Ptr<EndDeviceLoraMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLoraMac> ();
+      Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
       int dr = int(mac->GetDataRate ());
       double txPower = mac->GetTransmissionPower ();
       Vector pos = position->GetPosition ();

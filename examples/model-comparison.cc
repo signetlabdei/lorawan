@@ -9,7 +9,7 @@
 #include "ns3/lora-channel.h"
 #include "ns3/mobility-helper.h"
 #include "ns3/lora-phy-helper.h"
-#include "ns3/lora-mac-helper.h"
+#include "ns3/lorawan-mac-helper.h"
 #include "ns3/lora-helper.h"
 #include "ns3/gateway-lora-phy.h"
 #include "ns3/periodic-sender.h"
@@ -42,9 +42,9 @@ int main (int argc, char *argv[])
   CommandLine cmd;
   cmd.AddValue ("radius", "Radius in which to place devices", radius);
   cmd.AddValue ("lambda", "App-layer traffic intensity", lambda);
-  cmd.AddValue ("MType", "ns3::EndDeviceLoraMac::MType");
+  cmd.AddValue ("MType", "ns3::EndDeviceLorawanMac::MType");
   cmd.AddValue ("MaxTransmissions",
-                "ns3::EndDeviceLoraMac::MaxTransmissions");
+                "ns3::EndDeviceLorawanMac::MaxTransmissions");
   cmd.Parse (argc, argv);
 
   int nDevices = lambda * appPeriod;
@@ -56,15 +56,15 @@ int main (int argc, char *argv[])
   // LogComponentEnable ("LoraInterferenceHelper", LOG_LEVEL_ALL);
   // LogComponentEnable ("LoraPacketTracker", LOG_LEVEL_ALL);
   // LogComponentEnable ("SimpleGatewayLoraPhy", LOG_LEVEL_ALL);
-  // LogComponentEnable ("EndDeviceLoraMac", LOG_LEVEL_ALL);
+  // LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_ALL);
   // LogComponentEnable ("NetworkServer", LOG_LEVEL_ALL);
   // LogComponentEnable ("NetworkController", LOG_LEVEL_ALL);
-  // LogComponentEnable ("GatewayLoraMac", LOG_LEVEL_ALL);
+  // LogComponentEnable ("GatewayLorawanMac", LOG_LEVEL_ALL);
   // LogComponentEnable ("NetworkScheduler", LOG_LEVEL_ALL);
   // LogComponentEnable ("NetworkStatus", LOG_LEVEL_ALL);
   // LogComponentEnable ("EndDeviceStatus", LOG_LEVEL_ALL);
   // LogComponentEnable ("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
-  // LogComponentEnable ("LoraMacHelper", LOG_LEVEL_ALL);
+  // LogComponentEnable ("LorawanMacHelper", LOG_LEVEL_ALL);
   // LogComponentEnable ("LoraPacketTracker", LOG_LEVEL_ALL);
   LogComponentEnableAll (LOG_PREFIX_FUNC);
   LogComponentEnableAll (LOG_PREFIX_NODE);
@@ -101,8 +101,8 @@ int main (int argc, char *argv[])
   LoraPhyHelper phyHelper = LoraPhyHelper ();
   phyHelper.SetChannel (channel);
 
-  // Create the LoraMacHelper
-  LoraMacHelper macHelper = LoraMacHelper ();
+  // Create the LorawanMacHelper
+  LorawanMacHelper macHelper = LorawanMacHelper ();
 
   // Create the LoraHelper
   LoraHelper helper = LoraHelper ();
@@ -118,7 +118,7 @@ int main (int argc, char *argv[])
 
   // Create the LoraNetDevices of the gateways
   phyHelper.SetDeviceType (LoraPhyHelper::GW);
-  macHelper.SetDeviceType (LoraMacHelper::GW);
+  macHelper.SetDeviceType (LorawanMacHelper::GW);
   helper.Install (phyHelper, macHelper, gateways);
 
   ////////////////
@@ -139,9 +139,9 @@ int main (int argc, char *argv[])
 
   // Create the LoraNetDevices of the end devices
   phyHelper.SetDeviceType (LoraPhyHelper::ED);
-  macHelper.SetDeviceType (LoraMacHelper::ED);
+  macHelper.SetDeviceType (LorawanMacHelper::ED);
   macHelper.SetAddressGenerator (addrGen);
-  macHelper.SetRegion (LoraMacHelper::EU);
+  macHelper.SetRegion (LorawanMacHelper::EU);
   helper.Install (phyHelper, macHelper, endDevices);
 
   // Install applications in EDs

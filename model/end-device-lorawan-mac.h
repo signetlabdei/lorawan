@@ -22,8 +22,8 @@
 #ifndef END_DEVICE_LORA_MAC_H
 #define END_DEVICE_LORA_MAC_H
 
-#include "ns3/lora-mac.h"
-#include "ns3/lora-mac-header.h"
+#include "ns3/lorawan-mac.h"
+#include "ns3/lorawan-mac-header.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/random-variable-stream.h"
 #include "ns3/lora-device-address.h"
@@ -35,13 +35,13 @@ namespace lorawan {
 /**
  * Class representing the MAC layer of a LoRaWAN device.
  */
-class EndDeviceLoraMac : public LoraMac
+class EndDeviceLorawanMac : public LorawanMac
 {
 public:
   static TypeId GetTypeId (void);
 
-  EndDeviceLoraMac ();
-  virtual ~EndDeviceLoraMac ();
+  EndDeviceLorawanMac ();
+  virtual ~EndDeviceLorawanMac ();
 
   /////////////////////
   // Sending methods //
@@ -264,21 +264,21 @@ public:
   void ApplyNecessaryOptions (LoraFrameHeader &frameHeader);
 
   /**
-   * Add the necessary options and MAC commands to the LoraMacHeader.
+   * Add the necessary options and MAC commands to the LorawanMacHeader.
    *
    * \param macHeader The mac header on which to apply the options.
    */
-  void ApplyNecessaryOptions (LoraMacHeader &macHeader);
+  void ApplyNecessaryOptions (LorawanMacHeader &macHeader);
 
   /**
    * Set the message type to send when the Send method is called.
    */
-  void SetMType (LoraMacHeader::MType mType);
+  void SetMType (LorawanMacHeader::MType mType);
 
   /**
    * Get the message type to send when the Send method is called.
    */
-  LoraMacHeader::MType GetMType (void);
+  LorawanMacHeader::MType GetMType (void);
 
   /**
    * Parse and take action on the commands contained on this FrameHeader.
@@ -473,13 +473,13 @@ private:
   Time m_receiveDelay2;
 
   /**
-   * The duration of a receive window in number of symbols. This should be 
+   * The duration of a receive window in number of symbols. This should be
    * converted to time based or the reception parameter used.
-   * 
-   * The downlink preamble transmitted by the gateways contains 8 symbols. 
-   * The receiver requires 5 symbols to detect the preamble and synchronize. 
-   * Therefore there must be a 5 symbols overlap between the receive window 
-   * and the transmitted preamble. 
+   *
+   * The downlink preamble transmitted by the gateways contains 8 symbols.
+   * The receiver requires 5 symbols to detect the preamble and synchronize.
+   * Therefore there must be a 5 symbols overlap between the receive window
+   * and the transmitted preamble.
    * (Ref: Recommended SX1272/76 Settings for EU868 LoRaWAN Network Operation )
    */
   uint8_t m_receiveWindowDurationInSymbols;
@@ -570,7 +570,7 @@ private:
   /**
    * The message type to apply to packets sent with the Send method.
    */
-  LoraMacHeader::MType m_mType;
+  LorawanMacHeader::MType m_mType;
 
   /* Structure containing the retransmission parameters
    * for this device.

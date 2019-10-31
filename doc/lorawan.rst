@@ -99,11 +99,11 @@ LoRaWAN MAC layer, that needs to behave according to the official
 specifications.
 
 To represent these two models, the module features two generic ``LoraPhy`` and
-``LoraMac`` base classes. These classes are then extended by classes that
+``LorawanMac`` base classes. These classes are then extended by classes that
 model the peculiarities of the two wireless network devices: the End Device (ED)
 and the Gateway (GW). So, the PHY layers can be modeled by use of
 ``EndDeviceLoraPhy`` and ``GatewayLoraPhy`` classes, while objects of class
-``EndDeviceLoraMac`` and ``GatewayLoraMac`` are used to represent the MAC layer.
+``EndDeviceLorawanMac`` and ``GatewayLorawanMac`` are used to represent the MAC layer.
 A ``NetworkServer`` application can also be installed on a node that will then
 administer the wireless network through the GW's forwarding application,
 ``Forwarder``, which leverages the gateway's LoRa communication capabilities to
@@ -246,7 +246,7 @@ Headers, MAC commands and addressing system
 ###########################################
 
 The packet structure defined by the LoRaWAN standard is implemented through two
-classes that extend the ``Header`` class: ``LoraMacHeader`` and
+classes that extend the ``Header`` class: ``LorawanMacHeader`` and
 ``LoraFrameHeader``. In particular, ``LoraFrameHeader`` can include MAC commands
 by leveraging the ``MacCommand`` and ``LoraDeviceAddress`` classes, that are
 used to make serialization, deserialization and interpretation of MAC commands
@@ -268,14 +268,14 @@ Since LoRaWAN operates in unlicensed bands that are subject to restrictions on
 duty cycle, a series of objects were created to keep track of available
 transmission time and limit transmission at the MAC layer in case the layers
 above aren't aware of these limitations. A ``LogicalLoraChannelHelper`` is
-assigned to each ``LoraMac`` instance, and is tasked with keeping track of all
+assigned to each ``LorawanMac`` instance, and is tasked with keeping track of all
 available logical channels (which can be added and modified with MAC commands,
 and are represented by the ``LogicalLoraChannel`` class) and is aware of the
 sub-band they are in (through instances of the ``SubBand`` class).
 
 Additionally, in order to enforce duty cycle limitations, this object also
 registers all transmissions that are performed on each channel, and can be
-queried by the ``LoraMac`` instance to know the next time in which transmission
+queried by the ``LorawanMac`` instance to know the next time in which transmission
 will be possible according to the regulation. If a transmission of duration
 :math:`t_{\rm air}` is performed by the device on a channel where the duty cycle
 expressed in fractional form is :math:`\rm dc`, the time the device needs to
@@ -362,7 +362,7 @@ Regional parameters
 
 Since LoRaWAN parameters like default channel lineup and MAC command
 interpretations vary based on the operational region of the network,
-``LoraMacHelper`` includes methods to specify the region. While the current
+``LorawanMacHelper`` includes methods to specify the region. While the current
 implementation is predisposed to support different configurations of the network
 based on the region it's meant to be operating in, currently only the EU region
 using the 868 MHz sub band is supported.
@@ -392,13 +392,13 @@ Helpers
 
 The ``lorawan`` module features helpers to configure the PHY and MAC layers on a
 large number of devices. The two layers are split in two different classes,
-``LoraMacHelper`` and ``LoraPhyHelper``, which can be leveraged by a
+``LorawanMacHelper`` and ``LoraPhyHelper``, which can be leveraged by a
 ``LoraHelper`` object to fully configure a LoRa device (both for EDs and for
 GWs). Since the helpers are general purpose (i.e., they can be used both for ED
 and GW configuration), it is necessary to specify the device type via the
 ``SetDeviceType`` method before the ``Install`` method can be called.
 
-The ``LoraMacHelper`` also exposes a method to set up the Spreading Factors used
+The ``LorawanMacHelper`` also exposes a method to set up the Spreading Factors used
 by the devices participating in the network automatically, based on the channel
 conditions and on the placement of devices and gateways. This procedure is
 contained in the static method ``SetSpreadingFactorsUp``, and works by trying to
@@ -452,13 +452,13 @@ following trace sources are exposed:
   - ``OccupiedReceptionPaths`` is used to keep track of the number of occupied
     reception paths out of the 8 that are available at the gateway;
 
-- In ``LoraMac`` (both ``EndDeviceLoraMac`` and ``GatewayLoraMac``):
+- In ``LorawanMac`` (both ``EndDeviceLorawanMac`` and ``GatewayLorawanMac``):
 
   - ``CannotSendBecauseDutyCycle`` is used to keep track of the number of when a
     packet coming from the application layer cannot be sent on any of the
     available channels because of duty cycle limitations;
 
-- In ``EndDeviceLoraMac``:
+- In ``EndDeviceLorawanMac``:
 
   - ``DataRate`` keeps track of the data rate that is employed by the device;
   - ``LastKnownLinkMargin`` keeps track of the last link margin of this device's
@@ -511,7 +511,7 @@ cover the following classes:
 
 - ``LoraInterferenceHelper``
 - ``LoraDeviceAddress`` and ``LoraDeviceAddressHelper``
-- ``LoraFrameHeader`` and ``LoraMacHeader``
+- ``LoraFrameHeader`` and ``LorawanMacHeader``
 - ``ReceivePath`` and ``GatewayLoraPhy``
 - ``LogicalLoraChannel`` and ``LogicalLoraChannelHelper``
 - ``LoraPhy``

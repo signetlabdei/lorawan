@@ -5,8 +5,8 @@
 
 #include "ns3/end-device-lora-phy.h"
 #include "ns3/gateway-lora-phy.h"
-#include "ns3/end-device-lora-mac.h"
-#include "ns3/gateway-lora-mac.h"
+#include "ns3/end-device-lorawan-mac.h"
+#include "ns3/gateway-lorawan-mac.h"
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "ns3/constant-position-mobility-model.h"
@@ -34,17 +34,17 @@ int main (int argc, char *argv[])
   LogComponentEnable ("EndDeviceLoraPhy", LOG_LEVEL_ALL);
   LogComponentEnable ("GatewayLoraPhy", LOG_LEVEL_ALL);
   LogComponentEnable ("LoraInterferenceHelper", LOG_LEVEL_ALL);
-  LogComponentEnable ("LoraMac", LOG_LEVEL_ALL);
-  LogComponentEnable ("EndDeviceLoraMac", LOG_LEVEL_ALL);
-  LogComponentEnable ("GatewayLoraMac", LOG_LEVEL_ALL);
+  LogComponentEnable ("LorawanMac", LOG_LEVEL_ALL);
+  LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_ALL);
+  LogComponentEnable ("GatewayLorawanMac", LOG_LEVEL_ALL);
   LogComponentEnable ("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
   LogComponentEnable ("LogicalLoraChannel", LOG_LEVEL_ALL);
   LogComponentEnable ("LoraHelper", LOG_LEVEL_ALL);
   LogComponentEnable ("LoraPhyHelper", LOG_LEVEL_ALL);
-  LogComponentEnable ("LoraMacHelper", LOG_LEVEL_ALL);
+  LogComponentEnable ("LorawanMacHelper", LOG_LEVEL_ALL);
   LogComponentEnable ("OneShotSenderHelper", LOG_LEVEL_ALL);
   LogComponentEnable ("OneShotSender", LOG_LEVEL_ALL);
-  LogComponentEnable ("LoraMacHeader", LOG_LEVEL_ALL);
+  LogComponentEnable ("LorawanMacHeader", LOG_LEVEL_ALL);
   LogComponentEnable ("LoraFrameHeader", LOG_LEVEL_ALL);
   LogComponentEnableAll (LOG_PREFIX_FUNC);
   LogComponentEnableAll (LOG_PREFIX_NODE);
@@ -82,8 +82,8 @@ int main (int argc, char *argv[])
   LoraPhyHelper phyHelper = LoraPhyHelper ();
   phyHelper.SetChannel (channel);
 
-  // Create the LoraMacHelper
-  LoraMacHelper macHelper = LoraMacHelper ();
+  // Create the LorawanMacHelper
+  LorawanMacHelper macHelper = LorawanMacHelper ();
 
   // Create the LoraHelper
   LoraHelper helper = LoraHelper ();
@@ -103,7 +103,7 @@ int main (int argc, char *argv[])
 
   // Create the LoraNetDevices of the end devices
   phyHelper.SetDeviceType (LoraPhyHelper::ED);
-  macHelper.SetDeviceType (LoraMacHelper::ED);
+  macHelper.SetDeviceType (LorawanMacHelper::ED);
   helper.Install (phyHelper, macHelper, endDevices);
 
   /*********************
@@ -118,7 +118,7 @@ int main (int argc, char *argv[])
 
   // Create a netdevice for each gateway
   phyHelper.SetDeviceType (LoraPhyHelper::GW);
-  macHelper.SetDeviceType (LoraMacHelper::GW);
+  macHelper.SetDeviceType (LorawanMacHelper::GW);
   helper.Install (phyHelper, macHelper, gateways);
 
   /*********************************************

@@ -24,11 +24,10 @@
 #include "ns3/object.h"
 #include "ns3/lora-net-device.h"
 #include "ns3/lora-device-address.h"
-#include "ns3/lora-mac-header.h"
-#include "ns3/end-device-lora-mac.h"
+#include "ns3/lorawan-mac-header.h"
+#include "ns3/end-device-lorawan-mac.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/pointer.h"
-#include "ns3/lora-mac-header.h"
 #include "ns3/lora-frame-header.h"
 #include <iostream>
 
@@ -94,7 +93,7 @@ public:
   struct Reply
   {
     // The Mac Header to attach to the reply packet.
-    LoraMacHeader macHeader;
+    LorawanMacHeader macHeader;
 
     // The Frame Header to attach to the reply packet.
     LoraFrameHeader frameHeader;
@@ -128,7 +127,7 @@ public:
    *
    * \return The packet reply mac header.
    */
-  LoraMacHeader GetReplyMacHeader (void);
+  LorawanMacHeader GetReplyMacHeader (void);
 
   /**
    * Get the reply packet frame header.
@@ -186,7 +185,7 @@ public:
 
   EndDeviceStatus ();
   EndDeviceStatus (LoraDeviceAddress endDeviceAddress,
-                   Ptr<EndDeviceLoraMac> endDeviceMac);
+                   Ptr<EndDeviceLorawanMac> endDeviceMac);
   virtual ~EndDeviceStatus ();
 
   /**
@@ -245,7 +244,7 @@ public:
   /**
    * Set the reply packet mac header.
    */
-  void SetReplyMacHeader (LoraMacHeader macHeader);
+  void SetReplyMacHeader (LorawanMacHeader macHeader);
 
   /**
    * Set the reply packet frame header.
@@ -257,7 +256,7 @@ public:
    */
   void SetReplyPayload (Ptr<Packet> replyPayload);
 
-  Ptr<EndDeviceLoraMac> GetMac (void);
+  Ptr<EndDeviceLorawanMac> GetMac (void);
 
   //////////////////////
   //  Other methods  //
@@ -317,7 +316,7 @@ private:
 
   // NOTE Using this attribute is 'cheating', since we are assuming perfect
   // synchronization between the info at the device and at the network server
-  Ptr<EndDeviceLoraMac> m_mac;   //!< Pointer to the MAC layer of this device
+  Ptr<EndDeviceLorawanMac> m_mac;   //!< Pointer to the MAC layer of this device
 };
 }
 
