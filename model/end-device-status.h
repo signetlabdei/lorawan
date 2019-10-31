@@ -28,7 +28,6 @@
 #include "ns3/end-device-lorawan-mac.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/pointer.h"
-#include "ns3/lora-mac-header.h"
 #include "ns3/lora-frame-header.h"
 #include <iostream>
 
