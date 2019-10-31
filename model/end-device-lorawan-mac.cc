@@ -19,7 +19,7 @@
  *         Martina Capuzzo <capuzzom@dei.unipd.it>
  */
 
-#include "ns3/end-device-lora-mac.h"
+#include "ns3/end-device-lorawan-mac.h"
 #include "ns3/end-device-lora-phy.h"
 #include "ns3/simulator.h"
 #include "ns3/log.h"

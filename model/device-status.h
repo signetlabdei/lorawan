@@ -26,7 +26,7 @@
 #include "ns3/lora-device-address.h"
 #include "ns3/lora-mac-header.h"
 #include "ns3/lora-frame-header.h"
-#include "ns3/end-device-lora-mac.h"
+#include "ns3/end-device-lorawan-mac.h"
 
 namespace ns3 {
 namespace lorawan {

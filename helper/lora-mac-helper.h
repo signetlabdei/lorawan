@@ -26,7 +26,7 @@
 #include "ns3/lora-phy.h"
 #include "ns3/lora-mac.h"
 #include "ns3/lora-device-address-generator.h"
-#include "ns3/end-device-lora-mac.h"
+#include "ns3/end-device-lorawan-mac.h"
 #include "ns3/gateway-lora-mac.h"
 #include "ns3/node-container.h"
 #include "ns3/random-variable-stream.h"

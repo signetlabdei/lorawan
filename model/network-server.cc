@@ -29,7 +29,7 @@
 #include "ns3/network-status.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/node-container.h"
-#include "ns3/end-device-lora-mac.h"
+#include "ns3/end-device-lorawan-mac.h"
 #include "ns3/mac-command.h"
 
 namespace ns3 {

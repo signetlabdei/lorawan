@@ -35,7 +35,7 @@
 #include "ns3/network-controller.h"
 #include "ns3/node-container.h"
 #include "ns3/log.h"
-#include "ns3/end-device-lora-mac.h"
+#include "ns3/end-device-lorawan-mac.h"
 
 namespace ns3 {
 namespace lorawan {
