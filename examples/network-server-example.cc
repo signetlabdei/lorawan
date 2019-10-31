@@ -51,7 +51,7 @@ int main (int argc, char *argv[])
   // LogComponentEnable("LoraChannel", LOG_LEVEL_ALL);
   // LogComponentEnable("EndDeviceLoraPhy", LOG_LEVEL_ALL);
   // LogComponentEnable("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
-  LogComponentEnable ("EndDeviceLoraMac", LOG_LEVEL_ALL);
+  LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_ALL);
   // LogComponentEnable ("OneShotSender", LOG_LEVEL_ALL);
   // LogComponentEnable("PointToPointNetDevice", LOG_LEVEL_ALL);
   // LogComponentEnable ("Forwarder", LOG_LEVEL_ALL);
@@ -123,8 +123,8 @@ int main (int argc, char *argv[])
 
   // Set message type (Default is unconfirmed)
   Ptr<LoraMac> edMac1 = endDevices.Get (1)->GetDevice (0)->GetObject<LoraNetDevice> ()->GetMac ();
-  Ptr<EndDeviceLoraMac> edLoraMac1 = edMac1->GetObject<EndDeviceLoraMac> ();
-  edLoraMac1->SetMType (LoraMacHeader::CONFIRMED_DATA_UP);
+  Ptr<EndDeviceLorawanMac> edLorawanMac1 = edMac1->GetObject<EndDeviceLorawanMac> ();
+  edLorawanMac1->SetMType (LoraMacHeader::CONFIRMED_DATA_UP);
 
 
   // Install applications in EDs

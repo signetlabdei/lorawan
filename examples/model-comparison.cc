@@ -42,9 +42,9 @@ int main (int argc, char *argv[])
   CommandLine cmd;
   cmd.AddValue ("radius", "Radius in which to place devices", radius);
   cmd.AddValue ("lambda", "App-layer traffic intensity", lambda);
-  cmd.AddValue ("MType", "ns3::EndDeviceLoraMac::MType");
+  cmd.AddValue ("MType", "ns3::EndDeviceLorawanMac::MType");
   cmd.AddValue ("MaxTransmissions",
-                "ns3::EndDeviceLoraMac::MaxTransmissions");
+                "ns3::EndDeviceLorawanMac::MaxTransmissions");
   cmd.Parse (argc, argv);
 
   int nDevices = lambda * appPeriod;
@@ -56,7 +56,7 @@ int main (int argc, char *argv[])
   // LogComponentEnable ("LoraInterferenceHelper", LOG_LEVEL_ALL);
   // LogComponentEnable ("LoraPacketTracker", LOG_LEVEL_ALL);
   // LogComponentEnable ("SimpleGatewayLoraPhy", LOG_LEVEL_ALL);
-  // LogComponentEnable ("EndDeviceLoraMac", LOG_LEVEL_ALL);
+  // LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_ALL);
   // LogComponentEnable ("NetworkServer", LOG_LEVEL_ALL);
   // LogComponentEnable ("NetworkController", LOG_LEVEL_ALL);
   // LogComponentEnable ("GatewayLoraMac", LOG_LEVEL_ALL);
