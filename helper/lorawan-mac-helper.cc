@@ -1,4 +1,4 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+lorawan-mac-helperlorawan-mac-helper/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -18,7 +18,7 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#include "ns3/lora-mac-helper.h"
+#include "ns3/lorawan-mac-helper.h"
 #include "ns3/gateway-lora-phy.h"
 #include "ns3/end-device-lora-phy.h"
 #include "ns3/lora-net-device.h"

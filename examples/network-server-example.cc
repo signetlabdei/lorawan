@@ -10,7 +10,7 @@
 #include "ns3/lora-channel.h"
 #include "ns3/mobility-helper.h"
 #include "ns3/lora-phy-helper.h"
-#include "ns3/lora-mac-helper.h"
+#include "ns3/lorawan-mac-helper.h"
 #include "ns3/lora-helper.h"
 #include "ns3/gateway-lora-phy.h"
 #include "ns3/periodic-sender.h"
