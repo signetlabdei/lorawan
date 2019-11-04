@@ -27,32 +27,32 @@
 namespace ns3 {
 namespace lorawan {
 
-NS_LOG_COMPONENT_DEFINE ("GatewayLoraMac");
+NS_LOG_COMPONENT_DEFINE ("GatewayLorawanMac");
 
-NS_OBJECT_ENSURE_REGISTERED (GatewayLoraMac);
+NS_OBJECT_ENSURE_REGISTERED (GatewayLorawanMac);
 
 TypeId
-GatewayLoraMac::GetTypeId (void)
+GatewayLorawanMac::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::GatewayLoraMac")
+  static TypeId tid = TypeId ("ns3::GatewayLorawanMac")
     .SetParent<LoraMac> ()
-    .AddConstructor<GatewayLoraMac> ()
+    .AddConstructor<GatewayLorawanMac> ()
     .SetGroupName ("lorawan");
   return tid;
 }
 
-GatewayLoraMac::GatewayLoraMac ()
+GatewayLorawanMac::GatewayLorawanMac ()
 {
   NS_LOG_FUNCTION (this);
 }
 
-GatewayLoraMac::~GatewayLoraMac ()
+GatewayLorawanMac::~GatewayLorawanMac ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 void
-GatewayLoraMac::Send (Ptr<Packet> packet)
+GatewayLorawanMac::Send (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
 
@@ -104,13 +104,13 @@ GatewayLoraMac::Send (Ptr<Packet> packet)
 }
 
 bool
-GatewayLoraMac::IsTransmitting (void)
+GatewayLorawanMac::IsTransmitting (void)
 {
   return m_phy->IsTransmitting ();
 }
 
 void
-GatewayLoraMac::Receive (Ptr<Packet const> packet)
+GatewayLorawanMac::Receive (Ptr<Packet const> packet)
 {
   NS_LOG_FUNCTION (this << packet);
 
@@ -136,19 +136,19 @@ GatewayLoraMac::Receive (Ptr<Packet const> packet)
 }
 
 void
-GatewayLoraMac::FailedReception (Ptr<Packet const> packet)
+GatewayLorawanMac::FailedReception (Ptr<Packet const> packet)
 {
   NS_LOG_FUNCTION (this << packet);
 }
 
 void
-GatewayLoraMac::TxFinished (Ptr<const Packet> packet)
+GatewayLorawanMac::TxFinished (Ptr<const Packet> packet)
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
 
 Time
-GatewayLoraMac::GetWaitingTime (double frequency)
+GatewayLorawanMac::GetWaitingTime (double frequency)
 {
   NS_LOG_FUNCTION_NOARGS ();
 

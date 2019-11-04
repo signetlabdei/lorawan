@@ -27,13 +27,13 @@
 namespace ns3 {
 namespace lorawan {
 
-class GatewayLoraMac : public LoraMac
+class GatewayLorawanMac : public LoraMac
 {
 public:
   static TypeId GetTypeId (void);
 
-  GatewayLoraMac ();
-  virtual ~GatewayLoraMac ();
+  GatewayLorawanMac ();
+  virtual ~GatewayLorawanMac ();
 
   // Implementation of the LoraMac interface
   virtual void Send (Ptr<Packet> packet);
