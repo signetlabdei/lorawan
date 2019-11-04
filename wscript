@@ -13,7 +13,7 @@ def build(bld):
                                                'buildings'])
     module.source = [
         'model/lora-net-device.cc',
-        'model/lora-mac.cc',
+        'model/lorawan-mac.cc',
         'model/lora-phy.cc',
         'model/building-penetration-loss.cc',
         'model/correlated-shadowing-propagation-loss-model.cc',
@@ -74,7 +74,7 @@ def build(bld):
     headers.module = 'lorawan'
     headers.source = [
         'model/lora-net-device.h',
-        'model/lora-mac.h',
+        'model/lorawan-mac.h',
         'model/lora-phy.h',
         'model/building-penetration-loss.h',
         'model/correlated-shadowing-propagation-loss-model.h',
