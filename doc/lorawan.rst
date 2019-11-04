@@ -246,7 +246,7 @@ Headers, MAC commands and addressing system
 ###########################################
 
 The packet structure defined by the LoRaWAN standard is implemented through two
-classes that extend the ``Header`` class: ``LoraMacHeader`` and
+classes that extend the ``Header`` class: ``LorawanMacHeader`` and
 ``LoraFrameHeader``. In particular, ``LoraFrameHeader`` can include MAC commands
 by leveraging the ``MacCommand`` and ``LoraDeviceAddress`` classes, that are
 used to make serialization, deserialization and interpretation of MAC commands
@@ -511,7 +511,7 @@ cover the following classes:
 
 - ``LoraInterferenceHelper``
 - ``LoraDeviceAddress`` and ``LoraDeviceAddressHelper``
-- ``LoraFrameHeader`` and ``LoraMacHeader``
+- ``LoraFrameHeader`` and ``LorawanMacHeader``
 - ``ReceivePath`` and ``GatewayLoraPhy``
 - ``LogicalLoraChannel`` and ``LogicalLoraChannelHelper``
 - ``LoraPhy``
