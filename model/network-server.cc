@@ -23,7 +23,7 @@
 #include "ns3/net-device.h"
 #include "ns3/point-to-point-net-device.h"
 #include "ns3/packet.h"
-#include "ns3/lora-mac-header.h"
+#include "ns3/lorawan-mac-header.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/lora-device-address.h"
 #include "ns3/network-status.h"

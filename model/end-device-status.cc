@@ -21,7 +21,7 @@
 
 #include "ns3/end-device-status.h"
 #include "ns3/simulator.h"
-#include "ns3/lora-mac-header.h"
+#include "ns3/lorawan-mac-header.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/log.h"
 #include "ns3/pointer.h"

@@ -18,7 +18,7 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#include "ns3/lora-mac-header.h"
+#include "ns3/lorawan-mac-header.h"
 #include "ns3/log.h"
 #include <bitset>
 

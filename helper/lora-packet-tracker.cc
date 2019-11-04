@@ -21,7 +21,7 @@
 #include "lora-packet-tracker.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
-#include "ns3/lora-mac-header.h"
+#include "ns3/lorawan-mac-header.h"
 #include <iostream>
 #include <fstream>
 
