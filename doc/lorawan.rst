@@ -362,7 +362,7 @@ Regional parameters
 
 Since LoRaWAN parameters like default channel lineup and MAC command
 interpretations vary based on the operational region of the network,
-``LoraMacHelper`` includes methods to specify the region. While the current
+``LorawanMacHelper`` includes methods to specify the region. While the current
 implementation is predisposed to support different configurations of the network
 based on the region it's meant to be operating in, currently only the EU region
 using the 868 MHz sub band is supported.
@@ -392,13 +392,13 @@ Helpers
 
 The ``lorawan`` module features helpers to configure the PHY and MAC layers on a
 large number of devices. The two layers are split in two different classes,
-``LoraMacHelper`` and ``LoraPhyHelper``, which can be leveraged by a
+``LorawanMacHelper`` and ``LoraPhyHelper``, which can be leveraged by a
 ``LoraHelper`` object to fully configure a LoRa device (both for EDs and for
 GWs). Since the helpers are general purpose (i.e., they can be used both for ED
 and GW configuration), it is necessary to specify the device type via the
 ``SetDeviceType`` method before the ``Install`` method can be called.
 
-The ``LoraMacHelper`` also exposes a method to set up the Spreading Factors used
+The ``LorawanMacHelper`` also exposes a method to set up the Spreading Factors used
 by the devices participating in the network automatically, based on the channel
 conditions and on the placement of devices and gateways. This procedure is
 contained in the static method ``SetSpreadingFactorsUp``, and works by trying to
