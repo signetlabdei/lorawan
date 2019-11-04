@@ -39,13 +39,13 @@ class LoraPhy;
  * belongs to an End Device or a Gateway, while holding some functionality that
  * is common to both.
  */
-class LoraMac : public Object
+class LorawanMac : public Object
 {
 public:
   static TypeId GetTypeId (void);
 
-  LoraMac ();
-  virtual ~LoraMac ();
+  LorawanMac ();
+  virtual ~LorawanMac ();
 
   typedef std::array<std::array<uint8_t, 6>, 8> ReplyDataRateMatrix;
 
