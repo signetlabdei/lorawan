@@ -264,21 +264,21 @@ public:
   void ApplyNecessaryOptions (LoraFrameHeader &frameHeader);
 
   /**
-   * Add the necessary options and MAC commands to the LoraMacHeader.
+   * Add the necessary options and MAC commands to the LorawanMacHeader.
    *
    * \param macHeader The mac header on which to apply the options.
    */
-  void ApplyNecessaryOptions (LoraMacHeader &macHeader);
+  void ApplyNecessaryOptions (LorawanMacHeader &macHeader);
 
   /**
    * Set the message type to send when the Send method is called.
    */
-  void SetMType (LoraMacHeader::MType mType);
+  void SetMType (LorawanMacHeader::MType mType);
 
   /**
    * Get the message type to send when the Send method is called.
    */
-  LoraMacHeader::MType GetMType (void);
+  LorawanMacHeader::MType GetMType (void);
 
   /**
    * Parse and take action on the commands contained on this FrameHeader.
@@ -570,7 +570,7 @@ TracedValue<uint8_t> m_requiredTx;
   /**
    * The message type to apply to packets sent with the Send method.
    */
-  LoraMacHeader::MType m_mType;
+  LorawanMacHeader::MType m_mType;
 
   /* Structure containing the retransmission parameters
    * for this device.

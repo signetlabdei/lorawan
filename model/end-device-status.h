@@ -93,7 +93,7 @@ public:
   struct Reply
   {
     // The Mac Header to attach to the reply packet.
-    LoraMacHeader macHeader;
+    LorawanMacHeader macHeader;
 
     // The Frame Header to attach to the reply packet.
     LoraFrameHeader frameHeader;
@@ -127,7 +127,7 @@ public:
    *
    * \return The packet reply mac header.
    */
-  LoraMacHeader GetReplyMacHeader (void);
+  LorawanMacHeader GetReplyMacHeader (void);
 
   /**
    * Get the reply packet frame header.
@@ -244,7 +244,7 @@ public:
   /**
    * Set the reply packet mac header.
    */
-  void SetReplyMacHeader (LoraMacHeader macHeader);
+  void SetReplyMacHeader (LorawanMacHeader macHeader);
 
   /**
    * Set the reply packet frame header.

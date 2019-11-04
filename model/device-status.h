@@ -57,7 +57,7 @@ public:
   {
     bool hasReply = false;   // Whether this device already has a reply.
     Ptr<Packet> packet;   // The packet that will be sent as a reply.
-    LoraMacHeader macHeader; // The MacHeader to attach to the reply packet.
+    LorawanMacHeader macHeader; // The MacHeader to attach to the reply packet.
     LoraFrameHeader frameHeader; // The FrameHeader to attach to the reply packet.
   };
 

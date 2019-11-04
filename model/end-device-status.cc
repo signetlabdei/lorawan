@@ -127,13 +127,13 @@ EndDeviceStatus::GetCompleteReplyPacket (void)
   // Add headers
   m_reply.frameHeader.SetAddress (m_endDeviceAddress);
   Ptr<Packet> lastPacket = GetLastPacketReceivedFromDevice ()->Copy ();
-  LoraMacHeader mHdr;
+  LorawanMacHeader mHdr;
   LoraFrameHeader fHdr;
   fHdr.SetAsUplink ();
   lastPacket->RemoveHeader (mHdr);
   lastPacket->RemoveHeader (fHdr);
   m_reply.frameHeader.SetFCnt (fHdr.GetFCnt ());
-  m_reply.macHeader.SetMType (LoraMacHeader::UNCONFIRMED_DATA_DOWN);
+  m_reply.macHeader.SetMType (LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
   replyPacket->AddHeader (m_reply.frameHeader);
   replyPacket->AddHeader (m_reply.macHeader);
 
@@ -151,7 +151,7 @@ EndDeviceStatus::NeedsReply (void)
   return m_reply.needsReply;
 }
 
-LoraMacHeader
+LorawanMacHeader
 EndDeviceStatus::GetReplyMacHeader ()
 {
   NS_LOG_FUNCTION_NOARGS ();
@@ -214,7 +214,7 @@ EndDeviceStatus::SetSecondReceiveWindowFrequency (double frequency)
 }
 
 void
-EndDeviceStatus::SetReplyMacHeader (LoraMacHeader macHeader)
+EndDeviceStatus::SetReplyMacHeader (LorawanMacHeader macHeader)
 {
   NS_LOG_FUNCTION_NOARGS ();
   m_reply.macHeader = macHeader;
@@ -247,7 +247,7 @@ EndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket, const A
   Ptr<Packet> myPacket = receivedPacket->Copy ();
 
   // Extract the headers
-  LoraMacHeader macHdr;
+  LorawanMacHeader macHdr;
   myPacket->RemoveHeader (macHdr);
 
   LoraFrameHeader frameHdr;
@@ -278,7 +278,7 @@ EndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket, const A
       // Get the frame counter of the current packet to compare it with the
       // newly received one
       Ptr<Packet> packetCopy = ((*it).first)->Copy ();
-      LoraMacHeader currentMacHdr;
+      LorawanMacHeader currentMacHdr;
       packetCopy->RemoveHeader (currentMacHdr);
       LoraFrameHeader currentFrameHdr;
       frameHdr.SetAsUplink ();

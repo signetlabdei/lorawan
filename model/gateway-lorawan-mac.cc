@@ -118,7 +118,7 @@ GatewayLorawanMac::Receive (Ptr<Packet const> packet)
   Ptr<Packet> packetCopy = packet->Copy ();
 
   // Only forward the packet if it's uplink
-  LoraMacHeader macHdr;
+  LorawanMacHeader macHdr;
   packetCopy->PeekHeader (macHdr);
 
   if (macHdr.IsUplink ())

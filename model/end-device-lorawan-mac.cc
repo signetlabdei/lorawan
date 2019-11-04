@@ -90,11 +90,11 @@ EndDeviceLorawanMac::GetTypeId (void)
                    MakeBooleanChecker ())
     .AddAttribute ("MType",
                    "Specify type of message will be sent by this ED.",
-                   EnumValue (LoraMacHeader::UNCONFIRMED_DATA_UP),
+                   EnumValue (LorawanMacHeader::UNCONFIRMED_DATA_UP),
                    MakeEnumAccessor (&EndDeviceLorawanMac::m_mType),
-                   MakeEnumChecker (LoraMacHeader::UNCONFIRMED_DATA_UP,
+                   MakeEnumChecker (LorawanMacHeader::UNCONFIRMED_DATA_UP,
                                     "Unconfirmed",
-                                    LoraMacHeader::CONFIRMED_DATA_UP,
+                                    LorawanMacHeader::CONFIRMED_DATA_UP,
                                     "Confirmed"))
     .AddConstructor<EndDeviceLorawanMac> ();
   return tid;
@@ -120,7 +120,7 @@ EndDeviceLorawanMac::EndDeviceLorawanMac () :
   m_lastKnownLinkMargin (0),
   m_lastKnownGatewayCount (0),
   m_aggregatedDutyCycle (1),
-  m_mType (LoraMacHeader::CONFIRMED_DATA_UP),
+  m_mType (LorawanMacHeader::CONFIRMED_DATA_UP),
   m_currentFCnt (0)
 {
   NS_LOG_FUNCTION (this);
@@ -241,7 +241,7 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
                    " bytes.");
 
       // Add the Lora Mac header to the packet
-      LoraMacHeader macHdr;
+      LorawanMacHeader macHdr;
       ApplyNecessaryOptions (macHdr);
       packet->AddHeader (macHdr);
 
@@ -261,7 +261,7 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       resetRetransmissionParameters ();
 
       // If this is the first transmission of a confirmed packet, save parameters for the (possible) next retransmissions.
-      if (m_mType == LoraMacHeader::CONFIRMED_DATA_UP)
+      if (m_mType == LorawanMacHeader::CONFIRMED_DATA_UP)
         {
           m_retxParams.packet = packet->Copy ();
           m_retxParams.retxLeft = m_maxNumbTx;
@@ -297,7 +297,7 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           m_currentFCnt++;
 
           // Remove the headers
-          LoraMacHeader macHdr;
+          LorawanMacHeader macHdr;
           LoraFrameHeader frameHdr;
           packet->RemoveHeader(macHdr);
           packet->RemoveHeader(frameHdr);
@@ -310,8 +310,8 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           NS_LOG_INFO ("Added frame header of size " << frameHdr.GetSerializedSize () <<
                        " bytes.");
 
-          // Add the Lora Mac header to the packet
-          macHdr = LoraMacHeader ();
+          // Add the Lorawan Mac header to the packet
+          macHdr = LorawanMacHeader ();
           ApplyNecessaryOptions (macHdr);
           packet->AddHeader (macHdr);
           m_retxParams.retxLeft = m_retxParams.retxLeft - 1;           // decreasing the number of retransmissions
@@ -398,7 +398,7 @@ EndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
   Ptr<Packet> packetCopy = packet->Copy ();
 
   // Remove the Mac Header to get some information
-  LoraMacHeader mHdr;
+  LorawanMacHeader mHdr;
   packetCopy->RemoveHeader (mHdr);
 
   NS_LOG_DEBUG ("Mac Header: " << mHdr);
@@ -654,7 +654,7 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LoraFrameHeader& frameHeader)
   frameHeader.SetAddress (m_address);
   frameHeader.SetAdr (m_controlDataRate);
   frameHeader.SetAdrAckReq (0);                     // TODO Set ADRACKREQ if a member variable is true
-  if (m_mType == LoraMacHeader::CONFIRMED_DATA_UP)
+  if (m_mType == LorawanMacHeader::CONFIRMED_DATA_UP)
     {
       frameHeader.SetAck (1);
     }
@@ -678,7 +678,7 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LoraFrameHeader& frameHeader)
 }
 
 void
-EndDeviceLorawanMac::ApplyNecessaryOptions (LoraMacHeader& macHeader)
+EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMacHeader& macHeader)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -687,13 +687,13 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LoraMacHeader& macHeader)
 }
 
 void
-EndDeviceLorawanMac::SetMType (LoraMacHeader::MType mType)
+EndDeviceLorawanMac::SetMType (LorawanMacHeader::MType mType)
 {
   m_mType = mType;
   NS_LOG_DEBUG ("Message type is set to " << mType);
 }
 
-LoraMacHeader::MType
+LorawanMacHeader::MType
 EndDeviceLorawanMac::GetMType (void)
 {
   return m_mType;

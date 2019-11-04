@@ -104,7 +104,7 @@ NetworkStatus::OnReceivedPacket (Ptr<const Packet> packet,
   Ptr<Packet> myPacket = packet->Copy ();
 
   // Extract the headers
-  LoraMacHeader macHdr;
+  LorawanMacHeader macHdr;
   myPacket->RemoveHeader (macHdr);
   LoraFrameHeader frameHdr;
   frameHdr.SetAsUplink ();
@@ -206,7 +206,7 @@ NetworkStatus::GetEndDeviceStatus (Ptr<Packet const> packet)
   NS_LOG_FUNCTION (this << packet);
 
   // Get the address
-  LoraMacHeader mHdr;
+  LorawanMacHeader mHdr;
   LoraFrameHeader fHdr;
   Ptr<Packet> myPacket = packet->Copy ();
   myPacket->RemoveHeader (mHdr);
