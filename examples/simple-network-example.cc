@@ -44,7 +44,7 @@ int main (int argc, char *argv[])
   LogComponentEnable ("LorawanMacHelper", LOG_LEVEL_ALL);
   LogComponentEnable ("OneShotSenderHelper", LOG_LEVEL_ALL);
   LogComponentEnable ("OneShotSender", LOG_LEVEL_ALL);
-  LogComponentEnable ("LoraMacHeader", LOG_LEVEL_ALL);
+  LogComponentEnable ("LorawanMacHeader", LOG_LEVEL_ALL);
   LogComponentEnable ("LoraFrameHeader", LOG_LEVEL_ALL);
   LogComponentEnableAll (LOG_PREFIX_FUNC);
   LogComponentEnableAll (LOG_PREFIX_NODE);

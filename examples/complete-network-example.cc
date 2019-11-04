@@ -88,7 +88,7 @@ int main (int argc, char *argv[])
   // LogComponentEnable("LorawanMacHelper", LOG_LEVEL_ALL);
   // LogComponentEnable("PeriodicSenderHelper", LOG_LEVEL_ALL);
   // LogComponentEnable("PeriodicSender", LOG_LEVEL_ALL);
-  // LogComponentEnable("LoraMacHeader", LOG_LEVEL_ALL);
+  // LogComponentEnable("LorawanMacHeader", LOG_LEVEL_ALL);
   // LogComponentEnable("LoraFrameHeader", LOG_LEVEL_ALL);
   // LogComponentEnable("NetworkScheduler", LOG_LEVEL_ALL);
   // LogComponentEnable("NetworkServer", LOG_LEVEL_ALL);

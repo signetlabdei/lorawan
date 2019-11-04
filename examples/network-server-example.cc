@@ -44,7 +44,7 @@ int main (int argc, char *argv[])
   LogComponentEnable ("NetworkServer", LOG_LEVEL_ALL);
   LogComponentEnable ("GatewayLorawanMac", LOG_LEVEL_ALL);
   // LogComponentEnable("LoraFrameHeader", LOG_LEVEL_ALL);
-  // LogComponentEnable("LoraMacHeader", LOG_LEVEL_ALL);
+  // LogComponentEnable("LorawanMacHeader", LOG_LEVEL_ALL);
   // LogComponentEnable("MacCommand", LOG_LEVEL_ALL);
   // LogComponentEnable("GatewayLoraPhy", LOG_LEVEL_ALL);
   // LogComponentEnable("LoraPhy", LOG_LEVEL_ALL);
@@ -124,7 +124,7 @@ int main (int argc, char *argv[])
   // Set message type (Default is unconfirmed)
   Ptr<LoraMac> edMac1 = endDevices.Get (1)->GetDevice (0)->GetObject<LoraNetDevice> ()->GetMac ();
   Ptr<EndDeviceLorawanMac> edLorawanMac1 = edMac1->GetObject<EndDeviceLorawanMac> ();
-  edLorawanMac1->SetMType (LoraMacHeader::CONFIRMED_DATA_UP);
+  edLorawanMac1->SetMType (LorawanMacHeader::CONFIRMED_DATA_UP);
 
 
   // Install applications in EDs
