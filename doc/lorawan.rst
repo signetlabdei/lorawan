@@ -99,7 +99,7 @@ LoRaWAN MAC layer, that needs to behave according to the official
 specifications.
 
 To represent these two models, the module features two generic ``LoraPhy`` and
-``LoraMac`` base classes. These classes are then extended by classes that
+``LorawanMac`` base classes. These classes are then extended by classes that
 model the peculiarities of the two wireless network devices: the End Device (ED)
 and the Gateway (GW). So, the PHY layers can be modeled by use of
 ``EndDeviceLoraPhy`` and ``GatewayLoraPhy`` classes, while objects of class
@@ -268,14 +268,14 @@ Since LoRaWAN operates in unlicensed bands that are subject to restrictions on
 duty cycle, a series of objects were created to keep track of available
 transmission time and limit transmission at the MAC layer in case the layers
 above aren't aware of these limitations. A ``LogicalLoraChannelHelper`` is
-assigned to each ``LoraMac`` instance, and is tasked with keeping track of all
+assigned to each ``LorawanMac`` instance, and is tasked with keeping track of all
 available logical channels (which can be added and modified with MAC commands,
 and are represented by the ``LogicalLoraChannel`` class) and is aware of the
 sub-band they are in (through instances of the ``SubBand`` class).
 
 Additionally, in order to enforce duty cycle limitations, this object also
 registers all transmissions that are performed on each channel, and can be
-queried by the ``LoraMac`` instance to know the next time in which transmission
+queried by the ``LorawanMac`` instance to know the next time in which transmission
 will be possible according to the regulation. If a transmission of duration
 :math:`t_{\rm air}` is performed by the device on a channel where the duty cycle
 expressed in fractional form is :math:`\rm dc`, the time the device needs to
@@ -452,7 +452,7 @@ following trace sources are exposed:
   - ``OccupiedReceptionPaths`` is used to keep track of the number of occupied
     reception paths out of the 8 that are available at the gateway;
 
-- In ``LoraMac`` (both ``EndDeviceLorawanMac`` and ``GatewayLorawanMac``):
+- In ``LorawanMac`` (both ``EndDeviceLorawanMac`` and ``GatewayLorawanMac``):
 
   - ``CannotSendBecauseDutyCycle`` is used to keep track of the number of when a
     packet coming from the application layer cannot be sent on any of the
