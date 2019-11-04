@@ -57,7 +57,7 @@ public:
    * method.
    */
   virtual NetDeviceContainer Install (const LoraPhyHelper &phyHelper,
-                                      const LoraMacHelper &macHelper,
+                                      const LorawanMacHelper &macHelper,
                                       NodeContainer c) const;
 
   /**
@@ -70,7 +70,7 @@ public:
    * method.
    */
   virtual NetDeviceContainer Install (const LoraPhyHelper &phyHelper,
-                                      const LoraMacHelper &macHelper,
+                                      const LorawanMacHelper &macHelper,
                                       Ptr<Node> node) const;
 
   /**

@@ -40,7 +40,7 @@ NS_LOG_COMPONENT_DEFINE ("LoraHelper");
 
   NetDeviceContainer
   LoraHelper::Install ( const LoraPhyHelper &phyHelper,
-                        const LoraMacHelper &macHelper,
+                        const LorawanMacHelper &macHelper,
                         NodeContainer c) const
   {
     NS_LOG_FUNCTION_NOARGS ();
@@ -148,7 +148,7 @@ NS_LOG_COMPONENT_DEFINE ("LoraHelper");
 
 NetDeviceContainer
 LoraHelper::Install ( const LoraPhyHelper &phy,
-                      const LoraMacHelper &mac,
+                      const LorawanMacHelper &mac,
                       Ptr<Node> node) const
 {
   return Install (phy, mac, NodeContainer (node));
