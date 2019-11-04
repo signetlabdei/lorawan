@@ -71,10 +71,10 @@ LorawanMacHelper::SetRegion (enum LorawanMacHelper::Regions region)
   m_region = region;
 }
 
-Ptr<LoraMac>
+Ptr<LorawanMac>
 LorawanMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
 {
-  Ptr<LoraMac> mac = m_mac.Create<LoraMac> ();
+  Ptr<LorawanMac> mac = m_mac.Create<LorawanMac> ();
   mac->SetDevice (device);
 
   // If we are operating on an end device, add an address to it
@@ -138,7 +138,7 @@ LorawanMacHelper::ConfigureForEuRegion (Ptr<EndDeviceLorawanMac> edMac) const
   ////////////////////////////////////////////////////////////
   // Matrix to know which DataRate the GW will respond with //
   ////////////////////////////////////////////////////////////
-  LoraMac::ReplyDataRateMatrix matrix = {{{{0,0,0,0,0,0}},
+  LorawanMac::ReplyDataRateMatrix matrix = {{{{0,0,0,0,0,0}},
                                           {{1,0,0,0,0,0}},
                                           {{2,1,0,0,0,0}},
                                           {{3,2,1,0,0,0}},
@@ -201,7 +201,7 @@ LorawanMacHelper::ConfigureForEuRegion (Ptr<GatewayLorawanMac> gwMac) const
 }
 
 void
-LorawanMacHelper::ApplyCommonEuConfigurations (Ptr<LoraMac> loraMac) const
+LorawanMacHelper::ApplyCommonEuConfigurations (Ptr<LorawanMac> lorawanMac) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -224,16 +224,16 @@ LorawanMacHelper::ApplyCommonEuConfigurations (Ptr<LoraMac> loraMac) const
   channelHelper.AddChannel (lc2);
   channelHelper.AddChannel (lc3);
 
-  loraMac->SetLogicalLoraChannelHelper (channelHelper);
+  lorawanMac->SetLogicalLoraChannelHelper (channelHelper);
 
   ///////////////////////////////////////////////
   // DataRate -> SF, DataRate -> Bandwidth     //
   // and DataRate -> MaxAppPayload conversions //
   ///////////////////////////////////////////////
-  loraMac->SetSfForDataRate (std::vector<uint8_t> {12,11,10,9,8,7,7});
-  loraMac->SetBandwidthForDataRate (std::vector<double>
+  lorawanMac->SetSfForDataRate (std::vector<uint8_t> {12,11,10,9,8,7,7});
+  lorawanMac->SetBandwidthForDataRate (std::vector<double>
                                     {125000,125000,125000,125000,125000,125000,250000});
-  loraMac->SetMaxAppPayloadForDataRate (std::vector<uint32_t>
+  lorawanMac->SetMaxAppPayloadForDataRate (std::vector<uint32_t>
                                         {59,59,59,123,230,230,230,230});
 
 }

@@ -103,7 +103,7 @@ NS_LOG_COMPONENT_DEFINE ("LoraHelper");
         }
 
       // Create the MAC
-      Ptr<LoraMac> mac = macHelper.Create (node, device);
+      Ptr<LorawanMac> mac = macHelper.Create (node, device);
       NS_ASSERT (mac != 0);
       mac->SetPhy (phy);
       NS_LOG_DEBUG ("Done creating the MAC");

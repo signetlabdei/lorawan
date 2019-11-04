@@ -1292,36 +1292,36 @@ PhyConnectivityTest::DoRun (void)
 }
 
 /*****************
- * LoraMacTest *
+ * LorawanMacTest *
  *****************/
 
-class LoraMacTest : public TestCase
+class LorawanMacTest : public TestCase
 {
 public:
-  LoraMacTest ();
-  virtual ~LoraMacTest ();
+  LorawanMacTest ();
+  virtual ~LorawanMacTest ();
 
 private:
   virtual void DoRun (void);
 };
 
 // Add some help text to this case to describe what it is intended to test
-LoraMacTest::LoraMacTest ()
+LorawanMacTest::LorawanMacTest ()
   : TestCase ("Verify that the MAC layer of EDs behaves as expected")
 {
 }
 
 // Reminder that the test case should clean up after itself
-LoraMacTest::~LoraMacTest ()
+LorawanMacTest::~LorawanMacTest ()
 {
 }
 
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-LoraMacTest::DoRun (void)
+LorawanMacTest::DoRun (void)
 {
-  NS_LOG_DEBUG ("LoraMacTest");
+  NS_LOG_DEBUG ("LorawanMacTest");
 
 }
 
