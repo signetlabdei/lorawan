@@ -24,7 +24,7 @@
 #include "ns3/net-device.h"
 #include "ns3/lora-channel.h"
 #include "ns3/lora-phy.h"
-#include "ns3/lora-mac.h"
+#include "ns3/lorawan-mac.h"
 #include "ns3/lora-device-address-generator.h"
 #include "ns3/end-device-lorawan-mac.h"
 #include "ns3/gateway-lorawan-mac.h"

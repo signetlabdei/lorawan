@@ -22,7 +22,7 @@
 #ifndef END_DEVICE_LORA_MAC_H
 #define END_DEVICE_LORA_MAC_H
 
-#include "ns3/lora-mac.h"
+#include "ns3/lorawan-mac.h"
 #include "ns3/lorawan-mac-header.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/random-variable-stream.h"

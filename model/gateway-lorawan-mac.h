@@ -21,7 +21,7 @@
 #ifndef GATEWAY_LORA_MAC_H
 #define GATEWAY_LORA_MAC_H
 
-#include "ns3/lora-mac.h"
+#include "ns3/lorawan-mac.h"
 #include "ns3/lora-tag.h"
 
 namespace ns3 {

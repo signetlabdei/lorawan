@@ -18,7 +18,7 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#include "ns3/lora-mac.h"
+#include "ns3/lorawan-mac.h"
 #include "ns3/log.h"
 
 namespace ns3 {
