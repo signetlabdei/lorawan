@@ -36,7 +36,7 @@ TypeId
 EndDeviceLorawanMac::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::EndDeviceLorawanMac")
-    .SetParent<LoraMac> ()
+    .SetParent<LorawanMac> ()
     .SetGroupName ("lorawan")
     .AddTraceSource ("RequiredTransmissions",
                      "Total number of transmissions required to deliver this packet",

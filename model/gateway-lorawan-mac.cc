@@ -35,7 +35,7 @@ TypeId
 GatewayLorawanMac::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::GatewayLorawanMac")
-    .SetParent<LoraMac> ()
+    .SetParent<LorawanMac> ()
     .AddConstructor<GatewayLorawanMac> ()
     .SetGroupName ("lorawan");
   return tid;

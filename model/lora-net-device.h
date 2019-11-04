@@ -31,15 +31,15 @@ namespace lorawan {
 
 class LoraChannel;
 class LoraPhy;
-class LoraMac;
+class LorawanMac;
 
 /**
  * Hold together all LoRa related objects.
  *
- * This class holds together pointers to LoraChannel, LoraPhy and LoraMac,
+ * This class holds together pointers to LoraChannel, LoraPhy and LorawanMac,
  * exposing methods through which Application instances can send packets. The
  * Application only needs to craft its packets, the NetDevice will take care of
- * calling the LoraMac's Send method with the appropriate parameters.
+ * calling the LorawanMac's Send method with the appropriate parameters.
  */
 class LoraNetDevice : public NetDevice
 {
@@ -51,11 +51,11 @@ public:
   virtual ~LoraNetDevice ();
 
   /**
-   * Set which LoraMac instance is linked to this device.
+   * Set which LorawanMac instance is linked to this device.
    *
    * \param mac the mac layer to use.
    */
-  void SetMac (Ptr<LoraMac> mac);
+  void SetMac (Ptr<LorawanMac> mac);
 
   /**
    * Set which LoraPhy instance is linked to this device.
@@ -65,11 +65,11 @@ public:
   void SetPhy (Ptr<LoraPhy> phy);
 
   /**
-   * Get the LoraMac instance that is linked to this NetDevice.
+   * Get the LorawanMac instance that is linked to this NetDevice.
    *
    * \return the mac we are currently using.
    */
-  Ptr<LoraMac> GetMac (void) const;
+  Ptr<LorawanMac> GetMac (void) const;
 
   /**
    * Get the LoraPhy instance that is linked to this NetDevice.
@@ -152,7 +152,7 @@ private:
   // Member variables
   Ptr<Node> m_node; //!< The Node this NetDevice is connected to.
   Ptr<LoraPhy> m_phy; //!< The LoraPhy this NetDevice is connected to.
-  Ptr<LoraMac> m_mac; //!< The LoraMac this NetDevice is connected to.
+  Ptr<LorawanMac> m_mac; //!< The LorawanMac this NetDevice is connected to.
   bool m_configComplete; //!< Whether the configuration was already completed.
 
   /**

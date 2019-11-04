@@ -72,7 +72,7 @@ private:
   /**
    * The MAC layer of this node.
    */
-  Ptr<LoraMac> m_mac;
+  Ptr<LorawanMac> m_mac;
 };
 
 } //namespace ns3

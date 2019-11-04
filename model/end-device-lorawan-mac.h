@@ -35,7 +35,7 @@ namespace lorawan {
 /**
  * Class representing the MAC layer of a LoRaWAN device.
  */
-class EndDeviceLorawanMac : public LoraMac
+class EndDeviceLorawanMac : public LorawanMac
 {
 public:
   static TypeId GetTypeId (void);
