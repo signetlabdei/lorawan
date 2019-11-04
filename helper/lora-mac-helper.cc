@@ -48,7 +48,7 @@ LoraMacHelper::SetDeviceType (enum DeviceType dt)
   switch (dt)
     {
     case GW:
-      m_mac.SetTypeId ("ns3::GatewayLoraMac");
+      m_mac.SetTypeId ("ns3::GatewayLorawanMac");
       break;
     case ED:
       m_mac.SetTypeId ("ns3::EndDeviceLorawanMac");
@@ -105,7 +105,7 @@ LoraMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
     }
   else
     {
-      Ptr<GatewayLoraMac> gwMac = mac->GetObject<GatewayLoraMac> ();
+      Ptr<GatewayLorawanMac> gwMac = mac->GetObject<GatewayLorawanMac> ();
       switch (m_region)
         {
         case LoraMacHelper::EU:
@@ -161,7 +161,7 @@ LoraMacHelper::ConfigureForEuRegion (Ptr<EndDeviceLorawanMac> edMac) const
 }
 
 void
-LoraMacHelper::ConfigureForEuRegion (Ptr<GatewayLoraMac> gwMac) const
+LoraMacHelper::ConfigureForEuRegion (Ptr<GatewayLorawanMac> gwMac) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 

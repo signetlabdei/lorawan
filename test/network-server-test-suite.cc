@@ -292,7 +292,7 @@ NetworkServerTestSuite::NetworkServerTestSuite ()
   LogComponentEnable ("NetworkController", LOG_LEVEL_ALL);
   LogComponentEnable ("NetworkControllerComponent", LOG_LEVEL_ALL);
   LogComponentEnable ("LoraNetDevice", LOG_LEVEL_ALL);
-  LogComponentEnable ("GatewayLoraMac", LOG_LEVEL_ALL);
+  LogComponentEnable ("GatewayLorawanMac", LOG_LEVEL_ALL);
   LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_ALL);
   LogComponentEnable ("EndDeviceLoraPhy", LOG_LEVEL_ALL);
   LogComponentEnable ("EndDeviceStatus", LOG_LEVEL_ALL);

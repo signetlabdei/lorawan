@@ -130,10 +130,10 @@ private:
   /**
    * Perform region-specific configurations for the 868 MHz EU band.
    */
-  void ConfigureForEuRegion (Ptr<GatewayLoraMac> gwMac) const;
+  void ConfigureForEuRegion (Ptr<GatewayLorawanMac> gwMac) const;
 
   /**
-   * Apply configurations that are common both for the GatewayLoraMac and the
+   * Apply configurations that are common both for the GatewayLorawanMac and the
    * EndDeviceLorawanMac classes.
    */
   void ApplyCommonEuConfigurations (Ptr<LoraMac> loraMac) const;
