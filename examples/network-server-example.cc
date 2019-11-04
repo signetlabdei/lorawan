@@ -96,8 +96,8 @@ int main (int argc, char *argv[])
   LoraPhyHelper phyHelper = LoraPhyHelper ();
   phyHelper.SetChannel (channel);
 
-  // Create the LoraMacHelper
-  LoraMacHelper macHelper = LoraMacHelper ();
+  // Create the LorawanMacHelper
+  LorawanMacHelper macHelper = LorawanMacHelper ();
 
   // Create the LoraHelper
   LoraHelper helper = LoraHelper ();
@@ -116,9 +116,9 @@ int main (int argc, char *argv[])
 
   // Create the LoraNetDevices of the end devices
   phyHelper.SetDeviceType (LoraPhyHelper::ED);
-  macHelper.SetDeviceType (LoraMacHelper::ED);
+  macHelper.SetDeviceType (LorawanMacHelper::ED);
   macHelper.SetAddressGenerator (addrGen);
-  macHelper.SetRegion (LoraMacHelper::EU);
+  macHelper.SetRegion (LorawanMacHelper::EU);
   helper.Install (phyHelper, macHelper, endDevices);
 
   // Set message type (Default is unconfirmed)
@@ -148,7 +148,7 @@ int main (int argc, char *argv[])
 
   // Create the LoraNetDevices of the gateways
   phyHelper.SetDeviceType (LoraPhyHelper::GW);
-  macHelper.SetDeviceType (LoraMacHelper::GW);
+  macHelper.SetDeviceType (LorawanMacHelper::GW);
   helper.Install (phyHelper, macHelper, gateways);
 
   // Set spreading factors up

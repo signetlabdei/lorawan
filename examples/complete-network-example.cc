@@ -85,7 +85,7 @@ int main (int argc, char *argv[])
   // LogComponentEnable("LogicalLoraChannel", LOG_LEVEL_ALL);
   // LogComponentEnable("LoraHelper", LOG_LEVEL_ALL);
   // LogComponentEnable("LoraPhyHelper", LOG_LEVEL_ALL);
-  // LogComponentEnable("LoraMacHelper", LOG_LEVEL_ALL);
+  // LogComponentEnable("LorawanMacHelper", LOG_LEVEL_ALL);
   // LogComponentEnable("PeriodicSenderHelper", LOG_LEVEL_ALL);
   // LogComponentEnable("PeriodicSender", LOG_LEVEL_ALL);
   // LogComponentEnable("LoraMacHeader", LOG_LEVEL_ALL);
@@ -145,8 +145,8 @@ int main (int argc, char *argv[])
   LoraPhyHelper phyHelper = LoraPhyHelper ();
   phyHelper.SetChannel (channel);
 
-  // Create the LoraMacHelper
-  LoraMacHelper macHelper = LoraMacHelper ();
+  // Create the LorawanMacHelper
+  LorawanMacHelper macHelper = LorawanMacHelper ();
 
   // Create the LoraHelper
   LoraHelper helper = LoraHelper ();
@@ -188,7 +188,7 @@ int main (int argc, char *argv[])
   // Create the LoraNetDevices of the end devices
   macHelper.SetAddressGenerator (addrGen);
   phyHelper.SetDeviceType (LoraPhyHelper::ED);
-  macHelper.SetDeviceType (LoraMacHelper::ED);
+  macHelper.SetDeviceType (LorawanMacHelper::ED);
   helper.Install (phyHelper, macHelper, endDevices);
 
   // Now end devices are connected to the channel
@@ -219,7 +219,7 @@ int main (int argc, char *argv[])
 
   // Create a netdevice for each gateway
   phyHelper.SetDeviceType (LoraPhyHelper::GW);
-  macHelper.SetDeviceType (LoraMacHelper::GW);
+  macHelper.SetDeviceType (LorawanMacHelper::GW);
   helper.Install (phyHelper, macHelper, gateways);
 
   /**********************

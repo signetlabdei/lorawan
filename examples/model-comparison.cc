@@ -64,7 +64,7 @@ int main (int argc, char *argv[])
   // LogComponentEnable ("NetworkStatus", LOG_LEVEL_ALL);
   // LogComponentEnable ("EndDeviceStatus", LOG_LEVEL_ALL);
   // LogComponentEnable ("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
-  // LogComponentEnable ("LoraMacHelper", LOG_LEVEL_ALL);
+  // LogComponentEnable ("LorawanMacHelper", LOG_LEVEL_ALL);
   // LogComponentEnable ("LoraPacketTracker", LOG_LEVEL_ALL);
   LogComponentEnableAll (LOG_PREFIX_FUNC);
   LogComponentEnableAll (LOG_PREFIX_NODE);
@@ -101,8 +101,8 @@ int main (int argc, char *argv[])
   LoraPhyHelper phyHelper = LoraPhyHelper ();
   phyHelper.SetChannel (channel);
 
-  // Create the LoraMacHelper
-  LoraMacHelper macHelper = LoraMacHelper ();
+  // Create the LorawanMacHelper
+  LorawanMacHelper macHelper = LorawanMacHelper ();
 
   // Create the LoraHelper
   LoraHelper helper = LoraHelper ();
@@ -118,7 +118,7 @@ int main (int argc, char *argv[])
 
   // Create the LoraNetDevices of the gateways
   phyHelper.SetDeviceType (LoraPhyHelper::GW);
-  macHelper.SetDeviceType (LoraMacHelper::GW);
+  macHelper.SetDeviceType (LorawanMacHelper::GW);
   helper.Install (phyHelper, macHelper, gateways);
 
   ////////////////
@@ -139,9 +139,9 @@ int main (int argc, char *argv[])
 
   // Create the LoraNetDevices of the end devices
   phyHelper.SetDeviceType (LoraPhyHelper::ED);
-  macHelper.SetDeviceType (LoraMacHelper::ED);
+  macHelper.SetDeviceType (LorawanMacHelper::ED);
   macHelper.SetAddressGenerator (addrGen);
-  macHelper.SetRegion (LoraMacHelper::EU);
+  macHelper.SetRegion (LorawanMacHelper::EU);
   helper.Install (phyHelper, macHelper, endDevices);
 
   // Install applications in EDs
