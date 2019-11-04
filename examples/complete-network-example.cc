@@ -7,7 +7,7 @@
 #include "ns3/end-device-lora-phy.h"
 #include "ns3/gateway-lora-phy.h"
 #include "ns3/end-device-lorawan-mac.h"
-#include "ns3/gateway-lora-mac.h"
+#include "ns3/gateway-lorawan-mac.h"
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "ns3/pointer.h"
