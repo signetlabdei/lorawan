@@ -42,7 +42,7 @@ int main (int argc, char *argv[])
 
   LogComponentEnable ("NetworkServerExample", LOG_LEVEL_ALL);
   LogComponentEnable ("NetworkServer", LOG_LEVEL_ALL);
-  LogComponentEnable ("GatewayLoraMac", LOG_LEVEL_ALL);
+  LogComponentEnable ("GatewayLorawanMac", LOG_LEVEL_ALL);
   // LogComponentEnable("LoraFrameHeader", LOG_LEVEL_ALL);
   // LogComponentEnable("LoraMacHeader", LOG_LEVEL_ALL);
   // LogComponentEnable("MacCommand", LOG_LEVEL_ALL);
