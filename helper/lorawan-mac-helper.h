@@ -34,7 +34,7 @@
 namespace ns3 {
 namespace lorawan {
 
-class LoraMacHelper
+class LorawanMacHelper
 {
 public:
   /**
@@ -65,7 +65,7 @@ public:
    * Create a mac helper without any parameter set. The user must set
    * them all to be able to call Install later.
    */
-  LoraMacHelper ();
+  LorawanMacHelper ();
 
   /**
    * Set an attribute of the underlying MAC object.

@@ -18,7 +18,7 @@ lorawan-mac-helperlorawan-mac-helper/* -*- Mode:C++; c-file-style:"gnu"; indent-
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#include "ns3/lorawan-mac-helper.h"
+#include "ns3/lora-mac-helper.h"
 #include "ns3/gateway-lora-phy.h"
 #include "ns3/end-device-lora-phy.h"
 #include "ns3/lora-net-device.h"
@@ -28,21 +28,21 @@ lorawan-mac-helperlorawan-mac-helper/* -*- Mode:C++; c-file-style:"gnu"; indent-
 namespace ns3 {
 namespace lorawan {
 
-NS_LOG_COMPONENT_DEFINE ("LoraMacHelper");
+NS_LOG_COMPONENT_DEFINE ("LorawanMacHelper");
 
-LoraMacHelper::LoraMacHelper ()
-  : m_region (LoraMacHelper::EU)
+LorawanMacHelper::LorawanMacHelper ()
+  : m_region (LorawanMacHelper::EU)
 {
 }
 
 void
-LoraMacHelper::Set (std::string name, const AttributeValue &v)
+LorawanMacHelper::Set (std::string name, const AttributeValue &v)
 {
   m_mac.Set (name, v);
 }
 
 void
-LoraMacHelper::SetDeviceType (enum DeviceType dt)
+LorawanMacHelper::SetDeviceType (enum DeviceType dt)
 {
   NS_LOG_FUNCTION (this << dt);
   switch (dt)
@@ -58,7 +58,7 @@ LoraMacHelper::SetDeviceType (enum DeviceType dt)
 }
 
 void
-LoraMacHelper::SetAddressGenerator (Ptr<LoraDeviceAddressGenerator> addrGen)
+LorawanMacHelper::SetAddressGenerator (Ptr<LoraDeviceAddressGenerator> addrGen)
 {
   NS_LOG_FUNCTION (this);
 
@@ -66,13 +66,13 @@ LoraMacHelper::SetAddressGenerator (Ptr<LoraDeviceAddressGenerator> addrGen)
 }
 
 void
-LoraMacHelper::SetRegion (enum LoraMacHelper::Regions region)
+LorawanMacHelper::SetRegion (enum LorawanMacHelper::Regions region)
 {
   m_region = region;
 }
 
 Ptr<LoraMac>
-LoraMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
+LorawanMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
 {
   Ptr<LoraMac> mac = m_mac.Create<LoraMac> ();
   mac->SetDevice (device);
@@ -91,7 +91,7 @@ LoraMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
       Ptr<EndDeviceLorawanMac> edMac = mac->GetObject<EndDeviceLorawanMac> ();
       switch (m_region)
         {
-        case LoraMacHelper::EU:
+        case LorawanMacHelper::EU:
           {
             ConfigureForEuRegion (edMac);
             break;
@@ -108,7 +108,7 @@ LoraMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
       Ptr<GatewayLorawanMac> gwMac = mac->GetObject<GatewayLorawanMac> ();
       switch (m_region)
         {
-        case LoraMacHelper::EU:
+        case LorawanMacHelper::EU:
           {
             ConfigureForEuRegion (gwMac);
             break;
@@ -124,7 +124,7 @@ LoraMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
 }
 
 void
-LoraMacHelper::ConfigureForEuRegion (Ptr<EndDeviceLorawanMac> edMac) const
+LorawanMacHelper::ConfigureForEuRegion (Ptr<EndDeviceLorawanMac> edMac) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -161,7 +161,7 @@ LoraMacHelper::ConfigureForEuRegion (Ptr<EndDeviceLorawanMac> edMac) const
 }
 
 void
-LoraMacHelper::ConfigureForEuRegion (Ptr<GatewayLorawanMac> gwMac) const
+LorawanMacHelper::ConfigureForEuRegion (Ptr<GatewayLorawanMac> gwMac) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -201,7 +201,7 @@ LoraMacHelper::ConfigureForEuRegion (Ptr<GatewayLorawanMac> gwMac) const
 }
 
 void
-LoraMacHelper::ApplyCommonEuConfigurations (Ptr<LoraMac> loraMac) const
+LorawanMacHelper::ApplyCommonEuConfigurations (Ptr<LoraMac> loraMac) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -239,7 +239,7 @@ LoraMacHelper::ApplyCommonEuConfigurations (Ptr<LoraMac> loraMac) const
 }
 
 std::vector<int>
-LoraMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer gateways, Ptr<LoraChannel> channel)
+LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer gateways, Ptr<LoraChannel> channel)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -382,7 +382,7 @@ LoraMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer ga
 } //  end function
 
 std::vector<int>
-LoraMacHelper::SetSpreadingFactorsGivenDistribution (NodeContainer endDevices,
+LorawanMacHelper::SetSpreadingFactorsGivenDistribution (NodeContainer endDevices,
                                                      NodeContainer gateways,
                                                      std::vector<double> distribution)
 {
