@@ -207,7 +207,7 @@ LoraPacketTracker::IsUplink (Ptr<Packet const> packet)
 {
   NS_LOG_FUNCTION (this);
 
-  LoraMacHeader mHdr;
+  LorawanMacHeader mHdr;
   Ptr<Packet> copy = packet->Copy ();
   copy->RemoveHeader (mHdr);
   return mHdr.IsUplink ();
