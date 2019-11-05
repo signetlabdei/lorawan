@@ -1,4 +1,4 @@
-end-device-lorawan-mac# -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+# -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
 # def options(opt):
 #     pass
