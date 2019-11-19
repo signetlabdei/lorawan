@@ -384,7 +384,8 @@ EndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
   m_phy->GetObject<EndDeviceLoraPhy> ()->SetFrequency (txChannel->GetFrequency ());
 
   // Instruct the PHY on the right Spreading Factor to listen for during the window
-  uint8_t replyDataRate = GetFirstReceiveWindowDataRate ();
+  uint8_t replyDataRate = GetReceiveWindowDataRate ();
+  // uint8_t replyDataRate = GetFirstReceiveWindowDataRate ();
   NS_LOG_DEBUG ("m_dataRate: " << unsigned (m_dataRate) <<
                 ", m_rx1DrOffset: " << unsigned (m_rx1DrOffset) <<
                 ", replyDataRate: " << unsigned (replyDataRate) << ".");
@@ -712,14 +713,24 @@ EndDeviceLorawanMac::TxFinished (Ptr<const Packet> packet)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
-  // Schedule the opening of the first receive window
-  Simulator::Schedule (m_receiveDelay1,
-                       &EndDeviceLorawanMac::OpenFirstReceiveWindow, this);
+  if (m_cType == EndDeviceLorawanMac::CLASS_A) {
+    // Schedule the opening of the first receive window
+    Simulator::Schedule (m_receiveDelay1,
+                         &EndDeviceLorawanMac::OpenFirstReceiveWindow, this);
 
-  // Schedule the opening of the second receive window
-  m_secondReceiveWindow = Simulator::Schedule (m_receiveDelay2,
-                                               &EndDeviceLorawanMac::OpenSecondReceiveWindow,
-                                               this);
+    // Schedule the opening of the second receive window
+    m_secondReceiveWindow = Simulator::Schedule (m_receiveDelay2,
+                                                 &EndDeviceLorawanMac::OpenSecondReceiveWindow,
+                                                 this);
+  }
+  // // Schedule the opening of the first receive window
+  // Simulator::Schedule (m_receiveDelay1,
+  //                      &EndDeviceLorawanMac::OpenFirstReceiveWindow, this);
+  //
+  // // Schedule the opening of the second receive window
+  // m_secondReceiveWindow = Simulator::Schedule (m_receiveDelay2,
+  //                                              &EndDeviceLorawanMac::OpenSecondReceiveWindow,
+  //                                              this);
 
   // Switch the PHY to sleep
   m_phy->GetObject<EndDeviceLoraPhy> ()->SwitchToSleep ();
@@ -906,17 +917,19 @@ EndDeviceLorawanMac::GetNextTransmissionDelay (void)
 
 
   //    Check if there are receiving windows    //
-
-  if (!m_closeFirstWindow.IsExpired () || !m_closeSecondWindow.IsExpired () || !m_secondReceiveWindow.IsExpired () )
+  if (m_cType == EndDeviceLorawanMac::CLASS_A)
     {
-      NS_LOG_WARN ("Attempting to send when there are receive windows:" <<
-                   " Transmission postponed.");
+    if (!m_closeFirstWindow.IsExpired () || !m_closeSecondWindow.IsExpired () || !m_secondReceiveWindow.IsExpired () )
+      {
+        NS_LOG_WARN ("Attempting to send when there are receive windows:" <<
+                     " Transmission postponed.");
 
-      //Calculate the duration of a single symbol for the second receive window DR
-      double tSym = pow (2, GetSfFromDataRate (GetSecondReceiveWindowDataRate ())) / GetBandwidthFromDataRate ( GetSecondReceiveWindowDataRate ());
+        //Calculate the duration of a single symbol for the second receive window DR
+        double tSym = pow (2, GetSfFromDataRate (GetSecondReceiveWindowDataRate ())) / GetBandwidthFromDataRate ( GetSecondReceiveWindowDataRate ());
 
-      Time endSecondRxWindow = (m_receiveDelay2 + Seconds (m_receiveWindowDurationInSymbols*tSym));
-      waitingTime = std::max (waitingTime, endSecondRxWindow);
+        Time endSecondRxWindow = (m_receiveDelay2 + Seconds (m_receiveWindowDurationInSymbols*tSym));
+        waitingTime = std::max (waitingTime, endSecondRxWindow);
+      }
     }
 
   return waitingTime;
@@ -1310,6 +1323,15 @@ EndDeviceLorawanMac::AddSubBand (double startFrequency, double endFrequency, dou
   NS_LOG_FUNCTION_NOARGS ();
 
   m_channelHelper.AddSubBand (startFrequency, endFrequency, dutyCycle, maxTxPowerDbm);
+}
+
+uint8_t
+EndDeviceLorawanMac::GetReceiveWindowDataRate (void) const
+{
+  if (m_cType == EndDeviceLorawanMac::CLASS_A)
+    {
+      return EndDeviceLorawanMac::GetFirstReceiveWindowDataRate (void);
+    }
 }
 
 uint8_t
