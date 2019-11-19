@@ -18,8 +18,8 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#ifndef LORA_MAC_HEADER_H
-#define LORA_MAC_HEADER_H
+#ifndef LORAWAN_MAC_HEADER_H
+#define LORAWAN_MAC_HEADER_H
 
 #include "ns3/header.h"
 

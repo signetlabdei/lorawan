@@ -18,8 +18,8 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#ifndef LORA_MAC_H
-#define LORA_MAC_H
+#ifndef LORAWAN_MAC_H
+#define LORAWAN_MAC_H
 
 #include "ns3/object.h"
 #include "ns3/logical-lora-channel-helper.h"
@@ -281,4 +281,4 @@ protected:
 } /* namespace ns3 */
 
 }
-#endif /* LORA_MAC_H */
+#endif /* LORAWAN_MAC_H */

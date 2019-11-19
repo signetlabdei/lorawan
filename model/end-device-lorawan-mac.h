@@ -19,8 +19,8 @@
  *         Martina Capuzzo <capuzzom@dei.unipd.it>
  */
 
-#ifndef END_DEVICE_LORA_MAC_H
-#define END_DEVICE_LORA_MAC_H
+#ifndef END_DEVICE_LORAWAN_MAC_H
+#define END_DEVICE_LORAWAN_MAC_H
 
 #include "ns3/lorawan-mac.h"
 #include "ns3/lorawan-mac-header.h"
@@ -596,4 +596,4 @@ private:
 } /* namespace ns3 */
 
 }
-#endif /* END_DEVICE_LORA_MAC_H */
+#endif /* END_DEVICE_LORAWAN_MAC_H */

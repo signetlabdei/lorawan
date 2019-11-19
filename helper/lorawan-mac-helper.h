@@ -18,8 +18,8 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#ifndef LORA_MAC_HELPER_H
-#define LORA_MAC_HELPER_H
+#ifndef LORAWAN_MAC_HELPER_H
+#define LORAWAN_MAC_HELPER_H
 
 #include "ns3/net-device.h"
 #include "ns3/lora-channel.h"
