@@ -18,8 +18,8 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#ifndef GATEWAY_LORA_MAC_H
-#define GATEWAY_LORA_MAC_H
+#ifndef GATEWAY_LORAWAN_MAC_H
+#define GATEWAY_LORAWAN_MAC_H
 
 #include "ns3/lorawan-mac.h"
 #include "ns3/lora-tag.h"
@@ -63,4 +63,4 @@ protected:
 } /* namespace ns3 */
 
 }
-#endif /* GATEWAY_LORA_MAC_H */
+#endif /* GATEWAY_LORAWAN_MAC_H */
