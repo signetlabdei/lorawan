@@ -231,7 +231,7 @@ public:
    *     - If the device class type is CLASS A then it will return the first
    *       receive window.
    */
-   uint8_t GetReceiveWindowDataRate (void) const;
+   uint8_t GetReceiveWindowDataRate (void);
 
   /**
    * Get the Data Rate that will be used in the first receive window.
