@@ -38,6 +38,16 @@ namespace lorawan {
 class EndDeviceLorawanMac : public LorawanMac
 {
 public:
+  /**
+  * The device type.
+  */
+  enum CType
+  {
+    CLASS_A = 0,
+    CLASS_B = 1,
+    CLASS_C = 2
+};
+
   static TypeId GetTypeId (void);
 
   EndDeviceLorawanMac ();
@@ -101,6 +111,7 @@ public:
    */
   void TxFinished (Ptr<const Packet> packet);
 
+  // MOVE TO CLASS A
   /**
    * Perform operations needed to open the first receive window.
    */
@@ -124,6 +135,20 @@ public:
   /////////////////////////
   // Getters and Setters //
   /////////////////////////
+
+  /**
+   * Set the class type.
+   *
+   * \param ctype The class type of this device.
+   */
+  void SetCType (enum CType ctype);
+
+  /**
+   * Get the class type.
+   *
+   * \return The uint8_t corresponding to the device's class type.
+   */
+  uint8_t GetCType (void) const;
 
   /**
   * Reset retransmission parameters contained in the structure LoraRetxParams
@@ -191,6 +216,7 @@ public:
    */
   LoraDeviceAddress GetDeviceAddress (void);
 
+  // MOVE TO CLASS A
   /**
    * Set the Data Rate to be used in the second receive window.
    *
@@ -380,6 +406,11 @@ public:
 
 private:
   /**
+   * The class type.
+   */
+  uint8_t m_cType;
+
+  /**
    * Structure representing the parameters that will be used in the
    * retransmission procedure.
    */
@@ -460,6 +491,7 @@ private:
    */
   bool m_headerDisabled;
 
+  // MOVE TO CLASS A
   /**
    * The interval between when a packet is done sending and when the first
    * receive window is opened.
@@ -484,6 +516,7 @@ private:
    */
   uint8_t m_receiveWindowDurationInSymbols;
 
+  // MOVE TO CLASS A
   /**
    * The event of the closing the first receive window.
    *
@@ -525,6 +558,7 @@ private:
    */
   LoraDeviceAddress m_address;
 
+  // MOVE TO CLASS A
   /**
    * The frequency to listen on for the second receive window.
    */
