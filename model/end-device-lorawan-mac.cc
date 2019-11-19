@@ -431,8 +431,11 @@ EndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
         {
           NS_LOG_INFO ("The message is for us!");
 
-          // If it exists, cancel the second receive window event
-          Simulator::Cancel (m_secondReceiveWindow);
+          if (m_cType == EndDeviceLorawanMac::CLASS_A)
+            {
+              // If it exists, cancel the second receive window event
+              Simulator::Cancel (m_secondReceiveWindow);
+            }
 
           // Parse the MAC commands
           ParseCommands (fHdr);
@@ -452,7 +455,7 @@ EndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
           // packet in the second receive window and finding out, after the
           // fact, that the packet is not for us. In either case, if we no
           // longer have any retransmissions left, we declare failure.
-          if (m_retxParams.waitingAck && m_secondReceiveWindow.IsExpired ())
+          if (m_retxParams.waitingAck && m_secondReceiveWindow.IsExpired () && m_cType == EndDeviceLorawanMac::CLASS_A)
             {
               if (m_retxParams.retxLeft == 0)
                 {
@@ -471,7 +474,7 @@ EndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
             }
         }
     }
-  else if (m_retxParams.waitingAck && m_secondReceiveWindow.IsExpired ())
+  else if (m_retxParams.waitingAck && m_secondReceiveWindow.IsExpired () && m_cType == EndDeviceLorawanMac::CLASS_A)
     {
       NS_LOG_INFO ("The packet we are receiving is in uplink.");
       if (m_retxParams.retxLeft > 0)
@@ -1326,12 +1329,13 @@ EndDeviceLorawanMac::AddSubBand (double startFrequency, double endFrequency, dou
 }
 
 uint8_t
-EndDeviceLorawanMac::GetReceiveWindowDataRate (void) const
+EndDeviceLorawanMac::GetReceiveWindowDataRate (void)
 {
   if (m_cType == EndDeviceLorawanMac::CLASS_A)
     {
-      return EndDeviceLorawanMac::GetFirstReceiveWindowDataRate (void);
+      return GetFirstReceiveWindowDataRate ();
     }
+  return 0;
 }
 
 uint8_t
