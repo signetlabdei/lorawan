@@ -225,6 +225,15 @@ public:
   void SetSecondReceiveWindowDataRate (uint8_t dataRate);
 
   /**
+   * Get the Data Rate that will be used in the receive window.
+   *
+   * \return The Data Rate
+   *     - If the device class type is CLASS A then it will return the first
+   *       receive window.
+   */
+   uint8_t GetReceiveWindowDataRate (void) const;
+
+  /**
    * Get the Data Rate that will be used in the first receive window.
    *
    * \return The Data Rate
