@@ -83,8 +83,6 @@ public:
   // Getters and Setters //
   /////////////////////////
 
-  virtual Time GetNextClassTransmissionDelay (void);
-
   virtual uint8_t GetReceiveWindow (void);
 
   uint8_t GetFirstReceiveWindowDataRate (void);
@@ -102,6 +100,24 @@ public:
   /////////////////////////
 
   virtual void OnRxClassParamSetupReq (uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency);
+
+protected:
+
+  virtual Time GetNextClassTransmissionDelay (void);
+
+  Time m_receiveDelay1;
+
+  Time m_receiveDelay2;
+
+  EventId m_closeFirstWindow;
+
+  EventId m_closeSecondWindow;
+
+  EventId m_secondReceiveWindow;
+
+  uint8_t m_rx1DrOffset;
+
+private:
 
 
 } /* ClassAEndDeviceLorawanMac */
