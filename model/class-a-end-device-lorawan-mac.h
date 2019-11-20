@@ -105,6 +105,8 @@ protected:
 
   virtual Time GetNextClassTransmissionDelay (void);
 
+private:
+
   Time m_receiveDelay1;
 
   Time m_receiveDelay2;
@@ -116,9 +118,6 @@ protected:
   EventId m_secondReceiveWindow;
 
   uint8_t m_rx1DrOffset;
-
-private:
-
 
 } /* ClassAEndDeviceLorawanMac */
 } /* namespace lorawan */
