@@ -19,10 +19,121 @@
  *         Martina Capuzzo <capuzzom@dei.unipd.it>
  */
 
+#include "ns3/log.h"
 
 namespace ns3 {
 namespace lorawan {
 
+NS_LOG_COMPONENT_DEFINE ("ClassAEndDeviceLorawanMac");
+
+NS_OBJECT_ENSURE_REGISTERED (ClassAEndDeviceLorawanMac);
+
+TypeId
+ClassAEndDeviceLorawanMac::GetTypeId (void)
+{
+static TypeId tid = TypeId ("ns3::ClassAEndDeviceLorawanMac")
+  .SetParent<EndDeviceLorawanMac> ()
+  .SetGroupName ("lorawan")
+  .AddConstructor<ClassAEndDeviceLorawanMac> ();
+return tid;
+}
+
+ClassAEndDeviceLorawanMac::ClassAEndDeviceLorawanMac () :
+{
+  NS_LOG_FUNCTION (this);
+}
+
+ClassAEndDeviceLorawanMac::~ClassAEndDeviceLorawanMac ()
+{
+  NS_LOG_FUNCTION_NOARGS ();
+}
+
+//////////////////////////
+//  Receiving methods   //
+//////////////////////////
+void
+ClassAEndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
+{
+}
+
+void
+ClassAEndDeviceLorawanMac::FailedReception (Ptr<Packet const> packet)
+{
+}
+
+void
+ClassAEndDeviceLorawanMac::TxFinished (Ptr<const Packet> packet)
+{
+
+}
+
+void
+ClassAEndDeviceLorawanMac::OpenFirstReceiveWindow (void)
+{
+}
+
+void
+ClassAEndDeviceLorawanMac::CloseFirstReceiveWindow (void)
+{
+}
+
+void
+ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow (void)
+{
+}
+
+void
+ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow (void)
+{
+}
+
+/////////////////////////
+// Getters and Setters //
+/////////////////////////
+
+Time
+ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay (void)
+{
+}
+
+uint8_t
+ClassAEndDeviceLorawanMac::GetReceiveWindow (void)
+{
+}
+
+uint8_t
+ClassAEndDeviceLorawanMac::GetFirstReceiveWindowDataRate (void)
+{
+}
+
+void
+ClassAEndDeviceLorawanMac::SetSecondReceiveWindowDataRate (uint8_t dataRate)
+{
+}
+
+uint8_t
+ClassAEndDeviceLorawanMac::GetSecondReceiveWindowDataRate (void)
+{
+}
+
+void
+ClassAEndDeviceLorawanMac::SetSecondReceiveWindowFrequency (double frequencyMHz)
+{
+}
+
+double
+ClassAEndDeviceLorawanMac::GetSecondReceiveWindowFrequency (void)
+{
+}
+
+/////////////////////////
+// MAC command methods //
+/////////////////////////
+
+void
+ClassAEndDeviceLorawanMac::OnRxClassParamSetupReq (uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency)
+{
+}
 
 } /* namespace lorawan */
 } /* namespace ns3 */
