@@ -25,8 +25,86 @@
 namespace ns3 {
 namespace lorawan {
 
+/**
+ * Class representing the MAC layer of a Class A LoRaWAN device.
+ */
+class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
+{
+public:
+  static TypeId GetTypeId (void);
 
+  ClassAEndDeviceLorawanMac ();
+  virtual ~ClassAEndDeviceLorawanMac ();
+
+  //////////////////////////
+  //  Receiving methods   //
+  //////////////////////////
+
+  /**
+   * Receive a packet.
+   *
+   * This method is typically registered as a callback in the underlying PHY
+   * layer so that it's called when a packet is going up the stack.
+   *
+   * \param packet the received packet.
+   */
+  virtual void Receive (Ptr<Packet const> packet);
+
+  virtual void FailedReception (Ptr<Packet const> packet);
+
+  /**
+   * Perform the actions that are required after a packet send.
+   *
+   * This function handles opening of the first receive window.
+   */
+  virtual void TxFinished (Ptr<const Packet> packet);
+
+  /**
+   * Perform operations needed to open the first receive window.
+   */
+  void OpenFirstReceiveWindow (void);
+
+  /**
+   * Perform operations needed to open the second receive window.
+   */
+  void OpenSecondReceiveWindow (void);
+
+  /**
+   * Perform operations needed to close the first receive window.
+   */
+  void CloseFirstReceiveWindow (void);
+
+  /**
+   * Perform operations needed to close the second receive window.
+   */
+  void CloseSecondReceiveWindow (void);
+
+  /////////////////////////
+  // Getters and Setters //
+  /////////////////////////
+
+  virtual Time GetNextClassTransmissionDelay (void);
+
+  virtual uint8_t GetReceiveWindow (void);
+
+  uint8_t GetFirstReceiveWindowDataRate (void);
+
+  void SetSecondReceiveWindowDataRate (uint8_t dataRate);
+
+  uint8_t GetSecondReceiveWindowDataRate (void);
+
+  void SetSecondReceiveWindowFrequency (double frequencyMHz);
+
+  double GetSecondReceiveWindowFrequency (void);
+
+  /////////////////////////
+  // MAC command methods //
+  /////////////////////////
+
+  virtual void OnRxClassParamSetupReq (uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency);
+
+
+} /* ClassAEndDeviceLorawanMac */
 } /* namespace lorawan */
-
 } /* namespace ns3 */
 #endif /* CLASS_A_END_DEVICE_LORAWAN_MAC_H */
