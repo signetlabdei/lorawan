@@ -70,7 +70,7 @@ ClassAEndDeviceLorawanMac::~ClassAEndDeviceLorawanMac ()
 /////////////////////
 
 void
-SendToPhy (Ptr<Packet> packetToSend)
+ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
 {
   /////////////////////////////////////////////////////////
   // Add headers, prepare TX parameters and send the packet
