@@ -200,7 +200,7 @@ public:
    *
    * \return The transmission power this device uses when transmitting.
    */
-  uint8_t GetTransmissionPower (void);
+  virtual uint8_t GetTransmissionPower (void);
 
   /**
    * Set the network address of this device.
