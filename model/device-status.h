@@ -26,7 +26,7 @@
 #include "ns3/lora-device-address.h"
 #include "ns3/lorawan-mac-header.h"
 #include "ns3/lora-frame-header.h"
-#include "ns3/end-device-lorawan-mac.h"
+#include "ns3/class-a-end-device-lorawan-mac.h"
 
 namespace ns3 {
 namespace lorawan {
@@ -64,7 +64,7 @@ public:
   DeviceStatus ();
   virtual ~DeviceStatus ();
 
-  DeviceStatus (Ptr<EndDeviceLorawanMac> endDeviceMac);
+  DeviceStatus (Ptr<ClassAEndDeviceLorawanMacMac> endDeviceMac);
 
   /**
    * Get the data rate this device is using
@@ -174,7 +174,7 @@ public:
   uint8_t GetSecondReceiveWindowDataRate (void);
 
 private:
-  Ptr<EndDeviceLorawanMac> m_mac;   //!< Pointer to the device
+  Ptr<ClassAEndDeviceLorawanMacMac> m_mac;   //!< Pointer to the device
 
   LoraDeviceAddress m_address;   //!< The address of this device
 
