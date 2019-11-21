@@ -358,7 +358,7 @@ public:
    */
   void OnRxParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq);
 
-  virtual void OnRxClassParamSetupReq (Ptr<Packet> packet);
+  virtual void OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq);
 
   /**
    * Perform the actions that need to be taken when receiving a DevStatusReq command.

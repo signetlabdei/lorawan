@@ -275,12 +275,14 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           NS_LOG_DEBUG ("Copied packet: " << m_retxParams.packet);
           m_sentNewPacket (m_retxParams.packet);
 
-          static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (m_retxParams.packet);
+          // static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (m_retxParams.packet);
+          SendToPhy (m_retxParams.packet);
         }
       else
         {
           m_sentNewPacket (packet);
-          static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (packet);
+          // static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (packet);
+          SendToPhy (packet);
         }
 
     }
@@ -313,7 +315,8 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           m_retxParams.retxLeft = m_retxParams.retxLeft - 1;           // decreasing the number of retransmissions
           NS_LOG_DEBUG ("Retransmitting an old packet.");
 
-          static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (m_retxParams.packet);
+          // static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (m_retxParams.packet);
+          SendToPhy (m_retxParams.packet);
         }
     }
 
@@ -329,129 +332,11 @@ EndDeviceLorawanMac::SendToPhy (Ptr<Packet> packet)
 
 void
 EndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
-{
-  // NS_LOG_FUNCTION (this << packet);
-  //
-  // // Work on a copy of the packet
-  // Ptr<Packet> packetCopy = packet->Copy ();
-  //
-  // // Remove the Mac Header to get some information
-  // LorawanMacHeader mHdr;
-  // packetCopy->RemoveHeader (mHdr);
-  //
-  // NS_LOG_DEBUG ("Mac Header: " << mHdr);
-  //
-  // // Only keep analyzing the packet if it's downlink
-  // if (!mHdr.IsUplink ())
-  //   {
-  //     NS_LOG_INFO ("Found a downlink packet.");
-  //
-  //     // Remove the Frame Header
-  //     LoraFrameHeader fHdr;
-  //     fHdr.SetAsDownlink ();
-  //     packetCopy->RemoveHeader (fHdr);
-  //
-  //     NS_LOG_DEBUG ("Frame Header: " << fHdr);
-  //
-  //     // Determine whether this packet is for us
-  //     bool messageForUs = (m_address == fHdr.GetAddress ());
-  //
-  //     if (messageForUs)
-  //       {
-  //         NS_LOG_INFO ("The message is for us!");
-  //
-  //         if (m_cType == EndDeviceLorawanMac::CLASS_A)
-  //           {
-  //             // If it exists, cancel the second receive window event
-  //             // THIS WILL BE GetReceiveWindow()
-  //             Simulator::Cancel (m_secondReceiveWindow);
-  //           }
-  //
-  //         // Parse the MAC commands
-  //         ParseCommands (fHdr);
-  //
-  //         // TODO Pass the packet up to the NetDevice
-  //
-  //
-  //         // Call the trace source
-  //         m_receivedPacket (packet);
-  //       }
-  //     else
-  //       {
-  //         NS_LOG_DEBUG ("The message is intended for another recipient.");
-  //
-  //         // In this case, we are either receiving in the first receive window
-  //         // and finishing reception inside the second one, or receiving a
-  //         // packet in the second receive window and finding out, after the
-  //         // fact, that the packet is not for us. In either case, if we no
-  //         // longer have any retransmissions left, we declare failure.
-  //         if (m_retxParams.waitingAck && m_secondReceiveWindow.IsExpired () && m_cType == EndDeviceLorawanMac::CLASS_A)
-  //           {
-  //             if (m_retxParams.retxLeft == 0)
-  //               {
-  //                 uint8_t txs = m_maxNumbTx - (m_retxParams.retxLeft);
-  //                 m_requiredTxCallback (txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
-  //                 NS_LOG_DEBUG ("Failure: no more retransmissions left. Used " << unsigned(txs) << " transmissions.");
-  //
-  //                 // Reset retransmission parameters
-  //                 resetRetransmissionParameters ();
-  //               }
-  //             else       // Reschedule
-  //               {
-  //                 this->Send (m_retxParams.packet);
-  //                 NS_LOG_INFO ("We have " << unsigned(m_retxParams.retxLeft) << " retransmissions left: rescheduling transmission.");
-  //               }
-  //           }
-  //       }
-  //   }
-  // else if (m_retxParams.waitingAck && m_secondReceiveWindow.IsExpired () && m_cType == EndDeviceLorawanMac::CLASS_A)
-  //   {
-  //     NS_LOG_INFO ("The packet we are receiving is in uplink.");
-  //     if (m_retxParams.retxLeft > 0)
-  //       {
-  //         this->Send (m_retxParams.packet);
-  //         NS_LOG_INFO ("We have " << unsigned(m_retxParams.retxLeft) << " retransmissions left: rescheduling transmission.");
-  //       }
-  //     else
-  //       {
-  //         uint8_t txs = m_maxNumbTx - (m_retxParams.retxLeft);
-  //         m_requiredTxCallback (txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
-  //         NS_LOG_DEBUG ("Failure: no more retransmissions left. Used " << unsigned(txs) << " transmissions.");
-  //
-  //         // Reset retransmission parameters
-  //         resetRetransmissionParameters ();
-  //       }
-  //   }
-  //
-  // m_phy->GetObject<EndDeviceLoraPhy> ()->SwitchToSleep ();
-}
+{ }
 
 void
 EndDeviceLorawanMac::FailedReception (Ptr<Packet const> packet)
-{
-  // NS_LOG_FUNCTION (this << packet);
-  //
-  // // Switch to sleep after a failed reception
-  // m_phy->GetObject<EndDeviceLoraPhy> ()->SwitchToSleep ();
-  //
-  // if (m_secondReceiveWindow.IsExpired () && m_retxParams.waitingAck)
-  //   {
-  //     if (m_retxParams.retxLeft > 0)
-  //       {
-  //         this->Send (m_retxParams.packet);
-  //         NS_LOG_INFO ("We have " << unsigned(m_retxParams.retxLeft) << " retransmissions left: rescheduling transmission.");
-  //       }
-  //     else
-  //       {
-  //         uint8_t txs = m_maxNumbTx - (m_retxParams.retxLeft);
-  //         m_requiredTxCallback (txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
-  //         NS_LOG_DEBUG ("Failure: no more retransmissions left. Used " << unsigned(txs) << " transmissions.");
-  //
-  //         // Reset retransmission parameters
-  //         resetRetransmissionParameters ();
-  //       }
-  //   }
-}
+{ }
 
 void
 EndDeviceLorawanMac::ParseCommands (LoraFrameHeader frameHeader)
@@ -643,159 +528,10 @@ void
 EndDeviceLorawanMac::TxFinished (Ptr<const Packet> packet)
 { }
 
-// void
-// EndDeviceLorawanMac::OpenFirstReceiveWindow (void)
-// {
-//   NS_LOG_FUNCTION_NOARGS ();
-//
-//   // Set Phy in Standby mode
-//   m_phy->GetObject<EndDeviceLoraPhy> ()->SwitchToStandby ();
-//
-//   //Calculate the duration of a single symbol for the first receive window DR
-//   double tSym = pow (2, GetSfFromDataRate (GetFirstReceiveWindowDataRate ())) / GetBandwidthFromDataRate ( GetFirstReceiveWindowDataRate ());
-//
-//   // Schedule return to sleep after "at least the time required by the end
-//   // device's radio transceiver to effectively detect a downlink preamble"
-//   // (LoraWAN specification)
-//   m_closeFirstWindow = Simulator::Schedule (Seconds (m_receiveWindowDurationInSymbols*tSym),
-//                                             &EndDeviceLorawanMac::CloseFirstReceiveWindow, this); //m_receiveWindowDuration
-// }
-//
-// void
-// EndDeviceLorawanMac::CloseFirstReceiveWindow (void)
-// {
-//   NS_LOG_FUNCTION_NOARGS ();
-//
-//   Ptr<EndDeviceLoraPhy> phy = m_phy->GetObject<EndDeviceLoraPhy> ();
-//
-//   // Check the Phy layer's state:
-//   // - RX -> We are receiving a preamble.
-//   // - STANDBY -> Nothing was received.
-//   // - SLEEP -> We have received a packet.
-//   // We should never be in TX or SLEEP mode at this point
-//   switch (phy->GetState ())
-//     {
-//     case EndDeviceLoraPhy::TX:
-//       NS_ABORT_MSG ("PHY was in TX mode when attempting to " <<
-//                     "close a receive window.");
-//       break;
-//     case EndDeviceLoraPhy::RX:
-//       // PHY is receiving: let it finish. The Receive method will switch it back to SLEEP.
-//       break;
-//     case EndDeviceLoraPhy::SLEEP:
-//       // PHY has received, and the MAC's Receive already put the device to sleep
-//       break;
-//     case EndDeviceLoraPhy::STANDBY:
-//       // Turn PHY layer to SLEEP
-//       phy->SwitchToSleep ();
-//       break;
-//     }
-// }
-//
-// void
-// EndDeviceLorawanMac::OpenSecondReceiveWindow (void)
-// {
-//   NS_LOG_FUNCTION_NOARGS ();
-//
-//   // Check for receiver status: if it's locked on a packet, don't open this
-//   // window at all.
-//   if (m_phy->GetObject<EndDeviceLoraPhy> ()->GetState () == EndDeviceLoraPhy::RX)
-//     {
-//       NS_LOG_INFO ("Won't open second receive window since we are in RX mode.");
-//
-//       return;
-//     }
-//
-//   // Set Phy in Standby mode
-//   m_phy->GetObject<EndDeviceLoraPhy> ()->SwitchToStandby ();
-//
-//   // Switch to appropriate channel and data rate
-//   NS_LOG_INFO ("Using parameters: " << m_secondReceiveWindowFrequency << "Hz, DR"
-//                                     << unsigned(m_secondReceiveWindowDataRate));
-//
-//   m_phy->GetObject<EndDeviceLoraPhy> ()->SetFrequency
-//     (m_secondReceiveWindowFrequency);
-//   m_phy->GetObject<EndDeviceLoraPhy> ()->SetSpreadingFactor (GetSfFromDataRate
-//                                                                (m_secondReceiveWindowDataRate));
-//
-//   //Calculate the duration of a single symbol for the second receive window DR
-//   double tSym = pow (2, GetSfFromDataRate (GetSecondReceiveWindowDataRate ())) / GetBandwidthFromDataRate ( GetSecondReceiveWindowDataRate ());
-//
-//   // Schedule return to sleep after "at least the time required by the end
-//   // device's radio transceiver to effectively detect a downlink preamble"
-//   // (LoraWAN specification)
-//   m_closeSecondWindow = Simulator::Schedule (Seconds (m_receiveWindowDurationInSymbols*tSym),
-//                                              &EndDeviceLorawanMac::CloseSecondReceiveWindow, this);
-// }
-//
-// void
-// EndDeviceLorawanMac::CloseSecondReceiveWindow (void)
-// {
-//   NS_LOG_FUNCTION_NOARGS ();
-//
-//   Ptr<EndDeviceLoraPhy> phy = m_phy->GetObject<EndDeviceLoraPhy> ();
-//
-//   // NS_ASSERT (phy->m_state != EndDeviceLoraPhy::TX &&
-//   // phy->m_state != EndDeviceLoraPhy::SLEEP);
-//
-//   // Check the Phy layer's state:
-//   // - RX -> We have received a preamble.
-//   // - STANDBY -> Nothing was detected.
-//   switch (phy->GetState ())
-//     {
-//     case EndDeviceLoraPhy::TX:
-//       break;
-//     case EndDeviceLoraPhy::SLEEP:
-//       break;
-//     case EndDeviceLoraPhy::RX:
-//       // PHY is receiving: let it finish
-//       NS_LOG_DEBUG ("PHY is receiving: Receive will handle the result.");
-//       return;
-//     case EndDeviceLoraPhy::STANDBY:
-//       // Turn PHY layer to sleep
-//       phy->SwitchToSleep ();
-//       break;
-//     }
-//
-//   if (m_retxParams.waitingAck)
-//     {
-//       NS_LOG_DEBUG ("No reception initiated by PHY: rescheduling transmission.");
-//       if (m_retxParams.retxLeft > 0 )
-//         {
-//           NS_LOG_INFO ("We have " << unsigned(m_retxParams.retxLeft) << " retransmissions left: rescheduling transmission.");
-//           this->Send (m_retxParams.packet);
-//         }
-//
-//       else if (m_retxParams.retxLeft == 0 && m_phy->GetObject<EndDeviceLoraPhy> ()->GetState () != EndDeviceLoraPhy::RX)
-//         {
-//           uint8_t txs = m_maxNumbTx - (m_retxParams.retxLeft);
-//           m_requiredTxCallback (txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
-//           NS_LOG_DEBUG ("Failure: no more retransmissions left. Used " << unsigned(txs) << " transmissions.");
-//
-//           // Reset retransmission parameters
-//           resetRetransmissionParameters ();
-//         }
-//
-//       else
-//         {
-//           NS_ABORT_MSG ("The number of retransmissions left is negative ! ");
-//         }
-//     }
-//   else
-//     {
-//       uint8_t txs = m_maxNumbTx - (m_retxParams.retxLeft );
-//       m_requiredTxCallback (txs, true, m_retxParams.firstAttempt, m_retxParams.packet);
-//       NS_LOG_INFO ("We have " << unsigned(m_retxParams.retxLeft) <<
-//                    " transmissions left. We were not transmitting confirmed messages.");
-//
-//       // Reset retransmission parameters
-//       resetRetransmissionParameters ();
-//     }
-// }
-
 Time
 EndDeviceLorawanMac::GetNextClassTransmissionDelay (Time waitingTime)
 {
+  NS_LOG_FUNCTION_NOARGS ();
   return waitingTime;
 }
 
@@ -828,7 +564,8 @@ EndDeviceLorawanMac::GetNextTransmissionDelay (void)
                     frequency << " is = " << waitingTime.GetSeconds () << ".");
     }
 
-  waitingTime = static_cast<ClassAEndDeviceLorawanMac*>(this)->GetNextClassTransmissionDelay (waitingTime);
+  // waitingTime = static_cast<ClassAEndDeviceLorawanMac*>(this)->GetNextClassTransmissionDelay (waitingTime);
+  waitingTime = GetNextClassTransmissionDelay (waitingTime);
 
   return waitingTime;
 }
@@ -1121,7 +858,7 @@ EndDeviceLorawanMac::OnDutyCycleReq (double dutyCycle)
 }
 
 void
-EndDeviceLorawanMac::OnRxClassParamSetupReq (Ptr<Packet> packet)
+EndDeviceLorawanMac::OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq)
 { }
 
 void
@@ -1129,7 +866,8 @@ EndDeviceLorawanMac::OnRxParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq)
 {
   NS_LOG_FUNCTION (this << rxParamSetupReq);
 
-  static_cast<ClassAEndDeviceLorawanMac*>(this)->OnRxClassParamSetupReq (rxParamSetupReq);
+  // static_cast<ClassAEndDeviceLorawanMac*>(this)->OnRxClassParamSetupReq (rxParamSetupReq);
+  OnRxClassParamSetupReq (rxParamSetupReq);
 }
 
 void
