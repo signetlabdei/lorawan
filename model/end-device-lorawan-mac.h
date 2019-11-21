@@ -78,7 +78,7 @@ public:
   *
   * \param packet the packet to send
   */
-  virtual void SendToPhy (Ptr<Packet> packet);
+  virtual void SendToPhy (void);
 
   /**
    * Postpone transmission to the specified time and delete previously scheduled transmissions if present.
@@ -109,28 +109,28 @@ public:
    *
    * This function handles opening of the first receive window.
    */
-  void TxFinished (Ptr<const Packet> packet);
+  virtual void TxFinished (void);
 
-  // MOVE TO CLASS A
-  /**
-   * Perform operations needed to open the first receive window.
-   */
-  void OpenFirstReceiveWindow (void);
-
-  /**
-   * Perform operations needed to open the second receive window.
-   */
-  void OpenSecondReceiveWindow (void);
-
-  /**
-   * Perform operations needed to close the first receive window.
-   */
-  void CloseFirstReceiveWindow (void);
-
-  /**
-   * Perform operations needed to close the second receive window.
-   */
-  void CloseSecondReceiveWindow (void);
+  // // MOVE TO CLASS A
+  // /**
+  //  * Perform operations needed to open the first receive window.
+  //  */
+  // void OpenFirstReceiveWindow (void);
+  //
+  // /**
+  //  * Perform operations needed to open the second receive window.
+  //  */
+  // void OpenSecondReceiveWindow (void);
+  //
+  // /**
+  //  * Perform operations needed to close the first receive window.
+  //  */
+  // void CloseFirstReceiveWindow (void);
+  //
+  // /**
+  //  * Perform operations needed to close the second receive window.
+  //  */
+  // void CloseSecondReceiveWindow (void);
 
   /////////////////////////
   // Getters and Setters //
@@ -193,7 +193,7 @@ public:
    *
    * \return The data rate this device uses when transmitting.
    */
-  uint8_t GetDataRate (void);
+  virtual uint8_t GetDataRate (void);
 
   /**
    * Get the transmission power this end device is set to use.
@@ -207,7 +207,7 @@ public:
    *
    * \param address The address to set.
    */
-  void SetDeviceAddress (LoraDeviceAddress address);
+  virtual void SetDeviceAddress (LoraDeviceAddress address);
 
   /**
    * Get the network address of this device.
@@ -216,13 +216,7 @@ public:
    */
   LoraDeviceAddress GetDeviceAddress (void);
 
-  // MOVE TO CLASS A
-  /**
-   * Set the Data Rate to be used in the second receive window.
-   *
-   * \param dataRate The Data Rate.
-   */
-  void SetSecondReceiveWindowDataRate (uint8_t dataRate);
+  virtual uint8_t GetReceiveWindow (void);
 
   /**
    * Get the Data Rate that will be used in the receive window.
@@ -231,35 +225,43 @@ public:
    *     - If the device class type is CLASS A then it will return the first
    *       receive window.
    */
-   uint8_t GetReceiveWindowDataRate (void);
+   virtual uint8_t GetReceiveWindowDataRate (void);
 
-  /**
-   * Get the Data Rate that will be used in the first receive window.
-   *
-   * \return The Data Rate
-   */
-  uint8_t GetFirstReceiveWindowDataRate (void);
-
-  /**
-   * Get the Data Rate that will be used in the second receive window.
-   *
-   * \return The Data Rate
-   */
-  uint8_t GetSecondReceiveWindowDataRate (void);
-
-  /**
-   * Set the frequency that will be used for the second receive window.
-   *
-   * \param frequencyMHz the Frequency.
-   */
-  void SetSecondReceiveWindowFrequency (double frequencyMHz);
-
-  /**
-   * Get the frequency that is used for the second receive window.
-   *
-   * @return The frequency, in MHz
-   */
-  double GetSecondReceiveWindowFrequency (void);
+  // MOVE TO CLASS A
+  // /**
+  //  * Set the Data Rate to be used in the second receive window.
+  //  *
+  //  * \param dataRate The Data Rate.
+  //  */
+  // void SetSecondReceiveWindowDataRate (uint8_t dataRate);
+  //
+  // /**
+  //  * Get the Data Rate that will be used in the first receive window.
+  //  *
+  //  * \return The Data Rate
+  //  */
+  // uint8_t GetFirstReceiveWindowDataRate (void);
+  //
+  // /**
+  //  * Get the Data Rate that will be used in the second receive window.
+  //  *
+  //  * \return The Data Rate
+  //  */
+  // uint8_t GetSecondReceiveWindowDataRate (void);
+  //
+  // /**
+  //  * Set the frequency that will be used for the second receive window.
+  //  *
+  //  * \param frequencyMHz the Frequency.
+  //  */
+  // void SetSecondReceiveWindowFrequency (double frequencyMHz);
+  //
+  // /**
+  //  * Get the frequency that is used for the second receive window.
+  //  *
+  //  * @return The frequency, in MHz
+  //  */
+  // double GetSecondReceiveWindowFrequency (void);
 
   /**
    * Set a value for the RX1DROffset parameter.
@@ -354,7 +356,9 @@ public:
    * \param rx2DataRate The data rate to use for the second receive window.
    * \param frequency The frequency to use for the second receive window.
    */
-  void OnRxParamSetupReq (uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency);
+  void OnRxParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq);
+
+  virtual void OnRxClassParamSetupReq (void);
 
   /**
    * Perform the actions that need to be taken when receiving a DevStatusReq command.
@@ -413,6 +417,14 @@ public:
    */
   void AddMacCommand (Ptr<MacCommand> macCommand);
 
+protected:
+  /**
+   * The DataRate this device is using to transmit.
+   */
+  uint8_t m_dataRate;
+
+  virtual Time GetNextClassTransmissionDelay (Time waitingTime);
+
 private:
   /**
    * The class type.
@@ -467,19 +479,6 @@ private:
    */
   Ptr<UniformRandomVariable> m_uniformRV;
 
-
-  /**
-   * The total number of transmissions required.
-   */
-  /*
-    TracedValue<uint8_t> m_requiredTx;
-  */
-
-  /**
-   * The DataRate this device is using to transmit.
-   */
-  uint8_t m_dataRate;
-
   /**
    * Whether this device's data rate should be controlled by the NS.
    */
@@ -501,17 +500,17 @@ private:
   bool m_headerDisabled;
 
   // MOVE TO CLASS A
-  /**
-   * The interval between when a packet is done sending and when the first
-   * receive window is opened.
-   */
-  Time m_receiveDelay1;
-
-  /**
-   * The interval between when a packet is done sending and when the second
-   * receive window is opened.
-   */
-  Time m_receiveDelay2;
+  // /**
+  //  * The interval between when a packet is done sending and when the first
+  //  * receive window is opened.
+  //  */
+  // Time m_receiveDelay1;
+  //
+  // /**
+  //  * The interval between when a packet is done sending and when the second
+  //  * receive window is opened.
+  //  */
+  // Time m_receiveDelay2;
 
   /**
    * The duration of a receive window in number of symbols. This should be
@@ -526,27 +525,27 @@ private:
   uint8_t m_receiveWindowDurationInSymbols;
 
   // MOVE TO CLASS A
-  /**
-   * The event of the closing the first receive window.
-   *
-   * This Event will be canceled if there's a successful reception of a packet.
-   */
-  EventId m_closeFirstWindow;
-
-  /**
-   * The event of the closing the second receive window.
-   *
-   * This Event will be canceled if there's a successful reception of a packet.
-   */
-  EventId m_closeSecondWindow;
-
-  /**
-   * The event of the second receive window opening.
-   *
-   * This Event is used to cancel the second window in case the first one is
-   * successful.
-   */
-  EventId m_secondReceiveWindow;
+  // /**
+  //  * The event of the closing the first receive window.
+  //  *
+  //  * This Event will be canceled if there's a successful reception of a packet.
+  //  */
+  // EventId m_closeFirstWindow;
+  //
+  // /**
+  //  * The event of the closing the second receive window.
+  //  *
+  //  * This Event will be canceled if there's a successful reception of a packet.
+  //  */
+  // EventId m_closeSecondWindow;
+  //
+  // /**
+  //  * The event of the second receive window opening.
+  //  *
+  //  * This Event is used to cancel the second window in case the first one is
+  //  * successful.
+  //  */
+  // EventId m_secondReceiveWindow;
 
   /**
    * The event of retransmitting a packet in a consecutive moment if an ACK is not received.
@@ -568,20 +567,20 @@ private:
   LoraDeviceAddress m_address;
 
   // MOVE TO CLASS A
-  /**
-   * The frequency to listen on for the second receive window.
-   */
-  double m_secondReceiveWindowFrequency;
-
-  /**
-   * The Data Rate to listen for during the second downlink transmission.
-   */
-  uint8_t m_secondReceiveWindowDataRate;
-
-  /**
-   * The RX1DROffset parameter value
-   */
-  uint8_t m_rx1DrOffset;
+  // /**
+  //  * The frequency to listen on for the second receive window.
+  //  */
+  // double m_secondReceiveWindowFrequency;
+  //
+  // /**
+  //  * The Data Rate to listen for during the second downlink transmission.
+  //  */
+  // uint8_t m_secondReceiveWindowDataRate;
+  //
+  // /**
+  //  * The RX1DROffset parameter value
+  //  */
+  // uint8_t m_rx1DrOffset;
 
   /**
    * The last known link margin.
