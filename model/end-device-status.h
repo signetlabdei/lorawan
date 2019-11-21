@@ -25,7 +25,7 @@
 #include "ns3/lora-net-device.h"
 #include "ns3/lora-device-address.h"
 #include "ns3/lorawan-mac-header.h"
-#include "ns3/end-device-lorawan-mac.h"
+#include "ns3/class-a-end-device-lorawan-mac.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/pointer.h"
 #include "ns3/lora-frame-header.h"
@@ -185,7 +185,7 @@ public:
 
   EndDeviceStatus ();
   EndDeviceStatus (LoraDeviceAddress endDeviceAddress,
-                   Ptr<EndDeviceLorawanMac> endDeviceMac);
+                   Ptr<ClassAEndDeviceLorawanMac> endDeviceMac);
   virtual ~EndDeviceStatus ();
 
   /**
@@ -256,7 +256,7 @@ public:
    */
   void SetReplyPayload (Ptr<Packet> replyPayload);
 
-  Ptr<EndDeviceLorawanMac> GetMac (void);
+  Ptr<ClassAEndDeviceLorawanMac> GetMac (void);
 
   //////////////////////
   //  Other methods  //
@@ -316,7 +316,7 @@ private:
 
   // NOTE Using this attribute is 'cheating', since we are assuming perfect
   // synchronization between the info at the device and at the network server
-  Ptr<EndDeviceLorawanMac> m_mac;   //!< Pointer to the MAC layer of this device
+  Ptr<ClassAEndDeviceLorawanMac> m_mac;   //!< Pointer to the MAC layer of this device
 };
 }
 
