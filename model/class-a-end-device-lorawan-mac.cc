@@ -23,6 +23,7 @@
 #include "ns3/end-device-lorawan-mac.h"
 #include "ns3/end-device-lora-phy.h"
 #include "ns3/log.h"
+#include <algorithm>
 
 namespace ns3 {
 namespace lorawan {
@@ -62,12 +63,21 @@ ClassAEndDeviceLorawanMac::ClassAEndDeviceLorawanMac () :
 ClassAEndDeviceLorawanMac::~ClassAEndDeviceLorawanMac ()
 {
   NS_LOG_FUNCTION_NOARGS ();
+}
 
+/////////////////////
+// Sending methods //
+/////////////////////
+
+void
+SendToPhy (Ptr<Packet> packet)
+{
+  /////////////////////////////////////////////////////////
   // Add headers, prepare TX parameters and send the packet
   /////////////////////////////////////////////////////////
 
   NS_LOG_DEBUG ("PacketToSend: " << packetToSend);
-
+  
   // Data Rate Adaptation as in LoRaWAN specification, V1.0.2 (2016)
   if (m_enableDRAdapt && (m_dataRate > 0)
       && (m_retxParams.retxLeft < m_maxNumbTx)
@@ -120,16 +130,6 @@ ClassAEndDeviceLorawanMac::~ClassAEndDeviceLorawanMac ()
 
   m_phy->GetObject<EndDeviceLoraPhy> ()->SetSpreadingFactor
     (GetSfFromDataRate (replyDataRate));
-}
-
-/////////////////////
-// Sending methods //
-/////////////////////
-
-void
-SendToPhy (Ptr<Packet> packet)
-{
-  /////////////////////////////////////////////////////////
 
 }
 
@@ -442,29 +442,29 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow (void)
 // Getters and Setters //
 /////////////////////////
 
-void
-SetDataRate (uint8_t dataRate)
-{
-  EndDeviceLorawanMac::SetDataRate (dataRate);
-}
-
-uint8_t
-GetDataRate (void)
-{
-  return EndDeviceLorawanMac::GetDataRate ();
-}
-
-uint8_t
-GetTransmissionPower (void)
-{
-  return EndDeviceLorawanMac::GetTransmissionPower ();
-}
-
-void
-SetDeviceAddress (LoraDeviceAddress address)
-{
-  EndDeviceLorawanMac::SetDeviceAddress (address);
-}
+// void
+// SetDataRate (uint8_t dataRate)
+// {
+//   EndDeviceLorawanMac::SetDataRate (dataRate);
+// }
+//
+// uint8_t
+// GetDataRate (void)
+// {
+//   return EndDeviceLorawanMac::GetDataRate ();
+// }
+//
+// uint8_t
+// GetTransmissionPower (void)
+// {
+//   return EndDeviceLorawanMac::GetTransmissionPower ();
+// }
+//
+// void
+// SetDeviceAddress (LoraDeviceAddress address)
+// {
+//   EndDeviceLorawanMac::SetDeviceAddress (address);
+// }
 
 Time
 ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay (Time waitingTime)
