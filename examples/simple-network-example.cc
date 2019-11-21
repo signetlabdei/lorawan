@@ -36,6 +36,7 @@ int main (int argc, char *argv[])
   LogComponentEnable ("LoraInterferenceHelper", LOG_LEVEL_ALL);
   LogComponentEnable ("LorawanMac", LOG_LEVEL_ALL);
   LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_ALL);
+  LogComponentEnable ("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
   LogComponentEnable ("GatewayLorawanMac", LOG_LEVEL_ALL);
   LogComponentEnable ("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
   LogComponentEnable ("LogicalLoraChannel", LOG_LEVEL_ALL);
