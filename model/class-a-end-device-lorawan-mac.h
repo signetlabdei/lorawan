@@ -19,13 +19,15 @@
  *         Martina Capuzzo <capuzzom@dei.unipd.it>
  */
 
-#ifndef END_DEVICE_LORAWAN_MAC_H
-#define END_DEVICE_LORAWAN_MAC_H
+#ifndef CLASS_A_END_DEVICE_LORAWAN_MAC_H
+#define CLASS_A_END_DEVICE_LORAWAN_MAC_H
 
 #include "ns3/lorawan-mac.h"                // Packet
 #include "ns3/end-device-lorawan-mac.h"     // EndDeviceLorawanMac
 #include "ns3/lora-frame-header.h"          // RxParamSetupReq
+// #include "ns3/random-variable-stream.h"
 #include "ns3/lora-device-address.h"
+// #include "ns3/traced-value.h"
 
 namespace ns3 {
 namespace lorawan {
@@ -93,34 +95,6 @@ public:
   /////////////////////////
   // Getters and Setters //
   /////////////////////////
-
-  /**
-   * Get the data rate this end device is set to use.
-   *
-   * \return The data rate this device uses when transmitting.
-   */
-  virtual void SetDataRate (uint8_t dataRate);
-
-  /**
-   * Get the data rate this end device is set to use.
-   *
-   * \return The data rate this device uses when transmitting.
-   */
-  virtual uint8_t GetDataRate (void);
-
-  /**
-   * Get the transmission power this end device is set to use.
-   *
-   * \return The transmission power this device uses when transmitting.
-   */
-  uint8_t GetTransmissionPower (void);
-
-  /**
-   * Set the network address of this device.
-   *
-   * \param address The address to set.
-   */
-  virtual void SetDeviceAddress (LoraDeviceAddress address);
 
   virtual uint8_t GetReceiveWindow (void);
 

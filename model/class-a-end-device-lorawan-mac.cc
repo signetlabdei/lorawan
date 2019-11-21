@@ -442,30 +442,6 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow (void)
 // Getters and Setters //
 /////////////////////////
 
-// void
-// SetDataRate (uint8_t dataRate)
-// {
-//   EndDeviceLorawanMac::SetDataRate (dataRate);
-// }
-//
-// uint8_t
-// GetDataRate (void)
-// {
-//   return EndDeviceLorawanMac::GetDataRate ();
-// }
-//
-// uint8_t
-// GetTransmissionPower (void)
-// {
-//   return EndDeviceLorawanMac::GetTransmissionPower ();
-// }
-//
-// void
-// SetDeviceAddress (LoraDeviceAddress address)
-// {
-//   EndDeviceLorawanMac::SetDeviceAddress (address);
-// }
-
 Time
 ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay (Time waitingTime)
 {
