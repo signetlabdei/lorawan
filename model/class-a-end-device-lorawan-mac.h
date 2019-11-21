@@ -47,6 +47,11 @@ public:
   // Sending methods //
   /////////////////////
 
+  /**
+  * Add headers and send a packet with the sending function of the physical layer.
+  *
+  * \param packet the packet to send
+  */
   virtual void SendToPhy (Ptr<Packet> packet);
 
   //////////////////////////
@@ -96,17 +101,10 @@ public:
   // Getters and Setters //
   /////////////////////////
 
-  // virtual uint8_t GetReceiveWindow (void);
-
   /**
-   * Get the Data Rate that will be used in the receive window.
-   *
-   * \return The Data Rate
-   *     - If the device class type is CLASS A then it will return the first
-   *       receive window.
+   * Find the minimum waiting time before the next possible transmission based
+   * on End Device's Class Type.
    */
-  // virtual uint8_t GetReceiveWindowDataRate (void);
-
   virtual Time GetNextClassTransmissionDelay (Time waitingTime);
 
   /**
@@ -148,15 +146,16 @@ public:
   // MAC command methods //
   /////////////////////////
 
+  /**
+   * Perform the actions that need to be taken when receiving a RxParamSetupReq
+   * command based on the Device's Class Type.
+   *
+   * \param rxParamSetupReq The Parameter Setup Request, which contains:
+   *                            - The offset to set.
+   *                            - The data rate to use for the second receive window.
+   *                            - The frequency to use for the second receive window.
+   */
   virtual void OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq);
-
-// protected:
-//
-//   /**
-//    * Find the minimum waiting time before the next possible transmission
-//    * according to the class type.
-//    */
-//   virtual Time GetNextClassTransmissionDelay (Time waitingTime);
 
 private:
 

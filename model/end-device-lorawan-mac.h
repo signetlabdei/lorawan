@@ -171,8 +171,6 @@ public:
    */
   LoraDeviceAddress GetDeviceAddress (void);
 
-  // virtual uint8_t GetReceiveWindow (void);
-
   /**
    * Set a value for the RX1DROffset parameter.
    *
@@ -262,12 +260,16 @@ public:
   /**
    * Perform the actions that need to be taken when receiving a RxParamSetupReq command.
    *
-   * \param rx1DrOffset The offset to set.
-   * \param rx2DataRate The data rate to use for the second receive window.
-   * \param frequency The frequency to use for the second receive window.
+   * \param rxParamSetupReq The Parameter Setup Request
    */
   void OnRxParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq);
 
+  /**
+   * Perform the actions that need to be taken when receiving a RxParamSetupReq
+   * command based on the Device's Class Type.
+   *
+   * \param rxParamSetupReq The Parameter Setup Request
+   */
   virtual void OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq);
 
   /**
@@ -375,6 +377,10 @@ protected:
    */
   LoraDeviceAddress m_address;
 
+  /**
+   * Find the minimum waiting time before the next possible transmission based
+   * on End Device's Class Type.
+   */
   virtual Time GetNextClassTransmissionDelay (Time waitingTime);
 
   /**
