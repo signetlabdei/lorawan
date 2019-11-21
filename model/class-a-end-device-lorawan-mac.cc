@@ -445,7 +445,19 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow (void)
 void
 SetDataRate (uint8_t dataRate)
 {
-  EndDeviceLorawanMac::GetDataRate (dataRate);
+  EndDeviceLorawanMac::SetDataRate (dataRate);
+}
+
+uint8_t
+GetDataRate (void)
+{
+  return EndDeviceLorawanMac::GetDataRate ();
+}
+
+uint8_t
+GetTransmissionPower (void)
+{
+  return EndDeviceLorawanMac::GetTransmissionPower ();
 }
 
 void

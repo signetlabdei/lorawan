@@ -25,7 +25,7 @@
 #include "ns3/lorawan-mac.h"                // Packet
 #include "ns3/end-device-lorawan-mac.h"     // EndDeviceLorawanMac
 #include "ns3/lora-frame-header.h"          // RxParamSetupReq
-
+#include "ns3/lora-device-address.h"
 
 namespace ns3 {
 namespace lorawan {
@@ -100,6 +100,20 @@ public:
    * \return The data rate this device uses when transmitting.
    */
   virtual void SetDataRate (uint8_t dataRate);
+
+  /**
+   * Get the data rate this end device is set to use.
+   *
+   * \return The data rate this device uses when transmitting.
+   */
+  virtual uint8_t GetDataRate (void);
+
+  /**
+   * Get the transmission power this end device is set to use.
+   *
+   * \return The transmission power this device uses when transmitting.
+   */
+  uint8_t GetTransmissionPower (void);
 
   /**
    * Set the network address of this device.
