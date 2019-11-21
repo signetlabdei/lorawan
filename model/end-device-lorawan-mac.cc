@@ -828,7 +828,7 @@ EndDeviceLorawanMac::GetNextTransmissionDelay (void)
                     frequency << " is = " << waitingTime.GetSeconds () << ".");
     }
 
-  waitingTime = GetNextClassTransmissionDelay (waitingTime);
+  waitingTime = static_cast<ClassAEndDeviceLorawanMac*>(this)->GetNextClassTransmissionDelay (waitingTime);
 
   return waitingTime;
 }
