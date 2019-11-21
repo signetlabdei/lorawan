@@ -46,7 +46,7 @@ public:
     CLASS_A = 0,
     CLASS_B = 1,
     CLASS_C = 2
-};
+  };
 
   static TypeId GetTypeId (void);
 
