@@ -103,7 +103,7 @@ int main (int argc, char *argv[])
 
   // Create the LoraNetDevices of the end devices
   phyHelper.SetDeviceType (LoraPhyHelper::ED);
-  macHelper.SetDeviceType (LorawanMacHelper::ED);
+  macHelper.SetDeviceType (LorawanMacHelper::ED_A);
   helper.Install (phyHelper, macHelper, endDevices);
 
   /*********************

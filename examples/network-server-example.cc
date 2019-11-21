@@ -52,6 +52,7 @@ int main (int argc, char *argv[])
   // LogComponentEnable("EndDeviceLoraPhy", LOG_LEVEL_ALL);
   // LogComponentEnable("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
   LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_ALL);
+  LogComponentEnable ("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
   // LogComponentEnable ("OneShotSender", LOG_LEVEL_ALL);
   // LogComponentEnable("PointToPointNetDevice", LOG_LEVEL_ALL);
   // LogComponentEnable ("Forwarder", LOG_LEVEL_ALL);
@@ -116,14 +117,14 @@ int main (int argc, char *argv[])
 
   // Create the LoraNetDevices of the end devices
   phyHelper.SetDeviceType (LoraPhyHelper::ED);
-  macHelper.SetDeviceType (LorawanMacHelper::ED);
+  macHelper.SetDeviceType (LorawanMacHelper::ED_A);
   macHelper.SetAddressGenerator (addrGen);
   macHelper.SetRegion (LorawanMacHelper::EU);
   helper.Install (phyHelper, macHelper, endDevices);
 
   // Set message type (Default is unconfirmed)
   Ptr<LorawanMac> edMac1 = endDevices.Get (1)->GetDevice (0)->GetObject<LoraNetDevice> ()->GetMac ();
-  Ptr<EndDeviceLorawanMac> edLorawanMac1 = edMac1->GetObject<EndDeviceLorawanMac> ();
+  Ptr<ClassAEndDeviceLorawanMac> edLorawanMac1 = edMac1->GetObject<ClassAEndDeviceLorawanMac> ();
   edLorawanMac1->SetMType (LorawanMacHeader::CONFIRMED_DATA_UP);
 
 

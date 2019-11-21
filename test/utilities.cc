@@ -38,7 +38,7 @@ CreateEndDevices (int nDevices, MobilityHelper mobility, Ptr<LoraChannel> channe
 
   // Create the LoraNetDevices of the end devices
   phyHelper.SetDeviceType (LoraPhyHelper::ED);
-  macHelper.SetDeviceType (LorawanMacHelper::ED);
+  macHelper.SetDeviceType (LorawanMacHelper::ED_A);
   helper.Install (phyHelper, macHelper, endDevices);
 
   return endDevices;
