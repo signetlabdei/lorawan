@@ -445,6 +445,8 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow (void)
 Time
 ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay (Time waitingTime)
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   if (!m_closeFirstWindow.IsExpired () || !m_closeSecondWindow.IsExpired () || !m_secondReceiveWindow.IsExpired () )
     {
       NS_LOG_WARN ("Attempting to send when there are receive windows:" <<
@@ -497,6 +499,8 @@ ClassAEndDeviceLorawanMac::GetSecondReceiveWindowFrequency (void)
 void
 ClassAEndDeviceLorawanMac::OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq)
 {
+  NS_LOG_FUNCTION (this << rxParamSetupReq);
+  
   bool offsetOk = true;
   bool dataRateOk = true;
 
