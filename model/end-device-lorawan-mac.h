@@ -193,7 +193,7 @@ public:
    *
    * \return The data rate this device uses when transmitting.
    */
-  virtual uint8_t GetDataRate (void);
+  uint8_t GetDataRate (void);
 
   /**
    * Get the transmission power this end device is set to use.
@@ -207,7 +207,7 @@ public:
    *
    * \param address The address to set.
    */
-  virtual void SetDeviceAddress (LoraDeviceAddress address);
+  void SetDeviceAddress (LoraDeviceAddress address);
 
   /**
    * Get the network address of this device.
