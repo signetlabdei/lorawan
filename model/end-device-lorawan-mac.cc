@@ -112,19 +112,14 @@ EndDeviceLorawanMac::EndDeviceLorawanMac () :
   m_enableDRAdapt (false),
   m_maxNumbTx (8),
   m_dataRate (0),
-  m_controlDataRate (false),
   m_txPower (14),
   m_codingRate (1),
   // LoraWAN default
   m_headerDisabled (0),
   // LoraWAN default
-  m_receiveDelay1 (Seconds (1)),
-  // LoraWAN default
-  m_receiveDelay2 (Seconds (2)),
-  // LoraWAN default
   m_address (LoraDeviceAddress (0)),
-  m_rx1DrOffset (0),
   // LoraWAN default
+  m_controlDataRate (false),
   m_lastKnownLinkMargin (0),
   m_lastKnownGatewayCount (0),
   m_aggregatedDutyCycle (1),

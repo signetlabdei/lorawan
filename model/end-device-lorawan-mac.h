@@ -419,19 +419,6 @@ public:
 
 protected:
   /**
-   * The DataRate this device is using to transmit.
-   */
-  uint8_t m_dataRate;
-
-  virtual Time GetNextClassTransmissionDelay (Time waitingTime);
-
-private:
-  /**
-   * The class type.
-   */
-  uint8_t m_cType;
-
-  /**
    * Structure representing the parameters that will be used in the
    * retransmission procedure.
    */
@@ -454,35 +441,9 @@ private:
   uint8_t m_maxNumbTx;
 
   /**
-   * Randomly shuffle a Ptr<LogicalLoraChannel> vector.
-   *
-   * Used to pick a random channel on which to send the packet.
+   * The DataRate this device is using to transmit.
    */
-  std::vector<Ptr<LogicalLoraChannel> > Shuffle (std::vector<Ptr<LogicalLoraChannel> > vector);
-
-  /**
-   * Find the minimum waiting time before the next possible transmission.
-   */
-  Time GetNextTransmissionDelay (void);
-
-
-  /**
-   * Find a suitable channel for transmission. The channel is chosen among the
-   * ones that are available in the ED's LogicalLoraChannel, based on their duty
-   * cycle limitations.
-   */
-  Ptr<LogicalLoraChannel> GetChannelForTx (void);
-
-  /**
-   * An uniform random variable, used by the Shuffle method to randomly reorder
-   * the channel list.
-   */
-  Ptr<UniformRandomVariable> m_uniformRV;
-
-  /**
-   * Whether this device's data rate should be controlled by the NS.
-   */
-  bool m_controlDataRate;
+  uint8_t m_dataRate;
 
   /**
    * The transmission power this device is using to transmit.
@@ -499,18 +460,19 @@ private:
    */
   bool m_headerDisabled;
 
-  // MOVE TO CLASS A
-  // /**
-  //  * The interval between when a packet is done sending and when the first
-  //  * receive window is opened.
-  //  */
-  // Time m_receiveDelay1;
-  //
-  // /**
-  //  * The interval between when a packet is done sending and when the second
-  //  * receive window is opened.
-  //  */
-  // Time m_receiveDelay2;
+  /**
+   * The address of this device.
+   */
+  LoraDeviceAddress m_address;
+
+  virtual Time GetNextClassTransmissionDelay (Time waitingTime);
+
+  /**
+   * Find a suitable channel for transmission. The channel is chosen among the
+   * ones that are available in the ED's LogicalLoraChannel, based on their duty
+   * cycle limitations.
+   */
+  Ptr<LogicalLoraChannel> GetChannelForTx (void);
 
   /**
    * The duration of a receive window in number of symbols. This should be
@@ -524,28 +486,55 @@ private:
    */
   uint8_t m_receiveWindowDurationInSymbols;
 
-  // MOVE TO CLASS A
-  // /**
-  //  * The event of the closing the first receive window.
-  //  *
-  //  * This Event will be canceled if there's a successful reception of a packet.
-  //  */
-  // EventId m_closeFirstWindow;
-  //
-  // /**
-  //  * The event of the closing the second receive window.
-  //  *
-  //  * This Event will be canceled if there's a successful reception of a packet.
-  //  */
-  // EventId m_closeSecondWindow;
-  //
-  // /**
-  //  * The event of the second receive window opening.
-  //  *
-  //  * This Event is used to cancel the second window in case the first one is
-  //  * successful.
-  //  */
-  // EventId m_secondReceiveWindow;
+  /**
+   * List of the MAC commands that need to be applied to the next UL packet.
+   */
+  std::list<Ptr<MacCommand> > m_macCommandList;
+
+  /* Structure containing the retransmission parameters
+   * for this device.
+   */
+  struct LoraRetxParameters m_retxParams;
+
+  /////////////////
+  //  Callbacks  //
+  /////////////////
+
+  /**
+   * The trace source fired when the transmission procedure is finished.
+   *
+   * \see class CallBackTraceSource
+   */
+  TracedCallback<uint8_t, bool, Time, Ptr<Packet> > m_requiredTxCallback;
+
+private:
+  /**
+   * The class type.
+   */
+  uint8_t m_cType;
+
+  /**
+   * Randomly shuffle a Ptr<LogicalLoraChannel> vector.
+   *
+   * Used to pick a random channel on which to send the packet.
+   */
+  std::vector<Ptr<LogicalLoraChannel> > Shuffle (std::vector<Ptr<LogicalLoraChannel> > vector);
+
+  /**
+   * Find the minimum waiting time before the next possible transmission.
+   */
+  Time GetNextTransmissionDelay (void);
+
+  /**
+   * An uniform random variable, used by the Shuffle method to randomly reorder
+   * the channel list.
+   */
+  Ptr<UniformRandomVariable> m_uniformRV;
+
+  /**
+   * Whether this device's data rate should be controlled by the NS.
+   */
+  bool m_controlDataRate;
 
   /**
    * The event of retransmitting a packet in a consecutive moment if an ACK is not received.
@@ -561,26 +550,6 @@ private:
    * This Event is used to cancel the transmission of this packet if a newer packet is delivered from the application to be sent.
    */
   EventId m_nextRetx;
-  /**
-   * The address of this device.
-   */
-  LoraDeviceAddress m_address;
-
-  // MOVE TO CLASS A
-  // /**
-  //  * The frequency to listen on for the second receive window.
-  //  */
-  // double m_secondReceiveWindowFrequency;
-  //
-  // /**
-  //  * The Data Rate to listen for during the second downlink transmission.
-  //  */
-  // uint8_t m_secondReceiveWindowDataRate;
-  //
-  // /**
-  //  * The RX1DROffset parameter value
-  //  */
-  // uint8_t m_rx1DrOffset;
 
   /**
    * The last known link margin.
@@ -600,11 +569,6 @@ private:
   TracedValue<int> m_lastKnownGatewayCount;
 
   /**
-   * List of the MAC commands that need to be applied to the next UL packet.
-   */
-  std::list<Ptr<MacCommand> > m_macCommandList;
-
-  /**
    * The aggregated duty cycle this device needs to respect across all sub-bands.
    */
   TracedValue<double> m_aggregatedDutyCycle;
@@ -614,24 +578,7 @@ private:
    */
   LorawanMacHeader::MType m_mType;
 
-  /* Structure containing the retransmission parameters
-   * for this device.
-   */
-  struct LoraRetxParameters m_retxParams;
-
   uint8_t m_currentFCnt;
-
-  /////////////////
-  //  Callbacks  //
-  /////////////////
-
-  /**
-   * The trace source fired when the transmission procedure is finished.
-   *
-   * \see class CallBackTraceSource
-   */
-  TracedCallback<uint8_t, bool, Time, Ptr<Packet> > m_requiredTxCallback;
-
 };
 
 
