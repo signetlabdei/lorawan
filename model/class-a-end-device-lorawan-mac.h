@@ -96,7 +96,7 @@ public:
   // Getters and Setters //
   /////////////////////////
 
-  virtual uint8_t GetReceiveWindow (void);
+  // virtual uint8_t GetReceiveWindow (void);
 
   /**
    * Get the Data Rate that will be used in the receive window.
@@ -105,7 +105,9 @@ public:
    *     - If the device class type is CLASS A then it will return the first
    *       receive window.
    */
-  virtual uint8_t GetReceiveWindowDataRate (void);
+  // virtual uint8_t GetReceiveWindowDataRate (void);
+
+  // virtual Time GetNextClassTransmissionDelay (Time waitingTime);
 
   /**
    * Get the Data Rate that will be used in the first receive window.

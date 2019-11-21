@@ -19,7 +19,7 @@
  */
 
 #include "ns3/one-shot-sender.h"
-#include "ns3/end-device-lorawan-mac.h"
+#include "ns3/class-a-end-device-lorawan-mac.h"
 #include "ns3/pointer.h"
 #include "ns3/log.h"
 #include "ns3/double.h"

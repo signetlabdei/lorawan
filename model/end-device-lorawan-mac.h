@@ -78,7 +78,7 @@ public:
   *
   * \param packet the packet to send
   */
-  virtual void SendToPhy (void);
+  virtual void SendToPhy (Ptr<Packet> packet);
 
   /**
    * Postpone transmission to the specified time and delete previously scheduled transmissions if present.
@@ -109,7 +109,7 @@ public:
    *
    * This function handles opening of the first receive window.
    */
-  virtual void TxFinished (void);
+  virtual void TxFinished (Ptr<const Packet> packet);
 
   // // MOVE TO CLASS A
   // /**
@@ -216,7 +216,7 @@ public:
    */
   LoraDeviceAddress GetDeviceAddress (void);
 
-  virtual uint8_t GetReceiveWindow (void);
+  // virtual uint8_t GetReceiveWindow (void);
 
   /**
    * Get the Data Rate that will be used in the receive window.
@@ -225,7 +225,7 @@ public:
    *     - If the device class type is CLASS A then it will return the first
    *       receive window.
    */
-   virtual uint8_t GetReceiveWindowDataRate (void);
+   // virtual uint8_t GetReceiveWindowDataRate (void);
 
   // MOVE TO CLASS A
   // /**
@@ -358,7 +358,7 @@ public:
    */
   void OnRxParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq);
 
-  virtual void OnRxClassParamSetupReq (void);
+  virtual void OnRxClassParamSetupReq (Ptr<Packet> packet);
 
   /**
    * Perform the actions that need to be taken when receiving a DevStatusReq command.

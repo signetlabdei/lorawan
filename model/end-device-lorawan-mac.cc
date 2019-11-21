@@ -20,6 +20,7 @@
  */
 
 #include "ns3/end-device-lorawan-mac.h"
+#include "ns3/class-a-end-device-lorawan-mac.h"
 #include "ns3/end-device-lora-phy.h"
 #include "ns3/simulator.h"
 #include "ns3/log.h"
@@ -131,14 +132,6 @@ EndDeviceLorawanMac::EndDeviceLorawanMac () :
   // Initialize the random variable we'll use to decide which channel to
   // transmit on.
   m_uniformRV = CreateObject<UniformRandomVariable> ();
-
-  // Void the two receiveWindow events
-  m_closeFirstWindow = EventId ();
-  m_closeFirstWindow.Cancel ();
-  m_closeSecondWindow = EventId ();
-  m_closeSecondWindow.Cancel ();
-  m_secondReceiveWindow = EventId ();
-  m_secondReceiveWindow.Cancel ();
 
   // Void the transmission event
   m_nextTx = EventId ();
@@ -282,12 +275,12 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           NS_LOG_DEBUG ("Copied packet: " << m_retxParams.packet);
           m_sentNewPacket (m_retxParams.packet);
 
-          SendToPhy (m_retxParams.packet);
+          static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (m_retxParams.packet);
         }
       else
         {
           m_sentNewPacket (packet);
-          SendToPhy (packet);
+          static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (packet);
         }
 
     }
@@ -320,14 +313,14 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           m_retxParams.retxLeft = m_retxParams.retxLeft - 1;           // decreasing the number of retransmissions
           NS_LOG_DEBUG ("Retransmitting an old packet.");
 
-          SendToPhy (m_retxParams.packet);
+          static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (m_retxParams.packet);
         }
     }
 
 }
 
 void
-EndDeviceLorawanMac::SendToPhy (void)
+EndDeviceLorawanMac::SendToPhy (Ptr<Packet> packet)
 { }
 
 //////////////////////////
@@ -647,7 +640,7 @@ EndDeviceLorawanMac::GetMType (void)
 }
 
 void
-EndDeviceLorawanMac::TxFinished (void)
+EndDeviceLorawanMac::TxFinished (Ptr<const Packet> packet)
 { }
 
 // void
@@ -800,7 +793,8 @@ EndDeviceLorawanMac::TxFinished (void)
 //     }
 // }
 
-Time GetNextClassTransmissionDelay (Time waitingTime)
+Time
+EndDeviceLorawanMac::GetNextClassTransmissionDelay (Time waitingTime)
 {
   return waitingTime;
 }
@@ -1127,7 +1121,7 @@ EndDeviceLorawanMac::OnDutyCycleReq (double dutyCycle)
 }
 
 void
-EndDeviceLorawanMac::OnRxClassParamSetupReq (void)
+EndDeviceLorawanMac::OnRxClassParamSetupReq (Ptr<Packet> packet)
 { }
 
 void
@@ -1135,7 +1129,7 @@ EndDeviceLorawanMac::OnRxParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq)
 {
   NS_LOG_FUNCTION (this << rxParamSetupReq);
 
-  OnRxClassParamSetupReq (rxParamSetupReq);
+  static_cast<ClassAEndDeviceLorawanMac*>(this)->OnRxClassParamSetupReq (rxParamSetupReq);
 }
 
 void

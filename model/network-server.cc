@@ -29,7 +29,7 @@
 #include "ns3/network-status.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/node-container.h"
-#include "ns3/end-device-lorawan-mac.h"
+#include "ns3/class-a-end-device-lorawan-mac.h"
 #include "ns3/mac-command.h"
 
 namespace ns3 {
@@ -142,8 +142,8 @@ NetworkServer::AddNode (Ptr<Node> node)
     }
 
   // Get the MAC
-  Ptr<EndDeviceLorawanMac> edLorawanMac =
-    loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
+  Ptr<ClassAEndDeviceLorawanMac> edLorawanMac =
+    loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
 
   // Update the NetworkStatus about the existence of this node
   m_status->AddNode (edLorawanMac);
