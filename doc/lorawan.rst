@@ -103,11 +103,12 @@ To represent these two models, the module features two generic ``LoraPhy`` and
 model the peculiarities of the two wireless network devices: the End Device (ED)
 and the Gateway (GW). So, the PHY layers can be modeled by use of
 ``EndDeviceLoraPhy`` and ``GatewayLoraPhy`` classes, while objects of class
-``EndDeviceLorawanMac`` and ``GatewayLorawanMac`` are used to represent the MAC layer.
-A ``NetworkServer`` application can also be installed on a node that will then
-administer the wireless network through the GW's forwarding application,
-``Forwarder``, which leverages the gateway's LoRa communication capabilities to
-forward to End Devices the Network Server's packets.
+``EndDeviceLorawanMac``, ``ClassAEndDeviceLorawanMac``, and ``GatewayLorawanMac`` 
+are used to represent the MAC layer. A ``NetworkServer`` application can also be
+installed on a node that will then administer the wireless network through the
+GW's forwarding application, ``Forwarder``, which leverages the gateway's LoRa
+communication capabilities to forward to End Devices the Network Server's
+packets.
 
 PHY layer model
 ===============
