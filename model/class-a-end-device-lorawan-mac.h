@@ -107,7 +107,7 @@ public:
    */
   // virtual uint8_t GetReceiveWindowDataRate (void);
 
-  // virtual Time GetNextClassTransmissionDelay (Time waitingTime);
+  virtual Time GetNextClassTransmissionDelay (Time waitingTime);
 
   /**
    * Get the Data Rate that will be used in the first receive window.
@@ -150,13 +150,13 @@ public:
 
   virtual void OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq);
 
-protected:
-
-  /**
-   * Find the minimum waiting time before the next possible transmission
-   * according to the class type.
-   */
-  virtual Time GetNextClassTransmissionDelay (Time waitingTime);
+// protected:
+//
+//   /**
+//    * Find the minimum waiting time before the next possible transmission
+//    * according to the class type.
+//    */
+//   virtual Time GetNextClassTransmissionDelay (Time waitingTime);
 
 private:
 
