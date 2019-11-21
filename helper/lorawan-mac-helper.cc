@@ -49,8 +49,8 @@ LorawanMacHelper::SetDeviceType (enum DeviceType dt)
     case GW:
       m_mac.SetTypeId ("ns3::GatewayLorawanMac");
       break;
-    case ED:
-      m_mac.SetTypeId ("ns3::EndDeviceLorawanMac");
+    case ED_A:
+      m_mac.SetTypeId ("ns3::ClassAEndDeviceLorawanMac");
       break;
     }
   m_deviceType = dt;
@@ -77,16 +77,16 @@ LorawanMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
   mac->SetDevice (device);
 
   // If we are operating on an end device, add an address to it
-  if (m_deviceType == ED && m_addrGen != 0)
+  if (m_deviceType == ED_A && m_addrGen != 0)
     {
       mac->GetObject<EndDeviceLorawanMac> ()->SetDeviceAddress (m_addrGen->NextAddress ());
     }
 
   // Add a basic list of channels based on the region where the device is
   // operating
-  if (m_deviceType == ED)
+  if (m_deviceType == ED_A)
     {
-      Ptr<EndDeviceLorawanMac> edMac = mac->GetObject<EndDeviceLorawanMac> ();
+      Ptr<ClassAEndDeviceLorawanMac> edMac = mac->GetObject<ClassAEndDeviceLorawanMac> ();
       switch (m_region)
         {
         case LorawanMacHelper::EU:
@@ -366,7 +366,7 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
       Ptr<NetDevice> netDevice = object->GetDevice (0);
       Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
       NS_ASSERT (loraNetDevice != 0);
-      Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
+      Ptr<ClassAEndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
       NS_ASSERT (mac != 0);
 
       // Try computing the distance from each gateway and find the best one
@@ -524,7 +524,7 @@ LorawanMacHelper::SetSpreadingFactorsGivenDistribution (NodeContainer endDevices
       Ptr<NetDevice> netDevice = object->GetDevice (0);
       Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
       NS_ASSERT (loraNetDevice != 0);
-      Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
+      Ptr<ClassAEndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
       NS_ASSERT (mac != 0);
 
       double prob = uniformRV->GetValue (0, 1);
