@@ -22,6 +22,11 @@
 #ifndef END_DEVICE_LORAWAN_MAC_H
 #define END_DEVICE_LORAWAN_MAC_H
 
+#include "ns3/lorawan-mac.h"                // Packet
+#include "ns3/end-device-lorawan-mac.h"     // EndDeviceLorawanMac
+#include "ns3/lora-frame-header.h"          // RxParamSetupReq
+
+
 namespace ns3 {
 namespace lorawan {
 
@@ -35,6 +40,12 @@ public:
 
   ClassAEndDeviceLorawanMac ();
   virtual ~ClassAEndDeviceLorawanMac ();
+
+  /////////////////////
+  // Sending methods //
+  /////////////////////
+
+  virtual void SendToPhy (Ptr<Packet> packet);
 
   //////////////////////////
   //  Receiving methods   //
@@ -82,6 +93,20 @@ public:
   /////////////////////////
   // Getters and Setters //
   /////////////////////////
+
+  /**
+   * Get the data rate this end device is set to use.
+   *
+   * \return The data rate this device uses when transmitting.
+   */
+  virtual void SetDataRate (uint8_t dataRate);
+
+  /**
+   * Set the network address of this device.
+   *
+   * \param address The address to set.
+   */
+  virtual void SetDeviceAddress (LoraDeviceAddress address);
 
   virtual uint8_t GetReceiveWindow (void);
 
@@ -133,7 +158,7 @@ public:
   // MAC command methods //
   /////////////////////////
 
-  virtual void OnRxClassParamSetupReq (uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency);
+  virtual void OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq);
 
 protected:
 
@@ -141,7 +166,7 @@ protected:
    * Find the minimum waiting time before the next possible transmission
    * according to the class type.
    */
-  virtual Time GetNextClassTransmissionDelay (void);
+  virtual Time GetNextClassTransmissionDelay (Time waitingTime);
 
 private:
 
@@ -194,7 +219,7 @@ private:
    */
   uint8_t m_rx1DrOffset;
 
-} /* ClassAEndDeviceLorawanMac */
+}; /* ClassAEndDeviceLorawanMac */
 } /* namespace lorawan */
 } /* namespace ns3 */
 #endif /* CLASS_A_END_DEVICE_LORAWAN_MAC_H */
