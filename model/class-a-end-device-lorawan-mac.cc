@@ -500,9 +500,9 @@ ClassAEndDeviceLorawanMac::OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamS
   bool offsetOk = true;
   bool dataRateOk = true;
 
-  rx1DrOffset = rxParamSetupReq->GetRx1DrOffset ();
-  rx2DataRate = rxParamSetupReq->GetRx2DataRate ();
-  frequency = rxParamSetupReq->GetFrequency ();
+  uint8_t rx1DrOffset = rxParamSetupReq->GetRx1DrOffset ();
+  uint8_t rx2DataRate = rxParamSetupReq->GetRx2DataRate ();
+  double frequency = rxParamSetupReq->GetFrequency ();
 
   NS_LOG_FUNCTION (this << unsigned (rx1DrOffset) << unsigned (rx2DataRate) <<
                    frequency);
