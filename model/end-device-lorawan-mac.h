@@ -38,16 +38,6 @@ namespace lorawan {
 class EndDeviceLorawanMac : public LorawanMac
 {
 public:
-  /**
-  * The device type.
-  */
-  enum CType
-  {
-    CLASS_A = 0,
-    CLASS_B = 1,
-    CLASS_C = 2
-  };
-
   static TypeId GetTypeId (void);
 
   EndDeviceLorawanMac ();
@@ -114,20 +104,6 @@ public:
   /////////////////////////
   // Getters and Setters //
   /////////////////////////
-
-  /**
-   * Set the class type.
-   *
-   * \param ctype The class type of this device.
-   */
-  void SetCType (enum CType ctype);
-
-  /**
-   * Get the class type.
-   *
-   * \return The uint8_t corresponding to the device's class type.
-   */
-  uint8_t GetCType (void) const;
 
   /**
   * Reset retransmission parameters contained in the structure LoraRetxParams
@@ -442,11 +418,6 @@ protected:
   TracedCallback<uint8_t, bool, Time, Ptr<Packet> > m_requiredTxCallback;
 
 private:
-  /**
-   * The class type.
-   */
-  uint8_t m_cType;
-
   /**
    * Randomly shuffle a Ptr<LogicalLoraChannel> vector.
    *

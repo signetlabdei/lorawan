@@ -97,14 +97,6 @@ EndDeviceLorawanMac::GetTypeId (void)
                                     "Unconfirmed",
                                     LorawanMacHeader::CONFIRMED_DATA_UP,
                                     "Confirmed"))
-    .AddAttribute ("CType",
-                   "Specify the class of end device to use.",
-                   EnumValue (EndDeviceLorawanMac::CLASS_A),
-                   MakeEnumAccessor (&EndDeviceLorawanMac::m_cType),
-                   MakeEnumChecker (EndDeviceLorawanMac::CLASS_A,
-                                    "Class A",
-                                    EndDeviceLorawanMac::CLASS_C,
-                                    "Class C"))
     .AddConstructor<EndDeviceLorawanMac> ();
   return tid;
 }
@@ -632,20 +624,6 @@ EndDeviceLorawanMac::Shuffle (std::vector<Ptr<LogicalLoraChannel> > vector)
 /////////////////////////
 // Setters and Getters //
 /////////////////////////
-
-void
-EndDeviceLorawanMac::SetCType (enum CType ctype)
-{
-  NS_LOG_FUNCTION (this << ctype);
-  m_cType = ctype;
-}
-
-uint8_t
-EndDeviceLorawanMac::GetCType (void) const
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  return m_cType;
-}
 
 void EndDeviceLorawanMac::resetRetransmissionParameters ()
 {
