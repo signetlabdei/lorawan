@@ -111,27 +111,6 @@ public:
    */
   virtual void TxFinished (Ptr<const Packet> packet);
 
-  // // MOVE TO CLASS A
-  // /**
-  //  * Perform operations needed to open the first receive window.
-  //  */
-  // void OpenFirstReceiveWindow (void);
-  //
-  // /**
-  //  * Perform operations needed to open the second receive window.
-  //  */
-  // void OpenSecondReceiveWindow (void);
-  //
-  // /**
-  //  * Perform operations needed to close the first receive window.
-  //  */
-  // void CloseFirstReceiveWindow (void);
-  //
-  // /**
-  //  * Perform operations needed to close the second receive window.
-  //  */
-  // void CloseSecondReceiveWindow (void);
-
   /////////////////////////
   // Getters and Setters //
   /////////////////////////
@@ -217,51 +196,6 @@ public:
   LoraDeviceAddress GetDeviceAddress (void);
 
   // virtual uint8_t GetReceiveWindow (void);
-
-  /**
-   * Get the Data Rate that will be used in the receive window.
-   *
-   * \return The Data Rate
-   *     - If the device class type is CLASS A then it will return the first
-   *       receive window.
-   */
-   // virtual uint8_t GetReceiveWindowDataRate (void);
-
-  // MOVE TO CLASS A
-  // /**
-  //  * Set the Data Rate to be used in the second receive window.
-  //  *
-  //  * \param dataRate The Data Rate.
-  //  */
-  // void SetSecondReceiveWindowDataRate (uint8_t dataRate);
-  //
-  // /**
-  //  * Get the Data Rate that will be used in the first receive window.
-  //  *
-  //  * \return The Data Rate
-  //  */
-  // uint8_t GetFirstReceiveWindowDataRate (void);
-  //
-  // /**
-  //  * Get the Data Rate that will be used in the second receive window.
-  //  *
-  //  * \return The Data Rate
-  //  */
-  // uint8_t GetSecondReceiveWindowDataRate (void);
-  //
-  // /**
-  //  * Set the frequency that will be used for the second receive window.
-  //  *
-  //  * \param frequencyMHz the Frequency.
-  //  */
-  // void SetSecondReceiveWindowFrequency (double frequencyMHz);
-  //
-  // /**
-  //  * Get the frequency that is used for the second receive window.
-  //  *
-  //  * @return The frequency, in MHz
-  //  */
-  // double GetSecondReceiveWindowFrequency (void);
 
   /**
    * Set a value for the RX1DROffset parameter.

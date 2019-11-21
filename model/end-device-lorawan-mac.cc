@@ -937,37 +937,6 @@ EndDeviceLorawanMac::AddSubBand (double startFrequency, double endFrequency, dou
   m_channelHelper.AddSubBand (startFrequency, endFrequency, dutyCycle, maxTxPowerDbm);
 }
 
-// MOVE TO CLASS A
-// uint8_t
-// EndDeviceLorawanMac::GetFirstReceiveWindowDataRate (void)
-// {
-//   return m_replyDataRateMatrix.at (m_dataRate).at (m_rx1DrOffset);
-// }
-//
-// void
-// EndDeviceLorawanMac::SetSecondReceiveWindowDataRate (uint8_t dataRate)
-// {
-//   m_secondReceiveWindowDataRate = dataRate;
-// }
-//
-// uint8_t
-// EndDeviceLorawanMac::GetSecondReceiveWindowDataRate (void)
-// {
-//   return m_secondReceiveWindowDataRate;
-// }
-//
-// void
-// EndDeviceLorawanMac::SetSecondReceiveWindowFrequency (double frequencyMHz)
-// {
-//   m_secondReceiveWindowFrequency = frequencyMHz;
-// }
-//
-// double
-// EndDeviceLorawanMac::GetSecondReceiveWindowFrequency (void)
-// {
-//   return m_secondReceiveWindowFrequency;
-// }
-
 double
 EndDeviceLorawanMac::GetAggregatedDutyCycle (void)
 {
