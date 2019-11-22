@@ -40,26 +40,12 @@ public:
   /**
    * Define the kind of device. Can be either GW (Gateway) or ED (End Device).
    */
-  enum DeviceType
-  {
-    GW,
-    ED
-  };
+  enum DeviceType { GW, ED };
 
   /**
    * Define the operational region.
    */
-  enum Regions
-  {
-    EU,
-    US,
-    China,
-    EU433MHz,
-    Australia,
-    CN,
-    AS923MHz,
-    SouthKorea
-  };
+  enum Regions { EU, US, China, EU433MHz, Australia, CN, AS923MHz, SouthKorea, ALOHA };
 
   /**
    * Create a mac helper without any parameter set. The user must set
@@ -111,8 +97,7 @@ public:
    * SF11 -> DR1
    * SF12 -> DR0
    */
-  static std::vector<int> SetSpreadingFactorsUp (NodeContainer endDevices,
-                                                 NodeContainer gateways,
+  static std::vector<int> SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer gateways,
                                                  Ptr<LoraChannel> channel);
   /**
    * Set up the end device's data rates according to the given distribution.
@@ -138,13 +123,29 @@ private:
    */
   void ApplyCommonEuConfigurations (Ptr<LorawanMac> lorawanMac) const;
 
+  /**
+   * Perform region-specific configurations for the ALOHA band.
+   */
+  void ConfigureForAlohaRegion (Ptr<EndDeviceLorawanMac> edMac) const;
+
+  /**
+   * Perform region-specific configurations for the ALOHA band.
+   */
+  void ConfigureForAlohaRegion (Ptr<GatewayLorawanMac> gwMac) const;
+
+  /**
+   * Apply configurations that are common both for the GatewayLorawanMac and the
+   * EndDeviceLorawanMac classes.
+   */
+  void ApplyCommonAlohaConfigurations (Ptr<LorawanMac> lorawanMac) const;
+
   ObjectFactory m_mac;
   Ptr<LoraDeviceAddressGenerator> m_addrGen; //!< Pointer to the address generator to use
   enum DeviceType m_deviceType; //!< The kind of device to install
   enum Regions m_region; //!< The region in which the device will operate
 };
 
-} //namespace ns3
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* LORA_PHY_HELPER_H */

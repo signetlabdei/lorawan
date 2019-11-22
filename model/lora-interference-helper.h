@@ -52,9 +52,9 @@ public:
   class Event : public SimpleRefCount<LoraInterferenceHelper::Event>
   {
 
-public:
-    Event (Time duration, double rxPowerdBm, uint8_t spreadingFactor,
-           Ptr<Packet> packet, double frequencyMHz);
+  public:
+    Event (Time duration, double rxPowerdBm, uint8_t spreadingFactor, Ptr<Packet> packet,
+           double frequencyMHz);
     ~Event ();
 
     /**
@@ -97,7 +97,7 @@ public:
      */
     void Print (std::ostream &stream) const;
 
-private:
+  private:
     /**
      * The time this signal begins (at the device).
      */
@@ -127,7 +127,11 @@ private:
      * The frequency this event was on.
      */
     double m_frequencyMHz;
+  };
 
+  enum CollisionMatrix {
+    GOURSAUD,
+    ALOHA,
   };
 
   static TypeId GetTypeId (void);
@@ -146,16 +150,14 @@ private:
    *
    * \return the newly created event
    */
-  Ptr<LoraInterferenceHelper::Event> Add (Time duration, double rxPower,
-                                          uint8_t spreadingFactor,
-                                          Ptr<Packet> packet,
-                                          double frequencyMHz);
+  Ptr<LoraInterferenceHelper::Event> Add (Time duration, double rxPower, uint8_t spreadingFactor,
+                                          Ptr<Packet> packet, double frequencyMHz);
 
   /**
    * Get a list of the interferers currently registered at this
    * InterferenceHelper.
    */
-  std::list< Ptr< LoraInterferenceHelper::Event > > GetInterferers ();
+  std::list<Ptr<LoraInterferenceHelper::Event>> GetInterferers ();
 
   /**
    * Print the events that are saved in this helper in a human readable format.
@@ -171,8 +173,7 @@ private:
    * \return The sf of the packets that caused the loss, or 0 if there was no
    * loss.
    */
-  uint8_t IsDestroyedByInterference (Ptr<LoraInterferenceHelper::Event>
-                                     event);
+  uint8_t IsDestroyedByInterference (Ptr<LoraInterferenceHelper::Event> event);
 
   /**
    * Compute the time duration in which two given events are overlapping.
@@ -182,8 +183,8 @@ private:
    *
    * \return The overlap time
    */
-  Time GetOverlapTime (Ptr< LoraInterferenceHelper:: Event> event1,
-                       Ptr<LoraInterferenceHelper:: Event> event2);
+  Time GetOverlapTime (Ptr<LoraInterferenceHelper::Event> event1,
+                       Ptr<LoraInterferenceHelper::Event> event2);
 
   /**
    * Delete all events in the LoraInterferenceHelper.
@@ -195,31 +196,36 @@ private:
    */
   void CleanOldEvents (void);
 
+  static CollisionMatrix collisionMatrix;
+
+  static std::vector<std::vector<double>> collisionSnirAloha;
+  static std::vector<std::vector<double>> collisionSnirGoursaud;
+
 private:
+  void SetCollisionMatrix (enum CollisionMatrix collisionMatrix);
+
+  std::vector<std::vector<double>> m_collisionSnir;
+
   /**
    * A list of the events this LoraInterferenceHelper is keeping track of.
    */
-  std::list< Ptr< LoraInterferenceHelper::Event > > m_events;
+  std::list<Ptr<LoraInterferenceHelper::Event>> m_events;
 
   /**
    * The matrix containing information about how packets survive interference.
    */
-  static const double collisionSnir[6][6];
-
   /**
    * The threshold after which an event is considered old and removed from the
    * list.
    */
   static Time oldEventThreshold;
-
 };
 
 /**
  * Allow easy logging of LoraInterferenceHelper Events
  */
-std::ostream &operator << (std::ostream &os, const
-                           LoraInterferenceHelper::Event &event);
-}
+std::ostream &operator<< (std::ostream &os, const LoraInterferenceHelper::Event &event);
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* LORA_INTERFERENCE_HELPER_H */
