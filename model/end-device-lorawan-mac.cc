@@ -17,6 +17,8 @@
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  *         Martina Capuzzo <capuzzom@dei.unipd.it>
+ *
+ * Modified by: Peggy Anderson <peggy.anderson@usask.ca>
  */
 
 #include "ns3/end-device-lorawan-mac.h"

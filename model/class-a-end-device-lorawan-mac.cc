@@ -17,6 +17,8 @@
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  *         Martina Capuzzo <capuzzom@dei.unipd.it>
+ *
+ * Modified by: Peggy Anderson <peggy.anderson@usask.ca>
  */
 
 #include "ns3/class-a-end-device-lorawan-mac.h"
@@ -500,7 +502,7 @@ void
 ClassAEndDeviceLorawanMac::OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq)
 {
   NS_LOG_FUNCTION (this << rxParamSetupReq);
-  
+
   bool offsetOk = true;
   bool dataRateOk = true;
 
