@@ -79,7 +79,7 @@ LorawanMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
   // If we are operating on an end device, add an address to it
   if (m_deviceType == ED_A && m_addrGen != 0)
     {
-      mac->GetObject<EndDeviceLorawanMac> ()->SetDeviceAddress (m_addrGen->NextAddress ());
+      mac->GetObject<ClassAEndDeviceLorawanMac> ()->SetDeviceAddress (m_addrGen->NextAddress ());
     }
 
   // Add a basic list of channels based on the region where the device is
@@ -132,7 +132,7 @@ LorawanMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
 }
 
 void
-LorawanMacHelper::ConfigureForAlohaRegion (Ptr<EndDeviceLorawanMac> edMac) const
+LorawanMacHelper::ConfigureForAlohaRegion (Ptr<ClassAEndDeviceLorawanMac> edMac) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -238,7 +238,7 @@ LorawanMacHelper::ApplyCommonAlohaConfigurations (Ptr<LorawanMac> lorawanMac) co
 }
 
 void
-LorawanMacHelper::ConfigureForEuRegion (Ptr<EndDeviceLorawanMac> edMac) const
+LorawanMacHelper::ConfigureForEuRegion (Ptr<ClassAEndDeviceLorawanMac> edMac) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 

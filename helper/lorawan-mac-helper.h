@@ -40,7 +40,7 @@ public:
   /**
    * Define the kind of device. Can be either GW (Gateway) or ED (End Device).
    */
-  enum DeviceType { GW, ED };
+  enum DeviceType { GW, ED_A };
 
   /**
    * Define the operational region.
@@ -126,7 +126,7 @@ private:
   /**
    * Perform region-specific configurations for the ALOHA band.
    */
-  void ConfigureForAlohaRegion (Ptr<EndDeviceLorawanMac> edMac) const;
+  void ConfigureForAlohaRegion (Ptr<ClassAEndDeviceLorawanMac> edMac) const;
 
   /**
    * Perform region-specific configurations for the ALOHA band.
@@ -135,7 +135,7 @@ private:
 
   /**
    * Apply configurations that are common both for the GatewayLorawanMac and the
-   * EndDeviceLorawanMac classes.
+   * ClassAEndDeviceLorawanMac classes.
    */
   void ApplyCommonAlohaConfigurations (Ptr<LorawanMac> lorawanMac) const;
 
