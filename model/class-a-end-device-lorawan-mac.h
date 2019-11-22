@@ -17,6 +17,8 @@
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  *         Martina Capuzzo <capuzzom@dei.unipd.it>
+ *
+ * Modified by: Peggy Anderson <peggy.anderson@usask.ca>
  */
 
 #ifndef CLASS_A_END_DEVICE_LORAWAN_MAC_H
