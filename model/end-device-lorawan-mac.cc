@@ -103,23 +103,25 @@ EndDeviceLorawanMac::GetTypeId (void)
   return tid;
 }
 
-EndDeviceLorawanMac::EndDeviceLorawanMac () :
-  m_enableDRAdapt (false),
-  m_maxNumbTx (8),
-  m_dataRate (0),
-  m_txPower (14),
-  m_codingRate (1),
-  // LoraWAN default
-  m_headerDisabled (0),
-  // LoraWAN default
-  m_address (LoraDeviceAddress (0)),
-  // LoraWAN default
-  m_controlDataRate (false),
-  m_lastKnownLinkMargin (0),
-  m_lastKnownGatewayCount (0),
-  m_aggregatedDutyCycle (1),
-  m_mType (LorawanMacHeader::CONFIRMED_DATA_UP),
-  m_currentFCnt (0)
+EndDeviceLorawanMac::EndDeviceLorawanMac ()
+    : m_enableDRAdapt (false),
+      m_maxNumbTx (8),
+      m_dataRate (0),
+      m_txPower (14),
+      m_codingRate (1),
+      // LoraWAN default
+      m_headerDisabled (0),
+      // LoraWAN default
+      m_address (LoraDeviceAddress (0)),
+      // LoraWAN default
+      m_receiveWindowDurationInSymbols (8),
+      // LoraWAN default
+      m_controlDataRate (false),
+      m_lastKnownLinkMargin (0),
+      m_lastKnownGatewayCount (0),
+      m_aggregatedDutyCycle (1),
+      m_mType (LorawanMacHeader::CONFIRMED_DATA_UP),
+      m_currentFCnt (0)
 {
   NS_LOG_FUNCTION (this);
 
