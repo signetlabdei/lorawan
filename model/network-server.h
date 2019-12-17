@@ -28,7 +28,6 @@
 #include "ns3/point-to-point-net-device.h"
 #include "ns3/packet.h"
 #include "ns3/lora-device-address.h"
-#include "ns3/device-status.h"
 #include "ns3/gateway-status.h"
 #include "ns3/network-status.h"
 #include "ns3/network-scheduler.h"
@@ -95,8 +94,8 @@ public:
    * Receive a packet from a gateway.
    * \param packet the received packet
    */
-  bool Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
-                uint16_t protocol, const Address& address);
+  bool Receive (Ptr<NetDevice> device, Ptr<const Packet> packet, uint16_t protocol,
+                const Address &address);
 
   Ptr<NetworkStatus> GetNetworkStatus (void);
 
@@ -105,10 +104,10 @@ protected:
   Ptr<NetworkController> m_controller;
   Ptr<NetworkScheduler> m_scheduler;
 
-  TracedCallback<Ptr<const Packet> > m_receivedPacket;
+  TracedCallback<Ptr<const Packet>> m_receivedPacket;
 };
 
-} /* namespace ns3 */
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* NETWORK_SERVER_H */
