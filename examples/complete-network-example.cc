@@ -178,7 +178,8 @@ main (int argc, char *argv[])
 
   // Create the LoraNetDevices of the end devices
   macHelper.SetAddressGenerator (addrGen);
-  macHelper.SetRegion (LoraMacHelper::US915); //comment this line to set default pattern,that is EU868
+  macHelper.SetRegion (
+      LorawanMacHelper::US915); //comment this line to set default pattern,that is EU868
   phyHelper.SetDeviceType (LoraPhyHelper::ED);
   macHelper.SetDeviceType (LorawanMacHelper::ED_A);
   helper.Install (phyHelper, macHelper, endDevices);

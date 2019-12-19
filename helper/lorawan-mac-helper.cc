@@ -30,7 +30,7 @@ namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("LorawanMacHelper");
 
-LorawanMacHelper::LorawanMacHelper () : m_region (LorawanMacHelper::EU)
+LorawanMacHelper::LorawanMacHelper () : m_region (LorawanMacHelper::EU868)
 {
 }
 
@@ -89,9 +89,9 @@ LorawanMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
       Ptr<ClassAEndDeviceLorawanMac> edMac = mac->GetObject<ClassAEndDeviceLorawanMac> ();
       switch (m_region)
         {
-        case LorawanMacHelper::EU:
+        case LorawanMacHelper::EU868:
           {
-            ConfigureForEuRegion (edMac);
+            ConfigureForEu868Region (edMac);
             break;
           }
         case LorawanMacHelper::ALOHA:
@@ -111,9 +111,9 @@ LorawanMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
       Ptr<GatewayLorawanMac> gwMac = mac->GetObject<GatewayLorawanMac> ();
       switch (m_region)
         {
-        case LorawanMacHelper::EU:
+        case LorawanMacHelper::EU868:
           {
-            ConfigureForEuRegion (gwMac);
+            ConfigureForEu868Region (gwMac);
             break;
           }
         case LorawanMacHelper::ALOHA:
@@ -179,7 +179,7 @@ LorawanMacHelper::ConfigureForAlohaRegion (Ptr<GatewayLorawanMac> gwMac) const
   Ptr<GatewayLoraPhy> gwPhy =
       gwMac->GetDevice ()->GetObject<LoraNetDevice> ()->GetPhy ()->GetObject<GatewayLoraPhy> ();
 
-  ApplyCommonEuConfigurations (gwMac);
+  ApplyCommonEu868Configurations (gwMac);
 
   if (gwPhy) // If cast is successful, there's a GatewayLoraPhy
     {
@@ -238,11 +238,11 @@ LorawanMacHelper::ApplyCommonAlohaConfigurations (Ptr<LorawanMac> lorawanMac) co
 }
 
 void
-LorawanMacHelper::ConfigureForEuRegion (Ptr<ClassAEndDeviceLorawanMac> edMac) const
+LorawanMacHelper::ConfigureForEu868Region (Ptr<ClassAEndDeviceLorawanMac> edMac) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
-  ApplyCommonEuConfigurations (edMac);
+  ApplyCommonEu868Configurations (edMac);
 
   /////////////////////////////////////////////////////
   // TxPower -> Transmission power in dBm conversion //
@@ -275,7 +275,7 @@ LorawanMacHelper::ConfigureForEuRegion (Ptr<ClassAEndDeviceLorawanMac> edMac) co
 }
 
 void
-LorawanMacHelper::ConfigureForEuRegion (Ptr<GatewayLorawanMac> gwMac) const
+LorawanMacHelper::ConfigureForEu868Region (Ptr<GatewayLorawanMac> gwMac) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -285,7 +285,7 @@ LorawanMacHelper::ConfigureForEuRegion (Ptr<GatewayLorawanMac> gwMac) const
   Ptr<GatewayLoraPhy> gwPhy =
       gwMac->GetDevice ()->GetObject<LoraNetDevice> ()->GetPhy ()->GetObject<GatewayLoraPhy> ();
 
-  ApplyCommonEuConfigurations (gwMac);
+  ApplyCommonEu868Configurations (gwMac);
 
   if (gwPhy) // If cast is successful, there's a GatewayLoraPhy
     {
@@ -315,7 +315,7 @@ LorawanMacHelper::ConfigureForEuRegion (Ptr<GatewayLorawanMac> gwMac) const
 }
 
 void
-LorawanMacHelper::ApplyCommonEuConfigurations (Ptr<LorawanMac> lorawanMac) const
+LorawanMacHelper::ApplyCommonEu868Configurations (Ptr<LorawanMac> lorawanMac) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -366,7 +366,8 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
       Ptr<NetDevice> netDevice = object->GetDevice (0);
       Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
       NS_ASSERT (loraNetDevice != 0);
-      Ptr<ClassAEndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
+      Ptr<ClassAEndDeviceLorawanMac> mac =
+          loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
       NS_ASSERT (mac != 0);
 
       // Try computing the distance from each gateway and find the best one
@@ -524,7 +525,8 @@ LorawanMacHelper::SetSpreadingFactorsGivenDistribution (NodeContainer endDevices
       Ptr<NetDevice> netDevice = object->GetDevice (0);
       Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
       NS_ASSERT (loraNetDevice != 0);
-      Ptr<ClassAEndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
+      Ptr<ClassAEndDeviceLorawanMac> mac =
+          loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
       NS_ASSERT (mac != 0);
 
       double prob = uniformRV->GetValue (0, 1);
