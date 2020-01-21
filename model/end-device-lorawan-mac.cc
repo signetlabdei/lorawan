@@ -474,15 +474,8 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LoraFrameHeader& frameHeader)
   frameHeader.SetFPort (1);                     // TODO Use an appropriate frame port based on the application
   frameHeader.SetAddress (m_address);
   frameHeader.SetAdr (m_controlDataRate);
-  frameHeader.SetAdrAckReq (0);                     // TODO Set ADRACKREQ if a member variable is true
-  if (m_mType == LorawanMacHeader::CONFIRMED_DATA_UP)
-    {
-      frameHeader.SetAck (1);
-    }
-  else
-    {
-      frameHeader.SetAck (0);
-    }
+  frameHeader.SetAdrAckReq (0); // TODO Set ADRACKREQ if a member variable is true
+
   // FPending does not exist in uplink messages
   frameHeader.SetFCnt (m_currentFCnt);
 
