@@ -179,7 +179,7 @@ LorawanMacHelper::ConfigureForAlohaRegion (Ptr<GatewayLorawanMac> gwMac) const
   Ptr<GatewayLoraPhy> gwPhy =
       gwMac->GetDevice ()->GetObject<LoraNetDevice> ()->GetPhy ()->GetObject<GatewayLoraPhy> ();
 
-  ApplyCommonEuConfigurations (gwMac);
+  ApplyCommonAlohaConfigurations (gwMac);
 
   if (gwPhy) // If cast is successful, there's a GatewayLoraPhy
     {
