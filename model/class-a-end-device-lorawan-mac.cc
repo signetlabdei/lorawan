@@ -454,11 +454,12 @@ ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay (Time waitingTime)
       NS_LOG_WARN ("Attempting to send when there are receive windows:" <<
                    " Transmission postponed.");
 
-      //Calculate the duration of a single symbol for the second receive window DR
+      // Calculate the duration of a single symbol for the second receive window DR
       double tSym = pow (2, GetSfFromDataRate (GetSecondReceiveWindowDataRate ())) / GetBandwidthFromDataRate ( GetSecondReceiveWindowDataRate ());
+      // Calculates the closing time of the second receive window
+      Time endSecondRxWindow = Time(m_secondReceiveWindow.GetTs()) + Seconds (m_receiveWindowDurationInSymbols*tSym);
 
-      Time endSecondRxWindow = (m_receiveDelay2 + Seconds (m_receiveWindowDurationInSymbols*tSym));
-      waitingTime = std::max (waitingTime, endSecondRxWindow);
+      waitingTime = std::max (waitingTime, endSecondRxWindow - Simulator::Now());
     }
 
   return waitingTime;
