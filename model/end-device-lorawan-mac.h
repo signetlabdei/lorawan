@@ -414,6 +414,12 @@ protected:
    */
   struct LoraRetxParameters m_retxParams;
 
+  /**
+   * An uniform random variable, used by the Shuffle method to randomly reorder
+   * the channel list.
+   */
+  Ptr<UniformRandomVariable> m_uniformRV;
+
   /////////////////
   //  Callbacks  //
   /////////////////
@@ -437,12 +443,6 @@ private:
    * Find the minimum waiting time before the next possible transmission.
    */
   Time GetNextTransmissionDelay (void);
-
-  /**
-   * An uniform random variable, used by the Shuffle method to randomly reorder
-   * the channel list.
-   */
-  Ptr<UniformRandomVariable> m_uniformRV;
 
   /**
    * Whether this device's data rate should be controlled by the NS.
