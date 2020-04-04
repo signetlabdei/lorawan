@@ -450,32 +450,34 @@ ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay (Time waitingTime)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
-  // This is a new packet from APP, it can be sent until the end of the second recieve 
-  // window(if the second recieve window has not closed yet)
+  // This is a new packet from APP; it can not be sent until the end of the
+  // second receive window (if the second recieve window has not closed yet)
   if (!m_retxParams.waitingAck)
     {
-      if (!m_closeFirstWindow.IsExpired () || !m_closeSecondWindow.IsExpired () || !m_secondReceiveWindow.IsExpired () )
+      if (!m_closeFirstWindow.IsExpired () ||
+          !m_closeSecondWindow.IsExpired () ||
+          !m_secondReceiveWindow.IsExpired () )
         {
           NS_LOG_WARN ("Attempting to send when there are receive windows:" <<
                        " Transmission postponed.");
-          // Calculate the duration of a single symbol for the second receive window DR
-          double tSym = pow (2, GetSfFromDataRate (GetSecondReceiveWindowDataRate ())) / GetBandwidthFromDataRate ( GetSecondReceiveWindowDataRate ());
-          // Calculates the closing time of the second receive window
+          // Compute the duration of a single symbol for the second receive window DR
+          double tSym = pow (2, GetSfFromDataRate (GetSecondReceiveWindowDataRate ())) / GetBandwidthFromDataRate (GetSecondReceiveWindowDataRate ());
+          // Compute the closing time of the second receive window
           Time endSecondRxWindow = Time(m_secondReceiveWindow.GetTs()) + Seconds (m_receiveWindowDurationInSymbols*tSym);
 
           NS_LOG_DEBUG("Duration until endSecondRxWindow for new transmission:" << (endSecondRxWindow - Simulator::Now()).GetSeconds());
           waitingTime = std::max (waitingTime, endSecondRxWindow - Simulator::Now());
         }
     }
-  // This is a retransmitted packet, it can be sent until the end of ACK_TIMEOUT (this 
-  // timer starts when the second recieve window was open)
+  // This is a retransmitted packet, it can not be sent until the end of
+  // ACK_TIMEOUT (this timer starts when the second receive window was open)
   else
     {
       double ack_timeout = m_uniformRV->GetValue (1,3);
-      // Calculates the duration until ACK_TIMEOUT (It may be a negative number, but it doesn't matter.)
+      // Compute the duration until ACK_TIMEOUT (It may be a negative number, but it doesn't matter.)
       Time retransmitWaitingTime = Time(m_secondReceiveWindow.GetTs()) - Simulator::Now() + Seconds (ack_timeout);
 
-      NS_LOG_DEBUG("ack_timeout:" << ack_timeout << 
+      NS_LOG_DEBUG("ack_timeout:" << ack_timeout <<
                    " retransmitWaitingTime:" << retransmitWaitingTime.GetSeconds());
       waitingTime = std::max (waitingTime, retransmitWaitingTime);
     }

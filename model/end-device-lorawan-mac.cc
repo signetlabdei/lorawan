@@ -167,12 +167,6 @@ EndDeviceLorawanMac::Send (Ptr<Packet> packet)
   Time netxTxDelay = GetNextTransmissionDelay ();
   if (netxTxDelay != Seconds (0))
     {
-      // Add the ACK_TIMEOUT random delay if it is a retransmission.
-      // if (m_retxParams.waitingAck)
-      //   {
-      //     double ack_timeout = m_uniformRV->GetValue (1,3);
-      //     netxTxDelay = netxTxDelay + Seconds (ack_timeout);
-      //   }
       postponeTransmission (netxTxDelay, packet);
       return;
     }
@@ -553,7 +547,6 @@ EndDeviceLorawanMac::GetNextTransmissionDelay (void)
                     frequency << " is = " << waitingTime.GetSeconds () << ".");
     }
 
-  // waitingTime = static_cast<ClassAEndDeviceLorawanMac*>(this)->GetNextClassTransmissionDelay (waitingTime);
   waitingTime = GetNextClassTransmissionDelay (waitingTime);
 
   return waitingTime;
