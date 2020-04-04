@@ -70,7 +70,7 @@ BuildingPenetrationLoss::DoCalcRxPower (double txPowerDbm,
   double gfh = 0;
 
   // Go through various cases in which a and b are indoors or outdoors
-  if ((b1->IsIndoor () && a1->IsOutdoor ()))
+  if ((b1->IsIndoor () && !a1->IsIndoor ()))
     {
       NS_LOG_INFO ("Tx is outdoors and Rx is indoors");
 
@@ -80,7 +80,7 @@ BuildingPenetrationLoss::DoCalcRxPower (double txPowerDbm,
       gfh = 0;
 
     }
-  else if ((b1->IsOutdoor () && a1->IsIndoor ()))
+  else if ((!b1->IsIndoor () && a1->IsIndoor ()))
     {
       NS_LOG_INFO ("Rx is outdoors and Tx is indoors");
 
@@ -91,7 +91,7 @@ BuildingPenetrationLoss::DoCalcRxPower (double txPowerDbm,
       gfh = 0;
 
     }
-  else if (a1->IsOutdoor ()&& b1->IsOutdoor ())
+  else if (!a1->IsIndoor ()&& !b1->IsIndoor ())
     {
       NS_LOG_DEBUG ("No penetration loss since both devices are outside");
     }
