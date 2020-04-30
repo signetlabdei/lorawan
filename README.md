@@ -9,6 +9,8 @@ to perform simulations of a [LoRaWAN](http://www.lora-alliance.org/technology
 
 [API documentation](https://signetlabdei.github.io/lorawan/html/index.html).
 
+[Module Documentation](https://signetlabdei.github.io/lorawan/models/build/html/lorawan.html).
+
 ## Getting started ##
 
 ### Prerequisites ###
@@ -105,8 +107,8 @@ supervision of Prof. Lorenzo Vangelista, Prof. Michele Zorzi and with the help
 of Marco Centenaro.
 
 Publications:
-- D. Magrin, M. Capuzzo and A. Zanella, "A Thorough Study of LoRaWAN Performance Under Different 
-  Parameter Settings," in IEEE Internet of Things Journal. 2019. 
+- D. Magrin, M. Capuzzo and A. Zanella, "A Thorough Study of LoRaWAN Performance Under Different
+  Parameter Settings," in IEEE Internet of Things Journal. 2019.
   [Link](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8863372&isnumber=6702522).
 - M. Capuzzo, D. Magrin and A. Zanella, "Confirmed traffic in LoRaWAN: Pitfalls
   and countermeasures," 2018 17th Annual Mediterranean Ad Hoc Networking
