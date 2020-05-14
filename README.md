@@ -42,7 +42,7 @@ sure the file contains the following line:
 modules_enabled = ['lorawan']
 ```
 
-To compile, move to the `ns-3-dev` folder, configure and then build ns-3:
+To compile, move to the `ns-3` folder, configure and then build ns-3:
 
 ```bash
 ./waf configure --enable-tests --enable-examples
