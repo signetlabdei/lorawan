@@ -19,3 +19,6 @@ def build(bld):
 
     obj = bld.create_ns3_program('aloha-throughput', ['lorawan'])
     obj.source = 'aloha-throughput.cc'
+
+    obj = bld.create_ns3_program('parallel-reception-example', ['lorawan'])
+    obj.source = 'parallel-reception-example.cc'

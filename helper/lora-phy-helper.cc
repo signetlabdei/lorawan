@@ -27,9 +27,7 @@ namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("LoraPhyHelper");
 
-LoraPhyHelper::LoraPhyHelper ()
-  : m_maxReceptionPaths (8),
-  m_txPriority (true)
+LoraPhyHelper::LoraPhyHelper () : m_maxReceptionPaths (8), m_txPriority (true)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -98,22 +96,19 @@ LoraPhyHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
       frequencies.push_back (868.3);
       frequencies.push_back (868.5);
 
-      std::vector<double>::iterator it = frequencies.begin ();
+      for (auto &f : frequencies)
+        {
+          phy->GetObject<SimpleGatewayLoraPhy> ()->AddFrequency (f);
+        }
 
       int receptionPaths = 0;
       // Set maxReceptionPaths as a parameter
       // int maxReceptionPaths = 8;
       while (receptionPaths < m_maxReceptionPaths)
         {
-          if (it == frequencies.end ())
-            {
-              it = frequencies.begin ();
-            }
-          phy->GetObject<SimpleGatewayLoraPhy> ()->AddReceptionPath (*it);
-          ++it;
+          phy->GetObject<SimpleGatewayLoraPhy> ()->AddReceptionPath ();
           receptionPaths++;
         }
-
     }
   else if (typeId == "ns3::SimpleEndDeviceLoraPhy")
     {
@@ -143,5 +138,5 @@ LoraPhyHelper::SetGatewayTransmissionPriority (bool txPriority)
 {
   m_txPriority = txPriority;
 }
-}
-}
+} // namespace lorawan
+} // namespace ns3

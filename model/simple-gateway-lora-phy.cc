@@ -38,9 +38,9 @@ TypeId
 SimpleGatewayLoraPhy::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SimpleGatewayLoraPhy")
-    .SetParent<GatewayLoraPhy> ()
-    .SetGroupName ("lorawan")
-    .AddConstructor<SimpleGatewayLoraPhy> ();
+                          .SetParent<GatewayLoraPhy> ()
+                          .SetGroupName ("lorawan")
+                          .AddConstructor<SimpleGatewayLoraPhy> ();
 
   return tid;
 }
@@ -56,25 +56,24 @@ SimpleGatewayLoraPhy::~SimpleGatewayLoraPhy ()
 }
 
 void
-SimpleGatewayLoraPhy::Send (Ptr<Packet> packet, LoraTxParameters txParams,
-                            double frequencyMHz, double txPowerDbm)
+SimpleGatewayLoraPhy::Send (Ptr<Packet> packet, LoraTxParameters txParams, double frequencyMHz,
+                            double txPowerDbm)
 {
   NS_LOG_FUNCTION (this << packet << frequencyMHz << txPowerDbm);
 
   // Get the time a packet with these parameters will take to be transmitted
   Time duration = GetOnAirTime (packet, txParams);
 
-  NS_LOG_DEBUG ("Duration of packet: " << duration << ", SF" <<
-                unsigned(txParams.sf));
+  NS_LOG_DEBUG ("Duration of packet: " << duration << ", SF" << unsigned (txParams.sf));
 
   // Interrupt all receive operations
-  std::list<Ptr<SimpleGatewayLoraPhy::ReceptionPath> >::iterator it;
+  std::list<Ptr<SimpleGatewayLoraPhy::ReceptionPath>>::iterator it;
   for (it = m_receptionPaths.begin (); it != m_receptionPaths.end (); ++it)
     {
 
       Ptr<SimpleGatewayLoraPhy::ReceptionPath> currentPath = *it;
 
-      if (!currentPath->IsAvailable ())     // Reception path is occupied
+      if (!currentPath->IsAvailable ()) // Reception path is occupied
         {
           // Call the callback for reception interrupted by transmission
           // Fire the trace source
@@ -82,7 +81,6 @@ SimpleGatewayLoraPhy::Send (Ptr<Packet> packet, LoraTxParameters txParams,
             {
               m_noReceptionBecauseTransmitting (currentPath->GetEvent ()->GetPacket (),
                                                 m_device->GetNode ()->GetId ());
-
             }
           else
             {
@@ -117,8 +115,8 @@ SimpleGatewayLoraPhy::Send (Ptr<Packet> packet, LoraTxParameters txParams,
 }
 
 void
-SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
-                                    uint8_t sf, Time duration, double frequencyMHz)
+SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm, uint8_t sf,
+                                    Time duration, double frequencyMHz)
 {
   NS_LOG_FUNCTION (this << packet << rxPowerDbm << duration << frequencyMHz);
 
@@ -129,8 +127,7 @@ SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
     {
       // If we get to this point, there are no demodulators we can use
       NS_LOG_INFO ("Dropping packet reception of packet with sf = "
-                   << unsigned(sf) <<
-                   " because we are in TX mode");
+                   << unsigned (sf) << " because we are in TX mode");
 
       m_phyRxEndTrace (packet);
 
@@ -152,30 +149,25 @@ SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
   event = m_interference.Add (duration, rxPowerDbm, sf, packet, frequencyMHz);
 
   // Cycle over the receive paths to check availability to receive the packet
-  std::list<Ptr<SimpleGatewayLoraPhy::ReceptionPath> >::iterator it;
+  std::list<Ptr<SimpleGatewayLoraPhy::ReceptionPath>>::iterator it;
 
   for (it = m_receptionPaths.begin (); it != m_receptionPaths.end (); ++it)
     {
       Ptr<SimpleGatewayLoraPhy::ReceptionPath> currentPath = *it;
 
-      NS_LOG_DEBUG ("Current ReceptionPath is centered on frequency = " <<
-                    currentPath->GetFrequency ());
-
       // If the receive path is available and listening on the channel of
       // interest, we have a candidate
-      if (currentPath->GetFrequency () == frequencyMHz
-          && currentPath->IsAvailable ())
+      if (currentPath->IsAvailable ())
         {
           // See whether the reception power is above or below the sensitivity
           // for that spreading factor
-          double sensitivity = SimpleGatewayLoraPhy::sensitivity[unsigned(sf) - 7];
+          double sensitivity = SimpleGatewayLoraPhy::sensitivity[unsigned (sf) - 7];
 
-          if (rxPowerDbm < sensitivity)       // Packet arrived below sensitivity
+          if (rxPowerDbm < sensitivity) // Packet arrived below sensitivity
             {
               NS_LOG_INFO ("Dropping packet reception of packet with sf = "
-                           << unsigned(sf) <<
-                           " because under the sensitivity of "
-                           << sensitivity << " dBm");
+                           << unsigned (sf) << " because under the sensitivity of " << sensitivity
+                           << " dBm");
 
               if (m_device)
                 {
@@ -190,20 +182,18 @@ SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
               // search for another ReceivePath
               return;
             }
-          else        // We have sufficient sensitivity to start receiving
+          else // We have sufficient sensitivity to start receiving
             {
-              NS_LOG_INFO ("Scheduling reception of a packet, " <<
-                           "occupying one demodulator");
+              NS_LOG_INFO ("Scheduling reception of a packet, "
+                           << "occupying one demodulator");
 
               // Block this resource
               currentPath->LockOnEvent (event);
               m_occupiedReceptionPaths++;
 
               // Schedule the end of the reception of the packet
-              EventId endReceiveEventId = Simulator::Schedule (duration,
-                                                               &LoraPhy::EndReceive,
-                                                               this, packet,
-                                                               event);
+              EventId endReceiveEventId =
+                  Simulator::Schedule (duration, &LoraPhy::EndReceive, this, packet, event);
 
               currentPath->SetEndReceive (endReceiveEventId);
 
@@ -214,8 +204,8 @@ SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
     }
   // If we get to this point, there are no demodulators we can use
   NS_LOG_INFO ("Dropping packet reception of packet with sf = "
-               << unsigned(sf) <<
-               " because no suitable demodulator was found");
+               << unsigned (sf) << " and frequency " << frequencyMHz
+               << "MHz because no suitable demodulator was found");
 
   // Fire the trace source
   if (m_device)
@@ -229,8 +219,7 @@ SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
 }
 
 void
-SimpleGatewayLoraPhy::EndReceive (Ptr<Packet> packet,
-                                  Ptr<LoraInterferenceHelper::Event> event)
+SimpleGatewayLoraPhy::EndReceive (Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event)
 {
   NS_LOG_FUNCTION (this << packet << *event);
 
@@ -246,7 +235,7 @@ SimpleGatewayLoraPhy::EndReceive (Ptr<Packet> packet,
   // Check whether the packet was destroyed
   if (packetDestroyed != uint8_t (0))
     {
-      NS_LOG_DEBUG ("packetDestroyed by " << unsigned(packetDestroyed));
+      NS_LOG_DEBUG ("packetDestroyed by " << unsigned (packetDestroyed));
 
       // Update the packet's LoraTag
       LoraTag tag;
@@ -264,11 +253,10 @@ SimpleGatewayLoraPhy::EndReceive (Ptr<Packet> packet,
           m_interferedPacket (packet, 0);
         }
     }
-  else       // Reception was correct
+  else // Reception was correct
     {
-      NS_LOG_INFO ("Packet with SF " <<
-                   unsigned(event->GetSpreadingFactor ()) <<
-                   " received correctly");
+      NS_LOG_INFO ("Packet with SF " << unsigned (event->GetSpreadingFactor ())
+                                     << " received correctly");
 
       // Fire the trace source
       if (m_device)
@@ -297,12 +285,11 @@ SimpleGatewayLoraPhy::EndReceive (Ptr<Packet> packet,
 
           m_rxOkCallback (packet);
         }
-
     }
 
   // Search for the demodulator that was locked on this event to free it.
 
-  std::list< Ptr< SimpleGatewayLoraPhy::ReceptionPath > >::iterator it;
+  std::list<Ptr<SimpleGatewayLoraPhy::ReceptionPath>>::iterator it;
 
   for (it = m_receptionPaths.begin (); it != m_receptionPaths.end (); ++it)
     {
@@ -317,5 +304,5 @@ SimpleGatewayLoraPhy::EndReceive (Ptr<Packet> packet,
     }
 }
 
-}
-}
+} // namespace lorawan
+} // namespace ns3
