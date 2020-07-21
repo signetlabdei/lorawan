@@ -7,9 +7,9 @@ This is an [ns-3](https://www.nsnam.org "ns-3 Website") module that can be used
 to perform simulations of a [LoRaWAN](http://www.lora-alliance.org/technology
 "LoRa Alliance") network.
 
-[API documentation](https://signetlabdei.github.io/lorawan/html/index.html).
+[API documentation](https://signetlabdei.github.io/lorawan-docs/html/index.html).
 
-[Module Documentation](https://signetlabdei.github.io/lorawan/models/build/html/lorawan.html).
+[Module Documentation](https://signetlabdei.github.io/lorawan-docs/models/build/html/lorawan.html).
 
 ## Getting started ##
 
