@@ -68,7 +68,7 @@ GatewayLorawanMac::Send (Ptr<Packet> packet)
   packet->AddPacketTag (tag);
 
   // Make sure we can transmit this packet
-  if (m_channelHelper.GetWaitingTime(CreateObject<LogicalLoraChannel> (frequency)) > 0)
+  if (m_channelHelper.GetWaitingTime(CreateObject<LogicalLoraChannel> (frequency)) > Time(0))
     {
       // We cannot send now!
       NS_LOG_WARN ("Trying to send a packet but Duty Cycle won't allow it. Aborting.");
