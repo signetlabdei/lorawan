@@ -848,9 +848,9 @@ LogicalLoraChannelTest::DoRun (void)
                          "Waiting time doesn't behave as expected");
 
   // Other bands are not affected by this transmission
-  NS_TEST_EXPECT_MSG_EQ (channelHelper->GetWaitingTime (channel4), 0,
+  NS_TEST_EXPECT_MSG_EQ (channelHelper->GetWaitingTime (channel4), Time (0),
                          "Waiting time affects other subbands");
-  NS_TEST_EXPECT_MSG_EQ (channelHelper->GetWaitingTime (channel5), 0,
+  NS_TEST_EXPECT_MSG_EQ (channelHelper->GetWaitingTime (channel5), Time (0),
                          "Waiting time affects other subbands");
 }
 
