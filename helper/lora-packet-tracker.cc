@@ -223,7 +223,7 @@ LoraPacketTracker::CountPhyPacketsPerGw (Time startTime, Time stopTime,
 {
   // Vector packetCounts will contain - for the interval given in the input of
   // the function, the following fields: totPacketsSent receivedPackets
-  // interferedPackets noMoreGwPackets underSensitivityPackets
+  // interferedPackets noMoreGwPackets underSensitivityPackets lostBecauseTxPackets
 
   std::vector<int> packetCounts (6, 0);
 
@@ -285,7 +285,7 @@ LoraPacketTracker::PrintPhyPacketsPerGw (Time startTime, Time stopTime,
 {
   // Vector packetCounts will contain - for the interval given in the input of
   // the function, the following fields: totPacketsSent receivedPackets
-  // interferedPackets noMoreGwPackets underSensitivityPackets
+  // interferedPackets noMoreGwPackets underSensitivityPackets lostBecauseTxPackets
 
   std::vector<int> packetCounts (6, 0);
 
