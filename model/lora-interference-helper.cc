@@ -221,7 +221,10 @@ LoraInterferenceHelper::CleanOldEvents (void)
         {
           it = m_events.erase (it);
         }
-      it++;
+      else
+        {
+          it++;
+        }
     }
 }
 
