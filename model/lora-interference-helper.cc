@@ -115,15 +115,14 @@ operator<< (std::ostream &os, const LoraInterferenceHelper::Event &event)
 // This collision matrix can be used for comparisons with the performance of Aloha
 // systems, where collisions imply the loss of both packets.
 double inf = std::numeric_limits<double>::max ();
-double minf = std::numeric_limits<double>::min ();
-  std::vector<std::vector<double>> LoraInterferenceHelper::collisionSnirAloha= {
+std::vector<std::vector<double>> LoraInterferenceHelper::collisionSnirAloha= {
     //   7   8   9  10  11  12
-    {inf, minf, minf, minf, minf, minf}, // SF7
-    {minf, inf, minf, minf, minf, minf}, // SF8
-    {minf, minf, inf, minf, minf, minf}, // SF9
-    {minf, minf, minf, inf, minf, minf}, // SF10
-    {minf, minf, minf, minf, inf, minf}, // SF11
-    {minf, minf, minf, minf, minf, inf} // SF12
+    {inf, -inf, -inf, -inf, -inf, -inf}, // SF7
+    {-inf, inf, -inf, -inf, -inf, -inf}, // SF8
+    {-inf, -inf, inf, -inf, -inf, -inf}, // SF9
+    {-inf, -inf, -inf, inf, -inf, -inf}, // SF10
+    {-inf, -inf, -inf, -inf, inf, -inf}, // SF11
+    {-inf, -inf, -inf, -inf, -inf, inf} // SF12
 };
 
 // LoRa Collision Matrix (Goursaud)
