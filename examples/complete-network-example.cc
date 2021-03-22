@@ -247,7 +247,7 @@ main (int argc, char *argv[])
 
   BuildingsHelper::Install (endDevices);
   BuildingsHelper::Install (gateways);
-  BuildingsHelper::MakeMobilityModelConsistent ();
+  // BuildingsHelper::MakeMobilityModelConsistent ();
 
   // Print the buildings
   if (print)
