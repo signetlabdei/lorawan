@@ -37,7 +37,7 @@ NS_LOG_COMPONENT_DEFINE ("ComplexLorawanNetworkExample");
 // Network settings
 int nDevices = 200;
 int nGateways = 1;
-double radius = 7500;
+double radius = 6400; //Note that due to model updates, 7500 m is no longer the maximum distance 
 double simulationTime = 600;
 
 // Channel model
