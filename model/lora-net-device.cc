@@ -51,7 +51,12 @@ LoraNetDevice::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&LoraNetDevice::GetMac,
                                         &LoraNetDevice::SetMac),
-                   MakePointerChecker<LorawanMac> ());
+                   MakePointerChecker<LorawanMac> ())
+    .AddTraceSource ("PromiscSniffer", 
+                      "Trace source simulating a promiscuous packet sniffer "
+                      "attached to the device",
+                      MakeTraceSourceAccessor (&LoraNetDevice::m_promiscSnifferTrace),
+                      "ns3::Packet::TracedCallback");
   return tid;
 }
 
@@ -116,6 +121,7 @@ LoraNetDevice::Send (Ptr<Packet> packet)
   // Send the packet to the MAC layer, if it exists
   NS_ASSERT (m_mac != 0);
   m_mac->Send (packet);
+  m_promiscSnifferTrace (packet);
 }
 
 void
@@ -126,6 +132,7 @@ LoraNetDevice::Receive (Ptr<Packet> packet)
   // Fill protocol and address with empty stuff
   NS_LOG_DEBUG ("Calling receiveCallback");
   m_receiveCallback (this, packet, 0, Address ());
+  m_promiscSnifferTrace (packet);
 }
 
 /******************************************
