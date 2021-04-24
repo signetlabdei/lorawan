@@ -51,6 +51,11 @@ EndDeviceLorawanMac::GetTypeId (void)
                    UintegerValue (0),
                    MakeUintegerAccessor (&EndDeviceLorawanMac::m_dataRate),
                    MakeUintegerChecker<uint8_t> (0, 5))
+    .AddTraceSource ("DataRate",
+                     "Data Rate currently employed by this end device",
+                     MakeTraceSourceAccessor
+                       (&EndDeviceLorawanMac::m_dataRate),
+                     "ns3::TracedValueCallback::uint8_t")
     .AddAttribute ("DRControl",
                    "Whether to request the NS to control this device's Data Rate",
                    BooleanValue (),
