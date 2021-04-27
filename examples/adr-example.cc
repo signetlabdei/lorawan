@@ -101,7 +101,7 @@ int main (int argc, char *argv[])
    // Logging
    //////////
 
-   // LogComponentEnable ("AdrExample", LOG_LEVEL_ALL);
+   LogComponentEnable ("AdrExample", LOG_LEVEL_ALL);
    // LogComponentEnable ("LoraPacketTracker", LOG_LEVEL_ALL);
    // LogComponentEnable ("NetworkServer", LOG_LEVEL_ALL);
    // LogComponentEnable ("NetworkController", LOG_LEVEL_ALL);
