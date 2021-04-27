@@ -400,11 +400,6 @@ private:
   int m_interferenceCalls = 0;
   int m_receivedPacketCalls = 0;
   int m_maxOccupiedReceptionPaths = 0;
-
-  double frequency1 = 868.1;
-  double frequency2 = 868.3;
-  double frequency3 = 868.5;
-  double frequency4 = 868.7;
 };
 
 // Add some help text to this case to describe what it is intended to test
