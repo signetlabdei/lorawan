@@ -28,7 +28,6 @@
 #include "ns3/net-device.h"
 #include "ns3/lora-net-device.h"
 #include "ns3/lora-packet-tracker.h"
-#include "ns3/trace-helper.h"
 
 #include <ctime>
 
@@ -41,7 +40,7 @@ namespace lorawan {
  * This class can help create a large set of similar LoraNetDevice objects and
  * configure a large set of their attributes during creation.
  */
-class LoraHelper: public PcapHelperForDevice
+class LoraHelper
 {
 public:
   virtual ~LoraHelper ();
@@ -130,8 +129,6 @@ private:
    * function.
    */
   void DoPrintSimulationTime (Time interval);
-  
-  virtual void EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promiscuous, bool explicitFilename);
 
   Time m_lastPhyPerformanceUpdate;
   Time m_lastGlobalPerformanceUpdate;
