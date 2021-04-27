@@ -370,7 +370,9 @@ LoraHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool prom
    {
      filename = pcapHelper.GetFilenameFromDevice (prefix, device);
    }
-
+  
+ device -> EnablePcapHeader ();
+ 
  Ptr<PcapFileWrapper> file = pcapHelper.CreateFile (filename, std::ios::out, 
                                                     PcapHelper::DLT_LORATAP);
  pcapHelper.HookDefaultSink<LoraNetDevice> (device, "PromiscSniffer", file);
