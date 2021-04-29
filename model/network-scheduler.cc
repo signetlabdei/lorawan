@@ -48,7 +48,7 @@ NetworkScheduler::OnReceivedPacket (Ptr<const Packet> packet)
   LoraFrameHeader receivedFrameHdr;
   receivedFrameHdr.SetAsUplink ();
   packetCopy->RemoveHeader (receivedFrameHdr);
-  uint8_t currentFrameCounter = receivedFrameHdr.GetFCnt ();
+  uint16_t currentFrameCounter = receivedFrameHdr.GetFCnt ();
 
   // Get the saved packet's frame counter
   Ptr<const Packet> savedPacket = m_status->GetEndDeviceStatus
@@ -61,7 +61,7 @@ NetworkScheduler::OnReceivedPacket (Ptr<const Packet> packet)
       LoraFrameHeader savedFrameHdr;
       savedFrameHdr.SetAsUplink ();
       savedPacketCopy->RemoveHeader (savedFrameHdr);
-      uint8_t savedFrameCounter = savedFrameHdr.GetFCnt ();
+      uint16_t savedFrameCounter = savedFrameHdr.GetFCnt ();
 
       if (currentFrameCounter == savedFrameCounter)
         {
