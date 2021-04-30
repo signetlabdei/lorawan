@@ -365,6 +365,24 @@ EndDeviceStatus::AddMACCommand (Ptr<MacCommand> macCommand)
   m_reply.frameHeader.AddCommand (macCommand);
 }
 
+bool
+EndDeviceStatus::HasReceiveWindowOpportunityScheduled ()
+{
+  return m_receiveWindowEvent.IsRunning();
+}
+
+void
+EndDeviceStatus::SetReceiveWindowOpportunity (EventId event)
+{
+  m_receiveWindowEvent = event;
+}
+
+void
+EndDeviceStatus::RemoveReceiveWindowOpportunity (void)
+{
+  Simulator::Cancel(m_receiveWindowEvent);
+}
+
 std::map<double, Address>
 EndDeviceStatus::GetPowerGatewayMap (void)
 {

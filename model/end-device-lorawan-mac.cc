@@ -288,8 +288,6 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       if (m_retxParams.waitingAck)
         {
 
-          m_currentFCnt++;
-
           // Remove the headers
           LorawanMacHeader macHdr;
           LoraFrameHeader frameHdr;
