@@ -22,3 +22,6 @@ def build(bld):
 
     obj = bld.create_ns3_program('parallel-reception-example', ['lorawan'])
     obj.source = 'parallel-reception-example.cc'
+
+    obj = bld.create_ns3_program('frame-counter-update', ['lorawan'])
+    obj.source = 'frame-counter-update.cc'

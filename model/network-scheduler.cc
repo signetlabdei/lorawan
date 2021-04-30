@@ -48,39 +48,21 @@ NetworkScheduler::OnReceivedPacket (Ptr<const Packet> packet)
   LoraFrameHeader receivedFrameHdr;
   receivedFrameHdr.SetAsUplink ();
   packetCopy->RemoveHeader (receivedFrameHdr);
-  uint8_t currentFrameCounter = receivedFrameHdr.GetFCnt ();
 
-  // Get the saved packet's frame counter
-  Ptr<const Packet> savedPacket = m_status->GetEndDeviceStatus
-      (packet)->GetLastReceivedPacketInfo ().packet;
-  if (savedPacket)
-    {
-      Ptr<Packet> savedPacketCopy = savedPacket->Copy ();
-      LorawanMacHeader savedMacHdr;
-      savedPacketCopy->RemoveHeader (savedMacHdr);
-      LoraFrameHeader savedFrameHdr;
-      savedFrameHdr.SetAsUplink ();
-      savedPacketCopy->RemoveHeader (savedFrameHdr);
-      uint8_t savedFrameCounter = savedFrameHdr.GetFCnt ();
+  // Need to decide whether to schedule a receive window
+  if (!m_status->GetEndDeviceStatus (packet)->HasReceiveWindowOpportunityScheduled ())
+  {
+    // Extract the address
+    LoraDeviceAddress deviceAddress = receivedFrameHdr.GetAddress ();
 
-      if (currentFrameCounter == savedFrameCounter)
-        {
-          NS_LOG_DEBUG ("Packet was already received by another gateway.");
-          return;
-        }
-    }
-
-  // It's possible that we already received the same packet from another
-  // gateway.
-  // - Extract the address
-  LoraDeviceAddress deviceAddress = receivedFrameHdr.GetAddress ();
-
-  // Schedule OnReceiveWindowOpportunity event
-  Simulator::Schedule (Seconds (1),
-                       &NetworkScheduler::OnReceiveWindowOpportunity,
-                       this,
-                       deviceAddress,
-                       1);     // This will be the first receive window
+    // Schedule OnReceiveWindowOpportunity event
+    m_status->GetEndDeviceStatus (packet)->SetReceiveWindowOpportunity (
+      Simulator::Schedule (Seconds (1),
+                           &NetworkScheduler::OnReceiveWindowOpportunity,
+                           this,
+                           deviceAddress,
+                           1)); // This will be the first receive window
+  }
 }
 
 void
@@ -88,41 +70,45 @@ NetworkScheduler::OnReceiveWindowOpportunity (LoraDeviceAddress deviceAddress, i
 {
   NS_LOG_FUNCTION (deviceAddress);
 
-  NS_LOG_DEBUG ("Opening receive window nubmer " << window << " for device "
+  NS_LOG_DEBUG ("Opening receive window number " << window << " for device "
                                                  << deviceAddress);
 
   // Check whether we can send a reply to the device, again by using
   // NetworkStatus
   Address gwAddress = m_status->GetBestGatewayForDevice (deviceAddress, window);
 
-  NS_LOG_DEBUG ("Found available gateway with address: " << gwAddress);
-
   if (gwAddress == Address () && window == 1)
     {
-      NS_LOG_DEBUG ("No suitable gateway found.");
+      NS_LOG_DEBUG ("No suitable gateway found for first window.");
 
-      // No suitable GW was found
-      // Schedule OnReceiveWindowOpportunity event
-      Simulator::Schedule (Seconds (1),
-                           &NetworkScheduler::OnReceiveWindowOpportunity,
-                           this,
-                           deviceAddress,
-                           2);     // This will be the second receive window
+      // No suitable GW was found, but there's still hope to find one for the
+      // second window.
+      // Schedule another OnReceiveWindowOpportunity event
+      m_status->GetEndDeviceStatus (deviceAddress)->SetReceiveWindowOpportunity (
+        Simulator::Schedule (Seconds (1),
+                             &NetworkScheduler::OnReceiveWindowOpportunity,
+                             this,
+                             deviceAddress,
+                             2));     // This will be the second receive window
     }
   else if (gwAddress == Address () && window == 2)
     {
-      // No suitable GW was found
+      // No suitable GW was found and this was our last opportunity
       // Simply give up.
-      NS_LOG_INFO ("Giving up on reply: no suitable gateway was found " <<
+      NS_LOG_DEBUG ("Giving up on reply: no suitable gateway was found " <<
                    "on the second receive window");
 
       // Reset the reply
       // XXX Should we reset it here or keep it for the next opportunity?
+      m_status->GetEndDeviceStatus (deviceAddress)->RemoveReceiveWindowOpportunity();
       m_status->GetEndDeviceStatus (deviceAddress)->InitializeReply ();
     }
   else
     {
       // A gateway was found
+
+      NS_LOG_DEBUG ("Found available gateway with address: " << gwAddress);
+
       m_controller->BeforeSendingReply (m_status->GetEndDeviceStatus
                                           (deviceAddress));
 
@@ -139,6 +125,7 @@ NetworkScheduler::OnReceiveWindowOpportunity (LoraDeviceAddress deviceAddress, i
                                         gwAddress);
 
           // Reset the reply
+          m_status->GetEndDeviceStatus (deviceAddress)->RemoveReceiveWindowOpportunity();
           m_status->GetEndDeviceStatus (deviceAddress)->InitializeReply ();
         }
     }
