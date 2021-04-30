@@ -295,11 +295,20 @@ public:
   void UpdateGatewayData (GatewayList gwList, Address gwAddress, double rcvPower);
 
   /**
+   * Returns whether we already decided we will schedule a transmission to this ED
+   */
+  bool HasReceiveWindowOpportunityScheduled ();
+
+  void SetReceiveWindowOpportunity (EventId event);
+
+  void RemoveReceiveWindowOpportunity (void);
+
+  /**
    * Return an ordered list of the best gateways.
    */
   std::map<double, Address> GetPowerGatewayMap (void);
 
-  struct Reply m_reply;   //<! Next reply intended for this device
+  struct Reply m_reply; //<! Next reply intended for this device
 
   LoraDeviceAddress m_endDeviceAddress;   //<! The address of this device
 
@@ -311,6 +320,7 @@ private:
   double m_firstReceiveWindowFrequency = 0;
   uint8_t m_secondReceiveWindowOffset = 0;
   double m_secondReceiveWindowFrequency = 869.525;
+  EventId m_receiveWindowEvent;
 
   ReceivedPacketList m_receivedPacketList;   //<! List of received packets
 
