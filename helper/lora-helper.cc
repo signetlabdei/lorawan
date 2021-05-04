@@ -343,6 +343,40 @@ LoraHelper::DoPrintSimulationTime (Time interval)
   m_oldtime = std::time (0);
   Simulator::Schedule (interval, &LoraHelper::DoPrintSimulationTime, this, interval);
 }
+ 
+void 
+LoraHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promiscuous, bool explicitFilename)
+{
+ //
+ // All of the Pcap enable functions vector through here including the ones
+ // that are wandering through all of devices on perhaps all of the nodes in
+ // the system.  We can only deal with devices of type LoraNetDevice.
+ //
+ Ptr<LoraNetDevice> device = nd->GetObject<LoraNetDevice> ();
+ if (device == 0)
+   {
+     NS_LOG_INFO ("LoraHelper::EnablePcapInternal(): Device " << device << " not of type ns3::LoraNetDevice");
+     return;
+   }
+
+ PcapHelper pcapHelper;
+
+ std::string filename;
+ if (explicitFilename)
+   {
+     filename = prefix;
+   }
+ else
+   {
+     filename = pcapHelper.GetFilenameFromDevice (prefix, device);
+   }
+  
+ device -> EnablePcapHeader ();
+ 
+ Ptr<PcapFileWrapper> file = pcapHelper.CreateFile (filename, std::ios::out, 
+                                                    PcapHelper::DLT_LORATAP);
+ pcapHelper.HookDefaultSink<LoraNetDevice> (device, "PromiscSniffer", file);
+}
 
 }
 }
