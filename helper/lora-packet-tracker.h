@@ -66,7 +66,7 @@ struct RetransmissionStatus
 };
 
 typedef std::map<Ptr<Packet const>, MacPacketStatus> MacPacketData;
-typedef std::map<Ptr<Packet const>, PacketStatus> PhyPacketData;
+typedef std::multimap<Ptr<Packet const>, PacketStatus> PhyPacketData;
 typedef std::map<Ptr<Packet const>, RetransmissionStatus> RetransmissionData;
 
 

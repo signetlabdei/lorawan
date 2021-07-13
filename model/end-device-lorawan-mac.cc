@@ -87,7 +87,7 @@ EndDeviceLorawanMac::GetTypeId (void)
                      "ns3::TracedValueCallback::Double")
     .AddAttribute ("MaxTransmissions",
                    "Maximum number of transmissions for a packet",
-                   IntegerValue (8),
+                   IntegerValue (1),
                    MakeIntegerAccessor (&EndDeviceLorawanMac::m_maxNumbTx),
                    MakeIntegerChecker<uint8_t> ())
     .AddAttribute ("EnableEDDataRateAdaptation",
@@ -110,7 +110,7 @@ EndDeviceLorawanMac::GetTypeId (void)
 
 EndDeviceLorawanMac::EndDeviceLorawanMac ()
     : m_enableDRAdapt (false),
-      m_maxNumbTx (8),
+      m_maxNumbTx (1),
       m_dataRate (0),
       m_txPower (14),
       m_codingRate (1),
@@ -240,12 +240,17 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       // Reset MAC command list
       m_macCommandList.clear ();
 
+      uint8_t txs = m_maxNumbTx - (m_retxParams.retxLeft);
       if (m_retxParams.waitingAck)
         {
           // Call the callback to notify about the failure
-          uint8_t txs = m_maxNumbTx - (m_retxParams.retxLeft);
           m_requiredTxCallback (txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
-          NS_LOG_DEBUG (" Received new packet from the application layer: stopping retransmission procedure. Used " <<
+          NS_LOG_DEBUG (" Received new packet from the application layer: stopping retransmission procedure of confirmed packet. Used " <<
+                        unsigned(txs) << " transmissions out of a maximum of " << unsigned(m_maxNumbTx) << ".");
+        }
+      else if (m_retxParams.sendingMultipleUnconfirmed)
+        {
+          NS_LOG_DEBUG (" Received new packet from the application layer: stopping retransmission procedure for unconfirmed packet. Used " <<
                         unsigned(txs) << " transmissions out of a maximum of " << unsigned(m_maxNumbTx) << ".");
         }
 
@@ -258,6 +263,7 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           m_retxParams.packet = packet->Copy ();
           m_retxParams.retxLeft = m_maxNumbTx;
           m_retxParams.waitingAck = true;
+          m_retxParams.sendingMultipleUnconfirmed = false;
           m_retxParams.firstAttempt = Simulator::Now ();
           m_retxParams.retxLeft = m_retxParams.retxLeft - 1;       // decreasing the number of retransmissions
 
@@ -274,8 +280,31 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           // static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (m_retxParams.packet);
           SendToPhy (m_retxParams.packet);
         }
-      else
-        {
+      else if (m_maxNumbTx > 1) //Unconfirmed packet and NbTrans is configured to be more than 1
+      {
+          m_retxParams.packet = packet->Copy ();
+          m_retxParams.retxLeft = m_maxNumbTx;
+          m_retxParams.waitingAck = false;
+          m_retxParams.sendingMultipleUnconfirmed = true;
+          m_retxParams.firstAttempt = Simulator::Now ();
+          m_retxParams.retxLeft = m_retxParams.retxLeft - 1;       // decreasing the number of retransmissions
+
+          NS_LOG_DEBUG ("Message type is " << m_mType);
+          NS_LOG_DEBUG ("It is a unconfirmed packet. Setting retransmission parameters and decreasing the number of transmissions left.");
+
+          NS_LOG_INFO ("Added MAC header of size " << macHdr.GetSerializedSize () <<
+                       " bytes.");
+
+          // Sent a new packet
+          NS_LOG_DEBUG ("Copied packet: " << m_retxParams.packet);
+          m_sentNewPacket (m_retxParams.packet);
+
+          // static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (m_retxParams.packet);
+          SendToPhy (m_retxParams.packet);
+
+      }
+
+      else  {
           m_sentNewPacket (packet);
           // static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (packet);
           SendToPhy (packet);
@@ -285,7 +314,7 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
   // this is a retransmission
   else
     {
-      if (m_retxParams.waitingAck)
+      if (m_retxParams.waitingAck or m_retxParams.sendingMultipleUnconfirmed)
         {
 
           // Remove the headers
@@ -307,13 +336,16 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           ApplyNecessaryOptions (macHdr);
           packet->AddHeader (macHdr);
           m_retxParams.retxLeft = m_retxParams.retxLeft - 1;           // decreasing the number of retransmissions
-          NS_LOG_DEBUG ("Retransmitting an old packet.");
+
+          if(m_retxParams.waitingAck)
+            NS_LOG_DEBUG ("Retransmitting an old confirmed packet.");
+          else if(m_retxParams.sendingMultipleUnconfirmed)
+            NS_LOG_DEBUG ("Retransmitting an old unconfirmed packet.");
 
           // static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (m_retxParams.packet);
           SendToPhy (m_retxParams.packet);
         }
     }
-
 }
 
 void
@@ -357,6 +389,14 @@ EndDeviceLorawanMac::ParseCommands (LoraFrameHeader frameHeader)
         {
           NS_LOG_ERROR ("Received downlink message not containing an ACK while we were waiting for it!");
         }
+    }
+  else
+    {     
+      NS_LOG_DEBUG ("Reset retransmission variables to default values.");
+      if(m_retxParams.sendingMultipleUnconfirmed)
+          NS_LOG_DEBUG ("Uplink retransmissions will now be cancelled.");     
+      // Reset retransmission parameters
+      resetRetransmissionParameters ();     
     }
 
   std::list<Ptr<MacCommand> > commands = frameHeader.GetCommands ();
@@ -547,7 +587,7 @@ EndDeviceLorawanMac::GetNextTransmissionDelay (void)
 
       waitingTime = std::min (waitingTime, m_channelHelper.GetWaitingTime (logicalChannel));
 
-      NS_LOG_DEBUG ("Waiting time before the next transmission in channel with frequecy " <<
+      NS_LOG_DEBUG ("Waiting time before the next transmission in channel with frequency " <<
                     frequency << " is = " << waitingTime.GetSeconds () << ".");
     }
 
@@ -622,6 +662,7 @@ EndDeviceLorawanMac::Shuffle (std::vector<Ptr<LogicalLoraChannel> > vector)
 void EndDeviceLorawanMac::resetRetransmissionParameters ()
 {
   m_retxParams.waitingAck = false;
+  m_retxParams.sendingMultipleUnconfirmed = false;
   m_retxParams.retxLeft = m_maxNumbTx;
   m_retxParams.packet = 0;
   m_retxParams.firstAttempt = Seconds (0);
@@ -781,6 +822,8 @@ EndDeviceLorawanMac::OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
                 "DataRateOk: " << dataRateOk << ", " <<
                 "txPowerOk: " << txPowerOk);
 
+  //TODO: check if repetitions are in valid range [1:15]
+
   // If all checks are successful, set parameters up
   //////////////////////////////////////////////////
   if (channelMaskOk && dataRateOk && txPowerOk)
@@ -805,6 +848,8 @@ EndDeviceLorawanMac::OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
 
       // Set the transmission power
       m_txPower = GetDbmForTxPower (txPower);
+
+      //TODO: also adjust NbTrans. A value of 0 indicates a device should use the default value (1 transmision)
     }
 
   // Craft a LinkAdrAns MAC command as a response

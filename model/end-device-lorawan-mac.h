@@ -341,6 +341,7 @@ protected:
     Time firstAttempt;
     Ptr<Packet> packet = 0;
     bool waitingAck = false;
+    bool sendingMultipleUnconfirmed = false;
     uint8_t retxLeft;
   };
 

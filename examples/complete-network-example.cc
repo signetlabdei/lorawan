@@ -45,6 +45,8 @@ bool realisticChannelModel = false;
 
 int appPeriodSeconds = 600;
 
+uint8_t numberOfTransmissions = 1; // The maximum number of transmissions allowed, valid is [1:15]
+
 // Output control
 bool print = true;
 
@@ -87,6 +89,10 @@ main (int argc, char *argv[])
   // LogComponentEnable("NetworkStatus", LOG_LEVEL_ALL);
   // LogComponentEnable("NetworkController", LOG_LEVEL_ALL);
 
+  LogComponentEnableAll (LOG_PREFIX_FUNC);
+  LogComponentEnableAll (LOG_PREFIX_NODE);
+  LogComponentEnableAll (LOG_PREFIX_TIME);
+  
   /***********
    *  Setup  *
    ***********/
@@ -190,6 +196,10 @@ main (int argc, char *argv[])
       Ptr<Node> node = *j;
       Ptr<LoraNetDevice> loraNetDevice = node->GetDevice (0)->GetObject<LoraNetDevice> ();
       Ptr<LoraPhy> phy = loraNetDevice->GetPhy ();
+
+      Ptr<LorawanMac> edMac = loraNetDevice->GetMac ();
+      Ptr<ClassAEndDeviceLorawanMac> edLorawanMac = edMac->GetObject<ClassAEndDeviceLorawanMac> ();
+      edLorawanMac->SetMaxNumberOfTransmissions (numberOfTransmissions);
     }
 
   /*********************
