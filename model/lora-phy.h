@@ -233,6 +233,14 @@ public:
   void SetDevice (Ptr<NetDevice> device);
 
   /**
+   * Compute the symbol time from SF and BW.
+   *
+   * \param txParams The parameters for transmission
+   * \return TSym, the time required to send a LoRa modulation symbol.
+   */
+  static Time GetTSym (LoraTxParameters txParams);
+
+  /**
    * Compute the time that a packet with certain characteristics will take to be
    * transmitted.
    *
