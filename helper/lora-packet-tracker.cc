@@ -137,35 +137,7 @@ LoraPacketTracker::PacketReceptionCallback (Ptr<Packet const> packet, uint32_t g
                                  << " was successfully received at gateway "
                                  << gwId);
 
-
-      if(m_packetTracker.count(packet) == 1) //first reception
-        {
-          std::map<Ptr<Packet const>, PacketStatus>::iterator it = m_packetTracker.find (packet);
-          (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (gwId,
-                                                                           RECEIVED)); 
-        }
-      else
-        {
-          std::pair <std::multimap<Ptr<Packet const>, PacketStatus>::iterator, std::multimap<Ptr<Packet const>, PacketStatus>::iterator> ret;
-          ret = m_packetTracker.equal_range(packet); // find all instances of received packet
-          
-          int i = 1;
-
-          //loop through all instances and find the one which doesn't yet have an outcome at this gateway
-          for(std::multimap<Ptr<Packet const>, PacketStatus>::iterator it=ret.first; it != ret.second; ++it)
-            {
-                    
-              if((*it).second.outcomes.find(gwId) == (*it).second.outcomes.end()) 
-              {
-                NS_LOG_DEBUG("This is copy  " << i <<" of packet "<< packet);                
-                NS_LOG_DEBUG("This packet was sent at " << (*it).second.sendTime);
-                NS_LOG_DEBUG("It was not yet received by GW " << gwId << " logging it now as RECEIVED.");
-                (*it).second.outcomes.insert(std::pair<int, enum PhyPacketOutcome> (gwId,
-                                                                           RECEIVED)); 
-              }
-              i++;           
-            }
-        }
+      SetPacketOutcome(packet, std::pair<int, enum PhyPacketOutcome> (gwId,RECEIVED));
     }
 }
 
@@ -178,34 +150,7 @@ LoraPacketTracker::InterferenceCallback (Ptr<Packet const> packet, uint32_t gwId
                                  << " was interfered at gateway "
                                  << gwId);
 
-      if(m_packetTracker.count(packet) == 1) //first reception
-        {
-          std::map<Ptr<Packet const>, PacketStatus>::iterator it = m_packetTracker.find (packet);
-          (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (gwId,
-                                                                           INTERFERED)); 
-        }
-      else
-        {
-          std::pair <std::multimap<Ptr<Packet const>, PacketStatus>::iterator, std::multimap<Ptr<Packet const>, PacketStatus>::iterator> ret;
-          ret = m_packetTracker.equal_range(packet); // find all instances of received packet
-          
-          int i = 1;
-
-          //loop through all instances and find the one which doesn't yet have an outcome at this gateway
-          for(std::multimap<Ptr<Packet const>, PacketStatus>::iterator it=ret.first; it != ret.second; ++it)
-            {
-                    
-              if((*it).second.outcomes.find(gwId) == (*it).second.outcomes.end()) 
-              {
-                NS_LOG_INFO("This is copy  " << i <<" of packet "<< packet);                
-                NS_LOG_INFO("This packet was sent at " << (*it).second.sendTime);
-                NS_LOG_INFO("It was not yet received by GW " << gwId << " logging it now as INTERFERED.");
-                (*it).second.outcomes.insert(std::pair<int, enum PhyPacketOutcome> (gwId,
-                                                                           INTERFERED)); 
-              }
-              i++;           
-            }
-        }
+      SetPacketOutcome(packet, std::pair<int, enum PhyPacketOutcome> (gwId,INTERFERED));
     }
 }
 
@@ -218,34 +163,7 @@ LoraPacketTracker::NoMoreReceiversCallback (Ptr<Packet const> packet, uint32_t g
                                  << " was lost because no more receivers at gateway "
                                  << gwId);
 
-      if(m_packetTracker.count(packet) == 1) //first reception
-        {
-          std::map<Ptr<Packet const>, PacketStatus>::iterator it = m_packetTracker.find (packet);
-          (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (gwId,
-                                                                           NO_MORE_RECEIVERS)); 
-        }
-      else
-        {
-          std::pair <std::multimap<Ptr<Packet const>, PacketStatus>::iterator, std::multimap<Ptr<Packet const>, PacketStatus>::iterator> ret;
-          ret = m_packetTracker.equal_range(packet); // find all instances of received packet
-          
-          int i = 1;
-
-          //loop through all instances and find the one which doesn't yet have an outcome at this gateway
-          for(std::multimap<Ptr<Packet const>, PacketStatus>::iterator it=ret.first; it != ret.second; ++it)
-            {
-                    
-              if((*it).second.outcomes.find(gwId) == (*it).second.outcomes.end()) 
-              {
-                NS_LOG_INFO("This is copy  " << i <<" of packet "<< packet);                
-                NS_LOG_INFO("This packet was sent at " << (*it).second.sendTime);
-                NS_LOG_INFO("It was not yet received by GW " << gwId << " logging it now as NO_MORE_RECEIVERS.");
-                (*it).second.outcomes.insert(std::pair<int, enum PhyPacketOutcome> (gwId,
-                                                                           NO_MORE_RECEIVERS)); 
-              }
-              i++;           
-            }
-        }                                                                     
+      SetPacketOutcome(packet, std::pair<int, enum PhyPacketOutcome> (gwId,NO_MORE_RECEIVERS));                                                                      
     }
 }
 
@@ -258,34 +176,7 @@ LoraPacketTracker::UnderSensitivityCallback (Ptr<Packet const> packet, uint32_t 
                                  << " was lost because under sensitivity at gateway "
                                  << gwId);
 
-      if(m_packetTracker.count(packet) == 1) //first reception
-        {
-          std::map<Ptr<Packet const>, PacketStatus>::iterator it = m_packetTracker.find (packet);
-          (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (gwId,
-                                                                           UNDER_SENSITIVITY)); 
-        }
-      else
-        {
-          std::pair <std::multimap<Ptr<Packet const>, PacketStatus>::iterator, std::multimap<Ptr<Packet const>, PacketStatus>::iterator> ret;
-          ret = m_packetTracker.equal_range(packet); // find all instances of received packet
-          
-          int i = 1;
-
-          //loop through all instances and find the one which doesn't yet have an outcome at this gateway
-          for(std::multimap<Ptr<Packet const>, PacketStatus>::iterator it=ret.first; it != ret.second; ++it)
-            {
-                    
-              if((*it).second.outcomes.find(gwId) == (*it).second.outcomes.end()) 
-              {
-                NS_LOG_INFO("This is copy  " << i <<" of packet "<< packet);                
-                NS_LOG_INFO("This packet was sent at " << (*it).second.sendTime);
-                NS_LOG_INFO("It was not yet received by GW " << gwId << " logging it now as UNDER_SENSITIVITY.");
-                (*it).second.outcomes.insert(std::pair<int, enum PhyPacketOutcome> (gwId,
-                                                                           UNDER_SENSITIVITY)); 
-              }
-              i++;           
-            }
-        }    
+      SetPacketOutcome(packet, std::pair<int, enum PhyPacketOutcome> (gwId,UNDER_SENSITIVITY));                        
     }
 }
 
@@ -298,35 +189,44 @@ LoraPacketTracker::LostBecauseTxCallback (Ptr<Packet const> packet, uint32_t gwI
                                  << " was lost because of GW transmission at gateway "
                                  << gwId);
 
-      if(m_packetTracker.count(packet) == 1) //first reception
-        {
-          std::map<Ptr<Packet const>, PacketStatus>::iterator it = m_packetTracker.find (packet);
-          (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (gwId,
-                                                                           LOST_BECAUSE_TX)); 
-        }
-      else
-        {
-          std::pair <std::multimap<Ptr<Packet const>, PacketStatus>::iterator, std::multimap<Ptr<Packet const>, PacketStatus>::iterator> ret;
-          ret = m_packetTracker.equal_range(packet); // find all instances of received packet
-          
-          int i = 1;
-
-          //loop through all instances and find the one which doesn't yet have an outcome at this gateway
-          for(std::multimap<Ptr<Packet const>, PacketStatus>::iterator it=ret.first; it != ret.second; ++it)
-            {
-                    
-              if((*it).second.outcomes.find(gwId) == (*it).second.outcomes.end()) 
-              {
-                NS_LOG_INFO("This is copy  " << i <<" of packet "<< packet);                
-                NS_LOG_INFO("This packet was sent at " << (*it).second.sendTime);
-                NS_LOG_INFO("It was not yet received by GW " << gwId << " logging it now as LOST_BECAUSE_TX.");
-                (*it).second.outcomes.insert(std::pair<int, enum PhyPacketOutcome> (gwId,
-                                                                           LOST_BECAUSE_TX)); 
-              }
-              i++;           
-            }
-        }    
+      SetPacketOutcome(packet, std::pair<int, enum PhyPacketOutcome> (gwId, LOST_BECAUSE_TX));   
     }
+}
+
+void
+LoraPacketTracker::SetPacketOutcome(Ptr<Packet const> packet, std::pair<int, enum PhyPacketOutcome> outcome)
+{
+    NS_LOG_FUNCTION (this);
+
+    uint32_t gwId = outcome.first;
+
+    if(m_packetTracker.count(packet) == 1) //first reception
+      {
+        std::map<Ptr<Packet const>, PacketStatus>::iterator it = m_packetTracker.find (packet);
+        (*it).second.outcomes.insert (outcome); 
+      }
+    else
+      {
+        std::pair <std::multimap<Ptr<Packet const>, PacketStatus>::iterator, std::multimap<Ptr<Packet const>, PacketStatus>::iterator> ret;
+        ret = m_packetTracker.equal_range(packet); // find all instances of received packet
+        
+        int i = 1;
+
+        //loop through all instances and find the one which doesn't yet have an outcome at this gateway
+        for(std::multimap<Ptr<Packet const>, PacketStatus>::iterator it=ret.first; it != ret.second; ++it)
+          {
+                  
+            if((*it).second.outcomes.find(gwId) == (*it).second.outcomes.end()) 
+            {
+              NS_LOG_INFO("This is copy " << i <<" of packet "<< packet);                
+              NS_LOG_INFO("This packet was sent at " << (*it).second.sendTime);
+              NS_LOG_INFO("It was not yet received by GW " << gwId << " logging it now with outcome " << outcome.second);
+              (*it).second.outcomes.insert(outcome); 
+            }
+            i++;           
+          }
+      } 
+
 }
 
 bool
