@@ -89,7 +89,7 @@ EndDeviceLorawanMac::GetTypeId (void)
                    "Maximum number of transmissions for a packet",
                    IntegerValue (1),
                    MakeIntegerAccessor (&EndDeviceLorawanMac::m_maxNumbTx),
-                   MakeIntegerChecker<uint8_t> ())
+                   MakeIntegerChecker<uint8_t> (1, 15))
     .AddAttribute ("EnableEDDataRateAdaptation",
                    "Whether the End Device should up its Data Rate "
                    "in case it doesn't get a reply from the NS.",
