@@ -45,7 +45,7 @@ bool realisticChannelModel = false;
 
 int appPeriodSeconds = 600;
 
-uint8_t numberOfTransmissions = 1; // The maximum number of transmissions allowed, valid is [1:15]
+int numberOfTransmissions = 1; // The maximum number of transmissions allowed, valid is [1:15]
 
 // Output control
 bool print = true;
