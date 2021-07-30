@@ -98,7 +98,7 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
   params.bandwidthHz = GetBandwidthFromDataRate (m_dataRate);
   params.nPreamble = m_nPreambleSymbols;
   params.crcEnabled = 1;
-  params.lowDataRateOptimizationEnabled = 0;
+  params.lowDataRateOptimizationEnabled = LoraPhy::GetTSym (params) > MilliSeconds (16) ? true : false;
 
   // Wake up PHY layer and directly send the packet
 

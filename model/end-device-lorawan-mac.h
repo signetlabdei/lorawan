@@ -491,7 +491,7 @@ private:
    */
   LorawanMacHeader::MType m_mType;
 
-  uint8_t m_currentFCnt;
+  uint16_t m_currentFCnt;
 };
 
 

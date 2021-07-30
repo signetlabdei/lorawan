@@ -82,7 +82,7 @@ GatewayLorawanMac::Send (Ptr<Packet> packet)
   params.bandwidthHz = GetBandwidthFromDataRate (dataRate);
   params.nPreamble = 8;
   params.crcEnabled = 1;
-  params.lowDataRateOptimizationEnabled = 0;
+  params.lowDataRateOptimizationEnabled = LoraPhy::GetTSym (params) > MilliSeconds (16) ? true : false;
 
   // Get the duration
   Time duration = m_phy->GetOnAirTime (packet, params);

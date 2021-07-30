@@ -154,6 +154,11 @@ LoraPhy::SetTxFinishedCallback (TxFinishedCallback callback)
   m_txFinishedCallback = callback;
 }
 
+Time
+LoraPhy::GetTSym (LoraTxParameters txParams)
+{
+  return Seconds (pow (2, int (txParams.sf)) / (txParams.bandwidthHz));
+}
 
 Time
 LoraPhy::GetOnAirTime (Ptr<Packet> packet, LoraTxParameters txParams)
@@ -166,7 +171,7 @@ LoraPhy::GetOnAirTime (Ptr<Packet> packet, LoraTxParameters txParams)
 
   // Compute the symbol duration
   // Bandwidth is in Hz
-  double tSym = pow (2, int(txParams.sf)) / (txParams.bandwidthHz);
+  double tSym = GetTSym(txParams).GetSeconds();
 
   // Compute the preamble duration
   double tPreamble = (double(txParams.nPreamble) + 4.25) * tSym;

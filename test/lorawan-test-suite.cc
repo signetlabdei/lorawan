@@ -897,7 +897,7 @@ TimeOnAirTest::DoRun (void)
   txParams.bandwidthHz = 125000;
   txParams.nPreamble = 8;
   txParams.crcEnabled = 1;
-  txParams.lowDataRateOptimizationEnabled = 0;
+  txParams.lowDataRateOptimizationEnabled = false;
 
   duration = LoraPhy::GetOnAirTime (packet, txParams);
   NS_TEST_EXPECT_MSG_EQ_TOL (duration.GetSeconds (), 0.041216, 0.0001, "Unexpected duration");

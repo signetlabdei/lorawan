@@ -157,15 +157,6 @@ EndDeviceLorawanMac::Send (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
 
-  // Check that payload length is below the allowed maximum
-  if (packet->GetSize () > m_maxAppPayloadForDataRate.at (m_dataRate))
-    {
-      NS_LOG_WARN ("Attempting to send a packet larger than the maximum allowed"
-                   << " size at this DataRate (DR" << unsigned(m_dataRate) <<
-                   "). Transmission canceled.");
-      return;
-    }
-
   // If it is not possible to transmit now because of the duty cycle,
   // or because we are receiving, schedule a tx/retx later
 
@@ -230,6 +221,16 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
 
       NS_LOG_INFO ("Added frame header of size " << frameHdr.GetSerializedSize () <<
                    " bytes.");
+
+      // Check that MACPayload length is below the allowed maximum
+      if (packet->GetSize () > m_maxAppPayloadForDataRate.at (m_dataRate))
+        {
+          NS_LOG_WARN ("Attempting to send a packet larger than the maximum allowed"
+                       << " size at this DataRate (DR" << unsigned(m_dataRate) <<
+                       "). Transmission canceled.");
+          return;
+        }
+
 
       // Add the Lora Mac header to the packet
       LorawanMacHeader macHdr;
