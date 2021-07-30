@@ -18,38 +18,34 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#ifndef LORA_MAC_HELPER_H
-#define LORA_MAC_HELPER_H
+#ifndef LORAWAN_MAC_HELPER_H
+#define LORAWAN_MAC_HELPER_H
 
 #include "ns3/net-device.h"
 #include "ns3/lora-channel.h"
 #include "ns3/lora-phy.h"
-#include "ns3/lora-mac.h"
+#include "ns3/lorawan-mac.h"
+#include "ns3/class-a-end-device-lorawan-mac.h"
 #include "ns3/lora-device-address-generator.h"
-#include "ns3/end-device-lora-mac.h"
-#include "ns3/gateway-lora-mac.h"
+#include "ns3/gateway-lorawan-mac.h"
 #include "ns3/node-container.h"
+#include "ns3/random-variable-stream.h"
 
 namespace ns3 {
 namespace lorawan {
 
-class LoraMacHelper
+class LorawanMacHelper
 {
 public:
   /**
    * Define the kind of device. Can be either GW (Gateway) or ED (End Device).
    */
-  enum DeviceType
-  {
-    GW,
-    ED
-  };
+  enum DeviceType { GW, ED_A };
 
   /**
    * Define the operational region.
    */
-  enum Regions
-  {
+  enum Regions {
     EU,
     US,
     China,
@@ -57,14 +53,16 @@ public:
     Australia,
     CN,
     AS923MHz,
-    SouthKorea
+    SouthKorea,
+    SingleChannel,
+    ALOHA
   };
 
   /**
    * Create a mac helper without any parameter set. The user must set
    * them all to be able to call Install later.
    */
-  LoraMacHelper ();
+  LorawanMacHelper ();
 
   /**
    * Set an attribute of the underlying MAC object.
@@ -92,13 +90,13 @@ public:
   void SetRegion (enum Regions region);
 
   /**
-   * Create the LoRaMac instance and connect it to a device
+   * Create the LorawanMac instance and connect it to a device
    *
    * \param node the node on which we wish to create a wifi MAC.
    * \param device the device within which this MAC will be created.
-   * \returns a newly-created LoraMac object.
+   * \returns a newly-created LorawanMac object.
    */
-  Ptr<LoraMac> Create (Ptr<Node> node, Ptr<NetDevice> device) const;
+  Ptr<LorawanMac> Create (Ptr<Node> node, Ptr<NetDevice> device) const;
 
   /**
    * Set up the end device's data rates
@@ -110,26 +108,63 @@ public:
    * SF11 -> DR1
    * SF12 -> DR0
    */
-  static std::vector<int> SetSpreadingFactorsUp (NodeContainer endDevices,
-                                                 NodeContainer gateways,
+  static std::vector<int> SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer gateways,
                                                  Ptr<LoraChannel> channel);
+  /**
+   * Set up the end device's data rates according to the given distribution.
+   */
+  static std::vector<int> SetSpreadingFactorsGivenDistribution (NodeContainer endDevices,
+                                                                NodeContainer gateways,
+                                                                std::vector<double> distribution);
 
 private:
   /**
    * Perform region-specific configurations for the 868 MHz EU band.
    */
-  void ConfigureForEuRegion (Ptr<EndDeviceLoraMac> edMac) const;
+  void ConfigureForEuRegion (Ptr<ClassAEndDeviceLorawanMac> edMac) const;
 
   /**
    * Perform region-specific configurations for the 868 MHz EU band.
    */
-  void ConfigureForEuRegion (Ptr<GatewayLoraMac> gwMac) const;
+  void ConfigureForEuRegion (Ptr<GatewayLorawanMac> gwMac) const;
 
   /**
-   * Apply configurations that are common both for the GatewayLoraMac and the
-   * EndDeviceLoraMac classes.
+   * Apply configurations that are common both for the GatewayLorawanMac and the
+   * ClassAEndDeviceLorawanMac classes.
    */
-  void ApplyCommonEuConfigurations (Ptr<LoraMac> loraMac) const;
+  void ApplyCommonEuConfigurations (Ptr<LorawanMac> lorawanMac) const;
+
+  /**
+   * Perform region-specific configurations for the SINGLECHANNEL band.
+   */
+  void ConfigureForSingleChannelRegion (Ptr<ClassAEndDeviceLorawanMac> edMac) const;
+
+  /**
+   * Perform region-specific configurations for the SINGLECHANNEL band.
+   */
+  void ConfigureForSingleChannelRegion (Ptr<GatewayLorawanMac> gwMac) const;
+
+  /**
+   * Apply configurations that are common both for the GatewayLorawanMac and the
+   * ClassAEndDeviceLorawanMac classes.
+   */
+  void ApplyCommonSingleChannelConfigurations (Ptr<LorawanMac> lorawanMac) const;
+
+  /**
+   * Perform region-specific configurations for the ALOHA band.
+   */
+  void ConfigureForAlohaRegion (Ptr<ClassAEndDeviceLorawanMac> edMac) const;
+
+  /**
+   * Perform region-specific configurations for the ALOHA band.
+   */
+  void ConfigureForAlohaRegion (Ptr<GatewayLorawanMac> gwMac) const;
+
+  /**
+   * Apply configurations that are common both for the GatewayLorawanMac and the
+   * ClassAEndDeviceLorawanMac classes.
+   */
+  void ApplyCommonAlohaConfigurations (Ptr<LorawanMac> lorawanMac) const;
 
   ObjectFactory m_mac;
   Ptr<LoraDeviceAddressGenerator> m_addrGen; //!< Pointer to the address generator to use
@@ -137,7 +172,7 @@ private:
   enum Regions m_region; //!< The region in which the device will operate
 };
 
-} //namespace ns3
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* LORA_PHY_HELPER_H */

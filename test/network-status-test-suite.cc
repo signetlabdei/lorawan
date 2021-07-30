@@ -101,7 +101,7 @@ NetworkStatusTest::DoRun (void)
   NodeContainer endDevices = components.endDevices;
   NodeContainer gateways = components.gateways;
 
-  ns.AddNode (GetMacLayerFromNode<EndDeviceLoraMac> (endDevices.Get (0)));
+  ns.AddNode (GetMacLayerFromNode<ClassAEndDeviceLorawanMac> (endDevices.Get (0)));
 }
 
 /**************

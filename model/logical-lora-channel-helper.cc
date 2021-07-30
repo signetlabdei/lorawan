@@ -109,7 +109,8 @@ LogicalLoraChannelHelper::GetSubBandFromFrequency (double frequency)
         }
     }
 
-  NS_LOG_ERROR ("Warning: frequency is outside any known SubBand.");
+  NS_LOG_ERROR ("Requested frequency: " << frequency);
+  NS_ABORT_MSG ("Warning: frequency is outside any known SubBand.");
 
   return 0;     // If no SubBand is found, return 0
 }

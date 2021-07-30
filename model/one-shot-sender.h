@@ -23,7 +23,7 @@
 
 #include "ns3/application.h"
 #include "ns3/nstime.h"
-#include "ns3/lora-mac.h"
+#include "ns3/lorawan-mac.h"
 #include "ns3/attribute.h"
 
 namespace ns3 {
@@ -72,7 +72,7 @@ private:
   /**
    * The MAC layer of this node.
    */
-  Ptr<LoraMac> m_mac;
+  Ptr<LorawanMac> m_mac;
 };
 
 } //namespace ns3

@@ -480,6 +480,8 @@ LoraFrameHeader::AddLinkAdrReq (uint8_t dataRate, uint8_t txPower, std::list<int
 
   // TODO Implement chMaskCntl field
 
+  NS_LOG_DEBUG ("Creating LinkAdrReq with: DR = " << unsigned(dataRate) << " and txPower = " << unsigned(txPower));
+
   Ptr<LinkAdrReq> command = Create<LinkAdrReq> (dataRate, txPower, channelMask, 0, repetitions);
   m_macCommands.push_back (command);
 

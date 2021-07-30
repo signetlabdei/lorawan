@@ -22,12 +22,13 @@
 #ifndef NETWORK_STATUS_H
 #define NETWORK_STATUS_H
 
-#include "ns3/device-status.h"
 #include "ns3/end-device-status.h"
-#include "ns3/end-device-lora-mac.h"
+#include "ns3/class-a-end-device-lorawan-mac.h"
 #include "ns3/gateway-status.h"
 #include "ns3/lora-device-address.h"
 #include "ns3/network-scheduler.h"
+
+#include <iterator>
 
 namespace ns3 {
 namespace lorawan {
@@ -52,14 +53,14 @@ public:
   /**
    * Add a device to the ones that are tracked by this NetworkStatus object.
    */
-  void AddNode (Ptr<EndDeviceLoraMac> edMac);
+  void AddNode (Ptr<ClassAEndDeviceLorawanMac> edMac);
 
   /**
    * Add this gateway to the list of gateways connected to the network.
    *
    * Each GW is identified by its Address in the NS-GW network.
    */
-  void AddGateway (Address& address, Ptr<GatewayStatus> gwStatus);
+  void AddGateway (Address &address, Ptr<GatewayStatus> gwStatus);
 
   /**
    * Update network status on the received packet.
@@ -67,7 +68,7 @@ public:
    * \param packet the received packet.
    * \param address the gateway this packet was received from.
    */
-  void OnReceivedPacket (Ptr<const Packet> packet, const Address& gwaddress);
+  void OnReceivedPacket (Ptr<const Packet> packet, const Address &gwaddress);
 
   /**
    * Return whether the specified device needs a reply.
@@ -82,7 +83,7 @@ public:
    *
    * \param deviceAddress the address of the device we are interested in.
    */
-  Address GetBestGatewayForDevice (LoraDeviceAddress deviceAddress);
+  Address GetBestGatewayForDevice (LoraDeviceAddress deviceAddress, int window);
 
   /**
    * Send a packet through a Gateway.
@@ -108,12 +109,17 @@ public:
    */
   Ptr<EndDeviceStatus> GetEndDeviceStatus (LoraDeviceAddress address);
 
+  /**
+   * Return the number of end devices currently managed by the server.
+   */
+  int CountEndDevices (void);
+
 public:
-  std::map<LoraDeviceAddress, Ptr<EndDeviceStatus> > m_endDeviceStatuses;
-  std::map<Address, Ptr<GatewayStatus> > m_gatewayStatuses;
+  std::map<LoraDeviceAddress, Ptr<EndDeviceStatus>> m_endDeviceStatuses;
+  std::map<Address, Ptr<GatewayStatus>> m_gatewayStatuses;
 };
 
-} /* namespace ns3 */
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* NETWORK_STATUS_H */

@@ -24,11 +24,10 @@
 #include "ns3/object.h"
 #include "ns3/lora-net-device.h"
 #include "ns3/lora-device-address.h"
-#include "ns3/lora-mac-header.h"
-#include "ns3/end-device-lora-mac.h"
+#include "ns3/lorawan-mac-header.h"
+#include "ns3/class-a-end-device-lorawan-mac.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/pointer.h"
-#include "ns3/lora-mac-header.h"
 #include "ns3/lora-frame-header.h"
 #include <iostream>
 
@@ -94,7 +93,7 @@ public:
   struct Reply
   {
     // The Mac Header to attach to the reply packet.
-    LoraMacHeader macHeader;
+    LorawanMacHeader macHeader;
 
     // The Frame Header to attach to the reply packet.
     LoraFrameHeader frameHeader;
@@ -128,7 +127,7 @@ public:
    *
    * \return The packet reply mac header.
    */
-  LoraMacHeader GetReplyMacHeader (void);
+  LorawanMacHeader GetReplyMacHeader (void);
 
   /**
    * Get the reply packet frame header.
@@ -186,7 +185,7 @@ public:
 
   EndDeviceStatus ();
   EndDeviceStatus (LoraDeviceAddress endDeviceAddress,
-                   Ptr<EndDeviceLoraMac> endDeviceMac);
+                   Ptr<ClassAEndDeviceLorawanMac> endDeviceMac);
   virtual ~EndDeviceStatus ();
 
   /**
@@ -245,7 +244,7 @@ public:
   /**
    * Set the reply packet mac header.
    */
-  void SetReplyMacHeader (LoraMacHeader macHeader);
+  void SetReplyMacHeader (LorawanMacHeader macHeader);
 
   /**
    * Set the reply packet frame header.
@@ -257,7 +256,7 @@ public:
    */
   void SetReplyPayload (Ptr<Packet> replyPayload);
 
-  Ptr<EndDeviceLoraMac> GetMac (void);
+  Ptr<ClassAEndDeviceLorawanMac> GetMac (void);
 
   //////////////////////
   //  Other methods  //
@@ -296,13 +295,20 @@ public:
   void UpdateGatewayData (GatewayList gwList, Address gwAddress, double rcvPower);
 
   /**
-   * Return the best gateway that:
-   * - Can reach this device
-   * - Is available to send a packet
+   * Returns whether we already decided we will schedule a transmission to this ED
    */
-  Address GetBestGatewayForReply (void);
+  bool HasReceiveWindowOpportunityScheduled ();
 
-  struct Reply m_reply;   //<! Next reply intended for this device
+  void SetReceiveWindowOpportunity (EventId event);
+
+  void RemoveReceiveWindowOpportunity (void);
+
+  /**
+   * Return an ordered list of the best gateways.
+   */
+  std::map<double, Address> GetPowerGatewayMap (void);
+
+  struct Reply m_reply; //<! Next reply intended for this device
 
   LoraDeviceAddress m_endDeviceAddress;   //<! The address of this device
 
@@ -313,13 +319,14 @@ private:
   uint8_t m_firstReceiveWindowSpreadingFactor = 0;
   double m_firstReceiveWindowFrequency = 0;
   uint8_t m_secondReceiveWindowOffset = 0;
-  double m_secondReceiveWindowFrequency = 868.625;
+  double m_secondReceiveWindowFrequency = 869.525;
+  EventId m_receiveWindowEvent;
 
   ReceivedPacketList m_receivedPacketList;   //<! List of received packets
 
   // NOTE Using this attribute is 'cheating', since we are assuming perfect
   // synchronization between the info at the device and at the network server
-  Ptr<EndDeviceLoraMac> m_mac;   //!< Pointer to the MAC layer of this device
+  Ptr<ClassAEndDeviceLorawanMac> m_mac;   //!< Pointer to the MAC layer of this device
 };
 }
 

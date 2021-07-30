@@ -7,6 +7,10 @@ This is an [ns-3](https://www.nsnam.org "ns-3 Website") module that can be used
 to perform simulations of a [LoRaWAN](http://www.lora-alliance.org/technology
 "LoRa Alliance") network.
 
+[API documentation](https://signetlabdei.github.io/lorawan-docs/html/index.html).
+
+[Module Documentation](https://signetlabdei.github.io/lorawan-docs/models/build/html/lorawan.html).
+
 ## Getting started ##
 
 ### Prerequisites ###
@@ -38,7 +42,7 @@ sure the file contains the following line:
 modules_enabled = ['lorawan']
 ```
 
-To compile, move to the `ns-3-dev` folder, configure and then build ns-3:
+To compile, move to the `ns-3` folder, configure and then build ns-3:
 
 ```bash
 ./waf configure --enable-tests --enable-examples
@@ -103,13 +107,13 @@ supervision of Prof. Lorenzo Vangelista, Prof. Michele Zorzi and with the help
 of Marco Centenaro.
 
 Publications:
-- D. Magrin, M. Centenaro and L. Vangelista, "Performance evaluation of LoRa
-  networks in a smart city scenario," 2017 IEEE International Conference On
-  Communications (ICC), Paris, 2017. Available:
-  http://ieeexplore.ieee.org/document/7996384/
+- D. Magrin, M. Capuzzo and A. Zanella, "A Thorough Study of LoRaWAN Performance Under Different
+  Parameter Settings," in IEEE Internet of Things Journal. 2019.
+  [Link](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8863372&isnumber=6702522).
 - M. Capuzzo, D. Magrin and A. Zanella, "Confirmed traffic in LoRaWAN: Pitfalls
   and countermeasures," 2018 17th Annual Mediterranean Ad Hoc Networking
-  Workshop (Med-Hoc-Net), Capri, 2018. Available:
-  https://ieeexplore.ieee.org/abstract/document/8407095
-- Network level performances of a LoRa system (Master thesis). Available:
-  http://tesi.cab.unipd.it/53740/1/dissertation.pdf
+  Workshop (Med-Hoc-Net), Capri, 2018. [Link](https://ieeexplore.ieee.org/abstract/document/8407095).
+- D. Magrin, M. Centenaro and L. Vangelista, "Performance evaluation of LoRa
+  networks in a smart city scenario," 2017 IEEE International Conference On
+  Communications (ICC), Paris, 2017. [Link](http://ieeexplore.ieee.org/document/7996384/).
+- Network level performances of a LoRa system (Master thesis). [Link](http://tesi.cab.unipd.it/53740/1/dissertation.pdf).

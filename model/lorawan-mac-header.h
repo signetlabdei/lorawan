@@ -18,8 +18,8 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#ifndef LORA_MAC_HEADER_H
-#define LORA_MAC_HEADER_H
+#ifndef LORAWAN_MAC_HEADER_H
+#define LORAWAN_MAC_HEADER_H
 
 #include "ns3/header.h"
 
@@ -29,7 +29,7 @@ namespace lorawan {
 /**
  * This class represents the Mac header of a LoRaWAN packet.
  */
-class LoraMacHeader : public Header
+class LorawanMacHeader : public Header
 {
 public:
   /**
@@ -51,8 +51,8 @@ public:
 
   static TypeId GetTypeId (void);
 
-  LoraMacHeader ();
-  ~LoraMacHeader ();
+  LorawanMacHeader ();
+  ~LorawanMacHeader ();
 
   // Pure virtual methods from Header that need to be implemented by this class
   virtual TypeId GetInstanceTypeId (void) const;

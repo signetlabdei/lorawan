@@ -51,7 +51,7 @@ LoraNetDevice::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&LoraNetDevice::GetMac,
                                         &LoraNetDevice::SetMac),
-                   MakePointerChecker<LoraMac> ());
+                   MakePointerChecker<LorawanMac> ());
   return tid;
 }
 
@@ -70,12 +70,12 @@ LoraNetDevice::~LoraNetDevice ()
 }
 
 void
-LoraNetDevice::SetMac (Ptr<LoraMac> mac)
+LoraNetDevice::SetMac (Ptr<LorawanMac> mac)
 {
   m_mac = mac;
 }
 
-Ptr<LoraMac>
+Ptr<LorawanMac>
 LoraNetDevice::GetMac (void) const
 {
   return m_mac;

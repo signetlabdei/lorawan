@@ -34,7 +34,7 @@ namespace ns3 {
 namespace lorawan {
 
 /**
- * This class supports LoraMac instances by managing a list of the logical
+ * This class supports LorawanMac instances by managing a list of the logical
  * channels that the device is supposed to be using, and establishes their
  * relationship with SubBands.
  *

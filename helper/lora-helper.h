@@ -22,7 +22,7 @@
 #define LORA_HELPER_H
 
 #include "ns3/lora-phy-helper.h"
-#include "ns3/lora-mac-helper.h"
+#include "ns3/lorawan-mac-helper.h"
 #include "ns3/node-container.h"
 #include "ns3/net-device-container.h"
 #include "ns3/net-device.h"
@@ -57,7 +57,7 @@ public:
    * method.
    */
   virtual NetDeviceContainer Install (const LoraPhyHelper &phyHelper,
-                                      const LoraMacHelper &macHelper,
+                                      const LorawanMacHelper &macHelper,
                                       NodeContainer c) const;
 
   /**
@@ -70,31 +70,68 @@ public:
    * method.
    */
   virtual NetDeviceContainer Install (const LoraPhyHelper &phyHelper,
-                                      const LoraMacHelper &macHelper,
+                                      const LorawanMacHelper &macHelper,
                                       Ptr<Node> node) const;
 
   /**
-   * Enable tracking of packets via trace sources
+   * Enable tracking of packets via trace sources.
    *
-   * This method automatically connects to trace sources and computes relevant
+   * This method automatically connects to trace sources to computes relevant
    * metrics.
    */
-  void EnablePacketTracking (std::string filename);
+  void EnablePacketTracking (void);
 
-  void EnableSimulationTimePrinting (void);
+  /**
+   * Periodically prints the simulation time to the standard output.
+   */
+  void EnableSimulationTimePrinting (Time interval);
 
-  void PrintSimulationTime (void);
+  /**
+   * Periodically prints the status of devices in the network to a file.
+   */
+  void EnablePeriodicDeviceStatusPrinting (NodeContainer endDevices,
+                                           NodeContainer gateways,
+                                           std::string filename,
+                                           Time interval);
 
-  void PrintPerformance (Time start, Time stop);
+  /**
+   * Periodically prints PHY-level performance at every gateway in the container.
+   */
+  void EnablePeriodicPhyPerformancePrinting (NodeContainer gateways,
+                                             std::string filename,
+                                             Time interval);
 
-  void CountPhyPackets (Time start, Time stop);
+  void DoPrintPhyPerformance (NodeContainer gateways, std::string filename);
 
-  void PrintEndDevices (NodeContainer endDevices, NodeContainer gateways,
-                        std::string filename);
+  /**
+   * Periodically prints global performance.
+   */
+  void EnablePeriodicGlobalPerformancePrinting (std::string filename,
+                                                Time interval);
 
-  LoraPacketTracker *m_packetTracker = 0;
+  void DoPrintGlobalPerformance (std::string filename);
+
+  LoraPacketTracker& GetPacketTracker (void);
+
+  LoraPacketTracker* m_packetTracker = 0;
 
   time_t m_oldtime;
+
+  /**
+   * Print a summary of the status of all devices in the network.
+   */
+  void DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateways,
+                            std::string filename);
+
+private:
+  /**
+   * Actually print the simulation time and re-schedule execution of this
+   * function.
+   */
+  void DoPrintSimulationTime (Time interval);
+
+  Time m_lastPhyPerformanceUpdate;
+  Time m_lastGlobalPerformanceUpdate;
 };
 
 } //namespace ns3

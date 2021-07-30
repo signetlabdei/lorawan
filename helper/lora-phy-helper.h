@@ -27,7 +27,7 @@
 #include "ns3/lora-phy.h"
 #include "ns3/simple-end-device-lora-phy.h"
 #include "ns3/simple-gateway-lora-phy.h"
-#include "ns3/lora-mac.h"
+#include "ns3/lorawan-mac.h"
 
 namespace ns3 {
 namespace lorawan {

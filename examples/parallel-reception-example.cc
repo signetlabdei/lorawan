@@ -7,6 +7,7 @@
 #include "ns3/gateway-lora-phy.h"
 #include "ns3/end-device-lorawan-mac.h"
 #include "ns3/gateway-lorawan-mac.h"
+#include "ns3/lorawan-mac-helper.h"
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "ns3/constant-position-mobility-model.h"
@@ -22,31 +23,33 @@
 using namespace ns3;
 using namespace lorawan;
 
-NS_LOG_COMPONENT_DEFINE ("SimpleLorawanNetworkExample");
+NS_LOG_COMPONENT_DEFINE ("ParallelReceptionExample");
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
 
   // Set up logging
-  LogComponentEnable ("SimpleLorawanNetworkExample", LOG_LEVEL_ALL);
-  LogComponentEnable ("LoraChannel", LOG_LEVEL_INFO);
-  LogComponentEnable ("LoraPhy", LOG_LEVEL_ALL);
-  LogComponentEnable ("EndDeviceLoraPhy", LOG_LEVEL_ALL);
+  LogComponentEnable ("ParallelReceptionExample", LOG_LEVEL_ALL);
+  // LogComponentEnable ("LoraChannel", LOG_LEVEL_INFO);
+  // LogComponentEnable ("LoraPhy", LOG_LEVEL_ALL);
+  // LogComponentEnable ("EndDeviceLoraPhy", LOG_LEVEL_ALL);
   LogComponentEnable ("GatewayLoraPhy", LOG_LEVEL_ALL);
-  LogComponentEnable ("LoraInterferenceHelper", LOG_LEVEL_ALL);
-  LogComponentEnable ("LorawanMac", LOG_LEVEL_ALL);
-  LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_ALL);
-  LogComponentEnable ("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
+  LogComponentEnable ("SimpleGatewayLoraPhy", LOG_LEVEL_ALL);
+  // LogComponentEnable ("LoraInterferenceHelper", LOG_LEVEL_ALL);
+  // LogComponentEnable ("LorawanMac", LOG_LEVEL_ALL);
+  // LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_ALL);
+  // LogComponentEnable ("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
   LogComponentEnable ("GatewayLorawanMac", LOG_LEVEL_ALL);
-  LogComponentEnable ("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
-  LogComponentEnable ("LogicalLoraChannel", LOG_LEVEL_ALL);
-  LogComponentEnable ("LoraHelper", LOG_LEVEL_ALL);
-  LogComponentEnable ("LoraPhyHelper", LOG_LEVEL_ALL);
-  LogComponentEnable ("LorawanMacHelper", LOG_LEVEL_ALL);
-  LogComponentEnable ("OneShotSenderHelper", LOG_LEVEL_ALL);
-  LogComponentEnable ("OneShotSender", LOG_LEVEL_ALL);
-  LogComponentEnable ("LorawanMacHeader", LOG_LEVEL_ALL);
-  LogComponentEnable ("LoraFrameHeader", LOG_LEVEL_ALL);
+  // LogComponentEnable ("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
+  // LogComponentEnable ("LogicalLoraChannel", LOG_LEVEL_ALL);
+  // LogComponentEnable ("LoraHelper", LOG_LEVEL_ALL);
+  // LogComponentEnable ("LoraPhyHelper", LOG_LEVEL_ALL);
+  // LogComponentEnable ("LorawanMacHelper", LOG_LEVEL_ALL);
+  // LogComponentEnable ("OneShotSenderHelper", LOG_LEVEL_ALL);
+  // LogComponentEnable ("OneShotSender", LOG_LEVEL_ALL);
+  // LogComponentEnable ("LorawanMacHeader", LOG_LEVEL_ALL);
+  // LogComponentEnable ("LoraFrameHeader", LOG_LEVEL_ALL);
   LogComponentEnableAll (LOG_PREFIX_FUNC);
   LogComponentEnableAll (LOG_PREFIX_NODE);
   LogComponentEnableAll (LOG_PREFIX_TIME);
@@ -74,8 +77,7 @@ int main (int argc, char *argv[])
 
   MobilityHelper mobility;
   Ptr<ListPositionAllocator> allocator = CreateObject<ListPositionAllocator> ();
-  allocator->Add (Vector (1000,0,0));
-  allocator->Add (Vector (0,0,0));
+  allocator->Add (Vector (0, 0, 0));
   mobility.SetPositionAllocator (allocator);
   mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
 
@@ -97,14 +99,15 @@ int main (int argc, char *argv[])
 
   // Create a set of nodes
   NodeContainer endDevices;
-  endDevices.Create (1);
+  endDevices.Create (6);
 
-  // Assign a mobility model to the node
+  // Assign a mobility model to the nodes
   mobility.Install (endDevices);
 
   // Create the LoraNetDevices of the end devices
   phyHelper.SetDeviceType (LoraPhyHelper::ED);
   macHelper.SetDeviceType (LorawanMacHelper::ED_A);
+  macHelper.SetRegion (LorawanMacHelper::SingleChannel);
   helper.Install (phyHelper, macHelper, endDevices);
 
   /*********************
@@ -127,15 +130,22 @@ int main (int argc, char *argv[])
   *********************************************/
 
   OneShotSenderHelper oneShotSenderHelper;
-  oneShotSenderHelper.SetSendTime (Seconds (2));
 
+  oneShotSenderHelper.SetSendTime (Seconds (1));
   oneShotSenderHelper.Install (endDevices);
 
   /******************
    * Set Data Rates *
    ******************/
-  std::vector<int> sfQuantity (6);
-  sfQuantity = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
+  for (uint32_t i = 0; i < endDevices.GetN (); i++)
+    {
+      endDevices.Get (i)
+          ->GetDevice (0)
+          ->GetObject<LoraNetDevice> ()
+          ->GetMac ()
+          ->GetObject<EndDeviceLorawanMac> ()
+          ->SetDataRate (5 - i);
+    }
 
   /****************
   *  Simulation  *

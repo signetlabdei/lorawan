@@ -18,41 +18,41 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#include "ns3/lora-mac-header.h"
+#include "ns3/lorawan-mac-header.h"
 #include "ns3/log.h"
 #include <bitset>
 
 namespace ns3 {
 namespace lorawan {
 
-NS_LOG_COMPONENT_DEFINE ("LoraMacHeader");
+NS_LOG_COMPONENT_DEFINE ("LorawanMacHeader");
 
-LoraMacHeader::LoraMacHeader () : m_major (0)
+LorawanMacHeader::LorawanMacHeader () : m_major (0)
 {
 }
 
-LoraMacHeader::~LoraMacHeader ()
+LorawanMacHeader::~LorawanMacHeader ()
 {
 }
 
 TypeId
-LoraMacHeader::GetTypeId (void)
+LorawanMacHeader::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("LoraMacHeader")
+  static TypeId tid = TypeId ("LorawanMacHeader")
     .SetParent<Header> ()
-    .AddConstructor<LoraMacHeader> ()
+    .AddConstructor<LorawanMacHeader> ()
   ;
   return tid;
 }
 
 TypeId
-LoraMacHeader::GetInstanceTypeId (void) const
+LorawanMacHeader::GetInstanceTypeId (void) const
 {
   return GetTypeId ();
 }
 
 uint32_t
-LoraMacHeader::GetSerializedSize (void) const
+LorawanMacHeader::GetSerializedSize (void) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -60,7 +60,7 @@ LoraMacHeader::GetSerializedSize (void) const
 }
 
 void
-LoraMacHeader::Serialize (Buffer::Iterator start) const
+LorawanMacHeader::Serialize (Buffer::Iterator start) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -82,7 +82,7 @@ LoraMacHeader::Serialize (Buffer::Iterator start) const
 }
 
 uint32_t
-LoraMacHeader::Deserialize (Buffer::Iterator start)
+LorawanMacHeader::Deserialize (Buffer::Iterator start)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -101,14 +101,14 @@ LoraMacHeader::Deserialize (Buffer::Iterator start)
 }
 
 void
-LoraMacHeader::Print (std::ostream &os) const
+LorawanMacHeader::Print (std::ostream &os) const
 {
   os << "MessageType=" << unsigned(m_mtype) << std::endl;
   os << "Major=" << unsigned(m_major) << std::endl;
 }
 
 void
-LoraMacHeader::SetMType (enum MType mtype)
+LorawanMacHeader::SetMType (enum MType mtype)
 {
   NS_LOG_FUNCTION (this << mtype);
 
@@ -116,7 +116,7 @@ LoraMacHeader::SetMType (enum MType mtype)
 }
 
 uint8_t
-LoraMacHeader::GetMType (void) const
+LorawanMacHeader::GetMType (void) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -124,7 +124,7 @@ LoraMacHeader::GetMType (void) const
 }
 
 void
-LoraMacHeader::SetMajor (uint8_t major)
+LorawanMacHeader::SetMajor (uint8_t major)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -134,7 +134,7 @@ LoraMacHeader::SetMajor (uint8_t major)
 }
 
 uint8_t
-LoraMacHeader::GetMajor (void) const
+LorawanMacHeader::GetMajor (void) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -142,7 +142,7 @@ LoraMacHeader::GetMajor (void) const
 }
 
 bool
-LoraMacHeader::IsUplink (void) const
+LorawanMacHeader::IsUplink (void) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -152,7 +152,7 @@ LoraMacHeader::IsUplink (void) const
 }
 
 bool
-LoraMacHeader::IsConfirmed (void) const
+LorawanMacHeader::IsConfirmed (void) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 

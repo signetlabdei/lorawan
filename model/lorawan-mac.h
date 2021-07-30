@@ -18,8 +18,8 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#ifndef LORA_MAC_H
-#define LORA_MAC_H
+#ifndef LORAWAN_MAC_H
+#define LORAWAN_MAC_H
 
 #include "ns3/object.h"
 #include "ns3/logical-lora-channel-helper.h"
@@ -39,13 +39,13 @@ class LoraPhy;
  * belongs to an End Device or a Gateway, while holding some functionality that
  * is common to both.
  */
-class LoraMac : public Object
+class LorawanMac : public Object
 {
 public:
   static TypeId GetTypeId (void);
 
-  LoraMac ();
-  virtual ~LoraMac ();
+  LorawanMac ();
+  virtual ~LorawanMac ();
 
   typedef std::array<std::array<uint8_t, 6>, 8> ReplyDataRateMatrix;
 
@@ -281,4 +281,4 @@ protected:
 } /* namespace ns3 */
 
 }
-#endif /* LORA_MAC_H */
+#endif /* LORAWAN_MAC_H */

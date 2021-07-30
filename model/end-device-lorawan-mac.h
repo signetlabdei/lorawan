@@ -17,13 +17,15 @@
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  *         Martina Capuzzo <capuzzom@dei.unipd.it>
+ *
+ * Modified by: Peggy Anderson <peggy.anderson@usask.ca>
  */
 
-#ifndef END_DEVICE_LORA_MAC_H
-#define END_DEVICE_LORA_MAC_H
+#ifndef END_DEVICE_LORAWAN_MAC_H
+#define END_DEVICE_LORAWAN_MAC_H
 
-#include "ns3/lora-mac.h"
-#include "ns3/lora-mac-header.h"
+#include "ns3/lorawan-mac.h"
+#include "ns3/lorawan-mac-header.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/random-variable-stream.h"
 #include "ns3/lora-device-address.h"
@@ -35,13 +37,13 @@ namespace lorawan {
 /**
  * Class representing the MAC layer of a LoRaWAN device.
  */
-class EndDeviceLoraMac : public LoraMac
+class EndDeviceLorawanMac : public LorawanMac
 {
 public:
   static TypeId GetTypeId (void);
 
-  EndDeviceLoraMac ();
-  virtual ~EndDeviceLoraMac ();
+  EndDeviceLorawanMac ();
+  virtual ~EndDeviceLorawanMac ();
 
   /////////////////////
   // Sending methods //
@@ -99,27 +101,7 @@ public:
    *
    * This function handles opening of the first receive window.
    */
-  void TxFinished (Ptr<const Packet> packet);
-
-  /**
-   * Perform operations needed to open the first receive window.
-   */
-  void OpenFirstReceiveWindow (void);
-
-  /**
-   * Perform operations needed to open the second receive window.
-   */
-  void OpenSecondReceiveWindow (void);
-
-  /**
-   * Perform operations needed to close the first receive window.
-   */
-  void CloseFirstReceiveWindow (void);
-
-  /**
-   * Perform operations needed to close the second receive window.
-   */
-  void CloseSecondReceiveWindow (void);
+  virtual void TxFinished (Ptr<const Packet> packet);
 
   /////////////////////////
   // Getters and Setters //
@@ -171,6 +153,13 @@ public:
   uint8_t GetDataRate (void);
 
   /**
+   * Get the transmission power this end device is set to use.
+   *
+   * \return The transmission power this device uses when transmitting.
+   */
+  virtual uint8_t GetTransmissionPower (void);
+
+  /**
    * Set the network address of this device.
    *
    * \param address The address to set.
@@ -183,41 +172,6 @@ public:
    * \return This device's address.
    */
   LoraDeviceAddress GetDeviceAddress (void);
-
-  /**
-   * Set the Data Rate to be used in the second receive window.
-   *
-   * \param dataRate The Data Rate.
-   */
-  void SetSecondReceiveWindowDataRate (uint8_t dataRate);
-
-  /**
-   * Get the Data Rate that will be used in the first receive window.
-   *
-   * \return The Data Rate
-   */
-  uint8_t GetFirstReceiveWindowDataRate (void);
-
-  /**
-   * Get the Data Rate that will be used in the second receive window.
-   *
-   * \return The Data Rate
-   */
-  uint8_t GetSecondReceiveWindowDataRate (void);
-
-  /**
-   * Set the frequency that will be used for the second receive window.
-   *
-   * \param frequencyMHz the Frequency.
-   */
-  void SetSecondReceiveWindowFrequency (double frequencyMHz);
-
-  /**
-   * Get the frequency that is used for the second receive window.
-   *
-   * @return The frequency, in MHz
-   */
-  double GetSecondReceiveWindowFrequency (void);
 
   /**
    * Set a value for the RX1DROffset parameter.
@@ -257,21 +211,21 @@ public:
   void ApplyNecessaryOptions (LoraFrameHeader &frameHeader);
 
   /**
-   * Add the necessary options and MAC commands to the LoraMacHeader.
+   * Add the necessary options and MAC commands to the LorawanMacHeader.
    *
    * \param macHeader The mac header on which to apply the options.
    */
-  void ApplyNecessaryOptions (LoraMacHeader &macHeader);
+  void ApplyNecessaryOptions (LorawanMacHeader &macHeader);
 
   /**
    * Set the message type to send when the Send method is called.
    */
-  void SetMType (LoraMacHeader::MType mType);
+  void SetMType (LorawanMacHeader::MType mType);
 
   /**
- * Get the message type to send when the Send method is called.
- */
-  LoraMacHeader::MType GetMType (void);
+   * Get the message type to send when the Send method is called.
+   */
+  LorawanMacHeader::MType GetMType (void);
 
   /**
    * Parse and take action on the commands contained on this FrameHeader.
@@ -308,11 +262,17 @@ public:
   /**
    * Perform the actions that need to be taken when receiving a RxParamSetupReq command.
    *
-   * \param rx1DrOffset The offset to set.
-   * \param rx2DataRate The data rate to use for the second receive window.
-   * \param frequency The frequency to use for the second receive window.
+   * \param rxParamSetupReq The Parameter Setup Request
    */
-  void OnRxParamSetupReq (uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency);
+  void OnRxParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq);
+
+  /**
+   * Perform the actions that need to be taken when receiving a RxParamSetupReq
+   * command based on the Device's Class Type.
+   *
+   * \param rxParamSetupReq The Parameter Setup Request
+   */
+  virtual void OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq);
 
   /**
    * Perform the actions that need to be taken when receiving a DevStatusReq command.
@@ -371,9 +331,7 @@ public:
    */
   void AddMacCommand (Ptr<MacCommand> macCommand);
 
-  uint8_t GetTransmissionPower (void);
-
-private:
+protected:
   /**
    * Structure representing the parameters that will be used in the
    * retransmission procedure.
@@ -397,40 +355,6 @@ private:
   uint8_t m_maxNumbTx;
 
   /**
-   * Randomly shuffle a Ptr<LogicalLoraChannel> vector.
-   *
-   * Used to pick a random channel on which to send the packet.
-   */
-  std::vector<Ptr<LogicalLoraChannel> > Shuffle (std::vector<Ptr<LogicalLoraChannel> > vector);
-
-  /**
-    * Find the minimum waiting time before the next possible transmission.
-    */
-  Time GetNextTransmissionDelay (void);
-
-
-  /**
-   * Find a suitable channel for transmission. The channel is chosen among the
-   * ones that are available in the ED's LogicalLoraChannel, based on their duty
-   * cycle limitations.
-   */
-  Ptr<LogicalLoraChannel> GetChannelForTx (void);
-
-  /**
-   * An uniform random variable, used by the Shuffle method to randomly reorder
-   * the channel list.
-   */
-  Ptr<UniformRandomVariable> m_uniformRV;
-
-
-/**
-   * The total number of transmissions required.
-   */
-/*
-TracedValue<uint8_t> m_requiredTx;
-*/
-
-  /**
    * The DataRate this device is using to transmit.
    */
   TracedValue<uint8_t> m_dataRate;
@@ -451,50 +375,79 @@ TracedValue<uint8_t> m_requiredTx;
   bool m_headerDisabled;
 
   /**
-   * The interval between when a packet is done sending and when the first
-   * receive window is opened.
+   * The address of this device.
    */
-  Time m_receiveDelay1;
+  LoraDeviceAddress m_address;
 
   /**
-   * The interval between when a packet is done sending and when the second
-   * receive window is opened.
+   * Find the minimum waiting time before the next possible transmission based
+   * on End Device's Class Type.
    */
-  Time m_receiveDelay2;
+  virtual Time GetNextClassTransmissionDelay (Time waitingTime);
 
   /**
-   * The duration of a receive window in number of symbols. This should be 
+   * Find a suitable channel for transmission. The channel is chosen among the
+   * ones that are available in the ED's LogicalLoraChannel, based on their duty
+   * cycle limitations.
+   */
+  Ptr<LogicalLoraChannel> GetChannelForTx (void);
+
+  /**
+   * The duration of a receive window in number of symbols. This should be
    * converted to time based or the reception parameter used.
-   * 
-   * The downlink preamble transmitted by the gateways contains 8 symbols. 
-   * The receiver requires 5 symbols to detect the preamble and synchronize. 
-   * Therefore there must be a 5 symbols overlap between the receive window 
-   * and the transmitted preamble. 
+   *
+   * The downlink preamble transmitted by the gateways contains 8 symbols.
+   * The receiver requires 5 symbols to detect the preamble and synchronize.
+   * Therefore there must be a 5 symbols overlap between the receive window
+   * and the transmitted preamble.
    * (Ref: Recommended SX1272/76 Settings for EU868 LoRaWAN Network Operation )
    */
   uint8_t m_receiveWindowDurationInSymbols;
 
   /**
-   * The event of the closing the first receive window.
-   *
-   * This Event will be canceled if there's a successful reception of a packet.
+   * List of the MAC commands that need to be applied to the next UL packet.
    */
-  EventId m_closeFirstWindow;
+  std::list<Ptr<MacCommand> > m_macCommandList;
+
+  /* Structure containing the retransmission parameters
+   * for this device.
+   */
+  struct LoraRetxParameters m_retxParams;
 
   /**
-   * The event of the closing the second receive window.
-   *
-   * This Event will be canceled if there's a successful reception of a packet.
+   * An uniform random variable, used by the Shuffle method to randomly reorder
+   * the channel list.
    */
-  EventId m_closeSecondWindow;
+  Ptr<UniformRandomVariable> m_uniformRV;
+
+  /////////////////
+  //  Callbacks  //
+  /////////////////
 
   /**
-   * The event of the second receive window opening.
+   * The trace source fired when the transmission procedure is finished.
    *
-   * This Event is used to cancel the second window in case the first one is
-   * successful.
+   * \see class CallBackTraceSource
    */
-  EventId m_secondReceiveWindow;
+  TracedCallback<uint8_t, bool, Time, Ptr<Packet> > m_requiredTxCallback;
+
+private:
+  /**
+   * Randomly shuffle a Ptr<LogicalLoraChannel> vector.
+   *
+   * Used to pick a random channel on which to send the packet.
+   */
+  std::vector<Ptr<LogicalLoraChannel> > Shuffle (std::vector<Ptr<LogicalLoraChannel> > vector);
+
+  /**
+   * Find the minimum waiting time before the next possible transmission.
+   */
+  Time GetNextTransmissionDelay (void);
+
+  /**
+   * Whether this device's data rate should be controlled by the NS.
+   */
+  bool m_controlDataRate;
 
   /**
    * The event of retransmitting a packet in a consecutive moment if an ACK is not received.
@@ -510,25 +463,6 @@ TracedValue<uint8_t> m_requiredTx;
    * This Event is used to cancel the transmission of this packet if a newer packet is delivered from the application to be sent.
    */
   EventId m_nextRetx;
-  /**
-   * The address of this device.
-   */
-  LoraDeviceAddress m_address;
-
-  /**
-   * The frequency to listen on for the second receive window.
-   */
-  double m_secondReceiveWindowFrequency;
-
-  /**
-   * The Data Rate to listen for during the second downlink transmission.
-   */
-  uint8_t m_secondReceiveWindowDataRate;
-
-  /**
-   * The RX1DROffset parameter value
-   */
-  uint8_t m_rx1DrOffset;
 
   /**
    * The last known link margin.
@@ -548,11 +482,6 @@ TracedValue<uint8_t> m_requiredTx;
   TracedValue<int> m_lastKnownGatewayCount;
 
   /**
-   * List of the MAC commands that need to be applied to the next UL packet.
-   */
-  std::list<Ptr<MacCommand> > m_macCommandList;
-
-  /**
    * The aggregated duty cycle this device needs to respect across all sub-bands.
    */
   TracedValue<double> m_aggregatedDutyCycle;
@@ -560,30 +489,13 @@ TracedValue<uint8_t> m_requiredTx;
   /**
    * The message type to apply to packets sent with the Send method.
    */
-  LoraMacHeader::MType m_mType;
+  LorawanMacHeader::MType m_mType;
 
-  /* Structure containing the retransmission parameters
-   * for this device.
-   */
-  struct LoraRetxParameters m_retxParams;
-
-  uint8_t m_currentFCnt;
-
-  /////////////////
-  //  Callbacks  //
-  /////////////////
-
-  /**
-   * The trace source fired when the transmission procedure is finished.
-   *
-   * \see class CallBackTraceSource
-   */
-  TracedCallback<uint8_t, bool, Time, Ptr<Packet> > m_requiredTxCallback;
-
+  uint16_t m_currentFCnt;
 };
 
 
 } /* namespace ns3 */
 
 }
-#endif /* END_DEVICE_LORA_MAC_H */
+#endif /* END_DEVICE_LORAWAN_MAC_H */

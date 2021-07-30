@@ -53,14 +53,13 @@ public:
   GatewayLoraPhy ();
   virtual ~GatewayLoraPhy ();
 
-  virtual void StartReceive (Ptr<Packet> packet, double rxPowerDbm, uint8_t sf,
-                             Time duration, double frequencyMHz) = 0;
+  virtual void StartReceive (Ptr<Packet> packet, double rxPowerDbm, uint8_t sf, Time duration,
+                             double frequencyMHz) = 0;
 
-  virtual void EndReceive (Ptr<Packet> packet,
-                           Ptr<LoraInterferenceHelper::Event> event) = 0;
+  virtual void EndReceive (Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) = 0;
 
-  virtual void Send (Ptr<Packet> packet, LoraTxParameters txParams,
-                     double frequencyMHz, double txPowerDbm) = 0;
+  virtual void Send (Ptr<Packet> packet, LoraTxParameters txParams, double frequencyMHz,
+                     double txPowerDbm) = 0;
 
   virtual void TxFinished (Ptr<Packet> packet);
 
@@ -70,10 +69,8 @@ public:
 
   /**
    * Add a reception path, locked on a specific frequency.
-   *
-   * \param frequencyMHz The frequency on which to set this ReceptionPath.
    */
-  void AddReceptionPath (double frequencyMHz);
+  void AddReceptionPath ();
 
   /**
    * Reset the list of reception paths.
@@ -81,6 +78,11 @@ public:
    * This method deletes all currently available ReceptionPath objects.
    */
   void ResetReceptionPaths (void);
+
+  /**
+   * Add a frequency to the list of frequencies we are listening to.
+   */
+  void AddFrequency (double frequencyMHz);
 
   /**
    * A vector containing the sensitivities required to correctly decode
@@ -92,36 +94,20 @@ protected:
   /**
    * This class represents a configurable reception path.
    *
-   * ReceptionPaths are configured to listen on a certain frequency. Differently
-   * from EndDeviceLoraPhys, these do not need to be configured to listen for a
-   * certain SF. ReceptionPaths be either locked on an event or free.
+   * Differently from EndDeviceLoraPhys, these do not need to be configured to
+   * listen for a certain SF. ReceptionPaths be either locked on an event or
+   * free.
    */
   class ReceptionPath : public SimpleRefCount<GatewayLoraPhy::ReceptionPath>
   {
 
-public:
+  public:
     /**
      * Constructor.
-     *
-     * \param frequencyMHz The frequency this path is set to listen on.
      */
-    ReceptionPath (double frequencyMHz);
+    ReceptionPath ();
 
     ~ReceptionPath ();
-
-    /**
-     * Getter for the operating frequency.
-     *
-     * \return The frequency this ReceivePath is configured to listen on.
-     */
-    double GetFrequency (void);
-
-    /**
-     * Setter for the frequency.
-     *
-     * \param frequencyMHz The frequency [MHz] this ReceptionPath will listen on.
-     */
-    void SetFrequency (double frequencyMHz);
 
     /**
      * Query whether this reception path is available to lock on a signal.
@@ -173,12 +159,7 @@ public:
      */
     void SetEndReceive (EventId endReceiveEventId);
 
-private:
-    /**
-     * The frequency this path is currently listening on, in MHz.
-     */
-    double m_frequencyMHz;
-
+  private:
     /**
      * Whether this reception path is available to lock on a signal or not.
      */
@@ -187,7 +168,7 @@ private:
     /**
      * The event this reception path is currently locked on.
      */
-    Ptr< LoraInterferenceHelper::Event > m_event;
+    Ptr<LoraInterferenceHelper::Event> m_event;
 
     /**
      * The EventId associated of the call to EndReceive that is scheduled to
@@ -200,7 +181,7 @@ private:
    * A list containing the various parallel receivers that are managed by this
    * Gateway.
    */
-  std::list<Ptr<ReceptionPath> > m_receptionPaths;
+  std::list<Ptr<ReceptionPath>> m_receptionPaths;
 
   /**
    * The number of occupied reception paths.
@@ -224,9 +205,11 @@ private:
   TracedCallback<Ptr<const Packet>, uint32_t> m_noReceptionBecauseTransmitting;
 
   bool m_isTransmitting; //!< Flag indicating whether a transmission is going on
+
+  std::list<double> m_frequencies;
 };
 
-} /* namespace ns3 */
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* GATEWAY_LORA_PHY_H */
