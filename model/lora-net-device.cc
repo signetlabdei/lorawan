@@ -52,12 +52,7 @@ LoraNetDevice::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&LoraNetDevice::GetMac,
                                         &LoraNetDevice::SetMac),
-                   MakePointerChecker<LorawanMac> ())
-    .AddTraceSource ("PromiscSniffer", 
-                      "Trace source simulating a promiscuous packet sniffer "
-                      "attached to the device",
-                      MakeTraceSourceAccessor (&LoraNetDevice::m_promiscSnifferTrace),
-                      "ns3::Packet::TracedCallback");
+                   MakePointerChecker<LorawanMac> ());
   return tid;
 }
 

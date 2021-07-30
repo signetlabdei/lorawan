@@ -165,8 +165,6 @@ private:
    * Upper layer callback used for notification of new data packet arrivals.
    */
   NetDevice::ReceiveCallback m_receiveCallback;
-  
-  TracedCallback<Ptr<const Packet> > m_promiscSnifferTrace;
 };
 
 } //namespace ns3
