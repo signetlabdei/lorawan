@@ -154,7 +154,7 @@ LoratapPcapHeader::FillHeader (LoraTag &tag)
   m_frequency = unsigned(int(tag.GetFrequency () * 1000000));
   m_bandwidth = 1; // 1 * 125kHz
   m_sf = tag.GetSpreadingFactor ();
-  std::cout << tag.GetReceivePower () << "\n";
+  //std::cout << tag.GetReceivePower () << "\n";
   m_packet_rssi = unsigned(int(139.5 + tag.GetReceivePower ())); //139.5 insted of 139 to approximate to nearest int
   //m_max_rssi = ?
   //m_current_rssi = ?
