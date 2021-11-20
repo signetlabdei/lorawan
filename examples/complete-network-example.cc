@@ -305,6 +305,9 @@ main (int argc, char *argv[])
   // Simulation //
   ////////////////
 
+  // Uncomment to activate bidirectional sniffing in the gateways
+  //helper.EnablePcap("lora", gateways);
+
   Simulator::Stop (appStopTime + Hours (1));
 
   NS_LOG_INFO ("Running simulation...");
