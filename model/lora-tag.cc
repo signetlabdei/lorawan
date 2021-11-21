@@ -49,7 +49,8 @@ LoraTag::LoraTag (uint8_t sf, uint8_t destroyedBy) :
   m_destroyedBy (destroyedBy),
   m_receivePower (0),
   m_dataRate (0),
-  m_frequency (0)
+  m_frequency (0),
+  m_snr (0)
 {
 }
 
@@ -61,8 +62,8 @@ uint32_t
 LoraTag::GetSerializedSize (void) const
 {
   // Each datum about a SF is 1 byte + receivePower (the size of a double) +
-  // frequency (the size of a double)
-  return 3 + 2 * sizeof(double);
+  // frequency (the size of a double) + SNR (the size of a double)
+  return 3 + 3 * sizeof(double);
 }
 
 void
@@ -73,6 +74,7 @@ LoraTag::Serialize (TagBuffer i) const
   i.WriteDouble (m_receivePower);
   i.WriteU8 (m_dataRate);
   i.WriteDouble (m_frequency);
+  i.WriteDouble (m_snr);
 }
 
 void
@@ -83,6 +85,7 @@ LoraTag::Deserialize (TagBuffer i)
   m_receivePower = i.ReadDouble ();
   m_dataRate = i.ReadU8 ();
   m_frequency = i.ReadDouble ();
+  m_snr = i.ReadDouble ();
 }
 
 void
@@ -150,6 +153,18 @@ void
 LoraTag::SetDataRate (uint8_t dataRate)
 {
   m_dataRate = dataRate;
+}
+
+double
+LoraTag::GetSnr (void)
+{
+  return m_snr;
+}
+
+void
+LoraTag::SetSnr (double snr)
+{
+  m_snr = snr;
 }
 
 }

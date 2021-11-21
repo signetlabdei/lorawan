@@ -149,15 +149,17 @@ LoratapHeader::Print (std::ostream &os) const
 void
 LoratapHeader::Fill (LoraTag &tag)
 {
-  //NS_LOG_FUNCTION (this << tag); // This doesn't work and I don't know why
+  NS_LOG_FUNCTION_NOARGS ();
   
   m_frequency = unsigned(int(tag.GetFrequency () * 1000000));
   m_bandwidth = 1; // 1 * 125kHz
   m_sf = tag.GetSpreadingFactor ();
-  m_packet_rssi = unsigned(int(139.5 + tag.GetReceivePower ())); //139.5 insted of 139 to approximate to nearest int
-  //m_max_rssi = ?
-  //m_current_rssi = ?
-  //m_snr = ?
+  double rssi = tag.GetReceivePower () + 139.0;
+  m_packet_rssi = unsigned(int(rssi + 0.5 - (rssi < 0))); //.5 to approximate to nearest int
+  m_max_rssi = m_packet_rssi; // maybe this can be done better
+  m_current_rssi = m_packet_rssi; // maybe this can be done better
+  double snr = tag.GetSnr ();
+  m_snr = unsigned(int(snr + 0.5 - (snr < 0)) * 4);
 }
 
 

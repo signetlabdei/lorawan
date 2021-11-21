@@ -276,11 +276,12 @@ SimpleGatewayLoraPhy::EndReceive (Ptr<Packet> packet, Ptr<LoraInterferenceHelper
 
           // Set the receive power and frequency of this packet in the LoraTag: this
           // information can be useful for upper layers trying to control link
-          // quality.
+          // quality and to fill the packet sniffing header.
           LoraTag tag;
           packet->RemovePacketTag (tag);
           tag.SetReceivePower (event->GetRxPowerdBm ());
           tag.SetFrequency (event->GetFrequency ());
+          tag.SetSnr (m_interference.ComputeSnr (event));
           packet->AddPacketTag (tag);
 
           // Fire the sniffer trace source

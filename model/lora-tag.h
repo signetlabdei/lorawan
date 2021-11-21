@@ -123,6 +123,20 @@ public:
    */
   void SetDataRate (uint8_t dataRate);
 
+  /**
+   * Get the SNR for this packet.
+   *
+   * \return The SNR measured during demodulation of this packet.
+   */
+  double GetSnr (void);
+
+  /**
+   * Set the SNR for this packet.
+   *
+   * \param snr The SNR.
+   */
+  void SetSnr (double snr);
+
 private:
   uint8_t m_sf; //!< The Spreading Factor used by the packet.
   uint8_t m_destroyedBy; //!< The Spreading Factor that destroyed the packet.
@@ -130,6 +144,7 @@ private:
   uint8_t m_dataRate; //!< The Data Rate that needs to be used to send this
   //!packet.
   double m_frequency; //!< The frequency of this packet
+  double m_snr; //!< The SNR of this packet during demodulation
 };
 } // namespace ns3
 }

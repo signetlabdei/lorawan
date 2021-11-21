@@ -360,6 +360,75 @@ LoraInterferenceHelper::IsDestroyedByInterference (Ptr<LoraInterferenceHelper::E
   return uint8_t (0);
 }
 
+
+double
+LoraInterferenceHelper::ComputeSnr (Ptr<LoraInterferenceHelper::Event> event)
+{
+  NS_LOG_FUNCTION (this << event);
+
+  // We want to see the interference affecting this event: cycle through events
+  // that overlap with this one and see whether it survives the interference or
+  // not.
+
+  // Gather information about the event
+  double rxPowerDbm = event->GetRxPowerdBm ();
+  double frequency = event->GetFrequency ();
+
+  // Handy information about the time frame when the packet was received
+  Time now = Simulator::Now ();
+  Time duration = event->GetDuration ();
+  Time packetStartTime = now - duration;
+  Time packetEndTime = now;
+
+  // Get the list of interfering events
+  std::list<Ptr<LoraInterferenceHelper::Event>>::iterator it;
+
+  // Energy for interferers of various SFs
+  double cumulativeInterferenceEnergy = 0.0;
+
+  // Cycle over the events
+  for (it = m_events.begin (); it != m_events.end ();)
+    {
+      // Pointer to the current interferer
+      Ptr<LoraInterferenceHelper::Event> interferer = *it;
+
+      // Only consider the current event if the channel is the same: we
+      // assume there's no interchannel interference. Also skip the current
+      // event if it's the same that we want to analyze.
+      if (!(interferer->GetFrequency () == frequency) || interferer == event)
+        {
+          it++;
+          continue; // Continues from the first line inside the for cycle
+        }
+
+      // Gather information about this interferer
+      double interfererPower = interferer->GetRxPowerdBm ();
+      Time interfererStartTime = interferer->GetStartTime ();
+      Time interfererEndTime = interferer->GetEndTime ();
+
+      // Compute the fraction of time the two events are overlapping
+      Time overlap = GetOverlapTime (event, interferer);
+
+      // Compute the equivalent energy of the interference
+      // Power [mW] = 10^(Power[dBm]/10)
+      // Power [W] = Power [mW] / 1000
+      double interfererPowerW = pow (10, interfererPower / 10) / 1000;
+      // Energy [J] = Time [s] * Power [W]
+      double interferenceEnergy = overlap.GetSeconds () * interfererPowerW;
+      cumulativeInterferenceEnergy += interferenceEnergy;
+      it++;
+    }
+
+  // Use the computed cumulativeInterferenceEnergy to determine whether the
+  // interference with this SF destroys the packet
+  double signalPowerW = pow (10, rxPowerDbm / 10) / 1000;
+  double signalEnergy = duration.GetSeconds () * signalPowerW;
+  double snr = 10 * log10 (signalEnergy / cumulativeInterferenceEnergy);
+
+  // Compute SNR. If no interference we put it to 10dB (ideal max).
+  return (snr < 10.0)? snr : 10.0;
+}
+
 void
 LoraInterferenceHelper::ClearAllEvents (void)
 {
