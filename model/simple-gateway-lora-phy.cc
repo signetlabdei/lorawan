@@ -283,7 +283,12 @@ SimpleGatewayLoraPhy::EndReceive (Ptr<Packet> packet, Ptr<LoraInterferenceHelper
           tag.SetFrequency (event->GetFrequency ());
           packet->AddPacketTag (tag);
 
+          // Fire the sniffer trace source
+          if (!m_phySniffRxTrace.IsEmpty ()) m_phySniffRxTrace (packet);
+
+          // Forward to upper layer
           m_rxOkCallback (packet);
+
         }
     }
 

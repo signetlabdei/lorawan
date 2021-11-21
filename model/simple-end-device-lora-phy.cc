@@ -304,6 +304,10 @@ SimpleEndDeviceLoraPhy::EndReceive (Ptr<Packet> packet,
       // If there is one, perform the callback to inform the upper layer
       if (!m_rxOkCallback.IsNull ())
         {
+          // Fire the sniffer trace source
+          if (!m_phySniffRxTrace.IsEmpty ()) m_phySniffRxTrace (packet);
+
+          // Forward to upper layer
           m_rxOkCallback (packet);
         }
 

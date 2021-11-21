@@ -124,6 +124,10 @@ public:
   void DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateways,
                             std::string filename);
 
+protected:
+  static void PcapSniffRxEvent (Ptr<PcapFileWrapper> file,
+                                Ptr<const Packet> packet);
+
 private:
   /**
    * Actually print the simulation time and re-schedule execution of this

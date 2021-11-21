@@ -23,7 +23,6 @@
 #include "ns3/node.h"
 #include "ns3/log.h"
 #include "ns3/abort.h"
-#include "ns3/loratap-pcap-header.h"
 
 namespace ns3 {
 namespace lorawan {
@@ -53,11 +52,7 @@ LoraNetDevice::GetTypeId (void)
                    MakePointerAccessor (&LoraNetDevice::GetMac,
                                         &LoraNetDevice::SetMac),
                    MakePointerChecker<LorawanMac> ())
-    .AddTraceSource ("PromiscSniffer", 
-                      "Trace source simulating a promiscuous packet sniffer "
-                      "attached to the device",
-                      MakeTraceSourceAccessor (&LoraNetDevice::m_promiscSnifferTrace),
-                      "ns3::Packet::TracedCallback");
+  ;
   return tid;
 }
 
@@ -65,8 +60,7 @@ LoraNetDevice::LoraNetDevice () :
   m_node (0),
   m_phy (0),
   m_mac (0),
-  m_configComplete (0),
-  m_pacpHdrEnabled (0)
+  m_configComplete (0)
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
@@ -116,13 +110,6 @@ LoraNetDevice::CompleteConfig (void)
 }
 
 void
-LoraNetDevice::EnablePcapHeader (void)
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  m_pacpHdrEnabled = true;
-}
-
-void
 LoraNetDevice::Send (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
@@ -130,17 +117,6 @@ LoraNetDevice::Send (Ptr<Packet> packet)
   // Send the packet to the MAC layer, if it exists
   NS_ASSERT (m_mac != 0);
   m_mac->Send (packet);
-  
-  if (m_pacpHdrEnabled)
-    {
-      Ptr<Packet> packetCopy = packet -> Copy ();
-      LoraTag tag;
-      packetCopy -> RemovePacketTag (tag);
-      LoratapPcapHeader loratap;
-      loratap.FillHeader (tag);
-      packetCopy -> AddHeader (loratap);
-      m_promiscSnifferTrace (packetCopy);
-    }
 }
 
 void
@@ -151,17 +127,6 @@ LoraNetDevice::Receive (Ptr<Packet> packet)
   // Fill protocol and address with empty stuff
   NS_LOG_DEBUG ("Calling receiveCallback");
   m_receiveCallback (this, packet, 0, Address ());
-  
-  if (m_pacpHdrEnabled)
-    {
-      Ptr<Packet> packetCopy = packet -> Copy ();
-      LoraTag tag;
-      packetCopy -> RemovePacketTag (tag);
-      LoratapPcapHeader loratap;
-      loratap.FillHeader (tag);
-      packetCopy -> AddHeader (loratap);
-      m_promiscSnifferTrace (packetCopy);
-    }
 }
 
 /******************************************

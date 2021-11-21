@@ -18,17 +18,17 @@
  * Author: Alessandro Aimi <alleaimi95@gmail.com>
  */
 
-#include "ns3/loratap-pcap-header.h"
+#include "ns3/loratap-header.h"
 #include "ns3/log.h"
 #include <bitset>
 
 namespace ns3 {
 namespace lorawan {
 
-NS_LOG_COMPONENT_DEFINE ("LoratapPcapHeader");
+NS_LOG_COMPONENT_DEFINE ("LoratapHeader");
 
 // Initialization list
-LoratapPcapHeader::LoratapPcapHeader () :
+LoratapHeader::LoratapHeader () :
   m_lt_version (0),
   m_lt_padding (0),
   m_lt_length (0),
@@ -43,41 +43,41 @@ LoratapPcapHeader::LoratapPcapHeader () :
 {
 }
 
-LoratapPcapHeader::~LoratapPcapHeader ()
+LoratapHeader::~LoratapHeader ()
 {
 }
 
 TypeId
-LoratapPcapHeader::GetTypeId (void)
+LoratapHeader::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("LoratapPcapHeader")
+  static TypeId tid = TypeId ("LoratapHeader")
     .SetParent<Header> ()
-    .AddConstructor<LoratapPcapHeader> ()
+    .AddConstructor<LoratapHeader> ()
   ;
   return tid;
 }
 
 TypeId
-LoratapPcapHeader::GetInstanceTypeId (void) const
+LoratapHeader::GetInstanceTypeId (void) const
 {
   return GetTypeId ();
 }
 
 uint32_t
-LoratapPcapHeader::GetSerializedSize (void) const
+LoratapHeader::GetSerializedSize (void) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
   // Size in bytes, always the same
   uint32_t size = 15;
 
-  NS_LOG_INFO ("LoratapPcapHeader serialized size: " << size);
+  NS_LOG_INFO ("LoratapHeader serialized size: " << size);
 
   return size;
 }
 
 void
-LoratapPcapHeader::Serialize (Buffer::Iterator start) const
+LoratapHeader::Serialize (Buffer::Iterator start) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -95,7 +95,7 @@ LoratapPcapHeader::Serialize (Buffer::Iterator start) const
 }
 
 uint32_t
-LoratapPcapHeader::Deserialize (Buffer::Iterator start)
+LoratapHeader::Deserialize (Buffer::Iterator start)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -129,7 +129,7 @@ LoratapPcapHeader::Deserialize (Buffer::Iterator start)
 }
 
 void
-LoratapPcapHeader::Print (std::ostream &os) const
+LoratapHeader::Print (std::ostream &os) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -147,14 +147,13 @@ LoratapPcapHeader::Print (std::ostream &os) const
 }
 
 void
-LoratapPcapHeader::FillHeader (LoraTag &tag)
+LoratapHeader::Fill (LoraTag &tag)
 {
-  //NS_LOG_FUNCTION (this << tag); This doesn't work and I don't know why
+  //NS_LOG_FUNCTION (this << tag); // This doesn't work and I don't know why
   
   m_frequency = unsigned(int(tag.GetFrequency () * 1000000));
   m_bandwidth = 1; // 1 * 125kHz
   m_sf = tag.GetSpreadingFactor ();
-  //std::cout << tag.GetReceivePower () << "\n";
   m_packet_rssi = unsigned(int(139.5 + tag.GetReceivePower ())); //139.5 insted of 139 to approximate to nearest int
   //m_max_rssi = ?
   //m_current_rssi = ?

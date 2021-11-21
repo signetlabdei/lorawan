@@ -18,8 +18,8 @@
  * Author: Alessandro Aimi <alleaimi95@gmail.com>
  */
 
-#ifndef LORATAP_PCAP_HEADER_H
-#define LORATAP_PCAP_HEADER_H
+#ifndef LORATAP_HEADER_H
+#define LORATAP_HEADER_H
 
 #include "ns3/header.h"
 #include "ns3/lora-tag.h"
@@ -31,11 +31,11 @@ namespace lorawan {
  * This class represents the LoRaTap header that needs to be added to a packet 
  * before it is traced using Pcap.
  */
-class LoratapPcapHeader : public Header
+class LoratapHeader : public Header
 {
 public:
-  LoratapPcapHeader ();
-  ~LoratapPcapHeader ();
+  LoratapHeader ();
+  ~LoratapHeader ();
 
   // Methods inherited from Header
   static TypeId GetTypeId (void);
@@ -59,7 +59,7 @@ public:
   virtual void Serialize (Buffer::Iterator start) const;
 
   /**
-   * Deserialize the contents of the buffer into a LoratapPcapHeader object.
+   * Deserialize the contents of the buffer into a LoratapHeader object.
    *
    * \param start A pointer to the buffer we need to deserialize.
    * \return The number of consumed bytes.
@@ -78,7 +78,7 @@ public:
    *
    * \param tag The tag of the packet we want to add the header to.
    */
-  void FillHeader (LoraTag &tag);
+  void Fill (LoraTag &tag);
 
   private:
   

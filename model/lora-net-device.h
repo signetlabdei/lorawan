@@ -79,11 +79,6 @@ public:
   Ptr<LoraPhy> GetPhy (void) const;
   
   /**
-   * Enable addition of Pcap header to packets before firing Sniffer callback.
-   */
-  void EnablePcapHeader (void);
-
-  /**
    * Send a packet through the LoRaWAN stack.
    *
    * \param packet The packet to send.
@@ -159,14 +154,12 @@ private:
   Ptr<LoraPhy> m_phy; //!< The LoraPhy this NetDevice is connected to.
   Ptr<LorawanMac> m_mac; //!< The LorawanMac this NetDevice is connected to.
   bool m_configComplete; //!< Whether the configuration was already completed.
-  bool m_pacpHdrEnabled; //!< Whether pcap header addition is enabled on instantiation.
 
   /**
    * Upper layer callback used for notification of new data packet arrivals.
    */
   NetDevice::ReceiveCallback m_receiveCallback;
 
-  TracedCallback<Ptr<const Packet> > m_promiscSnifferTrace;
 };
 
 } //namespace ns3

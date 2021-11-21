@@ -314,6 +314,13 @@ protected:
    */
   TracedCallback<Ptr<const Packet>, uint32_t> m_interferedPacket;
 
+  /**
+   * The trace source fired when a received packet is sniffed.
+   *
+   * \see class CallBackTraceSource
+   */
+  TracedCallback<Ptr<const Packet> > m_phySniffRxTrace;
+
   // Callbacks
 
   /**
