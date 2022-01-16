@@ -1,13 +1,13 @@
-/*
- * This script simulates a complex scenario with multiple gateways and end
- * devices. The metric of interest for this script is the throughput of the
- * network.
- */
-
+#include "ns3/callback.h"
 #include "ns3/end-device-lora-phy.h"
 #include "ns3/gateway-lora-phy.h"
 #include "ns3/end-device-lorawan-mac.h"
 #include "ns3/gateway-lorawan-mac.h"
+#include "ns3/lora-device-address.h"
+#include "ns3/lora-frame-header.h"
+#include "ns3/lora-net-device.h"
+#include "ns3/lora-phy.h"
+#include "ns3/lorawan-mac-header.h"
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "ns3/pointer.h"
@@ -43,30 +43,60 @@ double simulationTime = 100;
 // Channel model
 bool realisticChannelModel = false;
 
-int appPeriodSeconds = simulationTime;
-int transientPeriods = 0;
+std::vector<int> packetsSent (6, 0);
+std::vector<int> packetsReceived (6, 0);
+
+void
+OnTransmissionCallback (Ptr<Packet const> packet, uint32_t systemId)
+{
+  NS_LOG_FUNCTION (packet << systemId);
+  LoraTag tag;
+  packet->PeekPacketTag(tag);
+  packetsSent.at(tag.GetSpreadingFactor()-7)++;
+}
+
+void
+OnPacketReceptionCallback (Ptr<Packet const> packet, uint32_t systemId)
+{
+  NS_LOG_FUNCTION (packet << systemId);
+  LoraTag tag;
+  packet->PeekPacketTag(tag);
+  packetsReceived.at(tag.GetSpreadingFactor()-7)++;
+}
 
 int
 main (int argc, char *argv[])
 {
 
+  std::string interferenceMatrix = "aloha";
+
   CommandLine cmd;
   cmd.AddValue ("nDevices", "Number of end devices to include in the simulation", nDevices);
+  cmd.AddValue ("simulationTime", "Simulation Time", simulationTime);
+  cmd.AddValue ("interferenceMatrix", "Interference matrix to use [aloha, goursaud]", interferenceMatrix);
+  cmd.AddValue ("radius", "Radius of the deployment", radius);
   cmd.Parse (argc, argv);
+
+  int appPeriodSeconds = simulationTime;
 
   // Set up logging
   LogComponentEnable ("AlohaThroughput", LOG_LEVEL_ALL);
 
   // Make all devices use SF7 (i.e., DR5)
-  Config::SetDefault ("ns3::EndDeviceLorawanMac::DataRate", UintegerValue (5));
-  LoraInterferenceHelper::collisionMatrix = LoraInterferenceHelper::ALOHA;
+  // Config::SetDefault ("ns3::EndDeviceLorawanMac::DataRate", UintegerValue (5));
+
+  if (interferenceMatrix == "aloha")
+  {
+    LoraInterferenceHelper::collisionMatrix = LoraInterferenceHelper::ALOHA;
+  }
+  else if (interferenceMatrix == "goursaud")
+  {
+    LoraInterferenceHelper::collisionMatrix = LoraInterferenceHelper::GOURSAUD;
+  }
 
   /***********
    *  Setup  *
    ***********/
-
-  // Create the time value from the period
-  Time appPeriod = Seconds (appPeriodSeconds);
 
   // Mobility
   MobilityHelper mobility;
@@ -192,15 +222,49 @@ main (int argc, char *argv[])
    *********************************************/
 
   Time appStopTime = Seconds (simulationTime);
+  int packetSize = 50;
   PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
   appHelper.SetPeriod (Seconds (appPeriodSeconds));
-  appHelper.SetPacketSize (150);
-  Ptr<RandomVariableStream> rv = CreateObjectWithAttributes<UniformRandomVariable> (
-      "Min", DoubleValue (0), "Max", DoubleValue (10));
+  appHelper.SetPacketSize (packetSize);
   ApplicationContainer appContainer = appHelper.Install (endDevices);
 
   appContainer.Start (Seconds (0));
   appContainer.Stop (appStopTime);
+
+
+  std::ofstream outputFile;
+  // Delete contents of the file as it is opened
+  outputFile.open ("durations.txt", std::ofstream::out | std::ofstream::trunc);
+  for (uint8_t sf = 7; sf <= 12; sf++)
+    {
+      LoraTxParameters txParams;
+      txParams.sf = sf;
+      txParams.headerDisabled = 0;
+      txParams.codingRate = 1;
+      txParams.bandwidthHz = 125000;
+      txParams.nPreamble = 8;
+      txParams.crcEnabled = 1;
+      txParams.lowDataRateOptimizationEnabled =
+          LoraPhy::GetTSym (txParams) > MilliSeconds (16) ? true : false;
+      Ptr<Packet> pkt = Create<Packet> (packetSize);
+
+      LoraFrameHeader frameHdr = LoraFrameHeader ();
+      frameHdr.SetAsUplink ();
+      frameHdr.SetFPort (1);
+      frameHdr.SetAddress (LoraDeviceAddress ());
+      frameHdr.SetAdr (0);
+      frameHdr.SetAdrAckReq (0);
+      frameHdr.SetFCnt (0);
+      pkt->AddHeader (frameHdr);
+
+      LorawanMacHeader macHdr = LorawanMacHeader ();
+      macHdr.SetMType (ns3::lorawan::LorawanMacHeader::UNCONFIRMED_DATA_UP);
+      macHdr.SetMajor (1);
+      pkt->AddHeader (macHdr);
+
+      outputFile << LoraPhy::GetOnAirTime (pkt, txParams).GetMicroSeconds() << " ";
+    }
+  outputFile.close ();
 
   /**************************
    *  Create Network Server  *
@@ -218,6 +282,22 @@ main (int argc, char *argv[])
   //Create a forwarder for each gateway
   forHelper.Install (gateways);
 
+  // Install trace sources
+  for (NodeContainer::Iterator node = gateways.Begin (); node != gateways.End(); node++)
+  {
+    (*node)->GetDevice (0)->GetObject<LoraNetDevice> ()->GetPhy ()->TraceConnectWithoutContext (
+        "ReceivedPacket", MakeCallback (OnPacketReceptionCallback));
+  }
+
+  // Install trace sources
+  for (NodeContainer::Iterator node = endDevices.Begin (); node != endDevices.End(); node++)
+  {
+    (*node)->GetDevice (0)->GetObject<LoraNetDevice> ()->GetPhy ()->TraceConnectWithoutContext (
+        "StartSending", MakeCallback (OnTransmissionCallback));
+  }
+
+  macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
+
   ////////////////
   // Simulation //
   ////////////////
@@ -234,10 +314,10 @@ main (int argc, char *argv[])
   /////////////////////////////
   NS_LOG_INFO ("Computing performance metrics...");
 
-  LoraPacketTracker &tracker = helper.GetPacketTracker ();
-
-  std::cout << tracker.PrintPhyPacketsPerGw (Seconds (0), appStopTime + Hours (1), nDevices)
-            << std::endl;
+  for (int i = 0; i < 6; i++)
+  {
+    std::cout << packetsSent.at(i) << " " << packetsReceived.at(i) << std::endl;
+  }
 
   return 0;
 }
