@@ -35,19 +35,17 @@ using namespace lorawan;
 NS_LOG_COMPONENT_DEFINE ("ComplexLorawanNetworkExample");
 
 // Network settings
-int nDevices = 120;
+int nDevices = 200;
 int nGateways = 1;
-double radius = 6300; //Note that due to model updates, 7500 m is no longer the maximum distance 
-double simulationTime = 591*50;
+double radius = 6400; //Note that due to model updates, 7500 m is no longer the maximum distance 
+double simulationTime = 600;
 
 // Channel model
 bool realisticChannelModel = false;
 
-int confirmedPercentage = 15; 
+int appPeriodSeconds = 600;
 
-int appPeriodSeconds = 591;
-
-int numberOfTransmissions = 3; // The maximum number of transmissions allowed, valid is [1:15]
+int numberOfTransmissions = 1; // The maximum number of transmissions allowed, valid is [1:15]
 
 // Output control
 bool print = true;
@@ -192,11 +190,6 @@ main (int argc, char *argv[])
 
   // Now end devices are connected to the channel
 
-  // Figure out how many devices should employ confirmed traffic
-  int confirmedNumber = confirmedPercentage * endDevices.GetN () / 100;
-  int i = 0;
-
-
   // Connect trace sources
   for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j)
     {
@@ -204,16 +197,9 @@ main (int argc, char *argv[])
       Ptr<LoraNetDevice> loraNetDevice = node->GetDevice (0)->GetObject<LoraNetDevice> ();
       Ptr<LoraPhy> phy = loraNetDevice->GetPhy ();
 
-
       Ptr<LorawanMac> edMac = loraNetDevice->GetMac ();
       Ptr<ClassAEndDeviceLorawanMac> edLorawanMac = edMac->GetObject<ClassAEndDeviceLorawanMac> ();
       edLorawanMac->SetMaxNumberOfTransmissions (numberOfTransmissions);
-
-            // Set message type, otherwise the NS does not send ACKs
-      if (i < confirmedNumber)
-      {
-       edLorawanMac->SetMType (LorawanMacHeader::CONFIRMED_DATA_UP);
-      }
     }
 
   /*********************
