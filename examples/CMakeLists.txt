@@ -1,63 +1,62 @@
-set(name simple-network-example)
-set(source_files ${name}.cc)
-set(header_files)
-set(libraries_to_link ${libcore} ${liblorawan})
 build_lib_example(
-  "${name}" "${source_files}" "${header_files}" "${libraries_to_link}"
+  NAME simple-network-example
+  SOURCE_FILES simple-network-example.cc
+  LIBRARIES_TO_LINK
+  ${libcore} ${liblorawan}
 )
 
-set(name network-server-example)
-set(source_files ${name}.cc)
-set(header_files)
-set(libraries_to_link ${libcore} ${liblorawan})
 build_lib_example(
-  "${name}" "${source_files}" "${header_files}" "${libraries_to_link}"
+  NAME network-server-example
+  SOURCE_FILES network-server-example.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${liblorawan}
 )
 
-set(name complete-network-example)
-set(source_files ${name}.cc)
-set(header_files)
-set(libraries_to_link ${libcore} ${liblorawan})
 build_lib_example(
-  "${name}" "${source_files}" "${header_files}" "${libraries_to_link}"
+  NAME complete-network-example
+  SOURCE_FILES complete-network-example.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${liblorawan}
 )
 
-set(name adr-example)
-set(source_files ${name}.cc)
-set(header_files)
-set(libraries_to_link ${libcore} ${liblorawan})
 build_lib_example(
-  "${name}" "${source_files}" "${header_files}" "${libraries_to_link}"
+  NAME adr-example
+  SOURCE_FILES adr-example.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${liblorawan}
 )
 
-set(name energy-model-example)
-set(source_files ${name}.cc)
-set(header_files)
-set(libraries_to_link ${libcore} ${liblorawan})
 build_lib_example(
-  "${name}" "${source_files}" "${header_files}" "${libraries_to_link}"
+  NAME lorawan-energy-model-example
+  SOURCE_FILES lorawan-energy-model-example.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${liblorawan}
 )
 
-set(name aloha-throughput)
-set(source_files ${name}.cc)
-set(header_files)
-set(libraries_to_link ${libcore} ${liblorawan})
 build_lib_example(
-  "${name}" "${source_files}" "${header_files}" "${libraries_to_link}"
+  NAME aloha-throughput
+  SOURCE_FILES aloha-throughput.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${liblorawan}
 )
 
-set(name parallel-reception-example)
-set(source_files ${name}.cc)
-set(header_files)
-set(libraries_to_link ${libcore} ${liblorawan})
 build_lib_example(
-  "${name}" "${source_files}" "${header_files}" "${libraries_to_link}"
+  NAME parallel-reception-example
+  SOURCE_FILES parallel-reception-example.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${liblorawan}
 )
 
-set(name frame-counter-update)
-set(source_files ${name}.cc)
-set(header_files)
-set(libraries_to_link ${libcore} ${liblorawan})
 build_lib_example(
-  "${name}" "${source_files}" "${header_files}" "${libraries_to_link}"
+  NAME frame-counter-update
+  SOURCE_FILES frame-counter-update.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${liblorawan}
 )

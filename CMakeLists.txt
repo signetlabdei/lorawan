@@ -1,5 +1,3 @@
-set(name lorawan)
-
 set(source_files
     model/lora-net-device.cc
     model/lorawan-mac.cc
@@ -101,18 +99,21 @@ set(header_files
     test/utilities.h
 )
 
-set(libraries_to_link ${libnetwork} ${libpropagation} ${libenergy}
-  ${libpoint-to-point} ${libbuildings} ${libmobility}
-)
-
-set(test_sources
+build_lib(
+  LIBNAME lorawan
+  SOURCE_FILES ${source_files}
+  HEADER_FILES ${header_files}
+  LIBRARIES_TO_LINK
+    ${libnetwork}
+    ${libpropagation}
+    ${libenergy}
+    ${libpoint-to-point}
+    ${libbuildings}
+    ${libmobility}
+  TEST_SOURCES
     test/utilities.cc
     test/lorawan-test-suite.cc
     test/network-status-test-suite.cc
     test/network-scheduler-test-suite.cc
     test/network-server-test-suite.cc
-)
-
-build_lib("${name}" "${source_files}" "${header_files}" "${libraries_to_link}"
-  "${test_sources}"
 )
