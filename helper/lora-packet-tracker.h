@@ -66,7 +66,7 @@ struct RetransmissionStatus
 };
 
 typedef std::map<Ptr<Packet const>, MacPacketStatus> MacPacketData;
-typedef std::map<Ptr<Packet const>, PacketStatus> PhyPacketData;
+typedef std::multimap<Ptr<Packet const>, PacketStatus> PhyPacketData;
 typedef std::map<Ptr<Packet const>, RetransmissionStatus> RetransmissionData;
 
 
@@ -107,6 +107,10 @@ public:
   //                            macPacketTracker, RetransmissionData reTransmissionTracker,
   //                            PhyPacketData packetTracker);
 
+  /* 
+  * Sets a packet's outcome at a specified gateway to one of PhyPacketOutcome's values. 
+  */
+  void SetPacketOutcome(Ptr<Packet const> packet, std::pair<int, enum PhyPacketOutcome> outcome);
   /**
    * Count packets to evaluate the performance at PHY level of a specific
    * gateway.
