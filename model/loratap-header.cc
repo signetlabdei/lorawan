@@ -154,12 +154,12 @@ LoratapHeader::Fill (LoraTag &tag)
   m_frequency = unsigned(int(tag.GetFrequency () * 1000000));
   m_bandwidth = 1; // 1 * 125kHz
   m_sf = tag.GetSpreadingFactor ();
-  double rssi = tag.GetReceivePower () + 139.0;
-  m_packet_rssi = unsigned(int(rssi + 0.5 - (rssi < 0))); //.5 to approximate to nearest int
-  m_max_rssi = m_packet_rssi; // maybe this can be done better
-  m_current_rssi = m_packet_rssi; // maybe this can be done better
-  double snr = tag.GetSnr ();
-  m_snr = unsigned(int(snr + 0.5 - (snr < 0)) * 4);
+  int snr = tag.GetSnr () + 0.5 - (tag.GetSnr () < 0); //.5 to approximate to nearest int
+  int rssi = tag.GetReceivePower () + 0.5 - (tag.GetReceivePower () < 0);
+  m_packet_rssi = rssi + 139;
+  m_max_rssi = m_packet_rssi; // Arbitrary
+  m_current_rssi = 0; // -139.0 dBm, arbitrary
+  m_snr = snr * 4;
 }
 
 
