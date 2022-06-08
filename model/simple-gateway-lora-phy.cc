@@ -281,7 +281,7 @@ SimpleGatewayLoraPhy::EndReceive (Ptr<Packet> packet, Ptr<LoraInterferenceHelper
           packet->RemovePacketTag (tag);
           tag.SetReceivePower (event->GetRxPowerdBm ());
           tag.SetFrequency (event->GetFrequency ());
-          tag.SetSnr (m_interference.ComputeSnr (event));
+          tag.SetSnr (RxPowerToSNR (event->GetRxPowerdBm ()));
           packet->AddPacketTag (tag);
 
           // Fire the sniffer trace source

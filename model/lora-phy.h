@@ -258,6 +258,16 @@ private:
   Ptr<MobilityModel> m_mobility;   //!< The mobility model associated to this PHY.
 
 protected:
+
+  /**
+   * Compute the Signal to Noise Ratio (SNR) from the transmission power 
+   * measured at packet reception.
+   *
+   * \param transmissionPower The reception transmission power (dBm)
+   * \return The SNR value in dB.
+   */
+  double RxPowerToSNR (double transmissionPower);
+
   // Member objects
 
   Ptr<NetDevice> m_device; //!< The net device this PHY is attached to.
@@ -266,6 +276,12 @@ protected:
 
   LoraInterferenceHelper m_interference; //!< The LoraInterferenceHelper
   //!associated to this PHY.
+
+  // Constants
+
+  const int B = 125000; //!Bandwidth (Hz)
+
+  const int NF = 6; //! Noise Figure (dB)
 
   // Trace sources
 

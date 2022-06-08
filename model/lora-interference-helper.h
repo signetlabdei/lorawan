@@ -176,15 +176,6 @@ public:
   uint8_t IsDestroyedByInterference (Ptr<LoraInterferenceHelper::Event> event);
 
   /**
-   * Compute the SNR of the packet during demodulation by measuring interference
-   *  energy of all overlapping transmissions on the same frequency.
-
-   * \param event The event for which to check the outcome.
-   * \return The SNR of the packet.
-   */
-  double ComputeSnr (Ptr<LoraInterferenceHelper::Event> event);
-
-  /**
    * Compute the time duration in which two given events are overlapping.
    *
    * \param event1 The first event

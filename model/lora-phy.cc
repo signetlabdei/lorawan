@@ -212,6 +212,12 @@ LoraPhy::GetOnAirTime (Ptr<Packet> packet, LoraTxParameters txParams)
   return Seconds (tPreamble + tPayload);
 }
 
+double LoraPhy::RxPowerToSNR (double transmissionPower)
+{
+  //The following conversion ignores interfering packets
+  return transmissionPower + 174 - 10 * log10 (B) - NF;
+}
+
 std::ostream &operator << (std::ostream &os, const LoraTxParameters &params)
 {
   os << "SF: " << unsigned(params.sf) <<
