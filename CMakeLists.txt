@@ -88,7 +88,7 @@ set(header_files
     model/lora-utils.h
     model/adr-component.h
     model/hex-grid-position-allocator.h
-    model/loratap-header.cc
+    model/loratap-header.h
     helper/lora-radio-energy-model-helper.h
     helper/lora-helper.h
     helper/lora-phy-helper.h
