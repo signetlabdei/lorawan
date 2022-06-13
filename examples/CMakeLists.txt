@@ -60,3 +60,11 @@ build_lib_example(
     ${libcore}
     ${liblorawan}
 )
+
+build_lib_example(
+  NAME pcap-example
+  SOURCE_FILES pcap-example.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${liblorawan}
+)
