@@ -1,3 +1,5 @@
 /.dir-locals.el
 *.png
 *.dat
+
+.vscode
