@@ -112,7 +112,7 @@ EndDeviceLorawanMac::EndDeviceLorawanMac ()
     : m_enableDRAdapt (false),
       m_maxNumbTx (8),
       m_dataRate (0),
-      m_txPower (14),
+      m_txPower (16),
       m_codingRate (1),
       // LoraWAN default
       m_headerDisabled (0),
