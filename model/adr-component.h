@@ -119,7 +119,11 @@ private:
   //ranging from 7 to 12 (the SNR values are in dB).
   double treshold[6] = {-20.0, -17.5, -15.0, -12.5, -10.0, -7.5};
 
+  //Regulate power in the ADR algorithm
   bool m_toggleTxPower;
+
+  //Additional SNR margin to decrease SF/TXPower
+  double m_deviceMargin;
 };
 }
 }

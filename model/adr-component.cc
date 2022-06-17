@@ -67,6 +67,9 @@ TypeId AdrComponent::GetTypeId (void)
                    BooleanValue (true),
                    MakeBooleanAccessor (&AdrComponent::m_toggleTxPower),
                    MakeBooleanChecker ())
+    .AddAttribute ("SNRDeviceMargin", "Additional SNR margin needed to decrease SF/TxPower",
+                   DoubleValue (0), MakeDoubleAccessor (&AdrComponent::m_deviceMargin),
+                   MakeDoubleChecker<double> ())
   ;
   return tid;
 }
@@ -214,7 +217,7 @@ void AdrComponent::AdrImplementation (uint8_t *newDataRate,
 
   //Compute the SNR margin taking into consideration the SNR of
   //previously received packets
-  double margin_SNR = m_SNR - req_SNR;
+  double margin_SNR = m_SNR - req_SNR - m_deviceMargin;
 
   NS_LOG_DEBUG ("Margin = " << margin_SNR);
 
