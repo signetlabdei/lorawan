@@ -130,6 +130,7 @@ public:
   };
 
   enum CollisionMatrix {
+    CROCE,
     GOURSAUD,
     ALOHA,
   };
@@ -200,6 +201,7 @@ public:
 
   static std::vector<std::vector<double>> collisionSnirAloha;
   static std::vector<std::vector<double>> collisionSnirGoursaud;
+  static std::vector<std::vector<double>> collisionSnirCroce;
 
 private:
   void SetCollisionMatrix (enum CollisionMatrix collisionMatrix);
