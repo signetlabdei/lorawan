@@ -68,3 +68,11 @@ build_lib_example(
     ${libcore}
     ${liblorawan}
 )
+
+build_lib_example(
+  NAME congestion-example
+  SOURCE_FILES congestion-example.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${liblorawan}
+)
