@@ -1,5 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
+ * Copyright (c) 2022 Orange SA
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation;
@@ -13,159 +15,129 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Davide Magrin <magrinda@dei.unipd.it>
+ * Author: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                         <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/log.h"
-#include "ns3/hex-grid-position-allocator.h"
+#include "hex-grid-position-allocator.h"
+
 #include "ns3/double.h"
+
+#include <assert.h>
 
 namespace ns3 {
 
-  NS_LOG_COMPONENT_DEFINE ("HexGridPositionAllocator");
+NS_LOG_COMPONENT_DEFINE ("HexGridPositionAllocator");
 
-  NS_OBJECT_ENSURE_REGISTERED (HexGridPositionAllocator);
+NS_OBJECT_ENSURE_REGISTERED (HexGridPositionAllocator);
 
-  TypeId
-  HexGridPositionAllocator::GetTypeId (void)
-  {
-    static TypeId tid = TypeId ("ns3::HexGridPositionAllocator")
-      .SetParent<PositionAllocator> ()
-      .AddConstructor<HexGridPositionAllocator> ()
-      .SetGroupName ("Lora")
-      .AddAttribute ("Radius", "The radius of a single hexagon",
-                     DoubleValue (6000),
-                     MakeDoubleAccessor (&HexGridPositionAllocator::m_radius),
-                     MakeDoubleChecker<double> ())
-      .AddAttribute ("Z", "Vertical position of nodes",
-                     DoubleValue (0.0),
-                     MakeDoubleAccessor (&HexGridPositionAllocator::m_radius),
-                     MakeDoubleChecker<double> ())
-    ;
-    return tid;
-  }
+TypeId
+HexGridPositionAllocator::GetTypeId (void)
+{
+  static TypeId tid =
+      TypeId ("ns3::HexGridPositionAllocator")
+          .SetParent<PositionAllocator> ()
+          .AddConstructor<HexGridPositionAllocator> ()
+          .SetGroupName ("Lora")
+          .AddAttribute ("distance", "The distance between two nodes", DoubleValue (6000),
+                         MakeDoubleAccessor (&HexGridPositionAllocator::SetDistance),
+                         MakeDoubleChecker<double> ())
+          .AddAttribute ("Z", "Vertical position of nodes", DoubleValue (0.0),
+                         MakeDoubleAccessor (&HexGridPositionAllocator::SetZ),
+                         MakeDoubleChecker<double> ());
+  return tid;
+}
 
-  HexGridPositionAllocator::HexGridPositionAllocator () :
-    m_radius (6000)
-  {
-    NS_LOG_FUNCTION_NOARGS ();
+HexGridPositionAllocator::HexGridPositionAllocator ()
+{
+  NS_LOG_FUNCTION_NOARGS ();
 
-    // Create the first position
-    m_positions.push_back (Vector (0.0,0.0,m_z));
+  ResetCoordinates ();
+}
 
-    // Add rings
-    for (int i = 0; i < 20; i++) {
-      m_positions = AddRing(m_positions);
+HexGridPositionAllocator::~HexGridPositionAllocator ()
+{
+  NS_LOG_FUNCTION_NOARGS ();
+}
+
+Vector
+HexGridPositionAllocator::GetNext (void) const
+{
+  Vector position = ObtainCurrentPosition ();
+  // Shift coordinates to point next position
+  // Standard case (Most common when going infinite)
+  if (m_hex < m_ring - 1)
+    {
+      m_hex++;
+      return position;
     }
-
-    // Set the iterator
-    m_next = m_positions.begin();
-  }
-
-  HexGridPositionAllocator::HexGridPositionAllocator (double radius) :
-    m_radius (radius)
-  {
-    NS_LOG_FUNCTION_NOARGS ();
-
-    // Create the first position
-    m_positions.push_back (Vector (0.0,0.0,m_z));
-
-    // Add a couple rings
-    // Add rings
-    for (int i = 0; i < 20; i++) {
-      m_positions = AddRing(m_positions);
+  // Sector finished (but not ring!)
+  if (m_sector < 5)
+    {
+      m_sector++;
+      m_hex = 0;
+      return position;
     }
+  // Ring finished
+  m_ring++;
+  m_sector = 0;
+  m_hex = 0;
+  return position;
+}
 
-    // Set the iterator
-    m_next = m_positions.begin();
-  }
+int64_t
+HexGridPositionAllocator::AssignStreams (int64_t stream)
+{
+  return 0;
+}
 
-  HexGridPositionAllocator::~HexGridPositionAllocator ()
-  {
-    NS_LOG_FUNCTION_NOARGS ();
-  }
+void
+HexGridPositionAllocator::SetDistance (double distance)
+{
+  assert (distance > 0);
+  m_d = distance;
+  ResetCoordinates ();
+}
 
-  const double HexGridPositionAllocator::pi = std::acos(-1);
+void
+HexGridPositionAllocator::SetZ (double z)
+{
+  assert (z >= 0);
+  m_z = z;
+  ResetCoordinates ();
+}
 
-  double
-  HexGridPositionAllocator::GetRadius (void)
-  {
-    return m_radius;
-  }
+Vector
+HexGridPositionAllocator::ObtainCurrentPosition () const
+{
+  NS_LOG_DEBUG ("Coordinates: ring=" << m_ring << ", sector=" << m_sector << ", hex=" << m_hex);
 
-  void
-  HexGridPositionAllocator::SetRadius (double radius)
-  {
-    m_radius = radius;
-  }
+  // First vector
+  double v1_x = -std::sin (p3 * m_sector) * m_d * m_ring;
+  double v1_y = std::cos (p3 * m_sector) * m_d * m_ring;
 
-  void
-  HexGridPositionAllocator::SetZ (double z)
-  {
-    m_z = z;
-  }
+  // Second vector
+  double v2_x = -std::sin (p3 * (m_sector + 2)) * m_d * m_hex;
+  double v2_y = std::cos (p3 * (m_sector + 2)) * m_d * m_hex;
 
-  Vector
-  HexGridPositionAllocator::GetNext (void) const
-  {
-    // TODO: Check that there is a next element
-    Vector position = *m_next;
-    m_next++;
-    return position;
-  }
+  // Sum vectors
+  double x = v1_x + v2_x;
+  double y = v1_y + v2_y;
 
-  int64_t
-  HexGridPositionAllocator::AssignStreams (int64_t stream)
-  {
-    return 0;
-  }
+  Vector position (x, y, m_z);
 
-  std::vector<Vector>
-  HexGridPositionAllocator::AddRing (std::vector<Vector> positions)
-  {
-    NS_LOG_FUNCTION (this);
+  NS_LOG_DEBUG ("New position: " << position);
 
-    // Make a copy of the vector
-    std::vector<Vector> copy = positions;
+  return position;
+}
 
-    // Iterate on the given vector
-    for (std::vector<Vector>::iterator it = positions.begin ();
-         it != positions.end (); it++)
-      {
-        // Get the current position
-        Vector currentPosition = *it;
-        NS_LOG_DEBUG ("Current position " << currentPosition);
+void
+HexGridPositionAllocator::ResetCoordinates (void)
+{
+  // Special initialization to manage the first assignment
+  m_ring = 0;
+  m_sector = 5;
+  m_hex = 0;
+}
 
-        // Iterate to create the 6 surrounding positions
-        // The angle is with respect to a vertical line
-        Vector newPosition;
-        for (double angle = 0; angle < 2*pi; angle+=pi/3)
-          {
-            newPosition = Vector (currentPosition.x+2*m_radius*std::sin(angle),
-                                  currentPosition.y+2*m_radius*std::cos(angle),
-                                  currentPosition.z);
-            NS_LOG_DEBUG ("New position: " << newPosition);
-
-            // If the newly created position is not already in the copy, add it
-            bool found = false;
-            for (std::vector<Vector>::iterator it = copy.begin ();
-                 it != copy.end (); it++)
-              {
-                // If the vector is already in the vector
-                // 1 is an EPSILON used to determine whether two floats are equal
-                if (CalculateDistance(newPosition, *it) < 10)
-                  {
-                    found = true;
-                    break;
-                  }
-              }
-            if (found == false)
-              {
-                NS_LOG_DEBUG ("Adding position " << newPosition);
-                copy.push_back (newPosition);
-              }
-          }
-      }
-    return copy;
-  }
 } // namespace ns3
