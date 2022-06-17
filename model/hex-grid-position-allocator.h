@@ -65,6 +65,11 @@ namespace ns3 {
      */
     double m_radius;
 
+    /**
+     * The vertical position of allocated nodes
+     */
+    double m_z;
+
     const static double pi; //!< Pi
   };
 

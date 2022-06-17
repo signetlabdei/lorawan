@@ -36,8 +36,12 @@ namespace ns3 {
       .AddAttribute ("Radius", "The radius of a single hexagon",
                      DoubleValue (6000),
                      MakeDoubleAccessor (&HexGridPositionAllocator::m_radius),
-                     MakeDoubleChecker<double> ());
-
+                     MakeDoubleChecker<double> ())
+      .AddAttribute ("Z", "Vertical position of nodes",
+                     DoubleValue (0.0),
+                     MakeDoubleAccessor (&HexGridPositionAllocator::m_radius),
+                     MakeDoubleChecker<double> ())
+    ;
     return tid;
   }
 
@@ -47,7 +51,7 @@ namespace ns3 {
     NS_LOG_FUNCTION_NOARGS ();
 
     // Create the first position
-    m_positions.push_back (Vector (0.0,0.0,15.0));
+    m_positions.push_back (Vector (0.0,0.0,m_z));
 
     // Add rings
     for (int i = 0; i < 20; i++) {
@@ -64,7 +68,7 @@ namespace ns3 {
     NS_LOG_FUNCTION_NOARGS ();
 
     // Create the first position
-    m_positions.push_back (Vector (0.0,0.0,15.0));
+    m_positions.push_back (Vector (0.0,0.0,m_z));
 
     // Add a couple rings
     // Add rings
