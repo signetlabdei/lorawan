@@ -37,6 +37,7 @@ set(source_files
     model/lora-utils.cc
     model/adr-component.cc
     model/hex-grid-position-allocator.cc
+    model/range-position-allocator.cc
     model/loratap-header.cc
     helper/lora-radio-energy-model-helper.cc
     helper/lora-helper.cc
@@ -88,6 +89,7 @@ set(header_files
     model/lora-utils.h
     model/adr-component.h
     model/hex-grid-position-allocator.h
+    model/range-position-allocator.h
     model/loratap-header.h
     helper/lora-radio-energy-model-helper.h
     helper/lora-helper.h
@@ -112,6 +114,7 @@ build_lib(
     ${libpoint-to-point}
     ${libbuildings}
     ${libmobility}
+    ${ortools_LIBRARIES}
   TEST_SOURCES
     test/utilities.cc
     test/lorawan-test-suite.cc
