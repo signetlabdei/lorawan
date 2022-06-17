@@ -99,6 +99,12 @@ namespace ns3 {
     m_radius = radius;
   }
 
+  void
+  HexGridPositionAllocator::SetZ (double z)
+  {
+    m_z = z;
+  }
+
   Vector
   HexGridPositionAllocator::GetNext (void) const
   {

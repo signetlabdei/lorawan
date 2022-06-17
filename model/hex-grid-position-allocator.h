@@ -42,6 +42,8 @@ namespace ns3 {
 
     void SetRadius (double radius);
 
+    void SetZ (double z);
+
   private:
     /**
      * This method adds to the given list of positions an outer ring of positions
