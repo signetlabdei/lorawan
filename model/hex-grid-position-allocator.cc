@@ -47,7 +47,7 @@ namespace ns3 {
     NS_LOG_FUNCTION_NOARGS ();
 
     // Create the first position
-    m_positions.push_back (Vector (0.0,0.0,0.0));
+    m_positions.push_back (Vector (0.0,0.0,15.0));
 
     // Add rings
     for (int i = 0; i < 20; i++) {
@@ -64,7 +64,7 @@ namespace ns3 {
     NS_LOG_FUNCTION_NOARGS ();
 
     // Create the first position
-    m_positions.push_back (Vector (0.0,0.0,0.0));
+    m_positions.push_back (Vector (0.0,0.0,15.0));
 
     // Add a couple rings
     // Add rings
