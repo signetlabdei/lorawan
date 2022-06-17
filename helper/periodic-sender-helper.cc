@@ -26,6 +26,7 @@
 #include "ns3/trace-source-accessor.h"
 #include "ns3/simulator.h"
 #include "ns3/log.h"
+#include "ns3/pointer.h"
 
 namespace ns3 {
 namespace lorawan {
@@ -35,6 +36,8 @@ NS_LOG_COMPONENT_DEFINE ("PeriodicSenderHelper");
 PeriodicSenderHelper::PeriodicSenderHelper ()
 {
   m_factory.SetTypeId ("ns3::PeriodicSender");
+
+  m_period = Minutes (10.0);
 
   // m_factory.Set ("PacketSizeRandomVariable", StringValue
   //                  ("ns3::ParetoRandomVariable[Bound=10|Shape=2.5]"));
@@ -48,6 +51,9 @@ PeriodicSenderHelper::PeriodicSenderHelper ()
 
   m_pktSize = 10;
   m_pktSizeRV = 0;
+
+  m_intervalGenerator = 0;
+  m_sizeGenerator = 0;
 }
 
 PeriodicSenderHelper::~PeriodicSenderHelper ()
@@ -96,11 +102,11 @@ PeriodicSenderHelper::InstallPriv (Ptr<Node> node) const
         {
           interval = Days (1);
         }
-      else if (0.4 <= intervalProb  && intervalProb < 0.8)
+      else if (0.4 <= intervalProb && intervalProb < 0.8)
         {
           interval = Hours (2);
         }
-      else if (0.8 <= intervalProb  && intervalProb < 0.95)
+      else if (0.8 <= intervalProb && intervalProb < 0.95)
         {
           interval = Hours (1);
         }
@@ -114,12 +120,22 @@ PeriodicSenderHelper::InstallPriv (Ptr<Node> node) const
       interval = m_period;
     }
 
+  // Overwrite interval if random variable for niterval was provided
+  if (m_intervalGenerator)
+    {
+      interval = Seconds (m_intervalGenerator->GetValue ());
+    }
+
   app->SetInterval (interval);
-  NS_LOG_DEBUG ("Created an application with interval = " <<
-                interval.GetHours () << " hours");
+  NS_LOG_DEBUG ("Created an application with interval = " << interval.GetSeconds () << " seconds");
 
   app->SetInitialDelay (Seconds (m_initialDelay->GetValue (0, interval.GetSeconds ())));
+
   app->SetPacketSize (m_pktSize);
+  if (m_sizeGenerator)
+    {
+      app->SetPacketSize (m_sizeGenerator->GetInteger ());
+    }
   if (m_pktSizeRV)
     {
       app->SetPacketSizeRandomVariable (m_pktSizeRV);
@@ -138,7 +154,7 @@ PeriodicSenderHelper::SetPeriod (Time period)
 }
 
 void
-PeriodicSenderHelper::SetPacketSizeRandomVariable (Ptr <RandomVariableStream> rv)
+PeriodicSenderHelper::SetPacketSizeRandomVariable (Ptr<RandomVariableStream> rv)
 {
   m_pktSizeRV = rv;
 }
@@ -149,5 +165,17 @@ PeriodicSenderHelper::SetPacketSize (uint8_t size)
   m_pktSize = size;
 }
 
+void
+PeriodicSenderHelper::SetPacketSizeGenerator (Ptr<RandomVariableStream> rv)
+{
+  m_sizeGenerator = rv;
 }
+
+void
+PeriodicSenderHelper::SetPeriodGenerator (Ptr<RandomVariableStream> rv)
+{
+  m_intervalGenerator = rv;
+}
+
+} // namespace lorawan
 } // namespace ns3
