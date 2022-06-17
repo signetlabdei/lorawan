@@ -359,7 +359,7 @@ LoraInterferenceHelper::IsDestroyedByInterference (Ptr<LoraInterferenceHelper::E
       if (snir >= snirIsolation)
         {
           // Move on and check the rest of the interferers
-          NS_LOG_DEBUG ("Packet survived interference with SF " << currentSf);
+          NS_LOG_DEBUG ("Packet survived interference with SF " << unsigned(currentSf));
         }
       else
         {
