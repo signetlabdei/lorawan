@@ -440,31 +440,31 @@ double AdrComponent::GetAverageSNR (EndDeviceStatus::ReceivedPacketList packetLi
 
 int AdrComponent::GetTxPowerIndex (int txPower)
 {
-  if (txPower >= 16)
+  if (txPower >= 14)
     {
       return 0;
     }
-  else if (txPower >= 14)
+  else if (txPower >= 12)
     {
       return 1;
     }
-  else if (txPower >= 12)
+  else if (txPower >= 10)
     {
       return 2;
     }
-  else if (txPower >= 10)
+  else if (txPower >= 8)
     {
       return 3;
     }
-  else if (txPower >= 8)
+  else if (txPower >= 6)
     {
       return 4;
     }
-  else if (txPower >= 6)
+  else if (txPower >= 4)
     {
       return 5;
     }
-  else if (txPower >= 4)
+  else if (txPower >= 2)
     {
       return 6;
     }

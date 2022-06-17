@@ -151,7 +151,7 @@ std::vector<std::vector<double>> LoraInterferenceHelper::collisionSnirAloha= {
 };
 
 LoraInterferenceHelper::CollisionMatrix LoraInterferenceHelper::collisionMatrix =
-    LoraInterferenceHelper::GOURSAUD;
+    LoraInterferenceHelper::CROCE;
 
 NS_OBJECT_ENSURE_REGISTERED (LoraInterferenceHelper);
 

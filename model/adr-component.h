@@ -100,11 +100,11 @@ private:
   //SF lower limit
   const int min_spreadingFactor = 7;
 
-  //Minimum transmission power (dBm e.i.r.p) (Europe)
-  const int min_transmissionPower = 2;
+  //Minimum transmission power (dBm e.r.p) (Europe)
+  const int min_transmissionPower = 0;
 
-  //Maximum transmission power (dBm e.i.r.p) (Europe)
-  const int max_transmissionPower = 16;
+  //Maximum transmission power (dBm e.r.p) (Europe)
+  const int max_transmissionPower = 14;
 
   //Device specific SNR margin (dB)
   // const int offset = 10;

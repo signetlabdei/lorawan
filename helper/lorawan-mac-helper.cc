@@ -143,7 +143,7 @@ LorawanMacHelper::ConfigureForAlohaRegion (Ptr<ClassAEndDeviceLorawanMac> edMac)
   /////////////////////////////////////////////////////
   // TxPower -> Transmission power in dBm conversion //
   /////////////////////////////////////////////////////
-  edMac->SetTxDbmForTxPower (std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
+  edMac->SetTxDbmForTxPower (std::vector<double>{14, 12, 10, 8, 6, 4, 2, 0});
 
   ////////////////////////////////////////////////////////////
   // Matrix to know which DataRate the GW will respond with //
@@ -209,7 +209,7 @@ LorawanMacHelper::ApplyCommonAlohaConfigurations (Ptr<LorawanMac> lorawanMac) co
   //////////////
 
   LogicalLoraChannelHelper channelHelper;
-  channelHelper.AddSubBand (868, 868.6, 1, 16);
+  channelHelper.AddSubBand (868, 868.6, 1, 14);
 
   //////////////////////
   // Default channels //
@@ -240,7 +240,7 @@ LorawanMacHelper::ConfigureForEuRegion (Ptr<ClassAEndDeviceLorawanMac> edMac) co
   //////////////////////////////////////////////////////////////
   // TxPower -> Transmission power in dBm e.i.r.p. conversion //
   //////////////////////////////////////////////////////////////
-  edMac->SetTxDbmForTxPower (std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
+  edMac->SetTxDbmForTxPower (std::vector<double>{14, 12, 10, 8, 6, 4, 2, 0});
 
   ////////////////////////////////////////////////////////////
   // Matrix to know which DataRate the GW will respond with //
@@ -315,12 +315,12 @@ LorawanMacHelper::ApplyCommonEuConfigurations (Ptr<LorawanMac> lorawanMac) const
   //////////////
 
   LogicalLoraChannelHelper channelHelper;
-  channelHelper.AddSubBand (863, 865, 0.001, 16);
-  channelHelper.AddSubBand (865, 868, 0.01, 16);
-  channelHelper.AddSubBand (868, 868.6, 0.01, 16);
-  channelHelper.AddSubBand (868.7, 869.2, 0.001, 16);
-  channelHelper.AddSubBand (869.4, 869.65, 0.1, 29);
-  channelHelper.AddSubBand (869.7, 870, 0.01, 16);
+  channelHelper.AddSubBand (863, 865, 0.001, 14);
+  channelHelper.AddSubBand (865, 868, 0.01, 14);
+  channelHelper.AddSubBand (868, 868.6, 0.01, 14);
+  channelHelper.AddSubBand (868.7, 869.2, 0.001, 14);
+  channelHelper.AddSubBand (869.4, 869.65, 0.1, 27);
+  channelHelper.AddSubBand (869.7, 870, 0.01, 14);
 
   //////////////////////
   // Default channels //
@@ -336,16 +336,16 @@ LorawanMacHelper::ApplyCommonEuConfigurations (Ptr<LorawanMac> lorawanMac) const
   // Addtional channels //
   ////////////////////////
 
-  //Ptr<LogicalLoraChannel> lc4 = CreateObject<LogicalLoraChannel> (867.1, 0, 5);
-  //Ptr<LogicalLoraChannel> lc5 = CreateObject<LogicalLoraChannel> (867.3, 0, 5);
-  //Ptr<LogicalLoraChannel> lc6 = CreateObject<LogicalLoraChannel> (867.5, 0, 5);
-  //Ptr<LogicalLoraChannel> lc7 = CreateObject<LogicalLoraChannel> (867.7, 0, 5);
-  //Ptr<LogicalLoraChannel> lc8 = CreateObject<LogicalLoraChannel> (867.9, 0, 5);
-  //channelHelper.AddChannel (lc4);
-  //channelHelper.AddChannel (lc5);
-  //channelHelper.AddChannel (lc6);
-  //channelHelper.AddChannel (lc7);
-  //channelHelper.AddChannel (lc8);
+  Ptr<LogicalLoraChannel> lc4 = CreateObject<LogicalLoraChannel> (867.1, 0, 5);
+  Ptr<LogicalLoraChannel> lc5 = CreateObject<LogicalLoraChannel> (867.3, 0, 5);
+  Ptr<LogicalLoraChannel> lc6 = CreateObject<LogicalLoraChannel> (867.5, 0, 5);
+  Ptr<LogicalLoraChannel> lc7 = CreateObject<LogicalLoraChannel> (867.7, 0, 5);
+  Ptr<LogicalLoraChannel> lc8 = CreateObject<LogicalLoraChannel> (867.9, 0, 5);
+  channelHelper.AddChannel (lc4);
+  channelHelper.AddChannel (lc5);
+  channelHelper.AddChannel (lc6);
+  channelHelper.AddChannel (lc7);
+  channelHelper.AddChannel (lc8);
 
   lorawanMac->SetLogicalLoraChannelHelper (channelHelper);
 
@@ -372,7 +372,7 @@ LorawanMacHelper::ConfigureForSingleChannelRegion (Ptr<ClassAEndDeviceLorawanMac
   /////////////////////////////////////////////////////
   // TxPower -> Transmission power in dBm conversion //
   /////////////////////////////////////////////////////
-  edMac->SetTxDbmForTxPower (std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
+  edMac->SetTxDbmForTxPower (std::vector<double>{14, 12, 10, 8, 6, 4, 2, 0});
 
   ////////////////////////////////////////////////////////////
   // Matrix to know which DataRate the GW will respond with //
@@ -445,8 +445,8 @@ LorawanMacHelper::ApplyCommonSingleChannelConfigurations (Ptr<LorawanMac> lorawa
   //////////////
 
   LogicalLoraChannelHelper channelHelper;
-  channelHelper.AddSubBand (868, 868.6, 0.01, 16);
-  channelHelper.AddSubBand (868.7, 869.2, 0.001, 16);
+  channelHelper.AddSubBand (868, 868.6, 0.01, 14);
+  channelHelper.AddSubBand (868.7, 869.2, 0.001, 14);
   channelHelper.AddSubBand (869.4, 869.65, 0.1, 27);
 
   //////////////////////
@@ -491,8 +491,8 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
       Ptr<Node> bestGateway = gateways.Get (0);
       Ptr<MobilityModel> bestGatewayPosition = bestGateway->GetObject<MobilityModel> ();
 
-      // Assume devices transmit at 16 dBm eirp
-      double highestRxPower = channel->GetRxPower (16, position, bestGatewayPosition);
+      // Assume devices transmit at 14 dBm erp
+      double highestRxPower = channel->GetRxPower (14, position, bestGatewayPosition);
 
       for (NodeContainer::Iterator currentGw = gateways.Begin () + 1; currentGw != gateways.End ();
            ++currentGw)
@@ -500,7 +500,7 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
           // Compute the power received from the current gateway
           Ptr<Node> curr = *currentGw;
           Ptr<MobilityModel> currPosition = curr->GetObject<MobilityModel> ();
-          double currentRxPower = channel->GetRxPower (16, position, currPosition); // dBm
+          double currentRxPower = channel->GetRxPower (14, position, currPosition); // dBm
 
           if (currentRxPower > highestRxPower)
             {
