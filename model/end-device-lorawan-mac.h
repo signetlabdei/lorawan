@@ -153,6 +153,15 @@ public:
   uint8_t GetDataRate (void);
 
   /**
+   * Set the transmission power this end device will use when transmitting. 
+   * For End Devices, this value is assumed to be fixed, and can be modified
+   * via MAC commands issued by the GW.
+   *
+   * \param txPower The txPower to use when transmitting.
+   */
+  void SetTransmissionPower (uint8_t txPower);
+
+  /**
    * Get the transmission power this end device is set to use.
    *
    * \return The transmission power this device uses when transmitting.

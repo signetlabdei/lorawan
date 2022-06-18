@@ -513,7 +513,47 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
       // NS_LOG_DEBUG ("Rx Power: " << highestRxPower);
       double rxPower = highestRxPower;
 
-      // Get the ED sensitivity
+      std::vector<double> snrThresholds = {-7.5, -10, -12.5, -15, -17.5, -20}; // dB
+      double noise = -174.0 + 10 * log10 (125000.0) + 6; // dBm
+      double snr = rxPower - noise; // dB
+
+      double prob_H = 0.98;
+      // dB, desired thermal gain for 0.98 PDR with rayleigh fading
+      double deviceMargin = 10 * log10 (-1 / log (prob_H));
+      double snrMargin = snr - deviceMargin;
+
+      uint8_t datarate = 0; // SF12
+      if (snrMargin > snrThresholds[0])
+        datarate = 5; // SF7
+      else if (snrMargin > snrThresholds[1])
+        datarate = 4; // SF8
+      else if (snrMargin > snrThresholds[2])
+        datarate = 3; // SF9
+      else if (snrMargin > snrThresholds[3])
+        datarate = 2; // SF10
+      else if (snrMargin > snrThresholds[4])
+        datarate = 1; // SF11
+      else if (snrMargin > snrThresholds[5])
+        sfQuantity[6]++; // keep SF12 and mark out of range
+
+      mac->SetDataRate (datarate);
+      sfQuantity[5 - datarate]++;
+
+      // Minimize power
+      if (datarate != 5)
+        continue;
+      for (int j = 14; j >= 0; j -= 2)
+        {
+          snrMargin =
+              channel->GetRxPower (14, position, bestGatewayPosition) - noise - deviceMargin;
+          if (snrMargin > snrThresholds[0])
+            {
+              mac->SetTransmissionPower (14 - j);
+              break;
+            }
+        }
+
+/*       // Get the ED sensitivity
       Ptr<EndDeviceLoraPhy> edPhy = loraNetDevice->GetPhy ()->GetObject<EndDeviceLoraPhy> ();
       const double *edSensitivity = edPhy->sensitivity;
 
@@ -554,8 +594,6 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
           sfQuantity[6] = sfQuantity[6] + 1;
           // NS_LOG_DEBUG ("sfQuantity[6] = " << sfQuantity[6]);
         }
-
-      /*
 
       // Get the Gw sensitivity
       Ptr<NetDevice> gatewayNetDevice = bestGateway->GetDevice (0);
@@ -603,7 +641,7 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
           sfQuantity[6] = sfQuantity[6] + 1;
 
         }
-        */
+*/
 
     } // end loop on nodes
 

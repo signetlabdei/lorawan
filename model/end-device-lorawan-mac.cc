@@ -930,5 +930,14 @@ EndDeviceLorawanMac::GetTransmissionPower (void)
 {
   return m_txPower;
 }
+
+void
+EndDeviceLorawanMac::SetTransmissionPower (uint8_t txPower)
+{
+  NS_LOG_FUNCTION (this << unsigned (txPower));
+
+  m_txPower = txPower;
+}
+
 }
 }
