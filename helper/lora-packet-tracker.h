@@ -30,8 +30,7 @@
 namespace ns3 {
 namespace lorawan {
 
-enum PhyPacketOutcome
-{
+enum PhyPacketOutcome {
   RECEIVED,
   INTERFERED,
   NO_MORE_RECEIVERS,
@@ -69,7 +68,6 @@ typedef std::map<Ptr<Packet const>, MacPacketStatus> MacPacketData;
 typedef std::map<Ptr<Packet const>, PacketStatus> PhyPacketData;
 typedef std::map<Ptr<Packet const>, RetransmissionStatus> RetransmissionData;
 
-
 class LoraPacketTracker
 {
 public:
@@ -93,8 +91,8 @@ public:
   /////////////////////////
   // Packet transmission at an EndDevice
   void MacTransmissionCallback (Ptr<Packet const> packet);
-  void RequiredTransmissionsCallback (uint8_t reqTx, bool success,
-                                      Time firstAttempt, Ptr<Packet> packet);
+  void RequiredTransmissionsCallback (uint8_t reqTx, bool success, Time firstAttempt,
+                                      Ptr<Packet> packet);
   // Packet reception at the Gateway
   void MacGwReceptionCallback (Ptr<Packet const> packet);
 
@@ -111,27 +109,23 @@ public:
    * Count packets to evaluate the performance at PHY level of a specific
    * gateway.
    */
-  std::vector<int> CountPhyPacketsPerGw (Time startTime, Time stopTime,
-                                         int systemId);
+  std::vector<int> CountPhyPacketsPerGw (Time startTime, Time stopTime, int systemId);
   /**
    * Count packets to evaluate the performance at PHY level of a specific
    * gateway.
    */
-  std::string PrintPhyPacketsPerGw (Time startTime, Time stopTime,
-                                    int systemId);
+  std::string PrintPhyPacketsPerGw (Time startTime, Time stopTime, int systemId);
   /**
    * Count packets to evaluate the performance at MAC level of a specific
    * gateway.
    */
-  std::string CountMacPacketsPerGw (Time startTime, Time stopTime,
-                                    int systemId);
+  std::string CountMacPacketsPerGw (Time startTime, Time stopTime, int systemId);
 
   /**
    * Count packets to evaluate the performance at MAC level of a specific
    * gateway.
    */
-  std::string PrintMacPacketsPerGw (Time startTime, Time stopTime,
-                                    int systemId);
+  std::string PrintMacPacketsPerGw (Time startTime, Time stopTime, int systemId);
 
   /**
    * Count the number of retransmissions that were needed to correctly deliver a
@@ -159,11 +153,14 @@ public:
    * of packets that generated a successful acknowledgment.
    */
   std::string CountMacPacketsGloballyCpsr (Time startTime, Time stopTime);
+
+  std::string PrintSimulationStatistics (Time startTime = Seconds (0));
+
 private:
   PhyPacketData m_packetTracker;
   MacPacketData m_macPacketTracker;
   RetransmissionData m_reTransmissionTracker;
 };
-}
-}
+} // namespace lorawan
+} // namespace ns3
 #endif

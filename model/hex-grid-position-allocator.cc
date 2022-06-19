@@ -23,8 +23,6 @@
 
 #include "ns3/double.h"
 
-#include <assert.h>
-
 namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("HexGridPositionAllocator");
@@ -94,7 +92,7 @@ HexGridPositionAllocator::AssignStreams (int64_t stream)
 void
 HexGridPositionAllocator::SetDistance (double distance)
 {
-  assert (distance > 0);
+  NS_ASSERT (distance > 0);
   m_d = distance;
   ResetCoordinates ();
 }
@@ -102,7 +100,7 @@ HexGridPositionAllocator::SetDistance (double distance)
 void
 HexGridPositionAllocator::SetZ (double z)
 {
-  assert (z >= 0);
+  NS_ASSERT (z >= 0);
   m_z = z;
   ResetCoordinates ();
 }
