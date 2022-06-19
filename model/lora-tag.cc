@@ -21,6 +21,7 @@
 #include "ns3/lora-tag.h"
 #include "ns3/tag.h"
 #include "ns3/uinteger.h"
+#include "ns3/nstime.h"
 
 namespace ns3 {
 namespace lorawan {
@@ -165,6 +166,18 @@ void
 LoraTag::SetSnr (double snr)
 {
   m_snr = snr;
+}
+
+Time
+LoraTag::GetReceptionTime (void)
+{
+  return m_receptionTime;
+}
+
+void
+LoraTag::SetReceptionTime (Time receptionTime)
+{
+  m_receptionTime = receptionTime;
 }
 
 }

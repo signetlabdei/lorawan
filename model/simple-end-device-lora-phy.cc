@@ -311,6 +311,7 @@ SimpleEndDeviceLoraPhy::EndReceive (Ptr<Packet> packet,
           tag.SetReceivePower (event->GetRxPowerdBm ());
           tag.SetFrequency (event->GetFrequency ());
           tag.SetSnr (RxPowerToSNR (event->GetRxPowerdBm ()));
+          tag.SetReceptionTime (Simulator::Now ());
           packet->AddPacketTag (tag);
 
           // Fire the sniffer trace source

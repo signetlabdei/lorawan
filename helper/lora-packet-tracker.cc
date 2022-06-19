@@ -93,6 +93,8 @@ LoraPacketTracker::MacGwReceptionCallback (Ptr<Packet const> packet)
         {
           (*it).second.receptionTimes.insert (
               std::pair<int, Time> (Simulator::GetContext (), Simulator::Now ()));
+          if (Simulator::Now () < (*it).second.receivedTime)
+            (*it).second.receivedTime = Simulator::Now ();
         }
       else
         {

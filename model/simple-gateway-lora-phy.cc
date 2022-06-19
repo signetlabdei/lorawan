@@ -241,6 +241,7 @@ SimpleGatewayLoraPhy::EndReceive (Ptr<Packet> packet, Ptr<LoraInterferenceHelper
       LoraTag tag;
       packet->RemovePacketTag (tag);
       tag.SetDestroyedBy (packetDestroyed);
+      tag.SetReceptionTime (Simulator::Now ());
       packet->AddPacketTag (tag);
 
       // Fire the trace source
@@ -282,14 +283,16 @@ SimpleGatewayLoraPhy::EndReceive (Ptr<Packet> packet, Ptr<LoraInterferenceHelper
           tag.SetReceivePower (event->GetRxPowerdBm ());
           tag.SetFrequency (event->GetFrequency ());
           tag.SetSnr (RxPowerToSNR (event->GetRxPowerdBm ()));
+          tag.SetReceptionTime (Simulator::Now ());
+
           packet->AddPacketTag (tag);
 
           // Fire the sniffer trace source
-          if (!m_phySniffRxTrace.IsEmpty ()) m_phySniffRxTrace (packet);
+          if (!m_phySniffRxTrace.IsEmpty ())
+            m_phySniffRxTrace (packet);
 
           // Forward to upper layer
           m_rxOkCallback (packet);
-
         }
     }
 

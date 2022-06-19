@@ -297,7 +297,7 @@ EndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket, const A
           GatewayList &gwList = it->second.gwList;
 
           PacketInfoPerGw gwInfo;
-          gwInfo.receivedTime = Simulator::Now ();
+          gwInfo.receivedTime = tag.GetReceptionTime ();
           gwInfo.rxPower = rcvPower;
           gwInfo.gwAddress = gwAddress;
           gwList.insert (std::pair<Address, PacketInfoPerGw> (gwAddress, gwInfo));
@@ -311,7 +311,7 @@ EndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket, const A
     {
       NS_LOG_INFO ("Packet was received for the first time");
       PacketInfoPerGw gwInfo;
-      gwInfo.receivedTime = Simulator::Now ();
+      gwInfo.receivedTime = tag.GetReceptionTime ();
       gwInfo.rxPower = rcvPower;
       gwInfo.gwAddress = gwAddress;
       info.gwList.insert (std::pair<Address, PacketInfoPerGw> (gwAddress, gwInfo));
