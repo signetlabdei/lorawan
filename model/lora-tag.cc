@@ -21,7 +21,6 @@
 #include "ns3/lora-tag.h"
 #include "ns3/tag.h"
 #include "ns3/uinteger.h"
-#include "ns3/nstime.h"
 
 namespace ns3 {
 namespace lorawan {
