@@ -236,6 +236,8 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       LorawanMacHeader macHdr;
       ApplyNecessaryOptions (macHdr);
       packet->AddHeader (macHdr);
+      // 4 Bytes of MIC
+      packet->AddPaddingAtEnd (4); 
 
       // Reset MAC command list
       m_macCommandList.clear ();
