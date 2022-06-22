@@ -58,6 +58,11 @@ public:
    * Set packet size
    */
   void SetPacketSize (uint8_t size);
+  
+  /**
+   * Get packet size
+   */
+  uint8_t GetPacketSize (void);
 
   /**
    * Set if using randomness in the packet size

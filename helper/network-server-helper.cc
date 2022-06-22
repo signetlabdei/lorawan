@@ -32,7 +32,7 @@ namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("NetworkServerHelper");
 
-NetworkServerHelper::NetworkServerHelper ()
+NetworkServerHelper::NetworkServerHelper () : m_adrEnabled (false), m_ccEnabled (false)
 {
   m_factory.SetTypeId ("ns3::NetworkServer");
   p2pHelper.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
@@ -139,6 +139,14 @@ NetworkServerHelper::SetAdr (std::string type)
 }
 
 void
+NetworkServerHelper::EnableCongestionControl (bool enableCC)
+{
+  NS_LOG_FUNCTION (this << enableCC);
+
+  m_ccEnabled = enableCC;
+}
+
+void
 NetworkServerHelper::InstallComponents (Ptr<NetworkServer> netServer)
 {
   NS_LOG_FUNCTION (this << netServer);
@@ -157,6 +165,10 @@ NetworkServerHelper::InstallComponents (Ptr<NetworkServer> netServer)
     {
       netServer->AddComponent (m_adrSupportFactory.Create<NetworkControllerComponent> ());
     }
+
+  // Add congestion control support
+  //if (m_ccEnabled)
+  //  netServer->AddComponent (CreateObject<CongestionControlComponent> ());
 }
 }
 } // namespace ns3

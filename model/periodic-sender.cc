@@ -101,6 +101,11 @@ PeriodicSender::SetPacketSize (uint8_t size)
   m_basePktSize = size;
 }
 
+uint8_t
+PeriodicSender::GetPacketSize (void)
+{
+  return m_basePktSize;
+}
 
 void
 PeriodicSender::SendPacket (void)
