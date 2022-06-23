@@ -160,7 +160,11 @@ EndDeviceLorawanMac::Send (Ptr<Packet> packet)
   // If it is not possible to transmit now because of the duty cycle,
   // or because we are receiving, schedule a tx/retx later
 
-  Time netxTxDelay = GetNextTransmissionDelay ();
+  // Check m_aggregatedDutyCycle
+  Time aggregatedDelay = 
+      m_channelHelper.GetAggregatedWaitingTime (m_aggregatedDutyCycle);
+
+  Time netxTxDelay = std::min(GetNextTransmissionDelay (), aggregatedDelay);
   if (netxTxDelay != Seconds (0))
     {
       postponeTransmission (netxTxDelay, packet);

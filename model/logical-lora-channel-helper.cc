@@ -38,9 +38,7 @@ LogicalLoraChannelHelper::GetTypeId (void)
   return tid;
 }
 
-LogicalLoraChannelHelper::LogicalLoraChannelHelper () :
-  m_nextAggregatedTransmissionTime (Seconds (0)),
-  m_aggregatedDutyCycle (1)
+LogicalLoraChannelHelper::LogicalLoraChannelHelper () : m_lastTimeOnAir (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -187,11 +185,12 @@ LogicalLoraChannelHelper::RemoveChannel (Ptr<LogicalLoraChannel> logicalChannel)
 }
 
 Time
-LogicalLoraChannelHelper::GetAggregatedWaitingTime (void)
+LogicalLoraChannelHelper::GetAggregatedWaitingTime (double aggregatedDutyCycle)
 {
   // Aggregate waiting time
-  Time aggregatedWaitingTime = m_nextAggregatedTransmissionTime - Simulator::Now ();
-
+  Time aggregatedWaitingTime = 
+      Seconds (m_lastTimeOnAir / aggregatedDutyCycle - m_lastTimeOnAir);
+  
   // Handle case in which waiting time is negative
   aggregatedWaitingTime = Seconds (std::max (aggregatedWaitingTime.GetSeconds (),
                                              double(0)));
@@ -235,17 +234,10 @@ LogicalLoraChannelHelper::AddEvent (Time duration,
   subBand->SetNextTransmissionTime (Simulator::Now () + Seconds
                                       (timeOnAir / dutyCycle - timeOnAir));
 
-  // Computation of necessary aggregate waiting time
-  m_nextAggregatedTransmissionTime = Simulator::Now () + Seconds
-      (timeOnAir / m_aggregatedDutyCycle - timeOnAir);
-
   NS_LOG_DEBUG ("Time on air: " << timeOnAir);
-  NS_LOG_DEBUG ("m_aggregatedDutyCycle: " << m_aggregatedDutyCycle);
   NS_LOG_DEBUG ("Current time: " << Simulator::Now ().GetSeconds ());
   NS_LOG_DEBUG ("Next transmission on this sub-band allowed at time: " <<
                 (subBand->GetNextTransmissionTime ()).GetSeconds ());
-  NS_LOG_DEBUG ("Next aggregated transmission allowed at time " <<
-                m_nextAggregatedTransmissionTime.GetSeconds ());
 }
 
 double
