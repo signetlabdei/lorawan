@@ -65,8 +65,8 @@ main (int argc, char *argv[])
   int nDevices = 100;
 
   bool adrEnabled = false;
-  bool initializeSF = false;
-  bool congest = true;
+  bool initializeSF = true;
+  bool congest = false;
 
   bool debug = false;
   bool file = false;
@@ -81,7 +81,7 @@ main (int argc, char *argv[])
   cmd.AddValue ("adr", "Whether to enable ADR", adrEnabled);
   cmd.AddValue ("congest", "Use congestion control", congest);
   cmd.AddValue ("debug", "Whether or not to debug logs at various levels. ", debug);
-  cmd.AddValue ("file", "Output a metrics of the simulation in a file", file);
+  cmd.AddValue ("file", "Output the metrics of the simulation in a file", file);
   cmd.AddValue ("run_number", "Run number for repeated simulations", run_number);
   cmd.Parse (argc, argv);
 
@@ -109,15 +109,17 @@ main (int argc, char *argv[])
    *  Logging *
    ************/
 
-  //LogComponentEnable ("CongestionExample", LOG_LEVEL_ALL);
-  LogComponentEnable ("CongestionControlComponent", LOG_LEVEL_DEBUG);
-  //LogComponentEnable ("EndDeviceStatus", LOG_LEVEL_ALL);
-  //LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_WARN);
-  //LogComponentEnable ("NetworkController", LOG_LEVEL_ALL);
-  //LogComponentEnable ("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
-  LogComponentEnableAll (LOG_PREFIX_FUNC);
-  LogComponentEnableAll (LOG_PREFIX_NODE);
-  LogComponentEnableAll (LOG_PREFIX_TIME);
+  if (debug)
+    { //LogComponentEnable ("CongestionExample", LOG_LEVEL_ALL);
+      LogComponentEnable ("CongestionControlComponent", LOG_LEVEL_DEBUG);
+      //LogComponentEnable ("EndDeviceStatus", LOG_LEVEL_ALL);
+      //LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_WARN);
+      //LogComponentEnable ("NetworkController", LOG_LEVEL_ALL);
+      //LogComponentEnable ("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
+      LogComponentEnableAll (LOG_PREFIX_FUNC);
+      LogComponentEnableAll (LOG_PREFIX_NODE);
+      LogComponentEnableAll (LOG_PREFIX_TIME);
+    }
 
   /******************
    *  Radio Channel *
@@ -261,14 +263,14 @@ main (int argc, char *argv[])
    ***************************/
 
   // Connect our traces
-  Config::ConnectWithoutContext (
-      "/NodeList/*/DeviceList/0/$ns3::LoraNetDevice/Mac/$ns3::EndDeviceLorawanMac/AggregatedDutyCycle",
-      MakeCallback (&OnDutyCycleChange));
+  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/0/$ns3::LoraNetDevice/Mac/"
+                                 "$ns3::EndDeviceLorawanMac/AggregatedDutyCycle",
+                                 MakeCallback (&OnDutyCycleChange));
 
   if (file)
     {
       // Activate printing of ED MAC parameters
-      Time stateSamplePeriod = Seconds (1200);
+      Time stateSamplePeriod = Seconds (1800);
       helper.EnablePeriodicDeviceStatusPrinting (endDevices, gateways, "nodeData.txt",
                                                  stateSamplePeriod);
       helper.EnablePeriodicPhyPerformancePrinting (gateways, "phyPerformance.txt",
@@ -299,9 +301,7 @@ main (int argc, char *argv[])
   Simulator::Run ();
 
   if (debug)
-    {
-      std::cout << tracker.PrintSimulationStatistics (trackFinalOutcomeFrom);
-    }
+    std::cout << tracker.PrintSimulationStatistics (trackFinalOutcomeFrom);
 
   Simulator::Destroy ();
   std::cout << "\nRun " << run_number << "\n" << std::endl;
