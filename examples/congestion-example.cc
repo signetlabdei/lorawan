@@ -2,28 +2,25 @@
  * This program creates a network which uses a ADR and congestion control.
  */
 
-#include "ns3/point-to-point-module.h"
-#include "ns3/forwarder-helper.h"
-#include "ns3/network-server-helper.h"
-#include "ns3/lora-channel.h"
-#include "ns3/mobility-helper.h"
-#include "ns3/lora-phy-helper.h"
-#include "ns3/lorawan-mac-helper.h"
-#include "ns3/lora-helper.h"
-#include "ns3/gateway-lora-phy.h"
-#include "ns3/periodic-sender.h"
-#include "ns3/periodic-sender-helper.h"
-#include "ns3/log.h"
-#include "ns3/string.h"
-#include "ns3/command-line.h"
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
-#include "ns3/lora-device-address-generator.h"
-#include "ns3/random-variable-stream.h"
-#include "ns3/config.h"
-#include "ns3/rectangle.h"
-#include "ns3/hex-grid-position-allocator.h"
+#include "ns3/point-to-point-module.h"
+#include "ns3/mobility-helper.h"
 #include "ns3/okumura-hata-propagation-loss-model.h"
+#include "ns3/command-line.h"
+#include "ns3/config.h"
+#include "ns3/string.h"
+#include "ns3/log.h"
+
+#include "ns3/lora-helper.h"
+#include "ns3/lora-phy-helper.h"
+#include "ns3/lorawan-mac-helper.h"
+#include "ns3/network-server-helper.h"
+#include "ns3/forwarder-helper.h"
+#include "ns3/periodic-sender-helper.h"
+#include "ns3/lora-channel.h"
+#include "ns3/lora-device-address-generator.h"
+#include "ns3/hex-grid-position-allocator.h"
 #include "ns3/range-position-allocator.h"
 
 using namespace ns3;
@@ -31,16 +28,27 @@ using namespace lorawan;
 
 NS_LOG_COMPONENT_DEFINE ("CongestionExample");
 
-// Trace sources that are called when a node changes its DR or TX power
+// Trace sources that are called when a node changes its duty-cycle
 void
-OnDataRateChange (uint8_t oldDr, uint8_t newDr)
+OnDutyCycleChange (double oldDutyCycle, double newDutyCycle)
 {
-  NS_LOG_DEBUG ("DR" << unsigned (oldDr) << " -> DR" << unsigned (newDr));
+  NS_LOG_DEBUG (oldDutyCycle << " E -> " << newDutyCycle << " E");
 }
-void
-OnTxPowerChange (double oldTxPower, double newTxPower)
+
+double
+ComputeArea (double range, int rings)
 {
-  NS_LOG_DEBUG (oldTxPower << " dBm -> " << newTxPower << " dBm");
+  double radius = range * std::cos (M_PI / 6);
+  int ngateways = 3 * rings * rings - 3 * rings + 1;
+
+  if (rings == 1)
+    return pow (range / 1000, 2) * M_PI;
+
+  double hexag = range / 1000 * radius / 1000 * 3;
+  double disc = pow (range / 1000, 2) * M_PI;
+  return (ngateways - 6 * (rings - 1)) * hexag // Internal hexagons
+         + 3 * (hexag + disc) // Vertices
+         + 2 * (rings - 2) * (2 * hexag + disc); // Sides
 }
 
 int
@@ -51,14 +59,14 @@ main (int argc, char *argv[])
    *  Simulation parameters  *
    ***************************/
 
-  int periods = 24; // H * D
+  int periods = 24 * 4; // H * D
   int gatewayRings = 1;
   double range = 2540.25; // Max range to have coverage probability > 0.98 (with okumura)
-  int nDevices = 1;
+  int nDevices = 100;
 
-  bool adrEnabled = true;
+  bool adrEnabled = false;
   bool initializeSF = false;
-  bool congest = false;
+  bool congest = true;
 
   bool debug = false;
   bool file = false;
@@ -79,11 +87,10 @@ main (int argc, char *argv[])
 
   // Static configurations
   Time periodLenght = Hours (1);
+  Time trackFinalOutcomeFrom = periodLenght * periods - Hours (10);
   std::string adrType = "ns3::AdrComponent";
 
   Config::SetDefault ("ns3::EndDeviceLorawanMac::DRControl", BooleanValue (true)); //!< ADR bit
-  Config::SetDefault ("ns3::EndDeviceLorawanMac::EnableEDDataRateAdaptation",
-                      BooleanValue (true)); //!< ADR backoff
   Config::SetDefault ("ns3::EndDeviceLorawanMac::MType", StringValue ("Unconfirmed"));
   Config::SetDefault ("ns3::EndDeviceLorawanMac::MaxTransmissions", IntegerValue (1));
 
@@ -94,30 +101,20 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::AdrComponent::SNRDeviceMargin",
                       DoubleValue (10 * log10 (-1 / log (0.98))));
 
+  Config::SetDefault ("ns3::CongestionControlComponent::StartTime", TimeValue (Hours (2.0)));
+  Config::SetDefault ("ns3::CongestionControlComponent::SamplingDuration", TimeValue (Hours (2.0)));
+  Config::SetDefault ("ns3::CongestionControlComponent::TargetPDR", DoubleValue (0.95));
+
   /************
    *  Logging *
    ************/
 
   //LogComponentEnable ("CongestionExample", LOG_LEVEL_ALL);
-  //LogComponentEnable ("PeriodicSenderHelper", LOG_LEVEL_ALL);
-  LogComponentEnable ("HexGridPositionAllocator", LOG_LEVEL_ALL);
-  //LogComponentEnable ("PeriodicSender", LOG_LEVEL_ALL);
-  //LogComponentEnable ("LoraPacketTracker", LOG_LEVEL_ALL);
-  //LogComponentEnable ("Forwarder", LOG_LEVEL_ALL);
-  //LogComponentEnable ("LoraChannel", LOG_LEVEL_ALL);
-  //LogComponentEnable ("LoraInterferenceHelper", LOG_LEVEL_ALL);
-  //LogComponentEnable ("NetworkServer", LOG_LEVEL_ALL);
-  //LogComponentEnable ("NetworkController", LOG_LEVEL_ALL);
-  //LogComponentEnable ("NetworkScheduler", LOG_LEVEL_ALL);
-  //LogComponentEnable ("NetworkStatus", LOG_LEVEL_ALL);
+  LogComponentEnable ("CongestionControlComponent", LOG_LEVEL_DEBUG);
   //LogComponentEnable ("EndDeviceStatus", LOG_LEVEL_ALL);
-  //LogComponentEnable ("AdrComponent", LOG_LEVEL_ALL);
-  //LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
-  //LogComponentEnable ("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
-  //LogComponentEnable ("MacCommand", LOG_LEVEL_ALL);
-  //LogComponentEnable ("AdrExploraSf", LOG_LEVEL_ALL);
-  //LogComponentEnable ("AdrExploraAt", LOG_LEVEL_ALL);
-  //LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_ALL);
+  //LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_WARN);
+  //LogComponentEnable ("NetworkController", LOG_LEVEL_ALL);
+  //LogComponentEnable ("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
   LogComponentEnableAll (LOG_PREFIX_FUNC);
   LogComponentEnableAll (LOG_PREFIX_NODE);
   LogComponentEnableAll (LOG_PREFIX_TIME);
@@ -140,8 +137,6 @@ main (int argc, char *argv[])
   rayleigh->SetAttribute ("m0", DoubleValue (1.0));
   rayleigh->SetAttribute ("m1", DoubleValue (1.0));
   rayleigh->SetAttribute ("m2", DoubleValue (1.0));
-
-  loss->SetNext (rayleigh);
 
   Ptr<LoraChannel> channel = CreateObject<LoraChannel> (loss, delay);
 
@@ -169,6 +164,10 @@ main (int argc, char *argv[])
   rangeAllocator->SetAttribute ("Z", DoubleValue (15.0));
   rangeAllocator->SetAttribute ("range", DoubleValue (range));
   mobilityEd.SetPositionAllocator (rangeAllocator);
+
+  double area = ComputeArea (range, gatewayRings);
+  std::cout << "Area: " << area << " km^2, Density: " << nDevices / area << " devs/km^2"
+            << std::endl;
 
   /*************
    *  Helpers  *
@@ -202,9 +201,9 @@ main (int argc, char *argv[])
   endDevices.Create (nDevices);
   mobilityEd.Install (endDevices);
 
-  /********************
-   *  Create NetDevs  *
-   ********************/
+  /************************
+   *  Create Net Devices  *
+   ************************/
 
   // Create a LoraDeviceAddressGenerator
   uint8_t nwkId = 54;
@@ -224,6 +223,12 @@ main (int argc, char *argv[])
   macHelper.SetRegion (LorawanMacHelper::EU);
   helper.Install (phyHelper, macHelper, endDevices);
 
+  // Initialize SF emulating the ADR algorithm, then add variance to path loss
+  std::vector<int> devPerSF;
+  if (initializeSF)
+    devPerSF = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
+  loss->SetNext (rayleigh);
+
   /*************************
    *  Create Applications  *
    *************************/
@@ -234,6 +239,7 @@ main (int argc, char *argv[])
   networkServerHelper.SetEndDevices (endDevices);
   networkServerHelper.EnableAdr (adrEnabled);
   networkServerHelper.SetAdr (adrType);
+  networkServerHelper.EnableCongestionControl (congest);
   networkServerHelper.Install (networkServer);
 
   // Install the Forwarder application on the gateways
@@ -247,16 +253,17 @@ main (int argc, char *argv[])
   appHelper.SetPeriodGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
       "Mean", DoubleValue (600.0), "Variance", DoubleValue (300.0), "Bound", DoubleValue (600.0)));
   appHelper.SetPacketSizeGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
-      "Mean", DoubleValue (31), "Variance", DoubleValue (10), "Bound", DoubleValue (19)));
+      "Mean", DoubleValue (18), "Variance", DoubleValue (10), "Bound", DoubleValue (18)));
   appHelper.Install (endDevices);
+
+  /***************************
+   *  Simulation and metrics *
+   ***************************/
 
   // Connect our traces
   Config::ConnectWithoutContext (
-      "/NodeList/*/DeviceList/0/$ns3::LoraNetDevice/Mac/$ns3::EndDeviceLorawanMac/TxPower",
-      MakeCallback (&OnTxPowerChange));
-  Config::ConnectWithoutContext (
-      "/NodeList/*/DeviceList/0/$ns3::LoraNetDevice/Mac/$ns3::EndDeviceLorawanMac/DataRate",
-      MakeCallback (&OnDataRateChange));
+      "/NodeList/*/DeviceList/0/$ns3::LoraNetDevice/Mac/$ns3::EndDeviceLorawanMac/AggregatedDutyCycle",
+      MakeCallback (&OnDutyCycleChange));
 
   if (file)
     {
@@ -271,12 +278,32 @@ main (int argc, char *argv[])
 
   LoraPacketTracker &tracker = helper.GetPacketTracker ();
 
+  if (debug)
+    {
+      // Print current configuration
+      std::stringstream ss;
+      if (initializeSF)
+        {
+          ss << "\n|- SF distribution:    ";
+          for (int j = (int) devPerSF.size () - 1; j >= 0; --j)
+            ss << "SF" << 12 - j << ":" << devPerSF[j] << ", ";
+          ss << "\n";
+        }
+      ss << "\nAll configurations terminated. Starting simulation...\n\n"
+         << "--------------------------------------------------------------------------------\n";
+      std::cout << ss.str ();
+    }
+
   // Start simulation
   Simulator::Stop (periodLenght * periods);
   Simulator::Run ();
 
-  std::cout << tracker.CountMacPacketsGlobally (Seconds (0), Simulator::Now ()) << std::endl;
+  if (debug)
+    {
+      std::cout << tracker.PrintSimulationStatistics (trackFinalOutcomeFrom);
+    }
 
   Simulator::Destroy ();
+  std::cout << "\nRun " << run_number << "\n" << std::endl;
   return 0;
 }

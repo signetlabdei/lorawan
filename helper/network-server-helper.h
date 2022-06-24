@@ -73,6 +73,12 @@ public:
    */
   void SetAdr (std::string type);
 
+  /**
+   * Enable (true) or disable (false) the congestion control component 
+   * in the Network Server created by this helper.
+   */
+  void EnableCongestionControl (bool enableCC);
+
 private:
   void InstallComponents (Ptr<NetworkServer> netServer);
   Ptr<Application> InstallPriv (Ptr<Node> node);
@@ -86,6 +92,8 @@ private:
   PointToPointHelper p2pHelper; //!< Helper to create PointToPoint links
 
   bool m_adrEnabled;
+
+  bool m_ccEnabled;
 
   ObjectFactory m_adrSupportFactory;
 };

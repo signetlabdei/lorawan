@@ -21,6 +21,7 @@
 #include "ns3/network-server-helper.h"
 #include "ns3/network-controller-components.h"
 #include "ns3/adr-component.h"
+#include "ns3/congestion-control-component.h"
 #include "ns3/double.h"
 #include "ns3/string.h"
 #include "ns3/trace-source-accessor.h"
@@ -167,8 +168,8 @@ NetworkServerHelper::InstallComponents (Ptr<NetworkServer> netServer)
     }
 
   // Add congestion control support
-  //if (m_ccEnabled)
-  //  netServer->AddComponent (CreateObject<CongestionControlComponent> ());
+  if (m_ccEnabled)
+    netServer->AddComponent (CreateObject<CongestionControlComponent> ());
 }
 }
 } // namespace ns3
