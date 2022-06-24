@@ -140,7 +140,7 @@ AdrComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
           if (newDataRate != SfToDr (spreadingFactor) || newTxPower != transmissionPower)
             {
               //Create a list with mandatory channel indexes
-              int channels[] = {0, 1, 2, 3, 4, 5, 6, 7};
+              int channels[] = {0, 1, 2};
               std::list<int> enabledChannels (channels,
                                               channels + sizeof(channels) /
                                               sizeof(int));

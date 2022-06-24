@@ -123,6 +123,7 @@ void
 LoraTag::SetSpreadingFactor (uint8_t sf)
 {
   m_sf = sf;
+  m_dataRate = 12 - sf;
 }
 
 void
@@ -153,6 +154,7 @@ void
 LoraTag::SetDataRate (uint8_t dataRate)
 {
   m_dataRate = dataRate;
+  m_sf = 12 - dataRate;
 }
 
 double

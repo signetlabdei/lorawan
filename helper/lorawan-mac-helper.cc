@@ -341,11 +341,11 @@ LorawanMacHelper::ApplyCommonEuConfigurations (Ptr<LorawanMac> lorawanMac) const
   Ptr<LogicalLoraChannel> lc6 = CreateObject<LogicalLoraChannel> (867.5, 0, 5);
   Ptr<LogicalLoraChannel> lc7 = CreateObject<LogicalLoraChannel> (867.7, 0, 5);
   Ptr<LogicalLoraChannel> lc8 = CreateObject<LogicalLoraChannel> (867.9, 0, 5);
-  channelHelper.AddChannel (lc4);
-  channelHelper.AddChannel (lc5);
-  channelHelper.AddChannel (lc6);
-  channelHelper.AddChannel (lc7);
-  channelHelper.AddChannel (lc8);
+  //channelHelper.AddChannel (lc4);
+  //channelHelper.AddChannel (lc5);
+  //channelHelper.AddChannel (lc6);
+  //channelHelper.AddChannel (lc7);
+  //channelHelper.AddChannel (lc8);
 
   lorawanMac->SetLogicalLoraChannelHelper (channelHelper);
 
@@ -474,7 +474,7 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
 {
   NS_LOG_FUNCTION_NOARGS ();
 
-  std::vector<int> sfQuantity (7, 0);
+  std::vector<int> sfQuantity (6, 0);
   for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j)
     {
       Ptr<Node> object = *j;
@@ -522,7 +522,7 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
       double deviceMargin = 10 * log10 (-1 / log (prob_H));
       double snrMargin = snr - deviceMargin;
 
-      uint8_t datarate = 0; // SF12
+      uint8_t datarate = 0; // SF12 by default
       if (snrMargin > snrThresholds[0])
         datarate = 5; // SF7
       else if (snrMargin > snrThresholds[1])
@@ -533,14 +533,12 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
         datarate = 2; // SF10
       else if (snrMargin > snrThresholds[4])
         datarate = 1; // SF11
-      else if (snrMargin > snrThresholds[5])
-        sfQuantity[6]++; // keep SF12 and mark out of range
 
       mac->SetDataRate (datarate);
-      sfQuantity[5 - datarate]++;
+      sfQuantity[datarate]++;
 
       // Minimize power
-      if (datarate != 5)
+      if (datarate != 6)
         continue;
       for (int j = 14; j >= 0; j -= 2)
         {
@@ -553,7 +551,7 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
             }
         }
 
-/*       // Get the ED sensitivity
+      /*       // Get the ED sensitivity
       Ptr<EndDeviceLoraPhy> edPhy = loraNetDevice->GetPhy ()->GetObject<EndDeviceLoraPhy> ();
       const double *edSensitivity = edPhy->sensitivity;
 
