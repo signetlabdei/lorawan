@@ -208,6 +208,14 @@ public:
    */
   double GetAggregatedDutyCycle (void);
 
+  /**
+   * Set the aggregated duty cycle.
+   *
+   * \param aggregatedDutyCycle A time instance containing the aggregated 
+   * duty cycle in fractional form.
+   */
+  void SetAggregatedDutyCycle (double aggregatedDutyCycle);
+
   /////////////////////////
   // MAC command methods //
   /////////////////////////

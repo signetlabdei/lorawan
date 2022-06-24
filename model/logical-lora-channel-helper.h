@@ -189,7 +189,9 @@ private:
    */
   std::vector<Ptr <LogicalLoraChannel> > m_channelList;
 
-  double m_lastTimeOnAir; //!<< Duration of the last frame (seconds).
+  Time m_lastTxDuration; //!< Duration of the last frame (seconds).
+
+  Time m_lastTxStart; //!< Timestamp of the last trasmission start.
 };
 }
 

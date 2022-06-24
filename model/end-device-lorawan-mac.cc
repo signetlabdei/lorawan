@@ -163,8 +163,7 @@ EndDeviceLorawanMac::Send (Ptr<Packet> packet)
   // Check m_aggregatedDutyCycle
   Time aggregatedDelay = 
       m_channelHelper.GetAggregatedWaitingTime (m_aggregatedDutyCycle);
-
-  Time netxTxDelay = std::min(GetNextTransmissionDelay (), aggregatedDelay);
+  Time netxTxDelay = Max (GetNextTransmissionDelay (), aggregatedDelay);
   if (netxTxDelay != Seconds (0))
     {
       postponeTransmission (netxTxDelay, packet);
@@ -202,8 +201,8 @@ EndDeviceLorawanMac::postponeTransmission (Time netxTxDelay, Ptr<Packet> packet)
   // Delete previously scheduled transmissions if any.
   Simulator::Cancel (m_nextTx);
   m_nextTx = Simulator::Schedule (netxTxDelay, &EndDeviceLorawanMac::DoSend, this, packet);
-  NS_LOG_WARN ("Attempting to send, but the aggregate duty cycle won't allow it. Scheduling a tx at a delay "
-               << netxTxDelay.GetSeconds () << ".");
+  NS_LOG_WARN ("Attempting to send, but the aggregate duty cycle won't allow it. Scheduling a tx in "
+               << netxTxDelay.As (Time::S) << ".");
 }
 
 
@@ -825,7 +824,7 @@ EndDeviceLorawanMac::OnDutyCycleReq (double dutyCycle)
   NS_LOG_FUNCTION (this << dutyCycle);
 
   // Make sure we get a value that makes sense
-  NS_ASSERT (0 <= dutyCycle && dutyCycle < 1);
+  NS_ASSERT (0 <= dutyCycle && dutyCycle <= 1);
 
   // Set the new duty cycle value
   m_aggregatedDutyCycle = dutyCycle;
@@ -921,6 +920,14 @@ EndDeviceLorawanMac::GetAggregatedDutyCycle (void)
   NS_LOG_FUNCTION_NOARGS ();
 
   return m_aggregatedDutyCycle;
+}
+
+void
+EndDeviceLorawanMac::SetAggregatedDutyCycle (double aggregatedDutyCycle)
+{
+  NS_LOG_FUNCTION_NOARGS ();
+
+  m_aggregatedDutyCycle = aggregatedDutyCycle;
 }
 
 void

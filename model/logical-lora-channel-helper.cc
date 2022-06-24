@@ -38,7 +38,7 @@ LogicalLoraChannelHelper::GetTypeId (void)
   return tid;
 }
 
-LogicalLoraChannelHelper::LogicalLoraChannelHelper () : m_lastTimeOnAir (0)
+LogicalLoraChannelHelper::LogicalLoraChannelHelper () : m_lastTxDuration (0), m_lastTxStart (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -188,14 +188,13 @@ Time
 LogicalLoraChannelHelper::GetAggregatedWaitingTime (double aggregatedDutyCycle)
 {
   // Aggregate waiting time
-  Time aggregatedWaitingTime = 
-      Seconds (m_lastTimeOnAir / aggregatedDutyCycle - m_lastTimeOnAir);
+  Time nextTransmissionTime = m_lastTxStart + m_lastTxDuration / aggregatedDutyCycle;
+  Time aggregatedWaitingTime = nextTransmissionTime - Simulator::Now ();
   
   // Handle case in which waiting time is negative
-  aggregatedWaitingTime = Seconds (std::max (aggregatedWaitingTime.GetSeconds (),
-                                             double(0)));
+  aggregatedWaitingTime = Max (aggregatedWaitingTime, Seconds (0));
 
-  NS_LOG_DEBUG ("Aggregated waiting time: " << aggregatedWaitingTime.GetSeconds ());
+  NS_LOG_DEBUG ("Aggregated waiting time: " << aggregatedWaitingTime.As (Time::S));
 
   return aggregatedWaitingTime;
 }
@@ -228,16 +227,16 @@ LogicalLoraChannelHelper::AddEvent (Time duration,
   Ptr<SubBand> subBand = GetSubBandFromChannel (channel);
 
   double dutyCycle = subBand->GetDutyCycle ();
-  double timeOnAir = duration.GetSeconds ();
+  m_lastTxDuration = duration;
+  m_lastTxStart = Simulator::Now ();
 
   // Computation of necessary waiting time on this sub-band
-  subBand->SetNextTransmissionTime (Simulator::Now () + Seconds
-                                      (timeOnAir / dutyCycle - timeOnAir));
+  subBand->SetNextTransmissionTime (Simulator::Now () + m_lastTxDuration / dutyCycle);
 
-  NS_LOG_DEBUG ("Time on air: " << timeOnAir);
-  NS_LOG_DEBUG ("Current time: " << Simulator::Now ().GetSeconds ());
+  NS_LOG_DEBUG ("Time on air: " << m_lastTxDuration.As (Time::MS));
+  NS_LOG_DEBUG ("Current time: " << Simulator::Now ().As (Time::S));
   NS_LOG_DEBUG ("Next transmission on this sub-band allowed at time: " <<
-                (subBand->GetNextTransmissionTime ()).GetSeconds ());
+                (subBand->GetNextTransmissionTime ()).As (Time::S));
 }
 
 double
