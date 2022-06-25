@@ -21,6 +21,7 @@
 #include "ns3/lora-helper.h"
 #include "ns3/log.h"
 #include "ns3/loratap-header.h"
+#include "ns3/periodic-sender.h"
 
 #include <fstream>
 
@@ -31,7 +32,8 @@ NS_LOG_COMPONENT_DEFINE ("LoraHelper");
 
   LoraHelper::LoraHelper () :
     m_lastPhyPerformanceUpdate (Seconds (0)),
-    m_lastGlobalPerformanceUpdate (Seconds (0))
+    m_lastGlobalPerformanceUpdate (Seconds (0)),
+    m_lastDeviceStatusUpdate (Seconds (0))
   {
   }
 
@@ -226,11 +228,29 @@ LoraHelper::DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateway
       int dr = int(mac->GetDataRate ());
       double txPower = mac->GetTransmissionPower ();
       Vector pos = position->GetPosition ();
+      // Add: #sent, #received, max-offered-traffic, duty-cycle
+      Ptr<PeriodicSender> app = object->GetApplication (0)->GetObject<PeriodicSender> ();
+      uint8_t size = app->GetPacketSize ();
+      double interval = app->GetInterval ().GetSeconds ();
+      LoraTxParameters params;
+      params.sf = 12 - dr;
+      params.lowDataRateOptimizationEnabled =
+          LoraPhy::GetTSym (params) > MilliSeconds (16) ? true : false;
+      double maxot = LoraPhy::GetOnAirTime (Create<Packet>(size + 13), params).GetSeconds () / interval;
+      maxot = std::min (maxot, 0.01);
+      double ot = mac->GetAggregatedDutyCycle ();
+      ot = std::min (ot, maxot);
       outputFile << currentTime.GetSeconds () << " "
                  << object->GetId () <<  " "
-                 << pos.x << " " << pos.y << " " << dr << " "
-                 << unsigned(txPower) << std::endl;
+                 << pos.x << " " << pos.y << " " 
+                 << dr << " " << unsigned(txPower) << " " 
+                 <<  m_packetTracker->PrintDevicePackets (m_lastDeviceStatusUpdate, 
+                                                          currentTime, 
+                                                          object->GetId ())  << " "
+                 << maxot << " " << ot << " "
+                 << std::endl;
     }
+  m_lastDeviceStatusUpdate = Simulator::Now ();
   // for (NodeContainer::Iterator j = gateways.Begin (); j != gateways.End (); ++j)
   //   {
   //     Ptr<Node> object = *j;

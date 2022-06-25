@@ -321,8 +321,8 @@ LoraPacketTracker::CountMacPacketsGlobally (Time startTime, Time stopTime)
 {
   NS_LOG_FUNCTION (this << startTime << stopTime);
 
-  double sent = 0;
-  double received = 0;
+  int sent = 0;
+  int received = 0;
   for (auto it = m_macPacketTracker.begin (); it != m_macPacketTracker.end (); ++it)
     {
       if ((*it).second.sendTime >= startTime && (*it).second.sendTime <= stopTime)
@@ -343,8 +343,8 @@ LoraPacketTracker::CountMacPacketsGloballyCpsr (Time startTime, Time stopTime)
 {
   NS_LOG_FUNCTION (this << startTime << stopTime);
 
-  double sent = 0;
-  double received = 0;
+  int sent = 0;
+  int received = 0;
   for (auto it = m_reTransmissionTracker.begin (); it != m_reTransmissionTracker.end (); ++it)
     {
       if ((*it).second.firstAttempt >= startTime && (*it).second.firstAttempt <= stopTime)
@@ -447,6 +447,28 @@ LoraPacketTracker::PrintSimulationStatistics (Time startTime)
   ss << "\nTotal offered traffic: " << totOffTraff << " E\n";
 
   return ss.str ();
+}
+
+std::string 
+LoraPacketTracker::PrintDevicePackets (Time startTime, Time stopTime, uint32_t devId)
+{
+  NS_LOG_FUNCTION (this << startTime << stopTime << devId);
+
+  int sent = 0;
+  int received = 0;
+  for (auto it = m_macPacketTracker.begin (); it != m_macPacketTracker.end (); ++it)
+    {
+      if ((*it).second.sendTime >= startTime && (*it).second.sendTime <= stopTime && (*it).second.senderId == devId)
+        {
+          sent++;
+          if ((*it).second.receptionTimes.size ())
+            {
+              received++;
+            }
+        }
+    }
+
+  return std::to_string (sent) + " " + std::to_string (received);
 }
 
 } // namespace lorawan

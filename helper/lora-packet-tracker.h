@@ -156,10 +156,13 @@ public:
 
   std::string PrintSimulationStatistics (Time startTime = Seconds (0));
 
+  std::string PrintDevicePackets (Time startTime, Time stopTime, uint32_t devId);
+
 private:
   PhyPacketData m_packetTracker;
   MacPacketData m_macPacketTracker;
   RetransmissionData m_reTransmissionTracker;
+  
 };
 } // namespace lorawan
 } // namespace ns3

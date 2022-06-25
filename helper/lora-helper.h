@@ -139,6 +139,7 @@ private:
 
   Time m_lastPhyPerformanceUpdate;
   Time m_lastGlobalPerformanceUpdate;
+  Time m_lastDeviceStatusUpdate;
 };
 
 } //namespace ns3
