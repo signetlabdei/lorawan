@@ -1,5 +1,5 @@
 /*
- * This program creates a network which uses a ADR and congestion control.
+ * This program creates a network which uses congestion control.
  */
 
 #include "ns3/core-module.h"
@@ -28,13 +28,6 @@ using namespace lorawan;
 
 NS_LOG_COMPONENT_DEFINE ("CongestionExample");
 
-// Trace sources that are called when a node changes its duty-cycle
-void
-OnDutyCycleChange (double oldDutyCycle, double newDutyCycle)
-{
-  NS_LOG_DEBUG (oldDutyCycle << " E -> " << newDutyCycle << " E");
-}
-
 double
 ComputeArea (double range, int rings)
 {
@@ -59,7 +52,7 @@ main (int argc, char *argv[])
    *  Simulation parameters  *
    ***************************/
 
-  int periods = 24 * 4; // H * D
+  int periods = 24; // H * D
   int gatewayRings = 1;
   double range = 2540.25; // Max range to have coverage probability > 0.98 (with okumura)
   int nDevices = 100;
@@ -168,8 +161,9 @@ main (int argc, char *argv[])
   mobilityEd.SetPositionAllocator (rangeAllocator);
 
   double area = ComputeArea (range, gatewayRings);
-  std::cout << "Area: " << area << " km^2, Density: " << nDevices / area << " devs/km^2"
-            << std::endl;
+  if (debug)
+    std::cout << "Area: " << area << " km^2, Density: " << nDevices / area << " devs/km^2"
+              << std::endl;
 
   /*************
    *  Helpers  *
@@ -262,11 +256,6 @@ main (int argc, char *argv[])
    *  Simulation and metrics *
    ***************************/
 
-  // Connect our traces
-  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/0/$ns3::LoraNetDevice/Mac/"
-                                 "$ns3::EndDeviceLorawanMac/AggregatedDutyCycle",
-                                 MakeCallback (&OnDutyCycleChange));
-
   if (file)
     {
       // Activate printing of ED MAC parameters
@@ -304,6 +293,5 @@ main (int argc, char *argv[])
     std::cout << tracker.PrintSimulationStatistics (trackFinalOutcomeFrom);
 
   Simulator::Destroy ();
-  std::cout << "\nRun " << run_number << "\n" << std::endl;
   return 0;
 }
