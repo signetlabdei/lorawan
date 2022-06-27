@@ -291,11 +291,11 @@ LoraPacketTracker::PrintPhyPacketsPerGw (Time startTime, Time stopTime, int gwId
                     packetCounts.at (3)++;
                     break;
                   }
-                  case UNDER_SENSITIVITY: {
+                  case LOST_BECAUSE_TX: {
                     packetCounts.at (4)++;
                     break;
                   }
-                  case LOST_BECAUSE_TX: {
+                  case UNDER_SENSITIVITY: {
                     packetCounts.at (5)++;
                     break;
                   }
