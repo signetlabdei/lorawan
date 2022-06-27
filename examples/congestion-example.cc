@@ -22,6 +22,9 @@
 #include "ns3/lora-device-address-generator.h"
 #include "ns3/hex-grid-position-allocator.h"
 #include "ns3/range-position-allocator.h"
+#include "ns3/lora-interference-helper.h"
+
+#include <unordered_map>
 
 using namespace ns3;
 using namespace lorawan;
@@ -44,6 +47,11 @@ ComputeArea (double range, int rings)
          + 2 * (rings - 2) * (2 * hexag + disc); // Sides
 }
 
+const std::unordered_map<std::string, LoraInterferenceHelper::CollisionMatrix> sirMap = {
+    {"CROCE", LoraInterferenceHelper::CROCE},
+    {"GOURSAUD", LoraInterferenceHelper::GOURSAUD},
+    {"ALOHA", LoraInterferenceHelper::ALOHA}};
+
 int
 main (int argc, char *argv[])
 {
@@ -56,6 +64,7 @@ main (int argc, char *argv[])
   int gatewayRings = 1;
   double range = 2540.25; // Max range to have coverage probability > 0.98 (with okumura)
   int nDevices = 100;
+  std::string sir = "CROCE";
 
   bool adrEnabled = false;
   bool initializeSF = true;
@@ -63,19 +72,19 @@ main (int argc, char *argv[])
 
   bool debug = false;
   bool file = false;
-  int run_number = 0;
 
   CommandLine cmd (__FILE__);
   cmd.AddValue ("periods", "Number of periods to simulate", periods);
   cmd.AddValue ("rings", "Number of gateway rings in hexagonal topology", gatewayRings);
   cmd.AddValue ("range", "Radius of the device allocation disk around a gateway)", range);
   cmd.AddValue ("devices", "Number of end devices to include in the simulation", nDevices);
+  cmd.AddValue ("sir", "Signal to Interference Ratio matrix used for interference calculations",
+                sir);
   cmd.AddValue ("initSF", "Whether to initialize the SFs", initializeSF);
   cmd.AddValue ("adr", "Whether to enable ADR", adrEnabled);
   cmd.AddValue ("congest", "Use congestion control", congest);
   cmd.AddValue ("debug", "Whether or not to debug logs at various levels. ", debug);
   cmd.AddValue ("file", "Output the metrics of the simulation in a file", file);
-  cmd.AddValue ("run_number", "Run number for repeated simulations", run_number);
   cmd.Parse (argc, argv);
 
   // Static configurations
@@ -117,6 +126,8 @@ main (int argc, char *argv[])
   /******************
    *  Radio Channel *
    ******************/
+
+  LoraInterferenceHelper::collisionMatrix = sirMap.at (sir);
 
   // Delay obtained from distance and speed of light in vacuum (constant)
   Ptr<PropagationDelayModel> delay = CreateObject<ConstantSpeedPropagationDelayModel> ();
