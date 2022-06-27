@@ -199,14 +199,16 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
           if (ProduceConfigScheme (dr))
             {
               for (auto const &d : dr.devs)
-                if (m_configToDoList[d.first] == m_devTracking[d.first].dutycycle)
-                  m_configToDoList.erase (d.first); // Nothing changed between config
+                if (m_configToDoList.count (d.first)) // Check key existence (to avoid creating it)
+                  if (m_configToDoList[d.first] == m_devTracking[d.first].dutycycle)
+                    m_configToDoList.erase (d.first); // Nothing changed between config
               break;
             }
 
-      // Cheat and re-enable devices
+      // Cheat and re-enable devices if they need to receive different config
       for (auto &ed : m_disabled)
-        ed->GetMac ()->SetAggregatedDutyCycle (1.0);
+        if (m_configToDoList.count (ed->m_endDeviceAddress.Get ()))
+          ed->GetMac ()->SetAggregatedDutyCycle (1.0);
 
       // This is in case there was nothig to reconfig
       // (otherwise rewritten at end of config)
@@ -224,18 +226,12 @@ CongestionControlComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
   // still no insurance whether this method will be called on reception.
 
   // Get address
-  Ptr<Packet> packetCopy = status->GetLastPacketReceivedFromDevice ()->Copy ();
-  LorawanMacHeader mhead;
-  packetCopy->RemoveHeader (mhead);
-  LoraFrameHeader fhead;
-  fhead.SetAsUplink (); //<! Needed by Deserialize ()
-  packetCopy->RemoveHeader (fhead);
-  uint32_t devaddr = fhead.GetAddress ().Get ();
+  uint32_t devaddr = status->m_endDeviceAddress.Get ();
 
   // Here we just set up the reply packet with dutycycle config.
 
   // Early returns
-  if (m_configToDoList.find (devaddr) == m_configToDoList.end ())
+  if (!m_configToDoList.count (devaddr))
     return; // No re-config instruction
   uint8_t dc = m_configToDoList[devaddr];
   NS_ASSERT (dc == 0 or (7 <= dc and dc <= 15) or dc == 255);
@@ -243,8 +239,8 @@ CongestionControlComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
   if (dc == 255)
     m_disabled.push_back (status);
 
-  NS_LOG_INFO ("Sending DutyCycleReq (" << 1.0 / pow (2, dc) << " E)"); //, "
-  //                                        << (int) m_configToDoList.size () << " remaining");
+  NS_LOG_INFO ("Sending DutyCycleReq (" << 1.0 / pow (2, dc) << " E), "
+                                        << (int) m_configToDoList.size () << " remaining");
 
   /*   // No ack policy
   m_devTracking[devaddr].dutycycle = m_configToDoList[devaddr];
