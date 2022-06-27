@@ -111,8 +111,9 @@ main (int argc, char *argv[])
    *  Logging *
    ************/
 
-  if (debug)
-    { //LogComponentEnable ("CongestionExample", LOG_LEVEL_ALL);
+  if (debug) // This also requires to build ns3 with debug option
+    {
+      //LogComponentEnable ("CongestionExample", LOG_LEVEL_ALL);
       LogComponentEnable ("CongestionControlComponent", LOG_LEVEL_DEBUG);
       //LogComponentEnable ("EndDeviceStatus", LOG_LEVEL_ALL);
       //LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_WARN);
