@@ -4,3 +4,4 @@
 
 .vscode
 experiments/*/*-results
+experiments/*/.ipynb_checkpoints
