@@ -3,5 +3,5 @@
 *.dat
 
 .vscode
-experiments/*/backup-results
+experiments/*/*-results
 experiments/*/.ipynb_checkpoints
