@@ -24,6 +24,11 @@
 #include "ns3/lora-net-device.h"
 #include "ns3/log.h"
 #include "ns3/random-variable-stream.h"
+#include "ns3/congestion-control-component.h"
+#include "ns3/traffic-shaping-utils.h"
+#include "ns3/periodic-sender.h"
+#include "ns3/node-list.h"
+#include "ns3/packet.h"
 
 namespace ns3 {
 namespace lorawan {
@@ -721,6 +726,91 @@ LorawanMacHelper::SetSpreadingFactorsGivenDistribution (NodeContainer endDevices
   return sfQuantity;
 
 } //  end function
+
+void
+LorawanMacHelper::SetDutyCyclesWithCapacityModel (NodeContainer endDevices, NodeContainer gateways,
+                                                  Ptr<LoraChannel> channel, double pdr)
+{
+  using datarate_t = std::vector<std::pair<uint32_t, double>>;
+  using gateway_t = std::vector<datarate_t>;
+  using output_t = std::unordered_map<uint32_t, uint8_t>;
+
+  const int N_SF = 6;
+  const int N_CH = 3;
+  const double limit = CongestionControlComponent::CapacityForPDRModel (pdr) * N_CH;
+
+  std::map<uint32_t, gateway_t> gwgroups;
+  for (NodeContainer::Iterator currGw = gateways.Begin (); currGw != gateways.End (); ++currGw)
+    gwgroups[(*currGw)->GetId ()] = gateway_t (N_SF);
+
+  for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j)
+    {
+      Ptr<Node> object = *j;
+      Ptr<MobilityModel> position = object->GetObject<MobilityModel> ();
+      NS_ASSERT (position != 0);
+      Ptr<NetDevice> netDevice = object->GetDevice (0);
+      Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+      NS_ASSERT (loraNetDevice != 0);
+      Ptr<ClassAEndDeviceLorawanMac> mac =
+          loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
+      NS_ASSERT (mac != 0);
+
+      // Try computing the distance from each gateway and find the best one
+      Ptr<Node> bestGateway = gateways.Get (0);
+      Ptr<MobilityModel> bestGatewayPosition = bestGateway->GetObject<MobilityModel> ();
+
+      // Assume devices transmit at 14 dBm erp
+      double highestRxPower = channel->GetRxPower (14, position, bestGatewayPosition);
+
+      for (NodeContainer::Iterator currentGw = gateways.Begin () + 1; currentGw != gateways.End ();
+           ++currentGw)
+        {
+          // Compute the power received from the current gateway
+          Ptr<Node> curr = *currentGw;
+          Ptr<MobilityModel> currPosition = curr->GetObject<MobilityModel> ();
+          double currentRxPower = channel->GetRxPower (14, position, currPosition); // dBm
+
+          if (currentRxPower > highestRxPower)
+            bestGateway = curr;
+        }
+
+      Ptr<PeriodicSender> app = object->GetApplication (0)->GetObject<PeriodicSender> ();
+
+      Ptr<Packet> tmp =
+          ns3::Create<Packet> (app->GetPacketSize () + 13 /* Headers with no MAC commands */);
+      LoraTxParameters params;
+      params.sf = 12 - mac->GetDataRate ();
+      params.lowDataRateOptimizationEnabled =
+          LoraPhy::GetTSym (params) > MilliSeconds (16) ? true : false;
+
+      double toa = LoraPhy::GetOnAirTime (tmp, params).GetSeconds ();
+      double traffic = toa / app->GetInterval ().GetSeconds ();
+      traffic = (traffic > 0.01) ? 0.01 : traffic;
+
+      gwgroups[bestGateway->GetId ()][mac->GetDataRate ()].push_back ({object->GetId (), traffic});
+    }
+  for (auto const &gw : gwgroups)
+    for (auto const &dr : gw.second)
+      {
+        output_t out;
+        TrafficShapingUtils::OptimizeDutyCycle (dr, limit, out);
+        for (auto const &id : out)
+          {
+            Ptr<Node> curr = NodeList::GetNode (id.first);
+            Ptr<NetDevice> netDevice = curr->GetDevice (0);
+            Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+            Ptr<ClassAEndDeviceLorawanMac> mac =
+                loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
+            // Check if we need to turn off completely
+            if (id.second == 255)
+              mac->SetAggregatedDutyCycle (0);
+            else if (id.second == 0)
+              mac->SetAggregatedDutyCycle (1);
+            else
+              mac->SetAggregatedDutyCycle (1 / std::pow (2, double (id.second)));
+          }
+      }
+}
 
 } // namespace lorawan
 } // namespace ns3

@@ -117,6 +117,9 @@ public:
                                                                 NodeContainer gateways,
                                                                 std::vector<double> distribution);
 
+  static void SetDutyCyclesWithCapacityModel (NodeContainer endDevices, NodeContainer gateways,
+                                              Ptr<LoraChannel> channel, double pdr);
+
 private:
   /**
    * Perform region-specific configurations for the 868 MHz EU band.
