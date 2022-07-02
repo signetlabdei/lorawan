@@ -65,11 +65,15 @@ main (int argc, char *argv[])
   double range = 2540.25; // Max range to have coverage probability > 0.98 (with okumura)
   int nDevices = 100;
   std::string sir = "CROCE";
-
   bool adrEnabled = false;
   bool initializeSF = true;
+  bool model = false;
   bool congest = false;
-
+  double warmup = 2;
+  double sampling = 2;
+  double target = 0.95;
+  double variance = 0.01;
+  double tolerance = 0.001;
   bool debug = false;
   bool file = false;
 
@@ -82,7 +86,20 @@ main (int argc, char *argv[])
                 sir);
   cmd.AddValue ("initSF", "Whether to initialize the SFs", initializeSF);
   cmd.AddValue ("adr", "Whether to enable ADR", adrEnabled);
+  cmd.AddValue ("model", "Use static duty-cycle config with capcacity model",
+                model);
   cmd.AddValue ("congest", "Use congestion control", congest);
+  cmd.AddValue ("warmup",
+                "[congestion control] Starting delay of the congestion control algorithm for "
+                "initial network warm-up (e.g. ADR) and RSSI measurements collection",
+                warmup);
+  cmd.AddValue ("sampling", "[congestion control] Duration (hours) of the PDR sampling fase",
+                sampling);
+  cmd.AddValue ("target", "[congestion control] Central PDR value targeted", target);
+  cmd.AddValue ("variance", "[congestion control] Acceptable variation around the target PDR value",
+                variance);
+  cmd.AddValue ("tolerance", "[congestion control] Tolerance step to declare value stagnation",
+                tolerance);
   cmd.AddValue ("debug", "Whether or not to debug logs at various levels. ", debug);
   cmd.AddValue ("file", "Output the metrics of the simulation in a file", file);
   cmd.Parse (argc, argv);
@@ -106,6 +123,9 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CongestionControlComponent::StartTime", TimeValue (Hours (2.0)));
   Config::SetDefault ("ns3::CongestionControlComponent::SamplingDuration", TimeValue (Hours (2.0)));
   Config::SetDefault ("ns3::CongestionControlComponent::TargetPDR", DoubleValue (0.95));
+  Config::SetDefault ("ns3::CongestionControlComponent::AcceptedPDRVariance", DoubleValue (0.01));
+  Config::SetDefault ("ns3::CongestionControlComponent::ValueStagnationTolerance",
+                      DoubleValue (0.001));
 
   /************
    *  Logging *
@@ -231,12 +251,6 @@ main (int argc, char *argv[])
   macHelper.SetRegion (LorawanMacHelper::EU);
   helper.Install (phyHelper, macHelper, endDevices);
 
-  // Initialize SF emulating the ADR algorithm, then add variance to path loss
-  std::vector<int> devPerSF;
-  if (initializeSF)
-    devPerSF = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
-  loss->SetNext (rayleigh);
-
   /*************************
    *  Create Applications  *
    *************************/
@@ -263,6 +277,14 @@ main (int argc, char *argv[])
   appHelper.SetPacketSizeGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
       "Mean", DoubleValue (18), "Variance", DoubleValue (10), "Bound", DoubleValue (18)));
   appHelper.Install (endDevices);
+
+  // Initialize SF emulating the ADR algorithm, then add variance to path loss
+  std::vector<int> devPerSF;
+  if (initializeSF)
+    devPerSF = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
+  if (model)
+    macHelper.SetDutyCyclesWithCapacityModel (endDevices, gateways, channel, target);
+  loss->SetNext (rayleigh);
 
   /***************************
    *  Simulation and metrics *
