@@ -102,14 +102,14 @@ public:
 
   void OnFailedReply (Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus);
 
+  static double CapacityForPDRModel (double pdr);
+
 private:
   void InitializeData (Ptr<NetworkStatus> status);
 
   std::string PrintCongestion (void);
 
   bool ProduceConfigScheme (datarate_t &dr);
-
-  double CapacityForPDRModel (double pdr);
 
   // To track network congestion
   std::map<Address, gateway_t> m_congestMetrics;

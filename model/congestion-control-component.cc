@@ -387,7 +387,7 @@ CongestionControlComponent::CapacityForPDRModel (double pdr)
 
 const int CongestionControlComponent::N_SF = 6;
 
-const int CongestionControlComponent::N_CH = 8;
+const int CongestionControlComponent::N_CH = 3;
 
 } // namespace lorawan
 } // namespace ns3
