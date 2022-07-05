@@ -177,7 +177,6 @@ TrafficShapingUtils::OptimizeDutyCycleMax (const devices_t &devs, const double l
   solver->SetTimeLimit (absl::Seconds (30));
 
   static int nsettings = 1 + m_dutycycles.size ();
-  const double infinity = solver->infinity ();
   static double c = 1e9;
 
   // Create the variables.

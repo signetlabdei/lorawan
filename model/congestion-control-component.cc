@@ -371,7 +371,7 @@ CongestionControlComponent::ProduceConfigScheme (datarate_t &dr)
 
   int sf = 12 - m_devTracking[dr.devs[0].first].datarate;
   NS_LOG_DEBUG ("Reconfig SF" << sf << ": " << ot.curr << " [" << ot.low << ", " << ot.high << "]");
-  TrafficShapingUtils::OptimizeDutyCycle (dr.devs, ot.curr, m_configToDoList);
+  TrafficShapingUtils::OptimizeDutyCycleMaxMin (dr.devs, ot.curr, m_configToDoList);
 
   return true;
 }
