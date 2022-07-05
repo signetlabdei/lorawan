@@ -43,7 +43,9 @@ class TrafficShapingUtils
   };
 
 public:
-  static void OptimizeDutyCycle (const devices_t &devs, const double limit, output_t &output);
+  static void OptimizeDutyCycleMaxMin (const devices_t &devs, const double limit, output_t &output);
+
+  static void OptimizeDutyCycleMax (const devices_t &devs, const double limit, output_t &output);
 
 private:
   TrafficShapingUtils ()

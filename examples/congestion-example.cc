@@ -86,8 +86,7 @@ main (int argc, char *argv[])
                 sir);
   cmd.AddValue ("initSF", "Whether to initialize the SFs", initializeSF);
   cmd.AddValue ("adr", "Whether to enable ADR", adrEnabled);
-  cmd.AddValue ("model", "Use static duty-cycle config with capcacity model",
-                model);
+  cmd.AddValue ("model", "Use static duty-cycle config with capcacity model", model);
   cmd.AddValue ("congest", "Use congestion control", congest);
   cmd.AddValue ("warmup",
                 "[congestion control] Starting delay of the congestion control algorithm for "
@@ -283,7 +282,11 @@ main (int argc, char *argv[])
   if (initializeSF)
     devPerSF = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
   if (model)
-    macHelper.SetDutyCyclesWithCapacityModel (endDevices, gateways, channel, target);
+    {
+      NS_ASSERT_MSG (!congest, "Static duty-cycle configuration cannot be applied if dynamic "
+                               "congestion control is in place.");
+      macHelper.SetDutyCyclesWithCapacityModel (endDevices, gateways, channel, target);
+    }
   loss->SetNext (rayleigh);
 
   /***************************

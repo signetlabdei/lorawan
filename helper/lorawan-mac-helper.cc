@@ -793,7 +793,7 @@ LorawanMacHelper::SetDutyCyclesWithCapacityModel (NodeContainer endDevices, Node
     for (auto const &dr : gw.second)
       {
         output_t out;
-        TrafficShapingUtils::OptimizeDutyCycle (dr, limit, out);
+        TrafficShapingUtils::OptimizeDutyCycleMax (dr, limit, out);
         for (auto const &id : out)
           {
             Ptr<Node> curr = NodeList::GetNode (id.first);
