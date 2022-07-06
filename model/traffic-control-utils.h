@@ -19,14 +19,14 @@
  *                         <alessandro.aimi@cnam.fr>
  */
 
-#ifndef TRAFFIC_SHAPING_UTILS_H
-#define TRAFFIC_SHAPING_UTILS_H
+#ifndef TRAFFIC_CONTROL_UTILS_H
+#define TRAFFIC_CONTROL_UTILS_H
 
 #include <unordered_map>
 
 namespace ns3 {
 
-class TrafficShapingUtils
+class TrafficControlUtils
 {
   using devices_t = std::vector<std::pair<uint32_t, double>>;
   using output_t = std::unordered_map<uint32_t, uint8_t>;
@@ -48,11 +48,11 @@ public:
   static void OptimizeDutyCycleMax (const devices_t &devs, const double limit, output_t &output);
 
 private:
-  TrafficShapingUtils ()
+  TrafficControlUtils ()
   {
   }
 
-  virtual ~TrafficShapingUtils ()
+  virtual ~TrafficControlUtils ()
   {
   }
 
@@ -62,4 +62,4 @@ private:
 
 } // namespace ns3
 
-#endif /* TRAFFIC_SHAPING_UTILS_H */
+#endif /* TRAFFIC_CONTROL_UTILS_H */

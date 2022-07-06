@@ -21,16 +21,16 @@
 
 #include "ns3/log.h"
 
-#include "traffic-shaping-utils.h"
+#include "traffic-control-utils.h"
 
 #include <ortools/linear_solver/linear_solver.h>
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("TrafficShapingUtils");
+NS_LOG_COMPONENT_DEFINE ("TrafficControlUtils");
 
 void
-TrafficShapingUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const double limit, output_t &output)
+TrafficControlUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const double limit, output_t &output)
 {
   using namespace operations_research;
 
@@ -48,7 +48,7 @@ TrafficShapingUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const doubl
       NS_LOG_WARN ("CBC solver unavailable.");
       return;
     }
-  //if (GetLogComponent ("TrafficShapingUtils").IsEnabled (LogLevel::LOG_DEBUG))
+  //if (GetLogComponent ("TrafficControlUtils").IsEnabled (LogLevel::LOG_DEBUG))
   if (false)
     solver->EnableOutput ();
   solver->SetTimeLimit (absl::Seconds (30));
@@ -154,7 +154,7 @@ TrafficShapingUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const doubl
 }
 
 void
-TrafficShapingUtils::OptimizeDutyCycleMax (const devices_t &devs, const double limit, output_t &output)
+TrafficControlUtils::OptimizeDutyCycleMax (const devices_t &devs, const double limit, output_t &output)
 {
   using namespace operations_research;
 
@@ -267,7 +267,7 @@ TrafficShapingUtils::OptimizeDutyCycleMax (const devices_t &devs, const double l
     }
 }
 
-const std::vector<double> TrafficShapingUtils::m_dutycycles = std::vector<double>{
+const std::vector<double> TrafficControlUtils::m_dutycycles = std::vector<double>{
     1.0 / std::pow (2.0, 7.0),  1.0 / std::pow (2.0, 8.0),  1.0 / std::pow (2.0, 9.0),
     1.0 / std::pow (2.0, 10.0), 1.0 / std::pow (2.0, 11.0), 1.0 / std::pow (2.0, 12.0),
     1.0 / std::pow (2.0, 13.0), 1.0 / std::pow (2.0, 14.0), 1.0 / std::pow (2.0, 15.0)};

@@ -37,7 +37,7 @@ set(source_files
     model/lora-utils.cc
     model/adr-component.cc
     model/congestion-control-component.cc
-    model/traffic-shaping-utils.cc
+    model/traffic-control-utils.cc
     model/hex-grid-position-allocator.cc
     model/range-position-allocator.cc
     model/loratap-header.cc
@@ -91,7 +91,7 @@ set(header_files
     model/lora-utils.h
     model/adr-component.h
     model/congestion-control-component.h
-    model/traffic-shaping-utils.h
+    model/traffic-control-utils.h
     model/hex-grid-position-allocator.h
     model/range-position-allocator.h
     model/loratap-header.h

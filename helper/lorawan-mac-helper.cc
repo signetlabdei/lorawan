@@ -25,7 +25,7 @@
 #include "ns3/log.h"
 #include "ns3/random-variable-stream.h"
 #include "ns3/congestion-control-component.h"
-#include "ns3/traffic-shaping-utils.h"
+#include "ns3/traffic-control-utils.h"
 #include "ns3/periodic-sender.h"
 #include "ns3/node-list.h"
 #include "ns3/packet.h"
@@ -793,7 +793,7 @@ LorawanMacHelper::SetDutyCyclesWithCapacityModel (NodeContainer endDevices, Node
     for (auto const &dr : gw.second)
       {
         output_t out;
-        TrafficShapingUtils::OptimizeDutyCycleMax (dr, limit, out);
+        TrafficControlUtils::OptimizeDutyCycleMax (dr, limit, out);
         for (auto const &id : out)
           {
             Ptr<Node> curr = NodeList::GetNode (id.first);
