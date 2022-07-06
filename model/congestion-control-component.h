@@ -27,6 +27,7 @@
 
 #include <unordered_map>
 #include <limits>
+#include <boost/circular_buffer.hpp>
 
 namespace ns3 {
 namespace lorawan {
@@ -51,7 +52,7 @@ class CongestionControlComponent : public NetworkControllerComponent
     double max = 0;
   };
 
-  struct datarate_t
+  struct gateway_t
   {
     devices_t devs;
     int received = 0;
@@ -60,7 +61,7 @@ class CongestionControlComponent : public NetworkControllerComponent
     void Reset (void);
   };
 
-  using gateway_t = std::vector<datarate_t>;
+  using datarate_t = std::map<Address, gateway_t>;
 
   // To track useful metrics of devices
   class rssi_t
@@ -109,10 +110,10 @@ private:
 
   std::string PrintCongestion (void);
 
-  bool ProduceConfigScheme (datarate_t &dr);
+  bool ProduceConfigScheme (gateway_t &group);
 
   // To track network congestion
-  std::map<Address, gateway_t> m_congestMetrics;
+  std::vector<datarate_t> m_congestMetrics;
 
   // To track current status of devices
   /*LoraDeviceAddress::Get() is hashable*/

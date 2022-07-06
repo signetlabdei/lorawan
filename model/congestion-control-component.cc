@@ -21,9 +21,7 @@
 
 #include "ns3/congestion-control-component.h"
 #include "ns3/periodic-sender.h"
-#include "ns3/traffic-shaping-utils.h"
-
-#include <boost/math/special_functions/lambert_w.hpp>
+#include "ns3/traffic-control-utils.h"
 
 namespace ns3 {
 namespace lorawan {
@@ -33,7 +31,7 @@ NS_LOG_COMPONENT_DEFINE ("CongestionControlComponent");
 NS_OBJECT_ENSURE_REGISTERED (CongestionControlComponent);
 
 void
-CongestionControlComponent::datarate_t::Reset (void)
+CongestionControlComponent::gateway_t::Reset (void)
 {
   received = 0;
   sent = 0;
@@ -96,7 +94,7 @@ CongestionControlComponent::GetTypeId (void)
   return tid;
 }
 
-CongestionControlComponent::CongestionControlComponent ()
+CongestionControlComponent::CongestionControlComponent () : m_congestMetrics ()
 {
 }
 
@@ -173,11 +171,11 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
       if (m_configToDoList.empty ())
         {
           NS_LOG_DEBUG ("Duty-cycle configuration terminated in "
-                        << (Simulator::Now () - m_samplingStart).As (Time::S));
+                        << (Simulator::Now () - m_samplingStart).As (Time::H));
           // Reset congestion metrics
-          for (auto &gw : m_congestMetrics)
-            for (auto &dr : gw.second)
-              dr.Reset ();
+          for (auto &dr : m_congestMetrics)
+            for (auto &gw : dr)
+              gw.second.Reset ();
           // Reset timer
           m_samplingStart = Simulator::Now ();
         }
@@ -185,20 +183,20 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
     }
 
   // Else, we are in sampling fase. Add sample to congestion metrics
-  datarate_t &currdr = m_congestMetrics[devinfo.GetBestGw ()][tag.GetDataRate ()];
-  currdr.received++;
-  currdr.sent += currFCnt - prevFCnt;
+  gateway_t &group = m_congestMetrics[tag.GetDataRate ()][devinfo.GetBestGw ()];
+  group.received++;
+  group.sent += currFCnt - prevFCnt;
 
   // If sampling fase expired, produce reconfiguration
   if (Simulator::Now () > m_samplingStart + m_samplingDuration)
     {
       NS_LOG_DEBUG (PrintCongestion ());
       // Produce new reconfig scheme (one SF for each gateway)
-      for (auto &gw : m_congestMetrics)
-        for (auto &dr : gw.second)
-          if (ProduceConfigScheme (dr))
+      for (auto const &gw : (networkStatus->m_gatewayStatuses))
+        for (auto &dr : m_congestMetrics)
+          if (ProduceConfigScheme (dr[gw.first]))
             {
-              for (auto const &d : dr.devs)
+              for (auto const &d : dr[gw.first].devs)
                 if (m_configToDoList.count (d.first)) // Check key existence (to avoid creating it)
                   if (m_configToDoList[d.first] == m_devTracking[d.first].dutycycle)
                     m_configToDoList.erase (d.first); // Nothing changed between config
@@ -251,9 +249,9 @@ CongestionControlComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
       NS_LOG_DEBUG ("Duty-cycle configuration terminated in "
                     << (Simulator::Now () - m_samplingStart).GetSeconds () << " seconds");
       // Reset congestion metrics
-      for (auto &gw : m_congestMetrics)
-        for (auto &dr : gw.second)
-          dr.Reset ();
+      for (auto &dr : m_congestMetrics)
+        for (auto &gw : dr)
+          gw.second.Reset ();
       // Reset timer
       m_samplingStart = Simulator::Now ();
     } */
@@ -278,8 +276,8 @@ CongestionControlComponent::InitializeData (Ptr<NetworkStatus> status)
 
   m_samplingStart = m_start;
 
-  for (auto const &gw : (status->m_gatewayStatuses))
-    m_congestMetrics[gw.first] = gateway_t (N_SF);
+  for (int i = 0; i < N_SF; ++i)
+    m_congestMetrics.push_back (datarate_t ());
 
   // Initialize device data.
   // (It's ok to cheat because this is declared on device registration)
@@ -307,11 +305,11 @@ CongestionControlComponent::InitializeData (Ptr<NetworkStatus> status)
       devinfo.maxoftraf = traffic;
 
       // Insert data in structure according to best gateway and SF
-      datarate_t &dr = m_congestMetrics[devinfo.GetBestGw ()][devinfo.datarate];
-      dr.devs.push_back ({ed.first.Get (), traffic});
-      dr.ot.max += traffic;
-      dr.ot.high += traffic;
-      dr.ot.curr += traffic;
+      gateway_t &group = m_congestMetrics[devinfo.datarate][devinfo.GetBestGw ()];
+      group.devs.push_back ({ed.first.Get (), traffic});
+      group.ot.max += traffic;
+      group.ot.high += traffic;
+      group.ot.curr += traffic;
     }
 }
 
@@ -323,10 +321,10 @@ CongestionControlComponent::PrintCongestion ()
     {
       double sent = 0.0;
       double rec = 0.0;
-      for (auto const &gw : m_congestMetrics)
+      for (auto const &gw : m_congestMetrics[dr])
         {
-          sent += gw.second[dr].sent;
-          rec += gw.second[dr].received;
+          sent += gw.second.sent;
+          rec += gw.second.received;
         }
       ss << "SF" << 12 - dr << ":" << ((sent > 0.0) ? rec / sent : -1.0) << ", ";
     }
@@ -334,7 +332,7 @@ CongestionControlComponent::PrintCongestion ()
 }
 
 bool
-CongestionControlComponent::ProduceConfigScheme (datarate_t &dr)
+CongestionControlComponent::ProduceConfigScheme (gateway_t &dr)
 {
   if (dr.devs.empty ())
     return false;
@@ -371,7 +369,7 @@ CongestionControlComponent::ProduceConfigScheme (datarate_t &dr)
 
   int sf = 12 - m_devTracking[dr.devs[0].first].datarate;
   NS_LOG_DEBUG ("Reconfig SF" << sf << ": " << ot.curr << " [" << ot.low << ", " << ot.high << "]");
-  TrafficShapingUtils::OptimizeDutyCycleMaxMin (dr.devs, ot.curr, m_configToDoList);
+  TrafficControlUtils::OptimizeDutyCycleMaxMin (dr.devs, ot.curr, m_configToDoList);
 
   return true;
 }
