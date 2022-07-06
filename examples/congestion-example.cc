@@ -64,7 +64,7 @@ main (int argc, char *argv[])
   int gatewayRings = 1;
   double range = 2540.25; // Max range to have coverage probability > 0.98 (with okumura)
   int nDevices = 100;
-  std::string sir = "CROCE";
+  std::string sir = "GOURSAUD";
   bool adrEnabled = false;
   bool initializeSF = true;
   bool model = false;
