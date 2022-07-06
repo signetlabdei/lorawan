@@ -27,7 +27,6 @@
 
 #include <unordered_map>
 #include <limits>
-#include <boost/circular_buffer.hpp>
 
 namespace ns3 {
 namespace lorawan {

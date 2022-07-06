@@ -23,6 +23,8 @@
 #include "ns3/periodic-sender.h"
 #include "ns3/traffic-control-utils.h"
 
+#include <boost/math/special_functions/lambert_w.hpp>
+
 namespace ns3 {
 namespace lorawan {
 
