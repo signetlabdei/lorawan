@@ -803,7 +803,10 @@ LorawanMacHelper::SetDutyCyclesWithCapacityModel (NodeContainer endDevices, Node
                 loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
             // Check if we need to turn off completely
             if (id.second == 255)
-              mac->SetAggregatedDutyCycle (0);
+              {
+                NS_LOG_DEBUG ("Device " + std::to_string(curr->GetId()) + " disabled.");
+                mac->SetAggregatedDutyCycle (0);
+              }
             else if (id.second == 0)
               mac->SetAggregatedDutyCycle (1);
             else

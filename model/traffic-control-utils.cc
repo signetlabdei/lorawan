@@ -32,6 +32,8 @@ NS_LOG_COMPONENT_DEFINE ("TrafficControlUtils");
 void
 TrafficControlUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const double limit, output_t &output)
 {
+  NS_LOG_FUNCTION ("Num devs: " + std::to_string(devs.size ()) << "Traffic bound: " + std::to_string(limit));
+  
   using namespace operations_research;
 
   // Prepare inputs
@@ -156,6 +158,8 @@ TrafficControlUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const doubl
 void
 TrafficControlUtils::OptimizeDutyCycleMax (const devices_t &devs, const double limit, output_t &output)
 {
+  NS_LOG_FUNCTION ("Num devs: " + std::to_string(devs.size ()) << "Traffic bound: " + std::to_string(limit));
+
   using namespace operations_research;
 
   // Prepare inputs

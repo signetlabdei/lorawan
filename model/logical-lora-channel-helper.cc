@@ -187,8 +187,11 @@ LogicalLoraChannelHelper::RemoveChannel (Ptr<LogicalLoraChannel> logicalChannel)
 Time
 LogicalLoraChannelHelper::GetAggregatedWaitingTime (double aggregatedDutyCycle)
 {
+  NS_LOG_FUNCTION ("Aggregated duty-cycle: " + std::to_string(aggregatedDutyCycle));
+
   // Aggregate waiting time
-  Time nextTransmissionTime = m_lastTxStart + m_lastTxDuration / aggregatedDutyCycle;
+  Time nextTransmissionTime = (aggregatedDutyCycle)? 
+      m_lastTxStart + m_lastTxDuration / aggregatedDutyCycle : Time::Max();
   Time aggregatedWaitingTime = nextTransmissionTime - Simulator::Now ();
   
   // Handle case in which waiting time is negative
