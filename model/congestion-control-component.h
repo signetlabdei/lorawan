@@ -78,6 +78,8 @@ class CongestionControlComponent : public NetworkControllerComponent
     int fCnt = 0;
     uint8_t datarate = 0;
 
+    uint8_t cluster = 0;
+
     // Just in case we need to reorganize
     double maxoftraf = 0;
     uint8_t dutycycle = 0;
@@ -143,6 +145,7 @@ private:
 
   static const int N_CH;
 
+  // Failsafe for disabled devices
   std::vector<Ptr<EndDeviceStatus>> m_disabled;
 };
 } // namespace lorawan

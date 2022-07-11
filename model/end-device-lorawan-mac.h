@@ -216,6 +216,20 @@ public:
    */
   void SetAggregatedDutyCycle (double aggregatedDutyCycle);
 
+  /**
+   * Get the cluster of this device.
+   *
+   * \return The cluster id.
+   */
+  uint8_t GetCluster (void);
+
+  /**
+   * Set the cluster of this device.
+   *
+   * \param clusterId The id of the cluster.
+   */
+  void SetCluster (uint8_t clusterId);
+
   /////////////////////////
   // MAC command methods //
   /////////////////////////
@@ -509,6 +523,8 @@ private:
   LorawanMacHeader::MType m_mType;
 
   uint16_t m_currentFCnt;
+
+  uint8_t m_cluster;
 };
 
 

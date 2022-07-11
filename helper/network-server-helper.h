@@ -40,6 +40,9 @@ namespace lorawan {
  */
 class NetworkServerHelper
 {
+  
+  using cluster_t = std::vector<std::pair<double, double>>;
+
 public:
   NetworkServerHelper ();
 
@@ -79,15 +82,20 @@ public:
    */
   void EnableCongestionControl (bool enableCC);
 
+  /** 
+   * Assign cluster membership to devices and create interference domains.
+   */
+  void AssignClusters (cluster_t clustersInfo);
+
 private:
   void InstallComponents (Ptr<NetworkServer> netServer);
   Ptr<Application> InstallPriv (Ptr<Node> node);
 
   ObjectFactory m_factory;
 
-  NodeContainer m_gateways;   //!< Set of gateways to connect to this NS
+  NodeContainer m_gateways; //!< Set of gateways to connect to this NS
 
-  NodeContainer m_endDevices;   //!< Set of endDevices to connect to this NS
+  NodeContainer m_endDevices; //!< Set of endDevices to connect to this NS
 
   PointToPointHelper p2pHelper; //!< Helper to create PointToPoint links
 
@@ -96,9 +104,11 @@ private:
   bool m_ccEnabled;
 
   ObjectFactory m_adrSupportFactory;
+
+  std::vector<double> m_clusterTargets; 
 };
 
-} // namespace ns3
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* NETWORK_SERVER_HELPER_H */

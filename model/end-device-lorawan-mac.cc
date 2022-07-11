@@ -126,7 +126,8 @@ EndDeviceLorawanMac::EndDeviceLorawanMac ()
       m_lastKnownGatewayCount (0),
       m_aggregatedDutyCycle (1),
       m_mType (LorawanMacHeader::CONFIRMED_DATA_UP),
-      m_currentFCnt (0)
+      m_currentFCnt (0),
+      m_cluster (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -950,6 +951,20 @@ EndDeviceLorawanMac::SetTransmissionPower (uint8_t txPower)
   NS_LOG_FUNCTION (this << unsigned (txPower));
 
   m_txPower = txPower;
+}
+
+uint8_t 
+EndDeviceLorawanMac::GetCluster (void)
+{
+  return m_cluster;
+}
+
+void 
+EndDeviceLorawanMac::SetCluster (uint8_t clusterId)
+{
+  NS_LOG_FUNCTION (this << unsigned (clusterId));
+
+  m_cluster = clusterId;
 }
 
 }

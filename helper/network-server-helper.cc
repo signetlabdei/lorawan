@@ -28,6 +28,7 @@
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 
+#include <regex>
 namespace ns3 {
 namespace lorawan {
 
@@ -39,6 +40,7 @@ NetworkServerHelper::NetworkServerHelper () : m_adrEnabled (false), m_ccEnabled 
   p2pHelper.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
   p2pHelper.SetChannelAttribute ("Delay", StringValue ("2ms"));
   SetAdr ("ns3::AdrComponent");
+  m_clusterTargets = {0.95};
 }
 
 NetworkServerHelper::~NetworkServerHelper ()
@@ -148,6 +150,56 @@ NetworkServerHelper::EnableCongestionControl (bool enableCC)
 }
 
 void
+NetworkServerHelper::AssignClusters (cluster_t clustersInfo) 
+{
+  int nClusters = clustersInfo.size ();
+  NS_ASSERT_MSG (nClusters == 1 or nClusters == 3, 
+      "For the moment only 1 or 3 clusters are supported.");
+  NS_ASSERT_MSG (m_endDevices.GetN () > 0, 
+      "Devices must be set before assigning clusters.");
+
+  double devWeight = double (100.0) / m_endDevices.GetN ();
+
+  uint8_t currCluster = 0;
+  double totWeight = 0;
+  for (NodeContainer::Iterator i = m_endDevices.Begin (); i != m_endDevices.End (); ++i)
+    {
+      if (clustersInfo[currCluster].first == 0.0)
+        currCluster++;
+
+      Ptr<EndDeviceLorawanMac> mac = (*i)->GetDevice (0)->GetObject<LoraNetDevice> ()
+          ->GetMac ()->GetObject<EndDeviceLorawanMac> ();
+      mac->SetCluster (currCluster);
+      
+      // Assign one frequency to each cluster
+      if (nClusters == 3)
+      {
+        int chid = 0;
+        for (auto &ch : mac->GetLogicalLoraChannelHelper ().GetChannelList ())
+          {
+            if (chid == currCluster)
+              ch->SetEnabledForUplink ();
+            else
+              ch->DisableForUplink ();
+            chid++;
+          }
+      }
+
+      totWeight += devWeight;
+
+      if (currCluster < nClusters - 1 and
+          totWeight >= clustersInfo[currCluster].first - devWeight / 2)
+        {
+          currCluster++;
+          totWeight = 0;
+        }
+    }
+  
+  for (auto const &cluster : clustersInfo)
+    m_clusterTargets.push_back (cluster.second);
+}
+
+void
 NetworkServerHelper::InstallComponents (Ptr<NetworkServer> netServer)
 {
   NS_LOG_FUNCTION (this << netServer);
@@ -171,5 +223,43 @@ NetworkServerHelper::InstallComponents (Ptr<NetworkServer> netServer)
   if (m_ccEnabled)
     netServer->AddComponent (CreateObject<CongestionControlComponent> ());
 }
+
+// Parse input string containing slices info
+std::vector<std::pair<double, double>>
+ParseClusterInfo (std::string s)
+{
+  s.erase (std::remove (s.begin (), s.end (), ' '), s.end ());
+  std::regex rx ("\\{\\{[0-9]+(\\.[0-9]+)?,0*(1(\\.0+)?|0|\\.[0-9]+)\\}"
+      "(,\\{[0-9]+(\\.[0-9]+)?,0*(1(\\.0+)?|0|\\.[0-9]+)\\})*\\}");
+  NS_ASSERT_MSG (std::regex_match (s, rx), "Cluster vector ill formatted. "
+      "Syntax: \"{{double > 0, double [0,1]},...}\"");
+
+  s.erase (std::remove (s.begin (), s.end (), '{'), s.end ());
+  s.erase (std::remove (s.begin (), s.end (), '}'), s.end ());
+
+  std::vector<std::pair<double, double>> clusterInfo;
+  double share = 0;
+  double pdr = 0;
+
+  std::string d = ",";
+  size_t pos = 0;
+  double tot = 0;
+  while ((pos = s.find (d)) != std::string::npos)
+    {
+      share = std::stod (s.substr (0, pos));
+      s.erase (0, pos + d.length ());
+      tot += share;  
+
+      pos = s.find (d);
+      pdr = std::stod (s.substr (0, pos));
+      s.erase (0, pos + d.length ());
+
+      clusterInfo.push_back ({share, pdr});
+    }
+  NS_ASSERT_MSG (tot != 100.0, 
+      "Total share among clusters must be 100%.");
+  return clusterInfo;
+}
+
 }
 } // namespace ns3

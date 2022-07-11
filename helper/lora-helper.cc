@@ -247,7 +247,7 @@ LoraHelper::DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateway
                  <<  m_packetTracker->PrintDevicePackets (m_lastDeviceStatusUpdate, 
                                                           currentTime, 
                                                           object->GetId ())  << " "
-                 << maxot << " " << ot << " "
+                 << maxot << " " << ot << " " << unsigned(mac->GetCluster ())
                  << std::endl;
     }
   m_lastDeviceStatusUpdate = Simulator::Now ();
