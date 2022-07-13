@@ -736,7 +736,7 @@ LorawanMacHelper::SetDutyCyclesWithCapacityModel (NodeContainer endDevices, Node
   using output_t = std::unordered_map<uint32_t, uint8_t>;
 
   const int N_SF = 6;
-  const int N_CH = 3;
+  const int N_CH = 1;
   const double limit = CongestionControlComponent::CapacityForPDRModel (pdr) * N_CH;
 
   std::map<uint32_t, gateway_t> gwgroups;
@@ -788,12 +788,22 @@ LorawanMacHelper::SetDutyCyclesWithCapacityModel (NodeContainer endDevices, Node
       traffic = (traffic > 0.01) ? 0.01 : traffic;
 
       gwgroups[bestGateway->GetId ()][mac->GetDataRate ()].push_back ({object->GetId (), traffic});
+
+      int chid = 0;
+      for (auto &ch : mac->GetLogicalLoraChannelHelper ().GetChannelList ())
+        {
+          if (chid == 0)
+            ch->SetEnabledForUplink ();
+          else
+            ch->DisableForUplink ();
+          chid++;
+        }
     }
   for (auto const &gw : gwgroups)
     for (auto const &dr : gw.second)
       {
         output_t out;
-        TrafficControlUtils::OptimizeDutyCycleMax (dr, limit, out);
+        TrafficControlUtils::OptimizeDutyCycleMaxMin (dr, limit, out);
         for (auto const &id : out)
           {
             Ptr<Node> curr = NodeList::GetNode (id.first);
@@ -804,7 +814,7 @@ LorawanMacHelper::SetDutyCyclesWithCapacityModel (NodeContainer endDevices, Node
             // Check if we need to turn off completely
             if (id.second == 255)
               {
-                NS_LOG_DEBUG ("Device " + std::to_string(curr->GetId()) + " disabled.");
+                NS_LOG_DEBUG ("Device " + std::to_string (curr->GetId ()) + " disabled.");
                 mac->SetAggregatedDutyCycle (0);
               }
             else if (id.second == 0)
