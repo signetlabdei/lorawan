@@ -59,7 +59,8 @@ TrafficControlUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const doubl
 
   static int nsettings = 1 + m_dutycycles.size ();
   const double infinity = solver->infinity ();
-  static double alpha = 1e-9;
+  /// TODO: fine tune
+  static double alpha = 1e9; 
 
   // Create the variables.
   std::vector<std::vector<MPVariable *>> x (dm.bound);
@@ -113,12 +114,12 @@ TrafficControlUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const doubl
   // Create the objective function.
   MPObjective *const objective = solver->MutableObjective ();
   // Maximize offered traffic (max min duty-cycle)
-  objective->SetCoefficient (theta, 1);
+  objective->SetCoefficient (theta, alpha);
   for (int i = 0; i < dm.bound; ++i)
     {
-      objective->SetCoefficient (x[i][0], dm.deltas[i] * alpha);
+      objective->SetCoefficient (x[i][0], dm.deltas[i]);
       for (int l = 1; l < nsettings; ++l)
-        objective->SetCoefficient (x[i][l], m_dutycycles[l - 1] * alpha);
+        objective->SetCoefficient (x[i][l], m_dutycycles[l - 1]);
     }
   objective->SetMaximization ();
 
