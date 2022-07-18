@@ -27,7 +27,8 @@ namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("LoraPhyHelper");
 
-LoraPhyHelper::LoraPhyHelper () : m_maxReceptionPaths (8), m_txPriority (true)
+LoraPhyHelper::LoraPhyHelper () : m_maxReceptionPaths (8), 
+    m_txPriority (true), m_duplex (true)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -110,7 +111,7 @@ LoraPhyHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
           receptionPaths++;
         }
     }
-  else if (typeId == "ns3::SimpleEndDeviceLoraPhy")
+  else if (typeId == "ns3::SimpleEndDeviceLoraPhy" and m_duplex)
     {
       // The line below can be commented to speed up uplink-only simulations.
       // This implies that the LoraChannel instance will only know about
@@ -137,6 +138,12 @@ void
 LoraPhyHelper::SetGatewayTransmissionPriority (bool txPriority)
 {
   m_txPriority = txPriority;
+}
+
+void
+LoraPhyHelper::SetDuplexMode (bool duplex)
+{
+  m_duplex = duplex;
 }
 } // namespace lorawan
 } // namespace ns3

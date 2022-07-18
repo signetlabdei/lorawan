@@ -86,7 +86,8 @@ main (int argc, char *argv[])
                 sir);
   cmd.AddValue ("initSF", "Whether to initialize the SFs", initializeSF);
   cmd.AddValue ("adr", "Whether to enable ADR", adrEnabled);
-  cmd.AddValue ("model", "Use static duty-cycle config with capcacity model", model);
+  cmd.AddValue ("model", "Use static duty-cycle config with capacity model", model);
+  cmd.AddValue ("target", "Central PDR value targeted by capacity model", target);
   cmd.AddValue ("congest", "Use congestion control", congest);
   cmd.AddValue ("warmup",
                 "[congestion control] Starting delay of the congestion control algorithm for "
@@ -94,7 +95,6 @@ main (int argc, char *argv[])
                 warmup);
   cmd.AddValue ("sampling", "[congestion control] Duration (hours) of the PDR sampling fase",
                 sampling);
-  cmd.AddValue ("target", "[congestion control] Central PDR value targeted", target);
   cmd.AddValue ("variance", "[congestion control] Acceptable variation around the target PDR value",
                 variance);
   cmd.AddValue ("tolerance", "[congestion control] Tolerance step to declare value stagnation",
@@ -102,11 +102,14 @@ main (int argc, char *argv[])
   cmd.AddValue ("debug", "Whether or not to debug logs at various levels. ", debug);
   cmd.AddValue ("file", "Output the metrics of the simulation in a file", file);
   cmd.Parse (argc, argv);
+  NS_ASSERT (!(congest & model));
 
   // Static configurations
   Time periodLenght = Hours (1);
   Time trackFinalOutcomeFrom = periodLenght * periods - Hours (10);
   std::string adrType = "ns3::AdrComponent";
+  using cluster_t = std::vector<std::pair<double, double>>;
+  cluster_t clusterInfo = {{100.0, 0.97}}; //,{33.3,0.90},{33.3,0.70}};
 
   Config::SetDefault ("ns3::EndDeviceLorawanMac::DRControl", BooleanValue (true)); //!< ADR bit
   Config::SetDefault ("ns3::EndDeviceLorawanMac::MType", StringValue ("Unconfirmed"));
@@ -121,7 +124,6 @@ main (int argc, char *argv[])
 
   Config::SetDefault ("ns3::CongestionControlComponent::StartTime", TimeValue (Hours (2.0)));
   Config::SetDefault ("ns3::CongestionControlComponent::SamplingDuration", TimeValue (Hours (2.0)));
-  Config::SetDefault ("ns3::CongestionControlComponent::TargetPDR", DoubleValue (0.95));
   Config::SetDefault ("ns3::CongestionControlComponent::AcceptedPDRVariance", DoubleValue (0.01));
   Config::SetDefault ("ns3::CongestionControlComponent::ValueStagnationTolerance",
                       DoubleValue (0.001));
@@ -135,9 +137,12 @@ main (int argc, char *argv[])
       //LogComponentEnable ("CongestionExample", LOG_LEVEL_ALL);
       LogComponentEnable ("CongestionControlComponent", LOG_LEVEL_DEBUG);
       //LogComponentEnable ("EndDeviceStatus", LOG_LEVEL_ALL);
-      //LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_WARN);
+      //LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_ALL);
+      //LogComponentEnable ("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
       //LogComponentEnable ("NetworkController", LOG_LEVEL_ALL);
       //LogComponentEnable ("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
+      LogComponentEnable ("TrafficControlUtils", LOG_LEVEL_DEBUG);
+      //LogComponentEnable ("LorawanMacHelper", LOG_LEVEL_ALL);
       LogComponentEnableAll (LOG_PREFIX_FUNC);
       LogComponentEnableAll (LOG_PREFIX_NODE);
       LogComponentEnableAll (LOG_PREFIX_TIME);
@@ -146,7 +151,6 @@ main (int argc, char *argv[])
   /******************
    *  Radio Channel *
    ******************/
-
   LoraInterferenceHelper::collisionMatrix = sirMap.at (sir);
 
   // Delay obtained from distance and speed of light in vacuum (constant)
@@ -203,6 +207,7 @@ main (int argc, char *argv[])
   // Create the LoraPhyHelper
   LoraPhyHelper phyHelper = LoraPhyHelper ();
   phyHelper.SetChannel (channel);
+  phyHelper.SetDuplexMode (!model);
 
   // Create the LorawanMacHelper
   LorawanMacHelper macHelper = LorawanMacHelper ();
@@ -261,6 +266,7 @@ main (int argc, char *argv[])
   networkServerHelper.EnableAdr (adrEnabled);
   networkServerHelper.SetAdr (adrType);
   networkServerHelper.EnableCongestionControl (congest);
+  networkServerHelper.AssignClusters (clusterInfo);
   networkServerHelper.Install (networkServer);
 
   // Install the Forwarder application on the gateways

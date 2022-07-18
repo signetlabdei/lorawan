@@ -102,7 +102,7 @@ public:
    */
   void SetGatewayTransmissionPriority (bool txPriority);
 
-
+  void SetDuplexMode (bool duplex);
 
 private:
   /**
@@ -124,6 +124,11 @@ private:
    * If giving priority to downlink transmission over reception at the gateways
    */
   bool m_txPriority;
+
+  /**
+   * Wheather we compute device reception (slower)
+   */
+  bool m_duplex;
 
 };
 
