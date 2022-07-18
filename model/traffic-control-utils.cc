@@ -269,7 +269,7 @@ TrafficControlUtils::OptimizeDutyCycleMax (const devices_t &devs, const double l
     }
 
   NS_LOG_DEBUG ("Bound = " + std::to_string (limit) +
-                ", Objective value = " + std::to_string (objective->Value ()) +
+                ", Objective value = " + std::to_string (objective->Value () / c) +
                 ", Num disabled = " + std::to_string (countDisabled));
 }
 
