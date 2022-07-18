@@ -153,8 +153,8 @@ void
 NetworkServerHelper::AssignClusters (cluster_t clustersInfo) 
 {
   int nClusters = clustersInfo.size ();
-  NS_ASSERT_MSG (nClusters == 1 or nClusters == 3, 
-      "For the moment only 1 or 3 clusters are supported.");
+  NS_ASSERT_MSG (nClusters <= 3, 
+      "For the moment only up to 3 clusters are supported.");
   NS_ASSERT_MSG (m_endDevices.GetN () > 0, 
       "Devices must be set before assigning clusters.");
 
@@ -172,18 +172,15 @@ NetworkServerHelper::AssignClusters (cluster_t clustersInfo)
       mac->SetCluster (currCluster);
       
       // Assign one frequency to each cluster
-      if (nClusters == 3)
-      {
-        int chid = 0;
-        for (auto &ch : mac->GetLogicalLoraChannelHelper ().GetChannelList ())
-          {
-            if (chid == currCluster)
-              ch->SetEnabledForUplink ();
-            else
-              ch->DisableForUplink ();
-            chid++;
-          }
-      }
+      int chid = 0;
+      for (auto &ch : mac->GetLogicalLoraChannelHelper ().GetChannelList ())
+        {
+          if (chid == currCluster)
+            ch->SetEnabledForUplink ();
+          else
+            ch->DisableForUplink ();
+          chid++;
+        }
 
       totWeight += devWeight;
 
@@ -195,6 +192,7 @@ NetworkServerHelper::AssignClusters (cluster_t clustersInfo)
         }
     }
   
+  m_clusterTargets.clear ();
   for (auto const &cluster : clustersInfo)
     m_clusterTargets.push_back (cluster.second);
 }
@@ -221,7 +219,11 @@ NetworkServerHelper::InstallComponents (Ptr<NetworkServer> netServer)
 
   // Add congestion control support
   if (m_ccEnabled)
-    netServer->AddComponent (CreateObject<CongestionControlComponent> ());
+    {
+      Ptr<CongestionControlComponent> ccc = CreateObject<CongestionControlComponent> ();
+      ccc->SetTargets (m_clusterTargets);
+      netServer->AddComponent (ccc);
+    }
 }
 
 // Parse input string containing slices info

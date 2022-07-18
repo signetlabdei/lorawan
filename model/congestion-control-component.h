@@ -39,6 +39,7 @@ namespace lorawan {
 
 class CongestionControlComponent : public NetworkControllerComponent
 {
+  using targets_t = std::vector<double>;
 
   // To track congestion status of the network
   using devices_t = std::vector<std::pair<uint32_t, double>>;
@@ -51,7 +52,7 @@ class CongestionControlComponent : public NetworkControllerComponent
     double max = 0;
   };
 
-  struct gateway_t
+  struct datarate_t
   {
     devices_t devs;
     int received = 0;
@@ -60,7 +61,8 @@ class CongestionControlComponent : public NetworkControllerComponent
     void Reset (void);
   };
 
-  using datarate_t = std::map<Address, gateway_t>;
+  using cluster_t = std::vector<datarate_t>;
+  using gateway_t = std::vector<cluster_t>;
 
   // To track useful metrics of devices
   class rssi_t
@@ -106,15 +108,17 @@ public:
 
   static double CapacityForPDRModel (double pdr);
 
+  void SetTargets (targets_t targets);
+
 private:
   void InitializeData (Ptr<NetworkStatus> status);
 
   std::string PrintCongestion (void);
 
-  bool ProduceConfigScheme (gateway_t &group);
+  bool ProduceConfigScheme (datarate_t &group, double target);
 
   // To track network congestion
-  std::vector<datarate_t> m_congestMetrics;
+  std::map<Address, gateway_t> m_congestMetrics;
 
   // To track current status of devices
   /*LoraDeviceAddress::Get() is hashable*/
@@ -131,8 +135,8 @@ private:
   // Start congestion control procedure
   Time m_start;
 
-  // PDR target
-  double m_targetPDR;
+  // PDR targets
+  targets_t m_targets;
 
   // Acceptable distance from target PDR value
   double m_epsilon;
@@ -140,10 +144,11 @@ private:
   // Minimum step between offered traffic values in a SF to declare value stagnation
   double m_tolerance;
 
+  // Number fo channels per cluster (not general right now)
+  int N_CH;
+
   // Constants
   static const int N_SF;
-
-  static const int N_CH;
 
   // Failsafe for disabled devices
   std::vector<Ptr<EndDeviceStatus>> m_disabled;
