@@ -59,8 +59,8 @@ TrafficControlUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const doubl
 
   static int nsettings = 1 + m_dutycycles.size ();
   const double infinity = solver->infinity ();
-  /// TODO: fine tune
-  static double alpha = 1e9; 
+  static double alpha = 1e-5;
+  static double c = 1e15;
 
   // Create the variables.
   std::vector<std::vector<MPVariable *>> x (dm.bound);
@@ -69,13 +69,13 @@ TrafficControlUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const doubl
         nsettings, "Which duty-cycle value is assigned to device " + std::to_string (i), &(x[i]));
 
   MPVariable *theta =
-      solver->MakeNumVar (0, infinity, "Linearization variable for the max min objective.");
+      solver->MakeNumVar (0.0, infinity, "Linearization variable for the max min objective.");
 
   // Create the constraints.
   for (int i = 0; i < dm.bound; ++i)
     {
       MPConstraint *constraint = solver->MakeRowConstraint (
-          1, 1, "One and only one duty-cycle setting must be used by device " + std::to_string (i));
+          1.0, 1.0, "One and only one duty-cycle setting must be used by device " + std::to_string (i));
       for (int l = 0; l < nsettings; ++l)
         constraint->SetCoefficient (x[i][l], 1);
     }
@@ -83,7 +83,7 @@ TrafficControlUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const doubl
   for (int i = 0; i < dm.bound; ++i)
     {
       MPConstraint *constraint = solver->MakeRowConstraint (
-          0, dm.deltas[i],
+          0.0, dm.deltas[i],
           "Duty-cycle setting must not be greater than current offered traffic for device " +
               std::to_string (i));
       constraint->SetCoefficient (x[i][0], dm.deltas[i]);
@@ -92,7 +92,7 @@ TrafficControlUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const doubl
     }
 
   MPConstraint *constraint = solver->MakeRowConstraint (
-      0, dm.limit,
+      0.0, dm.limit,
       "Total offerd traffic must not be grater than the limit imposed by PDR requirements");
   for (int i = 0; i < dm.bound; ++i)
     {
@@ -104,22 +104,22 @@ TrafficControlUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const doubl
   for (int i = 0; i < dm.bound; ++i)
     {
       MPConstraint *constraint = solver->MakeRowConstraint (
-          0, infinity, "Linearize objective for device " + std::to_string (i));
+          0.0, infinity, "Linearize objective for device " + std::to_string (i));
       constraint->SetCoefficient (x[i][0], dm.deltas[i]);
       for (int l = 1; l < nsettings; ++l)
         constraint->SetCoefficient (x[i][l], m_dutycycles[l - 1]);
-      constraint->SetCoefficient (theta, -1);
+      constraint->SetCoefficient (theta, -1.0);
     }
 
   // Create the objective function.
   MPObjective *const objective = solver->MutableObjective ();
   // Maximize offered traffic (max min duty-cycle)
-  objective->SetCoefficient (theta, alpha);
+  objective->SetCoefficient (theta, c);
   for (int i = 0; i < dm.bound; ++i)
     {
-      objective->SetCoefficient (x[i][0], dm.deltas[i]);
+      objective->SetCoefficient (x[i][0], dm.deltas[i] / dm.bound * c * alpha);
       for (int l = 1; l < nsettings; ++l)
-        objective->SetCoefficient (x[i][l], m_dutycycles[l - 1]);
+        objective->SetCoefficient (x[i][l], m_dutycycles[l - 1] / dm.bound * c * alpha);
     }
   objective->SetMaximization ();
 
@@ -190,6 +190,7 @@ TrafficControlUtils::OptimizeDutyCycleMax (const devices_t &devs, const double l
   solver->SetTimeLimit (absl::Seconds (30));
 
   static int nsettings = 1 + m_dutycycles.size ();
+  static double c = 1e9;
 
   // Create the variables.
   std::vector<std::vector<MPVariable *>> x (dm.bound);
@@ -232,9 +233,9 @@ TrafficControlUtils::OptimizeDutyCycleMax (const devices_t &devs, const double l
   // Maximize offered traffic
   for (int i = 0; i < dm.bound; ++i)
     {
-      objective->SetCoefficient (x[i][0], dm.deltas[i]);
+      objective->SetCoefficient (x[i][0], dm.deltas[i] * c);
       for (int l = 1; l < nsettings; ++l)
-        objective->SetCoefficient (x[i][l], m_dutycycles[l - 1]);
+        objective->SetCoefficient (x[i][l], m_dutycycles[l - 1] * c);
     }
   objective->SetMaximization ();
 
