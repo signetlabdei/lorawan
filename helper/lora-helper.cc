@@ -216,6 +216,9 @@ LoraHelper::DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateway
     }
 
   Time currentTime = Simulator::Now();
+  DevPktCount devPktCount;
+  m_packetTracker->CountAllDevicesPackets (m_lastDeviceStatusUpdate, currentTime, devPktCount);
+
   for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j)
     {
       Ptr<Node> object = *j;
@@ -240,13 +243,12 @@ LoraHelper::DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateway
       maxot = std::min (maxot, 0.01);
       double ot = mac->GetAggregatedDutyCycle ();
       ot = std::min (ot, maxot);
+      devCount_t& count = devPktCount[object->GetId ()];
       outputFile << currentTime.GetSeconds () << " "
                  << object->GetId () <<  " "
                  << pos.x << " " << pos.y << " " 
                  << dr << " " << unsigned(txPower) << " " 
-                 <<  m_packetTracker->PrintDevicePackets (m_lastDeviceStatusUpdate, 
-                                                          currentTime, 
-                                                          object->GetId ())  << " "
+                 << count.sent << " " << count.received << " "
                  << maxot << " " << ot << " " << unsigned(mac->GetCluster ())
                  << std::endl;
     }
@@ -265,22 +267,22 @@ LoraHelper::DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateway
 
 
 void
-LoraHelper::EnablePeriodicPhyPerformancePrinting (NodeContainer gateways,
+LoraHelper::EnablePeriodicGwsPerformancePrinting (NodeContainer gateways,
                                                   std::string filename,
                                                   Time interval)
 {
   NS_LOG_FUNCTION (this);
 
-  DoPrintPhyPerformance (gateways, filename);
+  DoPrintGwsPerformance (gateways, filename);
 
   Simulator::Schedule (interval,
-                       &LoraHelper::EnablePeriodicPhyPerformancePrinting,
+                       &LoraHelper::EnablePeriodicGwsPerformancePrinting,
                        this,
                        gateways, filename, interval);
 }
 
 void
-LoraHelper::DoPrintPhyPerformance (NodeContainer gateways,
+LoraHelper::DoPrintGwsPerformance (NodeContainer gateways,
                                    std::string filename)
 {
   NS_LOG_FUNCTION (this);
@@ -298,14 +300,15 @@ LoraHelper::DoPrintPhyPerformance (NodeContainer gateways,
       outputFile.open (c, std::ofstream::out | std::ofstream::app);
     }
 
+  GwsPhyPktPrint strings;
+  m_packetTracker->PrintPhyPacketsAllGws (m_lastPhyPerformanceUpdate,
+                                          Simulator::Now (), strings);
   for (auto it = gateways.Begin (); it != gateways.End (); ++it)
     {
       int systemId = (*it)->GetId ();
       outputFile << Simulator::Now ().GetSeconds () << " " <<
         std::to_string(systemId) << " " <<
-        m_packetTracker->PrintPhyPacketsPerGw(m_lastPhyPerformanceUpdate,
-                                              Simulator::Now (),
-                                              systemId) << std::endl;
+        strings[systemId].s << std::endl;
     }
 
   m_lastPhyPerformanceUpdate = Simulator::Now ();
@@ -346,7 +349,7 @@ LoraHelper::DoPrintGlobalPerformance (std::string filename)
     }
 
   outputFile << Simulator::Now ().GetSeconds () << " " <<
-    m_packetTracker->CountMacPacketsGlobally (m_lastGlobalPerformanceUpdate,
+    m_packetTracker->PrintPhyPacketsGlobally (m_lastGlobalPerformanceUpdate,
                                               Simulator::Now ()) <<
     std::endl;
 

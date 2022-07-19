@@ -96,13 +96,19 @@ public:
                                            Time interval);
 
   /**
+   * Print a summary of the status of all devices in the network.
+   */
+  void DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateways,
+                            std::string filename);
+
+  /**
    * Periodically prints PHY-level performance at every gateway in the container.
    */
-  void EnablePeriodicPhyPerformancePrinting (NodeContainer gateways,
+  void EnablePeriodicGwsPerformancePrinting (NodeContainer gateways,
                                              std::string filename,
                                              Time interval);
 
-  void DoPrintPhyPerformance (NodeContainer gateways, std::string filename);
+  void DoPrintGwsPerformance (NodeContainer gateways, std::string filename);
 
   /**
    * Periodically prints global performance.
@@ -117,12 +123,6 @@ public:
   LoraPacketTracker* m_packetTracker = 0;
 
   time_t m_oldtime;
-
-  /**
-   * Print a summary of the status of all devices in the network.
-   */
-  void DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateways,
-                            std::string filename);
 
 protected:
   static void PcapSniffRxEvent (Ptr<PcapFileWrapper> file,

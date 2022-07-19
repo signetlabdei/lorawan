@@ -68,6 +68,28 @@ typedef std::map<Ptr<Packet const>, MacPacketStatus> MacPacketData;
 typedef std::map<Ptr<Packet const>, PacketStatus> PhyPacketData;
 typedef std::map<Ptr<Packet const>, RetransmissionStatus> RetransmissionData;
 
+struct devCount_t
+{
+  int sent = 0;
+  int received = 0;
+};
+
+using DevPktCount = std::unordered_map<uint32_t, devCount_t>;
+
+struct phyCount_t
+{
+  std::vector<int> v = std::vector<int> (6, 0);
+};
+
+using GwsPhyPktCount = std::map<uint32_t, phyCount_t>;
+
+struct phyPrint_t
+{
+  std::string s = "0 0 0 0 0 0";
+};
+
+using GwsPhyPktPrint = std::unordered_map<uint32_t, phyPrint_t>;
+
 class LoraPacketTracker
 {
 public:
@@ -115,6 +137,13 @@ public:
    * gateway.
    */
   std::string PrintPhyPacketsPerGw (Time startTime, Time stopTime, int systemId);
+
+  void CountPhyPacketsAllGws (Time startTime, Time stopTime, GwsPhyPktCount &output);
+
+  void PrintPhyPacketsAllGws (Time startTime, Time stopTime, GwsPhyPktPrint &output);
+
+  std::string PrintPhyPacketsGlobally (Time startTime, Time stopTime);
+
   /**
    * Count packets to evaluate the performance at MAC level of a specific
    * gateway.
@@ -158,11 +187,12 @@ public:
 
   std::string PrintDevicePackets (Time startTime, Time stopTime, uint32_t devId);
 
+  void CountAllDevicesPackets (Time startTime, Time stopTime, DevPktCount &out);
+
 private:
   PhyPacketData m_packetTracker;
   MacPacketData m_macPacketTracker;
   RetransmissionData m_reTransmissionTracker;
-  
 };
 } // namespace lorawan
 } // namespace ns3

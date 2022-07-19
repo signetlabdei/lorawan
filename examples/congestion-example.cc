@@ -305,8 +305,6 @@ main (int argc, char *argv[])
       Time stateSamplePeriod = Seconds (1800);
       helper.EnablePeriodicDeviceStatusPrinting (endDevices, gateways, "nodeData.txt",
                                                  stateSamplePeriod);
-      helper.EnablePeriodicPhyPerformancePrinting (gateways, "phyPerformance.txt",
-                                                   stateSamplePeriod);
       helper.EnablePeriodicGlobalPerformancePrinting ("globalPerformance.txt", stateSamplePeriod);
     }
 
