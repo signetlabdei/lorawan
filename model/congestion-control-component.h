@@ -65,30 +65,16 @@ class CongestionControlComponent : public NetworkControllerComponent
   using gateway_t = std::vector<cluster_t>;
 
   // To track useful metrics of devices
-  class rssi_t
-  {
-    int num = 0;
-    double avg = 0;
-
-  public:
-    void Add (double rxpow);
-    double Avg (void);
-  };
-
   struct devinfo_t
   {
     int fCnt = 0;
     uint8_t datarate = 0;
-
     uint8_t cluster = 0;
+    Address bestGw = Address ();
 
     // Just in case we need to reorganize
     double maxoftraf = 0;
     uint8_t dutycycle = 0;
-
-    std::map<Address, rssi_t> rssimap;
-
-    Address GetBestGw (void);
   };
 
 public:
@@ -151,7 +137,7 @@ private:
   static const int N_SF;
 
   // Failsafe for disabled devices
-  std::vector<Ptr<EndDeviceStatus>> m_disabled;
+  std::map<uint32_t, Ptr<EndDeviceStatus>> m_disabled;
 };
 } // namespace lorawan
 } // namespace ns3

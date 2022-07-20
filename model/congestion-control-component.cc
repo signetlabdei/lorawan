@@ -39,30 +39,6 @@ CongestionControlComponent::datarate_t::Reset (void)
   sent = 0;
 }
 
-void
-CongestionControlComponent::rssi_t::Add (double rxpow)
-{
-  avg = (avg * num + rxpow) / (num + 1);
-  num++;
-}
-
-double
-CongestionControlComponent::rssi_t::Avg (void)
-{
-  NS_ASSERT_MSG (num > 0, "Cannot avg empty rssi_t");
-  return avg;
-}
-
-Address
-CongestionControlComponent::devinfo_t::GetBestGw ()
-{
-  using pair_t = decltype (rssimap)::value_type;
-  return std::max_element (
-             std::begin (rssimap), std::end (rssimap),
-             [] (pair_t &p1, pair_t &p2) { return p1.second.Avg () < p2.second.Avg (); })
-      ->first;
-}
-
 TypeId
 CongestionControlComponent::GetTypeId (void)
 {
@@ -129,12 +105,6 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
   uint32_t devaddr = fhead.GetAddress ().Get ();
   devinfo_t &devinfo = m_devTracking[devaddr];
 
-  // Update bestgateway and datarate
-  double rxpow = tag.GetReceivePower ();
-  Address gwaddr = status->GetPowerGatewayMap ()[rxpow];
-  devinfo.rssimap[gwaddr].Add (rxpow);
-  devinfo.datarate = tag.GetDataRate ();
-
   // Update frame counter
   uint16_t currFCnt = fhead.GetFCnt ();
   NS_ASSERT_MSG (
@@ -174,8 +144,8 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
             NS_LOG_INFO ((int) m_configToDoList.size () << " remaining");
           }
       // If it was a disabled device who did not receive duty-cycle command
-      /// TODO: implement
-      //if (m_disabled.)
+      if (m_disabled.count (devaddr) and !m_configToDoList.count (devaddr))
+        m_configToDoList[devaddr] = 255;
       // If config has finished, start sampling fase
       if (m_configToDoList.empty ())
         {
@@ -193,7 +163,7 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
     }
 
   // Else, we are in sampling fase. Add sample to congestion metrics
-  datarate_t &group = m_congestMetrics[devinfo.GetBestGw ()][devinfo.cluster][devinfo.datarate];
+  datarate_t &group = m_congestMetrics[devinfo.bestGw][devinfo.cluster][devinfo.datarate];
   group.received++;
   group.sent += currFCnt - prevFCnt;
 
@@ -217,8 +187,11 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
 
       // Cheat and re-enable devices if they need to receive different config
       for (auto const &ed : m_disabled)
-        if (m_configToDoList.count (ed->m_endDeviceAddress.Get ()))
-          ed->GetMac ()->SetAggregatedDutyCycle (1.0);
+        if (m_configToDoList.count (ed.first))
+          {
+            ed.second->GetMac ()->SetAggregatedDutyCycle (1.0);
+            m_devTracking[ed.first].dutycycle = 0;
+          }
       m_disabled.clear ();
 
       // This is in case there was nothig to reconfig
@@ -249,7 +222,8 @@ CongestionControlComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
   // Save devices which are disabled
   if (dc == 255)
     {
-      m_disabled.push_back (status);
+      if (!m_disabled.count (devaddr))
+        m_disabled[devaddr] = status;
       m_configToDoList.erase (devaddr);
     }
 
@@ -302,11 +276,8 @@ CongestionControlComponent::InitializeData (Ptr<NetworkStatus> status)
     {
       // Compute offered traffic
       devinfo_t &devinfo = m_devTracking[ed.first.Get ()];
-      Ptr<PeriodicSender> app = ed.second->GetMac ()
-                                    ->GetDevice ()
-                                    ->GetNode ()
-                                    ->GetApplication (0)
-                                    ->GetObject<PeriodicSender> ();
+      Ptr<Node> node = ed.second->GetMac ()->GetDevice ()->GetNode ();
+      Ptr<PeriodicSender> app = node->GetApplication (0)->GetObject<PeriodicSender> ();
 
       Ptr<Packet> tmp =
           Create<Packet> (app->GetPacketSize () + 13 /* Headers with no MAC commands */);
@@ -314,15 +285,28 @@ CongestionControlComponent::InitializeData (Ptr<NetworkStatus> status)
       params.sf = 12 - devinfo.datarate;
       params.lowDataRateOptimizationEnabled =
           LoraPhy::GetTSym (params) > MilliSeconds (16) ? true : false;
-
       double toa = LoraPhy::GetOnAirTime (tmp, params).GetSeconds ();
       double traffic = toa / app->GetInterval ().GetSeconds ();
-      traffic = (traffic > 0.01) ? 0.01 : traffic;
+      devinfo.maxoftraf = (traffic > 0.01) ? 0.01 : traffic;
 
-      devinfo.maxoftraf = traffic;
+      devinfo.datarate = ed.second->GetMac ()->GetDataRate ();
+      devinfo.cluster = ed.second->GetMac ()->GetCluster ();
+
+      Ptr<MobilityModel> devpos = node->GetObject<MobilityModel> ();
+      double distance = std::numeric_limits<double>::max ();
+      for (auto const &gw : (status->m_gatewayStatuses))
+        {
+          double tmp = devpos->GetDistanceFrom (
+              gw.second->GetGatewayMac ()->GetDevice ()->GetNode ()->GetObject<MobilityModel> ());
+          if (tmp < distance)
+            {
+              distance = tmp;
+              devinfo.bestGw = gw.first;
+            }
+        }
 
       // Insert data in structure according to best gateway and SF
-      datarate_t &group = m_congestMetrics[devinfo.GetBestGw ()][devinfo.cluster][devinfo.datarate];
+      datarate_t &group = m_congestMetrics[devinfo.bestGw][devinfo.cluster][devinfo.datarate];
       group.devs.push_back ({ed.first.Get (), traffic});
       group.ot.max += traffic;
       group.ot.high += traffic;
