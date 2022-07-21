@@ -68,7 +68,7 @@ CongestionControlComponent::GetTypeId (void)
   return tid;
 }
 
-CongestionControlComponent::CongestionControlComponent () : m_targets ({0.95}), N_CH (1)
+CongestionControlComponent::CongestionControlComponent () : m_targets ({0.95}), N_CH (3)
 {
 }
 
@@ -82,7 +82,6 @@ CongestionControlComponent::SetTargets (targets_t targets)
   NS_LOG_FUNCTION (targets);
 
   m_targets = targets;
-  N_CH = 1;
 }
 
 void
@@ -133,7 +132,7 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
   // If we are in reconfiguration fase, look for acknowledgement and exit
   if (!m_configToDoList.empty ())
     {
-      // Wait for ack policy
+      /*       // Wait for ack policy
       for (const auto &command : fhead.GetCommands ())
         if (command->GetCommandType () == DUTY_CYCLE_ANS)
           {
@@ -145,7 +144,7 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
           }
       // If it was a disabled device who did not receive duty-cycle command
       if (m_disabled.count (devaddr) and !m_configToDoList.count (devaddr))
-        m_configToDoList[devaddr] = 255;
+        m_configToDoList[devaddr] = 255; 
       // If config has finished, start sampling fase
       if (m_configToDoList.empty ())
         {
@@ -158,7 +157,7 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
                 dr.Reset ();
           // Reset timer
           m_samplingStart = Simulator::Now ();
-        }
+        } */
       return;
     }
 
@@ -219,20 +218,23 @@ CongestionControlComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
     return; // No re-config instruction
   uint8_t dc = m_configToDoList[devaddr];
   NS_ASSERT (dc == 0 or (7 <= dc and dc <= 15) or dc == 255);
-  // Save devices which are disabled
+/*   // Save devices which are disabled, ack policy
   if (dc == 255)
     {
       if (!m_disabled.count (devaddr))
         m_disabled[devaddr] = status;
       m_configToDoList.erase (devaddr);
-    }
+    } */
 
   NS_LOG_INFO ("Sending DutyCycleReq (" << 1.0 / pow (2, dc) << " E), "
                                         << (int) m_configToDoList.size () << " remaining");
 
-  /*   // No ack policy
+  // No ack policy
   m_devTracking[devaddr].dutycycle = m_configToDoList[devaddr];
   m_configToDoList.erase (devaddr);
+  if (dc == 255 and !m_disabled.count (devaddr))
+    m_disabled[devaddr] = status;
+
   // If config has finished, start sampling fase
   if (m_configToDoList.empty ())
     {
@@ -245,7 +247,7 @@ CongestionControlComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
             dr.Reset ();
       // Reset timer
       m_samplingStart = Simulator::Now ();
-    } */
+    }
 
   status->m_reply.frameHeader.AddDutyCycleReq (dc);
   status->m_reply.frameHeader.SetAsDownlink ();
@@ -321,7 +323,7 @@ CongestionControlComponent::PrintCongestion ()
   ss << std::endl;
   for (size_t cl = 0; cl < m_targets.size (); ++cl)
     {
-      ss << std::endl << "Cluster " << cl << ": ";
+      ss << "Cluster " << cl << ": ";
       for (int dr = N_SF - 1; dr >= 0; --dr)
         {
           double sent = 0.0;
@@ -367,7 +369,7 @@ CongestionControlComponent::ProduceConfigScheme (datarate_t &group, double targe
 
   ot.curr = (ot.high + ot.low) / 2;
 
-  if (false and !started) //! Check if we can jump start with capacity model.
+  if (!started) //! Check if we can jump start with capacity model.
     {
       double cap = CapacityForPDRModel (target) * N_CH;
       ot.curr = ((ot.high - cap) / 2.0 < m_tolerance) ? ot.curr : cap;

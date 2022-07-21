@@ -362,7 +362,7 @@ void
 LoraHelper::DoPrintSimulationTime (Time interval)
 {
   // NS_LOG_INFO ("Time: " << Simulator::Now().GetHours());
-  std::cout << "Simulated time: " << Simulator::Now ().GetHours () << " hours" << std::endl;
+  std::cout << "Simulated time: " << Simulator::Now ().GetHours () << " hours, ";
   std::cout << "Real time from last call: " << std::time (0) - m_oldtime << " seconds" << std::endl;
   m_oldtime = std::time (0);
   Simulator::Schedule (interval, &LoraHelper::DoPrintSimulationTime, this, interval);

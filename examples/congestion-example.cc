@@ -109,7 +109,7 @@ main (int argc, char *argv[])
   Time trackFinalOutcomeFrom = periodLenght * periods - Hours (10);
   std::string adrType = "ns3::AdrComponent";
   using cluster_t = std::vector<std::pair<double, double>>;
-  cluster_t clusterInfo = {{100.0, 0.97}}; //,{33.3,0.90},{33.3,0.70}};
+  cluster_t clusterInfo = {{100.0, 0.95}}; //,{33.3,0.90},{33.3,0.70}};
 
   Config::SetDefault ("ns3::EndDeviceLorawanMac::DRControl", BooleanValue (true)); //!< ADR bit
   Config::SetDefault ("ns3::EndDeviceLorawanMac::MType", StringValue ("Unconfirmed"));
@@ -122,11 +122,11 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::AdrComponent::SNRDeviceMargin",
                       DoubleValue (10 * log10 (-1 / log (0.98))));
 
-  Config::SetDefault ("ns3::CongestionControlComponent::StartTime", TimeValue (Hours (2.0)));
-  Config::SetDefault ("ns3::CongestionControlComponent::SamplingDuration", TimeValue (Hours (2.0)));
-  Config::SetDefault ("ns3::CongestionControlComponent::AcceptedPDRVariance", DoubleValue (0.01));
+  Config::SetDefault ("ns3::CongestionControlComponent::StartTime", TimeValue (Hours (warmup)));
+  Config::SetDefault ("ns3::CongestionControlComponent::SamplingDuration", TimeValue (Hours (sampling)));
+  Config::SetDefault ("ns3::CongestionControlComponent::AcceptedPDRVariance", DoubleValue (variance));
   Config::SetDefault ("ns3::CongestionControlComponent::ValueStagnationTolerance",
-                      DoubleValue (0.001));
+                      DoubleValue (tolerance));
 
   /************
    *  Logging *
@@ -324,6 +324,7 @@ main (int argc, char *argv[])
       ss << "\nAll configurations terminated. Starting simulation...\n\n"
          << "--------------------------------------------------------------------------------\n";
       std::cout << ss.str ();
+      helper.EnableSimulationTimePrinting (Seconds (3600));
     }
 
   // Start simulation
