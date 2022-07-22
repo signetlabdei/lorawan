@@ -68,6 +68,7 @@ main (int argc, char *argv[])
   bool adrEnabled = false;
   bool initializeSF = true;
   bool model = false;
+  int beta = 1;
   bool congest = false;
   double warmup = 2;
   double sampling = 2;
@@ -87,12 +88,13 @@ main (int argc, char *argv[])
   cmd.AddValue ("initSF", "Whether to initialize the SFs", initializeSF);
   cmd.AddValue ("adr", "Whether to enable ADR", adrEnabled);
   cmd.AddValue ("model", "Use static duty-cycle config with capacity model", model);
-  cmd.AddValue ("target", "Central PDR value targeted by capacity model", target);
+  cmd.AddValue ("beta", "Scaling factor of the static model output", beta);
   cmd.AddValue ("congest", "Use congestion control", congest);
   cmd.AddValue ("warmup",
                 "[congestion control] Starting delay of the congestion control algorithm for "
                 "initial network warm-up (e.g. ADR) and RSSI measurements collection",
                 warmup);
+  cmd.AddValue ("target", "[congestion control] Central PDR value targeted (single cluster)", target);
   cmd.AddValue ("sampling", "[congestion control] Duration (hours) of the PDR sampling fase",
                 sampling);
   cmd.AddValue ("variance", "[congestion control] Acceptable variation around the target PDR value",
@@ -109,7 +111,7 @@ main (int argc, char *argv[])
   Time trackFinalOutcomeFrom = periodLenght * periods - Hours (10);
   std::string adrType = "ns3::AdrComponent";
   using cluster_t = std::vector<std::pair<double, double>>;
-  cluster_t clusterInfo = {{100.0, 0.95}}; //,{33.3,0.90},{33.3,0.70}};
+  cluster_t clusterInfo = {{100.0, target}}; //,{33.3,0.90},{33.3,0.70}};
 
   Config::SetDefault ("ns3::EndDeviceLorawanMac::DRControl", BooleanValue (true)); //!< ADR bit
   Config::SetDefault ("ns3::EndDeviceLorawanMac::MType", StringValue ("Unconfirmed"));
@@ -291,7 +293,7 @@ main (int argc, char *argv[])
     {
       NS_ASSERT_MSG (!congest, "Static duty-cycle configuration cannot be applied if dynamic "
                                "congestion control is in place.");
-      macHelper.SetDutyCyclesWithCapacityModel (endDevices, gateways, channel, target);
+      macHelper.SetDutyCyclesWithCapacityModel (endDevices, gateways, channel, target, beta);
     }
   loss->SetNext (rayleigh);
 

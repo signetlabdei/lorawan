@@ -729,7 +729,7 @@ LorawanMacHelper::SetSpreadingFactorsGivenDistribution (NodeContainer endDevices
 
 void
 LorawanMacHelper::SetDutyCyclesWithCapacityModel (NodeContainer endDevices, NodeContainer gateways,
-                                                  Ptr<LoraChannel> channel, double pdr)
+                                                  Ptr<LoraChannel> channel, double pdr, int beta)
 {
   using datarate_t = std::vector<std::pair<uint32_t, double>>;
   using gateway_t = std::vector<datarate_t>;
@@ -737,7 +737,7 @@ LorawanMacHelper::SetDutyCyclesWithCapacityModel (NodeContainer endDevices, Node
 
   const int N_SF = 6;
   const int N_CH = 1;
-  const double limit = CongestionControlComponent::CapacityForPDRModel (pdr) * N_CH;
+  const double limit = CongestionControlComponent::CapacityForPDRModel (pdr) * N_CH * beta;
 
   std::map<uint32_t, gateway_t> gwgroups;
   for (NodeContainer::Iterator currGw = gateways.Begin (); currGw != gateways.End (); ++currGw)

@@ -118,7 +118,7 @@ public:
                                                                 std::vector<double> distribution);
 
   static void SetDutyCyclesWithCapacityModel (NodeContainer endDevices, NodeContainer gateways,
-                                              Ptr<LoraChannel> channel, double pdr);
+                                              Ptr<LoraChannel> channel, double pdr, int beta = 1);
 
 private:
   /**
