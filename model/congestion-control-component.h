@@ -41,29 +41,6 @@ class CongestionControlComponent : public NetworkControllerComponent
 {
   using targets_t = std::vector<double>;
 
-  // To track congestion status of the network
-  using devices_t = std::vector<std::pair<uint32_t, double>>;
-
-  struct oftraffic_t
-  {
-    double high = 0;
-    double low = 0;
-    double curr = 0;
-    double max = 0;
-  };
-
-  struct datarate_t
-  {
-    devices_t devs;
-    int received = 0;
-    int sent = 0;
-    oftraffic_t ot;
-    void Reset (void);
-  };
-
-  using cluster_t = std::vector<datarate_t>;
-  using gateway_t = std::vector<cluster_t>;
-
   // To track useful metrics of devices
   struct devinfo_t
   {
@@ -76,6 +53,39 @@ class CongestionControlComponent : public NetworkControllerComponent
     double maxoftraf = 0;
     uint8_t dutycycle = 0;
   };
+  using devinfomap_t = std::unordered_map<uint32_t, devinfo_t>;
+
+  // To track congestion status of the network
+  using devices_t = std::vector<std::pair<uint32_t, double>>;
+  struct offtraff_t
+  {
+    double high = 0;
+    double low = 0;
+    double curr = 0;
+    double max = 0;
+  };
+  struct dataratestatus_t
+  {
+    devices_t devs;
+    int received = 0;
+    int sent = 0;
+    offtraff_t ot;
+    void Reset (void);
+  };
+  using clusterstatus_t = std::vector<dataratestatus_t>;
+  using gatewaystatus_t = std::vector<clusterstatus_t>;
+  using networkstatus_t = std::map<Address, gatewaystatus_t>;
+
+  // Congestion to do list
+  /*LoraDeviceAddress::Get() is hashable*/
+  using configs_t = std::unordered_map<uint32_t, uint8_t>;
+  using configsmap_t = std::map<Address, std::vector<configs_t>>;
+
+  using samplingstatus_t = std::map<Address, std::vector<Time>>;
+
+  // Map disabled devices
+  using disabled_t = std::map<uint32_t, Ptr<EndDeviceStatus>>;
+  using disabledmap_t = std::map<Address, std::vector<disabled_t>>;
 
 public:
   static TypeId GetTypeId (void);
@@ -99,24 +109,25 @@ public:
 private:
   void InitializeData (Ptr<NetworkStatus> status);
 
-  std::string PrintCongestion (void);
+  std::string PrintCongestion (Address bestGw, uint8_t cluster);
 
-  bool ProduceConfigScheme (datarate_t &group, double target);
+  bool ProduceConfigScheme (dataratestatus_t &group, double target);
 
   // To track network congestion
-  std::map<Address, gateway_t> m_congestMetrics;
+  networkstatus_t m_congestionStatus;
 
   // To track current status of devices
-  /*LoraDeviceAddress::Get() is hashable*/
-  std::unordered_map<uint32_t, devinfo_t> m_devTracking;
+  devinfomap_t m_devStatus;
 
   // To track ongoing duty-cycle configuration
   /*LoraDeviceAddress::Get() is hashable*/
-  std::unordered_map<uint32_t, uint8_t> m_configToDoList;
+  configsmap_t m_configToDoList;
+
+  // Track sampling phases
+  samplingstatus_t m_samplingStart;
 
   // Duration of the period in which we sample PDR
   Time m_samplingDuration;
-  Time m_samplingStart;
 
   // Start congestion control procedure
   Time m_start;
@@ -137,7 +148,7 @@ private:
   static const int N_SF;
 
   // Failsafe for disabled devices
-  std::map<uint32_t, Ptr<EndDeviceStatus>> m_disabled;
+  disabledmap_t m_disabled;
 };
 } // namespace lorawan
 } // namespace ns3
