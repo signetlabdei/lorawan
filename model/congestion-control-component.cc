@@ -68,7 +68,7 @@ CongestionControlComponent::GetTypeId (void)
   return tid;
 }
 
-CongestionControlComponent::CongestionControlComponent () : m_targets ({0.95}), N_CH (10)
+CongestionControlComponent::CongestionControlComponent () : m_targets ({0.95}), N_CH (8)
 {
 }
 
