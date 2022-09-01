@@ -32,6 +32,7 @@ namespace lorawan {
 NS_LOG_COMPONENT_DEFINE ("LoraPacketTracker");
 
 LoraPacketTracker::LoraPacketTracker ()
+    : m_oldPacketThreshold (Seconds (0)), m_lastPacketCleanup (Seconds (0))
 {
   NS_LOG_FUNCTION (this);
 }
@@ -59,6 +60,7 @@ LoraPacketTracker::MacTransmissionCallback (Ptr<Packet const> packet)
       status.receivedTime = Time::Max ();
 
       m_macPacketTracker.insert (std::pair<Ptr<Packet const>, MacPacketStatus> (packet, status));
+      CleanupOldPackets ();
     }
 }
 
@@ -77,6 +79,7 @@ LoraPacketTracker::RequiredTransmissionsCallback (uint8_t reqTx, bool success, T
   entry.successful = success;
 
   m_reTransmissionTracker.insert (std::pair<Ptr<Packet>, RetransmissionStatus> (packet, entry));
+  CleanupOldPackets ();
 }
 
 void
@@ -120,6 +123,7 @@ LoraPacketTracker::TransmissionCallback (Ptr<Packet const> packet, uint32_t edId
       status.senderId = edId;
 
       m_packetTracker.insert (std::pair<Ptr<Packet const>, PacketStatus> (packet, status));
+      CleanupOldPackets ();
     }
 }
 
@@ -550,6 +554,50 @@ LoraPacketTracker::PrintSimulationStatistics (Time startTime)
   ss << "\nTotal offered traffic: " << totOffTraff << " E\n";
 
   return ss.str ();
+}
+
+void
+LoraPacketTracker::EnableOldPacketsCleanup (Time oldPacketThreshold)
+{
+  NS_ASSERT_MSG (
+      oldPacketThreshold > Minutes (30),
+      "Threshold to consider packets old should be > 30 min to avoid risk of partial entries");
+  m_oldPacketThreshold = oldPacketThreshold;
+}
+
+void
+LoraPacketTracker::CleanupOldPackets (void)
+{
+  if (m_oldPacketThreshold.IsZero ())
+    return;
+  if (Simulator::Now () < m_lastPacketCleanup + m_oldPacketThreshold)
+    return;
+
+  for (auto it = m_packetTracker.cbegin (); it != m_packetTracker.cend ();)
+    {
+      if ((*it).second.sendTime < Simulator::Now () - m_oldPacketThreshold)
+        it = m_packetTracker.erase (it);
+      else
+        ++it;
+    }
+
+  for (auto it = m_macPacketTracker.cbegin (); it != m_macPacketTracker.cend ();)
+    {
+      if ((*it).second.sendTime < Simulator::Now () - m_oldPacketThreshold)
+        it = m_macPacketTracker.erase (it);
+      else
+        ++it;
+    }
+
+  for (auto it = m_reTransmissionTracker.cbegin (); it != m_reTransmissionTracker.cend ();)
+    {
+      if ((*it).second.firstAttempt < Simulator::Now () - m_oldPacketThreshold)
+        it = m_reTransmissionTracker.erase (it);
+      else
+        ++it;
+    }
+
+  m_lastPacketCleanup = Simulator::Now ();
 }
 
 } // namespace lorawan

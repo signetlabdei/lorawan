@@ -132,14 +132,9 @@ public:
    * gateway.
    */
   std::vector<int> CountPhyPacketsPerGw (Time startTime, Time stopTime, int systemId);
-  /**
-   * Count packets to evaluate the performance at PHY level of a specific
-   * gateway.
-   */
   std::string PrintPhyPacketsPerGw (Time startTime, Time stopTime, int systemId);
 
   void CountPhyPacketsAllGws (Time startTime, Time stopTime, GwsPhyPktCount &output);
-
   void PrintPhyPacketsAllGws (Time startTime, Time stopTime, GwsPhyPktPrint &output);
 
   std::string PrintPhyPacketsGlobally (Time startTime, Time stopTime);
@@ -149,11 +144,6 @@ public:
    * gateway.
    */
   std::string CountMacPacketsPerGw (Time startTime, Time stopTime, int systemId);
-
-  /**
-   * Count packets to evaluate the performance at MAC level of a specific
-   * gateway.
-   */
   std::string PrintMacPacketsPerGw (Time startTime, Time stopTime, int systemId);
 
   /**
@@ -183,16 +173,22 @@ public:
    */
   std::string CountMacPacketsGloballyCpsr (Time startTime, Time stopTime);
 
-  std::string PrintSimulationStatistics (Time startTime = Seconds (0));
-
   std::string PrintDevicePackets (Time startTime, Time stopTime, uint32_t devId);
-
   void CountAllDevicesPackets (Time startTime, Time stopTime, DevPktCount &out);
 
+  std::string PrintSimulationStatistics (Time startTime = Seconds (0));
+
+  void EnableOldPacketsCleanup (Time oldPacketThreshold = Hours (12));
+
 private:
+  void CleanupOldPackets (void);
+
   PhyPacketData m_packetTracker;
   MacPacketData m_macPacketTracker;
   RetransmissionData m_reTransmissionTracker;
+
+  Time m_oldPacketThreshold;
+  Time m_lastPacketCleanup;
 };
 } // namespace lorawan
 } // namespace ns3

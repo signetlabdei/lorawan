@@ -94,7 +94,8 @@ main (int argc, char *argv[])
                 "[congestion control] Starting delay of the congestion control algorithm for "
                 "initial network warm-up (e.g. ADR) and RSSI measurements collection",
                 warmup);
-  cmd.AddValue ("target", "[congestion control] Central PDR value targeted (single cluster)", target);
+  cmd.AddValue ("target", "[congestion control] Central PDR value targeted (single cluster)",
+                target);
   cmd.AddValue ("sampling", "[congestion control] Duration (hours) of the PDR sampling fase",
                 sampling);
   cmd.AddValue ("variance", "[congestion control] Acceptable variation around the target PDR value",
@@ -125,8 +126,10 @@ main (int argc, char *argv[])
                       DoubleValue (10 * log10 (-1 / log (0.98))));
 
   Config::SetDefault ("ns3::CongestionControlComponent::StartTime", TimeValue (Hours (warmup)));
-  Config::SetDefault ("ns3::CongestionControlComponent::SamplingDuration", TimeValue (Hours (sampling)));
-  Config::SetDefault ("ns3::CongestionControlComponent::AcceptedPDRVariance", DoubleValue (variance));
+  Config::SetDefault ("ns3::CongestionControlComponent::SamplingDuration",
+                      TimeValue (Hours (sampling)));
+  Config::SetDefault ("ns3::CongestionControlComponent::AcceptedPDRVariance",
+                      DoubleValue (variance));
   Config::SetDefault ("ns3::CongestionControlComponent::ValueStagnationTolerance",
                       DoubleValue (tolerance));
 
@@ -311,6 +314,7 @@ main (int argc, char *argv[])
     }
 
   LoraPacketTracker &tracker = helper.GetPacketTracker ();
+  tracker.EnableOldPacketsCleanup (Hours (1));
 
   if (debug)
     {
