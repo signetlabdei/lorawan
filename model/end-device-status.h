@@ -30,6 +30,7 @@
 #include "ns3/pointer.h"
 #include "ns3/lora-frame-header.h"
 #include <iostream>
+#include <boost/circular_buffer.hpp>
 
 namespace ns3 {
 namespace lorawan {
@@ -173,7 +174,7 @@ public:
     double frequency;
   };
 
-  typedef std::list<std::pair<Ptr<Packet const>, ReceivedPacketInfo> >
+  typedef boost::circular_buffer<std::pair<Ptr<Packet const>, ReceivedPacketInfo> >
     ReceivedPacketList;
 
 

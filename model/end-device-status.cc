@@ -51,7 +51,7 @@ EndDeviceStatus::EndDeviceStatus (LoraDeviceAddress endDeviceAddress,
                                   Ptr<ClassAEndDeviceLorawanMac> endDeviceMac)
     : m_reply (EndDeviceStatus::Reply ()),
       m_endDeviceAddress (endDeviceAddress),
-      m_receivedPacketList (ReceivedPacketList ()),
+      m_receivedPacketList (ReceivedPacketList (20)),
       m_mac (endDeviceMac)
 {
   NS_LOG_FUNCTION (endDeviceAddress);
@@ -63,7 +63,7 @@ EndDeviceStatus::EndDeviceStatus ()
 
   // Initialize data structure
   m_reply = EndDeviceStatus::Reply ();
-  m_receivedPacketList = ReceivedPacketList ();
+  m_receivedPacketList = ReceivedPacketList (20);
 }
 
 EndDeviceStatus::~EndDeviceStatus ()
@@ -409,7 +409,7 @@ EndDeviceStatus::GetPowerGatewayMap (void)
 std::ostream &
 operator<< (std::ostream &os, const EndDeviceStatus &status)
 {
-  os << "Total packets received: " << status.m_receivedPacketList.size () << std::endl;
+  os << "Recently received packets: " << status.m_receivedPacketList.size () << std::endl;
 
   for (auto j = status.m_receivedPacketList.begin (); j != status.m_receivedPacketList.end (); j++)
     {
