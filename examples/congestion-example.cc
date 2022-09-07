@@ -2,6 +2,7 @@
  * This program creates a network which uses congestion control.
  */
 
+// ns3 imports
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/point-to-point-module.h"
@@ -12,6 +13,7 @@
 #include "ns3/string.h"
 #include "ns3/log.h"
 
+// lorawan imports
 #include "ns3/lora-helper.h"
 #include "ns3/lora-phy-helper.h"
 #include "ns3/lorawan-mac-helper.h"
@@ -23,34 +25,15 @@
 #include "ns3/hex-grid-position-allocator.h"
 #include "ns3/range-position-allocator.h"
 #include "ns3/lora-interference-helper.h"
+#include "example-utils.cc"
 
+// cpp imports
 #include <unordered_map>
 
 using namespace ns3;
 using namespace lorawan;
 
 NS_LOG_COMPONENT_DEFINE ("CongestionExample");
-
-double
-ComputeArea (double range, int rings)
-{
-  double radius = range * std::cos (M_PI / 6);
-  int ngateways = 3 * rings * rings - 3 * rings + 1;
-
-  if (rings == 1)
-    return pow (range / 1000, 2) * M_PI;
-
-  double hexag = range / 1000 * radius / 1000 * 3;
-  double disc = pow (range / 1000, 2) * M_PI;
-  return (ngateways - 6 * (rings - 1)) * hexag // Internal hexagons
-         + 3 * (hexag + disc) // Vertices
-         + 2 * (rings - 2) * (2 * hexag + disc); // Sides
-}
-
-const std::unordered_map<std::string, LoraInterferenceHelper::CollisionMatrix> sirMap = {
-    {"CROCE", LoraInterferenceHelper::CROCE},
-    {"GOURSAUD", LoraInterferenceHelper::GOURSAUD},
-    {"ALOHA", LoraInterferenceHelper::ALOHA}};
 
 int
 main (int argc, char *argv[])
@@ -72,48 +55,39 @@ main (int argc, char *argv[])
   bool congest = false;
   double warmup = 2;
   double sampling = 2;
-  double target = 0.95;
   double variance = 0.01;
   double tolerance = 0.001;
+  double target = 0.95;
+  std::string clusterStr;
   bool debug = false;
   bool file = false;
 
   CommandLine cmd (__FILE__);
-  cmd.AddValue ("periods", "Number of periods to simulate", periods);
+  cmd.AddValue ("periods", "Number of periods to simulate (1 period = 1 hour)", periods);
   cmd.AddValue ("rings", "Number of gateway rings in hexagonal topology", gatewayRings);
   cmd.AddValue ("range", "Radius of the device allocation disk around a gateway)", range);
   cmd.AddValue ("devices", "Number of end devices to include in the simulation", nDevices);
-  cmd.AddValue ("sir", "Signal to Interference Ratio matrix used for interference calculations",
-                sir);
+  cmd.AddValue ("sir", "Signal to Interference Ratio matrix used for interference", sir);
   cmd.AddValue ("initSF", "Whether to initialize the SFs", initializeSF);
-  cmd.AddValue ("adr", "Whether to enable ADR", adrEnabled);
+  cmd.AddValue ("adr", "Whether to enable online ADR", adrEnabled);
   cmd.AddValue ("model", "Use static duty-cycle config with capacity model", model);
-  cmd.AddValue ("beta", "Scaling factor of the static model output", beta);
+  cmd.AddValue ("beta", "[static ctrl] Scaling factor of the static model output", beta);
   cmd.AddValue ("congest", "Use congestion control", congest);
   cmd.AddValue ("warmup",
-                "[congestion control] Starting delay of the congestion control algorithm for "
+                "[cong ctrl] Starting delay of the congestion control algorithm for "
                 "initial network warm-up (e.g. ADR) and RSSI measurements collection",
                 warmup);
-  cmd.AddValue ("target", "[congestion control] Central PDR value targeted (single cluster)",
-                target);
-  cmd.AddValue ("sampling", "[congestion control] Duration (hours) of the PDR sampling fase",
-                sampling);
-  cmd.AddValue ("variance", "[congestion control] Acceptable variation around the target PDR value",
-                variance);
-  cmd.AddValue ("tolerance", "[congestion control] Tolerance step to declare value stagnation",
-                tolerance);
+  cmd.AddValue ("sampling", "[cong ctrl] Duration (hours) of the PDR sampling fase", sampling);
+  cmd.AddValue ("variance", "[cong ctrl] Acceptable gap around the target PDR value", variance);
+  cmd.AddValue ("tolerance", "[cong ctrl] Tolerance step to declare value stagnation", tolerance);
   cmd.AddValue ("debug", "Whether or not to debug logs at various levels. ", debug);
   cmd.AddValue ("file", "Output the metrics of the simulation in a file", file);
+  cmd.AddValue ("target", "[ctrl] Central PDR value targeted (single cluster)", target);
+  cmd.AddValue ("clusters", "[ctrl] Clusters descriptor: \"{{share,pdr},...\"}", clusterStr);
   cmd.Parse (argc, argv);
   NS_ASSERT (!(congest & model));
 
   // Static configurations
-  Time periodLenght = Hours (1);
-  Time trackFinalOutcomeFrom = periodLenght * periods - Hours (10);
-  std::string adrType = "ns3::AdrComponent";
-  using cluster_t = std::vector<std::pair<double, double>>;
-  cluster_t clusterInfo = {{100.0, target}}; //,{33.3,0.90},{33.3,0.70}};
-
   Config::SetDefault ("ns3::EndDeviceLorawanMac::DRControl", BooleanValue (true)); //!< ADR bit
   Config::SetDefault ("ns3::EndDeviceLorawanMac::MType", StringValue ("Unconfirmed"));
   Config::SetDefault ("ns3::EndDeviceLorawanMac::MaxTransmissions", IntegerValue (1));
@@ -139,15 +113,8 @@ main (int argc, char *argv[])
 
   if (debug) // This also requires to build ns3 with debug option
     {
-      //LogComponentEnable ("CongestionExample", LOG_LEVEL_ALL);
       LogComponentEnable ("CongestionControlComponent", LOG_LEVEL_DEBUG);
-      //LogComponentEnable ("EndDeviceStatus", LOG_LEVEL_ALL);
-      //LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_ALL);
-      //LogComponentEnable ("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
-      //LogComponentEnable ("NetworkController", LOG_LEVEL_ALL);
-      //LogComponentEnable ("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
       LogComponentEnable ("TrafficControlUtils", LOG_LEVEL_DEBUG);
-      //LogComponentEnable ("LorawanMacHelper", LOG_LEVEL_ALL);
       LogComponentEnableAll (LOG_PREFIX_FUNC);
       LogComponentEnableAll (LOG_PREFIX_NODE);
       LogComponentEnableAll (LOG_PREFIX_TIME);
@@ -264,14 +231,17 @@ main (int argc, char *argv[])
    *  Create Applications  *
    *************************/
 
+  // Set clusters
+  cluster_t clusters =
+      (clusterStr.empty ()) ? cluster_t ({{100.0, target}}) : ParseClusterInfo (clusterStr);
+
   // Install the NetworkServer application on the network server
   NetworkServerHelper networkServerHelper;
   networkServerHelper.SetGateways (gateways);
   networkServerHelper.SetEndDevices (endDevices);
   networkServerHelper.EnableAdr (adrEnabled);
-  networkServerHelper.SetAdr (adrType);
   networkServerHelper.EnableCongestionControl (congest);
-  networkServerHelper.AssignClusters (clusterInfo);
+  networkServerHelper.AssignClusters (clusters);
   networkServerHelper.Install (networkServer);
 
   // Install the Forwarder application on the gateways
@@ -293,11 +263,7 @@ main (int argc, char *argv[])
   if (initializeSF)
     devPerSF = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
   if (model)
-    {
-      NS_ASSERT_MSG (!congest, "Static duty-cycle configuration cannot be applied if dynamic "
-                               "congestion control is in place.");
-      macHelper.SetDutyCyclesWithCapacityModel (endDevices, gateways, channel, target, beta);
-    }
+    macHelper.SetDutyCyclesWithCapacityModel (endDevices, gateways, channel, target, beta);
   loss->SetNext (rayleigh);
 
   /***************************
@@ -307,10 +273,10 @@ main (int argc, char *argv[])
   if (file)
     {
       // Activate printing of ED MAC parameters
-      Time stateSamplePeriod = Seconds (1800);
+      Time statusSamplePeriod = Seconds (1800);
       helper.EnablePeriodicDeviceStatusPrinting (endDevices, gateways, "nodeData.txt",
-                                                 stateSamplePeriod);
-      helper.EnablePeriodicGlobalPerformancePrinting ("globalPerformance.txt", stateSamplePeriod);
+                                                 statusSamplePeriod);
+      helper.EnablePeriodicGlobalPerformancePrinting ("globalPerformance.txt", statusSamplePeriod);
     }
 
   LoraPacketTracker &tracker = helper.GetPacketTracker ();
@@ -334,9 +300,11 @@ main (int argc, char *argv[])
     }
 
   // Start simulation
+  Time periodLenght = Hours (1);
   Simulator::Stop (periodLenght * periods);
   Simulator::Run ();
 
+  Time trackFinalOutcomeFrom = periodLenght * periods - Hours (10);
   if (debug)
     std::cout << tracker.PrintSimulationStatistics (trackFinalOutcomeFrom);
 

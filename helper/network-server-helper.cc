@@ -28,7 +28,6 @@
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 
-#include <regex>
 namespace ns3 {
 namespace lorawan {
 
@@ -224,43 +223,6 @@ NetworkServerHelper::InstallComponents (Ptr<NetworkServer> netServer)
       ccc->SetTargets (m_clusterTargets);
       netServer->AddComponent (ccc);
     }
-}
-
-// Parse input string containing slices info
-std::vector<std::pair<double, double>>
-ParseClusterInfo (std::string s)
-{
-  s.erase (std::remove (s.begin (), s.end (), ' '), s.end ());
-  std::regex rx ("\\{\\{[0-9]+(\\.[0-9]+)?,0*(1(\\.0+)?|0|\\.[0-9]+)\\}"
-      "(,\\{[0-9]+(\\.[0-9]+)?,0*(1(\\.0+)?|0|\\.[0-9]+)\\})*\\}");
-  NS_ASSERT_MSG (std::regex_match (s, rx), "Cluster vector ill formatted. "
-      "Syntax: \"{{double > 0, double [0,1]},...}\"");
-
-  s.erase (std::remove (s.begin (), s.end (), '{'), s.end ());
-  s.erase (std::remove (s.begin (), s.end (), '}'), s.end ());
-
-  std::vector<std::pair<double, double>> clusterInfo;
-  double share = 0;
-  double pdr = 0;
-
-  std::string d = ",";
-  size_t pos = 0;
-  double tot = 0;
-  while ((pos = s.find (d)) != std::string::npos)
-    {
-      share = std::stod (s.substr (0, pos));
-      s.erase (0, pos + d.length ());
-      tot += share;  
-
-      pos = s.find (d);
-      pdr = std::stod (s.substr (0, pos));
-      s.erase (0, pos + d.length ());
-
-      clusterInfo.push_back ({share, pdr});
-    }
-  NS_ASSERT_MSG (tot != 100.0, 
-      "Total share among clusters must be 100%.");
-  return clusterInfo;
 }
 
 }
