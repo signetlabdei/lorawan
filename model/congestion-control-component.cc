@@ -326,12 +326,17 @@ CongestionControlComponent::PrintCongestion (Address bestGw, uint8_t cluster)
   std::stringstream ss;
   ss << "Cluster " << unsigned (cluster) << ", Gateway " << bestGw << ":\n\t";
   clusterstatus_t& cl = m_congestionStatus[bestGw][cluster];
+  double totsent = 0;
+  double totrec = 0;
   for (int dr = N_SF - 1; dr >= 0; --dr)
     {
       double sent = cl[dr].sent;
+      totsent += sent;
       double rec = cl[dr].received;
+      totrec += rec;
       ss << "SF" << 12 - dr << " " << ((sent > 0.0) ? rec / sent : -1.0) << ", ";
     }
+  ss << "All " <<  ((totsent > 0.0) ? totrec / totsent : -1.0);
   return ss.str ();
 }
 
