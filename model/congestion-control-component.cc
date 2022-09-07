@@ -172,7 +172,7 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
     {
       NS_LOG_DEBUG (PrintCongestion (devinfo.bestGw, devinfo.cluster));
       configs_t &configs = m_configToDoList[devinfo.bestGw][devinfo.cluster];
-      // Produce new reconfig scheme (one SF for the gateway/cluster)
+      // Produce new reconfig scheme 
       for (auto &dr : m_congestionStatus[devinfo.bestGw][devinfo.cluster])
         if (ProduceConfigScheme (dr, m_targets[devinfo.cluster]))
           {
@@ -180,7 +180,7 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
               if (configs.count (d.first)) // Check key existence (to avoid creating it)
                 if (configs[d.first] == m_devStatus[d.first].dutycycle)
                   configs.erase (d.first); // Nothing changed between config
-            break;
+            //break; //(comment to enforce one SF for the gateway/cluster)
           }
 
       // Cheat and re-enable devices if they need to receive different config
