@@ -241,7 +241,7 @@ main (int argc, char *argv[])
   networkServerHelper.SetEndDevices (endDevices);
   networkServerHelper.EnableAdr (adrEnabled);
   networkServerHelper.EnableCongestionControl (congest);
-  networkServerHelper.AssignClusters (clusters);
+  networkServerHelper.AssignClusters (clusters); // Assignes one freq. by default
   networkServerHelper.Install (networkServer);
 
   // Install the Forwarder application on the gateways
@@ -262,8 +262,9 @@ main (int argc, char *argv[])
   std::vector<int> devPerSF;
   if (initializeSF)
     devPerSF = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
+  //! Here is the point where we allocate channels in case
   if (model)
-    macHelper.SetDutyCyclesWithCapacityModel (endDevices, gateways, channel, target, beta);
+    macHelper.SetDutyCyclesWithCapacityModel (endDevices, gateways, channel, clusters, beta);
   loss->SetNext (rayleigh);
 
   /***************************

@@ -555,97 +555,6 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
               break;
             }
         }
-
-      /*       // Get the ED sensitivity
-      Ptr<EndDeviceLoraPhy> edPhy = loraNetDevice->GetPhy ()->GetObject<EndDeviceLoraPhy> ();
-      const double *edSensitivity = edPhy->sensitivity;
-
-      if (rxPower > *edSensitivity)
-        {
-          mac->SetDataRate (5);
-          sfQuantity[0] = sfQuantity[0] + 1;
-        }
-      else if (rxPower > *(edSensitivity + 1))
-        {
-          mac->SetDataRate (4);
-          sfQuantity[1] = sfQuantity[1] + 1;
-        }
-      else if (rxPower > *(edSensitivity + 2))
-        {
-          mac->SetDataRate (3);
-          sfQuantity[2] = sfQuantity[2] + 1;
-        }
-      else if (rxPower > *(edSensitivity + 3))
-        {
-          mac->SetDataRate (2);
-          sfQuantity[3] = sfQuantity[3] + 1;
-        }
-      else if (rxPower > *(edSensitivity + 4))
-        {
-          mac->SetDataRate (1);
-          sfQuantity[4] = sfQuantity[4] + 1;
-        }
-      else if (rxPower > *(edSensitivity + 5))
-        {
-          mac->SetDataRate (0);
-          sfQuantity[5] = sfQuantity[5] + 1;
-        }
-      else // Device is out of range. Assign SF12.
-        {
-          // NS_LOG_DEBUG ("Device out of range");
-          mac->SetDataRate (0);
-          sfQuantity[6] = sfQuantity[6] + 1;
-          // NS_LOG_DEBUG ("sfQuantity[6] = " << sfQuantity[6]);
-        }
-
-      // Get the Gw sensitivity
-      Ptr<NetDevice> gatewayNetDevice = bestGateway->GetDevice (0);
-      Ptr<LoraNetDevice> gatewayLoraNetDevice = gatewayNetDevice->GetObject<LoraNetDevice> ();
-      Ptr<GatewayLoraPhy> gatewayPhy = gatewayLoraNetDevice->GetPhy ()->GetObject<GatewayLoraPhy> ();
-      const double *gwSensitivity = gatewayPhy->sensitivity;
-
-      if(rxPower > *gwSensitivity)
-        {
-          mac->SetDataRate (5);
-          sfQuantity[0] = sfQuantity[0] + 1;
-
-        }
-      else if (rxPower > *(gwSensitivity+1))
-        {
-          mac->SetDataRate (4);
-          sfQuantity[1] = sfQuantity[1] + 1;
-
-        }
-      else if (rxPower > *(gwSensitivity+2))
-        {
-          mac->SetDataRate (3);
-          sfQuantity[2] = sfQuantity[2] + 1;
-
-        }
-      else if (rxPower > *(gwSensitivity+3))
-        {
-          mac->SetDataRate (2);
-          sfQuantity[3] = sfQuantity[3] + 1;
-        }
-      else if (rxPower > *(gwSensitivity+4))
-        {
-          mac->SetDataRate (1);
-          sfQuantity[4] = sfQuantity[4] + 1;
-        }
-      else if (rxPower > *(gwSensitivity+5))
-        {
-          mac->SetDataRate (0);
-          sfQuantity[5] = sfQuantity[5] + 1;
-
-        }
-      else // Device is out of range. Assign SF12.
-        {
-          mac->SetDataRate (0);
-          sfQuantity[6] = sfQuantity[6] + 1;
-
-        }
-*/
-
     } // end loop on nodes
 
   return sfQuantity;
@@ -729,20 +638,21 @@ LorawanMacHelper::SetSpreadingFactorsGivenDistribution (NodeContainer endDevices
 
 void
 LorawanMacHelper::SetDutyCyclesWithCapacityModel (NodeContainer endDevices, NodeContainer gateways,
-                                                  Ptr<LoraChannel> channel, double pdr, int beta)
+                                                  Ptr<LoraChannel> channel, cluster_t targets,
+                                                  int beta)
 {
   using datarate_t = std::vector<std::pair<uint32_t, double>>;
-  using gateway_t = std::vector<datarate_t>;
+  using gateway_t = std::vector<std::vector<datarate_t>>;
   using output_t = std::unordered_map<uint32_t, uint8_t>;
 
   const int N_SF = 6;
-  const int N_CH = 1;
-  const double limit = CongestionControlComponent::CapacityForPDRModel (pdr) * N_CH * beta;
+  const int N_CL = targets.size ();
+  std::vector<int> N_CH (N_CL, 0);
 
+  // Partition devices & retrieve their offered traffic and channels
   std::map<uint32_t, gateway_t> gwgroups;
   for (NodeContainer::Iterator currGw = gateways.Begin (); currGw != gateways.End (); ++currGw)
-    gwgroups[(*currGw)->GetId ()] = gateway_t (N_SF);
-
+    gwgroups[(*currGw)->GetId ()] = gateway_t (N_CL, std::vector<datarate_t> (N_SF));
   for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j)
     {
       Ptr<Node> object = *j;
@@ -787,42 +697,43 @@ LorawanMacHelper::SetDutyCyclesWithCapacityModel (NodeContainer endDevices, Node
       double traffic = toa / app->GetInterval ().GetSeconds ();
       traffic = (traffic > 0.01) ? 0.01 : traffic;
 
-      gwgroups[bestGateway->GetId ()][mac->GetDataRate ()].push_back ({object->GetId (), traffic});
+      gwgroups[bestGateway->GetId ()][mac->GetCluster ()][mac->GetDataRate ()].push_back (
+          {object->GetId (), traffic});
 
-      int chid = 0;
-      for (auto &ch : mac->GetLogicalLoraChannelHelper ().GetChannelList ())
-        {
-          if (chid == 0)
-            ch->SetEnabledForUplink ();
-          else
-            ch->DisableForUplink ();
-          chid++;
-        }
+      if (N_CH[mac->GetCluster ()])
+        continue;
+      N_CH[mac->GetCluster ()] =
+          mac->GetLogicalLoraChannelHelper ().GetEnabledChannelList ().size ();
     }
+
+  // Optimize duty cycle
   for (auto const &gw : gwgroups)
-    for (auto const &dr : gw.second)
-      {
-        output_t out;
-        TrafficControlUtils::OptimizeDutyCycleMax (dr, limit, out);
-        for (auto const &id : out)
-          {
-            Ptr<Node> curr = NodeList::GetNode (id.first);
-            Ptr<NetDevice> netDevice = curr->GetDevice (0);
-            Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
-            Ptr<ClassAEndDeviceLorawanMac> mac =
-                loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
-            // Check if we need to turn off completely
-            if (id.second == 255)
-              {
-                NS_LOG_DEBUG ("Device " + std::to_string (curr->GetId ()) + " disabled.");
-                mac->SetAggregatedDutyCycle (0);
-              }
-            else if (id.second == 0)
-              mac->SetAggregatedDutyCycle (1);
-            else
-              mac->SetAggregatedDutyCycle (1 / std::pow (2, double (id.second)));
-          }
-      }
+    for (int cl = 0; cl < N_CL; ++cl)
+      for (auto const &dr : gw.second[cl])
+        {
+          double limit =
+              CongestionControlComponent::CapacityForPDRModel (targets[cl].second) * N_CH[cl] * beta;
+          output_t out;
+          TrafficControlUtils::OptimizeDutyCycleMax (dr, limit, out);
+          for (auto const &id : out)
+            {
+              Ptr<Node> curr = NodeList::GetNode (id.first);
+              Ptr<NetDevice> netDevice = curr->GetDevice (0);
+              Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+              Ptr<ClassAEndDeviceLorawanMac> mac =
+                  loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
+              // Check if we need to turn off completely
+              if (id.second == 255)
+                {
+                  NS_LOG_DEBUG ("Device " + std::to_string (curr->GetId ()) + " disabled.");
+                  mac->SetAggregatedDutyCycle (0);
+                }
+              else if (id.second == 0)
+                mac->SetAggregatedDutyCycle (1);
+              else
+                mac->SetAggregatedDutyCycle (1 / std::pow (2, double (id.second)));
+            }
+        }
 }
 
 } // namespace lorawan

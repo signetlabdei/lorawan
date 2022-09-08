@@ -36,6 +36,8 @@ namespace lorawan {
 
 class LorawanMacHelper
 {
+  using cluster_t = std::vector<std::pair<double, double>>;
+
 public:
   /**
    * Define the kind of device. Can be either GW (Gateway) or ED (End Device).
@@ -118,7 +120,8 @@ public:
                                                                 std::vector<double> distribution);
 
   static void SetDutyCyclesWithCapacityModel (NodeContainer endDevices, NodeContainer gateways,
-                                              Ptr<LoraChannel> channel, double pdr, int beta = 1);
+                                              Ptr<LoraChannel> channel, cluster_t targets,
+                                              int beta = 1);
 
 private:
   /**
