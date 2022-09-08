@@ -172,28 +172,31 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
     {
       NS_LOG_DEBUG (PrintCongestion (devinfo.bestGw, devinfo.cluster));
       configs_t &configs = m_configToDoList[devinfo.bestGw][devinfo.cluster];
-      // Produce new reconfig scheme 
+      disabled_t &disabled = m_disabled[devinfo.bestGw][devinfo.cluster];
+      // Produce new reconfig scheme
       for (auto &dr : m_congestionStatus[devinfo.bestGw][devinfo.cluster])
         if (ProduceConfigScheme (dr, m_targets[devinfo.cluster]))
           {
             for (auto const &d : dr.devs)
               if (configs.count (d.first)) // Check key existence (to avoid creating it)
-                if (configs[d.first] == m_devStatus[d.first].dutycycle)
-                  configs.erase (d.first); // Nothing changed between config
-            //break; //(comment to enforce one SF for the gateway/cluster)
+                {
+                  if (configs[d.first] ==
+                      m_devStatus[d.first].dutycycle) // Nothing changed between configs
+                    {
+                      configs.erase (d.first);
+                      continue;
+                    }
+                  if (!disabled.count (d.first)) // Doesn't need re-enabling
+                    continue;
+                  disabled[d.first]->GetMac ()->SetAggregatedDutyCycle (1.0); // CHEAT and re-enable
+                  m_devStatus[d.first].dutycycle = 0;
+                  disabled.erase (d.first);
+                }
+            //break; //(uncomment to enforce one SF at a time per gateway/cluster)
           }
-
-      // Cheat and re-enable devices if they need to receive different config
-      for (auto const &ed : m_disabled[devinfo.bestGw][devinfo.cluster])
-        if (m_configToDoList[devinfo.bestGw][devinfo.cluster].count (ed.first))
-          {
-            ed.second->GetMac ()->SetAggregatedDutyCycle (1.0);
-            m_devStatus[ed.first].dutycycle = 0;
-          }
-      m_disabled[devinfo.bestGw][devinfo.cluster].clear ();
 
       // This is in case there was nothig to reconfig
-      // (otherwise rewritten at end of config)
+      // (otherwise always rewritten at end of config)
       m_samplingStart[devinfo.bestGw][devinfo.cluster] = Simulator::Now ();
     }
 }
@@ -235,7 +238,7 @@ CongestionControlComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
   m_devStatus[devaddr].dutycycle = dc;
   m_configToDoList[devinfo.bestGw][devinfo.cluster].erase (devaddr);
   if (dc == 255 and !m_disabled[devinfo.bestGw][devinfo.cluster].count (devaddr))
-    m_disabled[devinfo.bestGw][devinfo.cluster][devaddr] = status;
+    m_disabled[devinfo.bestGw][devinfo.cluster][devaddr] = status; // Add to disabled
 
   // If config has finished, start sampling fase
   if (m_configToDoList[devinfo.bestGw][devinfo.cluster].empty ())
@@ -325,7 +328,7 @@ CongestionControlComponent::PrintCongestion (Address bestGw, uint8_t cluster)
 {
   std::stringstream ss;
   ss << "Cluster " << unsigned (cluster) << ", Gateway " << bestGw << ":\n\t";
-  clusterstatus_t& cl = m_congestionStatus[bestGw][cluster];
+  clusterstatus_t &cl = m_congestionStatus[bestGw][cluster];
   double totsent = 0;
   double totrec = 0;
   for (int dr = N_SF - 1; dr >= 0; --dr)
@@ -336,7 +339,7 @@ CongestionControlComponent::PrintCongestion (Address bestGw, uint8_t cluster)
       totrec += rec;
       ss << "SF" << 12 - dr << " " << ((sent > 0.0) ? rec / sent : -1.0) << ", ";
     }
-  ss << "All " <<  ((totsent > 0.0) ? totrec / totsent : -1.0);
+  ss << "All " << ((totsent > 0.0) ? totrec / totsent : -1.0);
   return ss.str ();
 }
 
