@@ -80,10 +80,10 @@ main (int argc, char *argv[])
   cmd.AddValue ("sampling", "[cong ctrl] Duration (hours) of the PDR sampling fase", sampling);
   cmd.AddValue ("variance", "[cong ctrl] Acceptable gap around the target PDR value", variance);
   cmd.AddValue ("tolerance", "[cong ctrl] Tolerance step to declare value stagnation", tolerance);
-  cmd.AddValue ("debug", "Whether or not to debug logs at various levels. ", debug);
-  cmd.AddValue ("file", "Output the metrics of the simulation in a file", file);
   cmd.AddValue ("target", "[ctrl] Central PDR value targeted (single cluster)", target);
   cmd.AddValue ("clusters", "[ctrl] Clusters descriptor: \"{{share,pdr},...\"}", clusterStr);
+  cmd.AddValue ("debug", "Whether or not to debug logs at various levels. ", debug);
+  cmd.AddValue ("file", "Output the metrics of the simulation in a file", file);
   cmd.Parse (argc, argv);
   NS_ASSERT (!(congest & model));
 
@@ -91,14 +91,12 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::EndDeviceLorawanMac::DRControl", BooleanValue (true)); //!< ADR bit
   Config::SetDefault ("ns3::EndDeviceLorawanMac::MType", StringValue ("Unconfirmed"));
   Config::SetDefault ("ns3::EndDeviceLorawanMac::MaxTransmissions", IntegerValue (1));
-
   Config::SetDefault ("ns3::AdrComponent::MultipleGwCombiningMethod", StringValue ("max"));
   Config::SetDefault ("ns3::AdrComponent::MultiplePacketsCombiningMethod", StringValue ("avg"));
   Config::SetDefault ("ns3::AdrComponent::HistoryRange", IntegerValue (20));
   Config::SetDefault ("ns3::AdrComponent::ChangeTransmissionPower", BooleanValue (true));
   Config::SetDefault ("ns3::AdrComponent::SNRDeviceMargin",
                       DoubleValue (10 * log10 (-1 / log (0.98))));
-
   Config::SetDefault ("ns3::CongestionControlComponent::StartTime", TimeValue (Hours (warmup)));
   Config::SetDefault ("ns3::CongestionControlComponent::SamplingDuration",
                       TimeValue (Hours (sampling)));
@@ -166,11 +164,6 @@ main (int argc, char *argv[])
   rangeAllocator->SetAttribute ("Z", DoubleValue (15.0));
   rangeAllocator->SetAttribute ("range", DoubleValue (range));
   mobilityEd.SetPositionAllocator (rangeAllocator);
-
-  double area = ComputeArea (range, gatewayRings);
-  if (debug)
-    std::cout << "Area: " << area << " km^2, Density: " << nDevices / area << " devs/km^2"
-              << std::endl;
 
   /*************
    *  Helpers  *
@@ -259,10 +252,10 @@ main (int argc, char *argv[])
   appHelper.Install (endDevices);
 
   // Initialize SF emulating the ADR algorithm, then add variance to path loss
-  std::vector<int> devPerSF;
+  std::vector<int> devPerSF (1, nDevices);
   if (initializeSF)
     devPerSF = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
-  //! Here is the point where we allocate channels in case
+  //! Here is the point where we allocate CHANNELS in case
   if (model)
     macHelper.SetDutyCyclesWithCapacityModel (endDevices, gateways, channel, clusters, beta);
   loss->SetNext (rayleigh);
@@ -280,23 +273,14 @@ main (int argc, char *argv[])
       helper.EnablePeriodicGlobalPerformancePrinting ("globalPerformance.txt", statusSamplePeriod);
     }
 
+  // Limit memory usage
   LoraPacketTracker &tracker = helper.GetPacketTracker ();
   tracker.EnableOldPacketsCleanup (Hours (1));
 
   if (debug)
     {
       // Print current configuration
-      std::stringstream ss;
-      if (initializeSF)
-        {
-          ss << "\n|- SF distribution:    ";
-          for (int j = (int) devPerSF.size () - 1; j >= 0; --j)
-            ss << "SF" << 12 - j << ":" << devPerSF[j] << ", ";
-          ss << "\n";
-        }
-      ss << "\nAll configurations terminated. Starting simulation...\n\n"
-         << "--------------------------------------------------------------------------------\n";
-      std::cout << ss.str ();
+      PrintConfigSetup (nDevices, range, gatewayRings, devPerSF);
       helper.EnableSimulationTimePrinting (Seconds (3600));
     }
 

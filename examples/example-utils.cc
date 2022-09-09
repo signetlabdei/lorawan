@@ -7,6 +7,7 @@
 #include "ns3/lora-interference-helper.h"
 
 #include <unordered_map>
+#include <iomanip>
 #include <regex>
 
 using namespace ns3;
@@ -25,9 +26,9 @@ ParseClusterInfo (std::string s)
 {
   s.erase (std::remove (s.begin (), s.end (), ' '), s.end ());
   std::regex rx ("\\{\\{[0-9]+(\\.[0-9]+)?,0*(1(\\.0+)?|0|\\.[0-9]+)\\}"
-      "(,\\{[0-9]+(\\.[0-9]+)?,0*(1(\\.0+)?|0|\\.[0-9]+)\\})*\\}");
+                 "(,\\{[0-9]+(\\.[0-9]+)?,0*(1(\\.0+)?|0|\\.[0-9]+)\\})*\\}");
   NS_ASSERT_MSG (std::regex_match (s, rx), "Cluster vector ill formatted. "
-      "Syntax: \"{{double > 0, double [0,1]},...}\"");
+                                           "Syntax: \"{{double > 0, double [0,1]},...}\"");
 
   s.erase (std::remove (s.begin (), s.end (), '{'), s.end ());
   s.erase (std::remove (s.begin (), s.end (), '}'), s.end ());
@@ -43,7 +44,7 @@ ParseClusterInfo (std::string s)
     {
       share = std::stod (s.substr (0, pos));
       s.erase (0, pos + d.length ());
-      tot += share;  
+      tot += share;
 
       pos = s.find (d);
       pdr = std::stod (s.substr (0, pos));
@@ -51,8 +52,7 @@ ParseClusterInfo (std::string s)
 
       clusterInfo.push_back ({share, pdr});
     }
-  NS_ASSERT_MSG (tot != 100.0, 
-      "Total share among clusters must be 100%.");
+  NS_ASSERT_MSG (tot != 100.0, "Total share among clusters must be 100%.");
   return clusterInfo;
 }
 
@@ -91,3 +91,22 @@ const std::unordered_map<std::string, LoraInterferenceHelper::CollisionMatrix> s
     {"CROCE", LoraInterferenceHelper::CROCE},
     {"GOURSAUD", LoraInterferenceHelper::GOURSAUD},
     {"ALOHA", LoraInterferenceHelper::ALOHA}};
+
+/**
+ * Print initial configuration
+ */
+void
+PrintConfigSetup (int nDevs, double range, int rings, std::vector<int> &devPerSF)
+{
+  double area = ComputeArea (range, rings);
+  std::stringstream ss;
+  //ss << std::setprecision (10);
+  ss << "Area: " << area << " km^2, Density: " << nDevs / area << " devs/km^2\n";
+  ss << "\n|- SF distribution:    ";
+  for (int j = (int) devPerSF.size () - 1; j >= 0; --j)
+    ss << "SF" << 12 - j << ":" << devPerSF[j] << ", ";
+  ss << "\n";
+  ss << "\nAll configurations terminated. Starting simulation...\n\n"
+     << "--------------------------------------------------------------------------------\n";
+  std::cout << ss.str ();
+}
