@@ -58,7 +58,7 @@ main (int argc, char *argv[])
   double variance = 0.01;
   double tolerance = 0.001;
   double target = 0.95;
-  std::string clusterStr;
+  std::string clusterStr = ".";
   bool debug = false;
   bool file = false;
 
@@ -80,8 +80,8 @@ main (int argc, char *argv[])
   cmd.AddValue ("sampling", "[cong ctrl] Duration (hours) of the PDR sampling fase", sampling);
   cmd.AddValue ("variance", "[cong ctrl] Acceptable gap around the target PDR value", variance);
   cmd.AddValue ("tolerance", "[cong ctrl] Tolerance step to declare value stagnation", tolerance);
-  cmd.AddValue ("target", "[ctrl] Central PDR value targeted (single cluster)", target);
-  cmd.AddValue ("clusters", "[ctrl] Clusters descriptor: \"{{share,pdr},...\"}", clusterStr);
+  cmd.AddValue ("target", "Central PDR value targeted (single cluster)", target);
+  cmd.AddValue ("clusters", "Clusters descriptor: \"{{share,pdr},...\"}", clusterStr);
   cmd.AddValue ("debug", "Whether or not to debug logs at various levels. ", debug);
   cmd.AddValue ("file", "Output the metrics of the simulation in a file", file);
   cmd.Parse (argc, argv);
@@ -226,7 +226,7 @@ main (int argc, char *argv[])
 
   // Set clusters
   cluster_t clusters =
-      (clusterStr.empty ()) ? cluster_t ({{100.0, target}}) : ParseClusterInfo (clusterStr);
+      (clusterStr == ".") ? cluster_t ({{100.0, target}}) : ParseClusterInfo (clusterStr);
 
   // Install the NetworkServer application on the network server
   NetworkServerHelper networkServerHelper;
