@@ -41,7 +41,7 @@ namespace lorawan {
  * This class can help create a large set of similar LoraNetDevice objects and
  * configure a large set of their attributes during creation.
  */
-class LoraHelper: public PcapHelperForDevice
+class LoraHelper : public PcapHelperForDevice
 {
 public:
   virtual ~LoraHelper ();
@@ -58,8 +58,7 @@ public:
    * method.
    */
   virtual NetDeviceContainer Install (const LoraPhyHelper &phyHelper,
-                                      const LorawanMacHelper &macHelper,
-                                      NodeContainer c) const;
+                                      const LorawanMacHelper &macHelper, NodeContainer c) const;
 
   /**
    * Install LoraNetDevice on a single node
@@ -71,8 +70,7 @@ public:
    * method.
    */
   virtual NetDeviceContainer Install (const LoraPhyHelper &phyHelper,
-                                      const LorawanMacHelper &macHelper,
-                                      Ptr<Node> node) const;
+                                      const LorawanMacHelper &macHelper, Ptr<Node> node) const;
 
   /**
    * Enable tracking of packets via trace sources.
@@ -90,22 +88,18 @@ public:
   /**
    * Periodically prints the status of devices in the network to a file.
    */
-  void EnablePeriodicDeviceStatusPrinting (NodeContainer endDevices,
-                                           NodeContainer gateways,
-                                           std::string filename,
-                                           Time interval);
+  void EnablePeriodicDeviceStatusPrinting (NodeContainer endDevices, NodeContainer gateways,
+                                           std::string filename, Time interval);
 
   /**
    * Print a summary of the status of all devices in the network.
    */
-  void DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateways,
-                            std::string filename);
+  void DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateways, std::string filename);
 
   /**
    * Periodically prints PHY-level performance at every gateway in the container.
    */
-  void EnablePeriodicGwsPerformancePrinting (NodeContainer gateways,
-                                             std::string filename,
+  void EnablePeriodicGwsPerformancePrinting (NodeContainer gateways, std::string filename,
                                              Time interval);
 
   void DoPrintGwsPerformance (NodeContainer gateways, std::string filename);
@@ -113,20 +107,23 @@ public:
   /**
    * Periodically prints global performance.
    */
-  void EnablePeriodicGlobalPerformancePrinting (std::string filename,
-                                                Time interval);
+  void EnablePeriodicGlobalPerformancePrinting (std::string filename, Time interval);
 
   void DoPrintGlobalPerformance (std::string filename);
 
-  LoraPacketTracker& GetPacketTracker (void);
+  void EnablePeriodicSFStatusPrinting (NodeContainer endDevices, NodeContainer gateways,
+                                       std::string filename, Time interval);
 
-  LoraPacketTracker* m_packetTracker = 0;
+  void DoPrintSFStatus (NodeContainer endDevices, NodeContainer gateways, std::string filename);
+
+  LoraPacketTracker &GetPacketTracker (void);
+
+  LoraPacketTracker *m_packetTracker = 0;
 
   time_t m_oldtime;
 
 protected:
-  static void PcapSniffRxEvent (Ptr<PcapFileWrapper> file,
-                                Ptr<const Packet> packet);
+  static void PcapSniffRxEvent (Ptr<PcapFileWrapper> file, Ptr<const Packet> packet);
 
 private:
   /**
@@ -135,14 +132,16 @@ private:
    */
   void DoPrintSimulationTime (Time interval);
 
-  virtual void EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promiscuous, bool explicitFilename);
+  virtual void EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promiscuous,
+                                   bool explicitFilename);
 
   Time m_lastPhyPerformanceUpdate;
   Time m_lastGlobalPerformanceUpdate;
   Time m_lastDeviceStatusUpdate;
+  Time m_lastSFStatusUpdate;
 };
 
-} //namespace ns3
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* LORA_HELPER_H */

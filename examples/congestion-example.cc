@@ -268,8 +268,8 @@ main (int argc, char *argv[])
     {
       // Activate printing of ED MAC parameters
       Time statusSamplePeriod = Seconds (1800);
-      helper.EnablePeriodicDeviceStatusPrinting (endDevices, gateways, "nodeData.txt",
-                                                 statusSamplePeriod);
+      helper.EnablePeriodicSFStatusPrinting (endDevices, gateways, "sfData.txt",
+                                             statusSamplePeriod);
       helper.EnablePeriodicGlobalPerformancePrinting ("globalPerformance.txt", statusSamplePeriod);
     }
 
