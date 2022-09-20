@@ -369,7 +369,10 @@ LoraHelper::DoPrintSFStatus (NodeContainer endDevices, NodeContainer gateways, s
     double totMaxOT = 0.0;
     double totAggDC = 0.0;
   };
-  std::vector<sfStatus_t> sfStatus (6);
+
+  using sfMap_t = std::map<int, sfStatus_t>;
+  using clusterMap_t = std::map<int, sfMap_t>;
+  clusterMap_t clusmap;
 
   for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j)
     {
@@ -394,15 +397,20 @@ LoraHelper::DoPrintSFStatus (NodeContainer endDevices, NodeContainer gateways, s
       double ot = mac->GetAggregatedDutyCycle ();
       ot = std::min (ot, maxot);
       devCount_t &count = devPktCount[object->GetId ()];
-      sfStatus[dr].sent += count.sent;
-      sfStatus[dr].received += count.received;
-      sfStatus[dr].totMaxOT += maxot;
-      sfStatus[dr].totAggDC += ot;
+
+      sfStatus_t &sfstat = clusmap[mac->GetCluster ()][dr];
+      sfstat.sent += count.sent;
+      sfstat.received += count.received;
+      sfstat.totMaxOT += maxot;
+      sfstat.totAggDC += ot;
     }
-  for (int dr = 0; dr < 6; ++dr)
-    outputFile << currentTime.GetSeconds () << " " << dr << " " << sfStatus[dr].sent << " "
-               << sfStatus[dr].received << " " << sfStatus[dr].totMaxOT << " "
-               << sfStatus[dr].totAggDC << std::endl;
+
+  for (auto const &cl : clusmap)
+    for (auto const &sf : cl.second)
+      outputFile << currentTime.GetSeconds () << " " << cl.first << " " << sf.first << " "
+                 << sf.second.sent << " " << sf.second.received << " "
+                 << sf.second.totMaxOT << " " << sf.second.totAggDC << std::endl;
+
   m_lastSFStatusUpdate = Simulator::Now ();
   outputFile.close ();
 }
