@@ -24,11 +24,12 @@ using cluster_t = std::vector<std::pair<double, double>>;
 cluster_t
 ParseClusterInfo (std::string s)
 {
-  s.erase (std::remove (s.begin (), s.end (), ' '), s.end ());
   std::regex rx ("\\{\\{[0-9]+(\\.[0-9]+)?,0*(1(\\.0+)?|0|\\.[0-9]+)\\}"
                  "(,\\{[0-9]+(\\.[0-9]+)?,0*(1(\\.0+)?|0|\\.[0-9]+)\\})*\\}");
-  NS_ASSERT_MSG (std::regex_match (s, rx), "Cluster vector ill formatted. "
-                                           "Syntax: \"{{double > 0, double [0,1]},...}\"");
+  NS_ASSERT_MSG (std::regex_match (s, rx),
+                 "Cluster vector " << s
+                                   << " ill formatted. "
+                                      "Syntax (no spaces): {{double > 0,double [0,1]},...}");
 
   s.erase (std::remove (s.begin (), s.end (), '{'), s.end ());
   s.erase (std::remove (s.begin (), s.end (), '}'), s.end ());
@@ -52,7 +53,7 @@ ParseClusterInfo (std::string s)
 
       clusterInfo.push_back ({share, pdr});
     }
-  NS_ASSERT_MSG (tot != 100.0, "Total share among clusters must be 100%.");
+  NS_ASSERT_MSG (tot == 100.0, "Total share among clusters must be 100%.");
   return clusterInfo;
 }
 
