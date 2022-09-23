@@ -55,7 +55,7 @@ TrafficControlUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const doubl
   //if (GetLogComponent ("TrafficControlUtils").IsEnabled (LogLevel::LOG_DEBUG))
   if (false)
     solver->EnableOutput ();
-  solver->SetTimeLimit (absl::Seconds (60));
+  solver->SetTimeLimit (absl::Seconds (30));
 
   static int nsettings = 1 + m_dutycycles.size ();
   const double infinity = solver->infinity ();
