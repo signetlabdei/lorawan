@@ -55,7 +55,7 @@ TrafficControlUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const doubl
   //if (GetLogComponent ("TrafficControlUtils").IsEnabled (LogLevel::LOG_DEBUG))
   if (false)
     solver->EnableOutput ();
-  solver->SetTimeLimit (absl::Seconds (30));
+  solver->SetTimeLimit (absl::Seconds (60));
 
   static int nsettings = 1 + m_dutycycles.size ();
   const double infinity = solver->infinity ();
@@ -105,7 +105,7 @@ TrafficControlUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const doubl
     {
       MPConstraint *constraint = solver->MakeRowConstraint (
           0.0, infinity, "Linearize objective for device " + std::to_string (i));
-      constraint->SetCoefficient (x[i][0], dm.deltas[i]);
+      constraint->SetCoefficient (x[i][0], 1.0);
       for (int l = 1; l < nsettings; ++l)
         constraint->SetCoefficient (x[i][l], m_dutycycles[l - 1]);
       constraint->SetCoefficient (theta, -1.0);
