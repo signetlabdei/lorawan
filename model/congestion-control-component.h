@@ -39,53 +39,72 @@ namespace lorawan {
 
 class CongestionControlComponent : public NetworkControllerComponent
 {
+  // Cluster PDR targets
   using targets_t = std::vector<double>;
 
-  // To track useful metrics of devices
+  /** 
+   * ###################################
+   * # Track useful metrics of devices #
+   * ################################### 
+   **/
   struct devinfo_t
   {
-    int fCnt = 0;
+    // Static information
     uint8_t datarate = 0;
     uint8_t cluster = 0;
     Address bestGw = Address ();
+    double maxoftraf = 0; // Useful in case we need to reorganize
 
-    // Just in case we need to reorganize
-    double maxoftraf = 0;
+    // Changing with time
+    int fCnt = 0;
     uint8_t dutycycle = 0;
   };
-  using devinfomap_t = std::unordered_map<uint32_t, devinfo_t>;
+  using devinfomap_t = std::unordered_map<uint32_t, devinfo_t>; // 1 instance in the class
 
-  // To track congestion status of the network
+  /** 
+   * ##########################################
+   * # Track congestion status of the network #
+   * ########################################## 
+   **/
   using devices_t = std::vector<std::pair<uint32_t, double>>;
   struct offtraff_t
   {
     double high = 0;
     double low = 0;
-    double curr = 0;
-    double max = 0;
+    double currbest = 0;
+    bool started = false;
+    bool changed = false;
   };
   struct dataratestatus_t
   {
-    devices_t devs;
+    devices_t devs; // Devices in this group
+    offtraff_t ot; // Structure to track offered traffic convergence
     int received = 0;
     int sent = 0;
-    offtraff_t ot;
-    void Reset (void);
+    void Reset (void); // Reset sent and received to 0
   };
   using clusterstatus_t = std::vector<dataratestatus_t>;
   using gatewaystatus_t = std::vector<clusterstatus_t>;
-  using networkstatus_t = std::map<Address, gatewaystatus_t>;
+  using networkstatus_t = std::map<Address, gatewaystatus_t>; // 1 instance in the class
 
-  // Congestion to do list
+  /** 
+   * ##########################################################
+   * # Track configurations yet to be done + disabled devices #
+   * ########################################################## 
+   **/
   /*LoraDeviceAddress::Get() is hashable*/
-  using configs_t = std::unordered_map<uint32_t, uint8_t>;
-  using configsmap_t = std::map<Address, std::vector<configs_t>>;
+  using configs_t = std::unordered_map<uint32_t, uint8_t>; // In each gateway/cluster
+  using configsmap_t = std::map<Address, std::vector<configs_t>>; // 1 instance in the class
+  // Track disabled devices
+  using disabled_t = std::map<uint32_t, Ptr<EndDeviceStatus>>; // In each gateway/cluster
+  using disabledmap_t = std::map<Address, std::vector<disabled_t>>; // 1 instance in the class
 
+  /** 
+   * #########################
+   * # Track sampling phases #
+   * ######################### 
+   **/
   using samplingstatus_t = std::map<Address, std::vector<Time>>;
-
-  // Map disabled devices
-  using disabled_t = std::map<uint32_t, Ptr<EndDeviceStatus>>;
-  using disabledmap_t = std::map<Address, std::vector<disabled_t>>;
 
 public:
   static TypeId GetTypeId (void);
@@ -115,40 +134,38 @@ private:
 
   // To track network congestion
   networkstatus_t m_congestionStatus;
-
   // To track current status of devices
   devinfomap_t m_devStatus;
 
   // To track ongoing duty-cycle configuration
   /*LoraDeviceAddress::Get() is hashable*/
   configsmap_t m_configToDoList;
-
-  // Track sampling phases
-  samplingstatus_t m_samplingStart;
-
-  // Duration of the period in which we sample PDR
-  Time m_samplingDuration;
+  // Failsafe for disabled devices
+  disabledmap_t m_disabled;
 
   // Start congestion control procedure
   Time m_start;
+  // Duration of the period in which we sample PDR
+  Time m_samplingDuration;
+  // Track sampling phases
+  samplingstatus_t m_samplingStart;
 
   // PDR targets
   targets_t m_targets;
 
   // Acceptable distance from target PDR value
   double m_epsilon;
-
   // Minimum step between offered traffic values in a SF to declare value stagnation
   double m_tolerance;
 
-  // Number fo channels per cluster (not general right now)
+  // Number fo channels per cluster 
+  // (not general right now, used with capacity model to jump-start)
   int N_CH;
+  // Multiplicative constant for the capacity model
+  int m_beta;
 
   // Constants
   static const int N_SF;
-
-  // Failsafe for disabled devices
-  disabledmap_t m_disabled;
 };
 } // namespace lorawan
 } // namespace ns3

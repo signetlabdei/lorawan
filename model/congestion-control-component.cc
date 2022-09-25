@@ -68,7 +68,8 @@ CongestionControlComponent::GetTypeId (void)
   return tid;
 }
 
-CongestionControlComponent::CongestionControlComponent () : m_targets ({0.95}), N_CH (16)
+CongestionControlComponent::CongestionControlComponent ()
+    : m_targets ({0.95}), N_CH (1), m_beta (16)
 {
 }
 
@@ -128,6 +129,17 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
   // If first time, init congestion data
   if (m_congestionStatus.empty ())
     InitializeData (networkStatus);
+  // If first transmission of the device (late activation)
+  if (prevFCnt == 0)
+    {
+      dataratestatus_t &group =
+          m_congestionStatus[devinfo.bestGw][devinfo.cluster][devinfo.datarate];
+      group.devs.push_back ({devaddr, devinfo.maxoftraf});
+      if (!group.ot.started) // Reconfiguration not started yet
+        group.ot.currbest += devinfo.maxoftraf;
+      else
+        group.ot.changed = true;
+    }
 
   // If we are in reconfiguration fase, look for acknowledgement and exit
   if (!m_configToDoList[devinfo.bestGw][devinfo.cluster].empty ())
@@ -287,6 +299,9 @@ CongestionControlComponent::InitializeData (Ptr<NetworkStatus> status)
       Ptr<Node> node = ed.second->GetMac ()->GetDevice ()->GetNode ();
       Ptr<PeriodicSender> app = node->GetApplication (0)->GetObject<PeriodicSender> ();
 
+      devinfo.datarate = ed.second->GetMac ()->GetDataRate ();
+      devinfo.cluster = ed.second->GetMac ()->GetCluster ();
+
       Ptr<Packet> tmp =
           Create<Packet> (app->GetPacketSize () + 13 /* Headers with no MAC commands */);
       LoraTxParameters params;
@@ -296,9 +311,6 @@ CongestionControlComponent::InitializeData (Ptr<NetworkStatus> status)
       double toa = LoraPhy::GetOnAirTime (tmp, params).GetSeconds ();
       double traffic = toa / app->GetInterval ().GetSeconds ();
       devinfo.maxoftraf = (traffic > 0.01) ? 0.01 : traffic;
-
-      devinfo.datarate = ed.second->GetMac ()->GetDataRate ();
-      devinfo.cluster = ed.second->GetMac ()->GetCluster ();
 
       Ptr<MobilityModel> devpos = node->GetObject<MobilityModel> ();
       double distance = std::numeric_limits<double>::max ();
@@ -314,12 +326,13 @@ CongestionControlComponent::InitializeData (Ptr<NetworkStatus> status)
         }
 
       // Insert data in structure according to best gateway and SF
+      if (devinfo.fCnt == 0)
+        continue; // Do not insert and add it on first reception
       dataratestatus_t &group =
           m_congestionStatus[devinfo.bestGw][devinfo.cluster][devinfo.datarate];
       group.devs.push_back ({ed.first.Get (), traffic});
-      group.ot.max += traffic;
       group.ot.high += traffic;
-      group.ot.curr += traffic;
+      group.ot.currbest += traffic;
     }
 }
 
@@ -348,43 +361,49 @@ CongestionControlComponent::ProduceConfigScheme (dataratestatus_t &group, double
 {
   if (group.devs.empty ())
     return false;
-  if (group.sent <= 0.0)
-    ; // Do something else?
 
+  offtraff_t &ot = group.ot;
   double pdr = (group.sent > 0.0) ? (double) group.received / group.sent : 1.0;
   bool congested = (pdr < target);
-  offtraff_t &ot = group.ot;
-  bool started = (ot.curr < ot.max);
 
   // Early returns:
-  if (!congested and !started)
-    return false; //! Nothing to do
-  if (abs (target - pdr) < m_epsilon)
-    return false; //! We are in acceptable range
-  if ((ot.high - ot.low) / 2 < m_tolerance)
-    return false; //! Capacity values are stagnating
+  if (!ot.started and !congested) //! Nothing to do
+    return false;
+  if (abs (target - pdr) < m_epsilon) //! We are in acceptable range
+    return false;
+  if ((ot.high - ot.low) / 2 < m_tolerance and !ot.changed) //! Capacity values are stagnating
+    return false;
   // We are missing a failsafe in case pdr cannot be increased further due to low coverage
 
-  // Normal behaviour
-  if (congested and started)
-    ot.high = ot.curr;
-  else if (!congested and started)
-    ot.low = ot.curr;
-
-  ot.curr = (ot.high + ot.low) / 2;
-
-  if (!started) //! Check if we can jump start with capacity model.
+  // Bisection algorithm on offered traffic
+  if (!ot.changed)
     {
-      double cap = CapacityForPDRModel (target) * N_CH;
-      ot.curr = ((ot.high - cap) / 2.0 < m_tolerance) ? ot.curr : cap;
+      if (!ot.started) //! First iteration (check if we can jump start with capacity model)
+        {
+          ot.currbest = (ot.high + ot.low) / 2;
+          double cap = CapacityForPDRModel (target) * N_CH * m_beta;
+          ot.currbest = ((ot.high - cap) / 2.0 < m_tolerance) ? ot.currbest : cap;
+          ot.started = true;
+        }
+      else //! Normal behaviour during convergence
+        {
+          if (congested)
+            ot.high = ot.currbest;
+          else
+            ot.low = ot.currbest;
+          ot.currbest = (ot.high + ot.low) / 2;
+        }
     }
 
+  // Produce reconfiguration scheme
   devinfo_t &context = m_devStatus[group.devs[0].first];
   int sf = 12 - context.datarate;
-  NS_LOG_DEBUG ("Reconfig SF" << sf << ": " << ot.curr << " [" << ot.low << ", " << ot.high << "]");
-  TrafficControlUtils::OptimizeDutyCycleMaxMin (group.devs, ot.curr,
+  NS_LOG_DEBUG ("Reconfig SF" << sf << ": " << ot.currbest << " [" << ot.low << ", " << ot.high
+                              << "], New devices? " << ot.changed);
+  TrafficControlUtils::OptimizeDutyCycleMaxMin (group.devs, ot.currbest,
                                                 m_configToDoList[context.bestGw][context.cluster]);
 
+  ot.changed = false;
   return true;
 }
 
