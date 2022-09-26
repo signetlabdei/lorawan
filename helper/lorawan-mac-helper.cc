@@ -301,7 +301,7 @@ LorawanMacHelper::ConfigureForEuRegion (Ptr<GatewayLorawanMac> gwMac) const
         }
 
       int receptionPaths = 0;
-      int maxReceptionPaths = 50;
+      int maxReceptionPaths = 8;
       while (receptionPaths < maxReceptionPaths)
         {
           gwPhy->GetObject<GatewayLoraPhy> ()->AddReceptionPath ();
