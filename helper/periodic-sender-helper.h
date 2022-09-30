@@ -61,13 +61,16 @@ public:
    */
   void SetPeriod (Time period);
 
-  void SetPacketSizeRandomVariable (Ptr<RandomVariableStream> rv);
+  // Extract different constant period for each device from a distribution
+  void SetPeriodGenerator (Ptr<RandomVariableStream> rv);
 
   void SetPacketSize (uint8_t size);
 
+  // Extract different constant packet size for each device from a distribution
   void SetPacketSizeGenerator (Ptr<RandomVariableStream> rv);
-
-  void SetPeriodGenerator (Ptr<RandomVariableStream> rv);
+  
+  // Give devices a distribution to pick a different packet size on each transmission 
+  void SetPacketSizeRandomVariable (Ptr<RandomVariableStream> rv);
 
 private:
   Ptr<Application> InstallPriv (Ptr<Node> node) const;

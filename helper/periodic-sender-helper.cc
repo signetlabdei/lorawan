@@ -132,10 +132,12 @@ PeriodicSenderHelper::InstallPriv (Ptr<Node> node) const
   app->SetInitialDelay (Seconds (m_initialDelay->GetValue (0, interval.GetSeconds ())));
 
   app->SetPacketSize (m_pktSize);
+  // Different on each device
   if (m_sizeGenerator)
     {
       app->SetPacketSize (m_sizeGenerator->GetInteger ());
     }
+  // Different each transmission
   if (m_pktSizeRV)
     {
       app->SetPacketSizeRandomVariable (m_pktSizeRV);
