@@ -58,7 +58,7 @@ public:
    * Set packet size
    */
   void SetPacketSize (uint8_t size);
-  
+
   /**
    * Get packet size
    */
@@ -67,7 +67,7 @@ public:
   /**
    * Set if using randomness in the packet size
    */
-  void SetPacketSizeRandomVariable (Ptr <RandomVariableStream> rv);
+  void SetPacketSizeRandomVariable (Ptr<RandomVariableStream> rv);
 
   /**
    * Send a packet using the LoraNetDevice's Send method
@@ -83,6 +83,11 @@ public:
    * Stop the application
    */
   void StopApplication (void);
+
+  /** 
+   * True if the application is currently running
+   */
+  bool IsRunning (void);
 
 private:
   /**
@@ -110,16 +115,13 @@ private:
    */
   uint8_t m_basePktSize;
 
-
   /**
    * The random variable that adds bytes to the packet size
    */
   Ptr<RandomVariableStream> m_pktSizeRV;
-
-
 };
 
-} //namespace ns3
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* SENDER_APPLICATION */

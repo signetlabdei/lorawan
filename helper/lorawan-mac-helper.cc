@@ -711,8 +711,8 @@ LorawanMacHelper::SetDutyCyclesWithCapacityModel (NodeContainer endDevices, Node
     for (int cl = 0; cl < N_CL; ++cl)
       for (auto const &dr : gw.second[cl])
         {
-          double limit =
-              CongestionControlComponent::CapacityForPDRModel (targets[cl].second) * N_CH[cl] * beta;
+          double limit = CongestionControlComponent::CapacityForPDRModel (targets[cl].second) *
+                         N_CH[cl] * beta;
           output_t out;
           TrafficControlUtils::OptimizeDutyCycleMax (dr, limit, out);
           for (auto const &id : out)

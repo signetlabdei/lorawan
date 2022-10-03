@@ -45,7 +45,7 @@ main (int argc, char *argv[])
 
   int periods = 24; // H * D
   int gatewayRings = 1;
-  double range = 2540.25; // Max range to have coverage probability > 0.98 (with okumura)
+  double range = 2540.25; // Max range for downlink (!) coverage probability > 0.98 (with okumura)
   int nDevices = 100;
   std::string sir = "GOURSAUD";
   bool adrEnabled = false;
@@ -231,7 +231,7 @@ main (int argc, char *argv[])
   // Install the NetworkServer application on the network server
   NetworkServerHelper networkServerHelper;
   networkServerHelper.SetGateways (gateways);
-  networkServerHelper.SetEndDevices (endDevices);
+  networkServerHelper.SetEndDevices (endDevices); // Registering devices (saves mac layer)
   networkServerHelper.EnableAdr (adrEnabled);
   networkServerHelper.EnableCongestionControl (congest);
   networkServerHelper.AssignClusters (clusters); // Assignes one freq. by default
@@ -249,7 +249,15 @@ main (int argc, char *argv[])
       "Mean", DoubleValue (600.0), "Variance", DoubleValue (300.0), "Bound", DoubleValue (600.0)));
   appHelper.SetPacketSizeGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
       "Mean", DoubleValue (18), "Variance", DoubleValue (10), "Bound", DoubleValue (18)));
-  appHelper.Install (endDevices);
+  ApplicationContainer apps = appHelper.Install (endDevices);
+  /*   int j = 0; // Late activation of 100 devices
+  for (ApplicationContainer::Iterator i = apps.Begin (); i != apps.End (); ++i)
+    {
+      if (j >= 100)
+        break;
+      (*i)->SetStartTime (Days (5));
+      ++j;
+    } */
 
   // Initialize SF emulating the ADR algorithm, then add variance to path loss
   std::vector<int> devPerSF (1, nDevices);

@@ -105,17 +105,17 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
   uint32_t devaddr = fhead.GetAddress ().Get ();
   devinfo_t &devinfo = m_devStatus[devaddr];
 
-  // Update frame counter
+  // Update frame counter and most recent frame reception
   uint16_t currFCnt = fhead.GetFCnt ();
   NS_ASSERT_MSG (
       !(currFCnt < devinfo.fCnt),
       "Frame counter can't decrease, as re-connections to the network are not implemented.");
   int prevFCnt = devinfo.fCnt; // Save previous FCnt for PDR computations later
-  devinfo.fCnt = currFCnt;
-
   // If packet is a duplicate, exit
   if (currFCnt == prevFCnt)
     return;
+  devinfo.fCnt = currFCnt;
+  m_lastFrame[devaddr] = Simulator::Now ();
 
   // Do no start until start time
   if (Simulator::Now () < m_start)
@@ -129,19 +129,22 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
   // If first time, init congestion data
   if (m_congestionStatus.empty ())
     InitializeData (networkStatus);
-  // If first transmission of the device (late activation)
-  if (prevFCnt == 0)
-    {
-      dataratestatus_t &group =
-          m_congestionStatus[devinfo.bestGw][devinfo.cluster][devinfo.datarate];
-      group.devs.push_back ({devaddr, devinfo.maxoftraf});
-      if (!group.ot.started) // Reconfiguration not started yet
-        group.ot.currbest += devinfo.maxoftraf;
-      else
-        group.ot.changed = true;
-    }
 
-  // If we are in reconfiguration fase, look for acknowledgement and exit
+  // Add sample to congestion metrics (they are reset at the end of each reconfiguration)
+  {
+    dataratestatus_t &group = m_congestionStatus[devinfo.bestGw][devinfo.cluster][devinfo.datarate];
+    devices_t &devs = group.devs;
+    // If first transmission of the device (late activation)
+    if (prevFCnt == 0 and
+        std::find_if (devs.begin (), devs.end (), [devaddr] (std::pair<uint32_t, double> d) {
+          return d.first == devaddr;
+        }) == devs.end ()) // Not in the congestion status database
+      AddNewDevice (devaddr);
+    group.received++;
+    group.sent += currFCnt - prevFCnt;
+  }
+
+  // If we are still in reconfiguration fase, look for acknowledgement and exit
   if (!m_configToDoList[devinfo.bestGw][devinfo.cluster].empty ())
     {
       /*       // Wait for ack policy
@@ -173,44 +176,9 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
       return;
     }
 
-  // Else, we are in sampling fase. Add sample to congestion metrics
-  {
-    dataratestatus_t &group = m_congestionStatus[devinfo.bestGw][devinfo.cluster][devinfo.datarate];
-    group.received++;
-    group.sent += currFCnt - prevFCnt;
-  }
   // If sampling fase expired, produce reconfiguration
   if (Simulator::Now () > m_samplingStart[devinfo.bestGw][devinfo.cluster] + m_samplingDuration)
-    {
-      NS_LOG_DEBUG (PrintCongestion (devinfo.bestGw, devinfo.cluster));
-      configs_t &configs = m_configToDoList[devinfo.bestGw][devinfo.cluster];
-      disabled_t &disabled = m_disabled[devinfo.bestGw][devinfo.cluster];
-      // Produce new reconfig scheme
-      for (auto &dr : m_congestionStatus[devinfo.bestGw][devinfo.cluster])
-        if (ProduceConfigScheme (dr, m_targets[devinfo.cluster]))
-          {
-            for (auto const &d : dr.devs)
-              if (configs.count (d.first)) // Check key existence (to avoid creating it)
-                {
-                  if (configs[d.first] ==
-                      m_devStatus[d.first].dutycycle) // Nothing changed between configs
-                    {
-                      configs.erase (d.first);
-                      continue;
-                    }
-                  if (!disabled.count (d.first)) // Doesn't need re-enabling
-                    continue;
-                  disabled[d.first]->GetMac ()->SetAggregatedDutyCycle (1.0); // CHEAT and re-enable
-                  m_devStatus[d.first].dutycycle = 0;
-                  disabled.erase (d.first);
-                }
-            //break; //(uncomment to enforce one SF at a time per gateway/cluster)
-          }
-
-      // This is in case there was nothig to reconfig
-      // (otherwise always rewritten at end of config)
-      m_samplingStart[devinfo.bestGw][devinfo.cluster] = Simulator::Now ();
-    }
+    StartReconfig (devinfo.bestGw, devinfo.cluster);
 }
 
 void
@@ -254,16 +222,7 @@ CongestionControlComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
 
   // If config has finished, start sampling fase
   if (m_configToDoList[devinfo.bestGw][devinfo.cluster].empty ())
-    {
-      NS_LOG_DEBUG (
-          "Duty-cycle configuration terminated in "
-          << (Simulator::Now () - m_samplingStart[devinfo.bestGw][devinfo.cluster]).As (Time::H));
-      // Reset congestion metrics
-      for (auto &dr : m_congestionStatus[devinfo.bestGw][devinfo.cluster])
-        dr.Reset ();
-      // Reset timer
-      m_samplingStart[devinfo.bestGw][devinfo.cluster] = Simulator::Now ();
-    }
+    StartSampling (devinfo.bestGw, devinfo.cluster);
 
   status->m_reply.frameHeader.AddDutyCycleReq (dc);
   status->m_reply.frameHeader.SetAsDownlink ();
@@ -272,88 +231,90 @@ CongestionControlComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
 }
 
 void
-CongestionControlComponent::OnFailedReply (Ptr<EndDeviceStatus> status,
-                                           Ptr<NetworkStatus> networkStatus)
+CongestionControlComponent::StartSampling (Address bestGw, uint8_t cluster)
 {
-  NS_LOG_FUNCTION (this->GetTypeId () << networkStatus);
+  NS_LOG_DEBUG ("Duty-cycle configuration terminated in "
+                << (Simulator::Now () - m_samplingStart[bestGw][cluster]).As (Time::H));
+  // Reset congestion metrics
+  for (auto &dr : m_congestionStatus[bestGw][cluster])
+    dr.Reset ();
+  // Reset timer
+  m_samplingStart[bestGw][cluster] = Simulator::Now ();
 }
 
 void
-CongestionControlComponent::InitializeData (Ptr<NetworkStatus> status)
+CongestionControlComponent::StartReconfig (Address bestGw, uint8_t cluster)
 {
-  NS_LOG_FUNCTION (status);
-
-  for (auto const &gw : (status->m_gatewayStatuses))
+  NS_LOG_DEBUG (PrintCongestion (bestGw, cluster));
+  configs_t &configs = m_configToDoList[bestGw][cluster];
+  disabled_t &disabled = m_disabled[bestGw][cluster];
+  // Produce new reconfig scheme
+  for (auto &dr : m_congestionStatus[bestGw][cluster])
     {
-      m_disabled[gw.first] = std::vector<disabled_t> (m_targets.size ());
-      m_configToDoList[gw.first] = std::vector<configs_t> (m_targets.size ());
-      m_samplingStart[gw.first] = std::vector<Time> (m_targets.size (), m_start);
-      m_congestionStatus[gw.first] = gatewaystatus_t (m_targets.size (), clusterstatus_t (N_SF));
-    }
-  // Initialize device data.
-  // (It's ok to cheat because this is declared on device registration)
-  for (auto const &ed : (status->m_endDeviceStatuses))
-    {
-      // Compute offered traffic
-      devinfo_t &devinfo = m_devStatus[ed.first.Get ()];
-      Ptr<Node> node = ed.second->GetMac ()->GetDevice ()->GetNode ();
-      Ptr<PeriodicSender> app = node->GetApplication (0)->GetObject<PeriodicSender> ();
-
-      devinfo.datarate = ed.second->GetMac ()->GetDataRate ();
-      devinfo.cluster = ed.second->GetMac ()->GetCluster ();
-
-      Ptr<Packet> tmp =
-          Create<Packet> (app->GetPacketSize () + 13 /* Headers with no MAC commands */);
-      LoraTxParameters params;
-      params.sf = 12 - devinfo.datarate;
-      params.lowDataRateOptimizationEnabled =
-          LoraPhy::GetTSym (params) > MilliSeconds (16) ? true : false;
-      double toa = LoraPhy::GetOnAirTime (tmp, params).GetSeconds ();
-      double traffic = toa / app->GetInterval ().GetSeconds ();
-      devinfo.maxoftraf = (traffic > 0.01) ? 0.01 : traffic;
-
-      Ptr<MobilityModel> devpos = node->GetObject<MobilityModel> ();
-      double distance = std::numeric_limits<double>::max ();
-      for (auto const &gw : (status->m_gatewayStatuses))
+      if (Simulator::Now () > Days (5))
+        RemoveDisconnected (dr);
+      if (ProduceConfigScheme (dr, m_targets[cluster]))
         {
-          double tmp = devpos->GetDistanceFrom (
-              gw.second->GetGatewayMac ()->GetDevice ()->GetNode ()->GetObject<MobilityModel> ());
-          if (tmp < distance)
-            {
-              distance = tmp;
-              devinfo.bestGw = gw.first;
-            }
+          for (auto const &d : dr.devs)
+            if (configs.count (d.first)) // Check key existence (to avoid creating it)
+              {
+                if (configs[d.first] ==
+                    m_devStatus[d.first].dutycycle) // Nothing changed between configs
+                  {
+                    configs.erase (d.first);
+                    continue;
+                  }
+                if (!disabled.count (d.first)) // Doesn't need re-enabling
+                  continue;
+                disabled[d.first]->GetMac ()->SetAggregatedDutyCycle (1.0); // CHEAT and re-enable
+                m_devStatus[d.first].dutycycle = 0;
+                disabled.erase (d.first);
+              }
+          //break; //(uncomment to enforce one SF at a time per gateway/cluster)
         }
-
-      // Insert data in structure according to best gateway and SF
-      if (devinfo.fCnt == 0)
-        continue; // Do not insert and add it on first reception
-      dataratestatus_t &group =
-          m_congestionStatus[devinfo.bestGw][devinfo.cluster][devinfo.datarate];
-      group.devs.push_back ({ed.first.Get (), traffic});
-      group.ot.high += traffic;
-      group.ot.currbest += traffic;
     }
+
+  // This is in case there was nothig to reconfig
+  // (otherwise always rewritten at end of config)
+  m_samplingStart[bestGw][cluster] = Simulator::Now ();
 }
 
-std::string
-CongestionControlComponent::PrintCongestion (Address bestGw, uint8_t cluster)
+void
+CongestionControlComponent::AddNewDevice (uint32_t devaddr)
 {
-  std::stringstream ss;
-  ss << "Cluster " << unsigned (cluster) << ", Gateway " << bestGw << ":\n\t";
-  clusterstatus_t &cl = m_congestionStatus[bestGw][cluster];
-  double totsent = 0;
-  double totrec = 0;
-  for (int dr = N_SF - 1; dr >= 0; --dr)
-    {
-      double sent = cl[dr].sent;
-      totsent += sent;
-      double rec = cl[dr].received;
-      totrec += rec;
-      ss << "SF" << 12 - dr << " " << ((sent > 0.0) ? rec / sent : -1.0) << ", ";
-    }
-  ss << "All " << ((totsent > 0.0) ? totrec / totsent : -1.0);
-  return ss.str ();
+  NS_LOG_DEBUG ("New device detected, Address: " << (unsigned) devaddr);
+  devinfo_t &devinfo = m_devStatus[devaddr];
+  dataratestatus_t &group = m_congestionStatus[devinfo.bestGw][devinfo.cluster][devinfo.datarate];
+  group.devs.push_back ({devaddr, devinfo.maxoftraf});
+  if (!group.ot.started) // Reconfiguration not started yet
+    group.ot.high += devinfo.maxoftraf;
+  else
+    group.ot.changed = true;
+}
+
+void
+CongestionControlComponent::RemoveDisconnected (dataratestatus_t &group)
+{
+  auto IsDisconnected = [this, &group] (std::pair<uint32_t, double> &dev) {
+    devinfo_t &d = m_devStatus[dev.first];
+    if (d.dutycycle == 255) // Disabled
+      return false;
+    double dc = (d.dutycycle > 0) ? 1.0 / std::pow (2.0, (double) d.dutycycle) : d.maxoftraf;
+    if (Simulator::Now () < m_lastFrame[dev.first] + d.toa / dc * 30.0 or
+        Simulator::Now () < m_lastFrame[dev.first] + Hours (48))
+      return false;
+    if (!group.ot.started) // Reconfiguration not started yet
+      group.ot.high -= d.maxoftraf;
+    else
+      group.ot.changed = true;
+    return true;
+  };
+
+  devices_t &v = group.devs;
+  size_t before = v.size ();
+  v.erase (std::remove_if (v.begin (), v.end (), IsDisconnected), v.end ());
+  if (v.size () < before)
+    NS_LOG_DEBUG (before - v.size () << " devices disconnected.");
 }
 
 bool
@@ -399,12 +360,89 @@ CongestionControlComponent::ProduceConfigScheme (dataratestatus_t &group, double
   devinfo_t &context = m_devStatus[group.devs[0].first];
   int sf = 12 - context.datarate;
   NS_LOG_DEBUG ("Reconfig SF" << sf << ": " << ot.currbest << " [" << ot.low << ", " << ot.high
-                              << "], New devices? " << ot.changed);
+                              << "], Changes? " << ot.changed);
   TrafficControlUtils::OptimizeDutyCycleMaxMin (group.devs, ot.currbest,
                                                 m_configToDoList[context.bestGw][context.cluster]);
 
   ot.changed = false;
   return true;
+}
+
+void
+CongestionControlComponent::InitializeData (Ptr<NetworkStatus> status)
+{
+  NS_LOG_FUNCTION (status);
+
+  for (auto const &gw : (status->m_gatewayStatuses))
+    {
+      m_disabled[gw.first] = std::vector<disabled_t> (m_targets.size ());
+      m_configToDoList[gw.first] = std::vector<configs_t> (m_targets.size ());
+      m_samplingStart[gw.first] = std::vector<Time> (m_targets.size (), m_start);
+      m_congestionStatus[gw.first] = gatewaystatus_t (m_targets.size (), clusterstatus_t (N_SF));
+    }
+  // Initialize device data. We assume all devices in the simulation are registered.
+  // (It's ok to cheat because this is declared on device registration)
+  for (auto const &ed : (status->m_endDeviceStatuses))
+    {
+      // Compute offered traffic
+      devinfo_t &devinfo = m_devStatus[ed.first.Get ()];
+      Ptr<Node> node = ed.second->GetMac ()->GetDevice ()->GetNode ();
+      Ptr<PeriodicSender> app = node->GetApplication (0)->GetObject<PeriodicSender> ();
+
+      devinfo.datarate = ed.second->GetMac ()->GetDataRate ();
+      devinfo.cluster = ed.second->GetMac ()->GetCluster ();
+
+      Ptr<Packet> tmp =
+          Create<Packet> (app->GetPacketSize () + 13 /* Headers with no MAC commands */);
+      LoraTxParameters params;
+      params.sf = 12 - devinfo.datarate;
+      params.lowDataRateOptimizationEnabled =
+          LoraPhy::GetTSym (params) > MilliSeconds (16) ? true : false;
+      devinfo.toa = LoraPhy::GetOnAirTime (tmp, params);
+      double traffic = devinfo.toa.GetSeconds () / app->GetInterval ().GetSeconds ();
+      devinfo.maxoftraf = (traffic > 0.01) ? 0.01 : traffic;
+
+      Ptr<MobilityModel> devpos = node->GetObject<MobilityModel> ();
+      double distance = std::numeric_limits<double>::max ();
+      for (auto const &gw : (status->m_gatewayStatuses))
+        {
+          double tmp = devpos->GetDistanceFrom (
+              gw.second->GetGatewayMac ()->GetDevice ()->GetNode ()->GetObject<MobilityModel> ());
+          if (tmp < distance)
+            {
+              distance = tmp;
+              devinfo.bestGw = gw.first;
+            }
+        }
+
+      // Insert data in structure according to best gateway and SF
+      if (!app->IsRunning ())
+        continue; // Do not insert and add it on first reception
+      dataratestatus_t &group =
+          m_congestionStatus[devinfo.bestGw][devinfo.cluster][devinfo.datarate];
+      group.devs.push_back ({ed.first.Get (), devinfo.maxoftraf});
+      group.ot.high += devinfo.maxoftraf;
+    }
+}
+
+std::string
+CongestionControlComponent::PrintCongestion (Address bestGw, uint8_t cluster)
+{
+  std::stringstream ss;
+  ss << "Cluster " << unsigned (cluster) << ", Gateway " << bestGw << ":\n\t";
+  clusterstatus_t &cl = m_congestionStatus[bestGw][cluster];
+  double totsent = 0;
+  double totrec = 0;
+  for (int dr = N_SF - 1; dr >= 0; --dr)
+    {
+      double sent = cl[dr].sent;
+      totsent += sent;
+      double rec = cl[dr].received;
+      totrec += rec;
+      ss << "SF" << 12 - dr << " " << ((sent > 0.0) ? rec / sent : -1.0) << ", ";
+    }
+  ss << "All " << ((totsent > 0.0) ? totrec / totsent : -1.0);
+  return ss.str ();
 }
 
 double
@@ -417,6 +455,14 @@ CongestionControlComponent::CapacityForPDRModel (double pdr)
 }
 
 const int CongestionControlComponent::N_SF = 6;
+
+// Unused
+void
+CongestionControlComponent::OnFailedReply (Ptr<EndDeviceStatus> status,
+                                           Ptr<NetworkStatus> networkStatus)
+{
+  NS_LOG_FUNCTION (this->GetTypeId () << networkStatus);
+}
 
 } // namespace lorawan
 } // namespace ns3

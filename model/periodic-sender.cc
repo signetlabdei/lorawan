@@ -163,5 +163,12 @@ PeriodicSender::StopApplication (void)
   Simulator::Cancel (m_sendEvent);
 }
 
+bool
+PeriodicSender::IsRunning (void)
+{
+  NS_LOG_FUNCTION_NOARGS ();
+  return m_sendEvent.IsRunning ();
+}
+
 }
 }

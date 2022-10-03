@@ -54,12 +54,16 @@ class CongestionControlComponent : public NetworkControllerComponent
     uint8_t cluster = 0;
     Address bestGw = Address ();
     double maxoftraf = 0; // Useful in case we need to reorganize
+    Time toa = Seconds (0); // Time on Air, useful to track disconnections
 
     // Changing with time
     int fCnt = 0;
     uint8_t dutycycle = 0;
   };
   using devinfomap_t = std::unordered_map<uint32_t, devinfo_t>; // 1 instance in the class
+
+  // Timestamp map to track device disconnection (3 periods)
+  using lastframemap_t = std::unordered_map<uint32_t, Time>;
 
   /** 
    * ##########################################
@@ -69,9 +73,9 @@ class CongestionControlComponent : public NetworkControllerComponent
   using devices_t = std::vector<std::pair<uint32_t, double>>;
   struct offtraff_t
   {
-    double high = 0;
+    double high = 0; // Intialized to max ot tot at beginning
     double low = 0;
-    double currbest = 0;
+    double currbest = 0; // Initialized on first iteration
     bool started = false;
     bool changed = false;
   };
@@ -114,6 +118,8 @@ public:
   //Destructor
   virtual ~CongestionControlComponent ();
 
+  void SetTargets (targets_t targets);
+
   void OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndDeviceStatus> status,
                          Ptr<NetworkStatus> networkStatus);
 
@@ -123,19 +129,27 @@ public:
 
   static double CapacityForPDRModel (double pdr);
 
-  void SetTargets (targets_t targets);
-
 private:
+  void StartSampling (Address bestGw, uint8_t cluster);
+
+  void StartReconfig (Address bestGw, uint8_t cluster);
+
+  void AddNewDevice (uint32_t devaddr);
+
+  void RemoveDisconnected (dataratestatus_t &group);
+
+  bool ProduceConfigScheme (dataratestatus_t &group, double target);
+
   void InitializeData (Ptr<NetworkStatus> status);
 
   std::string PrintCongestion (Address bestGw, uint8_t cluster);
-
-  bool ProduceConfigScheme (dataratestatus_t &group, double target);
 
   // To track network congestion
   networkstatus_t m_congestionStatus;
   // To track current status of devices
   devinfomap_t m_devStatus;
+  // To track last frame reception in case of disconnections
+  lastframemap_t m_lastFrame;
 
   // To track ongoing duty-cycle configuration
   /*LoraDeviceAddress::Get() is hashable*/
@@ -158,7 +172,7 @@ private:
   // Minimum step between offered traffic values in a SF to declare value stagnation
   double m_tolerance;
 
-  // Number fo channels per cluster 
+  // Number fo channels per cluster
   // (not general right now, used with capacity model to jump-start)
   int N_CH;
   // Multiplicative constant for the capacity model
