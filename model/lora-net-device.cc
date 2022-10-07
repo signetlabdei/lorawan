@@ -126,7 +126,7 @@ LoraNetDevice::Receive (Ptr<Packet> packet)
 
   // Fill protocol and address with empty stuff
   NS_LOG_DEBUG ("Calling receiveCallback");
-  m_receiveCallback (this, packet, 0, Address ());
+  m_receiveCallback (this, packet, 0x0800, Address ());
 }
 
 /******************************************

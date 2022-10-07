@@ -2,7 +2,8 @@ build_lib_example(
   NAME simple-network-example
   SOURCE_FILES simple-network-example.cc
   LIBRARIES_TO_LINK
-  ${libcore} ${liblorawan}
+    ${libcore}
+    ${liblorawan}
 )
 
 build_lib_example(
@@ -75,4 +76,13 @@ build_lib_example(
   LIBRARIES_TO_LINK
     ${libcore}
     ${liblorawan}
+)
+
+build_lib_example(
+  NAME chirpstack-example
+  SOURCE_FILES chirpstack-example.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${liblorawan}
+    ${libtap-bridge}
 )

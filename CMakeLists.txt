@@ -19,6 +19,7 @@ set(source_files
     model/periodic-sender.cc
     model/one-shot-sender.cc
     model/forwarder.cc
+    model/udp-forwarder.cc
     model/lorawan-mac-header.cc
     model/lora-frame-header.cc
     model/mac-command.cc
@@ -48,8 +49,10 @@ set(source_files
     helper/periodic-sender-helper.cc
     helper/one-shot-sender-helper.cc
     helper/forwarder-helper.cc
+    helper/udp-forwarder-helper.cc
     helper/network-server-helper.cc
     helper/lora-packet-tracker.cc
+    utils/base64.cc
 )
 
 set(header_files
@@ -73,6 +76,7 @@ set(header_files
     model/periodic-sender.h
     model/one-shot-sender.h
     model/forwarder.h
+    model/udp-forwarder.h
     model/lorawan-mac-header.h
     model/lora-frame-header.h
     model/mac-command.h
@@ -102,9 +106,11 @@ set(header_files
     helper/periodic-sender-helper.h
     helper/one-shot-sender-helper.h
     helper/forwarder-helper.h
+    helper/udp-forwarder-helper.h
     helper/network-server-helper.h
     helper/lora-packet-tracker.h
     test/utilities.h
+    utils/base64.h
 )
 
 build_lib(
@@ -118,6 +124,8 @@ build_lib(
     ${libpoint-to-point}
     ${libbuildings}
     ${libmobility}
+    ${libapplications}
+    ${libcsma}
     ${ortools_LIBRARIES}
   TEST_SOURCES
     test/utilities.cc
