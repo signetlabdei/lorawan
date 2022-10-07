@@ -59,6 +59,7 @@ class CongestionControlComponent : public NetworkControllerComponent
     // Changing with time
     int fCnt = 0;
     uint8_t dutycycle = 0;
+    bool active = false;
   };
   using devinfomap_t = std::unordered_map<uint32_t, devinfo_t>; // 1 instance in the class
 

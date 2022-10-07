@@ -130,21 +130,19 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
   if (m_congestionStatus.empty ())
     InitializeData (networkStatus);
 
-  // Add sample to congestion metrics (they are reset at the end of each reconfiguration)
+  // If first transmission of the device (late activation)
+  if (!devinfo.active) // Not in the congestion status database
+    AddNewDevice (devaddr);
+  //RemoveDisconnected (m_congestionStatus[devinfo.bestGw][devinfo.cluster][devinfo.datarate]);
+
+  // Add sample to congestion metrics (they are reset at the end of each phase)
   {
     dataratestatus_t &group = m_congestionStatus[devinfo.bestGw][devinfo.cluster][devinfo.datarate];
-    devices_t &devs = group.devs;
-    // If first transmission of the device (late activation)
-    if (prevFCnt == 0 and
-        std::find_if (devs.begin (), devs.end (), [devaddr] (std::pair<uint32_t, double> d) {
-          return d.first == devaddr;
-        }) == devs.end ()) // Not in the congestion status database
-      AddNewDevice (devaddr);
     group.received++;
     group.sent += currFCnt - prevFCnt;
   }
 
-  // If we are still in reconfiguration fase, look for acknowledgement and exit
+  // If we are still in reconfiguration fase, (look for acknowledgement and) exit
   if (!m_configToDoList[devinfo.bestGw][devinfo.cluster].empty ())
     {
       /*       // Wait for ack policy
@@ -250,32 +248,31 @@ CongestionControlComponent::StartReconfig (Address bestGw, uint8_t cluster)
   disabled_t &disabled = m_disabled[bestGw][cluster];
   // Produce new reconfig scheme
   for (auto &dr : m_congestionStatus[bestGw][cluster])
-    {
-      if (Simulator::Now () > Days (5))
-        RemoveDisconnected (dr);
-      if (ProduceConfigScheme (dr, m_targets[cluster]))
-        {
-          for (auto const &d : dr.devs)
-            if (configs.count (d.first)) // Check key existence (to avoid creating it)
-              {
-                if (configs[d.first] ==
-                    m_devStatus[d.first].dutycycle) // Nothing changed between configs
-                  {
-                    configs.erase (d.first);
-                    continue;
-                  }
-                if (!disabled.count (d.first)) // Doesn't need re-enabling
+    if (ProduceConfigScheme (dr, m_targets[cluster]))
+      {
+        for (auto const &d : dr.devs)
+          if (configs.count (d.first)) // Check key existence (to avoid creating it)
+            {
+              if (configs[d.first] ==
+                  m_devStatus[d.first].dutycycle) // Nothing changed between configs
+                {
+                  configs.erase (d.first);
                   continue;
-                disabled[d.first]->GetMac ()->SetAggregatedDutyCycle (1.0); // CHEAT and re-enable
-                m_devStatus[d.first].dutycycle = 0;
-                disabled.erase (d.first);
-              }
-          //break; //(uncomment to enforce one SF at a time per gateway/cluster)
-        }
-    }
+                }
+              if (!disabled.count (d.first)) // Doesn't need re-enabling
+                continue;
+              disabled[d.first]->GetMac ()->SetAggregatedDutyCycle (1.0); // CHEAT and re-enable
+              m_devStatus[d.first].dutycycle = 0;
+              disabled.erase (d.first);
+              m_lastFrame[d.first] = Simulator::Now (); // To counter marking as disconnected
+            }
+        //break; //(uncomment to enforce one SF at a time per gateway/cluster)
+      }
 
   // This is in case there was nothig to reconfig
   // (otherwise always rewritten at end of config)
+  for (auto &dr : m_congestionStatus[bestGw][cluster])
+    dr.Reset ();
   m_samplingStart[bestGw][cluster] = Simulator::Now ();
 }
 
@@ -285,6 +282,7 @@ CongestionControlComponent::AddNewDevice (uint32_t devaddr)
   NS_LOG_DEBUG ("New device detected, Address: " << (unsigned) devaddr);
   devinfo_t &devinfo = m_devStatus[devaddr];
   dataratestatus_t &group = m_congestionStatus[devinfo.bestGw][devinfo.cluster][devinfo.datarate];
+  devinfo.active = true;
   group.devs.push_back ({devaddr, devinfo.maxoftraf});
   if (!group.ot.started) // Reconfiguration not started yet
     group.ot.high += devinfo.maxoftraf;
@@ -295,14 +293,21 @@ CongestionControlComponent::AddNewDevice (uint32_t devaddr)
 void
 CongestionControlComponent::RemoveDisconnected (dataratestatus_t &group)
 {
-  auto IsDisconnected = [this, &group] (std::pair<uint32_t, double> &dev) {
+  //double pdr = (group.sent > 0.0) ? (double) group.received / group.sent : 1.0;
+  double periods = 17.0 ; //(pdr < 1.0) ? ceil (log (1.0 - 0.9999999) / log (1.0 - pdr)) : 1.0;
+
+  auto IsDisconnected = [this, &group, periods] (std::pair<uint32_t, double> &dev) {
     devinfo_t &d = m_devStatus[dev.first];
     if (d.dutycycle == 255) // Disabled
       return false;
     double dc = (d.dutycycle > 0) ? 1.0 / std::pow (2.0, (double) d.dutycycle) : d.maxoftraf;
-    if (Simulator::Now () < m_lastFrame[dev.first] + d.toa / dc * 30.0 or
-        Simulator::Now () < m_lastFrame[dev.first] + Hours (48))
+    //! TODO: THIS IS BAD, too many false positives
+    if (Simulator::Now () <= m_lastFrame[dev.first] + d.toa / dc * periods or
+        Simulator::Now () <= m_lastFrame[dev.first] + Hours (4)) 
       return false;
+    d.active = false;
+    if (m_configToDoList[d.bestGw][d.cluster].count (dev.first))
+      m_configToDoList[d.bestGw][d.cluster].erase (dev.first);
     if (!group.ot.started) // Reconfiguration not started yet
       group.ot.high -= d.maxoftraf;
     else
@@ -418,6 +423,8 @@ CongestionControlComponent::InitializeData (Ptr<NetworkStatus> status)
       // Insert data in structure according to best gateway and SF
       if (!app->IsRunning ())
         continue; // Do not insert and add it on first reception
+
+      devinfo.active = true;
       dataratestatus_t &group =
           m_congestionStatus[devinfo.bestGw][devinfo.cluster][devinfo.datarate];
       group.devs.push_back ({ed.first.Get (), devinfo.maxoftraf});

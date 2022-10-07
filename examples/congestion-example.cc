@@ -185,8 +185,7 @@ main (int argc, char *argv[])
    *  Create Nodes  *
    ******************/
 
-  NodeContainer networkServer;
-  networkServer.Create (1);
+  Ptr<Node> networkServer = CreateObject<Node> ();
 
   NodeContainer gateways;
   int nGateways = 3 * gatewayRings * gatewayRings - 3 * gatewayRings + 1;
@@ -250,11 +249,12 @@ main (int argc, char *argv[])
   appHelper.SetPacketSizeGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
       "Mean", DoubleValue (18), "Variance", DoubleValue (10), "Bound", DoubleValue (18)));
   ApplicationContainer apps = appHelper.Install (endDevices);
-  /*   int j = 0; // Late activation of 100 devices
+  /*   int j = 0; // Late (dis)activation of 100 devices
   for (ApplicationContainer::Iterator i = apps.Begin (); i != apps.End (); ++i)
     {
-      if (j >= 100)
+      if (j >= 50)
         break;
+      //(*i)->SetStopTime (Days (4));
       (*i)->SetStartTime (Days (5));
       ++j;
     } */
