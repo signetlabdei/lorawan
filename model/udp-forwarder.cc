@@ -310,7 +310,7 @@ UdpForwarder::ThreadUp (void)
 
   /* fetch packets */
   nb_pkt = lgw_receive (NB_PKT_MAX, rxpkt);
-  /*   nb_pkt = 1;
+  /*   nb_pkt = 1; // Example Join request
   p = &rxpkt[0];
   p->count_us = 3512348611;
   p->freq_hz = 866349812;
