@@ -21,7 +21,7 @@
 #include "ns3/lora-helper.h"
 #include "ns3/log.h"
 #include "ns3/loratap-header.h"
-#include "ns3/periodic-sender.h"
+#include "ns3/lora-application.h"
 
 #include <fstream>
 
@@ -224,7 +224,7 @@ LoraHelper::DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateway
       double txPower = mac->GetTransmissionPower ();
       Vector pos = position->GetPosition ();
       // Add: #sent, #received, max-offered-traffic, duty-cycle
-      Ptr<PeriodicSender> app = object->GetApplication (0)->GetObject<PeriodicSender> ();
+      Ptr<LoraApplication> app = object->GetApplication (0)->GetObject<LoraApplication> ();
       uint8_t size = app->GetPacketSize ();
       double interval = app->GetInterval ().GetSeconds ();
       LoraTxParameters params;
@@ -384,7 +384,7 @@ LoraHelper::DoPrintSFStatus (NodeContainer endDevices, NodeContainer gateways, s
           loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
       int dr = int (mac->GetDataRate ());
       // Add: #sent, #received, max-offered-traffic, duty-cycle
-      Ptr<PeriodicSender> app = object->GetApplication (0)->GetObject<PeriodicSender> ();
+      Ptr<LoraApplication> app = object->GetApplication (0)->GetObject<LoraApplication> ();
       uint8_t size = app->GetPacketSize ();
       double interval = app->GetInterval ().GetSeconds ();
       LoraTxParameters params;

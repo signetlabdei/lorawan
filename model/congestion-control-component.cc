@@ -20,7 +20,7 @@
  */
 
 #include "ns3/congestion-control-component.h"
-#include "ns3/periodic-sender.h"
+#include "ns3/lora-application.h"
 #include "ns3/traffic-control-utils.h"
 
 #include <boost/math/special_functions/lambert_w.hpp>
@@ -392,7 +392,7 @@ CongestionControlComponent::InitializeData (Ptr<NetworkStatus> status)
       // Compute offered traffic
       devinfo_t &devinfo = m_devStatus[ed.first.Get ()];
       Ptr<Node> node = ed.second->GetMac ()->GetDevice ()->GetNode ();
-      Ptr<PeriodicSender> app = node->GetApplication (0)->GetObject<PeriodicSender> ();
+      Ptr<LoraApplication> app = node->GetApplication (0)->GetObject<LoraApplication> ();
 
       devinfo.datarate = ed.second->GetMac ()->GetDataRate ();
       devinfo.cluster = ed.second->GetMac ()->GetCluster ();

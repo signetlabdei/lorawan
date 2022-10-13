@@ -26,7 +26,7 @@
 #include "ns3/random-variable-stream.h"
 #include "ns3/congestion-control-component.h"
 #include "ns3/traffic-control-utils.h"
-#include "ns3/periodic-sender.h"
+#include "ns3/lora-application.h"
 #include "ns3/node-list.h"
 #include "ns3/packet.h"
 
@@ -684,7 +684,7 @@ LorawanMacHelper::SetDutyCyclesWithCapacityModel (NodeContainer endDevices, Node
             bestGateway = curr;
         }
 
-      Ptr<PeriodicSender> app = object->GetApplication (0)->GetObject<PeriodicSender> ();
+      Ptr<LoraApplication> app = object->GetApplication (0)->GetObject<LoraApplication> ();
 
       Ptr<Packet> tmp =
           ns3::Create<Packet> (app->GetPacketSize () + 13 /* Headers with no MAC commands */);
