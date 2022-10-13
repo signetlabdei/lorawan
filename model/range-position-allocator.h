@@ -26,6 +26,9 @@
 
 namespace ns3 {
 
+/**
+ * \brief Produce positions in range of a set of nodes.
+ */
 class RangePositionAllocator : public PositionAllocator
 {
 public:
@@ -59,6 +62,11 @@ public:
   void SetZ (double z);
 
   /**
+     * \param z   random variable to extract z coordinates for positions
+     */
+  void SetZ (Ptr<RandomVariableStream> z);
+
+  /**
      * \param nodes the nodes to be in range of
      */
   void SetNodes (NodeContainer nodes);
@@ -67,15 +75,16 @@ public:
   virtual int64_t AssignStreams (int64_t stream);
 
 private:
-  bool OutOfRange (double x, double y) const;
+  bool OutOfRange (double x, double y, double z) const;
 
   Ptr<UniformRandomVariable> m_rv; //!< pointer to uniform random variable
   double m_rho; //!< value of the radius of the disc
-  double m_range; //!< the max range from any gateway
+  double m_range; //!< the max range from any provided nodes
   double m_x; //!< x coordinate of center of disc
   double m_y; //!< y coordinate of center of disc
   double m_z; //!< z coordinate of the disc
-  NodeContainer m_nodes; //!< the nodes to be in range of
+  Ptr<RandomVariableStream> m_zrv; //!< random variable to extract z coordinates
+  std::vector<Ptr<Node>> m_nodes; //!< the nodes to be in range of
 };
 
 } // namespace ns3

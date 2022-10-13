@@ -20,6 +20,8 @@
 #include "ns3/double.h"
 #include "ns3/mobility-module.h"
 #include "ns3/node-container.h"
+#include "ns3/string.h"
+#include "ns3/pointer.h"
 
 #include <cmath>
 
@@ -51,7 +53,10 @@ RangePositionAllocator::GetTypeId (void)
                          MakeDoubleChecker<double> ())
           .AddAttribute ("Z", "The z coordinate of all the positions in the disc.",
                          DoubleValue (0.0), MakeDoubleAccessor (&RangePositionAllocator::m_z),
-                         MakeDoubleChecker<double> ());
+                         MakeDoubleChecker<double> ())
+          .AddAttribute ("ZRV", "Random variable to extract z coordinates for positions.",
+                         DoubleValue (0), MakePointerAccessor (&RangePositionAllocator::m_zrv),
+                         MakePointerChecker<RandomVariableStream> ());
   return tid;
 }
 
@@ -95,20 +100,27 @@ RangePositionAllocator::SetZ (double z)
 }
 
 void
+RangePositionAllocator::SetZ (Ptr<RandomVariableStream> z)
+{
+  m_zrv = z;
+}
+
+void
 RangePositionAllocator::SetNodes (NodeContainer nodes)
 {
-  m_nodes = nodes;
+  for (NodeContainer::Iterator i = nodes.Begin (); i != nodes.End (); ++i)
+    m_nodes.push_back (*i);
 }
 
 bool
-RangePositionAllocator::OutOfRange (double x, double y) const
+RangePositionAllocator::OutOfRange (double x, double y, double z) const
 {
   bool oor = true;
-  for (NodeContainer::Iterator i = m_nodes.Begin (); i != m_nodes.End (); ++i)
+  for (auto i : m_nodes)
     {
       Ptr<MobilityModel> pos = CreateObject<ConstantPositionMobilityModel> ();
-      pos->SetPosition (Vector (x, y, m_z));
-      double dist = (*i)->GetObject<MobilityModel> ()->GetDistanceFrom (pos);
+      pos->SetPosition (Vector (x, y, z));
+      double dist = i->GetObject<MobilityModel> ()->GetDistanceFrom (pos);
 
       if (dist <= 1.0)
         return true;
@@ -124,23 +136,26 @@ RangePositionAllocator::OutOfRange (double x, double y) const
 Vector
 RangePositionAllocator::GetNext (void) const
 {
-  double x, y;
+  double x, y, z;
+  
+  z = (m_zrv == 0) ? m_z : m_zrv->GetValue ();
   do
     {
       x = m_rv->GetValue (-m_rho, m_rho);
       y = m_rv->GetValue (-m_rho, m_rho);
-  } while (std::sqrt (x * x + y * y) > m_rho || OutOfRange (x + m_x, y + m_y));
+  } while (std::sqrt (x * x + y * y) > m_rho || OutOfRange (x + m_x, y + m_y, z));
 
   x += m_x;
   y += m_y;
-  NS_LOG_DEBUG ("Disc position x=" << x << ", y=" << y);
-  return Vector (x, y, m_z);
+  NS_LOG_DEBUG ("In-range position x=" << x << ", y=" << y << ", z=" << z);
+  return Vector (x, y, z);
 }
 
 int64_t
 RangePositionAllocator::AssignStreams (int64_t stream)
 {
   m_rv->SetStream (stream);
+  m_zrv->SetStream (stream);
   return 1;
 }
 
