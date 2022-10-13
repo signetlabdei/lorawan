@@ -15,126 +15,114 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Davide Magrin <magrinda@dei.unipd.it>
+ * Author: Alessandro Aimi <alessandro.aimi@cnam.fr>
+ *                         <alessandro.aimi@orange.com>
  */
 
-#include "periodic-sender.h"
+#include "poisson-sender.h"
 #include "ns3/pointer.h"
 #include "ns3/log.h"
 #include "ns3/double.h"
-#include "ns3/uinteger.h"
 #include "ns3/string.h"
+#include "ns3/uinteger.h"
 #include "ns3/lora-net-device.h"
 
 namespace ns3 {
 namespace lorawan {
 
-NS_LOG_COMPONENT_DEFINE ("PeriodicSender");
+NS_LOG_COMPONENT_DEFINE ("PoissonSender");
 
-NS_OBJECT_ENSURE_REGISTERED (PeriodicSender);
+NS_OBJECT_ENSURE_REGISTERED (PoissonSender);
 
 TypeId
-PeriodicSender::GetTypeId (void)
+PoissonSender::GetTypeId (void)
 {
   static TypeId tid =
-      TypeId ("ns3::PeriodicSender")
+      TypeId ("ns3::PoissonSender")
           .SetParent<Application> ()
-          .AddConstructor<PeriodicSender> ()
+          .AddConstructor<PoissonSender> ()
           .SetGroupName ("lorawan")
+          .AddAttribute ("Interval", "The average time to wait between packets",
+                         TimeValue (Seconds (600.0)),
+                         MakeTimeAccessor (&PoissonSender::m_avgInterval), MakeTimeChecker ())
           .AddAttribute (
-              "Interval", "The interval between packet sends of this app", TimeValue (Seconds (10)),
-              MakeTimeAccessor (&PeriodicSender::GetInterval, &PeriodicSender::SetInterval),
-              MakeTimeChecker ())
-          .AddAttribute (
-              "PacketSize", "The interval between packet sends of this app", UintegerValue (10),
-              MakeUintegerAccessor (&PeriodicSender::GetPacketSize, &PeriodicSender::SetPacketSize),
-              MakeUintegerChecker<uint8_t> ());
-  // .AddAttribute ("PacketSizeRandomVariable", "The random variable that determines the shape of the packet size, in bytes",
-  //                StringValue ("ns3::UniformRandomVariable[Min=0,Max=10]"),
-  //                MakePointerAccessor (&PeriodicSender::m_pktSizeRV),
-  //                MakePointerChecker <RandomVariableStream>());
+              "PacketSize",
+              "Size of packets generated. The minimum packet size is 12 bytes which is "
+              "the size of the header carrying the sequence number and the time stamp.",
+              UintegerValue (18),
+              MakeUintegerAccessor (&PoissonSender::GetPacketSize, &PoissonSender::SetPacketSize),
+              MakeUintegerChecker<uint32_t> ());
   return tid;
 }
 
-PeriodicSender::PeriodicSender ()
-    : m_interval (Seconds (10)), m_initialDelay (Seconds (1)), m_basePktSize (10), m_pktSizeRV (0)
+PoissonSender::PoissonSender ()
+    : m_avgInterval (Seconds (10)), m_initialDelay (Seconds (1)), m_basePktSize (10), m_interval (0)
 
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
 
-PeriodicSender::~PeriodicSender ()
+PoissonSender::~PoissonSender ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
 
 void
-PeriodicSender::SetInterval (Time interval)
+PoissonSender::SetInterval (Time interval)
 {
   NS_LOG_FUNCTION (this << interval);
-  m_interval = interval;
+  m_avgInterval = interval;
 }
 
 Time
-PeriodicSender::GetInterval (void) const
+PoissonSender::GetInterval (void) const
 {
   NS_LOG_FUNCTION (this);
-  return m_interval;
+  return m_avgInterval;
 }
 
 void
-PeriodicSender::SetInitialDelay (Time delay)
+PoissonSender::SetInitialDelay (Time delay)
 {
   NS_LOG_FUNCTION (this << delay);
   m_initialDelay = delay;
 }
 
 void
-PeriodicSender::SetPacketSizeRandomVariable (Ptr<RandomVariableStream> rv)
-{
-  m_pktSizeRV = rv;
-}
-
-void
-PeriodicSender::SetPacketSize (uint8_t size)
+PoissonSender::SetPacketSize (uint8_t size)
 {
   m_basePktSize = size;
 }
 
 uint8_t
-PeriodicSender::GetPacketSize (void) const
+PoissonSender::GetPacketSize (void) const
 {
   return m_basePktSize;
 }
 
 void
-PeriodicSender::SendPacket (void)
+PoissonSender::SendPacket (void)
 {
   NS_LOG_FUNCTION (this);
 
   // Create and send a new packet
   Ptr<Packet> packet;
-  if (m_pktSizeRV)
-    {
-      int randomsize = m_pktSizeRV->GetInteger ();
-      packet = Create<Packet> (m_basePktSize + randomsize);
-    }
-  else
-    {
-      packet = Create<Packet> (m_basePktSize);
-    }
+  packet = Create<Packet> (m_basePktSize);
   m_mac->Send (packet);
 
   // Schedule the next SendPacket event
-  m_sendEvent = Simulator::Schedule (m_interval, &PeriodicSender::SendPacket, this);
+  m_sendEvent =
+      Simulator::Schedule (Seconds (m_interval->GetValue ()), &PoissonSender::SendPacket, this);
 
   NS_LOG_DEBUG ("Sent a packet of size " << packet->GetSize ());
 }
 
 void
-PeriodicSender::StartApplication (void)
+PoissonSender::StartApplication (void)
 {
   NS_LOG_FUNCTION (this);
+
+  m_interval->SetAttribute ("Mean", DoubleValue (m_avgInterval.ToDouble (Time::S)));
 
   // Make sure we have a MAC layer
   if (m_mac == 0)
@@ -150,19 +138,19 @@ PeriodicSender::StartApplication (void)
   Simulator::Cancel (m_sendEvent);
   NS_LOG_DEBUG ("Starting up application with a first event with a " << m_initialDelay.GetSeconds ()
                                                                      << " seconds delay");
-  m_sendEvent = Simulator::Schedule (m_initialDelay, &PeriodicSender::SendPacket, this);
+  m_sendEvent = Simulator::Schedule (m_initialDelay, &PoissonSender::SendPacket, this);
   NS_LOG_DEBUG ("Event Id: " << m_sendEvent.GetUid ());
 }
 
 void
-PeriodicSender::StopApplication (void)
+PoissonSender::StopApplication (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
   Simulator::Cancel (m_sendEvent);
 }
 
 bool
-PeriodicSender::IsRunning (void)
+PoissonSender::IsRunning (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
   return m_sendEvent.IsRunning ();

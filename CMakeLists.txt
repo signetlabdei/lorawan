@@ -17,6 +17,7 @@ set(source_files
     model/logical-lora-channel.cc
     model/logical-lora-channel-helper.cc
     model/periodic-sender.cc
+    model/poisson-sender.cc
     model/one-shot-sender.cc
     model/forwarder.cc
     model/udp-forwarder.cc
@@ -73,7 +74,9 @@ set(header_files
     model/sub-band.h
     model/logical-lora-channel.h
     model/logical-lora-channel-helper.h
+    model/lora-application.h
     model/periodic-sender.h
+    model/poisson-sender.h
     model/one-shot-sender.h
     model/forwarder.h
     model/udp-forwarder.h

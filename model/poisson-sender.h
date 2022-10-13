@@ -15,25 +15,26 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Davide Magrin <magrinda@dei.unipd.it>
+ * Author: Alessandro Aimi <alessandro.aimi@cnam.fr>
+ *                         <alessandro.aimi@orange.com>
  */
 
-#ifndef PERIODIC_SENDER_H
-#define PERIODIC_SENDER_H
+#ifndef POISSON_SENDER_H
+#define POISSON_SENDER_H
 
 #include "lora-application.h"
-#include "ns3/nstime.h"
 #include "ns3/lorawan-mac.h"
-#include "ns3/attribute.h"
+#include "ns3/nstime.h"
+#include "ns3/random-variable-stream.h"
 
 namespace ns3 {
 namespace lorawan {
 
-class PeriodicSender : public LoraApplication
+class PoissonSender : public LoraApplication
 {
 public:
-  PeriodicSender ();
-  ~PeriodicSender ();
+  PoissonSender ();
+  ~PoissonSender ();
 
   static TypeId GetTypeId (void);
 
@@ -64,11 +65,6 @@ public:
    */
   uint8_t GetPacketSize (void) const;
 
-  /**
-   * Set if using randomness in the packet size
-   */
-  void SetPacketSizeRandomVariable (Ptr<RandomVariableStream> rv);
-
   /** 
    * True if the application is currently running
    */
@@ -91,9 +87,9 @@ private:
   void SendPacket (void);
 
   /**
-   * The interval between to consecutive send events
+   * The average interval between to consecutive send events
    */
-  Time m_interval;
+  Time m_avgInterval;
 
   /**
    * The initial delay of this application
@@ -115,13 +111,10 @@ private:
    */
   uint8_t m_basePktSize;
 
-  /**
-   * The random variable that adds bytes to the packet size
-   */
-  Ptr<RandomVariableStream> m_pktSizeRV;
+  Ptr<ExponentialRandomVariable> m_interval; //!< Random variable modeling packet inter-send time
 };
 
 } // namespace lorawan
 
 } // namespace ns3
-#endif /* SENDER_APPLICATION */
+#endif /* POISSON_SENDER_H */
