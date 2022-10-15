@@ -20,12 +20,8 @@
  */
 
 #include "poisson-sender.h"
-#include "ns3/pointer.h"
-#include "ns3/log.h"
-#include "ns3/double.h"
-#include "ns3/string.h"
-#include "ns3/uinteger.h"
 #include "ns3/lora-net-device.h"
+#include "ns3/double.h"
 
 namespace ns3 {
 namespace lorawan {
@@ -37,84 +33,21 @@ NS_OBJECT_ENSURE_REGISTERED (PoissonSender);
 TypeId
 PoissonSender::GetTypeId (void)
 {
-  static TypeId tid =
-      TypeId ("ns3::PoissonSender")
-          .SetParent<Application> ()
-          .AddConstructor<PoissonSender> ()
-          .SetGroupName ("lorawan")
-          .AddAttribute ("Interval", "The average time to wait between packets",
-                         TimeValue (Seconds (600.0)),
-                         MakeTimeAccessor (&PoissonSender::m_avgInterval), MakeTimeChecker ())
-          .AddAttribute (
-              "PacketSize",
-              "Size of packets generated. The minimum packet size is 12 bytes which is "
-              "the size of the header carrying the sequence number and the time stamp.",
-              UintegerValue (18),
-              MakeUintegerAccessor (&PoissonSender::GetPacketSize, &PoissonSender::SetPacketSize),
-              MakeUintegerChecker<uint32_t> ());
+  static TypeId tid = TypeId ("ns3::PoissonSender")
+                          .SetParent<LoraApplication> ()
+                          .AddConstructor<PoissonSender> ()
+                          .SetGroupName ("lorawan");
   return tid;
 }
 
 PoissonSender::PoissonSender ()
-    : m_avgInterval (Seconds (10)), m_initialDelay (Seconds (1)), m_basePktSize (10), m_interval (0)
-
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  m_interval = CreateObject<ExponentialRandomVariable> ();
 }
 
 PoissonSender::~PoissonSender ()
 {
   NS_LOG_FUNCTION_NOARGS ();
-}
-
-void
-PoissonSender::SetInterval (Time interval)
-{
-  NS_LOG_FUNCTION (this << interval);
-  m_avgInterval = interval;
-}
-
-Time
-PoissonSender::GetInterval (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_avgInterval;
-}
-
-void
-PoissonSender::SetInitialDelay (Time delay)
-{
-  NS_LOG_FUNCTION (this << delay);
-  m_initialDelay = delay;
-}
-
-void
-PoissonSender::SetPacketSize (uint8_t size)
-{
-  m_basePktSize = size;
-}
-
-uint8_t
-PoissonSender::GetPacketSize (void) const
-{
-  return m_basePktSize;
-}
-
-void
-PoissonSender::SendPacket (void)
-{
-  NS_LOG_FUNCTION (this);
-
-  // Create and send a new packet
-  Ptr<Packet> packet;
-  packet = Create<Packet> (m_basePktSize);
-  m_mac->Send (packet);
-
-  // Schedule the next SendPacket event
-  m_sendEvent =
-      Simulator::Schedule (Seconds (m_interval->GetValue ()), &PoissonSender::SendPacket, this);
-
-  NS_LOG_DEBUG ("Sent a packet of size " << packet->GetSize ());
 }
 
 void
@@ -149,11 +82,21 @@ PoissonSender::StopApplication (void)
   Simulator::Cancel (m_sendEvent);
 }
 
-bool
-PoissonSender::IsRunning (void)
+void
+PoissonSender::SendPacket (void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  return m_sendEvent.IsRunning ();
+  NS_LOG_FUNCTION (this);
+
+  // Create and send a new packet
+  Ptr<Packet> packet;
+  packet = Create<Packet> (m_basePktSize);
+  m_mac->Send (packet);
+
+  // Schedule the next SendPacket event
+  m_sendEvent =
+      Simulator::Schedule (Seconds (m_interval->GetValue ()), &PoissonSender::SendPacket, this);
+
+  NS_LOG_DEBUG ("Sent a packet of size " << packet->GetSize ());
 }
 
 } // namespace lorawan

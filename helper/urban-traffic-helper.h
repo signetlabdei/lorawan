@@ -19,48 +19,43 @@
  *                         <alessandro.aimi@orange.com>
  */
 
-#ifndef POISSON_SENDER_H
-#define POISSON_SENDER_H
+#ifndef URBAN_TRAFFIC_HELPER_H
+#define URBAN_TRAFFIC_HELPER_H
 
-#include "ns3/lora-application.h"
-#include "ns3/lorawan-mac.h"
+#include "ns3/object-factory.h"
+#include "ns3/node-container.h"
+#include "ns3/application-container.h"
+#include "ns3/random-variable-stream.h"
+#include "ns3/string.h"
 
 namespace ns3 {
 namespace lorawan {
 
-class PoissonSender : public LoraApplication
+/**
+ * This class can be used to install a range of realistic sender applications
+ * on a wide range of nodes. Traffic types and their distribution are from 
+ * [IEEE C802.16p-11/0102r2] for the urban scenario
+ */
+class UrbanTrafficHelper
 {
 public:
-  PoissonSender ();
-  ~PoissonSender ();
+  UrbanTrafficHelper ();
 
-  static TypeId GetTypeId (void);
+  ~UrbanTrafficHelper ();
+
+  ApplicationContainer Install (NodeContainer c) const;
+
+  ApplicationContainer Install (Ptr<Node> node) const;
 
 private:
-  /**
-   * Start the application by scheduling the first SendPacket event
-   */
-  void StartApplication (void);
+  Ptr<Application> InstallPriv (Ptr<Node> node) const;
 
-  /**
-   * Stop the application
-   */
-  void StopApplication (void);
+  Ptr<UniformRandomVariable> m_intervalProb;
 
-  /**
-   * Send a packet using the LoraNetDevice's Send method
-   */
-  void SendPacket (void);
-
-  Ptr<ExponentialRandomVariable> m_interval; //!< Random variable modeling packet inter-send time
-
-  /**
-   * The MAC layer of this node
-   */
-  Ptr<LorawanMac> m_mac;
+  std::vector<double> m_cdf;
 };
 
 } // namespace lorawan
 
 } // namespace ns3
-#endif /* POISSON_SENDER_H */
+#endif /* URBAN_TRAFFIC_HELPER_H */

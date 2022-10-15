@@ -17,6 +17,7 @@ set(source_files
     model/logical-lora-channel.cc
     model/logical-lora-channel-helper.cc
     model/periodic-sender.cc
+    model/lora-application.cc
     model/poisson-sender.cc
     model/one-shot-sender.cc
     model/forwarder.cc
@@ -48,12 +49,13 @@ set(source_files
     helper/lora-phy-helper.cc
     helper/lorawan-mac-helper.cc
     helper/periodic-sender-helper.cc
+    helper/urban-traffic-helper.cc
     helper/one-shot-sender-helper.cc
     helper/forwarder-helper.cc
     helper/udp-forwarder-helper.cc
     helper/network-server-helper.cc
     helper/lora-packet-tracker.cc
-    utils/base64.cc
+    libext/base64.cc
 )
 
 set(header_files
@@ -106,6 +108,7 @@ set(header_files
     helper/lora-helper.h
     helper/lora-phy-helper.h
     helper/lorawan-mac-helper.h
+    helper/urban-traffic-helper.h
     helper/periodic-sender-helper.h
     helper/one-shot-sender-helper.h
     helper/forwarder-helper.h
@@ -113,7 +116,7 @@ set(header_files
     helper/network-server-helper.h
     helper/lora-packet-tracker.h
     test/utilities.h
-    utils/base64.h
+    libext/base64.h
 )
 
 build_lib(

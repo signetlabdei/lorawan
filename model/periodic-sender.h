@@ -21,10 +21,8 @@
 #ifndef PERIODIC_SENDER_H
 #define PERIODIC_SENDER_H
 
-#include "lora-application.h"
-#include "ns3/nstime.h"
+#include "ns3/lora-application.h"
 #include "ns3/lorawan-mac.h"
-#include "ns3/attribute.h"
 
 namespace ns3 {
 namespace lorawan {
@@ -38,41 +36,9 @@ public:
   static TypeId GetTypeId (void);
 
   /**
-   * Set the sending interval
-   * \param interval the interval between two packet sendings
-   */
-  void SetInterval (Time interval);
-
-  /**
-   * Get the sending inteval
-   * \returns the interval between two packet sends
-   */
-  Time GetInterval (void) const;
-
-  /**
-   * Set the initial delay of this application
-   */
-  void SetInitialDelay (Time delay);
-
-  /**
-   * Set packet size
-   */
-  void SetPacketSize (uint8_t size);
-
-  /**
-   * Get packet size
-   */
-  uint8_t GetPacketSize (void) const;
-
-  /**
    * Set if using randomness in the packet size
    */
   void SetPacketSizeRandomVariable (Ptr<RandomVariableStream> rv);
-
-  /** 
-   * True if the application is currently running
-   */
-  bool IsRunning (void);
 
 private:
   /**
@@ -91,29 +57,9 @@ private:
   void SendPacket (void);
 
   /**
-   * The interval between to consecutive send events
-   */
-  Time m_interval;
-
-  /**
-   * The initial delay of this application
-   */
-  Time m_initialDelay;
-
-  /**
-   * The sending event scheduled as next
-   */
-  EventId m_sendEvent;
-
-  /**
    * The MAC layer of this node
    */
   Ptr<LorawanMac> m_mac;
-
-  /**
-   * The packet size.
-   */
-  uint8_t m_basePktSize;
 
   /**
    * The random variable that adds bytes to the packet size

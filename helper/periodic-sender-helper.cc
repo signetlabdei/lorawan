@@ -119,8 +119,7 @@ PeriodicSenderHelper::InstallPriv (Ptr<Node> node) const
     {
       interval = m_period;
     }
-
-  // Overwrite interval if random variable for niterval was provided
+  // Overwrite interval if random variable for iterval was provided
   if (m_intervalGenerator)
     {
       interval = Seconds (m_intervalGenerator->GetValue ());
@@ -128,7 +127,6 @@ PeriodicSenderHelper::InstallPriv (Ptr<Node> node) const
 
   app->SetInterval (interval);
   NS_LOG_DEBUG ("Created an application with interval = " << interval.GetSeconds () << " seconds");
-
   app->SetInitialDelay (Seconds (m_initialDelay->GetValue (0, interval.GetSeconds ())));
 
   app->SetPacketSize (m_pktSize);

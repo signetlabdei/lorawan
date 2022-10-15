@@ -30,55 +30,81 @@ namespace lorawan {
 class LoraApplication : public Application
 {
 public:
-  virtual ~LoraApplication (){};
+  /**
+   * \brief Get the type ID.
+   * \return the object TypeId
+   */
+  static TypeId GetTypeId (void);
+  LoraApplication ();
+  virtual ~LoraApplication ();
 
   /**
    * Set the sending interval
    * \param interval the interval between two packet sendings
    */
-  virtual void SetInterval (Time interval) = 0;
+  void SetInterval (Time interval);
 
   /**
    * Get the sending inteval
    * \returns the interval between two packet sends
    */
-  virtual Time GetInterval (void) const = 0;
+  Time GetInterval (void) const;
 
   /**
    * Set the initial delay of this application
    */
-  virtual void SetInitialDelay (Time delay) = 0;
+  void SetInitialDelay (Time delay);
 
   /**
    * Set packet size
    */
-  virtual void SetPacketSize (uint8_t size) = 0;
+  void SetPacketSize (uint8_t size);
 
   /**
    * Get packet size
    */
-  virtual uint8_t GetPacketSize (void) const = 0;
+  uint8_t GetPacketSize (void) const;
 
   /** 
    * True if the application is currently running
    */
-  virtual bool IsRunning (void) = 0;
+  bool IsRunning (void);
 
-private:
+protected:
   /**
    * Start the application by scheduling the first SendPacket event
    */
-  virtual void StartApplication (void) = 0;
+  virtual void StartApplication (void);
 
   /**
    * Stop the application
    */
-  virtual void StopApplication (void) = 0;
+  virtual void StopApplication (void);
 
   /**
    * Send a packet using the LoraNetDevice's Send method
    */
-  virtual void SendPacket (void) = 0;
+  virtual void SendPacket (void);
+
+  /**
+   * The average interval between to consecutive send events
+   */
+  Time m_avgInterval;
+
+  /**
+   * The initial delay of this application
+   */
+  Time m_initialDelay;
+
+  /**
+   * The sending event scheduled as next
+   */
+  EventId m_sendEvent;
+
+  /**
+   * The packet size.
+   */
+  uint8_t m_basePktSize;
 };
 
 } // namespace lorawan
