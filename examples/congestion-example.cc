@@ -20,6 +20,7 @@
 #include "ns3/network-server-helper.h"
 #include "ns3/forwarder-helper.h"
 #include "ns3/periodic-sender-helper.h"
+#include "ns3/urban-traffic-helper.h"
 #include "ns3/lora-channel.h"
 #include "ns3/lora-device-address-generator.h"
 #include "ns3/hex-grid-position-allocator.h"
@@ -45,7 +46,7 @@ main (int argc, char *argv[])
 
   int periods = 24; // H * D
   int gatewayRings = 1;
-  double range = 2540.25; // Max range for downlink (!) coverage probability > 0.98 (with okumura)
+  double range = 1553.5; //2540.25; // Max range for downlink (!) coverage probability > 0.98 (with okumura)
   int nDevices = 100;
   std::string sir = "GOURSAUD";
   bool adrEnabled = false;
@@ -128,7 +129,7 @@ main (int argc, char *argv[])
 
   // This one is empirical and it encompasses average loss due to distance, shadowing (i.e. obstacles), weather, height
   Ptr<OkumuraHataPropagationLossModel> loss = CreateObject<OkumuraHataPropagationLossModel> ();
-  loss->SetAttribute ("Frequency", DoubleValue (868000000.0));
+  loss->SetAttribute ("Frequency", DoubleValue (868100000.0));
   loss->SetAttribute ("Environment", EnumValue (EnvironmentType::UrbanEnvironment));
   loss->SetAttribute ("CitySize", EnumValue (CitySize::LargeCity));
 
@@ -151,7 +152,7 @@ main (int argc, char *argv[])
   // In hex tiling, distance = range * cos (pi/6) * 2 to have no holes
   double gatewayDistance = range * std::cos (M_PI / 6) * 2;
   Ptr<HexGridPositionAllocator> hexAllocator = CreateObject<HexGridPositionAllocator> ();
-  hexAllocator->SetAttribute ("Z", DoubleValue (15.0));
+  hexAllocator->SetAttribute ("Z", DoubleValue (30.0));
   hexAllocator->SetAttribute ("distance", DoubleValue (gatewayDistance));
   mobilityGw.SetPositionAllocator (hexAllocator);
 
@@ -161,7 +162,7 @@ main (int argc, char *argv[])
   double rho = range + 2.0 * gatewayDistance * (gatewayRings - 1);
   Ptr<RangePositionAllocator> rangeAllocator = CreateObject<RangePositionAllocator> ();
   rangeAllocator->SetAttribute ("rho", DoubleValue (rho));
-  rangeAllocator->SetAttribute ("Z", DoubleValue (15.0));
+  rangeAllocator->SetAttribute ("ZRV", StringValue ("ns3::UniformRandomVariable[Min=1|Max=10]"));
   rangeAllocator->SetAttribute ("range", DoubleValue (range));
   mobilityEd.SetPositionAllocator (rangeAllocator);
 
@@ -174,8 +175,16 @@ main (int argc, char *argv[])
   phyHelper.SetChannel (channel);
   phyHelper.SetDuplexMode (!model);
 
+  // Create a LoraDeviceAddressGenerator
+  uint8_t nwkId = 54;
+  uint32_t nwkAddr = 1864;
+  Ptr<LoraDeviceAddressGenerator> addrGen =
+      CreateObject<LoraDeviceAddressGenerator> (nwkId, nwkAddr);
+
   // Create the LorawanMacHelper
   LorawanMacHelper macHelper = LorawanMacHelper ();
+  macHelper.SetRegion (LorawanMacHelper::EU);
+  macHelper.SetAddressGenerator (addrGen);
 
   // Create the LoraHelper
   LoraHelper helper = LoraHelper ();
@@ -201,12 +210,6 @@ main (int argc, char *argv[])
    *  Create Net Devices  *
    ************************/
 
-  // Create a LoraDeviceAddressGenerator
-  uint8_t nwkId = 54;
-  uint32_t nwkAddr = 1864;
-  Ptr<LoraDeviceAddressGenerator> addrGen =
-      CreateObject<LoraDeviceAddressGenerator> (nwkId, nwkAddr);
-
   // Create the LoraNetDevices of the gateways
   phyHelper.SetDeviceType (LoraPhyHelper::GW);
   macHelper.SetDeviceType (LorawanMacHelper::GW);
@@ -215,8 +218,6 @@ main (int argc, char *argv[])
   // Create the LoraNetDevices of the end devices
   phyHelper.SetDeviceType (LoraPhyHelper::ED);
   macHelper.SetDeviceType (LorawanMacHelper::ED_A);
-  macHelper.SetAddressGenerator (addrGen);
-  macHelper.SetRegion (LorawanMacHelper::EU);
   helper.Install (phyHelper, macHelper, endDevices);
 
   /*************************
@@ -243,11 +244,12 @@ main (int argc, char *argv[])
   forwarderHelper.Install (gateways);
 
   // Install applications in EDs
-  PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
+  /*   PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
   appHelper.SetPeriodGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
       "Mean", DoubleValue (600.0), "Variance", DoubleValue (300.0), "Bound", DoubleValue (600.0)));
   appHelper.SetPacketSizeGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
-      "Mean", DoubleValue (18), "Variance", DoubleValue (10), "Bound", DoubleValue (18)));
+      "Mean", DoubleValue (18), "Variance", DoubleValue (10), "Bound", DoubleValue (18))); */
+  UrbanTrafficHelper appHelper = UrbanTrafficHelper ();
   ApplicationContainer apps = appHelper.Install (endDevices);
   /*   int j = 0; // Late (dis)activation of 100 devices
   for (ApplicationContainer::Iterator i = apps.Begin (); i != apps.End (); ++i)
@@ -283,7 +285,7 @@ main (int argc, char *argv[])
 
   // Limit memory usage
   LoraPacketTracker &tracker = helper.GetPacketTracker ();
-  tracker.EnableOldPacketsCleanup (Hours (1));
+  //! TODO: tracker.EnableOldPacketsCleanup (Hours (1));
 
   if (debug)
     {

@@ -43,7 +43,7 @@ class TrafficControlUtils
   };
 
 public:
-  static void OptimizeDutyCycleMaxMin (const devices_t &devs, const double limit, output_t &output);
+  static double OptimizeDutyCycleMaxMin (const devices_t &devs, const double limit, output_t &output);
 
   static void OptimizeDutyCycleMax (const devices_t &devs, const double limit, output_t &output);
 

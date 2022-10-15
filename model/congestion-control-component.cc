@@ -294,7 +294,7 @@ void
 CongestionControlComponent::RemoveDisconnected (dataratestatus_t &group)
 {
   //double pdr = (group.sent > 0.0) ? (double) group.received / group.sent : 1.0;
-  double periods = 17.0 ; //(pdr < 1.0) ? ceil (log (1.0 - 0.9999999) / log (1.0 - pdr)) : 1.0;
+  double periods = 17.0; //(pdr < 1.0) ? ceil (log (1.0 - 0.9999999) / log (1.0 - pdr)) : 1.0;
 
   auto IsDisconnected = [this, &group, periods] (std::pair<uint32_t, double> &dev) {
     devinfo_t &d = m_devStatus[dev.first];
@@ -303,7 +303,7 @@ CongestionControlComponent::RemoveDisconnected (dataratestatus_t &group)
     double dc = (d.dutycycle > 0) ? 1.0 / std::pow (2.0, (double) d.dutycycle) : d.maxoftraf;
     //! TODO: THIS IS BAD, too many false positives
     if (Simulator::Now () <= m_lastFrame[dev.first] + d.toa / dc * periods or
-        Simulator::Now () <= m_lastFrame[dev.first] + Hours (4)) 
+        Simulator::Now () <= m_lastFrame[dev.first] + Hours (4))
       return false;
     d.active = false;
     if (m_configToDoList[d.bestGw][d.cluster].count (dev.first))
@@ -366,8 +366,8 @@ CongestionControlComponent::ProduceConfigScheme (dataratestatus_t &group, double
   int sf = 12 - context.datarate;
   NS_LOG_DEBUG ("Reconfig SF" << sf << ": " << ot.currbest << " [" << ot.low << ", " << ot.high
                               << "], Changes? " << ot.changed);
-  TrafficControlUtils::OptimizeDutyCycleMaxMin (group.devs, ot.currbest,
-                                                m_configToDoList[context.bestGw][context.cluster]);
+  ot.currbest = TrafficControlUtils::OptimizeDutyCycleMaxMin (
+      group.devs, ot.currbest, m_configToDoList[context.bestGw][context.cluster]);
 
   ot.changed = false;
   return true;

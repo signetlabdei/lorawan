@@ -29,7 +29,7 @@ namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("TrafficControlUtils");
 
-void
+double
 TrafficControlUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const double limit,
                                               output_t &output)
 {
@@ -50,7 +50,7 @@ TrafficControlUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const doubl
   if (!solver)
     {
       NS_LOG_WARN ("CBC solver unavailable.");
-      return;
+      return 0;
     }
   //if (GetLogComponent ("TrafficControlUtils").IsEnabled (LogLevel::LOG_DEBUG))
   if (false)
@@ -160,6 +160,8 @@ TrafficControlUtils::OptimizeDutyCycleMaxMin (const devices_t &devs, const doubl
 
   NS_LOG_DEBUG ("Bound = " + std::to_string (limit) + ", Objective value = " +
                 std::to_string (objValue) + ", Num disabled = " + std::to_string (countDisabled));
+  
+  return objValue;
 }
 
 void
