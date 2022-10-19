@@ -482,6 +482,9 @@ LoraPacketTracker::PrintSimulationStatistics (Time startTime)
   double totBusyGw = 0;
   double totUnderSens = 0;
 
+  std::vector<double> sentSF (6, 0);
+  std::vector<double> receivedSF (6, 0);
+
   double totBytesReceived = 0;
   double totBytesSent = 0;
 
@@ -492,13 +495,10 @@ LoraPacketTracker::PrintSimulationStatistics (Time startTime)
       if (pd.second.sendTime < startTime - Seconds (5))
         continue;
 
-      total++;
       bool received = false;
       bool interfered = false;
       bool noPaths = false;
       bool busyGw = false;
-
-      totBytesSent += pd.first->GetSize ();
 
       LoraTxParameters params;
       LoraTag tag;
@@ -508,14 +508,16 @@ LoraPacketTracker::PrintSimulationStatistics (Time startTime)
           LoraPhy::GetTSym (params) > MilliSeconds (16) ? true : false;
       totOffTraff += LoraPhy::GetOnAirTime (pd.first->Copy (), params).GetSeconds ();
 
+      total++;
+      totBytesSent += pd.first->GetSize ();
+      sentSF[tag.GetDataRate ()]++;
       for (auto const &out : pd.second.outcomes)
         {
           if (out.second == RECEIVED)
             {
               received = true;
-
+              receivedSF[tag.GetDataRate ()]++;
               totBytesReceived += pd.first->GetSize ();
-
               break;
             }
           else if (!interfered and out.second == INTERFERED)
@@ -525,7 +527,6 @@ LoraPacketTracker::PrintSimulationStatistics (Time startTime)
           else if (!busyGw and out.second == LOST_BECAUSE_TX)
             busyGw = true;
         }
-
       if (received)
         totReceived++;
       else if (interfered)
@@ -545,6 +546,11 @@ LoraPacketTracker::PrintSimulationStatistics (Time startTime)
      << "%\n  NO_MORE_RECEIVERS: " << totNoMorePaths / total * 100
      << "%\n  BUSY_GATEWAY: " << totBusyGw / total * 100
      << "%\n  UNDER_SENSITIVITY: " << totUnderSens / total * 100 << "%\n";
+
+  ss << "\nPDR: ";
+  for (int dr = 5; dr >= 0; --dr)
+    ss << "SF" << 12 - dr << " " << receivedSF[dr] / sentSF[dr] * 100 << "%, ";
+  ss << "\n";
 
   double totTime = (Simulator::Now () - startTime).GetSeconds ();
   ss << "\nInput Traffic: " << totBytesSent * 8 / totTime

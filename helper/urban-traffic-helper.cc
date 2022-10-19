@@ -106,7 +106,7 @@ UrbanTrafficHelper::InstallPriv (Ptr<Node> node) const
    * | Movie rental machine     | 69.823      | 28800    | 51         | Poisson         | do they actually still exist?
    * ------------------------------------------------------------------------------------
    * | Home security system     | 3845.0      | 600      | 20         | Poisson/uniform | reliability critical
-   * | Elderly sensor device    | 384.5       | 20       | 43         | Poisson/uniform | reliability critical, duty-cycle limited from SF8
+   * | Elderly sensor device    | 384.5       | 20       | 43         | Poisson/uniform | reliability critical, duty-cycle limited from SF9
    * | Refrigerator             | 3845.0      | 3600     | 30         | Poisson/uniform |
    * | Freezer                  | 3845.0      | 86400    | 30         | Poisson/uniform |
    * | Other house appliance    | 26915.0     | 86400    | 8          | Poisson/uniform |
