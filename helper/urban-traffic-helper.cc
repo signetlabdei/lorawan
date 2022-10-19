@@ -103,7 +103,7 @@ UrbanTrafficHelper::InstallPriv (Ptr<Node> node) const
    * | Roadway sign             | 316.47      | 30       | 1          | Uniform         | duty-cycle limited on SF11 & SF12
    * | Traffic light            | 15.03       | 60       | 1          | Uniform         | duty-cycle limited on SF12
    * | Traffic sensor           | 15.03       | 60       | 1          | Poisson         | duty-cycle limited on SF12
-   * | Movie rental machine     | 69.823      | 28800    | 51         | Poisson         | do they actually still exist?
+   * | Movie rental machine     | 69.823      | 21600    | 38         | Poisson         | do they actually still exist?
    * ------------------------------------------------------------------------------------
    * | Home security system     | 3845.0      | 600      | 20         | Poisson/uniform | reliability critical
    * | Elderly sensor device    | 384.5       | 20       | 43         | Poisson/uniform | reliability critical, duty-cycle limited from SF9
@@ -154,8 +154,8 @@ UrbanTrafficHelper::InstallPriv (Ptr<Node> node) const
     }
   else if (intervalProb < m_cdf[5]) // Movie rental machine
     {
-      interval = Hours (8);
-      pktSize = 51;
+      interval = Hours (6);
+      pktSize = 38;
       poisson = true;
       type = "Movie rental machine";
     }

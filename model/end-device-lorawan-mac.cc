@@ -202,7 +202,7 @@ EndDeviceLorawanMac::postponeTransmission (Time netxTxDelay, Ptr<Packet> packet)
   // Delete previously scheduled transmissions if any.
   Simulator::Cancel (m_nextTx);
   m_nextTx = Simulator::Schedule (netxTxDelay, &EndDeviceLorawanMac::DoSend, this, packet);
-  NS_LOG_WARN ("Attempting to send, but the aggregate duty cycle won't allow it. Scheduling a tx in "
+  NS_LOG_DEBUG ("Attempting to send, but the aggregate duty cycle won't allow it. Scheduling a tx in "
                << netxTxDelay.As (Time::S) << ".");
 }
 
@@ -229,8 +229,10 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       // Check that MACPayload length is below the allowed maximum
       if (packet->GetSize () > m_maxAppPayloadForDataRate.at (m_dataRate))
         {
-          NS_LOG_WARN ("Attempting to send a packet larger than the maximum allowed"
-                       << " size at this DataRate (DR" << unsigned(m_dataRate) <<
+          NS_LOG_WARN ("Attempting to send a packet (" << (unsigned) packet->GetSize () 
+                       << "B) larger than the maximum allowed"
+                       << " size (" << (unsigned) m_maxAppPayloadForDataRate.at (m_dataRate) 
+                       << "B) at this DataRate (DR" << unsigned(m_dataRate) <<
                        "). Transmission canceled.");
           return;
         }

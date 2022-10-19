@@ -92,9 +92,10 @@ PoissonSender::SendPacket (void)
   packet = Create<Packet> (m_basePktSize);
   m_mac->Send (packet);
 
+  Time interval = Min (Seconds (m_interval->GetValue ()), Days (1));
+
   // Schedule the next SendPacket event
-  m_sendEvent =
-      Simulator::Schedule (Seconds (m_interval->GetValue ()), &PoissonSender::SendPacket, this);
+  m_sendEvent = Simulator::Schedule (interval, &PoissonSender::SendPacket, this);
 
   NS_LOG_DEBUG ("Sent a packet of size " << packet->GetSize ());
 }
