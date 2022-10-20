@@ -209,8 +209,23 @@ CongestionControlComponent::BeforeSendingReply (Ptr<EndDeviceStatus> status,
       m_configToDoList.erase (devaddr);
     } */
 
-  NS_LOG_INFO ("Sending DutyCycleReq (" << 1.0 / pow (2, dc) << " E), "
-                                        << (int) m_configToDoList.size () << " remaining");
+  NS_LOG_INFO ("Sending DutyCycleReq ( 1/2^"
+               << (unsigned) dc << " E, old = 1/2^" << (unsigned) m_devStatus[devaddr].dutycycle
+               << " E), " << (int) m_configToDoList[devinfo.bestGw][devinfo.cluster].size ()
+               << " remaining");
+
+  /*   // Debug missing reconfigurations
+  configs_t &conf = m_configToDoList[devinfo.bestGw][devinfo.cluster];
+  if (conf.size () < 5)
+    for (auto d : conf)
+      {
+        Ptr<ClassAEndDeviceLorawanMac> mac = networkStatus->GetEndDeviceStatus (d.first)->GetMac ();
+        Ptr<Node> node = mac->GetDevice ()->GetNode ();
+        Ptr<LoraApplication> app = node->GetApplication (0)->GetObject<LoraApplication> ();
+        std::cout << (unsigned) node->GetId () << " " << (unsigned) d.second << " "
+                  << mac->GetAggregatedDutyCycle () << " " << app->GetInterval ().As (Time::H)
+                  << " " << (unsigned) app->GetPacketSize () << "\n";
+      } */
 
   // No ack policy
   m_devStatus[devaddr].dutycycle = dc;

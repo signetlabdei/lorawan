@@ -110,8 +110,8 @@ UrbanTrafficHelper::InstallPriv (Ptr<Node> node) const
    * | Refrigerator             | 3845.0      | 3600     | 30         | Poisson/uniform |
    * | Freezer                  | 3845.0      | 86400    | 30         | Poisson/uniform |
    * | Other house appliance    | 26915.0     | 86400    | 8          | Poisson/uniform |
-   * | PHEV charging station    | 7690.0      | 2100     | 49         | Poisson/uniform |
-   * | Smart meter              | 11535.0     | 300      | 48         | Poisson/uniform |
+   * | PHEV charging station    | 7690.0      | 1400     | 32         | Poisson/uniform |
+   * | Smart meter              | 11535.0     | 150      | 34         | Poisson/uniform |
    * ------------------------------------------------------------------------------------
    * 
    * We could implement packet fragmentation...
@@ -196,15 +196,15 @@ UrbanTrafficHelper::InstallPriv (Ptr<Node> node) const
     }
   else if (intervalProb < m_cdf[11]) // PHEV charging station
     {
-      interval = Minutes (35);
-      pktSize = 49;
+      interval = Seconds (1400);
+      pktSize = 32;
       poisson = (bool) m_intervalProb->GetInteger (0, 1);
       type = "PHEV charging station";
     }
   else // m_cdf[12], Smart meter
     {
-      interval = Minutes (10);
-      pktSize = 48;
+      interval = Seconds (150);
+      pktSize = 34;
       poisson = (bool) m_intervalProb->GetInteger (0, 1);
       type = "Smart meter";
     }
