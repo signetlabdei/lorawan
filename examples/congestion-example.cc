@@ -46,7 +46,7 @@ main (int argc, char *argv[])
 
   int periods = 24; // H * D
   int gatewayRings = 1;
-  double range = 1553.5; //2540.25; // Max range for downlink (!) coverage probability > 0.98 (with okumura)
+  double range = 2426.85; // Max range for downlink (!) coverage probability > 0.98 (with okumura)
   int nDevices = 100;
   std::string sir = "GOURSAUD";
   bool adrEnabled = false;
@@ -114,6 +114,8 @@ main (int argc, char *argv[])
     {
       LogComponentEnable ("CongestionControlComponent", LOG_LEVEL_DEBUG);
       LogComponentEnable ("TrafficControlUtils", LOG_LEVEL_DEBUG);
+      LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_WARN);
+      //LogComponentEnable ("UrbanTrafficHelper", LOG_LEVEL_DEBUG);
       LogComponentEnableAll (LOG_PREFIX_FUNC);
       LogComponentEnableAll (LOG_PREFIX_NODE);
       LogComponentEnableAll (LOG_PREFIX_TIME);
@@ -277,7 +279,7 @@ main (int argc, char *argv[])
   if (file)
     {
       // Activate printing of ED MAC parameters
-      Time statusSamplePeriod = Seconds (1800);
+      Time statusSamplePeriod = Minutes (30);
       helper.EnablePeriodicSFStatusPrinting (endDevices, gateways, "sfData.txt",
                                              statusSamplePeriod);
       helper.EnablePeriodicGlobalPerformancePrinting ("globalPerformance.txt", statusSamplePeriod);
@@ -291,7 +293,7 @@ main (int argc, char *argv[])
     {
       // Print current configuration
       PrintConfigSetup (nDevices, range, gatewayRings, devPerSF);
-      helper.EnableSimulationTimePrinting (Seconds (3600));
+      helper.EnableSimulationTimePrinting (Hours (2));
     }
 
   // Start simulation
