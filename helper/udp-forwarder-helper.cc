@@ -66,18 +66,13 @@ UdpForwarderHelper::InstallPriv (Ptr<Node> node) const
       if (currentNetDevice->GetObject<LoraNetDevice> () != 0)
         {
           Ptr<LoraNetDevice> loraNetDevice = currentNetDevice->GetObject<LoraNetDevice> ();
+          app->SetLoraNetDevice (loraNetDevice);
           loraNetDevice->SetReceiveCallback (MakeCallback (&UdpForwarder::ReceiveFromLora, app));
         }
       else if (currentNetDevice->GetObject<CsmaNetDevice> () != 0)
-        {
-          Ptr<CsmaNetDevice> csmaNetDevice = currentNetDevice->GetObject<CsmaNetDevice> ();
-          // Questa linea rompe tutto (con tutto si intende, la connessione csma)
-          //csmaNetDevice->SetReceiveCallback (MakeCallback (&UdpForwarder::ReceiveFromCsma, app));
-        }
+        continue;
       else
-        {
-          NS_LOG_ERROR ("Potential error: NetDevice is neither Lora nor Csma");
-        }
+        NS_LOG_ERROR ("Potential error: NetDevice is neither Lora nor Csma");
     }
 
   return app;

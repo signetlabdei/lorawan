@@ -47,7 +47,7 @@ main (int argc, char *argv[])
   int periods = 24; // H * D
   int gatewayRings = 1;
   double range = 2540.25; // Max range for downlink (!) coverage probability > 0.98 (with okumura)
-  int nDevices = 100;
+  int nDevices = 1;
   std::string sir = "GOURSAUD";
   bool adrEnabled = false;
   bool initializeSF = true;
@@ -80,7 +80,7 @@ main (int argc, char *argv[])
 
   if (debug) // This also requires to build ns3 with debug option
     {
-      LogComponentEnable ("UdpForwarder", LOG_LEVEL_DEBUG);
+      LogComponentEnable ("UdpForwarder", LOG_LEVEL_INFO);
       LogComponentEnableAll (LOG_PREFIX_FUNC);
       LogComponentEnableAll (LOG_PREFIX_NODE);
       LogComponentEnableAll (LOG_PREFIX_TIME);
@@ -226,12 +226,14 @@ main (int argc, char *argv[])
 
   // Install applications in EDs
   PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
-  appHelper.SetPeriodGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
-      "Mean", DoubleValue (600.0), "Variance", DoubleValue (300.0), "Bound", DoubleValue (600.0)));
-  //appHelper.SetPeriodGenerator (
-  //    CreateObjectWithAttributes<ConstantRandomVariable> ("Constant", DoubleValue (10.0)));
-  appHelper.SetPacketSizeGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
-      "Mean", DoubleValue (18), "Variance", DoubleValue (10), "Bound", DoubleValue (18)));
+  /*   appHelper.SetPeriodGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
+      "Mean", DoubleValue (600.0), "Variance", DoubleValue (300.0), "Bound", DoubleValue (600.0))); */
+  appHelper.SetPeriodGenerator (
+      CreateObjectWithAttributes<ConstantRandomVariable> ("Constant", DoubleValue (5.0)));
+  /*   appHelper.SetPacketSizeGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
+      "Mean", DoubleValue (18), "Variance", DoubleValue (10), "Bound", DoubleValue (18))); */
+  appHelper.SetPacketSizeGenerator (
+      CreateObjectWithAttributes<ConstantRandomVariable> ("Constant", DoubleValue (5)));
   ApplicationContainer apps = appHelper.Install (endDevices);
 
   // Initialize SF emulating the ADR algorithm, then add variance to path loss

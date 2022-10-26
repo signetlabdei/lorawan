@@ -24,7 +24,6 @@
 #define UDP_FORWARDER_H
 
 #include "ns3/lora-net-device.h"
-#include "ns3/csma-net-device.h"
 #include "ns3/application.h"
 #include "ns3/event-id.h"
 #include "ns3/ptr.h"
@@ -32,137 +31,69 @@
 #include "ns3/socket.h"
 #include "ns3/packet.h"
 
+#include "ns3/loragw_hal.h"
+#include "ns3/jitqueue.h"
+
 #include <queue>
 
 /****************************** 
  * Semtech UDP Forwarder code *
  ******************************/
 
-// From trace.h
+/* -------------------------------------------------------------------------- */
+/* --- PRIVATE MACROS ------------------------------------------------------- */
 
-#define MSG(args...) printf (args) /* message that is destined to the user */
+#define ARRAY_SIZE(a) (sizeof (a) / sizeof ((a)[0]))
+#define STRINGIFY(x) #x
+#define STR(x) STRINGIFY (x)
+#define CHECK_NULL(a)       \
+  if (a == NULL)            \
+    {                       \
+      return LGW_HAL_ERROR; \
+    }
 
 /* -------------------------------------------------------------------------- */
-/* --- PRIVATE CONSTANTS - lora_pkt_fwd.c ----------------------------------- */
+/* --- PRIVATE CONSTANTS ---------------------------------------------------- */
 
+#ifndef VERSION_STRING
+#define VERSION_STRING "undefined"
+#endif
+
+#define DEFAULT_SERVER 127.0.0.1 /* hostname also supported */
+#define DEFAULT_PORT_UP 1700
+#define DEFAULT_PORT_DW 1700
+#define DEFAULT_KEEPALIVE 5 /* default time interval for downstream keep-alive packet */
+#define DEFAULT_STAT 30 /* default time interval for statistics */
 #define PUSH_TIMEOUT_MS 100
+#define PULL_TIMEOUT_MS 200
+#define GPS_REF_MAX_AGE \
+  30 /* maximum admitted delay in seconds of GPS loss before considering latest GPS sync unusable */
 #define FETCH_SLEEP_MS 10 /* nb of ms waited when a fetch return no packets */
 
 #define PROTOCOL_VERSION 2 /* v1.3 */
 
 #define PKT_PUSH_DATA 0
 #define PKT_PUSH_ACK 1
+#define PKT_PULL_DATA 2
+#define PKT_PULL_RESP 3
+#define PKT_PULL_ACK 4
+#define PKT_TX_ACK 5
 
 #define NB_PKT_MAX 8 /* max number of packets per fetch/send cycle */
 
 #define MIN_LORA_PREAMB 6 /* minimum Lora preamble length for this application */
 #define STD_LORA_PREAMB 8
+#define MIN_FSK_PREAMB 3 /* minimum FSK preamble length for this application */
+#define STD_FSK_PREAMB 5
 
 #define STATUS_SIZE 200
 #define TX_BUFF_SIZE ((540 * NB_PKT_MAX) + 30 + STATUS_SIZE)
 
-/* -------------------------------------------------------------------------- */
-/* --- PUBLIC CONSTANTS - loragw_hal.h -------------------------------------- */
-
-/* values available for the 'modulation' parameters */
-/* NOTE: arbitrary values */
-#define MOD_UNDEFINED 0
-#define MOD_LORA 0x10
-#define MOD_FSK 0x20
-
-/* values available for the 'bandwidth' parameters (LoRa & FSK) */
-/* NOTE: directly encode FSK RX bandwidth, do not change */
-#define BW_UNDEFINED 0
-#define BW_500KHZ 0x01
-#define BW_250KHZ 0x02
-#define BW_125KHZ 0x03
-#define BW_62K5HZ 0x04
-#define BW_31K2HZ 0x05
-#define BW_15K6HZ 0x06
-#define BW_7K8HZ 0x07
-
-/* values available for the 'datarate' parameters */
-/* NOTE: LoRa values used directly to code SF bitmask in 'multi' modem, do not change */
-#define DR_UNDEFINED 0
-#define DR_LORA_SF7 0x02
-#define DR_LORA_SF8 0x04
-#define DR_LORA_SF9 0x08
-#define DR_LORA_SF10 0x10
-#define DR_LORA_SF11 0x20
-#define DR_LORA_SF12 0x40
-#define DR_LORA_MULTI 0x7E
-
-/* values available for the 'coderate' parameters (LoRa only) */
-/* NOTE: arbitrary values */
-#define CR_UNDEFINED 0
-#define CR_LORA_4_5 0x01
-#define CR_LORA_4_6 0x02
-#define CR_LORA_4_7 0x03
-#define CR_LORA_4_8 0x04
-
-/* values available for the 'status' parameter */
-/* NOTE: values according to hardware specification */
-#define STAT_UNDEFINED 0x00
-#define STAT_NO_CRC 0x01
-#define STAT_CRC_BAD 0x11
-#define STAT_CRC_OK 0x10
+#define UNIX_GPS_EPOCH_OFFSET \
+  315964800 /* Number of seconds elapsed between 01.Jan.1970 00:00:00 and 06.Jan.1980 00:00:00 */
 
 namespace ns3 {
 namespace lorawan {
-
-/* -------------------------------------------------------------------------- */
-/* --- PUBLIC TYPES - loragw_hal.h ------------------------------------------ */
-
-/**
-@struct lgw_conf_lbt_chan_s
-@brief Configuration structure for LBT channels
-*/
-struct lgw_conf_lbt_chan_s
-{
-  uint32_t freq_hz;
-  uint16_t scan_time_us;
-};
-
-/**
-@struct lgw_pkt_rx_s
-@brief Structure containing the metadata of a packet that was received and a pointer to the payload
-*/
-struct lgw_pkt_rx_s
-{
-  uint32_t freq_hz; /*!> central frequency of the IF chain */
-  uint8_t if_chain; /*!> by which IF chain was packet received */
-  uint8_t status; /*!> status of the received packet */
-  uint32_t
-      count_us; /*!> internal concentrator counter for timestamping, 1 microsecond resolution */
-  uint8_t rf_chain; /*!> through which RF chain the packet was received */
-  uint8_t modulation; /*!> modulation used by the packet */
-  uint8_t bandwidth; /*!> modulation bandwidth (LoRa only) */
-  uint32_t datarate; /*!> RX datarate of the packet (SF for LoRa) */
-  uint8_t coderate; /*!> error-correcting code of the packet (LoRa only) */
-  float rssi; /*!> average packet RSSI in dB */
-  float snr; /*!> average packet SNR, in dB (LoRa only) */
-  float snr_min; /*!> minimum packet SNR, in dB (LoRa only) */
-  float snr_max; /*!> maximum packet SNR, in dB (LoRa only) */
-  uint16_t crc; /*!> CRC that was received in the payload */
-  uint16_t size; /*!> payload size in bytes */
-  uint8_t payload[256]; /*!> buffer containing the payload */
-};
-
-/* -------------------------------------------------------------------------- */
-/* --- PUBLIC TYPES - loragw_gps.h ------------------------------------------ */
-
-/**
-@struct coord_s
-@brief Time solution required for timestamp to absolute time conversion
-*/
-struct tref
-{
-  time_t systime; /*!> system time when solution was calculated */
-  uint32_t count_us; /*!> reference concentrator internal timestamp */
-  struct timespec utc; /*!> reference UTC time (from GPS/NMEA) */
-  struct timespec gps; /*!> reference GPS time (since 01.Jan.1980) */
-  double xtal_err; /*!> raw clock error (eg. <1 'slow' XTAL) */
-};
 
 /**
  * \brief A Udp encapsulator and forwarder for lora packets.
@@ -194,9 +125,11 @@ public:
   void SetRemote (Address addr);
 
   /**
-   * \return the total bytes sent by this app
+   * Sets the device to use to communicate with the EDs.
+   *
+   * \param loraNetDevice The LoraNetDevice on this node.
    */
-  uint64_t GetTotalTx () const;
+  void SetLoraNetDevice (Ptr<LoraNetDevice> loraNetDevice);
 
   /**
    * Receive a packet from the LoraNetDevice.
@@ -210,13 +143,6 @@ public:
   bool ReceiveFromLora (Ptr<NetDevice> loraNetDevice, Ptr<const Packet> packet, uint16_t protocol,
                         const Address &sender);
 
-  /**
-   * Receive a packet from the CsmaNetDevice
-   */ 
-  // Use a listening thread
-  bool ReceiveFromCsma (Ptr<NetDevice> csmaNetDevice, Ptr<const Packet> packet, uint16_t protocol,
-                        const Address &sender);
-
 protected:
   virtual void DoDispose (void);
 
@@ -224,42 +150,152 @@ private:
   virtual void StartApplication (void);
   virtual void StopApplication (void);
 
-  void ThreadUp (void);
-  int lgw_receive (int nb_pkt_max, lgw_pkt_rx_s rxpkt[]);
-
-  uint32_t m_sent; //!< Counter for sent packets
-  uint64_t m_totalTx; //!< Total bytes sent
-  Ptr<Socket> m_sockUp; //!< Socket
   Address m_peerAddress; //!< Remote peer address
   uint16_t m_peerPort; //!< Remote peer port
-  EventId m_forwardEvent; //!< Event to forward packets
 #ifdef NS3_LOG_ENABLE
   std::string m_peerAddressString; //!< Remote peer address string
 #endif // NS3_LOG_ENABLE
 
+  Ptr<LoraNetDevice> m_loraNetDevice; //!< Pointer to the node's LoraNetDevice
+
   /* -------------------------------------------------------------------------- */
-  /* --- PRIVATE VARIABLES (GLOBAL) - lora_pkt_fwd.c -------------------------- */
+  /* ---------------- Ns-3 INTEGRATION of lora_pkt_fwd.c ---------------------- */
+
+  /* Emulate lora_pkt_fwd.c parse_SX1301_configuration() & parse_gateway_configuration() */
+  void Configure (void);
+  static const struct coord_s m_center;
+
+  void ThreadUp (void); //!< Emulate lora_pkt_fwd.c uplink forwarding loop
+  /* THREAD UP auxiliary variables */
+  Ptr<Socket> m_sockUp; //!< Socket Up
+  EventId m_upEvent; //!< Event to forward packets uplink
+  /* protocol variables */
+  uint8_t m_upTokenH; /* random token for acknowledgement matching */
+  uint8_t m_upTokenL; /* random token for acknowledgement matching */
+  /* ping measurement variables */
+  timespec m_upSendTime;
+  timespec m_upRecvTime;
+  uint8_t m_remainingRecvAckAttempts;
+  void ReceiveAck (Ptr<Socket> sockUp);
+
+  void ThreadDown (void); //!< Emulate lora_pkt_fwd.c downlink reception loop
+  /* THREAD DOWN auxiliary variables */
+  Ptr<Socket> m_sockDown; //!< Socket Down
+  EventId m_downEvent;
+  /* protocol variables */
+  uint8_t m_downTokenH; /* random token for acknowledgement matching */
+  uint8_t m_downTokenL; /* random token for acknowledgement matching */
+  bool m_reqAck; /* keep track of whether PULL_DATA was acknowledged or not */
+  /* local timekeeping variables */
+  timespec m_downSendTime;
+  timespec m_downRecvTime;
+  /* auto-quit variable */
+  uint32_t m_autoquitCnt; /* count the number of PULL_DATA sent since the latest PULL_ACK */
+  void CheckPullCondition (void);
+  void SockDownTimeout (void);
+  void ReceiveDatagram (Ptr<Socket> sockDown);
+
+  void ThreadJit (void); //!< Emulate lora_pkt_fwd.c loop to send downlink packets in jit queue
+  EventId m_jitEvent;
+
+  void CollectStatistics (void); //!< Emulate lora_pkt_fwd.c stats collection loop
+  EventId m_statsEvent;
+
+  /* -------------------------------------------------------------------------- */
+  /* ---------- PUBLIC FUNCTIONS re-implemented from loragw_hal.h ------------- */
+
+  int LgwReceive (int nb_pkt_max, lgw_pkt_rx_s rxpkt[]); //!< Implements concentrator lgw_receive
+  std::queue<lgw_pkt_rx_s> m_rxPktBuff; //!< Emulate the concentrator reception packet buffer
+
+  int LgwStatus (uint8_t select, uint8_t *code);
+  int LgwSend (struct lgw_pkt_tx_s pkt_data);
+
+  /* -------------------------------------------------------------------------- */
+  /* ---------- GLOBAL VARIABLES & FUNCTIONS from lora_pkt_fwd.c -------------- */
+
+  /* packets filtering configuration variables */
+  bool fwd_valid_pkt = true; /* packets with PAYLOAD CRC OK are forwarded */
+  bool fwd_error_pkt = false; /* packets with PAYLOAD CRC ERROR are NOT forwarded */
+  bool fwd_nocrc_pkt = false; /* packets with NO PAYLOAD CRC are NOT forwarded */
 
   /* network configuration variables */
   uint64_t lgwm = 0; /* Lora gateway MAC address */
+  int keepalive_time =
+      DEFAULT_KEEPALIVE; /* send a PULL_DATA request every X seconds, negative = disabled */
+
+  /* statistics collection configuration variables */
+  unsigned stat_interval =
+      DEFAULT_STAT; /* time interval (in sec) at which statistics are collected and displayed */
 
   /* gateway <-> MAC protocol variables */
   uint32_t net_mac_h; /* Most Significant Nibble, network order */
   uint32_t net_mac_l; /* Least Significant Nibble, network order */
 
-  /* network sockets */
-  int sock_up; /* socket for upstream traffic */
-  int sock_down; /* socket for downstream traffic */
-
   /* network protocol variables */
-  //timeval push_timeout_half = {0, (PUSH_TIMEOUT_MS * 500)}; /* cut in half, critical for throughput */
+  struct timeval push_timeout_half = {
+      0, (PUSH_TIMEOUT_MS * 500)}; /* cut in half, critical for throughput */
+  struct timeval pull_timeout = {0, (PULL_TIMEOUT_MS * 1000)}; /* non critical for throughput */
+
+  /* Reference coordinates */
+  struct coord_s reference_coord;
+
+  /* Enable faking the GPS coordinates of the gateway */
+  bool gps_fake_enable; /* enable the feature */
 
   /* measurements to establish statistics */
-  uint32_t meas_up_network_byte; /* sum of UDP bytes sent for upstream traffic */
-  uint32_t meas_up_dgram_sent; /* number of datagrams sent for upstream traffic */
-  uint32_t meas_up_ack_rcv; /* number of datagrams acknowledged for upstream traffic */
+  uint32_t meas_nb_rx_rcv = 0; /* count packets received */
+  uint32_t meas_nb_rx_ok = 0; /* count packets received with PAYLOAD CRC OK */
+  uint32_t meas_nb_rx_bad = 0; /* count packets received with PAYLOAD CRC ERROR */
+  uint32_t meas_nb_rx_nocrc = 0; /* count packets received with NO PAYLOAD CRC */
+  uint32_t meas_up_pkt_fwd = 0; /* number of radio packet forwarded to the server */
+  uint32_t meas_up_network_byte = 0; /* sum of UDP bytes sent for upstream traffic */
+  uint32_t meas_up_payload_byte = 0; /* sum of radio payload bytes sent for upstream traffic */
+  uint32_t meas_up_dgram_sent = 0; /* number of datagrams sent for upstream traffic */
+  uint32_t meas_up_ack_rcv = 0; /* number of datagrams acknowledged for upstream traffic */
 
-  std::queue<lgw_pkt_rx_s> m_rxpktbuff;
+  uint32_t meas_dw_pull_sent = 0; /* number of PULL requests sent for downstream traffic */
+  uint32_t meas_dw_ack_rcv = 0; /* number of PULL requests acknowledged for downstream traffic */
+  uint32_t meas_dw_dgram_rcv = 0; /* count PULL response packets received for downstream traffic */
+  uint32_t meas_dw_network_byte = 0; /* sum of UDP bytes sent for upstream traffic */
+  uint32_t meas_dw_payload_byte = 0; /* sum of radio payload bytes sent for upstream traffic */
+  uint32_t meas_nb_tx_ok = 0; /* count packets emitted successfully */
+  uint32_t meas_nb_tx_fail = 0; /* count packets were TX failed for other reasons */
+  uint32_t meas_nb_tx_requested = 0; /* count TX request from server (downlinks) */
+  uint32_t meas_nb_tx_rejected_collision_packet =
+      0; /* count packets were TX request were rejected due to collision with another packet already programmed */
+  uint32_t meas_nb_tx_rejected_collision_beacon =
+      0; /* count packets were TX request were rejected due to collision with a beacon already programmed */
+  uint32_t meas_nb_tx_rejected_too_late =
+      0; /* count packets were TX request were rejected because it is too late to program it */
+  uint32_t meas_nb_tx_rejected_too_early =
+      0; /* count packets were TX request were rejected because timestamp is too much in advance */
+  uint32_t meas_nb_beacon_queued = 0; /* count beacon inserted in jit queue */
+  uint32_t meas_nb_beacon_sent = 0; /* count beacon actually sent to concentrator */
+  uint32_t meas_nb_beacon_rejected = 0; /* count beacon rejected for queuing */
+
+  bool report_ready = false; /* true when there is a new report to send to the server */
+  char status_report[STATUS_SIZE]; /* status report as a JSON object */
+
+  /* auto-quit function */
+  uint32_t autoquit_threshold =
+      0; /* enable auto-quit after a number of non-acknowledged PULL_DATA (0 = disabled)*/
+
+  /* Just In Time TX scheduling */
+  struct jit_queue_s jit_queue;
+
+  /* Gateway specificities */
+  int8_t antenna_gain = 0;
+
+  /* TX capabilities */
+  struct lgw_tx_gain_lut_s txlut; /* TX gain table */
+  uint32_t tx_freq_min[LGW_RF_CHAIN_NB]; /* lowest frequency supported by TX chain */
+  uint32_t tx_freq_max[LGW_RF_CHAIN_NB]; /* highest frequency supported by TX chain */
+
+  static double difftimespec (struct timespec end, struct timespec beginning);
+
+  int send_tx_ack (uint8_t token_h, uint8_t token_l, enum jit_error_e error);
+
+  static void print_tx_status (uint8_t tx_status);
 };
 
 } // namespace lorawan

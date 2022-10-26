@@ -31,6 +31,8 @@
 #include "ns3/lora-device-address.h"
 #include "ns3/traced-value.h"
 
+#include "ns3/LoRaMacCrypto.h"
+
 namespace ns3 {
 namespace lorawan {
 
@@ -525,6 +527,8 @@ private:
   uint16_t m_currentFCnt;
 
   uint8_t m_cluster;
+
+  LoRaMacCrypto* m_crypto;
 };
 
 

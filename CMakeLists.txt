@@ -56,6 +56,14 @@ set(source_files
     helper/network-server-helper.cc
     helper/lora-packet-tracker.cc
     libext/base64.cc
+    libext/parson.cc
+    libext/loragw_hal.cc
+    libext/jitqueue.cc
+    libext/timersync.cc
+    libext/LoRaMacCrypto.cc
+    libext/cmac.cc
+    libext/aes.cc
+    libext/utilities.cc
 )
 
 set(header_files
@@ -117,6 +125,16 @@ set(header_files
     helper/lora-packet-tracker.h
     test/utilities.h
     libext/base64.h
+    libext/parson.h
+    libext/loragw_hal.h
+    libext/jitqueue.h
+    libext/trace.h
+    libext/timersync.h
+    libext/LoRaMacCrypto.h
+    libext/cmac.h
+    libext/aes.h
+    libext/utilities.h
+    libext/se-identity.h
 )
 
 build_lib(
