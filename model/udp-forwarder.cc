@@ -284,12 +284,11 @@ UdpForwarder::Configure (void)
 
   /* CONFIGURATIONS FROM parse_gateway_configuration () */
 
-  /* gateway unique identifier (aka MAC address) (optional) */
-  uint8_t addr[8];
-  Mac64Address tmp = Mac64Address::Allocate ();
-  tmp.CopyTo (addr);
-  memcpy (&lgwm, addr, sizeof lgwm);
-  NS_LOG_INFO ("gateway MAC address is configured to " << tmp);
+  /* gateway unique identifier */
+  char eui[17];
+  lgwm = GetNode ()->GetId ();
+  snprintf (eui, 17, "%016lx", lgwm);
+  NS_LOG_INFO ("gateway ID is configured to " << eui);
 
   /* server addr and port are set as Ns3 attributes */
 
@@ -1508,7 +1507,8 @@ UdpForwarder::CollectStatistics (void)
   ss << buf;
   if (gps_fake_enable == true)
     {
-      snprintf (buf, 120, "# GPS *FAKE* coordinates: latitude %.5f, longitude %.5f, altitude %i m\n",
+      snprintf (buf, 120,
+                "# GPS *FAKE* coordinates: latitude %.5f, longitude %.5f, altitude %i m\n",
                 reference_coord.lat, reference_coord.lon, reference_coord.alt);
       ss << buf;
     }
@@ -1847,7 +1847,7 @@ UdpForwarder::send_tx_ack (uint8_t token_h, uint8_t token_l, enum jit_error_e er
     {
 #ifdef NS3_LOG_ENABLE
       NS_LOG_INFO ("Ack UP " << buff_index << " bytes to " << m_peerAddressString
-                            << " Time: " << (Simulator::Now ()).As (Time::S));
+                             << " Time: " << (Simulator::Now ()).As (Time::S));
 #endif // NS3_LOG_ENABLE
     }
 #ifdef NS3_LOG_ENABLE
