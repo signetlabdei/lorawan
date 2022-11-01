@@ -55,15 +55,16 @@ set(source_files
     helper/udp-forwarder-helper.cc
     helper/network-server-helper.cc
     helper/lora-packet-tracker.cc
-    libext/base64.cc
-    libext/parson.cc
-    libext/loragw_hal.cc
-    libext/jitqueue.cc
-    libext/timersync.cc
-    libext/LoRaMacCrypto.cc
-    libext/cmac.cc
-    libext/aes.cc
-    libext/utilities.cc
+    helper/chirpstack-helper.cc
+    external/base64.cc
+    external/parson.cc
+    external/loragw_hal.cc
+    external/jitqueue.cc
+    external/timersync.cc
+    external/LoRaMacCrypto.cc
+    external/cmac.cc
+    external/aes.cc
+    external/utilities.cc
 )
 
 set(header_files
@@ -123,18 +124,19 @@ set(header_files
     helper/udp-forwarder-helper.h
     helper/network-server-helper.h
     helper/lora-packet-tracker.h
+    helper/chirpstack-helper.h
     test/utilities.h
-    libext/base64.h
-    libext/parson.h
-    libext/loragw_hal.h
-    libext/jitqueue.h
-    libext/trace.h
-    libext/timersync.h
-    libext/LoRaMacCrypto.h
-    libext/cmac.h
-    libext/aes.h
-    libext/utilities.h
-    libext/se-identity.h
+    external/base64.h
+    external/parson.h
+    external/loragw_hal.h
+    external/jitqueue.h
+    external/trace.h
+    external/timersync.h
+    external/LoRaMacCrypto.h
+    external/cmac.h
+    external/aes.h
+    external/utilities.h
+    external/se-identity.h
 )
 
 build_lib(
@@ -151,6 +153,7 @@ build_lib(
     ${libapplications}
     ${libcsma}
     ${ortools_LIBRARIES}
+    ${curlpp_LIBRARIES}
   TEST_SOURCES
     test/utilities.cc
     test/lorawan-test-suite.cc
