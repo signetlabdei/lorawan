@@ -26,7 +26,7 @@
 #include "ns3/hex-grid-position-allocator.h"
 #include "ns3/range-position-allocator.h"
 #include "ns3/lora-interference-helper.h"
-#include "example-utils.cc"
+#include "utilities.cc"
 
 // cpp imports
 #include <unordered_map>

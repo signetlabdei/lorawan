@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <iomanip>
 #include <regex>
+#include <csignal>
 
 using namespace ns3;
 using namespace lorawan;
@@ -110,4 +111,19 @@ PrintConfigSetup (int nDevs, double range, int rings, std::vector<int> &devPerSF
   ss << "\nAll configurations terminated. Starting simulation...\n\n"
      << "--------------------------------------------------------------------------------\n";
   std::cout << ss.str ();
+}
+
+/**
+ * Setup action on interrupt 
+ */
+void
+OnInterrupt (sighandler_t action)
+{
+  std::signal (SIGINT, action);
+  std::signal (SIGSEGV, action);
+  std::signal (SIGILL, action);
+  std::signal (SIGFPE, action);
+  std::signal (SIGABRT, action);
+  std::signal (SIGFPE, action);
+  std::signal (SIGTERM, action);
 }

@@ -135,7 +135,7 @@ EndDeviceLorawanMac::~EndDeviceLorawanMac ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 
-  free (m_crypto);
+  delete m_crypto;
 }
 
 ////////////////////////

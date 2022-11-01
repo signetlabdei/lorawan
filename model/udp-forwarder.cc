@@ -942,7 +942,7 @@ UdpForwarder::ReceiveDatagram (Ptr<Socket> sockDown)
   NS_LOG_INFO ("[down] PULL_RESP received  - token[" << (unsigned) buff_down[1] << ":"
                                                      << (unsigned) buff_down[2]
                                                      << "] :)"); /* very verbose */
-  NS_LOG_DEBUG ("\nJSON down: " << (char *) (buff_down + 4)); /* DEBUG: display JSON payload */
+  NS_LOG_DEBUG ("JSON down: " << (char *) (buff_down + 4)); /* DEBUG: display JSON payload */
 
   /* initialize TX struct and try to parse JSON */
   memset (&txpkt, 0, sizeof txpkt);
