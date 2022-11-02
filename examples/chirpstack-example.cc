@@ -47,7 +47,7 @@ main (int argc, char *argv[])
    *  Simulation parameters  *
    ***************************/
 
-  int periods = 1; // H * D
+  int periods = 24; // H * D
   int gatewayRings = 1;
   double range = 2540.25; // Max range for downlink (!) coverage probability > 0.98 (with okumura)
   int nDevices = 1;
@@ -87,8 +87,7 @@ main (int argc, char *argv[])
   if (debug)
     {
       //!> Requirement: build ns3 with debug option
-      LogComponentEnable ("ChirpstackHelper", LOG_LEVEL_DEBUG);
-      //LogComponentEnable ("UdpForwarder", LOG_LEVEL_DEBUG);
+      LogComponentEnable ("UdpForwarder", LOG_LEVEL_DEBUG);
       LogComponentEnableAll (LOG_PREFIX_FUNC);
       LogComponentEnableAll (LOG_PREFIX_NODE);
       LogComponentEnableAll (LOG_PREFIX_TIME);
@@ -194,7 +193,7 @@ main (int argc, char *argv[])
     Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
   }
 
-  //////////// Attach Tap-bridge to outside the simulation to server csma device
+  //////////// Attach a Tap-bridge to outside the simulation to the server csma device
   TapBridgeHelper tapBridge;
   tapBridge.SetAttribute ("Mode", StringValue ("ConfigureLocal"));
   tapBridge.SetAttribute ("DeviceName", StringValue ("ns3-tap"));
@@ -217,9 +216,6 @@ main (int argc, char *argv[])
     // Mac layer settings
     macHelper.SetRegion (LorawanMacHelper::EU);
     macHelper.SetAddressGenerator (addrGen);
-
-    // General settings
-    helper.EnablePacketTracking ();
 
     // Create the LoraNetDevices of the gateways
     phyHelper.SetDeviceType (LoraPhyHelper::GW);
@@ -256,21 +252,17 @@ main (int argc, char *argv[])
    *  Simulation and metrics *
    ***************************/
 
+  // Signal handling
+  OnInterrupt ([] (int signal) { csHelper.CloseConnection (signal); });
   //!> Register tenant, gateways, and devices on the real server
   csHelper.InitConnection (Ipv4Address ("127.0.0.1"), 8090);
   csHelper.Register (NodeContainer (endDevices, gateways));
-  // Signal handling
-  OnInterrupt ([] (int signal) { csHelper.CloseConnection (signal); });
 
   //!> Initialize SF emulating the ADR algorithm, then add variance to path loss
   std::vector<int> devPerSF (1, nDevices);
   if (initializeSF)
     devPerSF = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
   loss->SetNext (rayleigh);
-
-  // Limit memory usage
-  LoraPacketTracker &tracker = helper.GetPacketTracker ();
-  tracker.EnableOldPacketsCleanup (Hours (1));
 
   if (debug)
     {
@@ -283,10 +275,6 @@ main (int argc, char *argv[])
   Time periodLenght = Hours (1);
   Simulator::Stop (periodLenght * periods);
   Simulator::Run ();
-
-  Time trackFinalOutcomeFrom = periodLenght * periods - Hours (10);
-  if (debug)
-    std::cout << tracker.PrintSimulationStatistics (trackFinalOutcomeFrom);
 
   Simulator::Destroy ();
 
