@@ -136,6 +136,8 @@ EndDeviceStatus::GetCompleteReplyPacket (void)
   m_reply.macHeader.SetMType (LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
   replyPacket->AddHeader (m_reply.frameHeader);
   replyPacket->AddHeader (m_reply.macHeader);
+  // Fake MIC (4 Bytes)
+  replyPacket->AddPaddingAtEnd (4);
 
   NS_LOG_DEBUG ("Added MAC header" << m_reply.macHeader);
   NS_LOG_DEBUG ("Added frame header" << m_reply.frameHeader);

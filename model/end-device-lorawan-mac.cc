@@ -237,6 +237,9 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       ApplyNecessaryOptions (macHdr);
       packet->AddHeader (macHdr);
 
+      // Fake MIC (4 Bytes)
+      packet->AddPaddingAtEnd(4);
+
       // Reset MAC command list
       m_macCommandList.clear ();
 
