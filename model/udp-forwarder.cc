@@ -109,16 +109,18 @@ UdpForwarder::ReceiveFromLora (Ptr<NetDevice> loraNetDevice, Ptr<const Packet> p
 {
   NS_LOG_FUNCTION (this);
   Ptr<Packet> pktcpy = packet->Copy ();
+
   LoraTag tag;
   pktcpy->RemovePacketTag (tag);
-  timespec utc;
-  timespec_get (&utc, TIME_UTC);
+
+  timeval raw_time;
+  gettimeofday (&raw_time, NULL);
 
   lgw_pkt_rx_s p;
   p.freq_hz = tag.GetFrequency () * 1e6;
   p.if_chain = 0;
   p.status = STAT_CRC_OK;
-  p.count_us = 0; // ms from last GPS epoch
+  p.count_us = raw_time.tv_sec * 1000000UL + raw_time.tv_usec; /* convert time in µs */
   p.rf_chain = 0;
   p.modulation = MOD_LORA;
   p.bandwidth = BW_125KHZ;
@@ -420,12 +422,14 @@ UdpForwarder::ThreadUp (void)
         {
         case STAT_CRC_OK:
           meas_nb_rx_ok += 1;
+#ifdef NS3_LOG_ENABLE
           {
             uint8_t buf_len = 100;
             char buf[buf_len];
             snprintf (buf, buf_len, "Received pkt from mote: %08X (fcnt=%u)", mote_addr, mote_fcnt);
             NS_LOG_INFO (buf);
           }
+#endif // NS3_LOG_ENABLE
           if (!fwd_valid_pkt)
             {
               continue; /* skip that packet */
@@ -1592,7 +1596,7 @@ UdpForwarder::LgwStatus (uint8_t select, uint8_t *code)
 
   if (select == TX_STATUS)
     {
-      read_value = (mac->IsTransmitting ()) ? 0x60 : 0x10;
+      read_value = (mac->IsTransmitting ()) ? 0x70 : 0x0;
       if (lgw_is_started == false)
         {
           *code = TX_OFF;
