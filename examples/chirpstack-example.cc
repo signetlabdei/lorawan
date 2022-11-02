@@ -54,7 +54,6 @@ main (int argc, char *argv[])
   std::string sir = "GOURSAUD";
   bool adrEnabled = false;
   bool initializeSF = true;
-  bool debug = false;
   bool file = false;
 
   /* Expose parameters to command line & apply static configurations */
@@ -67,10 +66,11 @@ main (int argc, char *argv[])
     cmd.AddValue ("sir", "Signal to Interference Ratio matrix used for interference", sir);
     cmd.AddValue ("initSF", "Whether to initialize the SFs", initializeSF);
     cmd.AddValue ("adr", "Whether to enable online ADR", adrEnabled);
-    cmd.AddValue ("debug", "Whether or not to debug logs at various levels. ", debug);
     cmd.AddValue ("file", "Output the metrics of the simulation in a file", file);
     cmd.Parse (argc, argv);
-
+  }
+  /* Apply static configurations */
+  {
     // Static configurations
     Config::SetDefault ("ns3::EndDeviceLorawanMac::DRControl", BooleanValue (false)); //!< ADR bit
     Config::SetDefault ("ns3::EndDeviceLorawanMac::MType", StringValue ("Unconfirmed"));
@@ -79,19 +79,14 @@ main (int argc, char *argv[])
     GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
     GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true));
   }
-
-  /*********************
-   *  Logging options  *
-   *********************/
-
-  if (debug)
-    {
-      //!> Requirement: build ns3 with debug option
-      LogComponentEnable ("UdpForwarder", LOG_LEVEL_DEBUG);
-      LogComponentEnableAll (LOG_PREFIX_FUNC);
-      LogComponentEnableAll (LOG_PREFIX_NODE);
-      LogComponentEnableAll (LOG_PREFIX_TIME);
-    }
+  /* Logging options */
+  {
+    //!> Requirement: build ns3 with debug option
+    LogComponentEnable ("UdpForwarder", LOG_LEVEL_DEBUG);
+    LogComponentEnableAll (LOG_PREFIX_FUNC);
+    LogComponentEnableAll (LOG_PREFIX_NODE);
+    LogComponentEnableAll (LOG_PREFIX_TIME);
+  }
 
   /*******************
    *  Radio Channel  *
@@ -171,7 +166,7 @@ main (int argc, char *argv[])
    *  Create Net Devices  *
    ************************/
 
-  //////////// Csma between gateways and server (represented by tap-bridge)
+  /* Csma between gateways and server (represented by tap-bridge) */
   {
     NodeContainer csmaNodes (NodeContainer (networkServer), gateways);
 
@@ -193,13 +188,13 @@ main (int argc, char *argv[])
     Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
   }
 
-  //////////// Attach a Tap-bridge to outside the simulation to the server csma device
+  ///////////////// Attach a Tap-bridge to outside the simulation to the server csma device
   TapBridgeHelper tapBridge;
   tapBridge.SetAttribute ("Mode", StringValue ("ConfigureLocal"));
   tapBridge.SetAttribute ("DeviceName", StringValue ("ns3-tap"));
   tapBridge.Install (networkServer, networkServer->GetDevice (0));
 
-  //////////// Radio side (between end devicees and gateways)
+  /* Radio side (between end devicees and gateways) */
   LorawanMacHelper macHelper;
   LoraHelper helper;
   {
@@ -252,24 +247,23 @@ main (int argc, char *argv[])
    *  Simulation and metrics *
    ***************************/
 
-  // Signal handling
+  ///////////////////// Signal handling
   OnInterrupt ([] (int signal) { csHelper.CloseConnection (signal); });
-  //!> Register tenant, gateways, and devices on the real server
+  ///////////////////// Register tenant, gateways, and devices on the real server
   csHelper.InitConnection (Ipv4Address ("127.0.0.1"), 8090);
   csHelper.Register (NodeContainer (endDevices, gateways));
 
-  //!> Initialize SF emulating the ADR algorithm, then add variance to path loss
+  // Initialize SF emulating the ADR algorithm, then add variance to path loss
   std::vector<int> devPerSF (1, nDevices);
   if (initializeSF)
     devPerSF = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
   loss->SetNext (rayleigh);
 
-  if (debug)
-    {
-      // Print current configuration
-      PrintConfigSetup (nDevices, range, gatewayRings, devPerSF);
-      helper.EnableSimulationTimePrinting (Seconds (3600));
-    }
+#ifdef NS_LOG_ENABLE
+  // Print current configuration
+  PrintConfigSetup (nDevices, range, gatewayRings, devPerSF);
+  helper.EnableSimulationTimePrinting (Seconds (3600));
+#endif // NS3_LOG_ENABLE
 
   // Start simulation
   Time periodLenght = Hours (1);
