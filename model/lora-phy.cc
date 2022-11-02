@@ -75,6 +75,11 @@ LoraPhy::GetTypeId (void)
                      "sniffing all received frames",
                      MakeTraceSourceAccessor (&LoraPhy::m_phySniffRxTrace),
                      "ns3::LoraPhy::SnifferRxTracedCallback")
+    .AddTraceSource ("SnifferTx",
+                     "Trace source simulating a device "
+                     "sniffing all frames being transmitted",
+                     MakeTraceSourceAccessor (&LoraPhy::m_phySniffTxTrace),
+                     "ns3::LoraPhy::SnifferRxTracedCallback")
   ;
   return tid;
 }

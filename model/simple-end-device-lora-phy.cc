@@ -98,6 +98,12 @@ SimpleEndDeviceLoraPhy::Send (Ptr<Packet> packet, LoraTxParameters txParams,
                            packet);
     }
 
+  // Fire the sniffer trace source
+  if (!m_phySniffTxTrace.IsEmpty ()) 
+    {
+      Simulator::Schedule (duration, &SimpleEndDeviceLoraPhy::m_phySniffTxTrace, this, 
+                           packet);
+    }
 
   // Call the trace source
   if (m_device)

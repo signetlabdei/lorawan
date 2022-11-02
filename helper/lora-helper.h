@@ -128,6 +128,9 @@ protected:
   static void PcapSniffRxEvent (Ptr<PcapFileWrapper> file,
                                 Ptr<const Packet> packet);
 
+  static void PcapSniffTxEvent (Ptr<PcapFileWrapper> file,
+                                Ptr<const Packet> packet);
+
 private:
   /**
    * Actually print the simulation time and re-schedule execution of this

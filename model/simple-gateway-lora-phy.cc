@@ -101,6 +101,13 @@ SimpleGatewayLoraPhy::Send (Ptr<Packet> packet, LoraTxParameters txParams, doubl
 
   Simulator::Schedule (duration, &SimpleGatewayLoraPhy::TxFinished, this, packet);
 
+  // Fire the sniffer trace source
+  if (!m_phySniffTxTrace.IsEmpty ()) 
+    {
+      Simulator::Schedule (duration, &SimpleGatewayLoraPhy::m_phySniffTxTrace, this,
+                           packet);
+    }
+
   m_isTransmitting = true;
 
   // Fire the trace source
