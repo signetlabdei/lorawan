@@ -259,7 +259,7 @@ main (int argc, char *argv[])
     devPerSF = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
   loss->SetNext (rayleigh);
 
-#ifdef NS_LOG_ENABLE
+#ifdef NS3_LOG_ENABLE
   // Print current configuration
   PrintConfigSetup (nDevices, range, gatewayRings, devPerSF);
   helper.EnableSimulationTimePrinting (Seconds (3600));
