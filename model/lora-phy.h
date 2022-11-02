@@ -337,6 +337,13 @@ protected:
    */
   TracedCallback<Ptr<const Packet> > m_phySniffRxTrace;
 
+  /**
+   * The trace source fired when a transmitted packet is sniffed.
+   *
+   * \see class CallBackTraceSource
+   */
+  TracedCallback<Ptr<const Packet> > m_phySniffTxTrace;
+
   // Callbacks
 
   /**

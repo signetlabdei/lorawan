@@ -434,9 +434,8 @@ LoraHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool prom
       return;
     }
 
-  Ptr<LoraPhy> phy = device->GetPhy ();
-  NS_ABORT_MSG_IF (phy == 0,
-                   "LoRaHelper::EnablePcapInternal(): Phy layer in LoraNetDevice must be set");
+  auto phy = device->GetPhy ();
+  NS_ABORT_MSG_IF (phy == 0, "LoRaHelper::EnablePcapInternal(): Phy layer in LoraNetDevice must be set");
 
   PcapHelper pcapHelper;
 
@@ -450,22 +449,35 @@ LoraHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool prom
       filename = pcapHelper.GetFilenameFromDevice (prefix, device);
     }
 
-  Ptr<PcapFileWrapper> file =
-      pcapHelper.CreateFile (filename, std::ios::out, PcapHelper::DLT_LORATAP);
-
-  phy->TraceConnectWithoutContext ("SnifferRx",
-                                   MakeBoundCallback (&LoraHelper::PcapSniffRxEvent, file));
+  auto file = pcapHelper.CreateFile (filename, std::ios::out, PcapHelper::DLT_LORATAP);
+  phy->TraceConnectWithoutContext ("SnifferRx", MakeBoundCallback (&LoraHelper::PcapSniffRxEvent, file));
+  phy->TraceConnectWithoutContext ("SnifferTx", MakeBoundCallback (&LoraHelper::PcapSniffTxEvent, file));
 }
 
 void
-LoraHelper::PcapSniffRxEvent (Ptr<PcapFileWrapper> file, Ptr<const Packet> packet
-                              /** + all other fields not in tag **/)
+LoraHelper::PcapSniffRxEvent (
+  Ptr<PcapFileWrapper>  file,
+  Ptr<const Packet>     packet)
+{
+  Ptr<Packet> p = packet->Copy ();
+  LoraTag tag;
+  p -> RemovePacketTag (tag);
+  LoratapHeader header;
+  header.Fill (tag);
+  p->AddHeader (header);
+  file->Write (Simulator::Now (), p);
+}
+
+void
+LoraHelper::PcapSniffTxEvent (
+  Ptr<PcapFileWrapper>  file,
+  Ptr<const Packet>     packet)
 {
   Ptr<Packet> p = packet->Copy ();
   LoraTag tag;
   p->RemovePacketTag (tag);
   LoratapHeader header;
-  header.Fill (tag /** + all other fields not in tag **/);
+  header.Fill (tag);
   p->AddHeader (header);
   file->Write (Simulator::Now (), p);
 }
