@@ -94,13 +94,11 @@ ChirpstackHelper::InitConnection (Ipv4Address ip, uint16_t port)
 void
 ChirpstackHelper::CloseConnection (int signal) const
 {
-  /* Remove tentant */
   str reply;
-  if (DELETE ("/api/tenants/" + m_session.tenantId, reply) == EXIT_FAILURE)
-    NS_FATAL_ERROR ("Unable to unregister tenant with cURLpp");
 
-  if (reply != "{}")
-    NS_FATAL_ERROR ("Unexpected error in reply: " << reply);
+  /* Remove tentant */
+  if (DELETE ("/api/tenants/" + m_session.tenantId, reply) == EXIT_FAILURE)
+    NS_LOG_ERROR ("Unable to unregister tenant, got reply: " << reply);
 
   /* Terminate curlpp */
   curlpp::terminate ();
@@ -145,12 +143,12 @@ ChirpstackHelper::NewTenant (const str &name)
 
   str reply;
   if (POST ("/api/tenants", payload, reply) == EXIT_FAILURE)
-    NS_FATAL_ERROR ("Unable to register new tenant with cURLpp");
+    NS_FATAL_ERROR ("Unable to register new tenant, got reply: " << reply);
 
   JSON_Value *json = NULL;
   json = json_parse_string_with_comments (reply.c_str ());
   if (json == NULL)
-    NS_FATAL_ERROR ("Invalid JSON in tenant registration reply");
+    NS_FATAL_ERROR ("Invalid JSON in tenant registration reply: " << reply);
 
   m_session.tenantId = json_object_get_string (json_value_get_object (json), "id");
   json_value_free (json);
@@ -199,12 +197,12 @@ ChirpstackHelper::NewDeviceProfile (const str &name)
 
   str reply;
   if (POST ("/api/device-profiles", payload, reply) == EXIT_FAILURE)
-    NS_FATAL_ERROR ("Unable to register new device profile with cURLpp");
+    NS_FATAL_ERROR ("Unable to register new device profile, got reply: " << reply);
 
   JSON_Value *json = NULL;
   json = json_parse_string_with_comments (reply.c_str ());
   if (json == NULL)
-    NS_FATAL_ERROR ("Invalid JSON in device profile registration reply");
+    NS_FATAL_ERROR ("Invalid JSON in device profile registration reply :" << reply);
 
   m_session.devProfId = json_object_get_string (json_value_get_object (json), "id");
   json_value_free (json);
@@ -230,12 +228,12 @@ ChirpstackHelper::NewApplication (const str &name)
 
   str reply;
   if (POST ("/api/applications", payload, reply) == EXIT_FAILURE)
-    NS_FATAL_ERROR ("Unable to register new application with cURLpp");
+    NS_FATAL_ERROR ("Unable to register new application, got reply: " << reply);
 
   JSON_Value *json = NULL;
   json = json_parse_string_with_comments (reply.c_str ());
   if (json == NULL)
-    NS_FATAL_ERROR ("Invalid JSON in device profile registration reply");
+    NS_FATAL_ERROR ("Invalid JSON in device profile registration reply: " << reply);
 
   m_session.appId = json_object_get_string (json_value_get_object (json), "id");
   json_value_free (json);
@@ -301,7 +299,7 @@ ChirpstackHelper::NewDevice (Ptr<Node> node) const
 
   str reply;
   if (POST ("/api/devices", payload, reply) == EXIT_FAILURE)
-    NS_FATAL_ERROR ("Unable to register new device with cURLpp");
+    NS_FATAL_ERROR ("Unable to register device " << str (eui) << ", reply: " << reply);
 
   char devAddr[9];
   Ptr<LoraNetDevice> netdev = node->GetDevice (0)->GetObject<LoraNetDevice> ();
@@ -332,7 +330,7 @@ ChirpstackHelper::NewDevice (Ptr<Node> node) const
             "}";
 
   if (POST ("/api/devices/" + str (eui) + "/activate", payload, reply) == EXIT_FAILURE)
-    NS_FATAL_ERROR ("Unable to register new device with cURLpp");
+    NS_FATAL_ERROR ("Unable to activate device " << str (eui) << ", reply: " << reply);
 
   return EXIT_SUCCESS;
 }
@@ -380,7 +378,7 @@ ChirpstackHelper::NewGateway (Ptr<Node> node) const
 
   str reply;
   if (POST ("/api/gateways", payload, reply) == EXIT_FAILURE)
-    NS_FATAL_ERROR ("Unable to register new gateway with cURLpp");
+    NS_FATAL_ERROR ("Unable to register gateway " << str (eui) << ", reply: " << reply);
 
   return EXIT_SUCCESS;
 }
@@ -406,7 +404,7 @@ ChirpstackHelper::POST (const str &path, const str &body, str &out) const
         }
 
       request.setOpt (new Options::WriteStream (&ss));
-      NS_LOG_DEBUG ("Sending POST request to " << m_url << path << ", with body: " << body);
+      NS_LOG_INFO ("Sending POST request to " << m_url << path << ", with body: " << body);
       request.perform ();
     }
   catch (LogicError &e)
@@ -421,11 +419,11 @@ ChirpstackHelper::POST (const str &path, const str &body, str &out) const
     }
 
   out = ss.str ();
-  NS_LOG_DEBUG ("Received POST reply: " << out);
+  NS_LOG_INFO ("Received POST reply: " << out);
 
   if (Infos::ResponseCode::get (request) != 200)
     {
-      NS_LOG_ERROR ("Bad response code " << Infos::ResponseCode::get (request));
+      NS_LOG_DEBUG ("Bad response code " << Infos::ResponseCode::get (request));
       return EXIT_FAILURE;
     }
   return EXIT_SUCCESS;
@@ -466,7 +464,7 @@ ChirpstackHelper::DELETE (const str &path, str &out) const
 
   if (Infos::ResponseCode::get (request) != 200)
     {
-      NS_LOG_ERROR ("Bad response code " << Infos::ResponseCode::get (request));
+      NS_LOG_DEBUG ("Bad response code " << Infos::ResponseCode::get (request));
       return EXIT_FAILURE;
     }
   return EXIT_SUCCESS;

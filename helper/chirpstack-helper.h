@@ -82,7 +82,9 @@ private:
 
   str m_url;
   std::list<str> m_header;
+  
   session_t m_session;
+
   static const struct coord_s m_center;
 };
 
