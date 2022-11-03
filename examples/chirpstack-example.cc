@@ -40,6 +40,7 @@ main (int argc, char *argv[])
   std::string sir = "GOURSAUD";
   bool adrEnabled = false;
   bool initializeSF = true;
+  bool file = false;
 
   /* Expose parameters to command line */
   {
@@ -51,21 +52,22 @@ main (int argc, char *argv[])
     cmd.AddValue ("sir", "Signal to Interference Ratio matrix used for interference", sir);
     cmd.AddValue ("initSF", "Whether to initialize the SFs", initializeSF);
     cmd.AddValue ("adr", "Whether to enable online ADR", adrEnabled);
+    cmd.AddValue ("file", "Whether to enable .pcap tracing on gateways", file);
     cmd.Parse (argc, argv);
   }
-  
+
   /* Apply global configurations */
   ///////////////// Real-time operation, necessary to interact with the outside world.
   GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
   GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true));
-  Config::SetDefault ("ns3::EndDeviceLorawanMac::RealMIC", BooleanValue (true));
+  Config::SetDefault ("ns3::EndDeviceLorawanMac::EnableRealMIC", BooleanValue (true));
   {
     Config::SetDefault ("ns3::EndDeviceLorawanMac::DRControl",
                         BooleanValue (adrEnabled)); //!< ADR bit
     Config::SetDefault ("ns3::EndDeviceLorawanMac::MType", StringValue ("Unconfirmed"));
     Config::SetDefault ("ns3::EndDeviceLorawanMac::MaxTransmissions", IntegerValue (1));
   }
-  
+
   /* Logging options */
   {
     //!> Requirement: build ns3 with debug option
@@ -114,7 +116,7 @@ main (int argc, char *argv[])
     mobilityGw.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
     // In hex tiling, distance = range * cos (pi/6) * 2 to have no holes
     double gatewayDistance = range * std::cos (M_PI / 6) * 2;
-    Ptr<HexGridPositionAllocator> hexAllocator = CreateObject<HexGridPositionAllocator> ();
+    auto hexAllocator = CreateObject<HexGridPositionAllocator> ();
     hexAllocator->SetAttribute ("Z", DoubleValue (15.0));
     hexAllocator->SetAttribute ("distance", DoubleValue (gatewayDistance));
     mobilityGw.SetPositionAllocator (hexAllocator);
@@ -162,7 +164,7 @@ main (int argc, char *argv[])
     csma.SetChannelAttribute ("DataRate", DataRateValue (DataRate (5000000)));
     csma.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
     csma.SetDeviceAttribute ("Mtu", UintegerValue (1500));
-    NetDeviceContainer csmaNetDevs = csma.Install (csmaNodes);
+    auto csmaNetDevs = csma.Install (csmaNodes);
 
     // Install and initialize internet stack on gateways and server nodes
     InternetStackHelper internet;
@@ -182,8 +184,9 @@ main (int argc, char *argv[])
   tapBridge.Install (networkServer, networkServer->GetDevice (0));
 
   /* Radio side (between end devicees and gateways) */
-  LorawanMacHelper macHelper;
   LoraHelper helper;
+  LorawanMacHelper macHelper;
+  NetDeviceContainer gwNetDev;
   {
     // Physiscal layer settings
     LoraPhyHelper phyHelper;
@@ -192,8 +195,7 @@ main (int argc, char *argv[])
     // Create a LoraDeviceAddressGenerator
     uint8_t nwkId = 54;
     uint32_t nwkAddr = 1864;
-    Ptr<LoraDeviceAddressGenerator> addrGen =
-        CreateObject<LoraDeviceAddressGenerator> (nwkId, nwkAddr);
+    auto addrGen = CreateObject<LoraDeviceAddressGenerator> (nwkId, nwkAddr);
 
     // Mac layer settings
     macHelper.SetRegion (LorawanMacHelper::EU);
@@ -202,7 +204,7 @@ main (int argc, char *argv[])
     // Create the LoraNetDevices of the gateways
     phyHelper.SetDeviceType (LoraPhyHelper::GW);
     macHelper.SetDeviceType (LorawanMacHelper::GW);
-    helper.Install (phyHelper, macHelper, gateways);
+    gwNetDev = helper.Install (phyHelper, macHelper, gateways);
 
     // Create the LoraNetDevices of the end devices
     phyHelper.SetDeviceType (LoraPhyHelper::ED);
@@ -251,6 +253,9 @@ main (int argc, char *argv[])
   PrintConfigSetup (nDevices, range, gatewayRings, devPerSF);
   helper.EnableSimulationTimePrinting (Seconds (3600));
 #endif // NS3_LOG_ENABLE
+
+  if (file)
+    helper.EnablePcap ("lora", gwNetDev);
 
   Simulator::Stop (Hours (1) * periods);
 

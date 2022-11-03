@@ -114,6 +114,7 @@ EndDeviceLorawanMac::EndDeviceLorawanMac ()
       m_receiveWindowDurationInSymbols (8),
       // LoraWAN default
       m_controlDataRate (false),
+      m_realMIC (false),
       m_lastKnownLinkMargin (0),
       m_lastKnownGatewayCount (0),
       m_aggregatedDutyCycle (1),
