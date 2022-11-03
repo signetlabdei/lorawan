@@ -104,7 +104,7 @@ ChirpstackHelper::CloseConnection (int signal) const
   curlpp::terminate ();
 
 #ifdef NS3_LOG_ENABLE
-  std::cout << "Tear down process terminated after signal " << signal << std::endl;
+  std::cout << "\nTear down process terminated after receiving signal " << signal << std::endl;
 #endif // NS3_LOG_ENABLE
 }
 

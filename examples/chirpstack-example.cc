@@ -1,32 +1,18 @@
 /*
  * This program produces real-time traffic to an external chirpstack server.
+ * Key elements are preceded by a comment with lots of dashes ( ///////////// ) 
  */
 
 // ns3 imports
 #include "ns3/core-module.h"
-#include "ns3/network-module.h"
-#include "ns3/mobility-helper.h"
-#include "ns3/okumura-hata-propagation-loss-model.h"
-#include "ns3/tap-bridge-module.h"
+#include "ns3/mobility-module.h"
+#include "ns3/propagation-module.h"
+#include "ns3/csma-module.h"
 #include "ns3/internet-module.h"
-#include "ns3/csma-helper.h"
-#include "ns3/command-line.h"
-#include "ns3/config.h"
-#include "ns3/string.h"
-#include "ns3/log.h"
+#include "ns3/tap-bridge-module.h"
 
 // lorawan imports
-#include "ns3/lora-helper.h"
-#include "ns3/lora-phy-helper.h"
-#include "ns3/lorawan-mac-helper.h"
-#include "ns3/udp-forwarder-helper.h"
-#include "ns3/periodic-sender-helper.h"
-#include "ns3/lora-channel.h"
-#include "ns3/lora-device-address-generator.h"
-#include "ns3/hex-grid-position-allocator.h"
-#include "ns3/range-position-allocator.h"
-#include "ns3/lora-interference-helper.h"
-#include "ns3/chirpstack-helper.h"
+#include "ns3/lorawan-module.h"
 #include "utilities.cc"
 
 // cpp imports
@@ -54,9 +40,8 @@ main (int argc, char *argv[])
   std::string sir = "GOURSAUD";
   bool adrEnabled = false;
   bool initializeSF = true;
-  bool file = false;
 
-  /* Expose parameters to command line & apply static configurations */
+  /* Expose parameters to command line */
   {
     CommandLine cmd (__FILE__);
     cmd.AddValue ("periods", "Number of periods to simulate (1 period = 1 hour)", periods);
@@ -66,19 +51,21 @@ main (int argc, char *argv[])
     cmd.AddValue ("sir", "Signal to Interference Ratio matrix used for interference", sir);
     cmd.AddValue ("initSF", "Whether to initialize the SFs", initializeSF);
     cmd.AddValue ("adr", "Whether to enable online ADR", adrEnabled);
-    cmd.AddValue ("file", "Output the metrics of the simulation in a file", file);
     cmd.Parse (argc, argv);
   }
-  /* Apply static configurations */
+  
+  /* Apply global configurations */
+  ///////////////// Real-time operation, necessary to interact with the outside world.
+  GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
+  GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true));
+  Config::SetDefault ("ns3::EndDeviceLorawanMac::RealMIC", BooleanValue (true));
   {
-    // Static configurations
-    Config::SetDefault ("ns3::EndDeviceLorawanMac::DRControl", BooleanValue (false)); //!< ADR bit
+    Config::SetDefault ("ns3::EndDeviceLorawanMac::DRControl",
+                        BooleanValue (adrEnabled)); //!< ADR bit
     Config::SetDefault ("ns3::EndDeviceLorawanMac::MType", StringValue ("Unconfirmed"));
     Config::SetDefault ("ns3::EndDeviceLorawanMac::MaxTransmissions", IntegerValue (1));
-    // Real-time operation, necessary to interact with the outside world.
-    GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
-    GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true));
   }
+  
   /* Logging options */
   {
     //!> Requirement: build ns3 with debug option
@@ -239,7 +226,7 @@ main (int argc, char *argv[])
     appHelper.SetPeriodGenerator (
         CreateObjectWithAttributes<ConstantRandomVariable> ("Constant", DoubleValue (5.0)));
     appHelper.SetPacketSizeGenerator (
-        CreateObjectWithAttributes<ConstantRandomVariable> ("Constant", DoubleValue (5)));
+        CreateObjectWithAttributes<ConstantRandomVariable> ("Constant", DoubleValue (5.0)));
     appHelper.Install (endDevices);
   }
 
@@ -265,11 +252,10 @@ main (int argc, char *argv[])
   helper.EnableSimulationTimePrinting (Seconds (3600));
 #endif // NS3_LOG_ENABLE
 
-  // Start simulation
-  Time periodLenght = Hours (1);
-  Simulator::Stop (periodLenght * periods);
-  Simulator::Run ();
+  Simulator::Stop (Hours (1) * periods);
 
+  // Start simulation
+  Simulator::Run ();
   Simulator::Destroy ();
 
   return 0;
