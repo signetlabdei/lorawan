@@ -1630,7 +1630,7 @@ UdpForwarder::LgwStatus (uint8_t select, uint8_t *code)
 int
 UdpForwarder::LgwSend (struct lgw_pkt_tx_s pkt_data)
 {
-  bool lgw_is_started = false;
+  bool lgw_is_started = true;
   LoraTag tag;
   Ptr<Packet> pkt;
   Ptr<GatewayLorawanMac> mac = m_loraNetDevice->GetMac ()->GetObject<GatewayLorawanMac> ();
@@ -1716,25 +1716,25 @@ UdpForwarder::LgwSend (struct lgw_pkt_tx_s pkt_data)
   switch (pkt_data.datarate)
     {
     case DR_LORA_SF7:
-      tag.SetDataRate (7);
+      tag.SetSpreadingFactor (7);
       break;
     case DR_LORA_SF8:
-      tag.SetDataRate (8);
+      tag.SetSpreadingFactor (8);
       break;
     case DR_LORA_SF9:
-      tag.SetDataRate (9);
+      tag.SetSpreadingFactor (9);
       break;
     case DR_LORA_SF10:
-      tag.SetDataRate (10);
+      tag.SetSpreadingFactor (10);
       break;
     case DR_LORA_SF11:
-      tag.SetDataRate (11);
+      tag.SetSpreadingFactor (11);
       break;
     case DR_LORA_SF12:
-      tag.SetDataRate (12);
+      tag.SetSpreadingFactor (12);
       break;
     default:
-      tag.SetDataRate (12);
+      tag.SetSpreadingFactor (12);
       break;
     }
   tag.SetFrequency ((double) pkt_data.freq_hz * 1e-6);
