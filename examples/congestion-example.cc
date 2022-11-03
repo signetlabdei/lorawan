@@ -60,7 +60,6 @@ main (int argc, char *argv[])
   double tolerance = 0.001;
   double target = 0.95;
   std::string clusterStr = ".";
-  bool debug = false;
   bool file = false;
 
   /* Expose parameters to command line */
@@ -85,7 +84,6 @@ main (int argc, char *argv[])
     cmd.AddValue ("tolerance", "[cong ctrl] Tolerance step to declare value stagnation", tolerance);
     cmd.AddValue ("target", "Central PDR value targeted (single cluster)", target);
     cmd.AddValue ("clusters", "Clusters descriptor: \"{{share,pdr},...\"}", clusterStr);
-    cmd.AddValue ("debug", "Whether or not to debug logs at various levels. ", debug);
     cmd.AddValue ("file", "Output the metrics of the simulation in a file", file);
     cmd.Parse (argc, argv);
     NS_ASSERT (!(congest & model));
