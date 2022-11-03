@@ -89,6 +89,13 @@ EndDeviceLorawanMac::GetTypeId (void)
                          MakeEnumAccessor (&EndDeviceLorawanMac::m_mType),
                          MakeEnumChecker (LorawanMacHeader::UNCONFIRMED_DATA_UP, "Unconfirmed",
                                           LorawanMacHeader::CONFIRMED_DATA_UP, "Confirmed"))
+          .AddAttribute ("EnableRealMIC",
+                         "Whether the End Device should compute the Message Integrity Code"
+                         "according to specifications, i.e. using real cryptographic"
+                         "libraries (slower).",
+                         BooleanValue (false),
+                         MakeBooleanAccessor (&EndDeviceLorawanMac::m_realMIC),
+                         MakeBooleanChecker ())
           .AddConstructor<EndDeviceLorawanMac> ();
   return tid;
 }
@@ -230,11 +237,14 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       packet->AddHeader (macHdr);
 
       // 4 Bytes of MIC
-      uint32_t mic;
-      uint8_t buff[256];
-      packet->CopyData (buff, 256);
-      m_crypto->ComputeCmacB0 (buff, packet->GetSize (), F_NWK_S_INT_KEY, false, UPLINK,
-                               m_address.Get (), m_currentFCnt, &mic);
+      uint32_t mic = 0;
+      if (m_realMIC)
+        {
+          uint8_t buff[256];
+          packet->CopyData (buff, 256);
+          m_crypto->ComputeCmacB0 (buff, packet->GetSize (), F_NWK_S_INT_KEY, false, UPLINK,
+                                   m_address.Get (), m_currentFCnt, &mic);
+        }
 
       // Re-serialize message to add the MIC
       uint8_t micser[4];

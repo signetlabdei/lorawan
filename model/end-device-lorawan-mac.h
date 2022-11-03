@@ -483,6 +483,11 @@ private:
   bool m_controlDataRate;
 
   /**
+   * Whether this device's MIC should be computed according to specifications.
+   */
+  bool m_realMIC;
+
+  /**
    * The event of retransmitting a packet in a consecutive moment if an ACK is not received.
    *
    * This Event is used to cancel the retransmission if the ACK is found in ParseCommand function and
