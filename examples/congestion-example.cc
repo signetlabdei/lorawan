@@ -262,7 +262,8 @@ main (int argc, char *argv[])
     appHelper.SetPacketSizeGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
         "Mean", DoubleValue (18), "Variance", DoubleValue (10), "Bound", DoubleValue (18)));
     //UrbanTrafficHelper appHelper = UrbanTrafficHelper ();
-    //ApplicationContainer apps = appHelper.Install (endDevices);
+    
+    ApplicationContainer apps = appHelper.Install (endDevices);
     /*   int j = 0; // Late (dis)activation of 100 devices
   for (ApplicationContainer::Iterator i = apps.Begin (); i != apps.End (); ++i)
     {
