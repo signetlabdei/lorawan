@@ -46,7 +46,7 @@ Maintainer: Michael Coracin
 /* -------------------------------------------------------------------------- */
 /* --- PRIVATE VARIABLES (GLOBAL) ------------------------------------------- */
 
-struct timeval offset_unix_concent = {0, 0}; /* timer offset between unix host and concentrator */
+struct timeval offset_unix_concent = {0, 30000}; /* timer offset between unix host and concentrator */
 
 /* -------------------------------------------------------------------------- */
 /* --- PUBLIC FUNCTIONS DEFINITION ------------------------------------------ */
