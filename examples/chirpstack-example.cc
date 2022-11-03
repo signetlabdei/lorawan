@@ -5,14 +5,22 @@
 
 // ns3 imports
 #include "ns3/core-module.h"
-#include "ns3/mobility-module.h"
-#include "ns3/propagation-module.h"
-#include "ns3/csma-module.h"
-#include "ns3/internet-module.h"
-#include "ns3/tap-bridge-module.h"
+#include "ns3/okumura-hata-propagation-loss-model.h"
+#include "ns3/propagation-delay-model.h"
+#include "ns3/mobility-helper.h"
+#include "ns3/csma-helper.h"
+#include "ns3/internet-stack-helper.h"
+#include "ns3/ipv4-address-helper.h"
+#include "ns3/ipv4-global-routing-helper.h"
+#include "ns3/tap-bridge-helper.h"
 
 // lorawan imports
-#include "ns3/lorawan-module.h"
+#include "ns3/chirpstack-helper.h"
+#include "ns3/hex-grid-position-allocator.h"
+#include "ns3/range-position-allocator.h"
+#include "ns3/lora-helper.h"
+#include "ns3/udp-forwarder-helper.h"
+#include "ns3/periodic-sender-helper.h"
 #include "utilities.cc"
 
 // cpp imports
@@ -25,6 +33,12 @@ NS_LOG_COMPONENT_DEFINE ("ChirpstackExample");
 
 /* Global declaration of connection helper for signal handling */
 ChirpstackHelper csHelper;
+
+void
+OnStateChange (EndDeviceLoraPhy::State oldS, EndDeviceLoraPhy::State newS)
+{
+  NS_LOG_DEBUG ("State change " << oldS << " -> " << newS);
+}
 
 int
 main (int argc, char *argv[])
@@ -40,7 +54,7 @@ main (int argc, char *argv[])
   std::string sir = "GOURSAUD";
   bool adrEnabled = false;
   bool initializeSF = true;
-  bool file = false;
+  bool file = false; // Warning: will produce a file for each gateway
 
   /* Expose parameters to command line */
   {
@@ -71,7 +85,9 @@ main (int argc, char *argv[])
   /* Logging options */
   {
     //!> Requirement: build ns3 with debug option
-    LogComponentEnable ("UdpForwarder", LOG_LEVEL_DEBUG);
+    //LogComponentEnable ("ChirpstackExample", LOG_LEVEL_ALL);
+    //LogComponentEnable ("UdpForwarder", LOG_LEVEL_DEBUG);
+    //LogComponentEnable ("SimpleEndDeviceLoraPhy", LOG_LEVEL_INFO);
     LogComponentEnableAll (LOG_PREFIX_FUNC);
     LogComponentEnableAll (LOG_PREFIX_NODE);
     LogComponentEnableAll (LOG_PREFIX_TIME);
@@ -253,6 +269,10 @@ main (int argc, char *argv[])
   PrintConfigSetup (nDevices, range, gatewayRings, devPerSF);
   helper.EnableSimulationTimePrinting (Seconds (3600));
 #endif // NS3_LOG_ENABLE
+
+  Config::ConnectWithoutContext (
+      "/NodeList/*/DeviceList/0/$ns3::LoraNetDevice/Phy/$ns3::EndDeviceLoraPhy/EndDeviceState",
+      MakeCallback (&OnStateChange));
 
   if (file)
     helper.EnablePcap ("lora", gwNetDev);
