@@ -63,197 +63,209 @@ main (int argc, char *argv[])
   bool debug = false;
   bool file = false;
 
-  CommandLine cmd (__FILE__);
-  cmd.AddValue ("periods", "Number of periods to simulate (1 period = 1 hour)", periods);
-  cmd.AddValue ("rings", "Number of gateway rings in hexagonal topology", gatewayRings);
-  cmd.AddValue ("range", "Radius of the device allocation disk around a gateway)", range);
-  cmd.AddValue ("devices", "Number of end devices to include in the simulation", nDevices);
-  cmd.AddValue ("sir", "Signal to Interference Ratio matrix used for interference", sir);
-  cmd.AddValue ("initSF", "Whether to initialize the SFs", initializeSF);
-  cmd.AddValue ("adr", "Whether to enable online ADR", adrEnabled);
-  cmd.AddValue ("model", "Use static duty-cycle config with capacity model", model);
-  cmd.AddValue ("beta", "[static ctrl] Scaling factor of the static model output", beta);
-  cmd.AddValue ("congest", "Use congestion control", congest);
-  cmd.AddValue ("warmup",
-                "[cong ctrl] Starting delay of the congestion control algorithm for "
-                "initial network warm-up (e.g. ADR) and RSSI measurements collection",
-                warmup);
-  cmd.AddValue ("sampling", "[cong ctrl] Duration (hours) of the PDR sampling fase", sampling);
-  cmd.AddValue ("variance", "[cong ctrl] Acceptable gap around the target PDR value", variance);
-  cmd.AddValue ("tolerance", "[cong ctrl] Tolerance step to declare value stagnation", tolerance);
-  cmd.AddValue ("target", "Central PDR value targeted (single cluster)", target);
-  cmd.AddValue ("clusters", "Clusters descriptor: \"{{share,pdr},...\"}", clusterStr);
-  cmd.AddValue ("debug", "Whether or not to debug logs at various levels. ", debug);
-  cmd.AddValue ("file", "Output the metrics of the simulation in a file", file);
-  cmd.Parse (argc, argv);
-  NS_ASSERT (!(congest & model));
+  /* Expose parameters to command line */
+  {
+    CommandLine cmd (__FILE__);
+    cmd.AddValue ("periods", "Number of periods to simulate (1 period = 1 hour)", periods);
+    cmd.AddValue ("rings", "Number of gateway rings in hexagonal topology", gatewayRings);
+    cmd.AddValue ("range", "Radius of the device allocation disk around a gateway)", range);
+    cmd.AddValue ("devices", "Number of end devices to include in the simulation", nDevices);
+    cmd.AddValue ("sir", "Signal to Interference Ratio matrix used for interference", sir);
+    cmd.AddValue ("initSF", "Whether to initialize the SFs", initializeSF);
+    cmd.AddValue ("adr", "Whether to enable online ADR", adrEnabled);
+    cmd.AddValue ("model", "Use static duty-cycle config with capacity model", model);
+    cmd.AddValue ("beta", "[static ctrl] Scaling factor of the static model output", beta);
+    cmd.AddValue ("congest", "Use congestion control", congest);
+    cmd.AddValue ("warmup",
+                  "[cong ctrl] Starting delay of the congestion control algorithm for "
+                  "initial network warm-up (e.g. ADR) and RSSI measurements collection",
+                  warmup);
+    cmd.AddValue ("sampling", "[cong ctrl] Duration (hours) of the PDR sampling fase", sampling);
+    cmd.AddValue ("variance", "[cong ctrl] Acceptable gap around the target PDR value", variance);
+    cmd.AddValue ("tolerance", "[cong ctrl] Tolerance step to declare value stagnation", tolerance);
+    cmd.AddValue ("target", "Central PDR value targeted (single cluster)", target);
+    cmd.AddValue ("clusters", "Clusters descriptor: \"{{share,pdr},...\"}", clusterStr);
+    cmd.AddValue ("debug", "Whether or not to debug logs at various levels. ", debug);
+    cmd.AddValue ("file", "Output the metrics of the simulation in a file", file);
+    cmd.Parse (argc, argv);
+    NS_ASSERT (!(congest & model));
+  }
 
-  // Static configurations
-  Config::SetDefault ("ns3::EndDeviceLorawanMac::DRControl", BooleanValue (true)); //!< ADR bit
-  Config::SetDefault ("ns3::EndDeviceLorawanMac::MType", StringValue ("Unconfirmed"));
-  Config::SetDefault ("ns3::EndDeviceLorawanMac::MaxTransmissions", IntegerValue (1));
-  Config::SetDefault ("ns3::AdrComponent::MultipleGwCombiningMethod", StringValue ("max"));
-  Config::SetDefault ("ns3::AdrComponent::MultiplePacketsCombiningMethod", StringValue ("avg"));
-  Config::SetDefault ("ns3::AdrComponent::HistoryRange", IntegerValue (20));
-  Config::SetDefault ("ns3::AdrComponent::ChangeTransmissionPower", BooleanValue (true));
-  Config::SetDefault ("ns3::AdrComponent::SNRDeviceMargin",
-                      DoubleValue (10 * log10 (-1 / log (0.98))));
-  Config::SetDefault ("ns3::CongestionControlComponent::StartTime", TimeValue (Hours (warmup)));
-  Config::SetDefault ("ns3::CongestionControlComponent::SamplingDuration",
-                      TimeValue (Hours (sampling)));
-  Config::SetDefault ("ns3::CongestionControlComponent::AcceptedPDRVariance",
-                      DoubleValue (variance));
-  Config::SetDefault ("ns3::CongestionControlComponent::ValueStagnationTolerance",
-                      DoubleValue (tolerance));
+  /* Apply global configurations */
+  {
+    Config::SetDefault ("ns3::EndDeviceLorawanMac::DRControl", BooleanValue (true)); //!< ADR bit
+    Config::SetDefault ("ns3::EndDeviceLorawanMac::MType", StringValue ("Unconfirmed"));
+    Config::SetDefault ("ns3::EndDeviceLorawanMac::MaxTransmissions", IntegerValue (1));
+    Config::SetDefault ("ns3::AdrComponent::MultipleGwCombiningMethod", StringValue ("max"));
+    Config::SetDefault ("ns3::AdrComponent::MultiplePacketsCombiningMethod", StringValue ("avg"));
+    Config::SetDefault ("ns3::AdrComponent::HistoryRange", IntegerValue (20));
+    Config::SetDefault ("ns3::AdrComponent::ChangeTransmissionPower", BooleanValue (true));
+    Config::SetDefault ("ns3::AdrComponent::SNRDeviceMargin",
+                        DoubleValue (10 * log10 (-1 / log (0.98))));
+    Config::SetDefault ("ns3::CongestionControlComponent::StartTime", TimeValue (Hours (warmup)));
+    Config::SetDefault ("ns3::CongestionControlComponent::SamplingDuration",
+                        TimeValue (Hours (sampling)));
+    Config::SetDefault ("ns3::CongestionControlComponent::AcceptedPDRVariance",
+                        DoubleValue (variance));
+    Config::SetDefault ("ns3::CongestionControlComponent::ValueStagnationTolerance",
+                        DoubleValue (tolerance));
+  }
 
-  /************
-   *  Logging *
-   ************/
-
-  if (debug) // This also requires to build ns3 with debug option
-    {
-      LogComponentEnable ("CongestionControlComponent", LOG_LEVEL_DEBUG);
-      LogComponentEnable ("TrafficControlUtils", LOG_LEVEL_DEBUG);
-      LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_WARN);
-      //LogComponentEnable ("UrbanTrafficHelper", LOG_LEVEL_DEBUG);
-      LogComponentEnableAll (LOG_PREFIX_FUNC);
-      LogComponentEnableAll (LOG_PREFIX_NODE);
-      LogComponentEnableAll (LOG_PREFIX_TIME);
-    }
+  /* Logging options */
+  {
+    //!> Requirement: build ns3 with debug option
+    LogComponentEnable ("CongestionControlComponent", LOG_LEVEL_DEBUG);
+    LogComponentEnable ("TrafficControlUtils", LOG_LEVEL_DEBUG);
+    LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_WARN);
+    //LogComponentEnable ("UrbanTrafficHelper", LOG_LEVEL_DEBUG);
+    LogComponentEnableAll (LOG_PREFIX_FUNC);
+    LogComponentEnableAll (LOG_PREFIX_NODE);
+    LogComponentEnableAll (LOG_PREFIX_TIME);
+  }
 
   /******************
    *  Radio Channel *
    ******************/
-  LoraInterferenceHelper::collisionMatrix = sirMap.at (sir);
 
-  // Delay obtained from distance and speed of light in vacuum (constant)
-  Ptr<PropagationDelayModel> delay = CreateObject<ConstantSpeedPropagationDelayModel> ();
+  Ptr<OkumuraHataPropagationLossModel> loss;
+  Ptr<NakagamiPropagationLossModel> rayleigh;
+  Ptr<LoraChannel> channel;
+  {
+    LoraInterferenceHelper::collisionMatrix = sirMap.at (sir);
 
-  // This one is empirical and it encompasses average loss due to distance, shadowing (i.e. obstacles), weather, height
-  Ptr<OkumuraHataPropagationLossModel> loss = CreateObject<OkumuraHataPropagationLossModel> ();
-  loss->SetAttribute ("Frequency", DoubleValue (868100000.0));
-  loss->SetAttribute ("Environment", EnumValue (EnvironmentType::UrbanEnvironment));
-  loss->SetAttribute ("CitySize", EnumValue (CitySize::LargeCity));
+    // Delay obtained from distance and speed of light in vacuum (constant)
+    Ptr<PropagationDelayModel> delay = CreateObject<ConstantSpeedPropagationDelayModel> ();
 
-  // Here we can add variance to the propagation model with multipath Rayleigh fading
-  Ptr<NakagamiPropagationLossModel> rayleigh = CreateObject<NakagamiPropagationLossModel> ();
-  rayleigh->SetAttribute ("m0", DoubleValue (1.0));
-  rayleigh->SetAttribute ("m1", DoubleValue (1.0));
-  rayleigh->SetAttribute ("m2", DoubleValue (1.0));
+    // This one is empirical and it encompasses average loss due to distance, shadowing (i.e. obstacles), weather, height
+    loss = CreateObject<OkumuraHataPropagationLossModel> ();
+    loss->SetAttribute ("Frequency", DoubleValue (868100000.0));
+    loss->SetAttribute ("Environment", EnumValue (EnvironmentType::UrbanEnvironment));
+    loss->SetAttribute ("CitySize", EnumValue (CitySize::LargeCity));
 
-  Ptr<LoraChannel> channel = CreateObject<LoraChannel> (loss, delay);
+    // Here we can add variance to the propagation model with multipath Rayleigh fading
+    rayleigh = CreateObject<NakagamiPropagationLossModel> ();
+    rayleigh->SetAttribute ("m0", DoubleValue (1.0));
+    rayleigh->SetAttribute ("m1", DoubleValue (1.0));
+    rayleigh->SetAttribute ("m2", DoubleValue (1.0));
+
+    channel = CreateObject<LoraChannel> (loss, delay);
+  }
 
   /**************
    *  Mobility  *
    **************/
 
   MobilityHelper mobilityEd, mobilityGw;
+  Ptr<RangePositionAllocator> rangeAllocator;
+  {
+    // Gateway mobility
+    mobilityGw.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
+    // In hex tiling, distance = range * cos (pi/6) * 2 to have no holes
+    double gatewayDistance = range * std::cos (M_PI / 6) * 2;
+    auto hexAllocator = CreateObject<HexGridPositionAllocator> ();
+    hexAllocator->SetAttribute ("Z", DoubleValue (30.0));
+    hexAllocator->SetAttribute ("distance", DoubleValue (gatewayDistance));
+    mobilityGw.SetPositionAllocator (hexAllocator);
 
-  // Gateway mobility
-  mobilityGw.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
-  // In hex tiling, distance = range * cos (pi/6) * 2 to have no holes
-  double gatewayDistance = range * std::cos (M_PI / 6) * 2;
-  Ptr<HexGridPositionAllocator> hexAllocator = CreateObject<HexGridPositionAllocator> ();
-  hexAllocator->SetAttribute ("Z", DoubleValue (30.0));
-  hexAllocator->SetAttribute ("distance", DoubleValue (gatewayDistance));
-  mobilityGw.SetPositionAllocator (hexAllocator);
-
-  // End Device mobility
-  mobilityEd.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
-  // We define rho to generalize the allocation disk for any number of gateway rings
-  double rho = range + 2.0 * gatewayDistance * (gatewayRings - 1);
-  Ptr<RangePositionAllocator> rangeAllocator = CreateObject<RangePositionAllocator> ();
-  rangeAllocator->SetAttribute ("rho", DoubleValue (rho));
-  rangeAllocator->SetAttribute ("ZRV", StringValue ("ns3::UniformRandomVariable[Min=1|Max=10]"));
-  rangeAllocator->SetAttribute ("range", DoubleValue (range));
-  mobilityEd.SetPositionAllocator (rangeAllocator);
-
-  /*************
-   *  Helpers  *
-   *************/
-
-  // Create the LoraPhyHelper
-  LoraPhyHelper phyHelper = LoraPhyHelper ();
-  phyHelper.SetChannel (channel);
-  phyHelper.SetDuplexMode (!model);
-
-  // Create a LoraDeviceAddressGenerator
-  uint8_t nwkId = 54;
-  uint32_t nwkAddr = 1864;
-  Ptr<LoraDeviceAddressGenerator> addrGen =
-      CreateObject<LoraDeviceAddressGenerator> (nwkId, nwkAddr);
-
-  // Create the LorawanMacHelper
-  LorawanMacHelper macHelper = LorawanMacHelper ();
-  macHelper.SetRegion (LorawanMacHelper::EU);
-  macHelper.SetAddressGenerator (addrGen);
-
-  // Create the LoraHelper
-  LoraHelper helper = LoraHelper ();
-  helper.EnablePacketTracking ();
+    // End Device mobility
+    mobilityEd.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
+    // We define rho to generalize the allocation disk for any number of gateway rings
+    double rho = range + 2.0 * gatewayDistance * (gatewayRings - 1);
+    rangeAllocator = CreateObject<RangePositionAllocator> ();
+    rangeAllocator->SetAttribute ("rho", DoubleValue (rho));
+    rangeAllocator->SetAttribute ("ZRV", StringValue ("ns3::UniformRandomVariable[Min=1|Max=10]"));
+    rangeAllocator->SetAttribute ("range", DoubleValue (range));
+    mobilityEd.SetPositionAllocator (rangeAllocator);
+  }
 
   /******************
    *  Create Nodes  *
    ******************/
 
-  Ptr<Node> networkServer = CreateObject<Node> ();
-
+  Ptr<Node> networkServer;
   NodeContainer gateways;
-  int nGateways = 3 * gatewayRings * gatewayRings - 3 * gatewayRings + 1;
-  gateways.Create (nGateways);
-  mobilityGw.Install (gateways);
-  rangeAllocator->SetNodes (gateways);
-
   NodeContainer endDevices;
-  endDevices.Create (nDevices);
-  mobilityEd.Install (endDevices);
+  {
+    networkServer = CreateObject<Node> ();
+
+    int nGateways = 3 * gatewayRings * gatewayRings - 3 * gatewayRings + 1;
+    gateways.Create (nGateways);
+    mobilityGw.Install (gateways);
+    rangeAllocator->SetNodes (gateways);
+
+    endDevices.Create (nDevices);
+    mobilityEd.Install (endDevices);
+  }
 
   /************************
    *  Create Net Devices  *
    ************************/
 
-  // Create the LoraNetDevices of the gateways
-  phyHelper.SetDeviceType (LoraPhyHelper::GW);
-  macHelper.SetDeviceType (LorawanMacHelper::GW);
-  helper.Install (phyHelper, macHelper, gateways);
+  LoraHelper helper;
+  LorawanMacHelper macHelper;
+  {
+    // General settings
+    helper.EnablePacketTracking ();
 
-  // Create the LoraNetDevices of the end devices
-  phyHelper.SetDeviceType (LoraPhyHelper::ED);
-  macHelper.SetDeviceType (LorawanMacHelper::ED_A);
-  helper.Install (phyHelper, macHelper, endDevices);
+    // Create a LoraDeviceAddressGenerator
+    uint8_t nwkId = 54;
+    uint32_t nwkAddr = 1864;
+    auto addrGen = CreateObject<LoraDeviceAddressGenerator> (nwkId, nwkAddr);
+
+    // Mac layer settings
+    macHelper.SetRegion (LorawanMacHelper::EU);
+    macHelper.SetAddressGenerator (addrGen);
+
+    // Physiscal layer settings
+    LoraPhyHelper phyHelper;
+    phyHelper.SetChannel (channel);
+    phyHelper.SetDuplexMode (!model);
+
+    // Create the LoraNetDevices of the gateways
+    phyHelper.SetDeviceType (LoraPhyHelper::GW);
+    macHelper.SetDeviceType (LorawanMacHelper::GW);
+    helper.Install (phyHelper, macHelper, gateways);
+
+    // Create the LoraNetDevices of the end devices
+    phyHelper.SetDeviceType (LoraPhyHelper::ED);
+    macHelper.SetDeviceType (LorawanMacHelper::ED_A);
+    helper.Install (phyHelper, macHelper, endDevices);
+  }
 
   /*************************
    *  Create Applications  *
    *************************/
 
-  // Set clusters
-  cluster_t clusters =
-      (clusterStr == ".") ? cluster_t ({{100.0, target}}) : ParseClusterInfo (clusterStr);
+  cluster_t clusters;
+  {
+    // Set clusters
+    clusters = (clusterStr == ".") ? cluster_t ({{100.0, target}}) : ParseClusterInfo (clusterStr);
 
-  // Install the NetworkServer application on the network server
-  NetworkServerHelper networkServerHelper;
-  networkServerHelper.SetGateways (gateways);
-  networkServerHelper.SetEndDevices (endDevices); // Registering devices (saves mac layer)
-  networkServerHelper.EnableAdr (adrEnabled);
-  networkServerHelper.EnableCongestionControl (congest);
-  networkServerHelper.AssignClusters (clusters); // Assignes one freq. by default
-  networkServerHelper.Install (networkServer);
+    // Install the NetworkServer application on the network server
+    NetworkServerHelper networkServerHelper;
+    networkServerHelper.SetGateways (gateways);
+    networkServerHelper.SetEndDevices (endDevices); // Registering devices (saves mac layer)
+    networkServerHelper.EnableAdr (adrEnabled);
+    networkServerHelper.EnableCongestionControl (congest);
+    networkServerHelper.AssignClusters (clusters); // Assignes one freq. by default
+    networkServerHelper.Install (networkServer);
 
-  // Install the Forwarder application on the gateways
-  // !!!! THIS MUST REMAIN AFTER SERVER INSTALL.
-  // ServerHelper.Install creates the p2p device needed by the app
-  ForwarderHelper forwarderHelper;
-  forwarderHelper.Install (gateways);
+    // Install the Forwarder application on the gateways
+    // !!!! THIS MUST REMAIN AFTER SERVER INSTALL.
+    // ServerHelper.Install creates the p2p device needed by the app
+    ForwarderHelper forwarderHelper;
+    forwarderHelper.Install (gateways);
 
-  // Install applications in EDs
-  /*   PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
-  appHelper.SetPeriodGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
-      "Mean", DoubleValue (600.0), "Variance", DoubleValue (300.0), "Bound", DoubleValue (600.0)));
-  appHelper.SetPacketSizeGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
-      "Mean", DoubleValue (18), "Variance", DoubleValue (10), "Bound", DoubleValue (18))); */
-  UrbanTrafficHelper appHelper = UrbanTrafficHelper ();
-  ApplicationContainer apps = appHelper.Install (endDevices);
-  /*   int j = 0; // Late (dis)activation of 100 devices
+    // Install applications in EDs
+    PeriodicSenderHelper appHelper;
+    appHelper.SetPeriodGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
+        "Mean", DoubleValue (600.0), "Variance", DoubleValue (300.0), "Bound",
+        DoubleValue (600.0)));
+    appHelper.SetPacketSizeGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
+        "Mean", DoubleValue (18), "Variance", DoubleValue (10), "Bound", DoubleValue (18)));
+    //UrbanTrafficHelper appHelper = UrbanTrafficHelper ();
+    //ApplicationContainer apps = appHelper.Install (endDevices);
+    /*   int j = 0; // Late (dis)activation of 100 devices
   for (ApplicationContainer::Iterator i = apps.Begin (); i != apps.End (); ++i)
     {
       if (j >= 50)
@@ -262,6 +274,11 @@ main (int argc, char *argv[])
       (*i)->SetStartTime (Days (5));
       ++j;
     } */
+  }
+
+  /***************************
+   *  Simulation and metrics *
+   ***************************/
 
   // Initialize SF emulating the ADR algorithm, then add variance to path loss
   std::vector<int> devPerSF (1, nDevices);
@@ -271,10 +288,6 @@ main (int argc, char *argv[])
   if (model)
     macHelper.SetDutyCyclesWithCapacityModel (endDevices, gateways, channel, clusters, beta);
   loss->SetNext (rayleigh);
-
-  /***************************
-   *  Simulation and metrics *
-   ***************************/
 
   if (file)
     {
@@ -287,24 +300,25 @@ main (int argc, char *argv[])
 
   // Limit memory usage
   LoraPacketTracker &tracker = helper.GetPacketTracker ();
-  //! TODO: tracker.EnableOldPacketsCleanup (Hours (1));
+  tracker.EnableOldPacketsCleanup (Hours (1));
 
-  if (debug)
-    {
-      // Print current configuration
-      PrintConfigSetup (nDevices, range, gatewayRings, devPerSF);
-      helper.EnableSimulationTimePrinting (Hours (2));
-    }
+#ifdef NS3_LOG_ENABLE
+  // Print current configuration
+  PrintConfigSetup (nDevices, range, gatewayRings, devPerSF);
+  helper.EnableSimulationTimePrinting (Hours (2));
+#endif // NS3_LOG_ENABLE
 
   // Start simulation
-  Time periodLenght = Hours (1);
-  Simulator::Stop (periodLenght * periods);
+  Time duration = Hours (1) * periods;
+  Simulator::Stop (duration);
   Simulator::Run ();
 
-  Time trackFinalOutcomeFrom = periodLenght * periods - Hours (10);
-  if (debug)
-    std::cout << tracker.PrintSimulationStatistics (trackFinalOutcomeFrom);
+  Time trackFinalOutcomeFrom = duration - Hours (10);
+#ifdef NS3_LOG_ENABLE
+  std::cout << tracker.PrintSimulationStatistics (trackFinalOutcomeFrom);
+#endif // NS3_LOG_ENABLE
 
   Simulator::Destroy ();
+
   return 0;
 }
