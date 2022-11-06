@@ -187,6 +187,10 @@ EndDeviceLorawanMac::Send (Ptr<Packet> packet)
       // Make sure we can transmit at the current power on this channel
       NS_ASSERT_MSG (m_txPower <= m_channelHelper.GetTxPowerForChannel (txChannel),
                      " The selected power is too hight to be supported by this channel.");
+      /* Extremely rare case: Send () happens after sending prev. pkt and before downlink 
+         reception of dutycycle reconf. A big increase in dutycycle may allow next packet
+         to be sent before current one, which has been postponed with old dutycycle conf. */
+      Simulator::Cancel (m_nextTx);
       DoSend (packet);
     }
 }
