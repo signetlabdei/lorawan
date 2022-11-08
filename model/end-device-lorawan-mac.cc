@@ -236,10 +236,15 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       LorawanMacHeader macHdr;
       ApplyNecessaryOptions (macHdr);
       packet->AddHeader (macHdr);
-
+      
+      //Add MIC trailer
+      LorawanMICTrailer micTrlr;
+      ApplyNecessaryOptions (micTrlr);
+      packet->AddTrailer (micTrlr);
+      
       // Reset MAC command list
       m_macCommandList.clear ();
-
+      
       if (m_retxParams.waitingAck)
         {
           // Call the callback to notify about the failure
@@ -249,6 +254,8 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
                         unsigned(txs) << " transmissions out of a maximum of " << unsigned(m_maxNumbTx) << ".");
         }
 
+    
+        
       // Reset retransmission parameters
       resetRetransmissionParameters ();
 
@@ -291,9 +298,12 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           // Remove the headers
           LorawanMacHeader macHdr;
           LoraFrameHeader frameHdr;
+          LorawanMICTrailer micTrlr;
+          packet->RemoveTrailer (micTrlr);
           packet->RemoveHeader(macHdr);
           packet->RemoveHeader(frameHdr);
-
+          
+          
           // Add the Lora Frame Header to the packet
           frameHdr = LoraFrameHeader ();
           ApplyNecessaryOptions (frameHdr);
@@ -306,6 +316,11 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           macHdr = LorawanMacHeader ();
           ApplyNecessaryOptions (macHdr);
           packet->AddHeader (macHdr);
+          
+          micTrlr = LorawanMICTrailer ();
+          ApplyNecessaryOptions (micTrlr);
+          packet->AddTrailer (micTrlr);
+          
           m_retxParams.retxLeft = m_retxParams.retxLeft - 1;           // decreasing the number of retransmissions
           NS_LOG_DEBUG ("Retransmitting an old packet.");
 
@@ -496,6 +511,14 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMacHeader& macHeader)
 
   macHeader.SetMType (m_mType);
   macHeader.SetMajor (1);
+}
+
+void
+EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMICTrailer& micTrlr)
+{
+    NS_LOG_FUNCTION_NOARGS ();
+    
+    micTrlr.SetMIC(0x00000000); /*  placeholder */
 }
 
 void

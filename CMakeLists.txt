@@ -21,6 +21,7 @@ set(source_files
     model/forwarder.cc
     model/lorawan-mac-header.cc
     model/lora-frame-header.cc
+    model/lorawan-mic-trailer.cc
     model/mac-command.cc
     model/lora-device-address.cc
     model/lora-device-address-generator.cc
@@ -71,6 +72,7 @@ set(header_files
     model/forwarder.h
     model/lorawan-mac-header.h
     model/lora-frame-header.h
+    model/lorawan-mic-trailer.h
     model/mac-command.h
     model/lora-device-address.h
     model/lora-device-address-generator.h

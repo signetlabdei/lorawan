@@ -26,7 +26,7 @@ LorawanMICTrailer::GetTypeId (void)
 }
 
 TypeId
-LorawanMICTrailer::GetInstanceTypeId (void)
+LorawanMICTrailer::GetInstanceTypeId (void) const
 {
     return GetTypeId ();
 }
@@ -44,6 +44,9 @@ LorawanMICTrailer::Serialize (Buffer::Iterator start) const
 {
     NS_LOG_FUNCTION_NOARGS ();
     
+    /*  move iterator to start of trailer before writing    */
+    start.Prev(GetSerializedSize ());
+    
     start.WriteU32 (m_mic);
     
     return;
@@ -57,13 +60,13 @@ LorawanMICTrailer::Deserialize (Buffer::Iterator end)
     NS_LOG_FUNCTION_NOARGS ();
     
     /*  move iterator to start of trailer before reading    */
-    end.Prev(this->GetSerializedSize ());
+    end.Prev(GetSerializedSize ());
     
     trailer_data = end.ReadU32 ();
     
     m_mic = trailer_data;
     
-    return this->GetSerializedSize ();
+    return GetSerializedSize ();
 }
 
 void
@@ -87,7 +90,7 @@ LorawanMICTrailer::SetMIC (uint32_t newMIC)
 }
 
 uint32_t
-LorawanMICTrailer::GetMIC (void)
+LorawanMICTrailer::GetMIC (void) const
 {
     NS_LOG_FUNCTION_NOARGS ();
     
@@ -193,7 +196,7 @@ void
 LorawanMICTrailer::aes128 (uint8_t K[16], uint8_t M[16], uint8_t O[16])
 {
     const uint8_t Nr = 10;  /*  number of rounds 10 for 128bit key  */
-    const uint8_t Nb = 4;
+    //const uint8_t Nb = 4;
     uint8_t state[4][4];
     uint8_t w[44][4];
     unsigned int i, j;
@@ -404,7 +407,8 @@ LorawanMICTrailer::aes128_keyexpansion (uint8_t K[16], uint8_t w[44][4], const u
         
         if (i % 4 == 0)
         {
-            subword (rotword (temp));
+            rotword (temp);
+            subword (temp, sbox);
             
             for (j = 0;j < 4;j++)
             {
@@ -474,7 +478,7 @@ LorawanMICTrailer::subword (uint8_t word[4], const uint8_t sbox[16][16])
 }
 
 uint32_t
-LorawanMICTrailer::aes128_cmac_4 (uint8_t xNwkSIntKey[16], uint8_t len, uint8_t *Bx_msg)
+LorawanMICTrailer::aes128_cmac_4 (uint8_t xNwkSIntKey[16], uint8_t *Bx_msg, uint8_t len)
 {
     uint8_t Mlast[16], padded[16], X[16], Y[16];
     uint8_t K1[16], K2[16];
@@ -555,11 +559,12 @@ LorawanMICTrailer::CalcMIC (uint8_t msgLen, uint8_t *msg, uint8_t B0[16], uint8_
         B0_msg[j + 16] = msg[j];
     }
     
-    mic = aes128_cmac_4(xNwkSIntKey, msgLen + 16, B0_msg);
+    mic = aes128_cmac_4(xNwkSIntKey, B0_msg, msgLen + (uint8_t)16);
     
     return mic;
 }
 
+/*  for LoRaWAN 1.1 Network Servers UL MIC  */
 uint32_t
 LorawanMICTrailer::CalcMIC_1_1_UL (uint8_t msgLen, uint8_t *msg, uint8_t B0[16], uint8_t B1[16], uint8_t SNwkSIntKey[16], uint8_t FNwkSIntKey[16])
 {
@@ -624,22 +629,22 @@ LorawanMICTrailer::GenerateB0UL (uint8_t B0[16], uint32_t DevAddr, uint32_t FCnt
 void
 LorawanMICTrailer::GenerateB1UL (uint8_t B1[16], uint16_t ConfFCnt, uint8_t TxDr, uint8_t TxCh, uint32_t DevAddr, uint32_t FCntUp, uint8_t msgLen)
 {
-    B0[0] = 0x49;
-    B0[1] = (uint8_t)(ConfFCnt >> 8);
-    B0[2] = (uint8_t)(ConfFCnt & 0x00ff);
-    B0[3] = TxDr;
-    B0[4] = TxCh;
-    B0[5] = 0x00;
-    B0[6] = (uint8_t)(DevAddr >> 24);
-    B0[7] = (uint8_t)((DevAddr & 0x00ff0000) >> 16);
-    B0[8] = (uint8_t)((DevAddr & 0x0000ff00) >> 8);
-    B0[9] = (uint8_t)(DevAddr & 0x000000ff);
-    B0[10] = (uint8_t)(FCntUp >> 24);
-    B0[11] = (uint8_t)((FCntUp & 0x00ff0000) >> 16);
-    B0[12] = (uint8_t)((FCntUp & 0x0000ff00) >> 8);
-    B0[13] = (uint8_t)(FCntUp & 0x000000ff);
-    B0[14] = 0x00;
-    B0[15] = msgLen;
+    B1[0] = 0x49;
+    B1[1] = (uint8_t)(ConfFCnt >> 8);
+    B1[2] = (uint8_t)(ConfFCnt & 0x00ff);
+    B1[3] = TxDr;
+    B1[4] = TxCh;
+    B1[5] = 0x00;
+    B1[6] = (uint8_t)(DevAddr >> 24);
+    B1[7] = (uint8_t)((DevAddr & 0x00ff0000) >> 16);
+    B1[8] = (uint8_t)((DevAddr & 0x0000ff00) >> 8);
+    B1[9] = (uint8_t)(DevAddr & 0x000000ff);
+    B1[10] = (uint8_t)(FCntUp >> 24);
+    B1[11] = (uint8_t)((FCntUp & 0x00ff0000) >> 16);
+    B1[12] = (uint8_t)((FCntUp & 0x0000ff00) >> 8);
+    B1[13] = (uint8_t)(FCntUp & 0x000000ff);
+    B1[14] = 0x00;
+    B1[15] = msgLen;
     
     return;
 }

@@ -53,7 +53,7 @@ public:
     void GenerateB0DL (uint8_t B0[16], uint16_t ConfFCnt, uint32_t DevAddr, uint32_t xFCntDwn, uint8_t msgLen);
     void GenerateB0UL (uint8_t B0[16], uint32_t DevAddr, uint32_t FCntUp, uint8_t msgLen);
     void GenerateB1UL (uint8_t B1[16], uint16_t ConfFCnt, uint8_t TxDr, uint8_t TxCh, uint32_t DevAddr, uint32_t FCntUp, uint8_t msgLen);   /*  LoRaWAN 1.1 Network servers use B1 and B0 */
-}
+};
 
 }
 }

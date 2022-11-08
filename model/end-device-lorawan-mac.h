@@ -27,6 +27,7 @@
 #include "ns3/lorawan-mac.h"
 #include "ns3/lorawan-mac-header.h"
 #include "ns3/lora-frame-header.h"
+#include "ns3/lorawan-mic-trailer.h"
 #include "ns3/random-variable-stream.h"
 #include "ns3/lora-device-address.h"
 #include "ns3/traced-value.h"
@@ -217,6 +218,13 @@ public:
    */
   void ApplyNecessaryOptions (LorawanMacHeader &macHeader);
 
+  /**
+   * Add the necessary options and to the LorawanMICTrailer.
+   *
+   * \param micTrlr The MIC trailer to which to apply the options
+   */
+  void ApplyNecessaryOptions (LorawanMICTrailer &micTrlr);
+  
   /**
    * Set the message type to send when the Send method is called.
    */
