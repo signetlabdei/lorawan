@@ -220,10 +220,12 @@ public:
 
   /**
    * Add the necessary options and to the LorawanMICTrailer.
-   *
-   * \param micTrlr The MIC trailer to which to apply the options
    */
-  void ApplyNecessaryOptions (LorawanMICTrailer &micTrlr);
+  void ApplyNecessaryOptions (LorawanMICTrailer& micTrlr);
+  
+  void ApplyNecessaryOptions (LorawanMICTrailer& micTrlr, bool isuplink, bool isLorawan_1_1, bool isAck, uint16_t fcnt, 
+                                                    uint32_t devaddr, uint32_t xFCntDwn, uint32_t FCntUp, uint8_t msgLen, uint8_t *msg, uint8_t SNwkSIntKey[16], 
+                                                    uint8_t FNwkSIntKey[16], uint8_t txch);
   
   /**
    * Set the message type to send when the Send method is called.

@@ -513,12 +513,60 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMacHeader& macHeader)
   macHeader.SetMajor (1);
 }
 
+/*  For usage only put values in for the parameters which you need for the tranmission type, send zero placeholders for unnecessary ones        */
 void
-EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMICTrailer& micTrlr)
+EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMICTrailer& micTrlr, bool isuplink, bool isLorawan_1_1, bool isAck, uint16_t fcnt, 
+                                            uint32_t devaddr, uint32_t xFCntDwn, uint32_t FCntUp, uint8_t msgLen, uint8_t *msg, uint8_t SNwkSIntKey[16], 
+                                            uint8_t FNwkSIntKey[16], uint8_t txch)
+{
+    uint8_t B0[16];
+    uint8_t B1[16];
+    uint16_t ConfFCnt;
+    uint32_t mic_temp;
+    
+    NS_LOG_FUNCTION_NOARGS ();
+    
+    if (isLorawan_1_1 && isAck)
+    {
+        ConfFCnt = fcnt;    /*  only value is of uint16_t so modding by 2^16 does nothing? maybe misunderstanding smth  */
+    }
+    else
+    {
+        ConfFCnt = 0x0000;
+    }
+    
+    if (!isuplink)
+    {
+        /*  downlink only needs B0  */
+        
+        micTrlr.GenerateB0DL (B0, ConfFCnt, devaddr, xFCntDwn, msgLen);
+        mic_temp = micTrlr.CalcMIC (msgLen, msg, B0, SNwkSIntKey);
+        micTrlr.SetMIC (mic_temp);
+    }
+    else
+    {
+        micTrlr.GenerateB0UL (B0, devaddr, FCntUp, msgLen);
+        
+        if (isLorawan_1_1)
+        {
+            micTrlr.GenerateB1UL (B1, ConfFCnt, m_dataRate, txch, devaddr, FCntUp, msgLen);
+            mic_temp = micTrlr.CalcMIC_1_1_UL (msgLen, msg, B0 ,B1, SNwkSIntKey, FNwkSIntKey);
+            micTrlr.SetMIC (mic_temp);
+        }
+        else
+        {
+            mic_temp = micTrlr.CalcMIC (msgLen, msg, B0, FNwkSIntKey);
+            micTrlr.SetMIC (mic_temp);
+        }
+    }
+}
+
+/*  placeholder func until all parameters are better organized for MIC calc     */
+void EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMICTrailer& micTrlr)
 {
     NS_LOG_FUNCTION_NOARGS ();
     
-    micTrlr.SetMIC(0x00000000); /*  placeholder */
+    micTrlr.SetMIC (0x00000000);
 }
 
 void
