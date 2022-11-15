@@ -293,9 +293,15 @@ main (int argc, char *argv[])
   NodeContainer networkServer;
   networkServer.Create (1);
 
+  // PointToPoint links between gateways and server
+  PointToPointHelper p2p;
+  p2p.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
+  p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
+  for (auto gw = gateways.Begin (); gw != gateways.End (); ++gw)
+    p2p.Install (networkServer.Get (0), *gw);
+
   // Create a NS for the network
   nsHelper.SetEndDevices (endDevices);
-  nsHelper.SetGateways (gateways);
   nsHelper.Install (networkServer);
 
   //Create a forwarder for each gateway

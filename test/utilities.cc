@@ -74,12 +74,20 @@ CreateGateways (int nGateways, MobilityHelper mobility, Ptr<LoraChannel> channel
 Ptr<Node>
 CreateNetworkServer (NodeContainer endDevices, NodeContainer gateways)
 {
-  // Create the NetworkServer
+  // Create the NetworkServer node
+  Ptr<Node> nsNode = CreateObject<Node> ();
+
+  // PointToPoint links between gateways and server
+  PointToPointHelper p2p;
+  p2p.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
+  p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
+  for (auto gw = gateways.Begin (); gw != gateways.End (); ++gw)
+    p2p.Install (nsNode, *gw);
+
+  // Install server application
   NetworkServerHelper networkServerHelper = NetworkServerHelper ();
   networkServerHelper.SetEndDevices (endDevices);
-  networkServerHelper.SetGateways (gateways);
-  Ptr<Node> nsNode = CreateObject<Node> ();
-  networkServerHelper.Install (nsNode);     // This connects NS and GWs
+  networkServerHelper.Install (nsNode);
 
   // Install a forwarder on the gateways
   ForwarderHelper forwarderHelper;
