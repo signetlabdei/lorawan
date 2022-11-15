@@ -4,32 +4,23 @@
 
 // ns3 imports
 #include "ns3/core-module.h"
-#include "ns3/network-module.h"
-#include "ns3/point-to-point-module.h"
-#include "ns3/mobility-helper.h"
-#include "ns3/okumura-hata-propagation-loss-model.h"
-#include "ns3/command-line.h"
-#include "ns3/config.h"
-#include "ns3/string.h"
 #include "ns3/log.h"
+#include "ns3/command-line.h"
+#include "ns3/okumura-hata-propagation-loss-model.h"
+#include "ns3/mobility-helper.h"
+#include "ns3/point-to-point-helper.h"
+#include "ns3/application-container.h"
+#include "ns3/propagation-delay-model.h"
 
 // lorawan imports
-#include "ns3/lora-helper.h"
-#include "ns3/lora-phy-helper.h"
-#include "ns3/lorawan-mac-helper.h"
-#include "ns3/network-server-helper.h"
-#include "ns3/forwarder-helper.h"
-#include "ns3/periodic-sender-helper.h"
-#include "ns3/urban-traffic-helper.h"
 #include "ns3/lora-channel.h"
-#include "ns3/lora-device-address-generator.h"
 #include "ns3/hex-grid-position-allocator.h"
 #include "ns3/range-position-allocator.h"
-#include "ns3/lora-interference-helper.h"
+#include "ns3/lora-helper.h"
+#include "ns3/network-server-helper.h"
+#include "ns3/forwarder-helper.h"
+#include "ns3/urban-traffic-helper.h"
 #include "utilities.cc"
-
-// cpp imports
-#include <unordered_map>
 
 using namespace ns3;
 using namespace lorawan;
@@ -180,11 +171,11 @@ main (int argc, char *argv[])
    *  Create Nodes  *
    ******************/
 
-  Ptr<Node> networkServer;
+  Ptr<Node> server;
   NodeContainer gateways;
   NodeContainer endDevices;
   {
-    networkServer = CreateObject<Node> ();
+    server = CreateObject<Node> ();
 
     int nGateways = 3 * gatewayRings * gatewayRings - 3 * gatewayRings + 1;
     gateways.Create (nGateways);
@@ -199,11 +190,22 @@ main (int argc, char *argv[])
    *  Create Net Devices  *
    ************************/
 
-  LoraHelper helper;
+  LoraHelper loraHelper;
   LorawanMacHelper macHelper;
   {
-    // General settings
-    helper.EnablePacketTracking ();
+    // PointToPoint links between gateways and server
+    PointToPointHelper p2p;
+    p2p.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
+    p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
+    for (auto gw = gateways.Begin (); gw != gateways.End (); ++gw)
+      p2p.Install (server, *gw);
+
+    /**
+     *  LoRa/LoRaWAN layers 
+     */
+
+    // General LoRa settings
+    loraHelper.EnablePacketTracking ();
 
     // Create a LoraDeviceAddressGenerator
     uint8_t nwkId = 54;
@@ -222,12 +224,12 @@ main (int argc, char *argv[])
     // Create the LoraNetDevices of the gateways
     phyHelper.SetDeviceType (LoraPhyHelper::GW);
     macHelper.SetDeviceType (LorawanMacHelper::GW);
-    helper.Install (phyHelper, macHelper, gateways);
+    loraHelper.Install (phyHelper, macHelper, gateways);
 
     // Create the LoraNetDevices of the end devices
     phyHelper.SetDeviceType (LoraPhyHelper::ED);
     macHelper.SetDeviceType (LorawanMacHelper::ED_A);
-    helper.Install (phyHelper, macHelper, endDevices);
+    loraHelper.Install (phyHelper, macHelper, endDevices);
   }
 
   /*************************
@@ -240,29 +242,19 @@ main (int argc, char *argv[])
     clusters = (clusterStr == ".") ? cluster_t ({{100.0, target}}) : ParseClusterInfo (clusterStr);
 
     // Install the NetworkServer application on the network server
-    NetworkServerHelper networkServerHelper;
-    networkServerHelper.SetGateways (gateways);
-    networkServerHelper.SetEndDevices (endDevices); // Registering devices (saves mac layer)
-    networkServerHelper.EnableAdr (adrEnabled);
-    networkServerHelper.EnableCongestionControl (congest);
-    networkServerHelper.AssignClusters (clusters); // Assignes one freq. by default
-    networkServerHelper.Install (networkServer);
+    NetworkServerHelper serverHelper;
+    serverHelper.SetEndDevices (endDevices); // Registering devices (saves mac layer)
+    serverHelper.EnableAdr (adrEnabled);
+    serverHelper.EnableCongestionControl (congest);
+    serverHelper.AssignClusters (clusters); // Assignes one freq. by default
+    serverHelper.Install (server);
 
     // Install the Forwarder application on the gateways
-    // !!!! THIS MUST REMAIN AFTER SERVER INSTALL.
-    // ServerHelper.Install creates the p2p device needed by the app
     ForwarderHelper forwarderHelper;
     forwarderHelper.Install (gateways);
 
     // Install applications in EDs
-    PeriodicSenderHelper appHelper;
-    appHelper.SetPeriodGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
-        "Mean", DoubleValue (600.0), "Variance", DoubleValue (300.0), "Bound",
-        DoubleValue (600.0)));
-    appHelper.SetPacketSizeGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
-        "Mean", DoubleValue (18), "Variance", DoubleValue (10), "Bound", DoubleValue (18)));
-    //UrbanTrafficHelper appHelper = UrbanTrafficHelper ();
-    
+    UrbanTrafficHelper appHelper = UrbanTrafficHelper ();
     ApplicationContainer apps = appHelper.Install (endDevices);
     /*   int j = 0; // Late (dis)activation of 100 devices
   for (ApplicationContainer::Iterator i = apps.Begin (); i != apps.End (); ++i)
@@ -292,19 +284,20 @@ main (int argc, char *argv[])
     {
       // Activate printing of ED MAC parameters
       Time statusSamplePeriod = Minutes (30);
-      helper.EnablePeriodicSFStatusPrinting (endDevices, gateways, "sfData.txt",
-                                             statusSamplePeriod);
-      helper.EnablePeriodicGlobalPerformancePrinting ("globalPerformance.txt", statusSamplePeriod);
+      loraHelper.EnablePeriodicSFStatusPrinting (endDevices, gateways, "sfData.txt",
+                                                 statusSamplePeriod);
+      loraHelper.EnablePeriodicGlobalPerformancePrinting ("globalPerformance.txt",
+                                                          statusSamplePeriod);
     }
 
   // Limit memory usage
-  LoraPacketTracker &tracker = helper.GetPacketTracker ();
+  LoraPacketTracker &tracker = loraHelper.GetPacketTracker ();
   tracker.EnableOldPacketsCleanup (Hours (1));
 
 #ifdef NS3_LOG_ENABLE
   // Print current configuration
   PrintConfigSetup (nDevices, range, gatewayRings, devPerSF);
-  helper.EnableSimulationTimePrinting (Hours (2));
+  loraHelper.EnableSimulationTimePrinting (Hours (2));
 #endif // NS3_LOG_ENABLE
 
   // Start simulation
@@ -312,9 +305,8 @@ main (int argc, char *argv[])
   Simulator::Stop (duration);
   Simulator::Run ();
 
-  Time trackFinalOutcomeFrom = duration - Hours (10);
 #ifdef NS3_LOG_ENABLE
-  std::cout << tracker.PrintSimulationStatistics (trackFinalOutcomeFrom);
+  std::cout << tracker.PrintSimulationStatistics (duration - Hours (24));
 #endif // NS3_LOG_ENABLE
 
   Simulator::Destroy ();
