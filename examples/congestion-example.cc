@@ -45,12 +45,10 @@ main (int argc, char *argv[])
   bool model = false;
   int beta = 1;
   bool congest = false;
-  double warmup = 2;
+  double warmup = 0;
   double sampling = 2;
-  double variance = 0.01;
-  double tolerance = 0.001;
   double target = 0.95;
-  std::string clusterStr = ".";
+  std::string clusterStr = "None";
   bool file = false;
 
   /* Expose parameters to command line */
@@ -67,12 +65,17 @@ main (int argc, char *argv[])
     cmd.AddValue ("beta", "[static ctrl] Scaling factor of the static model output", beta);
     cmd.AddValue ("congest", "Use congestion control", congest);
     cmd.AddValue ("warmup",
-                  "[cong ctrl] Starting delay of the congestion control algorithm for "
-                  "initial network warm-up (e.g. ADR) and RSSI measurements collection",
+                  "Starting delay of the congestion control algorithm for "
+                  "initial network warm-up (e.g. ADR) and RSSI measurements collection "
+                  "(ns3::CongestionControlComponent::StartTime)",
                   warmup);
-    cmd.AddValue ("sampling", "[cong ctrl] Duration (hours) of the PDR sampling fase", sampling);
-    cmd.AddValue ("variance", "[cong ctrl] Acceptable gap around the target PDR value", variance);
-    cmd.AddValue ("tolerance", "[cong ctrl] Tolerance step to declare value stagnation", tolerance);
+    cmd.AddValue ("sampling",
+                  "Duration (hours) of the PDR sampling fase "
+                  "(ns3::CongestionControlComponent::SamplingDuration)",
+                  sampling);
+    cmd.AddValue ("variance", "ns3::CongestionControlComponent::AcceptedPDRVariance");
+    cmd.AddValue ("tolerance", "ns3::CongestionControlComponent::ValueStagnationTolerance");
+    cmd.AddValue ("cfgfile", "ns3::CongestionControlComponent::LoadConfigFromFile");
     cmd.AddValue ("target", "Central PDR value targeted (single cluster)", target);
     cmd.AddValue ("clusters", "Clusters descriptor: \"{{share,pdr},...\"}", clusterStr);
     cmd.AddValue ("file", "Output the metrics of the simulation in a file", file);
@@ -82,22 +85,13 @@ main (int argc, char *argv[])
 
   /* Apply global configurations */
   {
-    Config::SetDefault ("ns3::EndDeviceLorawanMac::DRControl", BooleanValue (true)); //!< ADR bit
-    Config::SetDefault ("ns3::EndDeviceLorawanMac::MType", StringValue ("Unconfirmed"));
-    Config::SetDefault ("ns3::EndDeviceLorawanMac::MaxTransmissions", IntegerValue (1));
-    Config::SetDefault ("ns3::AdrComponent::MultipleGwCombiningMethod", StringValue ("max"));
-    Config::SetDefault ("ns3::AdrComponent::MultiplePacketsCombiningMethod", StringValue ("avg"));
-    Config::SetDefault ("ns3::AdrComponent::HistoryRange", IntegerValue (20));
-    Config::SetDefault ("ns3::AdrComponent::ChangeTransmissionPower", BooleanValue (true));
+    Config::SetDefault ("ns3::EndDeviceLorawanMac::DRControl",
+                        BooleanValue (adrEnabled)); //!< ADR bit
     Config::SetDefault ("ns3::AdrComponent::SNRDeviceMargin",
                         DoubleValue (10 * log10 (-1 / log (0.98))));
     Config::SetDefault ("ns3::CongestionControlComponent::StartTime", TimeValue (Hours (warmup)));
     Config::SetDefault ("ns3::CongestionControlComponent::SamplingDuration",
                         TimeValue (Hours (sampling)));
-    Config::SetDefault ("ns3::CongestionControlComponent::AcceptedPDRVariance",
-                        DoubleValue (variance));
-    Config::SetDefault ("ns3::CongestionControlComponent::ValueStagnationTolerance",
-                        DoubleValue (tolerance));
   }
 
   /* Logging options */
@@ -239,7 +233,8 @@ main (int argc, char *argv[])
   cluster_t clusters;
   {
     // Set clusters
-    clusters = (clusterStr == ".") ? cluster_t ({{100.0, target}}) : ParseClusterInfo (clusterStr);
+    clusters =
+        (clusterStr == "None") ? cluster_t ({{100.0, target}}) : ParseClusterInfo (clusterStr);
 
     // Install the NetworkServer application on the network server
     NetworkServerHelper serverHelper;

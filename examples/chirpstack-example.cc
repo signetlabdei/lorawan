@@ -52,7 +52,6 @@ main (int argc, char *argv[])
   double range = 2540.25; // Max range for downlink (!) coverage probability > 0.98 (with okumura)
   int nDevices = 1;
   std::string sir = "GOURSAUD";
-  bool adrEnabled = false;
   bool initializeSF = true;
   bool file = false; // Warning: will produce a file for each gateway
 
@@ -65,7 +64,7 @@ main (int argc, char *argv[])
     cmd.AddValue ("devices", "Number of end devices to include in the simulation", nDevices);
     cmd.AddValue ("sir", "Signal to Interference Ratio matrix used for interference", sir);
     cmd.AddValue ("initSF", "Whether to initialize the SFs", initializeSF);
-    cmd.AddValue ("adr", "Whether to enable online ADR", adrEnabled);
+    cmd.AddValue ("adr", "ns3::EndDeviceLorawanMac::DRControl");
     cmd.AddValue ("file", "Whether to enable .pcap tracing on gateways", file);
     cmd.Parse (argc, argv);
   }
@@ -75,12 +74,6 @@ main (int argc, char *argv[])
   GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
   GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true));
   Config::SetDefault ("ns3::EndDeviceLorawanMac::EnableRealMIC", BooleanValue (true));
-  {
-    Config::SetDefault ("ns3::EndDeviceLorawanMac::DRControl",
-                        BooleanValue (adrEnabled)); //!< ADR bit
-    Config::SetDefault ("ns3::EndDeviceLorawanMac::MType", StringValue ("Unconfirmed"));
-    Config::SetDefault ("ns3::EndDeviceLorawanMac::MaxTransmissions", IntegerValue (1));
-  }
 
   /* Logging options */
   {
