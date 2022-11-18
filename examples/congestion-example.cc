@@ -65,8 +65,8 @@ main (int argc, char *argv[])
     cmd.AddValue ("beta", "[static ctrl] Scaling factor of the static model output", beta);
     cmd.AddValue ("congest", "Use congestion control", congest);
     cmd.AddValue ("warmup",
-                  "Starting delay of the congestion control algorithm for "
-                  "initial network warm-up (e.g. ADR) and RSSI measurements collection "
+                  "Starting delay of the congestion control algorithm for initial network "
+                  "warm-up (e.g. ADR) and RSSI measurements collection "
                   "(ns3::CongestionControlComponent::StartTime)",
                   warmup);
     cmd.AddValue ("sampling",
@@ -75,7 +75,9 @@ main (int argc, char *argv[])
                   sampling);
     cmd.AddValue ("variance", "ns3::CongestionControlComponent::AcceptedPDRVariance");
     cmd.AddValue ("tolerance", "ns3::CongestionControlComponent::ValueStagnationTolerance");
-    cmd.AddValue ("cfgfile", "ns3::CongestionControlComponent::LoadConfigFromFile");
+    cmd.AddValue ("load", "ns3::CongestionControlComponent::InputConfigFile");
+    cmd.AddValue ("save", "ns3::CongestionControlComponent::OutputConfigFile");
+    cmd.AddValue ("fast", "ns3::CongestionControlComponent::FastConverge");
     cmd.AddValue ("target", "Central PDR value targeted (single cluster)", target);
     cmd.AddValue ("clusters", "Clusters descriptor: \"{{share,pdr},...\"}", clusterStr);
     cmd.AddValue ("file", "Output the metrics of the simulation in a file", file);
@@ -238,7 +240,7 @@ main (int argc, char *argv[])
 
     // Install the NetworkServer application on the network server
     NetworkServerHelper serverHelper;
-    serverHelper.SetEndDevices (endDevices); // Registering devices (saves mac layer)
+    serverHelper.SetEndDevices (endDevices); // Register devices (saves mac layer)
     serverHelper.EnableAdr (adrEnabled);
     serverHelper.EnableCongestionControl (congest);
     serverHelper.AssignClusters (clusters); // Assignes one freq. by default
@@ -285,24 +287,23 @@ main (int argc, char *argv[])
                                                           statusSamplePeriod);
     }
 
-  // Limit memory usage
   LoraPacketTracker &tracker = loraHelper.GetPacketTracker ();
-  tracker.EnableOldPacketsCleanup (Hours (1));
-
 #ifdef NS3_LOG_ENABLE
   // Print current configuration
   PrintConfigSetup (nDevices, range, gatewayRings, devPerSF);
   loraHelper.EnableSimulationTimePrinting (Hours (2));
+#else
+  // Limit memory usage
+  tracker.EnableOldPacketsCleanup (Hours (1));
 #endif // NS3_LOG_ENABLE
 
   // Start simulation
-  Time duration = Hours (1) * periods;
-  Simulator::Stop (duration);
+  Simulator::Stop (Hours (periods));
   Simulator::Run ();
 
 #ifdef NS3_LOG_ENABLE
-  std::cout << tracker.PrintSimulationStatistics (duration - Hours (24));
-#endif // NS3_LOG_ENABLE
+  std::cout << tracker.PrintSimulationStatistics (Simulator::Now () - Hours (24));
+#endif
 
   Simulator::Destroy ();
 

@@ -135,15 +135,25 @@ private:
 
   void StartReconfig (Address bestGw, uint8_t cluster);
 
+  bool ProduceConfigScheme (dataratestatus_t &group, double target);
+
+  bool BisectionLogic (offtraff_t &ot, double pdr, double target);
+
+  void TrimConfigs (const devices_t &devs, configs_t &configs, disabled_t &disabled);
+
+  void InitializeData (Ptr<NetworkStatus> status);
+
   void AddNewDevice (uint32_t devaddr);
 
   void RemoveDisconnected (dataratestatus_t &group);
 
-  bool ProduceConfigScheme (dataratestatus_t &group, double target);
-
-  void InitializeData (Ptr<NetworkStatus> status);
-
   std::string PrintCongestion (Address bestGw, uint8_t cluster);
+
+  void LoadConfigFromFile (Ptr<NetworkStatus> status);
+
+  void SaveConfigToFile (void);
+
+  void FastForwardConfig (Ptr<NetworkStatus> status, configs_t &configs);
 
   // To track network congestion
   networkstatus_t m_congestionStatus;
@@ -181,6 +191,13 @@ private:
 
   // Constants
   static const int N_SF;
+
+  // File path to load existing offered traffic configuration
+  std::string m_inputFile;
+  // File path to save updated offered traffic configurations
+  std::string m_outputFile;
+  // Whether to fast track convergence (skipping having to wait for uplink)
+  bool m_fast;
 };
 } // namespace lorawan
 } // namespace ns3
