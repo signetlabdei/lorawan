@@ -49,6 +49,7 @@ main (int argc, char *argv[])
   double sampling = 2;
   double target = 0.95;
   std::string clusterStr = "None";
+  bool fast = false;
   bool file = false;
 
   /* Expose parameters to command line */
@@ -77,7 +78,10 @@ main (int argc, char *argv[])
     cmd.AddValue ("tolerance", "ns3::CongestionControlComponent::ValueStagnationTolerance");
     cmd.AddValue ("load", "ns3::CongestionControlComponent::InputConfigFile");
     cmd.AddValue ("save", "ns3::CongestionControlComponent::OutputConfigFile");
-    cmd.AddValue ("fast", "ns3::CongestionControlComponent::FastConverge");
+    cmd.AddValue ("fast",
+                  "Skip sending reconfigurations to devices "
+                  "(ns3::CongestionControlComponent::FastConverge)",
+                  fast);
     cmd.AddValue ("target", "Central PDR value targeted (single cluster)", target);
     cmd.AddValue ("clusters", "Clusters descriptor: \"{{share,pdr},...\"}", clusterStr);
     cmd.AddValue ("file", "Output the metrics of the simulation in a file", file);
@@ -94,6 +98,7 @@ main (int argc, char *argv[])
     Config::SetDefault ("ns3::CongestionControlComponent::StartTime", TimeValue (Hours (warmup)));
     Config::SetDefault ("ns3::CongestionControlComponent::SamplingDuration",
                         TimeValue (Hours (sampling)));
+    Config::SetDefault ("ns3::CongestionControlComponent::FastConverge", BooleanValue (fast));
   }
 
   /* Logging options */

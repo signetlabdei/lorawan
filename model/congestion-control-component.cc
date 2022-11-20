@@ -119,10 +119,12 @@ CongestionControlComponent::OnReceivedPacket (Ptr<const Packet> packet, Ptr<EndD
 
   // Update frame counter and most recent frame reception
   uint16_t currFCnt = fhead.GetFCnt ();
-  NS_ASSERT_MSG (
-      !(currFCnt < devinfo.fCnt),
-      "Frame counter can't decrease, as re-connections to the network are not implemented.");
   int prevFCnt = devinfo.fCnt; // Save previous FCnt for PDR computations later
+  if (prevFCnt > currFCnt + 10000) // uint16_t has overflowed
+    prevFCnt -= 65536;
+  NS_ASSERT_MSG (prevFCnt <= currFCnt, "Frame counter can't decrease, "
+                                       "as re-connections to the network "
+                                       "are not implemented.");
   // If packet is a duplicate, exit
   if (currFCnt == prevFCnt)
     return;
@@ -542,6 +544,7 @@ CongestionControlComponent::SaveConfigToFile (void)
           for (auto const &d : gw.second[i][j].devs)
             maxtot += d.second;
           const offtraff_t &ot = gw.second[i][j].ot;
+          // Config template: | gwID | clusterID | drID | started | currbest | high | low | max |
           outputFile << std::scientific << gw.first << " " << i << " " << j << " " << ot.started
                      << " " << ot.currbest << " " << ot.high << " " << ot.low << " " << maxtot
                      << std::endl;
