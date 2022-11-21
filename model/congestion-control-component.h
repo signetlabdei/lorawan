@@ -143,9 +143,11 @@ private:
 
   void InitializeData (Ptr<NetworkStatus> status);
 
+  void LookForChanges (Ptr<NetworkStatus> status, Address bestGw, uint8_t cluster);
+
   void AddNewDevice (uint32_t devaddr);
 
-  void RemoveDisconnected (dataratestatus_t &group);
+  void RemoveDisconnected (uint32_t devaddr);
 
   std::string PrintCongestion (Address bestGw, uint8_t cluster);
 
@@ -159,8 +161,8 @@ private:
   networkstatus_t m_congestionStatus;
   // To track current status of devices
   devinfomap_t m_devStatus;
-  // To track last frame reception in case of disconnections
-  lastframemap_t m_lastFrame;
+  // To track unactive registerd devices
+  disabledmap_t m_unactive;
 
   // To track ongoing duty-cycle configuration
   /*LoraDeviceAddress::Get() is hashable*/

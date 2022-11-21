@@ -20,6 +20,7 @@
 #include "ns3/network-server-helper.h"
 #include "ns3/forwarder-helper.h"
 #include "ns3/urban-traffic-helper.h"
+#include "ns3/periodic-sender-helper.h"
 #include "utilities.cc"
 
 using namespace ns3;
@@ -42,14 +43,19 @@ main (int argc, char *argv[])
   std::string sir = "GOURSAUD";
   bool adrEnabled = false;
   bool initializeSF = true;
+
+  double target = 0.95;
+  std::string clusterStr = "None";
   bool model = false;
   int beta = 1;
   bool congest = false;
   double warmup = 0;
   double sampling = 2;
-  double target = 0.95;
-  std::string clusterStr = "None";
   bool fast = false;
+  double changeAfter = 0;
+  int newdevs = 0;
+  int killdevs = 0;
+
   bool file = false;
 
   /* Expose parameters to command line */
@@ -62,31 +68,48 @@ main (int argc, char *argv[])
     cmd.AddValue ("sir", "Signal to Interference Ratio matrix used for interference", sir);
     cmd.AddValue ("initSF", "Whether to initialize the SFs", initializeSF);
     cmd.AddValue ("adr", "Whether to enable online ADR", adrEnabled);
+    // Congestion-related
+    cmd.AddValue ("target", "Central PDR value targeted (single cluster)", target);
+    cmd.AddValue ("clusters",
+                  "Clusters descriptor: \"{{share,pdr},...\"} (overrides 'target' param)",
+                  clusterStr);
     cmd.AddValue ("model", "Use static duty-cycle config with capacity model", model);
-    cmd.AddValue ("beta", "[static ctrl] Scaling factor of the static model output", beta);
+    cmd.AddValue ("beta", "[static ctrl] Scaling factor of the static model output",
+                  beta); // Deprecated
     cmd.AddValue ("congest", "Use congestion control", congest);
     cmd.AddValue ("warmup",
-                  "Starting delay of the congestion control algorithm for initial network "
+                  "Starting delay (hours) of the congestion control algorithm for initial network "
                   "warm-up (e.g. ADR) and RSSI measurements collection "
                   "(ns3::CongestionControlComponent::StartTime)",
-                  warmup);
+                  warmup); // Deprecated
     cmd.AddValue ("sampling",
                   "Duration (hours) of the PDR sampling fase "
                   "(ns3::CongestionControlComponent::SamplingDuration)",
                   sampling);
     cmd.AddValue ("variance", "ns3::CongestionControlComponent::AcceptedPDRVariance");
     cmd.AddValue ("tolerance", "ns3::CongestionControlComponent::ValueStagnationTolerance");
-    cmd.AddValue ("load", "ns3::CongestionControlComponent::InputConfigFile");
-    cmd.AddValue ("save", "ns3::CongestionControlComponent::OutputConfigFile");
     cmd.AddValue ("fast",
-                  "Skip sending reconfigurations to devices "
+                  "Fast-forward sending reconfigurations phase until changes among devices"
                   "(ns3::CongestionControlComponent::FastConverge)",
                   fast);
-    cmd.AddValue ("target", "Central PDR value targeted (single cluster)", target);
-    cmd.AddValue ("clusters", "Clusters descriptor: \"{{share,pdr},...\"}", clusterStr);
+    cmd.AddValue ("change", "Time (hours) after which specified devices are (dis)activated",
+                  changeAfter);
+    cmd.AddValue ("add",
+                  "Number of devices (from total) that will be activated after time set with "
+                  "'changement' parameter",
+                  newdevs);
+    cmd.AddValue ("remove",
+                  "Number of devices (from total) that will be disabled after time set with "
+                  "'changement' parameter",
+                  killdevs);
+    cmd.AddValue ("load", "ns3::CongestionControlComponent::InputConfigFile");
+    cmd.AddValue ("save", "ns3::CongestionControlComponent::OutputConfigFile");
     cmd.AddValue ("file", "Output the metrics of the simulation in a file", file);
     cmd.Parse (argc, argv);
-    NS_ASSERT (!(congest & model));
+    NS_ASSERT (!(congest and model));
+    NS_ASSERT ((periods >= 0) and (gatewayRings > 0) and (nDevices >= 0) and
+               (warmup >= 0) & (sampling >= 0) and (changeAfter >= 0) and (newdevs >= 0) and
+               (killdevs >= 0));
   }
 
   /* Apply global configurations */
@@ -98,13 +121,14 @@ main (int argc, char *argv[])
     Config::SetDefault ("ns3::CongestionControlComponent::StartTime", TimeValue (Hours (warmup)));
     Config::SetDefault ("ns3::CongestionControlComponent::SamplingDuration",
                         TimeValue (Hours (sampling)));
+    // Due to SEM, we cannot pass bools by attribute (--fast would not work)
     Config::SetDefault ("ns3::CongestionControlComponent::FastConverge", BooleanValue (fast));
   }
 
   /* Logging options */
   {
     //!> Requirement: build ns3 with debug option
-    LogComponentEnable ("CongestionControlComponent", LOG_LEVEL_DEBUG);
+    LogComponentEnable ("CongestionControlComponent", LOG_LEVEL_INFO);
     LogComponentEnable ("TrafficControlUtils", LOG_LEVEL_DEBUG);
     LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_WARN);
     //LogComponentEnable ("UrbanTrafficHelper", LOG_LEVEL_DEBUG);
@@ -240,8 +264,9 @@ main (int argc, char *argv[])
   cluster_t clusters;
   {
     // Set clusters
-    clusters =
-        (clusterStr == "None") ? cluster_t ({{100.0, target}}) : ParseClusterInfo (clusterStr);
+    clusters = (clusterStr == "None")
+                   ? ParseClusterInfo ("{{100.0," + std::to_string (target) + "}}")
+                   : ParseClusterInfo (clusterStr);
 
     // Install the NetworkServer application on the network server
     NetworkServerHelper serverHelper;
@@ -256,17 +281,21 @@ main (int argc, char *argv[])
     forwarderHelper.Install (gateways);
 
     // Install applications in EDs
-    UrbanTrafficHelper appHelper = UrbanTrafficHelper ();
+    PeriodicSenderHelper appHelper;
+    appHelper.SetPeriodGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
+        "Mean", DoubleValue (600.0), "Variance", DoubleValue (300.0), "Bound",
+        DoubleValue (600.0)));
+    appHelper.SetPacketSizeGenerator (CreateObjectWithAttributes<NormalRandomVariable> (
+        "Mean", DoubleValue (18), "Variance", DoubleValue (10), "Bound", DoubleValue (18)));
+    //UrbanTrafficHelper appHelper = UrbanTrafficHelper ();
     ApplicationContainer apps = appHelper.Install (endDevices);
-    /*   int j = 0; // Late (dis)activation of 100 devices
-  for (ApplicationContainer::Iterator i = apps.Begin (); i != apps.End (); ++i)
-    {
-      if (j >= 50)
-        break;
-      //(*i)->SetStopTime (Days (4));
-      (*i)->SetStartTime (Days (5));
-      ++j;
-    } */
+
+    // Late (dis)activation of devices
+    auto i = apps.Begin ();
+    for (; newdevs > 0 and i != apps.End (); ++i, --newdevs)
+      (*i)->SetStartTime (Hours (changeAfter));
+    for (; killdevs > 0 and i != apps.End (); ++i, --killdevs)
+      (*i)->SetStopTime (Hours (changeAfter));
   }
 
   /***************************
