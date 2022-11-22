@@ -316,7 +316,7 @@ CongestionControlComponent::ProduceConfigScheme (dataratestatus_t &group, double
 {
   if (group.devs.empty ())
     {
-      NS_LOG_INFO ("No devices in this group");
+      NS_LOG_DEBUG ("No devices in this group");
       return false;
     }
 
@@ -344,17 +344,17 @@ CongestionControlComponent::BisectionLogic (offtraff_t &ot, double pdr, double t
   // Early returns:
   if (!ot.started and !congested) //! Nothing to do
     {
-      NS_LOG_INFO ("Not needed (not started and not congested) in this group");
+      NS_LOG_DEBUG ("Not needed (not started and not congested) in this group");
       return false;
     }
   if (abs (target - pdr) < m_epsilon) //! We are in acceptable range
     {
-      NS_LOG_INFO ("Reached the PDR objective in this group");
+      NS_LOG_DEBUG ("Reached the PDR objective in this group");
       return false;
     }
   if ((ot.high - ot.low) / 2 < m_tolerance and !ot.changed) //! Capacity values are stagnating
     {
-      NS_LOG_INFO ("Capacity values are stagnating in this group and no changes were detected");
+      NS_LOG_DEBUG ("Capacity values are stagnating in this group and no changes were detected");
       return false;
     }
   // We are missing a failsafe in case pdr cannot be increased further due to low coverage
