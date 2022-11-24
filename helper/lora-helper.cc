@@ -238,8 +238,8 @@ LoraHelper::DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateway
       ot = std::min (ot, maxot);
       devCount_t &count = devPktCount[object->GetId ()];
       outputFile << currentTime.GetSeconds () << " " << object->GetId () << " " << pos.x << " "
-                 << pos.y << " " << dr << " " << unsigned (txPower) << " " << count.sent << " "
-                 << count.received << " " << maxot << " " << ot << " "
+                 << pos.y << " " << pos.z << " " << dr << " " << unsigned (txPower) << " "
+                 << count.sent << " " << count.received << " " << maxot << " " << ot << " "
                  << unsigned (mac->GetCluster ()) << std::endl;
     }
   m_lastDeviceStatusUpdate = Simulator::Now ();
@@ -408,8 +408,8 @@ LoraHelper::DoPrintSFStatus (NodeContainer endDevices, NodeContainer gateways, s
   for (auto const &cl : clusmap)
     for (auto const &sf : cl.second)
       outputFile << currentTime.GetSeconds () << " " << cl.first << " " << sf.first << " "
-                 << sf.second.sent << " " << sf.second.received << " "
-                 << sf.second.totMaxOT << " " << sf.second.totAggDC << std::endl;
+                 << sf.second.sent << " " << sf.second.received << " " << sf.second.totMaxOT << " "
+                 << sf.second.totAggDC << std::endl;
 
   m_lastSFStatusUpdate = Simulator::Now ();
   outputFile.close ();
@@ -435,7 +435,8 @@ LoraHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool prom
     }
 
   auto phy = device->GetPhy ();
-  NS_ABORT_MSG_IF (phy == 0, "LoRaHelper::EnablePcapInternal(): Phy layer in LoraNetDevice must be set");
+  NS_ABORT_MSG_IF (phy == 0,
+                   "LoRaHelper::EnablePcapInternal(): Phy layer in LoraNetDevice must be set");
 
   PcapHelper pcapHelper;
 
@@ -450,18 +451,18 @@ LoraHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool prom
     }
 
   auto file = pcapHelper.CreateFile (filename, std::ios::out, PcapHelper::DLT_LORATAP);
-  phy->TraceConnectWithoutContext ("SnifferRx", MakeBoundCallback (&LoraHelper::PcapSniffRxEvent, file));
-  phy->TraceConnectWithoutContext ("SnifferTx", MakeBoundCallback (&LoraHelper::PcapSniffTxEvent, file));
+  phy->TraceConnectWithoutContext ("SnifferRx",
+                                   MakeBoundCallback (&LoraHelper::PcapSniffRxEvent, file));
+  phy->TraceConnectWithoutContext ("SnifferTx",
+                                   MakeBoundCallback (&LoraHelper::PcapSniffTxEvent, file));
 }
 
 void
-LoraHelper::PcapSniffRxEvent (
-  Ptr<PcapFileWrapper>  file,
-  Ptr<const Packet>     packet)
+LoraHelper::PcapSniffRxEvent (Ptr<PcapFileWrapper> file, Ptr<const Packet> packet)
 {
   Ptr<Packet> p = packet->Copy ();
   LoraTag tag;
-  p -> RemovePacketTag (tag);
+  p->RemovePacketTag (tag);
   LoratapHeader header;
   header.Fill (tag);
   p->AddHeader (header);
@@ -469,9 +470,7 @@ LoraHelper::PcapSniffRxEvent (
 }
 
 void
-LoraHelper::PcapSniffTxEvent (
-  Ptr<PcapFileWrapper>  file,
-  Ptr<const Packet>     packet)
+LoraHelper::PcapSniffTxEvent (Ptr<PcapFileWrapper> file, Ptr<const Packet> packet)
 {
   Ptr<Packet> p = packet->Copy ();
   LoraTag tag;
