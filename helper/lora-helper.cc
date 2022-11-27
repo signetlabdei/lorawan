@@ -223,6 +223,9 @@ LoraHelper::DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateway
       int dr = int (mac->GetDataRate ());
       double txPower = mac->GetTransmissionPower ();
       Vector pos = position->GetPosition ();
+      double gwdist = std::numeric_limits<double>::max ();
+      for (auto gw = gateways.Begin (); gw != gateways.End (); ++gw)
+        gwdist = std::min (gwdist, (*gw)->GetObject<MobilityModel> ()->GetDistanceFrom (position));
       // Add: #sent, #received, max-offered-traffic, duty-cycle
       Ptr<LoraApplication> app = object->GetApplication (0)->GetObject<LoraApplication> ();
       uint8_t size = app->GetPacketSize ();
@@ -238,8 +241,8 @@ LoraHelper::DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateway
       ot = std::min (ot, maxot);
       devCount_t &count = devPktCount[object->GetId ()];
       outputFile << currentTime.GetSeconds () << " " << object->GetId () << " " << pos.x << " "
-                 << pos.y << " " << pos.z << " " << dr << " " << unsigned (txPower) << " "
-                 << count.sent << " " << count.received << " " << maxot << " " << ot << " "
+                 << pos.y << " " << pos.z << " " << gwdist << " " << dr << " " << unsigned (txPower)
+                 << " " << count.sent << " " << count.received << " " << maxot << " " << ot << " "
                  << unsigned (mac->GetCluster ()) << std::endl;
     }
   m_lastDeviceStatusUpdate = Simulator::Now ();
