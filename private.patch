@@ -1,0 +1,3790 @@
+
+diff --git a/helper/lora-helper.cc b/helper/lora-helper.cc
+index 2f7b872..2e1fdf3 100644
+--- a/helper/lora-helper.cc
++++ b/helper/lora-helper.cc
+@@ -21,6 +21,7 @@
+ #include "ns3/lora-helper.h"
+ #include "ns3/log.h"
+ #include "ns3/loratap-header.h"
++#include "ns3/lora-application.h"
+ 
+ #include <fstream>
+ 
+@@ -29,77 +30,69 @@ namespace lorawan {
+ 
+ NS_LOG_COMPONENT_DEFINE ("LoraHelper");
+ 
+-  LoraHelper::LoraHelper () :
+-    m_lastPhyPerformanceUpdate (Seconds (0)),
+-    m_lastGlobalPerformanceUpdate (Seconds (0))
+-  {
+-  }
++LoraHelper::LoraHelper ()
++    : m_lastPhyPerformanceUpdate (Seconds (0)),
++      m_lastGlobalPerformanceUpdate (Seconds (0)),
++      m_lastDeviceStatusUpdate (Seconds (0)),
++      m_lastSFStatusUpdate (Seconds (0))
++{
++}
+ 
+-  LoraHelper::~LoraHelper ()
+-  {
+-  }
++LoraHelper::~LoraHelper ()
++{
++}
+ 
+-  NetDeviceContainer
+-  LoraHelper::Install ( const LoraPhyHelper &phyHelper,
+-                        const LorawanMacHelper &macHelper,
+-                        NodeContainer c) const
+-  {
+-    NS_LOG_FUNCTION_NOARGS ();
+-
+-    NetDeviceContainer devices;
+-
+-    // Go over the various nodes in which to install the NetDevice
+-    for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
+-      {
+-        Ptr<Node> node = *i;
+-
+-        // Create the LoraNetDevice
+-        Ptr<LoraNetDevice> device = CreateObject<LoraNetDevice> ();
+-
+-        // Create the PHY
+-        Ptr<LoraPhy> phy = phyHelper.Create (node, device);
+-        NS_ASSERT (phy != 0);
+-        device->SetPhy (phy);
+-        NS_LOG_DEBUG ("Done creating the PHY");
+-
+-        // Connect Trace Sources if necessary
+-        if (m_packetTracker)
+-          {
+-            if (phyHelper.GetDeviceType () ==
+-                TypeId::LookupByName ("ns3::SimpleEndDeviceLoraPhy"))
+-              {
+-                phy->TraceConnectWithoutContext ("StartSending",
+-                                                 MakeCallback
+-                                                 (&LoraPacketTracker::TransmissionCallback,
+-                                                  m_packetTracker));
+-              }
+-            else if (phyHelper.GetDeviceType () ==
+-                     TypeId::LookupByName ("ns3::SimpleGatewayLoraPhy"))
++NetDeviceContainer
++LoraHelper::Install (const LoraPhyHelper &phyHelper, const LorawanMacHelper &macHelper,
++                     NodeContainer c) const
++{
++  NS_LOG_FUNCTION_NOARGS ();
++
++  NetDeviceContainer devices;
++
++  // Go over the various nodes in which to install the NetDevice
++  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
++    {
++      Ptr<Node> node = *i;
++
++      // Create the LoraNetDevice
++      Ptr<LoraNetDevice> device = CreateObject<LoraNetDevice> ();
++
++      // Create the PHY
++      Ptr<LoraPhy> phy = phyHelper.Create (node, device);
++      NS_ASSERT (phy != 0);
++      device->SetPhy (phy);
++      NS_LOG_DEBUG ("Done creating the PHY");
++
++      // Connect Trace Sources if necessary
++      if (m_packetTracker)
++        {
++          if (phyHelper.GetDeviceType () == TypeId::LookupByName ("ns3::SimpleEndDeviceLoraPhy"))
+             {
+-              phy->TraceConnectWithoutContext ("StartSending",
+-                                               MakeCallback
+-                                               (&LoraPacketTracker::TransmissionCallback,
+-                                                m_packetTracker));
+-              phy->TraceConnectWithoutContext ("ReceivedPacket",
+-                                               MakeCallback
+-                                                 (&LoraPacketTracker::PacketReceptionCallback,
+-                                                 m_packetTracker));
+-              phy->TraceConnectWithoutContext ("LostPacketBecauseInterference",
+-                                               MakeCallback
+-                                                 (&LoraPacketTracker::InterferenceCallback,
+-                                                 m_packetTracker));
+-              phy->TraceConnectWithoutContext ("LostPacketBecauseNoMoreReceivers",
+-                                               MakeCallback
+-                                                 (&LoraPacketTracker::NoMoreReceiversCallback,
+-                                                 m_packetTracker));
+-              phy->TraceConnectWithoutContext ("LostPacketBecauseUnderSensitivity",
+-                                               MakeCallback
+-                                                 (&LoraPacketTracker::UnderSensitivityCallback,
+-                                                 m_packetTracker));
+-              phy->TraceConnectWithoutContext ("NoReceptionBecauseTransmitting",
+-                                               MakeCallback
+-                                                 (&LoraPacketTracker::LostBecauseTxCallback,
+-                                                 m_packetTracker));
++              phy->TraceConnectWithoutContext (
++                  "StartSending",
++                  MakeCallback (&LoraPacketTracker::TransmissionCallback, m_packetTracker));
++            }
++          else if (phyHelper.GetDeviceType () == TypeId::LookupByName ("ns3::SimpleGatewayLoraPhy"))
++            {
++              phy->TraceConnectWithoutContext (
++                  "StartSending",
++                  MakeCallback (&LoraPacketTracker::TransmissionCallback, m_packetTracker));
++              phy->TraceConnectWithoutContext (
++                  "ReceivedPacket",
++                  MakeCallback (&LoraPacketTracker::PacketReceptionCallback, m_packetTracker));
++              phy->TraceConnectWithoutContext (
++                  "LostPacketBecauseInterference",
++                  MakeCallback (&LoraPacketTracker::InterferenceCallback, m_packetTracker));
++              phy->TraceConnectWithoutContext (
++                  "LostPacketBecauseNoMoreReceivers",
++                  MakeCallback (&LoraPacketTracker::NoMoreReceiversCallback, m_packetTracker));
++              phy->TraceConnectWithoutContext (
++                  "LostPacketBecauseUnderSensitivity",
++                  MakeCallback (&LoraPacketTracker::UnderSensitivityCallback, m_packetTracker));
++              phy->TraceConnectWithoutContext (
++                  "NoReceptionBecauseTransmitting",
++                  MakeCallback (&LoraPacketTracker::LostBecauseTxCallback, m_packetTracker));
+             }
+         }
+ 
+@@ -112,45 +105,39 @@ NS_LOG_COMPONENT_DEFINE ("LoraHelper");
+ 
+       if (m_packetTracker)
+         {
+-          if (phyHelper.GetDeviceType () ==
+-              TypeId::LookupByName ("ns3::SimpleEndDeviceLoraPhy"))
++          if (phyHelper.GetDeviceType () == TypeId::LookupByName ("ns3::SimpleEndDeviceLoraPhy"))
+             {
+-              mac->TraceConnectWithoutContext ("SentNewPacket",
+-                                               MakeCallback
+-                                                 (&LoraPacketTracker::MacTransmissionCallback,
+-                                                 m_packetTracker));
+-
+-              mac->TraceConnectWithoutContext ("RequiredTransmissions",
+-                                               MakeCallback
+-                                                 (&LoraPacketTracker::RequiredTransmissionsCallback,
+-                                                 m_packetTracker));
++              mac->TraceConnectWithoutContext (
++                  "SentNewPacket",
++                  MakeCallback (&LoraPacketTracker::MacTransmissionCallback, m_packetTracker));
++
++              mac->TraceConnectWithoutContext (
++                  "RequiredTransmissions",
++                  MakeCallback (&LoraPacketTracker::RequiredTransmissionsCallback,
++                                m_packetTracker));
+             }
+-          else if (phyHelper.GetDeviceType () ==
+-                   TypeId::LookupByName ("ns3::SimpleGatewayLoraPhy"))
++          else if (phyHelper.GetDeviceType () == TypeId::LookupByName ("ns3::SimpleGatewayLoraPhy"))
+             {
+-              mac->TraceConnectWithoutContext ("SentNewPacket",
+-                                               MakeCallback
+-                                               (&LoraPacketTracker::MacTransmissionCallback,
+-                                                m_packetTracker));
+-
+-              mac->TraceConnectWithoutContext ("ReceivedPacket",
+-                                               MakeCallback
+-                                               (&LoraPacketTracker::MacGwReceptionCallback,
+-                                                m_packetTracker));
++              mac->TraceConnectWithoutContext (
++                  "SentNewPacket",
++                  MakeCallback (&LoraPacketTracker::MacTransmissionCallback, m_packetTracker));
++
++              mac->TraceConnectWithoutContext (
++                  "ReceivedPacket",
++                  MakeCallback (&LoraPacketTracker::MacGwReceptionCallback, m_packetTracker));
+             }
+         }
+ 
+       node->AddDevice (device);
+       devices.Add (device);
+-      NS_LOG_DEBUG ("node=" << node << ", mob=" << node->GetObject<MobilityModel> ()->GetPosition ());
++      NS_LOG_DEBUG ("node=" << node
++                            << ", mob=" << node->GetObject<MobilityModel> ()->GetPosition ());
+     }
+   return devices;
+ }
+ 
+ NetDeviceContainer
+-LoraHelper::Install ( const LoraPhyHelper &phy,
+-                      const LorawanMacHelper &mac,
+-                      Ptr<Node> node) const
++LoraHelper::Install (const LoraPhyHelper &phy, const LorawanMacHelper &mac, Ptr<Node> node) const
+ {
+   return Install (phy, mac, NodeContainer (node));
+ }
+@@ -164,7 +151,7 @@ LoraHelper::EnablePacketTracking ()
+   m_packetTracker = new LoraPacketTracker ();
+ }
+ 
+-LoraPacketTracker&
++LoraPacketTracker &
+ LoraHelper::GetPacketTracker (void)
+ {
+   NS_LOG_FUNCTION (this);
+@@ -176,31 +163,37 @@ void
+ LoraHelper::EnableSimulationTimePrinting (Time interval)
+ {
+   m_oldtime = std::time (0);
+-  Simulator::Schedule (Seconds (0), &LoraHelper::DoPrintSimulationTime, this,
+-                       interval);
++  Simulator::Schedule (Seconds (0), &LoraHelper::DoPrintSimulationTime, this, interval);
+ }
+ 
+ void
+-LoraHelper::EnablePeriodicDeviceStatusPrinting (NodeContainer endDevices,
+-                                                NodeContainer gateways,
+-                                                std::string filename,
+-                                                Time interval)
++LoraHelper::DoPrintSimulationTime (Time interval)
++{
++  // NS_LOG_INFO ("Time: " << Simulator::Now().GetHours());
++  std::cout << "Simulated time: " << Simulator::Now ().GetHours () << " hours, ";
++  std::cout << "Real time from last call: " << std::time (0) - m_oldtime << " seconds" << std::endl;
++  m_oldtime = std::time (0);
++  Simulator::Schedule (interval, &LoraHelper::DoPrintSimulationTime, this, interval);
++}
++
++void
++LoraHelper::EnablePeriodicDeviceStatusPrinting (NodeContainer endDevices, NodeContainer gateways,
++                                                std::string filename, Time interval)
+ {
+   NS_LOG_FUNCTION (this);
+ 
+   DoPrintDeviceStatus (endDevices, gateways, filename);
+ 
+   // Schedule periodic printing
+-  Simulator::Schedule (interval,
+-                       &LoraHelper::EnablePeriodicDeviceStatusPrinting, this,
+-                       endDevices, gateways, filename, interval);
++  Simulator::Schedule (interval, &LoraHelper::EnablePeriodicDeviceStatusPrinting, this, endDevices,
++                       gateways, filename, interval);
+ }
+ 
+ void
+ LoraHelper::DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateways,
+                                  std::string filename)
+ {
+-  const char * c = filename.c_str ();
++  const char *c = filename.c_str ();
+   std::ofstream outputFile;
+   if (Simulator::Now () == Seconds (0))
+     {
+@@ -213,7 +206,10 @@ LoraHelper::DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateway
+       outputFile.open (c, std::ofstream::out | std::ofstream::app);
+     }
+ 
+-  Time currentTime = Simulator::Now();
++  Time currentTime = Simulator::Now ();
++  DevPktCount devPktCount;
++  m_packetTracker->CountAllDevicesPackets (m_lastDeviceStatusUpdate, currentTime, devPktCount);
++
+   for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j)
+     {
+       Ptr<Node> object = *j;
+@@ -222,50 +218,52 @@ LoraHelper::DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateway
+       Ptr<NetDevice> netDevice = object->GetDevice (0);
+       Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+       NS_ASSERT (loraNetDevice != 0);
+-      Ptr<ClassAEndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
+-      int dr = int(mac->GetDataRate ());
++      Ptr<ClassAEndDeviceLorawanMac> mac =
++          loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
++      int dr = int (mac->GetDataRate ());
+       double txPower = mac->GetTransmissionPower ();
+       Vector pos = position->GetPosition ();
+-      outputFile << currentTime.GetSeconds () << " "
+-                 << object->GetId () <<  " "
+-                 << pos.x << " " << pos.y << " " << dr << " "
+-                 << unsigned(txPower) << std::endl;
++      // Add: #sent, #received, max-offered-traffic, duty-cycle
++      Ptr<LoraApplication> app = object->GetApplication (0)->GetObject<LoraApplication> ();
++      uint8_t size = app->GetPacketSize ();
++      double interval = app->GetInterval ().GetSeconds ();
++      LoraTxParameters params;
++      params.sf = 12 - dr;
++      params.lowDataRateOptimizationEnabled =
++          LoraPhy::GetTSym (params) > MilliSeconds (16) ? true : false;
++      double maxot =
++          LoraPhy::GetOnAirTime (Create<Packet> (size + 13), params).GetSeconds () / interval;
++      maxot = std::min (maxot, 0.01);
++      double ot = mac->GetAggregatedDutyCycle ();
++      ot = std::min (ot, maxot);
++      devCount_t &count = devPktCount[object->GetId ()];
++      outputFile << currentTime.GetSeconds () << " " << object->GetId () << " " << pos.x << " "
++                 << pos.y << " " << dr << " " << unsigned (txPower) << " " << count.sent << " "
++                 << count.received << " " << maxot << " " << ot << " "
++                 << unsigned (mac->GetCluster ()) << std::endl;
+     }
+-  // for (NodeContainer::Iterator j = gateways.Begin (); j != gateways.End (); ++j)
+-  //   {
+-  //     Ptr<Node> object = *j;
+-  //     Ptr<MobilityModel> position = object->GetObject<MobilityModel> ();
+-  //     Vector pos = position->GetPosition ();
+-  //     outputFile << currentTime.GetSeconds () << " "
+-  //                << object->GetId () <<  " "
+-  //                << pos.x << " " << pos.y << " " << "-1 -1" << std::endl;
+-  //   }
++  m_lastDeviceStatusUpdate = Simulator::Now ();
+   outputFile.close ();
+ }
+ 
+-
+ void
+-LoraHelper::EnablePeriodicPhyPerformancePrinting (NodeContainer gateways,
+-                                                  std::string filename,
++LoraHelper::EnablePeriodicGwsPerformancePrinting (NodeContainer gateways, std::string filename,
+                                                   Time interval)
+ {
+   NS_LOG_FUNCTION (this);
+ 
+-  DoPrintPhyPerformance (gateways, filename);
++  DoPrintGwsPerformance (gateways, filename);
+ 
+-  Simulator::Schedule (interval,
+-                       &LoraHelper::EnablePeriodicPhyPerformancePrinting,
+-                       this,
+-                       gateways, filename, interval);
++  Simulator::Schedule (interval, &LoraHelper::EnablePeriodicGwsPerformancePrinting, this, gateways,
++                       filename, interval);
+ }
+ 
+ void
+-LoraHelper::DoPrintPhyPerformance (NodeContainer gateways,
+-                                   std::string filename)
++LoraHelper::DoPrintGwsPerformance (NodeContainer gateways, std::string filename)
+ {
+   NS_LOG_FUNCTION (this);
+ 
+-  const char * c = filename.c_str ();
++  const char *c = filename.c_str ();
+   std::ofstream outputFile;
+   if (Simulator::Now () == Seconds (0))
+     {
+@@ -278,32 +276,28 @@ LoraHelper::DoPrintPhyPerformance (NodeContainer gateways,
+       outputFile.open (c, std::ofstream::out | std::ofstream::app);
+     }
+ 
++  GwsPhyPktPrint strings;
++  m_packetTracker->PrintPhyPacketsAllGws (m_lastPhyPerformanceUpdate, Simulator::Now (), strings);
+   for (auto it = gateways.Begin (); it != gateways.End (); ++it)
+     {
+       int systemId = (*it)->GetId ();
+-      outputFile << Simulator::Now ().GetSeconds () << " " <<
+-        std::to_string(systemId) << " " <<
+-        m_packetTracker->PrintPhyPacketsPerGw(m_lastPhyPerformanceUpdate,
+-                                              Simulator::Now (),
+-                                              systemId) << std::endl;
++      outputFile << Simulator::Now ().GetSeconds () << " " << std::to_string (systemId) << " "
++                 << strings[systemId].s << std::endl;
+     }
+ 
+   m_lastPhyPerformanceUpdate = Simulator::Now ();
+ 
+-  outputFile.close();
++  outputFile.close ();
+ }
+ 
+ void
+-LoraHelper::EnablePeriodicGlobalPerformancePrinting (std::string filename,
+-                                                     Time interval)
++LoraHelper::EnablePeriodicGlobalPerformancePrinting (std::string filename, Time interval)
+ {
+   NS_LOG_FUNCTION (this << filename << interval);
+ 
+   DoPrintGlobalPerformance (filename);
+ 
+-  Simulator::Schedule (interval,
+-                       &LoraHelper::EnablePeriodicGlobalPerformancePrinting,
+-                       this,
++  Simulator::Schedule (interval, &LoraHelper::EnablePeriodicGlobalPerformancePrinting, this,
+                        filename, interval);
+ }
+ 
+@@ -312,7 +306,7 @@ LoraHelper::DoPrintGlobalPerformance (std::string filename)
+ {
+   NS_LOG_FUNCTION (this);
+ 
+-  const char * c = filename.c_str ();
++  const char *c = filename.c_str ();
+   std::ofstream outputFile;
+   if (Simulator::Now () == Seconds (0))
+     {
+@@ -325,28 +319,105 @@ LoraHelper::DoPrintGlobalPerformance (std::string filename)
+       outputFile.open (c, std::ofstream::out | std::ofstream::app);
+     }
+ 
+-  outputFile << Simulator::Now ().GetSeconds () << " " <<
+-    m_packetTracker->CountMacPacketsGlobally (m_lastGlobalPerformanceUpdate,
+-                                              Simulator::Now ()) <<
+-    std::endl;
++  outputFile << Simulator::Now ().GetSeconds () << " "
++             << m_packetTracker->PrintPhyPacketsGlobally (m_lastGlobalPerformanceUpdate,
++                                                          Simulator::Now ())
++             << std::endl;
+ 
+   m_lastGlobalPerformanceUpdate = Simulator::Now ();
+ 
+-  outputFile.close();
++  outputFile.close ();
+ }
+ 
+ void
+-LoraHelper::DoPrintSimulationTime (Time interval)
++LoraHelper::EnablePeriodicSFStatusPrinting (NodeContainer endDevices, NodeContainer gateways,
++                                            std::string filename, Time interval)
+ {
+-  // NS_LOG_INFO ("Time: " << Simulator::Now().GetHours());
+-  std::cout << "Simulated time: " << Simulator::Now ().GetHours () << " hours" << std::endl;
+-  std::cout << "Real time from last call: " << std::time (0) - m_oldtime << " seconds" << std::endl;
+-  m_oldtime = std::time (0);
+-  Simulator::Schedule (interval, &LoraHelper::DoPrintSimulationTime, this, interval);
++  NS_LOG_FUNCTION (this);
++
++  DoPrintSFStatus (endDevices, gateways, filename);
++
++  // Schedule periodic printing
++  Simulator::Schedule (interval, &LoraHelper::EnablePeriodicSFStatusPrinting, this, endDevices,
++                       gateways, filename, interval);
++}
++
++void
++LoraHelper::DoPrintSFStatus (NodeContainer endDevices, NodeContainer gateways, std::string filename)
++{
++  const char *c = filename.c_str ();
++  std::ofstream outputFile;
++  if (Simulator::Now () == Seconds (0))
++    {
++      // Delete contents of the file as it is opened
++      outputFile.open (c, std::ofstream::out | std::ofstream::trunc);
++    }
++  else
++    {
++      // Only append to the file
++      outputFile.open (c, std::ofstream::out | std::ofstream::app);
++    }
++
++  Time currentTime = Simulator::Now ();
++  DevPktCount devPktCount;
++  m_packetTracker->CountAllDevicesPackets (m_lastSFStatusUpdate, currentTime, devPktCount);
++
++  struct sfStatus_t
++  {
++    int sent = 0;
++    int received = 0;
++    double totMaxOT = 0.0;
++    double totAggDC = 0.0;
++  };
++
++  using sfMap_t = std::map<int, sfStatus_t>;
++  using clusterMap_t = std::map<int, sfMap_t>;
++  clusterMap_t clusmap;
++
++  for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j)
++    {
++      Ptr<Node> object = *j;
++      Ptr<NetDevice> netDevice = object->GetDevice (0);
++      Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
++      NS_ASSERT (loraNetDevice != 0);
++      Ptr<ClassAEndDeviceLorawanMac> mac =
++          loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
++      int dr = int (mac->GetDataRate ());
++      // Add: #sent, #received, max-offered-traffic, duty-cycle
++      Ptr<LoraApplication> app = object->GetApplication (0)->GetObject<LoraApplication> ();
++      uint8_t size = app->GetPacketSize ();
++      double interval = app->GetInterval ().GetSeconds ();
++      LoraTxParameters params;
++      params.sf = 12 - dr;
++      params.lowDataRateOptimizationEnabled =
++          LoraPhy::GetTSym (params) > MilliSeconds (16) ? true : false;
++      double maxot =
++          LoraPhy::GetOnAirTime (Create<Packet> (size + 13), params).GetSeconds () / interval;
++      maxot = std::min (maxot, 0.01);
++      double ot = mac->GetAggregatedDutyCycle ();
++      ot = std::min (ot, maxot);
++      devCount_t &count = devPktCount[object->GetId ()];
++
++      sfStatus_t &sfstat = clusmap[mac->GetCluster ()][dr];
++      sfstat.sent += count.sent;
++      sfstat.received += count.received;
++      sfstat.totMaxOT += maxot;
++      sfstat.totAggDC += ot;
++    }
++
++  for (auto const &cl : clusmap)
++    for (auto const &sf : cl.second)
++      outputFile << currentTime.GetSeconds () << " " << cl.first << " " << sf.first << " "
++                 << sf.second.sent << " " << sf.second.received << " "
++                 << sf.second.totMaxOT << " " << sf.second.totAggDC << std::endl;
++
++  m_lastSFStatusUpdate = Simulator::Now ();
++  outputFile.close ();
+ }
+- 
+-void 
+-LoraHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promiscuous, bool explicitFilename)
++
++void
++LoraHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promiscuous,
++                                bool explicitFilename)
+ {
+   NS_LOG_FUNCTION (this << prefix << nd << promiscuous << explicitFilename);
+ 
+@@ -358,11 +429,12 @@ LoraHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool prom
+   Ptr<LoraNetDevice> device = nd->GetObject<LoraNetDevice> ();
+   if (device == 0)
+     {
+-      NS_LOG_INFO ("LoraHelper::EnablePcapInternal(): Device " << device << " not of type ns3::LoraNetDevice");
++      NS_LOG_INFO ("LoraHelper::EnablePcapInternal(): Device "
++                   << device << " not of type ns3::LoraNetDevice");
+       return;
+     }
+ 
+-  Ptr<LoraPhy> phy = device->GetPhy ();
++  auto phy = device->GetPhy ();
+   NS_ABORT_MSG_IF (phy == 0, "LoRaHelper::EnablePcapInternal(): Phy layer in LoraNetDevice must be set");
+ 
+   PcapHelper pcapHelper;
+@@ -377,26 +449,38 @@ LoraHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool prom
+       filename = pcapHelper.GetFilenameFromDevice (prefix, device);
+     }
+ 
+-  Ptr<PcapFileWrapper> file = pcapHelper.CreateFile (filename, std::ios::out,
+-                                                     PcapHelper::DLT_LORATAP);
+-
++  auto file = pcapHelper.CreateFile (filename, std::ios::out, PcapHelper::DLT_LORATAP);
+   phy->TraceConnectWithoutContext ("SnifferRx", MakeBoundCallback (&LoraHelper::PcapSniffRxEvent, file));
++  phy->TraceConnectWithoutContext ("SnifferTx", MakeBoundCallback (&LoraHelper::PcapSniffTxEvent, file));
+ }
+ 
+ void
+ LoraHelper::PcapSniffRxEvent (
+   Ptr<PcapFileWrapper>  file,
+-  Ptr<const Packet>     packet
+-  /** + all other fields not in tag **/)
++  Ptr<const Packet>     packet)
+ {
+   Ptr<Packet> p = packet->Copy ();
+   LoraTag tag;
+   p -> RemovePacketTag (tag);
+   LoratapHeader header;
+-  header.Fill (tag /** + all other fields not in tag **/);
++  header.Fill (tag);
+   p->AddHeader (header);
+   file->Write (Simulator::Now (), p);
+ }
+ 
++void
++LoraHelper::PcapSniffTxEvent (
++  Ptr<PcapFileWrapper>  file,
++  Ptr<const Packet>     packet)
++{
++  Ptr<Packet> p = packet->Copy ();
++  LoraTag tag;
++  p->RemovePacketTag (tag);
++  LoratapHeader header;
++  header.Fill (tag);
++  p->AddHeader (header);
++  file->Write (Simulator::Now (), p);
+ }
+-}
++
++} // namespace lorawan
++} // namespace ns3
+diff --git a/helper/lora-helper.h b/helper/lora-helper.h
+index 1319a89..7dcfb78 100644
+--- a/helper/lora-helper.h
++++ b/helper/lora-helper.h
+@@ -41,7 +41,7 @@ namespace lorawan {
+  * This class can help create a large set of similar LoraNetDevice objects and
+  * configure a large set of their attributes during creation.
+  */
+-class LoraHelper: public PcapHelperForDevice
++class LoraHelper : public PcapHelperForDevice
+ {
+ public:
+   virtual ~LoraHelper ();
+@@ -58,8 +58,7 @@ public:
+    * method.
+    */
+   virtual NetDeviceContainer Install (const LoraPhyHelper &phyHelper,
+-                                      const LorawanMacHelper &macHelper,
+-                                      NodeContainer c) const;
++                                      const LorawanMacHelper &macHelper, NodeContainer c) const;
+ 
+   /**
+    * Install LoraNetDevice on a single node
+@@ -71,8 +70,7 @@ public:
+    * method.
+    */
+   virtual NetDeviceContainer Install (const LoraPhyHelper &phyHelper,
+-                                      const LorawanMacHelper &macHelper,
+-                                      Ptr<Node> node) const;
++                                      const LorawanMacHelper &macHelper, Ptr<Node> node) const;
+ 
+   /**
+    * Enable tracking of packets via trace sources.
+@@ -90,42 +88,44 @@ public:
+   /**
+    * Periodically prints the status of devices in the network to a file.
+    */
+-  void EnablePeriodicDeviceStatusPrinting (NodeContainer endDevices,
+-                                           NodeContainer gateways,
+-                                           std::string filename,
+-                                           Time interval);
++  void EnablePeriodicDeviceStatusPrinting (NodeContainer endDevices, NodeContainer gateways,
++                                           std::string filename, Time interval);
++
++  /**
++   * Print a summary of the status of all devices in the network.
++   */
++  void DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateways, std::string filename);
+ 
+   /**
+    * Periodically prints PHY-level performance at every gateway in the container.
+    */
+-  void EnablePeriodicPhyPerformancePrinting (NodeContainer gateways,
+-                                             std::string filename,
++  void EnablePeriodicGwsPerformancePrinting (NodeContainer gateways, std::string filename,
+                                              Time interval);
+ 
+-  void DoPrintPhyPerformance (NodeContainer gateways, std::string filename);
++  void DoPrintGwsPerformance (NodeContainer gateways, std::string filename);
+ 
+   /**
+    * Periodically prints global performance.
+    */
+-  void EnablePeriodicGlobalPerformancePrinting (std::string filename,
+-                                                Time interval);
++  void EnablePeriodicGlobalPerformancePrinting (std::string filename, Time interval);
+ 
+   void DoPrintGlobalPerformance (std::string filename);
+ 
+-  LoraPacketTracker& GetPacketTracker (void);
++  void EnablePeriodicSFStatusPrinting (NodeContainer endDevices, NodeContainer gateways,
++                                       std::string filename, Time interval);
+ 
+-  LoraPacketTracker* m_packetTracker = 0;
++  void DoPrintSFStatus (NodeContainer endDevices, NodeContainer gateways, std::string filename);
+ 
+-  time_t m_oldtime;
++  LoraPacketTracker &GetPacketTracker (void);
+ 
+-  /**
+-   * Print a summary of the status of all devices in the network.
+-   */
+-  void DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateways,
+-                            std::string filename);
++  LoraPacketTracker *m_packetTracker = 0;
++
++  time_t m_oldtime;
+ 
+ protected:
+-  static void PcapSniffRxEvent (Ptr<PcapFileWrapper> file,
++  static void PcapSniffRxEvent (Ptr<PcapFileWrapper> file, Ptr<const Packet> packet);
++
++  static void PcapSniffTxEvent (Ptr<PcapFileWrapper> file,
+                                 Ptr<const Packet> packet);
+ 
+ private:
+@@ -135,13 +135,16 @@ private:
+    */
+   void DoPrintSimulationTime (Time interval);
+ 
+-  virtual void EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promiscuous, bool explicitFilename);
++  virtual void EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promiscuous,
++                                   bool explicitFilename);
+ 
+   Time m_lastPhyPerformanceUpdate;
+   Time m_lastGlobalPerformanceUpdate;
++  Time m_lastDeviceStatusUpdate;
++  Time m_lastSFStatusUpdate;
+ };
+ 
+-} //namespace ns3
++} // namespace lorawan
+ 
+-}
++} // namespace ns3
+ #endif /* LORA_HELPER_H */
+diff --git a/helper/lora-packet-tracker.cc b/helper/lora-packet-tracker.cc
+index 0116e53..1e994dd 100644
+--- a/helper/lora-packet-tracker.cc
++++ b/helper/lora-packet-tracker.cc
+@@ -22,6 +22,8 @@
+ #include "ns3/log.h"
+ #include "ns3/simulator.h"
+ #include "ns3/lorawan-mac-header.h"
++#include "ns3/lora-phy.h"
++#include "ns3/lora-tag.h"
+ #include <iostream>
+ #include <fstream>
+ 
+@@ -30,6 +32,7 @@ namespace lorawan {
+ NS_LOG_COMPONENT_DEFINE ("LoraPacketTracker");
+ 
+ LoraPacketTracker::LoraPacketTracker ()
++    : m_oldPacketThreshold (Seconds (0)), m_lastPacketCleanup (Seconds (0))
+ {
+   NS_LOG_FUNCTION (this);
+ }
+@@ -56,20 +59,18 @@ LoraPacketTracker::MacTransmissionCallback (Ptr<Packet const> packet)
+       status.senderId = Simulator::GetContext ();
+       status.receivedTime = Time::Max ();
+ 
+-      m_macPacketTracker.insert (std::pair<Ptr<Packet const>, MacPacketStatus>
+-                                   (packet, status));
++      m_macPacketTracker.insert (std::pair<Ptr<Packet const>, MacPacketStatus> (packet, status));
++      CleanupOldPackets ();
+     }
+ }
+ 
+ void
+-LoraPacketTracker::RequiredTransmissionsCallback (uint8_t reqTx, bool success,
+-                                                  Time firstAttempt,
++LoraPacketTracker::RequiredTransmissionsCallback (uint8_t reqTx, bool success, Time firstAttempt,
+                                                   Ptr<Packet> packet)
+ {
+   NS_LOG_INFO ("Finished retransmission attempts for a packet");
+-  NS_LOG_DEBUG ("Packet: " << packet << "ReqTx " << unsigned(reqTx) <<
+-                ", succ: " << success << ", firstAttempt: " <<
+-                firstAttempt.GetSeconds ());
++  NS_LOG_DEBUG ("Packet: " << packet << "ReqTx " << unsigned (reqTx) << ", succ: " << success
++                           << ", firstAttempt: " << firstAttempt.GetSeconds ());
+ 
+   RetransmissionStatus entry;
+   entry.firstAttempt = firstAttempt;
+@@ -77,8 +78,8 @@ LoraPacketTracker::RequiredTransmissionsCallback (uint8_t reqTx, bool success,
+   entry.reTxAttempts = reqTx;
+   entry.successful = success;
+ 
+-  m_reTransmissionTracker.insert (std::pair<Ptr<Packet>, RetransmissionStatus>
+-                                    (packet, entry));
++  m_reTransmissionTracker.insert (std::pair<Ptr<Packet>, RetransmissionStatus> (packet, entry));
++  CleanupOldPackets ();
+ }
+ 
+ void
+@@ -86,17 +87,17 @@ LoraPacketTracker::MacGwReceptionCallback (Ptr<Packet const> packet)
+ {
+   if (IsUplink (packet))
+     {
+-      NS_LOG_INFO ("A packet was successfully received" <<
+-                   " at the MAC layer of gateway " <<
+-                   Simulator::GetContext ());
++      NS_LOG_INFO ("A packet was successfully received"
++                   << " at the MAC layer of gateway " << Simulator::GetContext ());
+ 
+       // Find the received packet in the m_macPacketTracker
+       auto it = m_macPacketTracker.find (packet);
+       if (it != m_macPacketTracker.end ())
+         {
+-          (*it).second.receptionTimes.insert (std::pair<int, Time>
+-                                                (Simulator::GetContext (),
+-                                                Simulator::Now ()));
++          (*it).second.receptionTimes.insert (
++              std::pair<int, Time> (Simulator::GetContext (), Simulator::Now ()));
++          if (Simulator::Now () < (*it).second.receivedTime)
++            (*it).second.receivedTime = Simulator::Now ();
+         }
+       else
+         {
+@@ -114,9 +115,7 @@ LoraPacketTracker::TransmissionCallback (Ptr<Packet const> packet, uint32_t edId
+ {
+   if (IsUplink (packet))
+     {
+-      NS_LOG_INFO ("PHY packet " << packet
+-                                 << " was transmitted by device "
+-                                 << edId);
++      NS_LOG_INFO ("PHY packet " << packet << " was transmitted by device " << edId);
+       // Create a packetStatus
+       PacketStatus status;
+       status.packet = packet;
+@@ -124,6 +123,7 @@ LoraPacketTracker::TransmissionCallback (Ptr<Packet const> packet, uint32_t edId
+       status.senderId = edId;
+ 
+       m_packetTracker.insert (std::pair<Ptr<Packet const>, PacketStatus> (packet, status));
++      CleanupOldPackets ();
+     }
+ }
+ 
+@@ -133,13 +133,10 @@ LoraPacketTracker::PacketReceptionCallback (Ptr<Packet const> packet, uint32_t g
+   if (IsUplink (packet))
+     {
+       // Remove the successfully received packet from the list of sent ones
+-      NS_LOG_INFO ("PHY packet " << packet
+-                                 << " was successfully received at gateway "
+-                                 << gwId);
++      NS_LOG_INFO ("PHY packet " << packet << " was successfully received at gateway " << gwId);
+ 
+       std::map<Ptr<Packet const>, PacketStatus>::iterator it = m_packetTracker.find (packet);
+-      (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (gwId,
+-                                                                           RECEIVED));
++      (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (gwId, RECEIVED));
+     }
+ }
+ 
+@@ -148,13 +145,10 @@ LoraPacketTracker::InterferenceCallback (Ptr<Packet const> packet, uint32_t gwId
+ {
+   if (IsUplink (packet))
+     {
+-      NS_LOG_INFO ("PHY packet " << packet
+-                                 << " was interfered at gateway "
+-                                 << gwId);
++      NS_LOG_INFO ("PHY packet " << packet << " was interfered at gateway " << gwId);
+ 
+       std::map<Ptr<Packet const>, PacketStatus>::iterator it = m_packetTracker.find (packet);
+-      (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (gwId,
+-                                                                           INTERFERED));
++      (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (gwId, INTERFERED));
+     }
+ }
+ 
+@@ -163,12 +157,11 @@ LoraPacketTracker::NoMoreReceiversCallback (Ptr<Packet const> packet, uint32_t g
+ {
+   if (IsUplink (packet))
+     {
+-      NS_LOG_INFO ("PHY packet " << packet
+-                                 << " was lost because no more receivers at gateway "
++      NS_LOG_INFO ("PHY packet " << packet << " was lost because no more receivers at gateway "
+                                  << gwId);
+       std::map<Ptr<Packet const>, PacketStatus>::iterator it = m_packetTracker.find (packet);
+-      (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (gwId,
+-                                                                           NO_MORE_RECEIVERS));
++      (*it).second.outcomes.insert (
++          std::pair<int, enum PhyPacketOutcome> (gwId, NO_MORE_RECEIVERS));
+     }
+ }
+ 
+@@ -177,13 +170,12 @@ LoraPacketTracker::UnderSensitivityCallback (Ptr<Packet const> packet, uint32_t
+ {
+   if (IsUplink (packet))
+     {
+-      NS_LOG_INFO ("PHY packet " << packet
+-                                 << " was lost because under sensitivity at gateway "
++      NS_LOG_INFO ("PHY packet " << packet << " was lost because under sensitivity at gateway "
+                                  << gwId);
+ 
+       std::map<Ptr<Packet const>, PacketStatus>::iterator it = m_packetTracker.find (packet);
+-      (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (gwId,
+-                                                                           UNDER_SENSITIVITY));
++      (*it).second.outcomes.insert (
++          std::pair<int, enum PhyPacketOutcome> (gwId, UNDER_SENSITIVITY));
+     }
+ }
+ 
+@@ -192,13 +184,11 @@ LoraPacketTracker::LostBecauseTxCallback (Ptr<Packet const> packet, uint32_t gwI
+ {
+   if (IsUplink (packet))
+     {
+-      NS_LOG_INFO ("PHY packet " << packet
+-                                 << " was lost because of GW transmission at gateway "
++      NS_LOG_INFO ("PHY packet " << packet << " was lost because of GW transmission at gateway "
+                                  << gwId);
+ 
+       std::map<Ptr<Packet const>, PacketStatus>::iterator it = m_packetTracker.find (packet);
+-      (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (gwId,
+-                                                                           LOST_BECAUSE_TX));
++      (*it).second.outcomes.insert (std::pair<int, enum PhyPacketOutcome> (gwId, LOST_BECAUSE_TX));
+     }
+ }
+ 
+@@ -218,8 +208,7 @@ LoraPacketTracker::IsUplink (Ptr<Packet const> packet)
+ ////////////////////////
+ 
+ std::vector<int>
+-LoraPacketTracker::CountPhyPacketsPerGw (Time startTime, Time stopTime,
+-                                         int gwId)
++LoraPacketTracker::CountPhyPacketsPerGw (Time startTime, Time stopTime, int gwId)
+ {
+   // Vector packetCounts will contain - for the interval given in the input of
+   // the function, the following fields: totPacketsSent receivedPackets
+@@ -227,49 +216,41 @@ LoraPacketTracker::CountPhyPacketsPerGw (Time startTime, Time stopTime,
+ 
+   std::vector<int> packetCounts (6, 0);
+ 
+-  for (auto itPhy = m_packetTracker.begin ();
+-       itPhy != m_packetTracker.end ();
+-       ++itPhy)
++  for (auto itPhy = m_packetTracker.begin (); itPhy != m_packetTracker.end (); ++itPhy)
+     {
+       if ((*itPhy).second.sendTime >= startTime && (*itPhy).second.sendTime <= stopTime)
+         {
+           packetCounts.at (0)++;
+ 
+           NS_LOG_DEBUG ("Dealing with packet " << (*itPhy).second.packet);
+-          NS_LOG_DEBUG ("This packet was received by " <<
+-                        (*itPhy).second.outcomes.size () << " gateways");
++          NS_LOG_DEBUG ("This packet was received by " << (*itPhy).second.outcomes.size ()
++                                                       << " gateways");
+ 
+           if ((*itPhy).second.outcomes.count (gwId) > 0)
+             {
+               switch ((*itPhy).second.outcomes.at (gwId))
+                 {
+-                case RECEIVED:
+-                  {
++                  case RECEIVED: {
+                     packetCounts.at (1)++;
+                     break;
+                   }
+-                case INTERFERED:
+-                  {
++                  case INTERFERED: {
+                     packetCounts.at (2)++;
+                     break;
+                   }
+-                case NO_MORE_RECEIVERS:
+-                  {
++                  case NO_MORE_RECEIVERS: {
+                     packetCounts.at (3)++;
+                     break;
+                   }
+-                case UNDER_SENSITIVITY:
+-                  {
++                  case UNDER_SENSITIVITY: {
+                     packetCounts.at (4)++;
+                     break;
+                   }
+-                case LOST_BECAUSE_TX:
+-                  {
++                  case LOST_BECAUSE_TX: {
+                     packetCounts.at (5)++;
+                     break;
+                   }
+-                case UNSET:
+-                  {
++                  case UNSET: {
+                     break;
+                   }
+                 }
+@@ -279,65 +260,15 @@ LoraPacketTracker::CountPhyPacketsPerGw (Time startTime, Time stopTime,
+ 
+   return packetCounts;
+ }
++
+ std::string
+-LoraPacketTracker::PrintPhyPacketsPerGw (Time startTime, Time stopTime,
+-                                         int gwId)
++LoraPacketTracker::PrintPhyPacketsPerGw (Time startTime, Time stopTime, int gwId)
+ {
+   // Vector packetCounts will contain - for the interval given in the input of
+   // the function, the following fields: totPacketsSent receivedPackets
+   // interferedPackets noMoreGwPackets underSensitivityPackets lostBecauseTxPackets
+ 
+-  std::vector<int> packetCounts (6, 0);
+-
+-  for (auto itPhy = m_packetTracker.begin ();
+-       itPhy != m_packetTracker.end ();
+-       ++itPhy)
+-    {
+-      if ((*itPhy).second.sendTime >= startTime && (*itPhy).second.sendTime <= stopTime)
+-        {
+-          packetCounts.at (0)++;
+-
+-          NS_LOG_DEBUG ("Dealing with packet " << (*itPhy).second.packet);
+-          NS_LOG_DEBUG ("This packet was received by " <<
+-                        (*itPhy).second.outcomes.size () << " gateways");
+-
+-          if ((*itPhy).second.outcomes.count (gwId) > 0)
+-            {
+-              switch ((*itPhy).second.outcomes.at (gwId))
+-                {
+-                case RECEIVED:
+-                  {
+-                    packetCounts.at (1)++;
+-                    break;
+-                  }
+-                case INTERFERED:
+-                  {
+-                    packetCounts.at (2)++;
+-                    break;
+-                  }
+-                case NO_MORE_RECEIVERS:
+-                  {
+-                    packetCounts.at (3)++;
+-                    break;
+-                  }
+-                case UNDER_SENSITIVITY:
+-                  {
+-                    packetCounts.at (4)++;
+-                    break;
+-                  }
+-                case LOST_BECAUSE_TX:
+-                  {
+-                    packetCounts.at (5)++;
+-                    break;
+-                  }
+-                case UNSET:
+-                  {
+-                    break;
+-                  }
+-                }
+-            }
+-        }
+-    }
++  std::vector<int> packetCounts (CountPhyPacketsPerGw (startTime, stopTime, gwId));
+ 
+   std::string output ("");
+   for (int i = 0; i < 6; ++i)
+@@ -348,58 +279,332 @@ LoraPacketTracker::PrintPhyPacketsPerGw (Time startTime, Time stopTime,
+   return output;
+ }
+ 
+-  std::string
+-  LoraPacketTracker::CountMacPacketsGlobally (Time startTime, Time stopTime)
+-  {
+-    NS_LOG_FUNCTION (this << startTime << stopTime);
+-
+-    double sent = 0;
+-    double received = 0;
+-    for (auto it = m_macPacketTracker.begin ();
+-         it != m_macPacketTracker.end ();
+-         ++it)
++void
++LoraPacketTracker::CountPhyPacketsAllGws (Time startTime, Time stopTime, GwsPhyPktCount &output)
++{
++  output.clear ();
++  for (auto const &ppd : m_packetTracker)
++    if (ppd.second.sendTime >= startTime && ppd.second.sendTime <= stopTime)
+       {
+-        if ((*it).second.sendTime >= startTime && (*it).second.sendTime <= stopTime)
++        NS_LOG_DEBUG ("Dealing with packet " << ppd.second.packet);
++        NS_LOG_DEBUG ("This packet was received by " << ppd.second.outcomes.size () << " gateways");
++        for (auto const &out : ppd.second.outcomes)
+           {
+-            sent++;
+-            if ((*it).second.receptionTimes.size ())
++            output[out.first].v[0]++;
++            switch (out.second)
+               {
+-                received++;
++                case RECEIVED: {
++                  output[out.first].v[1]++;
++                  break;
++                }
++                case INTERFERED: {
++                  output[out.first].v[2]++;
++                  break;
++                }
++                case NO_MORE_RECEIVERS: {
++                  output[out.first].v[3]++;
++                  break;
++                }
++                case LOST_BECAUSE_TX: {
++                  output[out.first].v[4]++;
++                  break;
++                }
++                case UNDER_SENSITIVITY: {
++                  output[out.first].v[5]++;
++                  break;
++                }
++                case UNSET: {
++                  break;
++                }
+               }
+           }
+       }
++}
+ 
+-    return std::to_string (sent) + " " +
+-      std::to_string (received);
+-  }
++void
++LoraPacketTracker::PrintPhyPacketsAllGws (Time startTime, Time stopTime, GwsPhyPktPrint &output)
++{
++  output.clear ();
++  GwsPhyPktCount count;
++  CountPhyPacketsAllGws (startTime, stopTime, count);
++  for (auto const &gw : count)
++    {
++      std::string out ("");
++      for (int i = 0; i < 5; ++i)
++        out += std::to_string (gw.second.v[i]) + " ";
++      out += std::to_string (gw.second.v[5]);
++      output[gw.first].s = out;
++    }
++}
+ 
+-  std::string
+-  LoraPacketTracker::CountMacPacketsGloballyCpsr (Time startTime, Time stopTime)
+-  {
+-    NS_LOG_FUNCTION (this << startTime << stopTime);
++std::string
++LoraPacketTracker::PrintPhyPacketsGlobally (Time startTime, Time stopTime)
++{
++  NS_LOG_FUNCTION (this << startTime << stopTime);
+ 
+-    double sent = 0;
+-    double received = 0;
+-    for (auto it = m_reTransmissionTracker.begin ();
+-         it != m_reTransmissionTracker.end ();
+-         ++it)
++  std::vector<int> count (6, 0);
++
++  for (auto const &ppd : m_packetTracker)
++    if (ppd.second.sendTime >= startTime && ppd.second.sendTime <= stopTime)
+       {
+-        if ((*it).second.firstAttempt >= startTime && (*it).second.firstAttempt <= stopTime)
++        count[0]++;
++        bool received = false;
++        bool interfered = false;
++        bool noPaths = false;
++        bool busyGw = false;
++        for (auto const &out : ppd.second.outcomes)
+           {
+-            sent++;
+-            NS_LOG_DEBUG ("Found a packet");
+-            NS_LOG_DEBUG ("Number of attempts: " << unsigned(it->second.reTxAttempts) <<
+-                          ", successful: " << it->second.successful);
+-            if (it->second.successful)
++            if (out.second == RECEIVED)
+               {
+-                received++;
++                received = true;
++                break;
+               }
++            else if (!interfered and out.second == INTERFERED)
++              interfered = true;
++            else if (!noPaths and out.second == NO_MORE_RECEIVERS)
++              noPaths = true;
++            else if (!busyGw and out.second == LOST_BECAUSE_TX)
++              busyGw = true;
+           }
++        if (received)
++          count[1]++;
++        else if (interfered)
++          count[2]++;
++        else if (noPaths)
++          count[3]++;
++        else if (busyGw)
++          count[4]++;
++        else
++          count[5]++;
+       }
+ 
+-    return std::to_string (sent) + " " +
+-      std::to_string (received);
+-  }
++  std::string output ("");
++  for (int i = 0; i < 5; ++i)
++    output += std::to_string (count[i]) + " ";
++  output += std::to_string (count[5]);
++  return output;
++}
+ 
++std::string
++LoraPacketTracker::CountMacPacketsGlobally (Time startTime, Time stopTime)
++{
++  NS_LOG_FUNCTION (this << startTime << stopTime);
++
++  int sent = 0;
++  int received = 0;
++  for (auto it = m_macPacketTracker.begin (); it != m_macPacketTracker.end (); ++it)
++    {
++      if ((*it).second.sendTime >= startTime && (*it).second.sendTime <= stopTime)
++        {
++          sent++;
++          if ((*it).second.receptionTimes.size ())
++            {
++              received++;
++            }
++        }
++    }
++
++  return std::to_string (sent) + " " + std::to_string (received);
+ }
++
++std::string
++LoraPacketTracker::CountMacPacketsGloballyCpsr (Time startTime, Time stopTime)
++{
++  NS_LOG_FUNCTION (this << startTime << stopTime);
++
++  int sent = 0;
++  int received = 0;
++  for (auto it = m_reTransmissionTracker.begin (); it != m_reTransmissionTracker.end (); ++it)
++    {
++      if ((*it).second.firstAttempt >= startTime && (*it).second.firstAttempt <= stopTime)
++        {
++          sent++;
++          NS_LOG_DEBUG ("Found a packet");
++          NS_LOG_DEBUG ("Number of attempts: " << unsigned (it->second.reTxAttempts)
++                                               << ", successful: " << it->second.successful);
++          if (it->second.successful)
++            {
++              received++;
++            }
++        }
++    }
++
++  return std::to_string (sent) + " " + std::to_string (received);
++}
++
++std::string
++LoraPacketTracker::PrintDevicePackets (Time startTime, Time stopTime, uint32_t devId)
++{
++  NS_LOG_FUNCTION (this << startTime << stopTime << devId);
++
++  int sent = 0;
++  int received = 0;
++  for (auto it = m_macPacketTracker.begin (); it != m_macPacketTracker.end (); ++it)
++    {
++      if ((*it).second.sendTime >= startTime && (*it).second.sendTime <= stopTime &&
++          (*it).second.senderId == devId)
++        {
++          sent++;
++          if ((*it).second.receptionTimes.size ())
++            {
++              received++;
++            }
++        }
++    }
++
++  return std::to_string (sent) + " " + std::to_string (received);
++}
++
++void
++LoraPacketTracker::CountAllDevicesPackets (Time startTime, Time stopTime, DevPktCount &out)
++{
++  NS_LOG_FUNCTION (this << startTime << stopTime);
++
++  out.clear ();
++  for (auto const &mpd : m_macPacketTracker)
++    if (mpd.second.sendTime >= startTime && mpd.second.sendTime <= stopTime)
++      {
++        out[mpd.second.senderId].sent++;
++        if (mpd.second.receptionTimes.size ())
++          out[mpd.second.senderId].received++;
++      }
++}
++
++std::string
++LoraPacketTracker::PrintSimulationStatistics (Time startTime)
++{
++  NS_ASSERT (startTime < Simulator::Now ());
++
++  uint32_t total = 0;
++  double totReceived = 0;
++  double totInterfered = 0;
++  double totNoMorePaths = 0;
++  double totBusyGw = 0;
++  double totUnderSens = 0;
++
++  std::vector<double> sentSF (6, 0);
++  std::vector<double> receivedSF (6, 0);
++
++  double totBytesReceived = 0;
++  double totBytesSent = 0;
++
++  double totOffTraff = 0.0;
++
++  for (auto const &pd : m_packetTracker)
++    {
++      if (pd.second.sendTime < startTime - Seconds (5))
++        continue;
++
++      bool received = false;
++      bool interfered = false;
++      bool noPaths = false;
++      bool busyGw = false;
++
++      LoraTxParameters params;
++      LoraTag tag;
++      pd.first->Copy ()->RemovePacketTag (tag);
++      params.sf = tag.GetSpreadingFactor ();
++      params.lowDataRateOptimizationEnabled =
++          LoraPhy::GetTSym (params) > MilliSeconds (16) ? true : false;
++      totOffTraff += LoraPhy::GetOnAirTime (pd.first->Copy (), params).GetSeconds ();
++
++      total++;
++      totBytesSent += pd.first->GetSize ();
++      sentSF[tag.GetDataRate ()]++;
++      for (auto const &out : pd.second.outcomes)
++        {
++          if (out.second == RECEIVED)
++            {
++              received = true;
++              receivedSF[tag.GetDataRate ()]++;
++              totBytesReceived += pd.first->GetSize ();
++              break;
++            }
++          else if (!interfered and out.second == INTERFERED)
++            interfered = true;
++          else if (!noPaths and out.second == NO_MORE_RECEIVERS)
++            noPaths = true;
++          else if (!busyGw and out.second == LOST_BECAUSE_TX)
++            busyGw = true;
++        }
++      if (received)
++        totReceived++;
++      else if (interfered)
++        totInterfered++;
++      else if (noPaths)
++        totNoMorePaths++;
++      else if (busyGw)
++        totBusyGw++;
++      else
++        totUnderSens++;
++    }
++
++  std::stringstream ss;
++  ss << "\nPackets outcomes distribution (" << total << " sent, " << totReceived << " received):"
++     << "\n  RECEIVED: " << totReceived / total * 100
++     << "%\n  INTERFERED: " << totInterfered / total * 100
++     << "%\n  NO_MORE_RECEIVERS: " << totNoMorePaths / total * 100
++     << "%\n  BUSY_GATEWAY: " << totBusyGw / total * 100
++     << "%\n  UNDER_SENSITIVITY: " << totUnderSens / total * 100 << "%\n";
++
++  ss << "\nPDR: ";
++  for (int dr = 5; dr >= 0; --dr)
++    ss << "SF" << 12 - dr << " " << receivedSF[dr] / sentSF[dr] * 100 << "%, ";
++  ss << "\n";
++
++  double totTime = (Simulator::Now () - startTime).GetSeconds ();
++  ss << "\nInput Traffic: " << totBytesSent * 8 / totTime
++     << " b/s\nNetwork Throughput: " << totBytesReceived * 8 / totTime << " b/s\n";
++
++  totOffTraff /= totTime;
++  ss << "\nTotal offered traffic: " << totOffTraff << " E\n";
++
++  return ss.str ();
+ }
++
++void
++LoraPacketTracker::EnableOldPacketsCleanup (Time oldPacketThreshold)
++{
++  NS_ASSERT_MSG (
++      oldPacketThreshold > Minutes (30),
++      "Threshold to consider packets old should be > 30 min to avoid risk of partial entries");
++  m_oldPacketThreshold = oldPacketThreshold;
++}
++
++void
++LoraPacketTracker::CleanupOldPackets (void)
++{
++  if (m_oldPacketThreshold.IsZero ())
++    return;
++  if (Simulator::Now () < m_lastPacketCleanup + m_oldPacketThreshold)
++    return;
++
++  for (auto it = m_packetTracker.cbegin (); it != m_packetTracker.cend ();)
++    {
++      if ((*it).second.sendTime < Simulator::Now () - m_oldPacketThreshold)
++        it = m_packetTracker.erase (it);
++      else
++        ++it;
++    }
++
++  for (auto it = m_macPacketTracker.cbegin (); it != m_macPacketTracker.cend ();)
++    {
++      if ((*it).second.sendTime < Simulator::Now () - m_oldPacketThreshold)
++        it = m_macPacketTracker.erase (it);
++      else
++        ++it;
++    }
++
++  for (auto it = m_reTransmissionTracker.cbegin (); it != m_reTransmissionTracker.cend ();)
++    {
++      if ((*it).second.firstAttempt < Simulator::Now () - m_oldPacketThreshold)
++        it = m_reTransmissionTracker.erase (it);
++      else
++        ++it;
++    }
++
++  m_lastPacketCleanup = Simulator::Now ();
++}
++
++} // namespace lorawan
++} // namespace ns3
+diff --git a/helper/lora-packet-tracker.h b/helper/lora-packet-tracker.h
+index ab8c3da..d440c7c 100644
+--- a/helper/lora-packet-tracker.h
++++ b/helper/lora-packet-tracker.h
+@@ -30,8 +30,7 @@
+ namespace ns3 {
+ namespace lorawan {
+ 
+-enum PhyPacketOutcome
+-{
++enum PhyPacketOutcome {
+   RECEIVED,
+   INTERFERED,
+   NO_MORE_RECEIVERS,
+@@ -69,6 +68,27 @@ typedef std::map<Ptr<Packet const>, MacPacketStatus> MacPacketData;
+ typedef std::map<Ptr<Packet const>, PacketStatus> PhyPacketData;
+ typedef std::map<Ptr<Packet const>, RetransmissionStatus> RetransmissionData;
+ 
++struct devCount_t
++{
++  int sent = 0;
++  int received = 0;
++};
++
++using DevPktCount = std::unordered_map<uint32_t, devCount_t>;
++
++struct phyCount_t
++{
++  std::vector<int> v = std::vector<int> (6, 0);
++};
++
++using GwsPhyPktCount = std::map<uint32_t, phyCount_t>;
++
++struct phyPrint_t
++{
++  std::string s = "0 0 0 0 0 0";
++};
++
++using GwsPhyPktPrint = std::unordered_map<uint32_t, phyPrint_t>;
+ 
+ class LoraPacketTracker
+ {
+@@ -93,8 +113,8 @@ public:
+   /////////////////////////
+   // Packet transmission at an EndDevice
+   void MacTransmissionCallback (Ptr<Packet const> packet);
+-  void RequiredTransmissionsCallback (uint8_t reqTx, bool success,
+-                                      Time firstAttempt, Ptr<Packet> packet);
++  void RequiredTransmissionsCallback (uint8_t reqTx, bool success, Time firstAttempt,
++                                      Ptr<Packet> packet);
+   // Packet reception at the Gateway
+   void MacGwReceptionCallback (Ptr<Packet const> packet);
+ 
+@@ -111,27 +131,20 @@ public:
+    * Count packets to evaluate the performance at PHY level of a specific
+    * gateway.
+    */
+-  std::vector<int> CountPhyPacketsPerGw (Time startTime, Time stopTime,
+-                                         int systemId);
+-  /**
+-   * Count packets to evaluate the performance at PHY level of a specific
+-   * gateway.
+-   */
+-  std::string PrintPhyPacketsPerGw (Time startTime, Time stopTime,
+-                                    int systemId);
+-  /**
+-   * Count packets to evaluate the performance at MAC level of a specific
+-   * gateway.
+-   */
+-  std::string CountMacPacketsPerGw (Time startTime, Time stopTime,
+-                                    int systemId);
++  std::vector<int> CountPhyPacketsPerGw (Time startTime, Time stopTime, int systemId);
++  std::string PrintPhyPacketsPerGw (Time startTime, Time stopTime, int systemId);
++
++  void CountPhyPacketsAllGws (Time startTime, Time stopTime, GwsPhyPktCount &output);
++  void PrintPhyPacketsAllGws (Time startTime, Time stopTime, GwsPhyPktPrint &output);
++
++  std::string PrintPhyPacketsGlobally (Time startTime, Time stopTime);
+ 
+   /**
+    * Count packets to evaluate the performance at MAC level of a specific
+    * gateway.
+    */
+-  std::string PrintMacPacketsPerGw (Time startTime, Time stopTime,
+-                                    int systemId);
++  std::string CountMacPacketsPerGw (Time startTime, Time stopTime, int systemId);
++  std::string PrintMacPacketsPerGw (Time startTime, Time stopTime, int systemId);
+ 
+   /**
+    * Count the number of retransmissions that were needed to correctly deliver a
+@@ -159,11 +172,24 @@ public:
+    * of packets that generated a successful acknowledgment.
+    */
+   std::string CountMacPacketsGloballyCpsr (Time startTime, Time stopTime);
++
++  std::string PrintDevicePackets (Time startTime, Time stopTime, uint32_t devId);
++  void CountAllDevicesPackets (Time startTime, Time stopTime, DevPktCount &out);
++
++  std::string PrintSimulationStatistics (Time startTime = Seconds (0));
++
++  void EnableOldPacketsCleanup (Time oldPacketThreshold = Hours (12));
++
+ private:
++  void CleanupOldPackets (void);
++
+   PhyPacketData m_packetTracker;
+   MacPacketData m_macPacketTracker;
+   RetransmissionData m_reTransmissionTracker;
++
++  Time m_oldPacketThreshold;
++  Time m_lastPacketCleanup;
+ };
+-}
+-}
++} // namespace lorawan
++} // namespace ns3
+ #endif
+diff --git a/helper/lora-phy-helper.cc b/helper/lora-phy-helper.cc
+index 060137b..b3fa1fd 100644
+--- a/helper/lora-phy-helper.cc
++++ b/helper/lora-phy-helper.cc
+@@ -27,7 +27,8 @@ namespace lorawan {
+ 
+ NS_LOG_COMPONENT_DEFINE ("LoraPhyHelper");
+ 
+-LoraPhyHelper::LoraPhyHelper () : m_maxReceptionPaths (8), m_txPriority (true)
++LoraPhyHelper::LoraPhyHelper () : m_maxReceptionPaths (8), 
++    m_txPriority (true), m_duplex (true)
+ {
+   NS_LOG_FUNCTION (this);
+ }
+@@ -110,14 +111,14 @@ LoraPhyHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
+           receptionPaths++;
+         }
+     }
+-  else if (typeId == "ns3::SimpleEndDeviceLoraPhy")
++  else if (typeId == "ns3::SimpleEndDeviceLoraPhy" and m_duplex)
+     {
+       // The line below can be commented to speed up uplink-only simulations.
+       // This implies that the LoraChannel instance will only know about
+       // Gateways, and it will not lose time delivering packets and interference
+       // information to devices which will never listen.
+ 
+-      m_channel->Add (phy);
++      m_channel->AddDown (phy);
+     }
+ 
+   // Link the PHY to its net device
+@@ -138,5 +139,11 @@ LoraPhyHelper::SetGatewayTransmissionPriority (bool txPriority)
+ {
+   m_txPriority = txPriority;
+ }
++
++void
++LoraPhyHelper::SetDuplexMode (bool duplex)
++{
++  m_duplex = duplex;
++}
+ } // namespace lorawan
+ } // namespace ns3
+diff --git a/helper/lora-phy-helper.h b/helper/lora-phy-helper.h
+index b5b51b1..dc944c1 100644
+--- a/helper/lora-phy-helper.h
++++ b/helper/lora-phy-helper.h
+@@ -102,7 +102,7 @@ public:
+    */
+   void SetGatewayTransmissionPriority (bool txPriority);
+ 
+-
++  void SetDuplexMode (bool duplex);
+ 
+ private:
+   /**
+@@ -125,6 +125,11 @@ private:
+    */
+   bool m_txPriority;
+ 
++  /**
++   * Wheather we compute device reception (slower)
++   */
++  bool m_duplex;
++
+ };
+ 
+ }   //namespace ns3
+diff --git a/helper/lorawan-mac-helper.cc b/helper/lorawan-mac-helper.cc
+index 3de51c6..e86dec4 100644
+--- a/helper/lorawan-mac-helper.cc
++++ b/helper/lorawan-mac-helper.cc
+@@ -24,6 +24,11 @@
+ #include "ns3/lora-net-device.h"
+ #include "ns3/log.h"
+ #include "ns3/random-variable-stream.h"
++#include "ns3/congestion-control-component.h"
++#include "ns3/traffic-control-utils.h"
++#include "ns3/lora-application.h"
++#include "ns3/node-list.h"
++#include "ns3/packet.h"
+ 
+ namespace ns3 {
+ namespace lorawan {
+@@ -143,7 +148,7 @@ LorawanMacHelper::ConfigureForAlohaRegion (Ptr<ClassAEndDeviceLorawanMac> edMac)
+   /////////////////////////////////////////////////////
+   // TxPower -> Transmission power in dBm conversion //
+   /////////////////////////////////////////////////////
+-  edMac->SetTxDbmForTxPower (std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
++  edMac->SetTxDbmForTxPower (std::vector<double>{14, 12, 10, 8, 6, 4, 2, 0});
+ 
+   ////////////////////////////////////////////////////////////
+   // Matrix to know which DataRate the GW will respond with //
+@@ -237,10 +242,10 @@ LorawanMacHelper::ConfigureForEuRegion (Ptr<ClassAEndDeviceLorawanMac> edMac) co
+ 
+   ApplyCommonEuConfigurations (edMac);
+ 
+-  /////////////////////////////////////////////////////
+-  // TxPower -> Transmission power in dBm conversion //
+-  /////////////////////////////////////////////////////
+-  edMac->SetTxDbmForTxPower (std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
++  ////////////////////////////////////////////////////////////
++  // TxPower -> Transmission power in dBm e.r.p. conversion //
++  ////////////////////////////////////////////////////////////
++  edMac->SetTxDbmForTxPower (std::vector<double>{14, 12, 10, 8, 6, 4, 2, 0});
+ 
+   ////////////////////////////////////////////////////////////
+   // Matrix to know which DataRate the GW will respond with //
+@@ -296,7 +301,7 @@ LorawanMacHelper::ConfigureForEuRegion (Ptr<GatewayLorawanMac> gwMac) const
+         }
+ 
+       int receptionPaths = 0;
+-      int maxReceptionPaths = 8;
++      int maxReceptionPaths = 50;
+       while (receptionPaths < maxReceptionPaths)
+         {
+           gwPhy->GetObject<GatewayLoraPhy> ()->AddReceptionPath ();
+@@ -315,9 +320,12 @@ LorawanMacHelper::ApplyCommonEuConfigurations (Ptr<LorawanMac> lorawanMac) const
+   //////////////
+ 
+   LogicalLoraChannelHelper channelHelper;
++  channelHelper.AddSubBand (863, 865, 0.001, 14);
++  channelHelper.AddSubBand (865, 868, 0.01, 14);
+   channelHelper.AddSubBand (868, 868.6, 0.01, 14);
+   channelHelper.AddSubBand (868.7, 869.2, 0.001, 14);
+   channelHelper.AddSubBand (869.4, 869.65, 0.1, 27);
++  channelHelper.AddSubBand (869.7, 870, 0.01, 14);
+ 
+   //////////////////////
+   // Default channels //
+@@ -329,6 +337,21 @@ LorawanMacHelper::ApplyCommonEuConfigurations (Ptr<LorawanMac> lorawanMac) const
+   channelHelper.AddChannel (lc2);
+   channelHelper.AddChannel (lc3);
+ 
++  ////////////////////////
++  // Addtional channels //
++  ////////////////////////
++
++  Ptr<LogicalLoraChannel> lc4 = CreateObject<LogicalLoraChannel> (867.1, 0, 5);
++  Ptr<LogicalLoraChannel> lc5 = CreateObject<LogicalLoraChannel> (867.3, 0, 5);
++  Ptr<LogicalLoraChannel> lc6 = CreateObject<LogicalLoraChannel> (867.5, 0, 5);
++  Ptr<LogicalLoraChannel> lc7 = CreateObject<LogicalLoraChannel> (867.7, 0, 5);
++  Ptr<LogicalLoraChannel> lc8 = CreateObject<LogicalLoraChannel> (867.9, 0, 5);
++  //channelHelper.AddChannel (lc4);
++  //channelHelper.AddChannel (lc5);
++  //channelHelper.AddChannel (lc6);
++  //channelHelper.AddChannel (lc7);
++  //channelHelper.AddChannel (lc8);
++
+   lorawanMac->SetLogicalLoraChannelHelper (channelHelper);
+ 
+   ///////////////////////////////////////////////
+@@ -354,7 +377,7 @@ LorawanMacHelper::ConfigureForSingleChannelRegion (Ptr<ClassAEndDeviceLorawanMac
+   /////////////////////////////////////////////////////
+   // TxPower -> Transmission power in dBm conversion //
+   /////////////////////////////////////////////////////
+-  edMac->SetTxDbmForTxPower (std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
++  edMac->SetTxDbmForTxPower (std::vector<double>{14, 12, 10, 8, 6, 4, 2, 0});
+ 
+   ////////////////////////////////////////////////////////////
+   // Matrix to know which DataRate the GW will respond with //
+@@ -456,7 +479,7 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
+ {
+   NS_LOG_FUNCTION_NOARGS ();
+ 
+-  std::vector<int> sfQuantity (7, 0);
++  std::vector<int> sfQuantity (6, 0);
+   for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j)
+     {
+       Ptr<Node> object = *j;
+@@ -473,7 +496,7 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
+       Ptr<Node> bestGateway = gateways.Get (0);
+       Ptr<MobilityModel> bestGatewayPosition = bestGateway->GetObject<MobilityModel> ();
+ 
+-      // Assume devices transmit at 14 dBm
++      // Assume devices transmit at 14 dBm erp
+       double highestRxPower = channel->GetRxPower (14, position, bestGatewayPosition);
+ 
+       for (NodeContainer::Iterator currentGw = gateways.Begin () + 1; currentGw != gateways.End ();
+@@ -495,98 +518,43 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
+       // NS_LOG_DEBUG ("Rx Power: " << highestRxPower);
+       double rxPower = highestRxPower;
+ 
+-      // Get the ED sensitivity
+-      Ptr<EndDeviceLoraPhy> edPhy = loraNetDevice->GetPhy ()->GetObject<EndDeviceLoraPhy> ();
+-      const double *edSensitivity = edPhy->sensitivity;
+-
+-      if (rxPower > *edSensitivity)
+-        {
+-          mac->SetDataRate (5);
+-          sfQuantity[0] = sfQuantity[0] + 1;
+-        }
+-      else if (rxPower > *(edSensitivity + 1))
+-        {
+-          mac->SetDataRate (4);
+-          sfQuantity[1] = sfQuantity[1] + 1;
+-        }
+-      else if (rxPower > *(edSensitivity + 2))
+-        {
+-          mac->SetDataRate (3);
+-          sfQuantity[2] = sfQuantity[2] + 1;
+-        }
+-      else if (rxPower > *(edSensitivity + 3))
+-        {
+-          mac->SetDataRate (2);
+-          sfQuantity[3] = sfQuantity[3] + 1;
+-        }
+-      else if (rxPower > *(edSensitivity + 4))
+-        {
+-          mac->SetDataRate (1);
+-          sfQuantity[4] = sfQuantity[4] + 1;
+-        }
+-      else if (rxPower > *(edSensitivity + 5))
+-        {
+-          mac->SetDataRate (0);
+-          sfQuantity[5] = sfQuantity[5] + 1;
+-        }
+-      else // Device is out of range. Assign SF12.
+-        {
+-          // NS_LOG_DEBUG ("Device out of range");
+-          mac->SetDataRate (0);
+-          sfQuantity[6] = sfQuantity[6] + 1;
+-          // NS_LOG_DEBUG ("sfQuantity[6] = " << sfQuantity[6]);
+-        }
+-
+-      /*
+-
+-      // Get the Gw sensitivity
+-      Ptr<NetDevice> gatewayNetDevice = bestGateway->GetDevice (0);
+-      Ptr<LoraNetDevice> gatewayLoraNetDevice = gatewayNetDevice->GetObject<LoraNetDevice> ();
+-      Ptr<GatewayLoraPhy> gatewayPhy = gatewayLoraNetDevice->GetPhy ()->GetObject<GatewayLoraPhy> ();
+-      const double *gwSensitivity = gatewayPhy->sensitivity;
+-
+-      if(rxPower > *gwSensitivity)
+-        {
+-          mac->SetDataRate (5);
+-          sfQuantity[0] = sfQuantity[0] + 1;
+-
+-        }
+-      else if (rxPower > *(gwSensitivity+1))
+-        {
+-          mac->SetDataRate (4);
+-          sfQuantity[1] = sfQuantity[1] + 1;
+-
+-        }
+-      else if (rxPower > *(gwSensitivity+2))
+-        {
+-          mac->SetDataRate (3);
+-          sfQuantity[2] = sfQuantity[2] + 1;
+-
+-        }
+-      else if (rxPower > *(gwSensitivity+3))
+-        {
+-          mac->SetDataRate (2);
+-          sfQuantity[3] = sfQuantity[3] + 1;
+-        }
+-      else if (rxPower > *(gwSensitivity+4))
++      std::vector<double> snrThresholds = {-7.5, -10, -12.5, -15, -17.5, -20}; // dB
++      double noise = -174.0 + 10 * log10 (125000.0) + 6; // dBm
++      double snr = rxPower - noise; // dB
++
++      double prob_H = 0.98;
++      // dB, desired thermal gain for 0.98 PDR with rayleigh fading
++      double deviceMargin = 10 * log10 (-1 / log (prob_H));
++      double snrMargin = snr - deviceMargin;
++
++      uint8_t datarate = 0; // SF12 by default
++      if (snrMargin > snrThresholds[0])
++        datarate = 5; // SF7
++      else if (snrMargin > snrThresholds[1])
++        datarate = 4; // SF8
++      else if (snrMargin > snrThresholds[2])
++        datarate = 3; // SF9
++      else if (snrMargin > snrThresholds[3])
++        datarate = 2; // SF10
++      else if (snrMargin > snrThresholds[4])
++        datarate = 1; // SF11
++
++      mac->SetDataRate (datarate);
++      sfQuantity[datarate]++;
++
++      // Minimize power
++      if (datarate != 6)
++        continue;
++      for (int j = 14; j >= 0; j -= 2)
+         {
+-          mac->SetDataRate (1);
+-          sfQuantity[4] = sfQuantity[4] + 1;
+-        }
+-      else if (rxPower > *(gwSensitivity+5))
+-        {
+-          mac->SetDataRate (0);
+-          sfQuantity[5] = sfQuantity[5] + 1;
+-
+-        }
+-      else // Device is out of range. Assign SF12.
+-        {
+-          mac->SetDataRate (0);
+-          sfQuantity[6] = sfQuantity[6] + 1;
+-
++          snrMargin =
++              channel->GetRxPower (14, position, bestGatewayPosition) - noise - deviceMargin;
++          if (snrMargin > snrThresholds[0])
++            {
++              mac->SetTransmissionPower (14 - j);
++              break;
++            }
+         }
+-        */
+-
+     } // end loop on nodes
+ 
+   return sfQuantity;
+@@ -668,5 +636,105 @@ LorawanMacHelper::SetSpreadingFactorsGivenDistribution (NodeContainer endDevices
+ 
+ } //  end function
+ 
++void
++LorawanMacHelper::SetDutyCyclesWithCapacityModel (NodeContainer endDevices, NodeContainer gateways,
++                                                  Ptr<LoraChannel> channel, cluster_t targets,
++                                                  int beta)
++{
++  using datarate_t = std::vector<std::pair<uint32_t, double>>;
++  using gateway_t = std::vector<std::vector<datarate_t>>;
++  using output_t = std::unordered_map<uint32_t, uint8_t>;
++
++  const int N_SF = 6;
++  const int N_CL = targets.size ();
++  std::vector<int> N_CH (N_CL, 0);
++
++  // Partition devices & retrieve their offered traffic and channels
++  std::map<uint32_t, gateway_t> gwgroups;
++  for (NodeContainer::Iterator currGw = gateways.Begin (); currGw != gateways.End (); ++currGw)
++    gwgroups[(*currGw)->GetId ()] = gateway_t (N_CL, std::vector<datarate_t> (N_SF));
++  for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j)
++    {
++      Ptr<Node> object = *j;
++      Ptr<MobilityModel> position = object->GetObject<MobilityModel> ();
++      NS_ASSERT (position != 0);
++      Ptr<NetDevice> netDevice = object->GetDevice (0);
++      Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
++      NS_ASSERT (loraNetDevice != 0);
++      Ptr<ClassAEndDeviceLorawanMac> mac =
++          loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
++      NS_ASSERT (mac != 0);
++
++      // Try computing the distance from each gateway and find the best one
++      Ptr<Node> bestGateway = gateways.Get (0);
++      Ptr<MobilityModel> bestGatewayPosition = bestGateway->GetObject<MobilityModel> ();
++
++      // Assume devices transmit at 14 dBm erp
++      double highestRxPower = channel->GetRxPower (14, position, bestGatewayPosition);
++
++      for (NodeContainer::Iterator currentGw = gateways.Begin () + 1; currentGw != gateways.End ();
++           ++currentGw)
++        {
++          // Compute the power received from the current gateway
++          Ptr<Node> curr = *currentGw;
++          Ptr<MobilityModel> currPosition = curr->GetObject<MobilityModel> ();
++          double currentRxPower = channel->GetRxPower (14, position, currPosition); // dBm
++
++          if (currentRxPower > highestRxPower)
++            bestGateway = curr;
++        }
++
++      Ptr<LoraApplication> app = object->GetApplication (0)->GetObject<LoraApplication> ();
++
++      Ptr<Packet> tmp =
++          ns3::Create<Packet> (app->GetPacketSize () + 13 /* Headers with no MAC commands */);
++      LoraTxParameters params;
++      params.sf = 12 - mac->GetDataRate ();
++      params.lowDataRateOptimizationEnabled =
++          LoraPhy::GetTSym (params) > MilliSeconds (16) ? true : false;
++
++      double toa = LoraPhy::GetOnAirTime (tmp, params).GetSeconds ();
++      double traffic = toa / app->GetInterval ().GetSeconds ();
++      traffic = (traffic > 0.01) ? 0.01 : traffic;
++
++      gwgroups[bestGateway->GetId ()][mac->GetCluster ()][mac->GetDataRate ()].push_back (
++          {object->GetId (), traffic});
++
++      if (N_CH[mac->GetCluster ()])
++        continue;
++      N_CH[mac->GetCluster ()] =
++          mac->GetLogicalLoraChannelHelper ().GetEnabledChannelList ().size ();
++    }
++
++  // Optimize duty cycle
++  for (auto const &gw : gwgroups)
++    for (int cl = 0; cl < N_CL; ++cl)
++      for (auto const &dr : gw.second[cl])
++        {
++          double limit = CongestionControlComponent::CapacityForPDRModel (targets[cl].second) *
++                         N_CH[cl] * beta;
++          output_t out;
++          TrafficControlUtils::OptimizeDutyCycleMaxMin (dr, limit, out);
++          for (auto const &id : out)
++            {
++              Ptr<Node> curr = NodeList::GetNode (id.first);
++              Ptr<NetDevice> netDevice = curr->GetDevice (0);
++              Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
++              Ptr<ClassAEndDeviceLorawanMac> mac =
++                  loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
++              // Check if we need to turn off completely
++              if (id.second == 255)
++                {
++                  NS_LOG_DEBUG ("Device " + std::to_string (curr->GetId ()) + " disabled.");
++                  mac->SetAggregatedDutyCycle (0);
++                }
++              else if (id.second == 0)
++                mac->SetAggregatedDutyCycle (1);
++              else
++                mac->SetAggregatedDutyCycle (1 / std::pow (2, double (id.second)));
++            }
++        }
++}
++
+ } // namespace lorawan
+ } // namespace ns3
+diff --git a/helper/lorawan-mac-helper.h b/helper/lorawan-mac-helper.h
+index e472fa1..3eaca0e 100644
+--- a/helper/lorawan-mac-helper.h
++++ b/helper/lorawan-mac-helper.h
+@@ -36,6 +36,8 @@ namespace lorawan {
+ 
+ class LorawanMacHelper
+ {
++  using cluster_t = std::vector<std::pair<double, double>>;
++
+ public:
+   /**
+    * Define the kind of device. Can be either GW (Gateway) or ED (End Device).
+@@ -117,6 +119,10 @@ public:
+                                                                 NodeContainer gateways,
+                                                                 std::vector<double> distribution);
+ 
++  static void SetDutyCyclesWithCapacityModel (NodeContainer endDevices, NodeContainer gateways,
++                                              Ptr<LoraChannel> channel, cluster_t targets,
++                                              int beta = 1);
++
+ private:
+   /**
+    * Perform region-specific configurations for the 868 MHz EU band.
+diff --git a/helper/network-server-helper.cc b/helper/network-server-helper.cc
+index dc4f8f8..fd7fa44 100644
+--- a/helper/network-server-helper.cc
++++ b/helper/network-server-helper.cc
+@@ -21,9 +21,11 @@
+ #include "ns3/network-server-helper.h"
+ #include "ns3/network-controller-components.h"
+ #include "ns3/adr-component.h"
++#include "ns3/congestion-control-component.h"
+ #include "ns3/double.h"
+ #include "ns3/string.h"
+ #include "ns3/trace-source-accessor.h"
++#include "ns3/point-to-point-channel.h"
+ #include "ns3/simulator.h"
+ #include "ns3/log.h"
+ 
+@@ -32,12 +34,11 @@ namespace lorawan {
+ 
+ NS_LOG_COMPONENT_DEFINE ("NetworkServerHelper");
+ 
+-NetworkServerHelper::NetworkServerHelper ()
++NetworkServerHelper::NetworkServerHelper () : m_adrEnabled (false), m_ccEnabled (false)
+ {
+   m_factory.SetTypeId ("ns3::NetworkServer");
+-  p2pHelper.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
+-  p2pHelper.SetChannelAttribute ("Delay", StringValue ("2ms"));
+   SetAdr ("ns3::AdrComponent");
++  m_clusterTargets = {0.95};
+ }
+ 
+ NetworkServerHelper::~NetworkServerHelper ()
+@@ -50,12 +51,6 @@ NetworkServerHelper::SetAttribute (std::string name, const AttributeValue &value
+   m_factory.Set (name, value);
+ }
+ 
+-void
+-NetworkServerHelper::SetGateways (NodeContainer gateways)
+-{
+-  m_gateways = gateways;
+-}
+-
+ void
+ NetworkServerHelper::SetEndDevices (NodeContainer endDevices)
+ {
+@@ -90,26 +85,26 @@ NetworkServerHelper::InstallPriv (Ptr<Node> node)
+   app->SetNode (node);
+   node->AddApplication (app);
+ 
+-  // Cycle on each gateway
+-  for (NodeContainer::Iterator i = m_gateways.Begin ();
+-       i != m_gateways.End ();
+-       i++)
+-    {
+-      // Add the connections with the gateway
+-      // Create a PointToPoint link between gateway and NS
+-      NetDeviceContainer container = p2pHelper.Install (node, *i);
+-
+-      // Add the gateway to the NS list
+-      app->AddGateway (*i, container.Get (0));
+-    }
+-
+-  // Link the NetworkServer to its NetDevices
+   for (uint32_t i = 0; i < node->GetNDevices (); i++)
+     {
++      // Link the NetworkServer app to its NetDevices
+       Ptr<NetDevice> currentNetDevice = node->GetDevice (i);
+-      currentNetDevice->SetReceiveCallback (MakeCallback
+-                                              (&NetworkServer::Receive,
+-                                              app));
++      currentNetDevice->SetReceiveCallback (MakeCallback (&NetworkServer::Receive, app));
++      
++      // Register gateways
++      Ptr<Channel> channel = currentNetDevice->GetChannel ();
++      NS_ASSERT_MSG (channel->GetObject<PointToPointChannel> () != 0, 
++                     "Connection with gateways is not PointToPoint");
++      for (uint32_t j = 0; j < channel->GetNDevices (); ++j)
++        {
++          Ptr<Node> gwNode = channel->GetDevice (j)->GetNode ();
++          if (gwNode->GetId () != node->GetId ())
++            {
++              // Add the gateway to the NS list
++              app->AddGateway (gwNode, currentNetDevice);
++              break;
++            }
++        }
+     }
+ 
+   // Add the end devices
+@@ -138,6 +133,62 @@ NetworkServerHelper::SetAdr (std::string type)
+   m_adrSupportFactory.SetTypeId (type);
+ }
+ 
++void
++NetworkServerHelper::EnableCongestionControl (bool enableCC)
++{
++  NS_LOG_FUNCTION (this << enableCC);
++
++  m_ccEnabled = enableCC;
++}
++
++void
++NetworkServerHelper::AssignClusters (cluster_t clustersInfo) 
++{
++  int nClusters = clustersInfo.size ();
++  NS_ASSERT_MSG (nClusters <= 3, 
++      "For the moment only up to 3 clusters are supported.");
++  NS_ASSERT_MSG (m_endDevices.GetN () > 0, 
++      "Devices must be set before assigning clusters.");
++
++  double devWeight = double (100.0) / m_endDevices.GetN ();
++
++  uint8_t currCluster = 0;
++  double totWeight = 0;
++  for (NodeContainer::Iterator i = m_endDevices.Begin (); i != m_endDevices.End (); ++i)
++    {
++      if (clustersInfo[currCluster].first == 0.0)
++        currCluster++;
++
++      Ptr<EndDeviceLorawanMac> mac = (*i)->GetDevice (0)->GetObject<LoraNetDevice> ()
++          ->GetMac ()->GetObject<EndDeviceLorawanMac> ();
++      mac->SetCluster (currCluster);
++      
++      // Assign one frequency to each cluster
++      int chid = 0;
++      for (auto &ch : mac->GetLogicalLoraChannelHelper ().GetChannelList ())
++        {
++          if (chid == currCluster)
++            ch->SetEnabledForUplink ();
++          else
++            ch->DisableForUplink ();
++          chid++;
++        }
++
++      totWeight += devWeight;
++
++      if (currCluster < nClusters - 1 and
++          totWeight >= clustersInfo[currCluster].first - devWeight / 2)
++        {
++          currCluster++;
++          totWeight = 0;
++        }
++    }
++  
++  m_clusterTargets.clear ();
++  for (auto const &cluster : clustersInfo)
++    m_clusterTargets.push_back (cluster.second);
++}
++
+ void
+ NetworkServerHelper::InstallComponents (Ptr<NetworkServer> netServer)
+ {
+@@ -157,6 +208,15 @@ NetworkServerHelper::InstallComponents (Ptr<NetworkServer> netServer)
+     {
+       netServer->AddComponent (m_adrSupportFactory.Create<NetworkControllerComponent> ());
+     }
++
++  // Add congestion control support
++  if (m_ccEnabled)
++    {
++      Ptr<CongestionControlComponent> ccc = CreateObject<CongestionControlComponent> ();
++      ccc->SetTargets (m_clusterTargets);
++      netServer->AddComponent (ccc);
++    }
+ }
++
+ }
+ } // namespace ns3
+diff --git a/helper/network-server-helper.h b/helper/network-server-helper.h
+index 4d3b454..6b99f5f 100644
+--- a/helper/network-server-helper.h
++++ b/helper/network-server-helper.h
+@@ -40,6 +40,9 @@ namespace lorawan {
+  */
+ class NetworkServerHelper
+ {
++  
++  using cluster_t = std::vector<std::pair<double, double>>;
++
+ public:
+   NetworkServerHelper ();
+ 
+@@ -51,11 +54,6 @@ public:
+ 
+   ApplicationContainer Install (Ptr<Node> node);
+ 
+-  /**
+-   * Set which gateways will need to be connected to this NS.
+-   */
+-  void SetGateways (NodeContainer gateways);
+-
+   /**
+    * Set which end devices will be managed by this NS.
+    */
+@@ -73,24 +71,35 @@ public:
+    */
+   void SetAdr (std::string type);
+ 
++  /**
++   * Enable (true) or disable (false) the congestion control component 
++   * in the Network Server created by this helper.
++   */
++  void EnableCongestionControl (bool enableCC);
++
++  /** 
++   * Assign cluster membership to devices and create interference domains.
++   */
++  void AssignClusters (cluster_t clustersInfo);
++
+ private:
+   void InstallComponents (Ptr<NetworkServer> netServer);
+   Ptr<Application> InstallPriv (Ptr<Node> node);
+ 
+   ObjectFactory m_factory;
+ 
+-  NodeContainer m_gateways;   //!< Set of gateways to connect to this NS
+-
+-  NodeContainer m_endDevices;   //!< Set of endDevices to connect to this NS
+-
+-  PointToPointHelper p2pHelper; //!< Helper to create PointToPoint links
++  NodeContainer m_endDevices; //!< Set of endDevices to connect to this NS
+ 
+   bool m_adrEnabled;
+ 
++  bool m_ccEnabled;
++
+   ObjectFactory m_adrSupportFactory;
++
++  std::vector<double> m_clusterTargets; 
+ };
+ 
+-} // namespace ns3
++} // namespace lorawan
+ 
+-}
++} // namespace ns3
+ #endif /* NETWORK_SERVER_HELPER_H */
+diff --git a/helper/periodic-sender-helper.cc b/helper/periodic-sender-helper.cc
+index 205048b..cefd102 100644
+--- a/helper/periodic-sender-helper.cc
++++ b/helper/periodic-sender-helper.cc
+@@ -26,6 +26,7 @@
+ #include "ns3/trace-source-accessor.h"
+ #include "ns3/simulator.h"
+ #include "ns3/log.h"
++#include "ns3/pointer.h"
+ 
+ namespace ns3 {
+ namespace lorawan {
+@@ -36,6 +37,8 @@ PeriodicSenderHelper::PeriodicSenderHelper ()
+ {
+   m_factory.SetTypeId ("ns3::PeriodicSender");
+ 
++  m_period = Minutes (10.0);
++
+   // m_factory.Set ("PacketSizeRandomVariable", StringValue
+   //                  ("ns3::ParetoRandomVariable[Bound=10|Shape=2.5]"));
+ 
+@@ -48,6 +51,9 @@ PeriodicSenderHelper::PeriodicSenderHelper ()
+ 
+   m_pktSize = 10;
+   m_pktSizeRV = 0;
++
++  m_intervalGenerator = 0;
++  m_sizeGenerator = 0;
+ }
+ 
+ PeriodicSenderHelper::~PeriodicSenderHelper ()
+@@ -96,11 +102,11 @@ PeriodicSenderHelper::InstallPriv (Ptr<Node> node) const
+         {
+           interval = Days (1);
+         }
+-      else if (0.4 <= intervalProb  && intervalProb < 0.8)
++      else if (0.4 <= intervalProb && intervalProb < 0.8)
+         {
+           interval = Hours (2);
+         }
+-      else if (0.8 <= intervalProb  && intervalProb < 0.95)
++      else if (0.8 <= intervalProb && intervalProb < 0.95)
+         {
+           interval = Hours (1);
+         }
+@@ -113,13 +119,23 @@ PeriodicSenderHelper::InstallPriv (Ptr<Node> node) const
+     {
+       interval = m_period;
+     }
++  // Overwrite interval if random variable for iterval was provided
++  if (m_intervalGenerator)
++    {
++      interval = Seconds (m_intervalGenerator->GetValue ());
++    }
+ 
+   app->SetInterval (interval);
+-  NS_LOG_DEBUG ("Created an application with interval = " <<
+-                interval.GetHours () << " hours");
+-
++  NS_LOG_DEBUG ("Created an application with interval = " << interval.GetSeconds () << " seconds");
+   app->SetInitialDelay (Seconds (m_initialDelay->GetValue (0, interval.GetSeconds ())));
++
+   app->SetPacketSize (m_pktSize);
++  // Different on each device
++  if (m_sizeGenerator)
++    {
++      app->SetPacketSize (m_sizeGenerator->GetInteger ());
++    }
++  // Different each transmission
+   if (m_pktSizeRV)
+     {
+       app->SetPacketSizeRandomVariable (m_pktSizeRV);
+@@ -138,7 +154,7 @@ PeriodicSenderHelper::SetPeriod (Time period)
+ }
+ 
+ void
+-PeriodicSenderHelper::SetPacketSizeRandomVariable (Ptr <RandomVariableStream> rv)
++PeriodicSenderHelper::SetPacketSizeRandomVariable (Ptr<RandomVariableStream> rv)
+ {
+   m_pktSizeRV = rv;
+ }
+@@ -149,5 +165,17 @@ PeriodicSenderHelper::SetPacketSize (uint8_t size)
+   m_pktSize = size;
+ }
+ 
++void
++PeriodicSenderHelper::SetPacketSizeGenerator (Ptr<RandomVariableStream> rv)
++{
++  m_sizeGenerator = rv;
+ }
++
++void
++PeriodicSenderHelper::SetPeriodGenerator (Ptr<RandomVariableStream> rv)
++{
++  m_intervalGenerator = rv;
++}
++
++} // namespace lorawan
+ } // namespace ns3
+diff --git a/helper/periodic-sender-helper.h b/helper/periodic-sender-helper.h
+index 1c01aec..03556c5 100644
+--- a/helper/periodic-sender-helper.h
++++ b/helper/periodic-sender-helper.h
+@@ -61,10 +61,16 @@ public:
+    */
+   void SetPeriod (Time period);
+ 
+-  void SetPacketSizeRandomVariable (Ptr <RandomVariableStream> rv);
++  // Extract different constant period for each device from a distribution
++  void SetPeriodGenerator (Ptr<RandomVariableStream> rv);
+ 
+   void SetPacketSize (uint8_t size);
+ 
++  // Extract different constant packet size for each device from a distribution
++  void SetPacketSizeGenerator (Ptr<RandomVariableStream> rv);
++  
++  // Give devices a distribution to pick a different packet size on each transmission 
++  void SetPacketSizeRandomVariable (Ptr<RandomVariableStream> rv);
+ 
+ private:
+   Ptr<Application> InstallPriv (Ptr<Node> node) const;
+@@ -76,15 +82,18 @@ private:
+   Ptr<UniformRandomVariable> m_intervalProb;
+ 
+   Time m_period; //!< The period with which the application will be set to send
+-                 // messages
++      // messages
+ 
+-  Ptr<RandomVariableStream> m_pktSizeRV; // whether or not a random component is added to the packet size
++  Ptr<RandomVariableStream>
++      m_pktSizeRV; // whether or not a random component is added to the packet size
+ 
+   uint8_t m_pktSize; // the packet size.
+ 
++  Ptr<RandomVariableStream> m_intervalGenerator; //!< the sending interval assignment variable
++  Ptr<RandomVariableStream> m_sizeGenerator; //!< the packet size assignment variable
+ };
+ 
+-} // namespace ns3
++} // namespace lorawan
+ 
+-}
++} // namespace ns3
+ #endif /* PERIODIC_SENDER_HELPER_H */
+diff --git a/model/adr-component.cc b/model/adr-component.cc
+index d299732..be36d30 100644
+--- a/model/adr-component.cc
++++ b/model/adr-component.cc
+@@ -39,7 +39,7 @@ TypeId AdrComponent::GetTypeId (void)
+     .SetParent<NetworkControllerComponent> ()
+     .AddAttribute ("MultipleGwCombiningMethod",
+                    "Whether to average the received power of gateways or to use the maximum",
+-                   EnumValue (AdrComponent::AVERAGE),
++                   EnumValue (AdrComponent::MAXIMUM),
+                    MakeEnumAccessor (&AdrComponent::tpAveraging),
+                    MakeEnumChecker (AdrComponent::AVERAGE,
+                                     "avg",
+@@ -49,7 +49,7 @@ TypeId AdrComponent::GetTypeId (void)
+                                     "min"))
+     .AddAttribute ("MultiplePacketsCombiningMethod",
+                    "Whether to average SNRs from multiple packets or to use the maximum",
+-                   EnumValue (AdrComponent::AVERAGE),
++                   EnumValue (AdrComponent::MAXIMUM),
+                    MakeEnumAccessor (&AdrComponent::historyAveraging),
+                    MakeEnumChecker (AdrComponent::AVERAGE,
+                                     "avg",
+@@ -59,7 +59,7 @@ TypeId AdrComponent::GetTypeId (void)
+                                     "min"))
+     .AddAttribute ("HistoryRange",
+                    "Number of packets to use for averaging",
+-                   IntegerValue (4),
++                   IntegerValue (20),
+                    MakeIntegerAccessor (&AdrComponent::historyRange),
+                    MakeIntegerChecker<int> (0, 100))
+     .AddAttribute ("ChangeTransmissionPower",
+@@ -67,6 +67,9 @@ TypeId AdrComponent::GetTypeId (void)
+                    BooleanValue (true),
+                    MakeBooleanAccessor (&AdrComponent::m_toggleTxPower),
+                    MakeBooleanChecker ())
++    .AddAttribute ("SNRDeviceMargin", "Additional SNR margin needed to decrease SF/TxPower",
++                   DoubleValue (0), MakeDoubleAccessor (&AdrComponent::m_deviceMargin),
++                   MakeDoubleChecker<double> ())
+   ;
+   return tid;
+ }
+@@ -214,7 +217,7 @@ void AdrComponent::AdrImplementation (uint8_t *newDataRate,
+ 
+   //Compute the SNR margin taking into consideration the SNR of
+   //previously received packets
+-  double margin_SNR = m_SNR - req_SNR;
++  double margin_SNR = m_SNR - req_SNR - m_deviceMargin;
+ 
+   NS_LOG_DEBUG ("Margin = " << margin_SNR);
+ 
+@@ -437,31 +440,31 @@ double AdrComponent::GetAverageSNR (EndDeviceStatus::ReceivedPacketList packetLi
+ 
+ int AdrComponent::GetTxPowerIndex (int txPower)
+ {
+-  if (txPower >= 16)
++  if (txPower >= 14)
+     {
+       return 0;
+     }
+-  else if (txPower >= 14)
++  else if (txPower >= 12)
+     {
+       return 1;
+     }
+-  else if (txPower >= 12)
++  else if (txPower >= 10)
+     {
+       return 2;
+     }
+-  else if (txPower >= 10)
++  else if (txPower >= 8)
+     {
+       return 3;
+     }
+-  else if (txPower >= 8)
++  else if (txPower >= 6)
+     {
+       return 4;
+     }
+-  else if (txPower >= 6)
++  else if (txPower >= 4)
+     {
+       return 5;
+     }
+-  else if (txPower >= 4)
++  else if (txPower >= 2)
+     {
+       return 6;
+     }
+diff --git a/model/adr-component.h b/model/adr-component.h
+index 152215e..c7dc491 100644
+--- a/model/adr-component.h
++++ b/model/adr-component.h
+@@ -100,10 +100,10 @@ private:
+   //SF lower limit
+   const int min_spreadingFactor = 7;
+ 
+-  //Minimum transmission power (dBm) (Europe)
+-  const int min_transmissionPower = 2;
++  //Minimum transmission power (dBm e.r.p) (Europe)
++  const int min_transmissionPower = 0;
+ 
+-  //Maximum transmission power (dBm) (Europe)
++  //Maximum transmission power (dBm e.r.p) (Europe)
+   const int max_transmissionPower = 14;
+ 
+   //Device specific SNR margin (dB)
+@@ -119,7 +119,11 @@ private:
+   //ranging from 7 to 12 (the SNR values are in dB).
+   double treshold[6] = {-20.0, -17.5, -15.0, -12.5, -10.0, -7.5};
+ 
++  //Regulate power in the ADR algorithm
+   bool m_toggleTxPower;
++
++  //Additional SNR margin to decrease SF/TXPower
++  double m_deviceMargin;
+ };
+ }
+ }
+diff --git a/model/class-a-end-device-lorawan-mac.cc b/model/class-a-end-device-lorawan-mac.cc
+index 7b95837..2b7dc8c 100644
+--- a/model/class-a-end-device-lorawan-mac.cc
++++ b/model/class-a-end-device-lorawan-mac.cc
+@@ -104,7 +104,6 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
+ 
+   Ptr<LogicalLoraChannel> txChannel = GetChannelForTx ();
+ 
+-  NS_LOG_DEBUG ("PacketToSend: " << packetToSend);
+   m_phy->Send (packetToSend, params, txChannel->GetFrequency (), m_txPower);
+ 
+   //////////////////////////////////////////////
+diff --git a/model/end-device-lorawan-mac.cc b/model/end-device-lorawan-mac.cc
+index aa06d0f..e435b81 100644
+--- a/model/end-device-lorawan-mac.cc
++++ b/model/end-device-lorawan-mac.cc
+@@ -38,73 +38,65 @@ NS_OBJECT_ENSURE_REGISTERED (EndDeviceLorawanMac);
+ TypeId
+ EndDeviceLorawanMac::GetTypeId (void)
+ {
+-  static TypeId tid = TypeId ("ns3::EndDeviceLorawanMac")
+-    .SetParent<LorawanMac> ()
+-    .SetGroupName ("lorawan")
+-    .AddTraceSource ("RequiredTransmissions",
+-                     "Total number of transmissions required to deliver this packet",
+-                     MakeTraceSourceAccessor
+-                       (&EndDeviceLorawanMac::m_requiredTxCallback),
+-                     "ns3::TracedValueCallback::uint8_t")
+-    .AddAttribute ("DataRate",
+-                   "Data Rate currently employed by this end device",
+-                   UintegerValue (0),
+-                   MakeUintegerAccessor (&EndDeviceLorawanMac::m_dataRate),
+-                   MakeUintegerChecker<uint8_t> (0, 5))
+-    .AddTraceSource ("DataRate",
+-                     "Data Rate currently employed by this end device",
+-                     MakeTraceSourceAccessor
+-                       (&EndDeviceLorawanMac::m_dataRate),
+-                     "ns3::TracedValueCallback::uint8_t")
+-    .AddAttribute ("DRControl",
+-                   "Whether to request the NS to control this device's Data Rate",
+-                   BooleanValue (),
+-                   MakeBooleanAccessor (&EndDeviceLorawanMac::m_controlDataRate),
+-                   MakeBooleanChecker ())
+-    .AddTraceSource ("TxPower",
+-                     "Transmission power currently employed by this end device",
+-                     MakeTraceSourceAccessor
+-                       (&EndDeviceLorawanMac::m_txPower),
+-                     "ns3::TracedValueCallback::Double")
+-    .AddTraceSource ("LastKnownLinkMargin",
+-                     "Last known demodulation margin in "
+-                     "communications between this end device "
+-                     "and a gateway",
+-                     MakeTraceSourceAccessor
+-                       (&EndDeviceLorawanMac::m_lastKnownLinkMargin),
+-                     "ns3::TracedValueCallback::Double")
+-    .AddTraceSource ("LastKnownGatewayCount",
+-                     "Last known number of gateways able to "
+-                     "listen to this end device",
+-                     MakeTraceSourceAccessor
+-                       (&EndDeviceLorawanMac::m_lastKnownGatewayCount),
+-                     "ns3::TracedValueCallback::Int")
+-    .AddTraceSource ("AggregatedDutyCycle",
+-                     "Aggregate duty cycle, in fraction form, "
+-                     "this end device must respect",
+-                     MakeTraceSourceAccessor
+-                       (&EndDeviceLorawanMac::m_aggregatedDutyCycle),
+-                     "ns3::TracedValueCallback::Double")
+-    .AddAttribute ("MaxTransmissions",
+-                   "Maximum number of transmissions for a packet",
+-                   IntegerValue (8),
+-                   MakeIntegerAccessor (&EndDeviceLorawanMac::m_maxNumbTx),
+-                   MakeIntegerChecker<uint8_t> ())
+-    .AddAttribute ("EnableEDDataRateAdaptation",
+-                   "Whether the End Device should up its Data Rate "
+-                   "in case it doesn't get a reply from the NS.",
+-                   BooleanValue (false),
+-                   MakeBooleanAccessor (&EndDeviceLorawanMac::m_enableDRAdapt),
+-                   MakeBooleanChecker ())
+-    .AddAttribute ("MType",
+-                   "Specify type of message will be sent by this ED.",
+-                   EnumValue (LorawanMacHeader::UNCONFIRMED_DATA_UP),
+-                   MakeEnumAccessor (&EndDeviceLorawanMac::m_mType),
+-                   MakeEnumChecker (LorawanMacHeader::UNCONFIRMED_DATA_UP,
+-                                    "Unconfirmed",
+-                                    LorawanMacHeader::CONFIRMED_DATA_UP,
+-                                    "Confirmed"))
+-    .AddConstructor<EndDeviceLorawanMac> ();
++  static TypeId tid =
++      TypeId ("ns3::EndDeviceLorawanMac")
++          .SetParent<LorawanMac> ()
++          .SetGroupName ("lorawan")
++          .AddTraceSource ("RequiredTransmissions",
++                           "Total number of transmissions required to deliver this packet",
++                           MakeTraceSourceAccessor (&EndDeviceLorawanMac::m_requiredTxCallback),
++                           "ns3::TracedValueCallback::uint8_t")
++          .AddAttribute ("DataRate", "Data Rate currently employed by this end device",
++                         UintegerValue (0), MakeUintegerAccessor (&EndDeviceLorawanMac::m_dataRate),
++                         MakeUintegerChecker<uint8_t> (0, 5))
++          .AddTraceSource ("DataRate", "Data Rate currently employed by this end device",
++                           MakeTraceSourceAccessor (&EndDeviceLorawanMac::m_dataRate),
++                           "ns3::TracedValueCallback::uint8_t")
++          .AddAttribute (
++              "DRControl", "Whether to request the NS to control this device's Data Rate",
++              BooleanValue (), MakeBooleanAccessor (&EndDeviceLorawanMac::m_controlDataRate),
++              MakeBooleanChecker ())
++          .AddTraceSource ("TxPower", "Transmission power currently employed by this end device",
++                           MakeTraceSourceAccessor (&EndDeviceLorawanMac::m_txPower),
++                           "ns3::TracedValueCallback::Double")
++          .AddTraceSource ("LastKnownLinkMargin",
++                           "Last known demodulation margin in "
++                           "communications between this end device "
++                           "and a gateway",
++                           MakeTraceSourceAccessor (&EndDeviceLorawanMac::m_lastKnownLinkMargin),
++                           "ns3::TracedValueCallback::Double")
++          .AddTraceSource ("LastKnownGatewayCount",
++                           "Last known number of gateways able to "
++                           "listen to this end device",
++                           MakeTraceSourceAccessor (&EndDeviceLorawanMac::m_lastKnownGatewayCount),
++                           "ns3::TracedValueCallback::Int")
++          .AddTraceSource ("AggregatedDutyCycle",
++                           "Aggregate duty cycle, in fraction form, "
++                           "this end device must respect",
++                           MakeTraceSourceAccessor (&EndDeviceLorawanMac::m_aggregatedDutyCycle),
++                           "ns3::TracedValueCallback::Double")
++          .AddAttribute ("MaxTransmissions", "Maximum number of transmissions for a packet",
++                         IntegerValue (8), MakeIntegerAccessor (&EndDeviceLorawanMac::m_maxNumbTx),
++                         MakeIntegerChecker<uint8_t> ())
++          .AddAttribute ("EnableEDDataRateAdaptation",
++                         "Whether the End Device should up its Data Rate "
++                         "in case it doesn't get a reply from the NS.",
++                         BooleanValue (false),
++                         MakeBooleanAccessor (&EndDeviceLorawanMac::m_enableDRAdapt),
++                         MakeBooleanChecker ())
++          .AddAttribute ("MType", "Specify type of message will be sent by this ED.",
++                         EnumValue (LorawanMacHeader::UNCONFIRMED_DATA_UP),
++                         MakeEnumAccessor (&EndDeviceLorawanMac::m_mType),
++                         MakeEnumChecker (LorawanMacHeader::UNCONFIRMED_DATA_UP, "Unconfirmed",
++                                          LorawanMacHeader::CONFIRMED_DATA_UP, "Confirmed"))
++          .AddAttribute ("EnableRealMIC",
++                         "Whether the End Device should compute the Message Integrity Code"
++                         "according to specifications, i.e. using real cryptographic"
++                         "libraries (slower).",
++                         BooleanValue (false),
++                         MakeBooleanAccessor (&EndDeviceLorawanMac::m_realMIC),
++                         MakeBooleanChecker ())
++          .AddConstructor<EndDeviceLorawanMac> ();
+   return tid;
+ }
+ 
+@@ -122,11 +114,13 @@ EndDeviceLorawanMac::EndDeviceLorawanMac ()
+       m_receiveWindowDurationInSymbols (8),
+       // LoraWAN default
+       m_controlDataRate (false),
++      m_realMIC (false),
+       m_lastKnownLinkMargin (0),
+       m_lastKnownGatewayCount (0),
+       m_aggregatedDutyCycle (1),
+       m_mType (LorawanMacHeader::CONFIRMED_DATA_UP),
+-      m_currentFCnt (0)
++      m_currentFCnt (0),
++      m_cluster (0)
+ {
+   NS_LOG_FUNCTION (this);
+ 
+@@ -141,11 +135,15 @@ EndDeviceLorawanMac::EndDeviceLorawanMac ()
+   // Initialize structure for retransmission parameters
+   m_retxParams = EndDeviceLorawanMac::LoraRetxParameters ();
+   m_retxParams.retxLeft = m_maxNumbTx;
++
++  m_crypto = new LoRaMacCrypto ();
+ }
+ 
+ EndDeviceLorawanMac::~EndDeviceLorawanMac ()
+ {
+   NS_LOG_FUNCTION_NOARGS ();
++
++  delete m_crypto;
+ }
+ 
+ ////////////////////////
+@@ -160,7 +158,9 @@ EndDeviceLorawanMac::Send (Ptr<Packet> packet)
+   // If it is not possible to transmit now because of the duty cycle,
+   // or because we are receiving, schedule a tx/retx later
+ 
+-  Time netxTxDelay = GetNextTransmissionDelay ();
++  // Check m_aggregatedDutyCycle
++  Time aggregatedDelay = m_channelHelper.GetAggregatedWaitingTime (m_aggregatedDutyCycle);
++  Time netxTxDelay = Max (GetNextTransmissionDelay (), aggregatedDelay);
+   if (netxTxDelay != Seconds (0))
+     {
+       postponeTransmission (netxTxDelay, packet);
+@@ -182,11 +182,15 @@ EndDeviceLorawanMac::Send (Ptr<Packet> packet)
+         }
+     }
+   else
+-  // the transmitting channel is available and we have not run out the maximum number of retransmissions
++    // the transmitting channel is available and we have not run out the maximum number of retransmissions
+     {
+       // Make sure we can transmit at the current power on this channel
+       NS_ASSERT_MSG (m_txPower <= m_channelHelper.GetTxPowerForChannel (txChannel),
+                      " The selected power is too hight to be supported by this channel.");
++      /* Extremely rare case: Send () happens after sending prev. pkt and before downlink 
++         reception of dutycycle reconf. A big increase in dutycycle may allow next packet
++         to be sent before current one, which has been postponed with old dutycycle conf. */
++      Simulator::Cancel (m_nextTx);
+       DoSend (packet);
+     }
+ }
+@@ -198,11 +202,11 @@ EndDeviceLorawanMac::postponeTransmission (Time netxTxDelay, Ptr<Packet> packet)
+   // Delete previously scheduled transmissions if any.
+   Simulator::Cancel (m_nextTx);
+   m_nextTx = Simulator::Schedule (netxTxDelay, &EndDeviceLorawanMac::DoSend, this, packet);
+-  NS_LOG_WARN ("Attempting to send, but the aggregate duty cycle won't allow it. Scheduling a tx at a delay "
+-               << netxTxDelay.GetSeconds () << ".");
++  NS_LOG_DEBUG (
++      "Attempting to send, but the aggregate duty cycle won't allow it. Scheduling a tx in "
++      << netxTxDelay.As (Time::S) << ".");
+ }
+ 
+-
+ void
+ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
+ {
+@@ -219,24 +223,39 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
+       ApplyNecessaryOptions (frameHdr);
+       packet->AddHeader (frameHdr);
+ 
+-      NS_LOG_INFO ("Added frame header of size " << frameHdr.GetSerializedSize () <<
+-                   " bytes.");
++      NS_LOG_INFO ("Added frame header of size " << frameHdr.GetSerializedSize () << " bytes.");
+ 
+       // Check that MACPayload length is below the allowed maximum
+       if (packet->GetSize () > m_maxAppPayloadForDataRate.at (m_dataRate))
+         {
+-          NS_LOG_WARN ("Attempting to send a packet larger than the maximum allowed"
+-                       << " size at this DataRate (DR" << unsigned(m_dataRate) <<
+-                       "). Transmission canceled.");
++          NS_LOG_WARN ("Attempting to send a packet ("
++                       << (unsigned) packet->GetSize () << "B) larger than the maximum allowed"
++                       << " size (" << (unsigned) m_maxAppPayloadForDataRate.at (m_dataRate)
++                       << "B) at this DataRate (DR" << unsigned (m_dataRate)
++                       << "). Transmission canceled.");
+           return;
+         }
+ 
+-
+       // Add the Lora Mac header to the packet
+       LorawanMacHeader macHdr;
+       ApplyNecessaryOptions (macHdr);
+       packet->AddHeader (macHdr);
+ 
++      // 4 Bytes of MIC
++      uint32_t mic = 0;
++      if (m_realMIC)
++        {
++          uint8_t buff[256];
++          packet->CopyData (buff, 256);
++          m_crypto->ComputeCmacB0 (buff, packet->GetSize (), F_NWK_S_INT_KEY, false, UPLINK,
++                                   m_address.Get (), m_currentFCnt, &mic);
++        }
++
++      // Re-serialize message to add the MIC
++      uint8_t micser[4];
++      mempcpy (micser, &mic, 4);
++      packet->AddAtEnd (Create<Packet> (micser, 4));
++
+       // Reset MAC command list
+       m_macCommandList.clear ();
+ 
+@@ -245,8 +264,10 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
+           // Call the callback to notify about the failure
+           uint8_t txs = m_maxNumbTx - (m_retxParams.retxLeft);
+           m_requiredTxCallback (txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
+-          NS_LOG_DEBUG (" Received new packet from the application layer: stopping retransmission procedure. Used " <<
+-                        unsigned(txs) << " transmissions out of a maximum of " << unsigned(m_maxNumbTx) << ".");
++          NS_LOG_DEBUG (" Received new packet from the application layer: stopping retransmission "
++                        "procedure. Used "
++                        << unsigned (txs) << " transmissions out of a maximum of "
++                        << unsigned (m_maxNumbTx) << ".");
+         }
+ 
+       // Reset retransmission parameters
+@@ -259,13 +280,14 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
+           m_retxParams.retxLeft = m_maxNumbTx;
+           m_retxParams.waitingAck = true;
+           m_retxParams.firstAttempt = Simulator::Now ();
+-          m_retxParams.retxLeft = m_retxParams.retxLeft - 1;       // decreasing the number of retransmissions
++          m_retxParams.retxLeft =
++              m_retxParams.retxLeft - 1; // decreasing the number of retransmissions
+ 
+           NS_LOG_DEBUG ("Message type is " << m_mType);
+-          NS_LOG_DEBUG ("It is a confirmed packet. Setting retransmission parameters and decreasing the number of transmissions left.");
++          NS_LOG_DEBUG ("It is a confirmed packet. Setting retransmission parameters and "
++                        "decreasing the number of transmissions left.");
+ 
+-          NS_LOG_INFO ("Added MAC header of size " << macHdr.GetSerializedSize () <<
+-                       " bytes.");
++          NS_LOG_INFO ("Added MAC header of size " << macHdr.GetSerializedSize () << " bytes.");
+ 
+           // Sent a new packet
+           NS_LOG_DEBUG ("Copied packet: " << m_retxParams.packet);
+@@ -280,7 +302,6 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
+           // static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (packet);
+           SendToPhy (packet);
+         }
+-
+     }
+   // this is a retransmission
+   else
+@@ -291,34 +312,34 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
+           // Remove the headers
+           LorawanMacHeader macHdr;
+           LoraFrameHeader frameHdr;
+-          packet->RemoveHeader(macHdr);
+-          packet->RemoveHeader(frameHdr);
++          packet->RemoveHeader (macHdr);
++          packet->RemoveHeader (frameHdr);
+ 
+           // Add the Lora Frame Header to the packet
+           frameHdr = LoraFrameHeader ();
+           ApplyNecessaryOptions (frameHdr);
+           packet->AddHeader (frameHdr);
+ 
+-          NS_LOG_INFO ("Added frame header of size " << frameHdr.GetSerializedSize () <<
+-                       " bytes.");
++          NS_LOG_INFO ("Added frame header of size " << frameHdr.GetSerializedSize () << " bytes.");
+ 
+           // Add the Lorawan Mac header to the packet
+           macHdr = LorawanMacHeader ();
+           ApplyNecessaryOptions (macHdr);
+           packet->AddHeader (macHdr);
+-          m_retxParams.retxLeft = m_retxParams.retxLeft - 1;           // decreasing the number of retransmissions
++          m_retxParams.retxLeft =
++              m_retxParams.retxLeft - 1; // decreasing the number of retransmissions
+           NS_LOG_DEBUG ("Retransmitting an old packet.");
+ 
+           // static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (m_retxParams.packet);
+           SendToPhy (m_retxParams.packet);
+         }
+     }
+-
+ }
+ 
+ void
+ EndDeviceLorawanMac::SendToPhy (Ptr<Packet> packet)
+-{ }
++{
++}
+ 
+ //////////////////////////
+ //  Receiving methods   //
+@@ -326,11 +347,13 @@ EndDeviceLorawanMac::SendToPhy (Ptr<Packet> packet)
+ 
+ void
+ EndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
+-{ }
++{
++}
+ 
+ void
+ EndDeviceLorawanMac::FailedReception (Ptr<Packet const> packet)
+-{ }
++{
++}
+ 
+ void
+ EndDeviceLorawanMac::ParseCommands (LoraFrameHeader frameHeader)
+@@ -343,32 +366,33 @@ EndDeviceLorawanMac::ParseCommands (LoraFrameHeader frameHeader)
+         {
+           NS_LOG_INFO ("The message is an ACK, not waiting for it anymore.");
+ 
+-          NS_LOG_DEBUG ("Reset retransmission variables to default values and cancel retransmission if already scheduled.");
++          NS_LOG_DEBUG ("Reset retransmission variables to default values and cancel "
++                        "retransmission if already scheduled.");
+ 
+           uint8_t txs = m_maxNumbTx - (m_retxParams.retxLeft);
+           m_requiredTxCallback (txs, true, m_retxParams.firstAttempt, m_retxParams.packet);
+-          NS_LOG_DEBUG ("Received ACK packet after " << unsigned(txs) << " transmissions: stopping retransmission procedure. ");
++          NS_LOG_DEBUG ("Received ACK packet after "
++                        << unsigned (txs) << " transmissions: stopping retransmission procedure. ");
+ 
+           // Reset retransmission parameters
+           resetRetransmissionParameters ();
+-
+         }
+       else
+         {
+-          NS_LOG_ERROR ("Received downlink message not containing an ACK while we were waiting for it!");
++          NS_LOG_ERROR (
++              "Received downlink message not containing an ACK while we were waiting for it!");
+         }
+     }
+ 
+-  std::list<Ptr<MacCommand> > commands = frameHeader.GetCommands ();
+-  std::list<Ptr<MacCommand> >::iterator it;
++  std::list<Ptr<MacCommand>> commands = frameHeader.GetCommands ();
++  std::list<Ptr<MacCommand>>::iterator it;
+   for (it = commands.begin (); it != commands.end (); it++)
+     {
+       NS_LOG_DEBUG ("Iterating over the MAC commands...");
+       enum MacCommandType type = (*it)->GetCommandType ();
+       switch (type)
+         {
+-        case (LINK_CHECK_ANS):
+-          {
++          case (LINK_CHECK_ANS): {
+             NS_LOG_DEBUG ("Detected a LinkCheckAns command.");
+ 
+             // Cast the command
+@@ -379,8 +403,7 @@ EndDeviceLorawanMac::ParseCommands (LoraFrameHeader frameHeader)
+ 
+             break;
+           }
+-        case (LINK_ADR_REQ):
+-          {
++          case (LINK_ADR_REQ): {
+             NS_LOG_DEBUG ("Detected a LinkAdrReq command.");
+ 
+             // Cast the command
+@@ -388,13 +411,11 @@ EndDeviceLorawanMac::ParseCommands (LoraFrameHeader frameHeader)
+ 
+             // Call the appropriate function to take action
+             OnLinkAdrReq (linkAdrReq->GetDataRate (), linkAdrReq->GetTxPower (),
+-                          linkAdrReq->GetEnabledChannelsList (),
+-                          linkAdrReq->GetRepetitions ());
++                          linkAdrReq->GetEnabledChannelsList (), linkAdrReq->GetRepetitions ());
+ 
+             break;
+           }
+-        case (DUTY_CYCLE_REQ):
+-          {
++          case (DUTY_CYCLE_REQ): {
+             NS_LOG_DEBUG ("Detected a DutyCycleReq command.");
+ 
+             // Cast the command
+@@ -405,8 +426,7 @@ EndDeviceLorawanMac::ParseCommands (LoraFrameHeader frameHeader)
+ 
+             break;
+           }
+-        case (RX_PARAM_SETUP_REQ):
+-          {
++          case (RX_PARAM_SETUP_REQ): {
+             NS_LOG_DEBUG ("Detected a RxParamSetupReq command.");
+ 
+             // Cast the command
+@@ -417,8 +437,7 @@ EndDeviceLorawanMac::ParseCommands (LoraFrameHeader frameHeader)
+ 
+             break;
+           }
+-        case (DEV_STATUS_REQ):
+-          {
++          case (DEV_STATUS_REQ): {
+             NS_LOG_DEBUG ("Detected a DevStatusReq command.");
+ 
+             // Cast the command
+@@ -429,47 +448,42 @@ EndDeviceLorawanMac::ParseCommands (LoraFrameHeader frameHeader)
+ 
+             break;
+           }
+-        case (NEW_CHANNEL_REQ):
+-          {
++          case (NEW_CHANNEL_REQ): {
+             NS_LOG_DEBUG ("Detected a NewChannelReq command.");
+ 
+             // Cast the command
+             Ptr<NewChannelReq> newChannelReq = (*it)->GetObject<NewChannelReq> ();
+ 
+             // Call the appropriate function to take action
+-            OnNewChannelReq (newChannelReq->GetChannelIndex (), newChannelReq->GetFrequency (), newChannelReq->GetMinDataRate (), newChannelReq->GetMaxDataRate ());
++            OnNewChannelReq (newChannelReq->GetChannelIndex (), newChannelReq->GetFrequency (),
++                             newChannelReq->GetMinDataRate (), newChannelReq->GetMaxDataRate ());
+ 
+             break;
+           }
+-        case (RX_TIMING_SETUP_REQ):
+-          {
++          case (RX_TIMING_SETUP_REQ): {
+             break;
+           }
+-        case (TX_PARAM_SETUP_REQ):
+-          {
++          case (TX_PARAM_SETUP_REQ): {
+             break;
+           }
+-        case (DL_CHANNEL_REQ):
+-          {
++          case (DL_CHANNEL_REQ): {
+             break;
+           }
+-        default:
+-          {
++          default: {
+             NS_LOG_ERROR ("CID not recognized");
+             break;
+           }
+         }
+     }
+-
+ }
+ 
+ void
+-EndDeviceLorawanMac::ApplyNecessaryOptions (LoraFrameHeader& frameHeader)
++EndDeviceLorawanMac::ApplyNecessaryOptions (LoraFrameHeader &frameHeader)
+ {
+   NS_LOG_FUNCTION_NOARGS ();
+ 
+   frameHeader.SetAsUplink ();
+-  frameHeader.SetFPort (1);                     // TODO Use an appropriate frame port based on the application
++  frameHeader.SetFPort (1); // TODO Use an appropriate frame port based on the application
+   frameHeader.SetAddress (m_address);
+   frameHeader.SetAdr (m_controlDataRate);
+   frameHeader.SetAdrAckReq (0); // TODO Set ADRACKREQ if a member variable is true
+@@ -480,22 +494,20 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LoraFrameHeader& frameHeader)
+   // Add listed MAC commands
+   for (const auto &command : m_macCommandList)
+     {
+-      NS_LOG_INFO ("Applying a MAC Command of CID " <<
+-                   unsigned(MacCommand::GetCIDFromMacCommand
+-                              (command->GetCommandType ())));
++      NS_LOG_INFO ("Applying a MAC Command of CID "
++                   << unsigned (MacCommand::GetCIDFromMacCommand (command->GetCommandType ())));
+ 
+       frameHeader.AddCommand (command);
+     }
+-
+ }
+ 
+ void
+-EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMacHeader& macHeader)
++EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMacHeader &macHeader)
+ {
+   NS_LOG_FUNCTION_NOARGS ();
+ 
+   macHeader.SetMType (m_mType);
+-  macHeader.SetMajor (1);
++  macHeader.SetMajor (0);
+ }
+ 
+ void
+@@ -513,7 +525,8 @@ EndDeviceLorawanMac::GetMType (void)
+ 
+ void
+ EndDeviceLorawanMac::TxFinished (Ptr<const Packet> packet)
+-{ }
++{
++}
+ 
+ Time
+ EndDeviceLorawanMac::GetNextClassTransmissionDelay (Time waitingTime)
+@@ -530,15 +543,15 @@ EndDeviceLorawanMac::GetNextTransmissionDelay (void)
+   //    Check duty cycle    //
+ 
+   // Pick a random channel to transmit on
+-  std::vector<Ptr<LogicalLoraChannel> > logicalChannels;
+-  logicalChannels = m_channelHelper.GetEnabledChannelList ();                 // Use a separate list to do the shuffle
++  std::vector<Ptr<LogicalLoraChannel>> logicalChannels;
++  logicalChannels =
++      m_channelHelper.GetEnabledChannelList (); // Use a separate list to do the shuffle
+   //logicalChannels = Shuffle (logicalChannels);
+ 
+-
+   Time waitingTime = Time::Max ();
+ 
+   // Try every channel
+-  std::vector<Ptr<LogicalLoraChannel> >::iterator it;
++  std::vector<Ptr<LogicalLoraChannel>>::iterator it;
+   for (it = logicalChannels.begin (); it != logicalChannels.end (); ++it)
+     {
+       // Pointer to the current channel
+@@ -547,8 +560,8 @@ EndDeviceLorawanMac::GetNextTransmissionDelay (void)
+ 
+       waitingTime = std::min (waitingTime, m_channelHelper.GetWaitingTime (logicalChannel));
+ 
+-      NS_LOG_DEBUG ("Waiting time before the next transmission in channel with frequecy " <<
+-                    frequency << " is = " << waitingTime.GetSeconds () << ".");
++      NS_LOG_DEBUG ("Waiting time before the next transmission in channel with frequecy "
++                    << frequency << " is = " << waitingTime.GetSeconds () << ".");
+     }
+ 
+   waitingTime = GetNextClassTransmissionDelay (waitingTime);
+@@ -562,12 +575,13 @@ EndDeviceLorawanMac::GetChannelForTx (void)
+   NS_LOG_FUNCTION_NOARGS ();
+ 
+   // Pick a random channel to transmit on
+-  std::vector<Ptr<LogicalLoraChannel> > logicalChannels;
+-  logicalChannels = m_channelHelper.GetEnabledChannelList ();                 // Use a separate list to do the shuffle
++  std::vector<Ptr<LogicalLoraChannel>> logicalChannels;
++  logicalChannels =
++      m_channelHelper.GetEnabledChannelList (); // Use a separate list to do the shuffle
+   logicalChannels = Shuffle (logicalChannels);
+ 
+   // Try every channel
+-  std::vector<Ptr<LogicalLoraChannel> >::iterator it;
++  std::vector<Ptr<LogicalLoraChannel>>::iterator it;
+   for (it = logicalChannels.begin (); it != logicalChannels.end (); ++it)
+     {
+       // Pointer to the current channel
+@@ -579,8 +593,7 @@ EndDeviceLorawanMac::GetChannelForTx (void)
+       // Verify that we can send the packet
+       Time waitingTime = m_channelHelper.GetWaitingTime (logicalChannel);
+ 
+-      NS_LOG_DEBUG ("Waiting time for current channel = " <<
+-                    waitingTime.GetSeconds ());
++      NS_LOG_DEBUG ("Waiting time for current channel = " << waitingTime.GetSeconds ());
+ 
+       // Send immediately if we can
+       if (waitingTime == Seconds (0))
+@@ -589,16 +602,15 @@ EndDeviceLorawanMac::GetChannelForTx (void)
+         }
+       else
+         {
+-          NS_LOG_DEBUG ("Packet cannot be immediately transmitted on " <<
+-                        "the current channel because of duty cycle limitations.");
++          NS_LOG_DEBUG ("Packet cannot be immediately transmitted on "
++                        << "the current channel because of duty cycle limitations.");
+         }
+     }
+-  return 0;                 // In this case, no suitable channel was found
++  return 0; // In this case, no suitable channel was found
+ }
+ 
+-
+-std::vector<Ptr<LogicalLoraChannel> >
+-EndDeviceLorawanMac::Shuffle (std::vector<Ptr<LogicalLoraChannel> > vector)
++std::vector<Ptr<LogicalLoraChannel>>
++EndDeviceLorawanMac::Shuffle (std::vector<Ptr<LogicalLoraChannel>> vector)
+ {
+   NS_LOG_FUNCTION_NOARGS ();
+ 
+@@ -619,7 +631,8 @@ EndDeviceLorawanMac::Shuffle (std::vector<Ptr<LogicalLoraChannel> > vector)
+ // Setters and Getters //
+ /////////////////////////
+ 
+-void EndDeviceLorawanMac::resetRetransmissionParameters ()
++void
++EndDeviceLorawanMac::resetRetransmissionParameters ()
+ {
+   m_retxParams.waitingAck = false;
+   m_retxParams.retxLeft = m_maxNumbTx;
+@@ -646,7 +659,7 @@ EndDeviceLorawanMac::GetDataRateAdaptation (void)
+ void
+ EndDeviceLorawanMac::SetMaxNumberOfTransmissions (uint8_t maxNumbTx)
+ {
+-  NS_LOG_FUNCTION (this << unsigned(maxNumbTx));
++  NS_LOG_FUNCTION (this << unsigned (maxNumbTx));
+   m_maxNumbTx = maxNumbTx;
+   m_retxParams.retxLeft = maxNumbTx;
+ }
+@@ -654,11 +667,10 @@ EndDeviceLorawanMac::SetMaxNumberOfTransmissions (uint8_t maxNumbTx)
+ uint8_t
+ EndDeviceLorawanMac::GetMaxNumberOfTransmissions (void)
+ {
+-  NS_LOG_FUNCTION (this );
++  NS_LOG_FUNCTION (this);
+   return m_maxNumbTx;
+ }
+ 
+-
+ void
+ EndDeviceLorawanMac::SetDataRate (uint8_t dataRate)
+ {
+@@ -694,7 +706,7 @@ EndDeviceLorawanMac::GetDeviceAddress (void)
+ void
+ EndDeviceLorawanMac::OnLinkCheckAns (uint8_t margin, uint8_t gwCnt)
+ {
+-  NS_LOG_FUNCTION (this << unsigned(margin) << unsigned(gwCnt));
++  NS_LOG_FUNCTION (this << unsigned (margin) << unsigned (gwCnt));
+ 
+   m_lastKnownLinkMargin = margin;
+   m_lastKnownGatewayCount = gwCnt;
+@@ -702,10 +714,9 @@ EndDeviceLorawanMac::OnLinkCheckAns (uint8_t margin, uint8_t gwCnt)
+ 
+ void
+ EndDeviceLorawanMac::OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
+-                                std::list<int> enabledChannels, int repetitions)
++                                   std::list<int> enabledChannels, int repetitions)
+ {
+-  NS_LOG_FUNCTION (this << unsigned (dataRate) << unsigned (txPower) <<
+-                   repetitions);
++  NS_LOG_FUNCTION (this << unsigned (dataRate) << unsigned (txPower) << repetitions);
+ 
+   // Three bools for three requirements before setting things up
+   bool channelMaskOk = true;
+@@ -746,15 +757,15 @@ EndDeviceLorawanMac::OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
+   // We need to know we can use it in at least one of the enabled channels
+   // Cycle through available channels, stop when at least one is enabled for the
+   // specified dataRate.
+-  if (dataRateOk && channelMaskOk)                 // If false, skip the check
++  if (dataRateOk && channelMaskOk) // If false, skip the check
+     {
+       bool foundAvailableChannel = false;
+       for (auto it = enabledChannels.begin (); it != enabledChannels.end (); it++)
+         {
+           NS_LOG_DEBUG ("MinDR: " << unsigned (channelList.at (*it)->GetMinimumDataRate ()));
+           NS_LOG_DEBUG ("MaxDR: " << unsigned (channelList.at (*it)->GetMaximumDataRate ()));
+-          if (channelList.at (*it)->GetMinimumDataRate () <= dataRate
+-              && channelList.at (*it)->GetMaximumDataRate () >= dataRate)
++          if (channelList.at (*it)->GetMinimumDataRate () <= dataRate &&
++              channelList.at (*it)->GetMaximumDataRate () >= dataRate)
+             {
+               foundAvailableChannel = true;
+               break;
+@@ -776,10 +787,10 @@ EndDeviceLorawanMac::OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
+       txPowerOk = false;
+     }
+ 
+-  NS_LOG_DEBUG ("Finished checking. " <<
+-                "ChannelMaskOk: " << channelMaskOk << ", " <<
+-                "DataRateOk: " << dataRateOk << ", " <<
+-                "txPowerOk: " << txPowerOk);
++  NS_LOG_DEBUG ("Finished checking. "
++                << "ChannelMaskOk: " << channelMaskOk << ", "
++                << "DataRateOk: " << dataRateOk << ", "
++                << "txPowerOk: " << txPowerOk);
+ 
+   // If all checks are successful, set parameters up
+   //////////////////////////////////////////////////
+@@ -788,7 +799,8 @@ EndDeviceLorawanMac::OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
+       // Cycle over all channels in the list
+       for (uint32_t i = 0; i < m_channelHelper.GetChannelList ().size (); i++)
+         {
+-          if (std::find (enabledChannels.begin (), enabledChannels.end (), i) != enabledChannels.end ())
++          if (std::find (enabledChannels.begin (), enabledChannels.end (), i) !=
++              enabledChannels.end ())
+             {
+               m_channelHelper.GetChannelList ().at (i)->SetEnabledForUplink ();
+               NS_LOG_DEBUG ("Channel " << i << " enabled");
+@@ -809,8 +821,7 @@ EndDeviceLorawanMac::OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
+ 
+   // Craft a LinkAdrAns MAC command as a response
+   ///////////////////////////////////////////////
+-  m_macCommandList.push_back (CreateObject<LinkAdrAns> (txPowerOk, dataRateOk,
+-                                                        channelMaskOk));
++  m_macCommandList.push_back (CreateObject<LinkAdrAns> (txPowerOk, dataRateOk, channelMaskOk));
+ }
+ 
+ void
+@@ -819,7 +830,7 @@ EndDeviceLorawanMac::OnDutyCycleReq (double dutyCycle)
+   NS_LOG_FUNCTION (this << dutyCycle);
+ 
+   // Make sure we get a value that makes sense
+-  NS_ASSERT (0 <= dutyCycle && dutyCycle < 1);
++  NS_ASSERT (0 <= dutyCycle && dutyCycle <= 1);
+ 
+   // Set the new duty cycle value
+   m_aggregatedDutyCycle = dutyCycle;
+@@ -831,7 +842,8 @@ EndDeviceLorawanMac::OnDutyCycleReq (double dutyCycle)
+ 
+ void
+ EndDeviceLorawanMac::OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq)
+-{ }
++{
++}
+ 
+ void
+ EndDeviceLorawanMac::OnRxParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq)
+@@ -847,8 +859,8 @@ EndDeviceLorawanMac::OnDevStatusReq (void)
+ {
+   NS_LOG_FUNCTION (this);
+ 
+-  uint8_t battery = 10;                     // XXX Fake battery level
+-  uint8_t margin = 10;                     // XXX Fake margin
++  uint8_t battery = 10; // XXX Fake battery level
++  uint8_t margin = 10; // XXX Fake margin
+ 
+   // Craft a RxParamSetupAns as response
+   NS_LOG_INFO ("Adding DevStatusAns reply");
+@@ -856,13 +868,13 @@ EndDeviceLorawanMac::OnDevStatusReq (void)
+ }
+ 
+ void
+-EndDeviceLorawanMac::OnNewChannelReq (uint8_t chIndex, double frequency, uint8_t minDataRate, uint8_t maxDataRate)
++EndDeviceLorawanMac::OnNewChannelReq (uint8_t chIndex, double frequency, uint8_t minDataRate,
++                                      uint8_t maxDataRate)
+ {
+   NS_LOG_FUNCTION (this);
+ 
+-
+-  bool dataRateRangeOk = true;                     // XXX Check whether the new data rate range is ok
+-  bool channelFrequencyOk = true;                     // XXX Check whether the frequency is ok
++  bool dataRateRangeOk = true; // XXX Check whether the new data rate range is ok
++  bool channelFrequencyOk = true; // XXX Check whether the frequency is ok
+ 
+   // TODO Return false if one of the checks above failed
+   // TODO Create new channel in the LogicalLoraChannelHelper
+@@ -870,8 +882,7 @@ EndDeviceLorawanMac::OnNewChannelReq (uint8_t chIndex, double frequency, uint8_t
+   SetLogicalChannel (chIndex, frequency, minDataRate, maxDataRate);
+ 
+   NS_LOG_INFO ("Adding NewChannelAns reply");
+-  m_macCommandList.push_back (CreateObject<NewChannelAns> (dataRateRangeOk,
+-                                                           channelFrequencyOk));
++  m_macCommandList.push_back (CreateObject<NewChannelAns> (dataRateRangeOk, channelFrequencyOk));
+ }
+ 
+ void
+@@ -891,18 +902,19 @@ EndDeviceLorawanMac::AddLogicalChannel (Ptr<LogicalLoraChannel> logicalChannel)
+ }
+ 
+ void
+-EndDeviceLorawanMac::SetLogicalChannel (uint8_t chIndex, double frequency,
+-                                     uint8_t minDataRate, uint8_t maxDataRate)
++EndDeviceLorawanMac::SetLogicalChannel (uint8_t chIndex, double frequency, uint8_t minDataRate,
++                                        uint8_t maxDataRate)
+ {
+-  NS_LOG_FUNCTION (this << unsigned (chIndex) << frequency <<
+-                   unsigned (minDataRate) << unsigned(maxDataRate));
++  NS_LOG_FUNCTION (this << unsigned (chIndex) << frequency << unsigned (minDataRate)
++                        << unsigned (maxDataRate));
+ 
+-  m_channelHelper.SetChannel (chIndex, CreateObject<LogicalLoraChannel>
+-                                (frequency, minDataRate, maxDataRate));
++  m_channelHelper.SetChannel (
++      chIndex, CreateObject<LogicalLoraChannel> (frequency, minDataRate, maxDataRate));
+ }
+ 
+ void
+-EndDeviceLorawanMac::AddSubBand (double startFrequency, double endFrequency, double dutyCycle, double maxTxPowerDbm)
++EndDeviceLorawanMac::AddSubBand (double startFrequency, double endFrequency, double dutyCycle,
++                                 double maxTxPowerDbm)
+ {
+   NS_LOG_FUNCTION_NOARGS ();
+ 
+@@ -917,6 +929,14 @@ EndDeviceLorawanMac::GetAggregatedDutyCycle (void)
+   return m_aggregatedDutyCycle;
+ }
+ 
++void
++EndDeviceLorawanMac::SetAggregatedDutyCycle (double aggregatedDutyCycle)
++{
++  NS_LOG_FUNCTION_NOARGS ();
++
++  m_aggregatedDutyCycle = aggregatedDutyCycle;
++}
++
+ void
+ EndDeviceLorawanMac::AddMacCommand (Ptr<MacCommand> macCommand)
+ {
+@@ -930,5 +950,28 @@ EndDeviceLorawanMac::GetTransmissionPower (void)
+ {
+   return m_txPower;
+ }
++
++void
++EndDeviceLorawanMac::SetTransmissionPower (uint8_t txPower)
++{
++  NS_LOG_FUNCTION (this << unsigned (txPower));
++
++  m_txPower = txPower;
++}
++
++uint8_t
++EndDeviceLorawanMac::GetCluster (void)
++{
++  return m_cluster;
+ }
++
++void
++EndDeviceLorawanMac::SetCluster (uint8_t clusterId)
++{
++  NS_LOG_FUNCTION (this << unsigned (clusterId));
++
++  m_cluster = clusterId;
+ }
++
++} // namespace lorawan
++} // namespace ns3
+diff --git a/model/end-device-lorawan-mac.h b/model/end-device-lorawan-mac.h
+index a013a6a..d987561 100644
+--- a/model/end-device-lorawan-mac.h
++++ b/model/end-device-lorawan-mac.h
+@@ -31,6 +31,8 @@
+ #include "ns3/lora-device-address.h"
+ #include "ns3/traced-value.h"
+ 
++#include "ns3/LoRaMacCrypto.h"
++
+ namespace ns3 {
+ namespace lorawan {
+ 
+@@ -152,6 +154,15 @@ public:
+    */
+   uint8_t GetDataRate (void);
+ 
++  /**
++   * Set the transmission power this end device will use when transmitting. 
++   * For End Devices, this value is assumed to be fixed, and can be modified
++   * via MAC commands issued by the GW.
++   *
++   * \param txPower The txPower to use when transmitting.
++   */
++  void SetTransmissionPower (uint8_t txPower);
++
+   /**
+    * Get the transmission power this end device is set to use.
+    *
+@@ -199,6 +210,28 @@ public:
+    */
+   double GetAggregatedDutyCycle (void);
+ 
++  /**
++   * Set the aggregated duty cycle.
++   *
++   * \param aggregatedDutyCycle A time instance containing the aggregated 
++   * duty cycle in fractional form.
++   */
++  void SetAggregatedDutyCycle (double aggregatedDutyCycle);
++
++  /**
++   * Get the cluster of this device.
++   *
++   * \return The cluster id.
++   */
++  uint8_t GetCluster (void);
++
++  /**
++   * Set the cluster of this device.
++   *
++   * \param clusterId The id of the cluster.
++   */
++  void SetCluster (uint8_t clusterId);
++
+   /////////////////////////
+   // MAC command methods //
+   /////////////////////////
+@@ -449,6 +482,11 @@ private:
+    */
+   bool m_controlDataRate;
+ 
++  /**
++   * Whether this device's MIC should be computed according to specifications.
++   */
++  bool m_realMIC;
++
+   /**
+    * The event of retransmitting a packet in a consecutive moment if an ACK is not received.
+    *
+@@ -492,6 +530,10 @@ private:
+   LorawanMacHeader::MType m_mType;
+ 
+   uint16_t m_currentFCnt;
++
++  uint8_t m_cluster;
++
++  LoRaMacCrypto* m_crypto;
+ };
+ 
+ 
+diff --git a/model/end-device-status.cc b/model/end-device-status.cc
+index 2891e0b..22c9beb 100644
+--- a/model/end-device-status.cc
++++ b/model/end-device-status.cc
+@@ -51,7 +51,7 @@ EndDeviceStatus::EndDeviceStatus (LoraDeviceAddress endDeviceAddress,
+                                   Ptr<ClassAEndDeviceLorawanMac> endDeviceMac)
+     : m_reply (EndDeviceStatus::Reply ()),
+       m_endDeviceAddress (endDeviceAddress),
+-      m_receivedPacketList (ReceivedPacketList ()),
++      m_receivedPacketList (ReceivedPacketList (20)),
+       m_mac (endDeviceMac)
+ {
+   NS_LOG_FUNCTION (endDeviceAddress);
+@@ -63,7 +63,7 @@ EndDeviceStatus::EndDeviceStatus ()
+ 
+   // Initialize data structure
+   m_reply = EndDeviceStatus::Reply ();
+-  m_receivedPacketList = ReceivedPacketList ();
++  m_receivedPacketList = ReceivedPacketList (20);
+ }
+ 
+ EndDeviceStatus::~EndDeviceStatus ()
+@@ -136,7 +136,9 @@ EndDeviceStatus::GetCompleteReplyPacket (void)
+   m_reply.macHeader.SetMType (LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+   replyPacket->AddHeader (m_reply.frameHeader);
+   replyPacket->AddHeader (m_reply.macHeader);
+-
++  // 4 Bytes of MIC
++  replyPacket->AddPaddingAtEnd (4); 
++  
+   NS_LOG_DEBUG ("Added MAC header" << m_reply.macHeader);
+   NS_LOG_DEBUG ("Added frame header" << m_reply.frameHeader);
+ 
+@@ -297,7 +299,7 @@ EndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket, const A
+           GatewayList &gwList = it->second.gwList;
+ 
+           PacketInfoPerGw gwInfo;
+-          gwInfo.receivedTime = Simulator::Now ();
++          gwInfo.receivedTime = tag.GetReceptionTime ();
+           gwInfo.rxPower = rcvPower;
+           gwInfo.gwAddress = gwAddress;
+           gwList.insert (std::pair<Address, PacketInfoPerGw> (gwAddress, gwInfo));
+@@ -311,7 +313,7 @@ EndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket, const A
+     {
+       NS_LOG_INFO ("Packet was received for the first time");
+       PacketInfoPerGw gwInfo;
+-      gwInfo.receivedTime = Simulator::Now ();
++      gwInfo.receivedTime = tag.GetReceptionTime ();
+       gwInfo.rxPower = rcvPower;
+       gwInfo.gwAddress = gwAddress;
+       info.gwList.insert (std::pair<Address, PacketInfoPerGw> (gwAddress, gwInfo));
+@@ -407,7 +409,7 @@ EndDeviceStatus::GetPowerGatewayMap (void)
+ std::ostream &
+ operator<< (std::ostream &os, const EndDeviceStatus &status)
+ {
+-  os << "Total packets received: " << status.m_receivedPacketList.size () << std::endl;
++  os << "Recently received packets: " << status.m_receivedPacketList.size () << std::endl;
+ 
+   for (auto j = status.m_receivedPacketList.begin (); j != status.m_receivedPacketList.end (); j++)
+     {
+diff --git a/model/end-device-status.h b/model/end-device-status.h
+index f6d15bc..225b931 100644
+--- a/model/end-device-status.h
++++ b/model/end-device-status.h
+@@ -30,6 +30,7 @@
+ #include "ns3/pointer.h"
+ #include "ns3/lora-frame-header.h"
+ #include <iostream>
++#include <boost/circular_buffer.hpp>
+ 
+ namespace ns3 {
+ namespace lorawan {
+@@ -173,7 +174,7 @@ public:
+     double frequency;
+   };
+ 
+-  typedef std::list<std::pair<Ptr<Packet const>, ReceivedPacketInfo> >
++  typedef boost::circular_buffer<std::pair<Ptr<Packet const>, ReceivedPacketInfo> >
+     ReceivedPacketList;
+ 
+ 
+diff --git a/model/gateway-lora-phy.cc b/model/gateway-lora-phy.cc
+index 2bf8b21..0919ae0 100644
+--- a/model/gateway-lora-phy.cc
++++ b/model/gateway-lora-phy.cc
+@@ -132,7 +132,8 @@ GatewayLoraPhy::~GatewayLoraPhy ()
+ 
+ // Uplink sensitivity (Source: SX1301 datasheet)
+ // {SF7, SF8, SF9, SF10, SF11, SF12}
+-const double GatewayLoraPhy::sensitivity[6] = {-130.0, -132.5, -135.0, -137.5, -140.0, -142.5};
++// These sensitivities are for a bandwidth of 125000 Hz
++const double GatewayLoraPhy::sensitivity[6] = {-126.5, -129, -131.5, -134, -136.5, -139.5};
+ 
+ void
+ GatewayLoraPhy::AddReceptionPath ()
+diff --git a/model/logical-lora-channel-helper.cc b/model/logical-lora-channel-helper.cc
+index 2f12606..f472431 100644
+--- a/model/logical-lora-channel-helper.cc
++++ b/model/logical-lora-channel-helper.cc
+@@ -38,9 +38,7 @@ LogicalLoraChannelHelper::GetTypeId (void)
+   return tid;
+ }
+ 
+-LogicalLoraChannelHelper::LogicalLoraChannelHelper () :
+-  m_nextAggregatedTransmissionTime (Seconds (0)),
+-  m_aggregatedDutyCycle (1)
++LogicalLoraChannelHelper::LogicalLoraChannelHelper () : m_lastTxDuration (0), m_lastTxStart (0)
+ {
+   NS_LOG_FUNCTION (this);
+ }
+@@ -187,16 +185,19 @@ LogicalLoraChannelHelper::RemoveChannel (Ptr<LogicalLoraChannel> logicalChannel)
+ }
+ 
+ Time
+-LogicalLoraChannelHelper::GetAggregatedWaitingTime (void)
++LogicalLoraChannelHelper::GetAggregatedWaitingTime (double aggregatedDutyCycle)
+ {
+-  // Aggregate waiting time
+-  Time aggregatedWaitingTime = m_nextAggregatedTransmissionTime - Simulator::Now ();
++  NS_LOG_FUNCTION ("Aggregated duty-cycle: " + std::to_string(aggregatedDutyCycle));
+ 
++  // Aggregate waiting time
++  Time nextTransmissionTime = (aggregatedDutyCycle)? 
++      m_lastTxStart + m_lastTxDuration / aggregatedDutyCycle : Time::Max();
++  Time aggregatedWaitingTime = nextTransmissionTime - Simulator::Now ();
++  
+   // Handle case in which waiting time is negative
+-  aggregatedWaitingTime = Seconds (std::max (aggregatedWaitingTime.GetSeconds (),
+-                                             double(0)));
++  aggregatedWaitingTime = Max (aggregatedWaitingTime, Seconds (0));
+ 
+-  NS_LOG_DEBUG ("Aggregated waiting time: " << aggregatedWaitingTime.GetSeconds ());
++  NS_LOG_DEBUG ("Aggregated waiting time: " << aggregatedWaitingTime.As (Time::S));
+ 
+   return aggregatedWaitingTime;
+ }
+@@ -229,23 +230,16 @@ LogicalLoraChannelHelper::AddEvent (Time duration,
+   Ptr<SubBand> subBand = GetSubBandFromChannel (channel);
+ 
+   double dutyCycle = subBand->GetDutyCycle ();
+-  double timeOnAir = duration.GetSeconds ();
++  m_lastTxDuration = duration;
++  m_lastTxStart = Simulator::Now ();
+ 
+   // Computation of necessary waiting time on this sub-band
+-  subBand->SetNextTransmissionTime (Simulator::Now () + Seconds
+-                                      (timeOnAir / dutyCycle - timeOnAir));
+-
+-  // Computation of necessary aggregate waiting time
+-  m_nextAggregatedTransmissionTime = Simulator::Now () + Seconds
+-      (timeOnAir / m_aggregatedDutyCycle - timeOnAir);
++  subBand->SetNextTransmissionTime (Simulator::Now () + m_lastTxDuration / dutyCycle);
+ 
+-  NS_LOG_DEBUG ("Time on air: " << timeOnAir);
+-  NS_LOG_DEBUG ("m_aggregatedDutyCycle: " << m_aggregatedDutyCycle);
+-  NS_LOG_DEBUG ("Current time: " << Simulator::Now ().GetSeconds ());
++  NS_LOG_DEBUG ("Time on air: " << m_lastTxDuration.As (Time::MS));
++  NS_LOG_DEBUG ("Current time: " << Simulator::Now ().As (Time::S));
+   NS_LOG_DEBUG ("Next transmission on this sub-band allowed at time: " <<
+-                (subBand->GetNextTransmissionTime ()).GetSeconds ());
+-  NS_LOG_DEBUG ("Next aggregated transmission allowed at time " <<
+-                m_nextAggregatedTransmissionTime.GetSeconds ());
++                (subBand->GetNextTransmissionTime ()).As (Time::S));
+ }
+ 
+ double
+diff --git a/model/logical-lora-channel-helper.h b/model/logical-lora-channel-helper.h
+index 9590fed..af4a11b 100644
+--- a/model/logical-lora-channel-helper.h
++++ b/model/logical-lora-channel-helper.h
+@@ -52,11 +52,12 @@ public:
+ 
+   /**
+    * Get the time it is necessary to wait before transmitting again, according
+-   * to the aggregate duty cycle timer.
++   * to the aggregate duty cycle parameter and the duration of the last packet.
+    *
++   * \param aggregatedDutyCycle The parameter
+    * \return The aggregate waiting time.
+    */
+-  Time GetAggregatedWaitingTime (void);
++  Time GetAggregatedWaitingTime (double aggregatedDutyCycle);
+ 
+   /**
+    * Get the time it is necessary to wait for before transmitting on a given
+@@ -188,15 +189,9 @@ private:
+    */
+   std::vector<Ptr <LogicalLoraChannel> > m_channelList;
+ 
+-  Time m_nextAggregatedTransmissionTime; //!< The next time at which
+-  //!transmission will be possible
+-  //!according to the aggregated
+-  //!transmission timer
++  Time m_lastTxDuration; //!< Duration of the last frame (seconds).
+ 
+-  double m_aggregatedDutyCycle; //!< The next time at which
+-  //!transmission will be possible
+-  //!according to the aggregated
+-  //!transmission timer
++  Time m_lastTxStart; //!< Timestamp of the last trasmission start.
+ };
+ }
+ 
+diff --git a/model/lora-channel.cc b/model/lora-channel.cc
+index 47ec5ca..d709acb 100644
+--- a/model/lora-channel.cc
++++ b/model/lora-channel.cc
+@@ -66,6 +66,7 @@ LoraChannel::LoraChannel ()
+ LoraChannel::~LoraChannel ()
+ {
+   m_phyList.clear ();
++  m_phyListDown.clear ();
+ }
+ 
+ LoraChannel::LoraChannel (Ptr<PropagationLossModel> loss,
+@@ -84,6 +85,15 @@ LoraChannel::Add (Ptr<LoraPhy> phy)
+   m_phyList.push_back (phy);
+ }
+ 
++void
++LoraChannel::AddDown (Ptr<LoraPhy> phy)
++{
++  NS_LOG_FUNCTION (this << phy);
++
++  // Add the new phy to the vector
++  m_phyListDown.push_back (phy);
++}
++
+ void
+ LoraChannel::Remove (Ptr<LoraPhy> phy)
+ {
+@@ -180,6 +190,81 @@ LoraChannel::Send (Ptr< LoraPhy > sender, Ptr< Packet > packet,
+     }
+ }
+ 
++void
++LoraChannel::SendDown (Ptr< LoraPhy > sender, Ptr< Packet > packet,
++                       double txPowerDbm, LoraTxParameters txParams,
++                       Time duration, double frequencyMHz) const
++{
++  NS_LOG_FUNCTION (this << sender << packet << txPowerDbm << txParams <<
++                   duration << frequencyMHz);
++
++  // Get the mobility model of the sender
++  Ptr<MobilityModel> senderMobility = sender->GetMobility ()->GetObject<MobilityModel> ();
++
++  NS_ASSERT (senderMobility != 0);     // Make sure it's available
++
++  NS_LOG_INFO ("Starting cycle over all " << m_phyListDown.size () << " PHYs");
++  NS_LOG_INFO ("Sender mobility: " << senderMobility->GetPosition ());
++
++  // Cycle over all registered PHYs
++  uint32_t j = 0;
++  std::vector<Ptr<LoraPhy> >::const_iterator i;
++  for (i = m_phyListDown.begin (); i != m_phyListDown.end (); i++, j++)
++    {
++      // Do not deliver to the sender (*i is the current PHY)
++      if (sender != (*i))
++        {
++          // Get the receiver's mobility model
++          Ptr<MobilityModel> receiverMobility = (*i)->GetMobility ()->
++            GetObject<MobilityModel> ();
++
++          NS_LOG_INFO ("Receiver mobility: " <<
++                       receiverMobility->GetPosition ());
++
++          // Compute delay using the delay model
++          Time delay = m_delay->GetDelay (senderMobility, receiverMobility);
++
++          // Compute received power using the loss model
++          double rxPowerDbm = GetRxPower (txPowerDbm, senderMobility,
++                                          receiverMobility);
++
++          NS_LOG_DEBUG ("Propagation: txPower=" << txPowerDbm <<
++                        "dbm, rxPower=" << rxPowerDbm << "dbm, " <<
++                        "distance=" << senderMobility->GetDistanceFrom (receiverMobility) <<
++                        "m, delay=" << delay);
++
++          // Get the id of the destination PHY to correctly format the context
++          Ptr<NetDevice> dstNetDevice = m_phyListDown[j]->GetDevice ();
++          uint32_t dstNode = 0;
++          if (dstNetDevice != 0)
++            {
++              NS_LOG_INFO ("Getting node index from NetDevice, since it exists");
++              dstNode = dstNetDevice->GetNode ()->GetId ();
++              NS_LOG_DEBUG ("dstNode = " << dstNode);
++            }
++          else
++            {
++              NS_LOG_INFO ("No net device connected to the PHY, using context 0");
++            }
++
++          // Create the parameters object based on the calculations above
++          LoraChannelParameters parameters;
++          parameters.rxPowerDbm = rxPowerDbm;
++          parameters.sf = txParams.sf;
++          parameters.duration = duration;
++          parameters.frequencyMHz = frequencyMHz;
++
++          // Schedule the receive event
++          NS_LOG_INFO ("Scheduling reception of the packet");
++          Simulator::ScheduleWithContext (dstNode, delay, &LoraChannel::ReceiveDown,
++                                          this, j, packet, parameters);
++
++          // Fire the trace source for sent packet
++          m_packetSent (packet);
++        }
++    }
++}
++
+ void
+ LoraChannel::Receive (uint32_t i, Ptr<Packet> packet,
+                       LoraChannelParameters parameters) const
+@@ -191,6 +276,17 @@ LoraChannel::Receive (uint32_t i, Ptr<Packet> packet,
+                               parameters.duration, parameters.frequencyMHz);
+ }
+ 
++void
++LoraChannel::ReceiveDown (uint32_t i, Ptr<Packet> packet,
++                          LoraChannelParameters parameters) const
++{
++  NS_LOG_FUNCTION (this << i << packet << parameters);
++
++  // Call the appropriate PHY instance to let it begin reception
++  m_phyListDown[i]->StartReceive (packet, parameters.rxPowerDbm, parameters.sf,
++                                  parameters.duration, parameters.frequencyMHz);
++}
++
+ double
+ LoraChannel::GetRxPower (double txPowerDbm, Ptr<MobilityModel> senderMobility,
+                          Ptr<MobilityModel> receiverMobility) const
+diff --git a/model/lora-channel.h b/model/lora-channel.h
+index a6de5dc..2ed90b1 100644
+--- a/model/lora-channel.h
++++ b/model/lora-channel.h
+@@ -103,6 +103,8 @@ public:
+     */
+   void Add (Ptr<LoraPhy> phy);
+ 
++  void AddDown (Ptr<LoraPhy> phy);
++
+   /**
+     * Remove a physical layer from the LoraChannel.
+     *
+@@ -138,6 +140,10 @@ public:
+              LoraTxParameters txParams, Time duration, double frequencyMHz)
+   const;
+ 
++  void SendDown (Ptr<LoraPhy> sender, Ptr<Packet> packet, double txPowerDbm,
++                 LoraTxParameters txParams, Time duration, double frequencyMHz)
++  const;
++
+   /**
+     * Compute the received power when transmitting from a point to another one.
+     *
+@@ -168,12 +174,17 @@ private:
+   void Receive (uint32_t i, Ptr<Packet> packet,
+                 LoraChannelParameters parameters) const;
+ 
++  void ReceiveDown (uint32_t i, Ptr<Packet> packet,
++                    LoraChannelParameters parameters) const;
++
+   /**
+     * The vector containing the PHYs that are currently connected to the
+     * channel.
+     */
+   std::vector<Ptr<LoraPhy> > m_phyList;
+ 
++  std::vector<Ptr<LoraPhy> > m_phyListDown;
++
+   /**
+     * Pointer to the loss model.
+     *
+diff --git a/model/simple-gateway-lora-phy.cc b/model/simple-gateway-lora-phy.cc
+index 6ada6d2..f8e1289 100644
+--- a/model/simple-gateway-lora-phy.cc
++++ b/model/simple-gateway-lora-phy.cc
+@@ -97,10 +97,17 @@ SimpleGatewayLoraPhy::Send (Ptr<Packet> packet, LoraTxParameters txParams, doubl
+7     }
+ 
+   // Send the packet in the channel
+-  m_channel->Send (this, packet, txPowerDbm, txParams, duration, frequencyMHz);
++  m_channel->SendDown (this, packet, txPowerDbm, txParams, duration, frequencyMHz);
+ 
