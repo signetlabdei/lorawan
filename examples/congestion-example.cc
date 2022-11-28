@@ -321,12 +321,10 @@ main (int argc, char *argv[])
     {
       // Activate printing of ED MAC parameters
       Time statusSamplePeriod = Minutes (30);
-      loraHelper.EnablePeriodicDeviceStatusPrinting (endDevices, gateways, "deviceStatus.txt",
-                                                     statusSamplePeriod);
-      /* loraHelper.EnablePeriodicSFStatusPrinting (endDevices, gateways, "sfData.txt",
+      loraHelper.EnablePeriodicSFStatusPrinting (endDevices, gateways, "sfData.txt",
                                                  statusSamplePeriod);
       loraHelper.EnablePeriodicGlobalPerformancePrinting ("globalPerformance.txt",
-                                                          statusSamplePeriod); */
+                                                          statusSamplePeriod);
     }
 
   LoraPacketTracker &tracker = loraHelper.GetPacketTracker ();
