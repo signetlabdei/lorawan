@@ -44,9 +44,10 @@ namespace lorawan {
 class LoraHelper : public PcapHelperForDevice
 {
 public:
-  virtual ~LoraHelper ();
+  enum TraceLevel { PKT, DEV, SF, GW, NET };
 
   LoraHelper ();
+  virtual ~LoraHelper ();
 
   /**
    * Install LoraNetDevices on a list of nodes
@@ -116,6 +117,9 @@ public:
 
   void DoPrintSFStatus (NodeContainer endDevices, NodeContainer gateways, std::string filename);
 
+  void EnablePrinting (NodeContainer endDevices, NodeContainer gateways,
+                       std::vector<enum TraceLevel> levels, Time samplePeriod);
+
   LoraPacketTracker &GetPacketTracker (void);
 
   LoraPacketTracker *m_packetTracker = 0;
@@ -125,8 +129,7 @@ public:
 protected:
   static void PcapSniffRxEvent (Ptr<PcapFileWrapper> file, Ptr<const Packet> packet);
 
-  static void PcapSniffTxEvent (Ptr<PcapFileWrapper> file,
-                                Ptr<const Packet> packet);
+  static void PcapSniffTxEvent (Ptr<PcapFileWrapper> file, Ptr<const Packet> packet);
 
 private:
   /**

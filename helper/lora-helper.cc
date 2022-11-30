@@ -419,6 +419,37 @@ LoraHelper::DoPrintSFStatus (NodeContainer endDevices, NodeContainer gateways, s
 }
 
 void
+LoraHelper::EnablePrinting (NodeContainer endDevices, NodeContainer gateways,
+                            std::vector<enum TraceLevel> levels, Time samplePeriod)
+{
+  std::vector<bool> active (5, false);
+  for (auto l : levels)
+    {
+      if (active[l])
+        continue;
+      switch (l)
+        {
+        case NET:
+          EnablePeriodicGlobalPerformancePrinting ("globalPerformance.txt", samplePeriod);
+          break;
+        case GW:
+          EnablePeriodicGwsPerformancePrinting (gateways, "gwData.txt", samplePeriod);
+          break;
+          EnablePeriodicSFStatusPrinting (endDevices, gateways, "sfData.txt", samplePeriod);
+          break;
+        case DEV:
+          EnablePeriodicDeviceStatusPrinting (endDevices, gateways, "deviceStatus.txt",
+                                              samplePeriod);
+          break;
+        case PKT:
+        default:
+          break;
+        }
+      active[l] = true;
+    }
+}
+
+void
 LoraHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promiscuous,
                                 bool explicitFilename)
 {

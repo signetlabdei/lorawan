@@ -58,7 +58,7 @@ main (int argc, char *argv[])
 
   std::string save = "None";
   std::string load = "None";
-  bool file = false;
+  std::string file = "None";
 
   /* Expose parameters to command line */
   {
@@ -72,8 +72,7 @@ main (int argc, char *argv[])
     cmd.AddValue ("adr", "Whether to enable online ADR", adrEnabled);
     // Congestion-related
     cmd.AddValue ("target", "Central PDR value targeted (single cluster)", target);
-    cmd.AddValue ("clusters",
-                  "Clusters descriptor: \"{{share,pdr},...\"} (overrides 'target' param)",
+    cmd.AddValue ("clusters", "Clusters descriptor: {{share,pdr},...} (overrides 'target' param)",
                   clusterStr);
     cmd.AddValue ("model", "Use static duty-cycle config with capacity model", model);
     cmd.AddValue ("beta", "[static ctrl] Scaling factor of the static model output",
@@ -106,7 +105,11 @@ main (int argc, char *argv[])
                   killdevs);
     cmd.AddValue ("load", "File path with initial offered traffic values to use", load);
     cmd.AddValue ("save", "File path to save updated offered traffic values", save);
-    cmd.AddValue ("file", "Output the metrics of the simulation in a file", file);
+    cmd.AddValue ("file",
+                  "Output the metrics of the simulation in a file."
+                  "Use to set granularity among DEV|SF|GW|NET."
+                  "Multiple can be passed in the form {DEV,...}",
+                  file);
     cmd.Parse (argc, argv);
     NS_ASSERT (!(congest and model));
     NS_ASSERT ((periods >= 0) and (gatewayRings > 0) and (nDevices >= 0) and
@@ -317,14 +320,11 @@ main (int argc, char *argv[])
     macHelper.SetDutyCyclesWithCapacityModel (endDevices, gateways, channel, clusters, beta);
   loss->SetNext (rayleigh);
 
-  if (file)
+  //! Trace simulation metrics
+  if (file != "None")
     {
-      // Activate printing of ED MAC parameters
-      Time statusSamplePeriod = Minutes (30);
-      loraHelper.EnablePeriodicSFStatusPrinting (endDevices, gateways, "sfData.txt",
-                                                 statusSamplePeriod);
-      loraHelper.EnablePeriodicGlobalPerformancePrinting ("globalPerformance.txt",
-                                                          statusSamplePeriod);
+      Time samplePeriod = Minutes (30);
+      loraHelper.EnablePrinting (endDevices, gateways, ParseTraceLevels (file), samplePeriod);
     }
 
   LoraPacketTracker &tracker = loraHelper.GetPacketTracker ();
