@@ -435,6 +435,7 @@ LoraHelper::EnablePrinting (NodeContainer endDevices, NodeContainer gateways,
         case GW:
           EnablePeriodicGwsPerformancePrinting (gateways, "gwData.txt", samplePeriod);
           break;
+        case SF:
           EnablePeriodicSFStatusPrinting (endDevices, gateways, "sfData.txt", samplePeriod);
           break;
         case DEV:
