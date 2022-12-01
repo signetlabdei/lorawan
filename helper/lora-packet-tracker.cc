@@ -557,7 +557,7 @@ LoraPacketTracker::PrintSimulationStatistics (Time startTime)
      << " b/s\nNetwork Throughput: " << totBytesReceived * 8 / totTime << " b/s\n";
 
   totOffTraff /= totTime;
-  ss << "\nTotal offered traffic: " << totOffTraff << " E\n";
+  ss << "\nTotal (empirical) offered traffic: " << totOffTraff << " E\n";
 
   return ss.str ();
 }
