@@ -97,11 +97,11 @@ main (int argc, char *argv[])
                   changeAfter);
     cmd.AddValue ("add",
                   "Number of devices (from total) that will be activated after time set with "
-                  "'changement' parameter",
+                  "'change' parameter",
                   newdevs);
     cmd.AddValue ("remove",
                   "Number of devices (from total) that will be disabled after time set with "
-                  "'changement' parameter",
+                  "'change' parameter",
                   killdevs);
     cmd.AddValue ("load", "File path with initial offered traffic values to use", load);
     cmd.AddValue ("save", "File path to save updated offered traffic values", save);
