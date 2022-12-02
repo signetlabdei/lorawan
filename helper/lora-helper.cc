@@ -22,6 +22,7 @@
 #include "ns3/log.h"
 #include "ns3/loratap-header.h"
 #include "ns3/lora-application.h"
+#include "ns3/energy-source-container.h"
 
 #include <fstream>
 
@@ -371,6 +372,7 @@ LoraHelper::DoPrintSFStatus (NodeContainer endDevices, NodeContainer gateways, s
     int received = 0;
     double totMaxOT = 0.0;
     double totAggDC = 0.0;
+    double totEnergy = 0.0;
   };
 
   using sfMap_t = std::map<int, sfStatus_t>;
@@ -379,15 +381,24 @@ LoraHelper::DoPrintSFStatus (NodeContainer endDevices, NodeContainer gateways, s
 
   for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j)
     {
+      // Obtain device information      
       Ptr<Node> object = *j;
       Ptr<NetDevice> netDevice = object->GetDevice (0);
       Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
       NS_ASSERT (loraNetDevice != 0);
       Ptr<ClassAEndDeviceLorawanMac> mac =
           loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
-      int dr = int (mac->GetDataRate ());
-      // Add: #sent, #received, max-offered-traffic, duty-cycle
       Ptr<LoraApplication> app = object->GetApplication (0)->GetObject<LoraApplication> ();
+
+      int dr = int (mac->GetDataRate ());
+      sfStatus_t &sfstat = clusmap[mac->GetCluster ()][dr];
+
+      // Sent, received
+      devCount_t &count = devPktCount[object->GetId ()];
+      sfstat.sent += count.sent;
+      sfstat.received += count.received;
+
+      // Max-offered-traffic, duty-cycle
       uint8_t size = app->GetPacketSize ();
       double interval = app->GetInterval ().GetSeconds ();
       LoraTxParameters params;
@@ -399,20 +410,23 @@ LoraHelper::DoPrintSFStatus (NodeContainer endDevices, NodeContainer gateways, s
       maxot = std::min (maxot, 0.01);
       double ot = mac->GetAggregatedDutyCycle ();
       ot = std::min (ot, maxot);
-      devCount_t &count = devPktCount[object->GetId ()];
-
-      sfStatus_t &sfstat = clusmap[mac->GetCluster ()][dr];
-      sfstat.sent += count.sent;
-      sfstat.received += count.received;
       sfstat.totMaxOT += maxot;
       sfstat.totAggDC += ot;
+
+      // Total energy consumed
+      if (auto esc = object->GetObject<EnergySourceContainer> ())
+        {
+          auto demc = esc->Get (0)->FindDeviceEnergyModels ("ns3::LoraRadioEnergyModel");
+          if (demc.GetN ())
+            sfstat.totEnergy += demc.Get (0)->GetTotalEnergyConsumption ();
+        }
     }
 
   for (auto const &cl : clusmap)
     for (auto const &sf : cl.second)
       outputFile << currentTime.GetSeconds () << " " << cl.first << " " << sf.first << " "
                  << sf.second.sent << " " << sf.second.received << " " << sf.second.totMaxOT << " "
-                 << sf.second.totAggDC << std::endl;
+                 << sf.second.totAggDC << " " << sf.second.totEnergy << std::endl;
 
   m_lastSFStatusUpdate = Simulator::Now ();
   outputFile.close ();

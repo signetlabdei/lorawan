@@ -21,6 +21,8 @@
 #include "ns3/forwarder-helper.h"
 #include "ns3/urban-traffic-helper.h"
 #include "ns3/periodic-sender-helper.h"
+#include "ns3/basic-energy-source-helper.h"
+#include "ns3/lora-radio-energy-model-helper.h"
 #include "utilities.cc"
 
 using namespace ns3;
@@ -58,6 +60,7 @@ main (int argc, char *argv[])
 
   std::string save = "None";
   std::string load = "None";
+  bool energy = false;
   std::string file = "None";
 
   /* Expose parameters to command line */
@@ -105,6 +108,7 @@ main (int argc, char *argv[])
                   killdevs);
     cmd.AddValue ("load", "File path with initial offered traffic values to use", load);
     cmd.AddValue ("save", "File path to save updated offered traffic values", save);
+    cmd.AddValue ("energy", "Track devices energy consumption", energy);
     cmd.AddValue ("file",
                   "Output the metrics of the simulation in a file."
                   "Use to set granularity among DEV|SF|GW|NET."
@@ -226,6 +230,7 @@ main (int argc, char *argv[])
 
   LoraHelper loraHelper;
   LorawanMacHelper macHelper;
+  NetDeviceContainer edNetDevices;
   {
     // PointToPoint links between gateways and server
     PointToPointHelper p2p;
@@ -263,7 +268,7 @@ main (int argc, char *argv[])
     // Create the LoraNetDevices of the end devices
     phyHelper.SetDeviceType (LoraPhyHelper::ED);
     macHelper.SetDeviceType (LorawanMacHelper::ED_A);
-    loraHelper.Install (phyHelper, macHelper, endDevices);
+    edNetDevices = loraHelper.Install (phyHelper, macHelper, endDevices);
   }
 
   /*************************
@@ -306,6 +311,30 @@ main (int argc, char *argv[])
     for (; killdevs > 0 and i != apps.End (); ++i, --killdevs)
       (*i)->SetStopTime (Hours (changeAfter));
   }
+
+  /************************
+   * Install Energy Model *
+   ************************/
+
+  if (energy)
+    {
+      BasicEnergySourceHelper basicSourceHelper;
+      // configure energy source
+      basicSourceHelper.Set ("BasicEnergySourceInitialEnergyJ",
+                             DoubleValue (118800)); // Energy in J
+      basicSourceHelper.Set ("BasicEnergySupplyVoltageV", DoubleValue (3.3));
+      basicSourceHelper.Set ("PeriodicEnergyUpdateInterval",
+                             TimeValue (Hours (5))); // Only update on demand
+
+      // install source on EDs' nodes
+      EnergySourceContainer sources = basicSourceHelper.Install (endDevices);
+
+      LoraRadioEnergyModelHelper radioEnergyHelper;
+      radioEnergyHelper.SetTxCurrentModel ("ns3::ConstantLoraTxCurrentModel");
+
+      // install device model
+      radioEnergyHelper.Install (edNetDevices, sources);
+    }
 
   /***************************
    *  Simulation and metrics *
