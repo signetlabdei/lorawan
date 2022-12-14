@@ -110,8 +110,8 @@ main (int argc, char *argv[])
     cmd.AddValue ("save", "File path to save updated offered traffic values", save);
     cmd.AddValue ("energy", "Track devices energy consumption", energy);
     cmd.AddValue ("file",
-                  "Output the metrics of the simulation in a file."
-                  "Use to set granularity among DEV|SF|GW|NET."
+                  "Output the metrics of the simulation in a file. "
+                  "Use to set granularity among DEV|SF|GW|NET. "
                   "Multiple can be passed in the form {DEV,...}",
                   file);
     cmd.Parse (argc, argv);
