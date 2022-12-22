@@ -9,7 +9,7 @@
 Description:
     LoRa concentrator : Just In Time TX scheduling queue
 
-License: Revised BSD License, see LICENSE.TXT file include in the project
+License: Revised BSD License, see LICENSE file in this directory
 Maintainer: Michael Coracin
 */
 

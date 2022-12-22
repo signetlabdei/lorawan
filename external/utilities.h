@@ -3,7 +3,7 @@
  *
  * \brief     Helper functions implementation
  *
- * \copyright Revised BSD License, see section \ref LICENSE.
+ * \copyright Revised BSD License, see LICENSE file in this directory.
  *
  * \code
  *                ______                              _

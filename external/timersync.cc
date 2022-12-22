@@ -10,7 +10,7 @@ Description:
     LoRa concentrator : Timer synchronization
         Provides synchronization between unix, concentrator and gps clocks
 
-License: Revised BSD License, see LICENSE.TXT file include in the project
+License: Revised BSD License, see LICENSE file in this directory
 Maintainer: Michael Coracin
 */
 
