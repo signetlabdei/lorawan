@@ -139,6 +139,17 @@ std::vector<std::vector<double>> LoraInterferenceHelper::collisionSnirAloha= {
     {-36, -36, -36, -36, -36, 6} // SF12
 };
 
+// LoRa Collision Matrix (Croce)
+  std::vector<std::vector<double>> LoraInterferenceHelper::collisionSnirCroce= {
+    // SF7  SF8  SF9  SF10 SF11 SF12
+    {1, -8, -9, -9, -9, -9}, // SF7
+    {-11, 1, -11, -12, -13, -13}, // SF8
+    {-15, -13, 1, -13, -14, -15}, // SF9
+    {-19, -18, -17, 1, -17, -18}, // SF10
+    {-22, -22, -21, -20, 1, -20}, // SF11
+    {-25, -25, -25, -24, -23, 1} // SF12
+};
+
 LoraInterferenceHelper::CollisionMatrix LoraInterferenceHelper::collisionMatrix =
     LoraInterferenceHelper::GOURSAUD;
 
@@ -157,6 +168,10 @@ LoraInterferenceHelper::SetCollisionMatrix (
     case LoraInterferenceHelper::GOURSAUD:
       NS_LOG_DEBUG ("Setting the GOURSAUD collision matrix");
       m_collisionSnir = LoraInterferenceHelper::collisionSnirGoursaud;
+      break;
+    case LoraInterferenceHelper::CROCE:
+      NS_LOG_DEBUG ("Setting the CROCE collision matrix");
+      m_collisionSnir = LoraInterferenceHelper::collisionSnirCroce;
       break;
     }
 }
@@ -344,7 +359,7 @@ LoraInterferenceHelper::IsDestroyedByInterference (Ptr<LoraInterferenceHelper::E
       if (snir >= snirIsolation)
         {
           // Move on and check the rest of the interferers
-          NS_LOG_DEBUG ("Packet survived interference with SF " << currentSf);
+          NS_LOG_DEBUG ("Packet survived interference with SF " << unsigned(currentSf));
         }
       else
         {
