@@ -15,11 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Davide Magrin <magrinda@dei.unipd.it>
+ * Author: Alessandro Aimi <alessandro.aimi@cnam.fr>
+ *                         <alessandro.aimi@orange.com>
  */
 
-#ifndef PERIODIC_SENDER_H
-#define PERIODIC_SENDER_H
+#ifndef POISSON_SENDER_H
+#define POISSON_SENDER_H
 
 #include "ns3/lora-application.h"
 #include "ns3/lorawan-mac.h"
@@ -27,18 +28,13 @@
 namespace ns3 {
 namespace lorawan {
 
-class PeriodicSender : public LoraApplication
+class PoissonSender : public LoraApplication
 {
 public:
-  PeriodicSender ();
-  ~PeriodicSender ();
+  PoissonSender ();
+  ~PoissonSender ();
 
   static TypeId GetTypeId (void);
-
-  /**
-   * Set if using randomness in the packet size
-   */
-  void SetPacketSizeRandomVariable (Ptr<RandomVariableStream> rv);
 
 private:
   /**
@@ -56,18 +52,15 @@ private:
    */
   void SendPacket (void);
 
+  Ptr<ExponentialRandomVariable> m_interval; //!< Random variable modeling packet inter-send time
+
   /**
    * The MAC layer of this node
    */
   Ptr<LorawanMac> m_mac;
-
-  /**
-   * The random variable that adds bytes to the packet size
-   */
-  Ptr<RandomVariableStream> m_pktSizeRV;
 };
 
 } // namespace lorawan
 
 } // namespace ns3
-#endif /* SENDER_APPLICATION */
+#endif /* POISSON_SENDER_H */
