@@ -1,5 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
+ * Copyright (c) 2022 Orange SA
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation;
@@ -13,61 +15,77 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Davide Magrin <magrinda@dei.unipd.it>
+ * Author: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                         <alessandro.aimi@cnam.fr>
  */
 
 #ifndef HEX_GRID_POSITION_ALLOCATOR_H
 #define HEX_GRID_POSITION_ALLOCATOR_H
 
 #include "ns3/position-allocator.h"
+
 #include <cmath>
 
 namespace ns3 {
 
-  class HexGridPositionAllocator : public PositionAllocator
-  {
-  public:
-    HexGridPositionAllocator ();
-    HexGridPositionAllocator (double radius);
+/**
+   * This class is an iterable generator for hexagonal grid positions
+   */
+class HexGridPositionAllocator : public PositionAllocator
+{
+public:
+  static TypeId GetTypeId (void);
 
-    ~HexGridPositionAllocator ();
+  HexGridPositionAllocator ();
+  ~HexGridPositionAllocator ();
 
-    virtual Vector GetNext (void) const;
+  virtual Vector GetNext (void) const;
 
-    virtual int64_t AssignStreams (int64_t stream);
+  virtual int64_t AssignStreams (int64_t stream);
 
-    static TypeId GetTypeId (void);
+  void SetDistance (double distance);
 
-    double GetRadius (void);
+  void SetZ (double z);
 
-    void SetRadius (double radius);
+private:
+  /**
+   * Refer to hexagonal tiling. We build concentric rings 
+   * of hexagon starting from one hexagon in the center. 
+   * Hexagons are placed from the center-top of the last 
+   * ring, in counter-clockwise fashion.
+   * 
+   * We compute the position tracking:
+   *  - the index of the ring of hexagons, 
+   *  - the sector (the 6 sides of the ring 
+   *    which is itself a hexagon),
+   *  - the hexagon index in the ring line
+   *    orthogonal to the radius.
+   * 
+   * With this information we build 2 vectors, one radial 
+   * and the other fase-shifted counter-clockwise by 120 deg.
+   */
+  Vector ObtainCurrentPosition (void) const;
 
-  private:
-    /**
-     * This method adds to the given list of positions an outer ring of positions
-     * \param position the list of position around which to create the other positions
+  void ResetCoordinates (void);
+
+  /**
+     * The distance between two adjacent nodes
      */
-    std::vector<Vector> AddRing (std::vector<Vector> positions);
+  double m_d;
 
-    /**
-     * The list of current positions
+  /**
+     * The vertical position of allocated nodes
      */
-    std::vector<Vector> m_positions;
+  double m_z;
 
-    /**
-     * The iterator pointing to the next position to return
+  /**
+     * The coordinates used to keep track of allocation progress
      */
-    mutable std::vector<Vector>::const_iterator m_next;
+  mutable int m_ring, m_sector, m_hex;
 
-    /**
-     * The radius of a cell (defined as the half the distance between two
-     * adjacent nodes)
-     */
-    double m_radius;
-
-    const static double pi; //!< Pi
-  };
+  const double p3 = M_PI / 3.0;
+};
 
 } // namespace ns3
 
-#endif /* PERIODIC_SENDER_HELPER_H */
+#endif /* HEX_GRID_POSITION_ALLOCATOR_H */
