@@ -61,10 +61,16 @@ public:
    */
   void SetPeriod (Time period);
 
-  void SetPacketSizeRandomVariable (Ptr <RandomVariableStream> rv);
+  // Extract different constant period for each device from a distribution
+  void SetPeriodGenerator (Ptr<RandomVariableStream> rv);
 
   void SetPacketSize (uint8_t size);
 
+  // Extract different constant packet size for each device from a distribution
+  void SetPacketSizeGenerator (Ptr<RandomVariableStream> rv);
+  
+  // Give devices a distribution to pick a different packet size on each transmission 
+  void SetPacketSizeRandomVariable (Ptr<RandomVariableStream> rv);
 
 private:
   Ptr<Application> InstallPriv (Ptr<Node> node) const;
@@ -76,15 +82,18 @@ private:
   Ptr<UniformRandomVariable> m_intervalProb;
 
   Time m_period; //!< The period with which the application will be set to send
-                 // messages
+      // messages
 
-  Ptr<RandomVariableStream> m_pktSizeRV; // whether or not a random component is added to the packet size
+  Ptr<RandomVariableStream>
+      m_pktSizeRV; // whether or not a random component is added to the packet size
 
   uint8_t m_pktSize; // the packet size.
 
+  Ptr<RandomVariableStream> m_intervalGenerator; //!< the sending interval assignment variable
+  Ptr<RandomVariableStream> m_sizeGenerator; //!< the packet size assignment variable
 };
 
-} // namespace ns3
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* PERIODIC_SENDER_HELPER_H */
