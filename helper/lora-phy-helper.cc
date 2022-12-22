@@ -117,7 +117,7 @@ LoraPhyHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
       // Gateways, and it will not lose time delivering packets and interference
       // information to devices which will never listen.
 
-      m_channel->Add (phy);
+      m_channel->AddDown (phy);
     }
 
   // Link the PHY to its net device

@@ -103,6 +103,8 @@ public:
     */
   void Add (Ptr<LoraPhy> phy);
 
+  void AddDown (Ptr<LoraPhy> phy);
+
   /**
     * Remove a physical layer from the LoraChannel.
     *
@@ -138,6 +140,10 @@ public:
              LoraTxParameters txParams, Time duration, double frequencyMHz)
   const;
 
+  void SendDown (Ptr<LoraPhy> sender, Ptr<Packet> packet, double txPowerDbm,
+                 LoraTxParameters txParams, Time duration, double frequencyMHz)
+  const;
+
   /**
     * Compute the received power when transmitting from a point to another one.
     *
@@ -168,11 +174,16 @@ private:
   void Receive (uint32_t i, Ptr<Packet> packet,
                 LoraChannelParameters parameters) const;
 
+  void ReceiveDown (uint32_t i, Ptr<Packet> packet,
+                    LoraChannelParameters parameters) const;
+
   /**
     * The vector containing the PHYs that are currently connected to the
     * channel.
     */
   std::vector<Ptr<LoraPhy> > m_phyList;
+
+  std::vector<Ptr<LoraPhy> > m_phyListDown;
 
   /**
     * Pointer to the loss model.
