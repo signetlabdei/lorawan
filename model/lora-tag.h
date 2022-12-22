@@ -22,6 +22,7 @@
 #define LORA_TAG_H
 
 #include "ns3/tag.h"
+#include "ns3/nstime.h"
 
 namespace ns3 {
 namespace lorawan {
@@ -137,6 +138,20 @@ public:
    */
   void SetSnr (double snr);
 
+    /**
+   * Get the reception time (demodulation end) for this packet.
+   *
+   * \return The timestamp at demodulation end of this packet.
+   */
+  Time GetReceptionTime (void);
+
+  /**
+   * Set the reception time for this packet.
+   *
+   * \param receptionTime The reception time.
+   */
+  void SetReceptionTime (Time receptionTime);
+
 private:
   uint8_t m_sf; //!< The Spreading Factor used by the packet.
   uint8_t m_destroyedBy; //!< The Spreading Factor that destroyed the packet.
@@ -145,6 +160,7 @@ private:
   //!packet.
   double m_frequency; //!< The frequency of this packet
   double m_snr; //!< The SNR of this packet during demodulation
+  Time m_receptionTime;
 };
 } // namespace ns3
 }
