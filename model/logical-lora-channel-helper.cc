@@ -38,9 +38,7 @@ LogicalLoraChannelHelper::GetTypeId (void)
   return tid;
 }
 
-LogicalLoraChannelHelper::LogicalLoraChannelHelper () :
-  m_nextAggregatedTransmissionTime (Seconds (0)),
-  m_aggregatedDutyCycle (1)
+LogicalLoraChannelHelper::LogicalLoraChannelHelper () : m_lastTxDuration (0), m_lastTxStart (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -187,16 +185,19 @@ LogicalLoraChannelHelper::RemoveChannel (Ptr<LogicalLoraChannel> logicalChannel)
 }
 
 Time
-LogicalLoraChannelHelper::GetAggregatedWaitingTime (void)
+LogicalLoraChannelHelper::GetAggregatedWaitingTime (double aggregatedDutyCycle)
 {
+  NS_LOG_FUNCTION ("Aggregated duty-cycle: " + std::to_string(aggregatedDutyCycle));
+
   // Aggregate waiting time
-  Time aggregatedWaitingTime = m_nextAggregatedTransmissionTime - Simulator::Now ();
-
+  Time nextTransmissionTime = (aggregatedDutyCycle)? 
+      m_lastTxStart + m_lastTxDuration / aggregatedDutyCycle : Time::Max();
+  Time aggregatedWaitingTime = nextTransmissionTime - Simulator::Now ();
+  
   // Handle case in which waiting time is negative
-  aggregatedWaitingTime = Seconds (std::max (aggregatedWaitingTime.GetSeconds (),
-                                             double(0)));
+  aggregatedWaitingTime = Max (aggregatedWaitingTime, Seconds (0));
 
-  NS_LOG_DEBUG ("Aggregated waiting time: " << aggregatedWaitingTime.GetSeconds ());
+  NS_LOG_DEBUG ("Aggregated waiting time: " << aggregatedWaitingTime.As (Time::S));
 
   return aggregatedWaitingTime;
 }
@@ -229,23 +230,16 @@ LogicalLoraChannelHelper::AddEvent (Time duration,
   Ptr<SubBand> subBand = GetSubBandFromChannel (channel);
 
   double dutyCycle = subBand->GetDutyCycle ();
-  double timeOnAir = duration.GetSeconds ();
+  m_lastTxDuration = duration;
+  m_lastTxStart = Simulator::Now ();
 
   // Computation of necessary waiting time on this sub-band
-  subBand->SetNextTransmissionTime (Simulator::Now () + Seconds
-                                      (timeOnAir / dutyCycle - timeOnAir));
+  subBand->SetNextTransmissionTime (Simulator::Now () + m_lastTxDuration / dutyCycle);
 
-  // Computation of necessary aggregate waiting time
-  m_nextAggregatedTransmissionTime = Simulator::Now () + Seconds
-      (timeOnAir / m_aggregatedDutyCycle - timeOnAir);
-
-  NS_LOG_DEBUG ("Time on air: " << timeOnAir);
-  NS_LOG_DEBUG ("m_aggregatedDutyCycle: " << m_aggregatedDutyCycle);
-  NS_LOG_DEBUG ("Current time: " << Simulator::Now ().GetSeconds ());
+  NS_LOG_DEBUG ("Time on air: " << m_lastTxDuration.As (Time::MS));
+  NS_LOG_DEBUG ("Current time: " << Simulator::Now ().As (Time::S));
   NS_LOG_DEBUG ("Next transmission on this sub-band allowed at time: " <<
-                (subBand->GetNextTransmissionTime ()).GetSeconds ());
-  NS_LOG_DEBUG ("Next aggregated transmission allowed at time " <<
-                m_nextAggregatedTransmissionTime.GetSeconds ());
+                (subBand->GetNextTransmissionTime ()).As (Time::S));
 }
 
 double

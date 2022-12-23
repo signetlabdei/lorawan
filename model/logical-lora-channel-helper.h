@@ -52,11 +52,12 @@ public:
 
   /**
    * Get the time it is necessary to wait before transmitting again, according
-   * to the aggregate duty cycle timer.
+   * to the aggregate duty cycle parameter and the duration of the last packet.
    *
+   * \param aggregatedDutyCycle The parameter
    * \return The aggregate waiting time.
    */
-  Time GetAggregatedWaitingTime (void);
+  Time GetAggregatedWaitingTime (double aggregatedDutyCycle);
 
   /**
    * Get the time it is necessary to wait for before transmitting on a given
@@ -188,15 +189,9 @@ private:
    */
   std::vector<Ptr <LogicalLoraChannel> > m_channelList;
 
-  Time m_nextAggregatedTransmissionTime; //!< The next time at which
-  //!transmission will be possible
-  //!according to the aggregated
-  //!transmission timer
+  Time m_lastTxDuration; //!< Duration of the last frame (seconds).
 
-  double m_aggregatedDutyCycle; //!< The next time at which
-  //!transmission will be possible
-  //!according to the aggregated
-  //!transmission timer
+  Time m_lastTxStart; //!< Timestamp of the last trasmission start.
 };
 }
 

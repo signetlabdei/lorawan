@@ -31,6 +31,8 @@
 #include "ns3/lora-device-address.h"
 #include "ns3/traced-value.h"
 
+#include "ns3/LoRaMacCrypto.h"
+
 namespace ns3 {
 namespace lorawan {
 
@@ -153,6 +155,15 @@ public:
   uint8_t GetDataRate (void);
 
   /**
+   * Set the transmission power this end device will use when transmitting. 
+   * For End Devices, this value is assumed to be fixed, and can be modified
+   * via MAC commands issued by the GW.
+   *
+   * \param txPower The txPower to use when transmitting.
+   */
+  void SetTransmissionPower (uint8_t txPower);
+
+  /**
    * Get the transmission power this end device is set to use.
    *
    * \return The transmission power this device uses when transmitting.
@@ -198,6 +209,14 @@ public:
    * form.
    */
   double GetAggregatedDutyCycle (void);
+
+  /**
+   * Set the aggregated duty cycle.
+   *
+   * \param aggregatedDutyCycle A time instance containing the aggregated 
+   * duty cycle in fractional form.
+   */
+  void SetAggregatedDutyCycle (double aggregatedDutyCycle);
 
   /////////////////////////
   // MAC command methods //
@@ -450,6 +469,11 @@ private:
   bool m_controlDataRate;
 
   /**
+   * Whether this device's MIC should be computed according to specifications.
+   */
+  bool m_realMIC;
+
+  /**
    * The event of retransmitting a packet in a consecutive moment if an ACK is not received.
    *
    * This Event is used to cancel the retransmission if the ACK is found in ParseCommand function and
@@ -492,6 +516,8 @@ private:
   LorawanMacHeader::MType m_mType;
 
   uint16_t m_currentFCnt;
+
+  LoRaMacCrypto* m_crypto;
 };
 
 
