@@ -24,7 +24,7 @@ Maintainer: Michael Coracin
 #include <stdbool.h>    /* bool type */
 #include <sys/time.h>   /* timeval */
 
-#include "loragw_hal.h"
+#include "ns3/loragw_hal.h"
 //#include "loragw_gps.h"
 
 /* -------------------------------------------------------------------------- */

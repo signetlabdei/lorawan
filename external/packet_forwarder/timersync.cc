@@ -23,7 +23,7 @@ Maintainer: Michael Coracin
 
 #include "trace.h"
 #include "timersync.h"
-#include "loragw_hal.h"
+#include "ns3/loragw_hal.h"
 
 /* -------------------------------------------------------------------------- */
 /* --- PRIVATE CONSTANTS & TYPES -------------------------------------------- */
