@@ -22,8 +22,6 @@ Maintainer: Sylvain Miermont
 
 #include <stdint.h>        /* C99 types */
 
-namespace ns3 {
-
 /* -------------------------------------------------------------------------- */
 /* --- PUBLIC FUNCTIONS PROTOTYPES ------------------------------------------ */
 
@@ -58,8 +56,6 @@ int bin_to_b64(const uint8_t * in, int size, char * out, int max_len);
 @brief Decode Base64 string to binary data (remove padding if necessary)
 */
 int b64_to_bin(const char * in, int size, uint8_t * out, int max_len);
-
-}
 
 #endif
 

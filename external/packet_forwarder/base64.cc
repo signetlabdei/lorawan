@@ -32,8 +32,6 @@ Maintainer: Sylvain Miermont
 //#define DEBUG(args...)    fprintf(stderr,"debug: " args) /* diagnostic message that is destined to the user */
 #define DEBUG(args...)
 
-namespace ns3 {
-
 /* -------------------------------------------------------------------------- */
 /* --- PRIVATE CONSTANTS ---------------------------------------------------- */
 
@@ -304,8 +302,6 @@ int b64_to_bin(const char * in, int size, uint8_t * out, int max_len) {
     } else { /* treat as unpadded Base64 */
         return b64_to_bin_nopad(in, size, out, max_len);
     }
-}
-
 }
 
 /* --- EOF ------------------------------------------------------------------ */

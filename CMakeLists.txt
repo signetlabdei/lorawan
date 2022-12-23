@@ -54,15 +54,15 @@ set(source_files
     helper/network-server-helper.cc
     helper/lora-packet-tracker.cc
     helper/chirpstack-helper.cc
-    external/base64.cc
-    external/parson.cc
-    external/loragw_hal.cc
-    external/jitqueue.cc
-    external/timersync.cc
-    external/LoRaMacCrypto.cc
-    external/cmac.cc
-    external/aes.cc
-    external/utilities.cc
+    external/lora_gateway/loragw_hal.cc
+    external/loramac-node/aes.cc
+    external/loramac-node/cmac.cc
+    external/loramac-node/LoRaMacCrypto.cc
+    external/loramac-node/utilities.cc
+    external/packet_forwarder/base64.cc
+    external/packet_forwarder/jitqueue.cc
+    external/packet_forwarder/parson.cc
+    external/packet_forwarder/timersync.cc
 )
 
 set(header_files
@@ -122,17 +122,17 @@ set(header_files
     helper/lora-packet-tracker.h
     helper/chirpstack-helper.h
     test/utilities.h
-    external/base64.h
-    external/parson.h
-    external/loragw_hal.h
-    external/jitqueue.h
-    external/trace.h
-    external/timersync.h
-    external/LoRaMacCrypto.h
-    external/cmac.h
-    external/aes.h
-    external/utilities.h
-    external/se-identity.h
+    external/lora_gateway/loragw_hal.h
+    external/loramac-node/aes.h
+    external/loramac-node/cmac.h
+    external/loramac-node/LoRaMacCrypto.h
+    external/loramac-node/se-identity.h
+    external/loramac-node/utilities.h
+    external/packet_forwarder/base64.h
+    external/packet_forwarder/jitqueue.h
+    external/packet_forwarder/parson.h
+    external/packet_forwarder/timersync.h
+    external/packet_forwarder/trace.h
 )
 
 build_lib(
