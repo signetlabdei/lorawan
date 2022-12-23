@@ -9,7 +9,7 @@
 Description:
     LoRa concentrator Hardware Abstraction Layer
 
-License: Revised BSD License, see LICENSE.TXT file include in the project
+License: Revised BSD License, see LICENSE file in this directory
 Maintainer: Sylvain Miermont
 */
 
