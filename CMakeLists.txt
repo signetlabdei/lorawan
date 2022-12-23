@@ -17,8 +17,11 @@ set(source_files
     model/logical-lora-channel.cc
     model/logical-lora-channel-helper.cc
     model/periodic-sender.cc
+    model/lora-application.cc
+    model/poisson-sender.cc
     model/one-shot-sender.cc
     model/forwarder.cc
+    model/udp-forwarder.cc
     model/lorawan-mac-header.cc
     model/lora-frame-header.cc
     model/mac-command.cc
@@ -37,16 +40,29 @@ set(source_files
     model/lora-utils.cc
     model/adr-component.cc
     model/hex-grid-position-allocator.cc
+    model/range-position-allocator.cc
     model/loratap-header.cc
     helper/lora-radio-energy-model-helper.cc
     helper/lora-helper.cc
     helper/lora-phy-helper.cc
     helper/lorawan-mac-helper.cc
     helper/periodic-sender-helper.cc
+    helper/urban-traffic-helper.cc
     helper/one-shot-sender-helper.cc
     helper/forwarder-helper.cc
+    helper/udp-forwarder-helper.cc
     helper/network-server-helper.cc
     helper/lora-packet-tracker.cc
+    helper/chirpstack-helper.cc
+    external/base64.cc
+    external/parson.cc
+    external/loragw_hal.cc
+    external/jitqueue.cc
+    external/timersync.cc
+    external/LoRaMacCrypto.cc
+    external/cmac.cc
+    external/aes.cc
+    external/utilities.cc
 )
 
 set(header_files
@@ -67,9 +83,12 @@ set(header_files
     model/sub-band.h
     model/logical-lora-channel.h
     model/logical-lora-channel-helper.h
+    model/lora-application.h
     model/periodic-sender.h
+    model/poisson-sender.h
     model/one-shot-sender.h
     model/forwarder.h
+    model/udp-forwarder.h
     model/lorawan-mac-header.h
     model/lora-frame-header.h
     model/mac-command.h
@@ -88,17 +107,32 @@ set(header_files
     model/lora-utils.h
     model/adr-component.h
     model/hex-grid-position-allocator.h
+    model/range-position-allocator.h
     model/loratap-header.h
     helper/lora-radio-energy-model-helper.h
     helper/lora-helper.h
     helper/lora-phy-helper.h
     helper/lorawan-mac-helper.h
+    helper/urban-traffic-helper.h
     helper/periodic-sender-helper.h
     helper/one-shot-sender-helper.h
     helper/forwarder-helper.h
+    helper/udp-forwarder-helper.h
     helper/network-server-helper.h
     helper/lora-packet-tracker.h
+    helper/chirpstack-helper.h
     test/utilities.h
+    external/base64.h
+    external/parson.h
+    external/loragw_hal.h
+    external/jitqueue.h
+    external/trace.h
+    external/timersync.h
+    external/LoRaMacCrypto.h
+    external/cmac.h
+    external/aes.h
+    external/utilities.h
+    external/se-identity.h
 )
 
 build_lib(
@@ -112,6 +146,9 @@ build_lib(
     ${libpoint-to-point}
     ${libbuildings}
     ${libmobility}
+    ${libapplications}
+    ${libcsma}
+    ${curlpp_LIBRARIES}
   TEST_SOURCES
     test/utilities.cc
     test/lorawan-test-suite.cc
