@@ -39,7 +39,7 @@ TypeId AdrComponent::GetTypeId (void)
     .SetParent<NetworkControllerComponent> ()
     .AddAttribute ("MultipleGwCombiningMethod",
                    "Whether to average the received power of gateways or to use the maximum",
-                   EnumValue (AdrComponent::AVERAGE),
+                   EnumValue (AdrComponent::MAXIMUM),
                    MakeEnumAccessor (&AdrComponent::tpAveraging),
                    MakeEnumChecker (AdrComponent::AVERAGE,
                                     "avg",
@@ -49,7 +49,7 @@ TypeId AdrComponent::GetTypeId (void)
                                     "min"))
     .AddAttribute ("MultiplePacketsCombiningMethod",
                    "Whether to average SNRs from multiple packets or to use the maximum",
-                   EnumValue (AdrComponent::AVERAGE),
+                   EnumValue (AdrComponent::MAXIMUM),
                    MakeEnumAccessor (&AdrComponent::historyAveraging),
                    MakeEnumChecker (AdrComponent::AVERAGE,
                                     "avg",
@@ -59,7 +59,7 @@ TypeId AdrComponent::GetTypeId (void)
                                     "min"))
     .AddAttribute ("HistoryRange",
                    "Number of packets to use for averaging",
-                   IntegerValue (4),
+                   IntegerValue (20),
                    MakeIntegerAccessor (&AdrComponent::historyRange),
                    MakeIntegerChecker<int> (0, 100))
     .AddAttribute ("ChangeTransmissionPower",
@@ -67,6 +67,9 @@ TypeId AdrComponent::GetTypeId (void)
                    BooleanValue (true),
                    MakeBooleanAccessor (&AdrComponent::m_toggleTxPower),
                    MakeBooleanChecker ())
+    .AddAttribute ("SNRDeviceMargin", "Additional SNR margin needed to decrease SF/TxPower",
+                   DoubleValue (0), MakeDoubleAccessor (&AdrComponent::m_deviceMargin),
+                   MakeDoubleChecker<double> ())
   ;
   return tid;
 }
@@ -214,7 +217,7 @@ void AdrComponent::AdrImplementation (uint8_t *newDataRate,
 
   //Compute the SNR margin taking into consideration the SNR of
   //previously received packets
-  double margin_SNR = m_SNR - req_SNR;
+  double margin_SNR = m_SNR - req_SNR - m_deviceMargin;
 
   NS_LOG_DEBUG ("Margin = " << margin_SNR);
 
@@ -437,31 +440,31 @@ double AdrComponent::GetAverageSNR (EndDeviceStatus::ReceivedPacketList packetLi
 
 int AdrComponent::GetTxPowerIndex (int txPower)
 {
-  if (txPower >= 16)
+  if (txPower >= 14)
     {
       return 0;
     }
-  else if (txPower >= 14)
+  else if (txPower >= 12)
     {
       return 1;
     }
-  else if (txPower >= 12)
+  else if (txPower >= 10)
     {
       return 2;
     }
-  else if (txPower >= 10)
+  else if (txPower >= 8)
     {
       return 3;
     }
-  else if (txPower >= 8)
+  else if (txPower >= 6)
     {
       return 4;
     }
-  else if (txPower >= 6)
+  else if (txPower >= 4)
     {
       return 5;
     }
-  else if (txPower >= 4)
+  else if (txPower >= 2)
     {
       return 6;
     }
