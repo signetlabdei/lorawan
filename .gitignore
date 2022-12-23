@@ -1,3 +1,7 @@
 /.dir-locals.el
 *.png
 *.dat
+
+.vscode
+experiments/*/*results
+experiments/*/.ipynb_checkpoints
