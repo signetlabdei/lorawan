@@ -961,7 +961,6 @@ EndDeviceLorawanMac::SetTransmissionPower (uint8_t txPower)
 
   m_txPower = txPower;
 }
-}
 
 } // namespace lorawan
 } // namespace ns3

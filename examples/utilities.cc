@@ -83,3 +83,39 @@ OnInterrupt (sighandler_t action)
   std::signal (SIGFPE, action);
   std::signal (SIGTERM, action);
 }
+
+/**
+ * Granularities of the tracing system 
+ */
+const std::unordered_map<std::string, LoraHelper::TraceLevel> traceLevelMap = {
+    {"PKT", LoraHelper::PKT},
+    {"DEV", LoraHelper::DEV},
+    {"SF", LoraHelper::SF},
+    {"GW", LoraHelper::GW},
+    {"NET", LoraHelper::NET}};
+
+std::vector<LoraHelper::TraceLevel>
+ParseTraceLevels (std::string s)
+{
+  std::regex rx ("PKT|DEV|SF|GW|NET|\\{((PKT|DEV|SF|GW|NET),)*(PKT|DEV|SF|GW|NET)\\}");
+  NS_ASSERT_MSG (std::regex_match (s, rx),
+                 "Trace granularity vector "
+                     << s
+                     << " ill formatted. "
+                        "Syntax (no spaces): --file=OPTION or --file={OPTION,...}");
+
+  s.erase (std::remove (s.begin (), s.end (), '{'), s.end ());
+  s.erase (std::remove (s.begin (), s.end (), '}'), s.end ());
+
+  std::vector<LoraHelper::TraceLevel> out;
+
+  std::stringstream ss (s);
+  while (ss.good ())
+    {
+      std::string substr;
+      getline (ss, substr, ',');
+      out.push_back (traceLevelMap.at (substr));
+    }
+
+  return out;
+}
