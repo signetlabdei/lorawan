@@ -44,7 +44,7 @@ namespace lorawan {
 class LoraHelper : public PcapHelperForDevice
 {
 public:
-  virtual ~LoraHelper ();
+  enum TraceLevel { PKT, DEV, SF, GW, NET };
 
   LoraHelper ();
   virtual ~LoraHelper ();
@@ -93,12 +93,17 @@ public:
                                            std::string filename, Time interval);
 
   /**
+   * Print a summary of the status of all devices in the network.
+   */
+  void DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateways, std::string filename);
+
+  /**
    * Periodically prints PHY-level performance at every gateway in the container.
    */
-  void EnablePeriodicPhyPerformancePrinting (NodeContainer gateways, std::string filename,
+  void EnablePeriodicGwsPerformancePrinting (NodeContainer gateways, std::string filename,
                                              Time interval);
 
-  void DoPrintPhyPerformance (NodeContainer gateways, std::string filename);
+  void DoPrintGwsPerformance (NodeContainer gateways, std::string filename);
 
   /**
    * Periodically prints global performance.
@@ -107,16 +112,19 @@ public:
 
   void DoPrintGlobalPerformance (std::string filename);
 
+  void EnablePeriodicSFStatusPrinting (NodeContainer endDevices, NodeContainer gateways,
+                                       std::string filename, Time interval);
+
+  void DoPrintSFStatus (NodeContainer endDevices, NodeContainer gateways, std::string filename);
+
+  void EnablePrinting (NodeContainer endDevices, NodeContainer gateways,
+                       std::vector<enum TraceLevel> levels, Time samplePeriod);
+
   LoraPacketTracker &GetPacketTracker (void);
 
   LoraPacketTracker *m_packetTracker = 0;
 
   time_t m_oldtime;
-
-  /**
-   * Print a summary of the status of all devices in the network.
-   */
-  void DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateways, std::string filename);
 
 protected:
   static void PcapSniffRxEvent (Ptr<PcapFileWrapper> file, Ptr<const Packet> packet);
@@ -135,6 +143,8 @@ private:
 
   Time m_lastPhyPerformanceUpdate;
   Time m_lastGlobalPerformanceUpdate;
+  Time m_lastDeviceStatusUpdate;
+  Time m_lastSFStatusUpdate;
 };
 
 } // namespace lorawan
