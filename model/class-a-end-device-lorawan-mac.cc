@@ -20,6 +20,10 @@
  *
  * Modified by: Peggy Anderson <peggy.anderson@usask.ca>
  *              qiuyukang <b612n@qq.com>
+ * 
+ * 23/12/2022
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #include "ns3/class-a-end-device-lorawan-mac.h"

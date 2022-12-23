@@ -17,6 +17,10 @@
  *
  * Authors: Martina Capuzzo <capuzzom@dei.unipd.it>
  *          Davide Magrin <magrinda@dei.unipd.it>
+ * 
+ * 23/12/2022
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #include "ns3/end-device-status.h"

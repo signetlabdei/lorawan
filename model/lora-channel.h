@@ -19,6 +19,10 @@
  *
  * The structure of this class is inspired by the YansWifiChannel
  * contained in the WiFi module.
+ * 
+ * 23/12/2022
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #ifndef LORA_CHANNEL_H
