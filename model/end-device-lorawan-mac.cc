@@ -19,6 +19,10 @@
  *         Martina Capuzzo <capuzzom@dei.unipd.it>
  *
  * Modified by: Peggy Anderson <peggy.anderson@usask.ca>
+ * 
+ * 23/12/2022
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #include "ns3/end-device-lorawan-mac.h"
