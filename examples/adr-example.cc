@@ -164,7 +164,8 @@ int main (int argc, char *argv[])
    // positionAllocGw->Add (Vector (5000.0, 5000.0, 15.0));
    // mobilityGw.SetPositionAllocator (positionAllocGw);
    // mobilityGw.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
-   Ptr<HexGridPositionAllocator> hexAllocator = CreateObject<HexGridPositionAllocator> (gatewayDistance / 2);
+   Ptr<HexGridPositionAllocator> hexAllocator = CreateObject<HexGridPositionAllocator> ();
+   hexAllocator->SetAttribute ("distance", DoubleValue(gatewayDistance));
    mobilityGw.SetPositionAllocator (hexAllocator);
    mobilityGw.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
 
