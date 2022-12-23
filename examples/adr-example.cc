@@ -250,9 +250,15 @@ int main (int argc, char *argv[])
   NodeContainer networkServers;
   networkServers.Create (1);
 
+  // PointToPoint links between gateways and server
+  PointToPointHelper p2p;
+  p2p.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
+  p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
+  for (auto gw = gateways.Begin (); gw != gateways.End (); ++gw)
+    p2p.Install (networkServers.Get (0), *gw);
+
   // Install the NetworkServer application on the network server
   NetworkServerHelper networkServerHelper;
-  networkServerHelper.SetGateways (gateways);
   networkServerHelper.SetEndDevices (endDevices);
   networkServerHelper.EnableAdr (adrEnabled);
   networkServerHelper.SetAdr (adrType);
@@ -271,7 +277,7 @@ int main (int argc, char *argv[])
   // Activate printing of ED MAC parameters
   Time stateSamplePeriod = Seconds (1200);
   helper.EnablePeriodicDeviceStatusPrinting (endDevices, gateways, "nodeData.txt", stateSamplePeriod);
-  helper.EnablePeriodicPhyPerformancePrinting (gateways, "phyPerformance.txt", stateSamplePeriod);
+  helper.EnablePeriodicGwsPerformancePrinting (gateways, "phyPerformance.txt", stateSamplePeriod);
   helper.EnablePeriodicGlobalPerformancePrinting ("globalPerformance.txt", stateSamplePeriod);
 
   LoraPacketTracker& tracker = helper.GetPacketTracker ();

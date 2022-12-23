@@ -52,11 +52,6 @@ public:
   ApplicationContainer Install (Ptr<Node> node);
 
   /**
-   * Set which gateways will need to be connected to this NS.
-   */
-  void SetGateways (NodeContainer gateways);
-
-  /**
    * Set which end devices will be managed by this NS.
    */
   void SetEndDevices (NodeContainer endDevices);
@@ -79,18 +74,14 @@ private:
 
   ObjectFactory m_factory;
 
-  NodeContainer m_gateways;   //!< Set of gateways to connect to this NS
-
-  NodeContainer m_endDevices;   //!< Set of endDevices to connect to this NS
-
-  PointToPointHelper p2pHelper; //!< Helper to create PointToPoint links
+  NodeContainer m_endDevices; //!< Set of endDevices to connect to this NS
 
   bool m_adrEnabled;
 
   ObjectFactory m_adrSupportFactory;
 };
 
-} // namespace ns3
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* NETWORK_SERVER_HELPER_H */

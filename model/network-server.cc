@@ -95,10 +95,19 @@ NetworkServer::AddGateway (Ptr<Node> gateway, Ptr<NetDevice> netDevice)
         }
     }
 
-  // Get the gateway's LoRa MAC layer (assumes gateway's MAC is configured as first device)
-  Ptr<GatewayLorawanMac> gwMac = gateway->GetDevice (0)->GetObject<LoraNetDevice> ()->
-    GetMac ()->GetObject<GatewayLorawanMac> ();
-  NS_ASSERT (gwMac != 0);
+  // Get the gateway's LoRa MAC layer
+  Ptr<GatewayLorawanMac> gwMac = 0;
+  for (uint32_t i = 0; i < gateway->GetNDevices (); i++)
+    {
+      if (gateway->GetDevice (i)->GetObject<LoraNetDevice> () != 0)
+        {
+          gwMac = gateway->GetDevice (i)
+                      ->GetObject<LoraNetDevice> ()
+                      ->GetMac ()
+                      ->GetObject<GatewayLorawanMac> ();
+          break;
+        }
+    }
 
   // Get the Address
   Address gatewayAddress = p2pNetDevice->GetAddress ();
