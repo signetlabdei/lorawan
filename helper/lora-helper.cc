@@ -29,77 +29,67 @@ namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("LoraHelper");
 
-  LoraHelper::LoraHelper () :
-    m_lastPhyPerformanceUpdate (Seconds (0)),
-    m_lastGlobalPerformanceUpdate (Seconds (0))
-  {
-  }
+LoraHelper::LoraHelper ()
+    : m_lastPhyPerformanceUpdate (Seconds (0)),
+      m_lastGlobalPerformanceUpdate (Seconds (0))
+{
+}
 
-  LoraHelper::~LoraHelper ()
-  {
-  }
+LoraHelper::~LoraHelper ()
+{
+}
 
-  NetDeviceContainer
-  LoraHelper::Install ( const LoraPhyHelper &phyHelper,
-                        const LorawanMacHelper &macHelper,
-                        NodeContainer c) const
-  {
-    NS_LOG_FUNCTION_NOARGS ();
+NetDeviceContainer
+LoraHelper::Install (const LoraPhyHelper &phyHelper, const LorawanMacHelper &macHelper,
+                     NodeContainer c) const
+{
+  NS_LOG_FUNCTION_NOARGS ();
 
-    NetDeviceContainer devices;
+  NetDeviceContainer devices;
 
-    // Go over the various nodes in which to install the NetDevice
-    for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
-      {
-        Ptr<Node> node = *i;
+  // Go over the various nodes in which to install the NetDevice
+  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
+    {
+      Ptr<Node> node = *i;
 
-        // Create the LoraNetDevice
-        Ptr<LoraNetDevice> device = CreateObject<LoraNetDevice> ();
+      // Create the LoraNetDevice
+      Ptr<LoraNetDevice> device = CreateObject<LoraNetDevice> ();
 
-        // Create the PHY
-        Ptr<LoraPhy> phy = phyHelper.Create (node, device);
-        NS_ASSERT (phy != 0);
-        device->SetPhy (phy);
-        NS_LOG_DEBUG ("Done creating the PHY");
+      // Create the PHY
+      Ptr<LoraPhy> phy = phyHelper.Create (node, device);
+      NS_ASSERT (phy != 0);
+      device->SetPhy (phy);
+      NS_LOG_DEBUG ("Done creating the PHY");
 
-        // Connect Trace Sources if necessary
-        if (m_packetTracker)
-          {
-            if (phyHelper.GetDeviceType () ==
-                TypeId::LookupByName ("ns3::SimpleEndDeviceLoraPhy"))
-              {
-                phy->TraceConnectWithoutContext ("StartSending",
-                                                 MakeCallback
-                                                 (&LoraPacketTracker::TransmissionCallback,
-                                                  m_packetTracker));
-              }
-            else if (phyHelper.GetDeviceType () ==
-                     TypeId::LookupByName ("ns3::SimpleGatewayLoraPhy"))
+      // Connect Trace Sources if necessary
+      if (m_packetTracker)
+        {
+          if (phyHelper.GetDeviceType () == TypeId::LookupByName ("ns3::SimpleEndDeviceLoraPhy"))
             {
-              phy->TraceConnectWithoutContext ("StartSending",
-                                               MakeCallback
-                                               (&LoraPacketTracker::TransmissionCallback,
-                                                m_packetTracker));
-              phy->TraceConnectWithoutContext ("ReceivedPacket",
-                                               MakeCallback
-                                                 (&LoraPacketTracker::PacketReceptionCallback,
-                                                 m_packetTracker));
-              phy->TraceConnectWithoutContext ("LostPacketBecauseInterference",
-                                               MakeCallback
-                                                 (&LoraPacketTracker::InterferenceCallback,
-                                                 m_packetTracker));
-              phy->TraceConnectWithoutContext ("LostPacketBecauseNoMoreReceivers",
-                                               MakeCallback
-                                                 (&LoraPacketTracker::NoMoreReceiversCallback,
-                                                 m_packetTracker));
-              phy->TraceConnectWithoutContext ("LostPacketBecauseUnderSensitivity",
-                                               MakeCallback
-                                                 (&LoraPacketTracker::UnderSensitivityCallback,
-                                                 m_packetTracker));
-              phy->TraceConnectWithoutContext ("NoReceptionBecauseTransmitting",
-                                               MakeCallback
-                                                 (&LoraPacketTracker::LostBecauseTxCallback,
-                                                 m_packetTracker));
+              phy->TraceConnectWithoutContext (
+                  "StartSending",
+                  MakeCallback (&LoraPacketTracker::TransmissionCallback, m_packetTracker));
+            }
+          else if (phyHelper.GetDeviceType () == TypeId::LookupByName ("ns3::SimpleGatewayLoraPhy"))
+            {
+              phy->TraceConnectWithoutContext (
+                  "StartSending",
+                  MakeCallback (&LoraPacketTracker::TransmissionCallback, m_packetTracker));
+              phy->TraceConnectWithoutContext (
+                  "ReceivedPacket",
+                  MakeCallback (&LoraPacketTracker::PacketReceptionCallback, m_packetTracker));
+              phy->TraceConnectWithoutContext (
+                  "LostPacketBecauseInterference",
+                  MakeCallback (&LoraPacketTracker::InterferenceCallback, m_packetTracker));
+              phy->TraceConnectWithoutContext (
+                  "LostPacketBecauseNoMoreReceivers",
+                  MakeCallback (&LoraPacketTracker::NoMoreReceiversCallback, m_packetTracker));
+              phy->TraceConnectWithoutContext (
+                  "LostPacketBecauseUnderSensitivity",
+                  MakeCallback (&LoraPacketTracker::UnderSensitivityCallback, m_packetTracker));
+              phy->TraceConnectWithoutContext (
+                  "NoReceptionBecauseTransmitting",
+                  MakeCallback (&LoraPacketTracker::LostBecauseTxCallback, m_packetTracker));
             }
         }
 
@@ -112,45 +102,39 @@ NS_LOG_COMPONENT_DEFINE ("LoraHelper");
 
       if (m_packetTracker)
         {
-          if (phyHelper.GetDeviceType () ==
-              TypeId::LookupByName ("ns3::SimpleEndDeviceLoraPhy"))
+          if (phyHelper.GetDeviceType () == TypeId::LookupByName ("ns3::SimpleEndDeviceLoraPhy"))
             {
-              mac->TraceConnectWithoutContext ("SentNewPacket",
-                                               MakeCallback
-                                                 (&LoraPacketTracker::MacTransmissionCallback,
-                                                 m_packetTracker));
+              mac->TraceConnectWithoutContext (
+                  "SentNewPacket",
+                  MakeCallback (&LoraPacketTracker::MacTransmissionCallback, m_packetTracker));
 
-              mac->TraceConnectWithoutContext ("RequiredTransmissions",
-                                               MakeCallback
-                                                 (&LoraPacketTracker::RequiredTransmissionsCallback,
-                                                 m_packetTracker));
+              mac->TraceConnectWithoutContext (
+                  "RequiredTransmissions",
+                  MakeCallback (&LoraPacketTracker::RequiredTransmissionsCallback,
+                                m_packetTracker));
             }
-          else if (phyHelper.GetDeviceType () ==
-                   TypeId::LookupByName ("ns3::SimpleGatewayLoraPhy"))
+          else if (phyHelper.GetDeviceType () == TypeId::LookupByName ("ns3::SimpleGatewayLoraPhy"))
             {
-              mac->TraceConnectWithoutContext ("SentNewPacket",
-                                               MakeCallback
-                                               (&LoraPacketTracker::MacTransmissionCallback,
-                                                m_packetTracker));
+              mac->TraceConnectWithoutContext (
+                  "SentNewPacket",
+                  MakeCallback (&LoraPacketTracker::MacTransmissionCallback, m_packetTracker));
 
-              mac->TraceConnectWithoutContext ("ReceivedPacket",
-                                               MakeCallback
-                                               (&LoraPacketTracker::MacGwReceptionCallback,
-                                                m_packetTracker));
+              mac->TraceConnectWithoutContext (
+                  "ReceivedPacket",
+                  MakeCallback (&LoraPacketTracker::MacGwReceptionCallback, m_packetTracker));
             }
         }
 
       node->AddDevice (device);
       devices.Add (device);
-      NS_LOG_DEBUG ("node=" << node << ", mob=" << node->GetObject<MobilityModel> ()->GetPosition ());
+      NS_LOG_DEBUG ("node=" << node
+                            << ", mob=" << node->GetObject<MobilityModel> ()->GetPosition ());
     }
   return devices;
 }
 
 NetDeviceContainer
-LoraHelper::Install ( const LoraPhyHelper &phy,
-                      const LorawanMacHelper &mac,
-                      Ptr<Node> node) const
+LoraHelper::Install (const LoraPhyHelper &phy, const LorawanMacHelper &mac, Ptr<Node> node) const
 {
   return Install (phy, mac, NodeContainer (node));
 }
@@ -164,7 +148,7 @@ LoraHelper::EnablePacketTracking ()
   m_packetTracker = new LoraPacketTracker ();
 }
 
-LoraPacketTracker&
+LoraPacketTracker &
 LoraHelper::GetPacketTracker (void)
 {
   NS_LOG_FUNCTION (this);
@@ -176,8 +160,7 @@ void
 LoraHelper::EnableSimulationTimePrinting (Time interval)
 {
   m_oldtime = std::time (0);
-  Simulator::Schedule (Seconds (0), &LoraHelper::DoPrintSimulationTime, this,
-                       interval);
+  Simulator::Schedule (Seconds (0), &LoraHelper::DoPrintSimulationTime, this, interval);
 }
 
 void
@@ -191,16 +174,15 @@ LoraHelper::EnablePeriodicDeviceStatusPrinting (NodeContainer endDevices,
   DoPrintDeviceStatus (endDevices, gateways, filename);
 
   // Schedule periodic printing
-  Simulator::Schedule (interval,
-                       &LoraHelper::EnablePeriodicDeviceStatusPrinting, this,
-                       endDevices, gateways, filename, interval);
+  Simulator::Schedule (interval, &LoraHelper::EnablePeriodicDeviceStatusPrinting, this, endDevices,
+                       gateways, filename, interval);
 }
 
 void
 LoraHelper::DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateways,
                                  std::string filename)
 {
-  const char * c = filename.c_str ();
+  const char *c = filename.c_str ();
   std::ofstream outputFile;
   if (Simulator::Now () == Seconds (0))
     {
@@ -222,8 +204,9 @@ LoraHelper::DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateway
       Ptr<NetDevice> netDevice = object->GetDevice (0);
       Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
       NS_ASSERT (loraNetDevice != 0);
-      Ptr<ClassAEndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
-      int dr = int(mac->GetDataRate ());
+      Ptr<ClassAEndDeviceLorawanMac> mac =
+          loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
+      int dr = int (mac->GetDataRate ());
       double txPower = mac->GetTransmissionPower ();
       Vector pos = position->GetPosition ();
       outputFile << currentTime.GetSeconds () << " "
@@ -231,18 +214,8 @@ LoraHelper::DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateway
                  << pos.x << " " << pos.y << " " << dr << " "
                  << unsigned(txPower) << std::endl;
     }
-  // for (NodeContainer::Iterator j = gateways.Begin (); j != gateways.End (); ++j)
-  //   {
-  //     Ptr<Node> object = *j;
-  //     Ptr<MobilityModel> position = object->GetObject<MobilityModel> ();
-  //     Vector pos = position->GetPosition ();
-  //     outputFile << currentTime.GetSeconds () << " "
-  //                << object->GetId () <<  " "
-  //                << pos.x << " " << pos.y << " " << "-1 -1" << std::endl;
-  //   }
   outputFile.close ();
 }
-
 
 void
 LoraHelper::EnablePeriodicPhyPerformancePrinting (NodeContainer gateways,
@@ -265,7 +238,7 @@ LoraHelper::DoPrintPhyPerformance (NodeContainer gateways,
 {
   NS_LOG_FUNCTION (this);
 
-  const char * c = filename.c_str ();
+  const char *c = filename.c_str ();
   std::ofstream outputFile;
   if (Simulator::Now () == Seconds (0))
     {
@@ -290,20 +263,17 @@ LoraHelper::DoPrintPhyPerformance (NodeContainer gateways,
 
   m_lastPhyPerformanceUpdate = Simulator::Now ();
 
-  outputFile.close();
+  outputFile.close ();
 }
 
 void
-LoraHelper::EnablePeriodicGlobalPerformancePrinting (std::string filename,
-                                                     Time interval)
+LoraHelper::EnablePeriodicGlobalPerformancePrinting (std::string filename, Time interval)
 {
   NS_LOG_FUNCTION (this << filename << interval);
 
   DoPrintGlobalPerformance (filename);
 
-  Simulator::Schedule (interval,
-                       &LoraHelper::EnablePeriodicGlobalPerformancePrinting,
-                       this,
+  Simulator::Schedule (interval, &LoraHelper::EnablePeriodicGlobalPerformancePrinting, this,
                        filename, interval);
 }
 
@@ -312,7 +282,7 @@ LoraHelper::DoPrintGlobalPerformance (std::string filename)
 {
   NS_LOG_FUNCTION (this);
 
-  const char * c = filename.c_str ();
+  const char *c = filename.c_str ();
   std::ofstream outputFile;
   if (Simulator::Now () == Seconds (0))
     {
@@ -344,9 +314,10 @@ LoraHelper::DoPrintSimulationTime (Time interval)
   m_oldtime = std::time (0);
   Simulator::Schedule (interval, &LoraHelper::DoPrintSimulationTime, this, interval);
 }
- 
-void 
-LoraHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promiscuous, bool explicitFilename)
+
+void
+LoraHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promiscuous,
+                                bool explicitFilename)
 {
   NS_LOG_FUNCTION (this << prefix << nd << promiscuous << explicitFilename);
 
@@ -358,12 +329,14 @@ LoraHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool prom
   Ptr<LoraNetDevice> device = nd->GetObject<LoraNetDevice> ();
   if (device == 0)
     {
-      NS_LOG_INFO ("LoraHelper::EnablePcapInternal(): Device " << device << " not of type ns3::LoraNetDevice");
+      NS_LOG_INFO ("LoraHelper::EnablePcapInternal(): Device "
+                   << device << " not of type ns3::LoraNetDevice");
       return;
     }
 
   auto phy = device->GetPhy ();
-  NS_ABORT_MSG_IF (phy == 0, "LoRaHelper::EnablePcapInternal(): Phy layer in LoraNetDevice must be set");
+  NS_ABORT_MSG_IF (phy == 0,
+                   "LoRaHelper::EnablePcapInternal(): Phy layer in LoraNetDevice must be set");
 
   PcapHelper pcapHelper;
 
@@ -378,18 +351,18 @@ LoraHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool prom
     }
 
   auto file = pcapHelper.CreateFile (filename, std::ios::out, PcapHelper::DLT_LORATAP);
-  phy->TraceConnectWithoutContext ("SnifferRx", MakeBoundCallback (&LoraHelper::PcapSniffRxEvent, file));
-  phy->TraceConnectWithoutContext ("SnifferTx", MakeBoundCallback (&LoraHelper::PcapSniffTxEvent, file));
+  phy->TraceConnectWithoutContext ("SnifferRx",
+                                   MakeBoundCallback (&LoraHelper::PcapSniffRxEvent, file));
+  phy->TraceConnectWithoutContext ("SnifferTx",
+                                   MakeBoundCallback (&LoraHelper::PcapSniffTxEvent, file));
 }
 
 void
-LoraHelper::PcapSniffRxEvent (
-  Ptr<PcapFileWrapper>  file,
-  Ptr<const Packet>     packet)
+LoraHelper::PcapSniffRxEvent (Ptr<PcapFileWrapper> file, Ptr<const Packet> packet)
 {
   Ptr<Packet> p = packet->Copy ();
   LoraTag tag;
-  p -> RemovePacketTag (tag);
+  p->RemovePacketTag (tag);
   LoratapHeader header;
   header.Fill (tag);
   p->AddHeader (header);
@@ -397,18 +370,16 @@ LoraHelper::PcapSniffRxEvent (
 }
 
 void
-LoraHelper::PcapSniffTxEvent (
-  Ptr<PcapFileWrapper>  file,
-  Ptr<const Packet>     packet)
+LoraHelper::PcapSniffTxEvent (Ptr<PcapFileWrapper> file, Ptr<const Packet> packet)
 {
   Ptr<Packet> p = packet->Copy ();
   LoraTag tag;
-  p -> RemovePacketTag (tag);
+  p->RemovePacketTag (tag);
   LoratapHeader header;
   header.Fill (tag);
   p->AddHeader (header);
   file->Write (Simulator::Now (), p);
 }
 
-}
-}
+} // namespace lorawan
+} // namespace ns3
