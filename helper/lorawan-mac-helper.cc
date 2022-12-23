@@ -143,7 +143,7 @@ LorawanMacHelper::ConfigureForAlohaRegion (Ptr<ClassAEndDeviceLorawanMac> edMac)
   /////////////////////////////////////////////////////
   // TxPower -> Transmission power in dBm conversion //
   /////////////////////////////////////////////////////
-  edMac->SetTxDbmForTxPower (std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
+  edMac->SetTxDbmForTxPower (std::vector<double>{14, 12, 10, 8, 6, 4, 2, 0});
 
   ////////////////////////////////////////////////////////////
   // Matrix to know which DataRate the GW will respond with //
@@ -237,10 +237,10 @@ LorawanMacHelper::ConfigureForEuRegion (Ptr<ClassAEndDeviceLorawanMac> edMac) co
 
   ApplyCommonEuConfigurations (edMac);
 
-  /////////////////////////////////////////////////////
-  // TxPower -> Transmission power in dBm conversion //
-  /////////////////////////////////////////////////////
-  edMac->SetTxDbmForTxPower (std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
+  ////////////////////////////////////////////////////////////
+  // TxPower -> Transmission power in dBm e.r.p. conversion //
+  ////////////////////////////////////////////////////////////
+  edMac->SetTxDbmForTxPower (std::vector<double>{14, 12, 10, 8, 6, 4, 2, 0});
 
   ////////////////////////////////////////////////////////////
   // Matrix to know which DataRate the GW will respond with //
@@ -315,9 +315,12 @@ LorawanMacHelper::ApplyCommonEuConfigurations (Ptr<LorawanMac> lorawanMac) const
   //////////////
 
   LogicalLoraChannelHelper channelHelper;
+  channelHelper.AddSubBand (863, 865, 0.001, 14);
+  channelHelper.AddSubBand (865, 868, 0.01, 14);
   channelHelper.AddSubBand (868, 868.6, 0.01, 14);
   channelHelper.AddSubBand (868.7, 869.2, 0.001, 14);
   channelHelper.AddSubBand (869.4, 869.65, 0.1, 27);
+  channelHelper.AddSubBand (869.7, 870, 0.01, 14);
 
   //////////////////////
   // Default channels //
@@ -328,6 +331,21 @@ LorawanMacHelper::ApplyCommonEuConfigurations (Ptr<LorawanMac> lorawanMac) const
   channelHelper.AddChannel (lc1);
   channelHelper.AddChannel (lc2);
   channelHelper.AddChannel (lc3);
+
+  ////////////////////////
+  // Addtional channels //
+  ////////////////////////
+
+  Ptr<LogicalLoraChannel> lc4 = CreateObject<LogicalLoraChannel> (867.1, 0, 5);
+  Ptr<LogicalLoraChannel> lc5 = CreateObject<LogicalLoraChannel> (867.3, 0, 5);
+  Ptr<LogicalLoraChannel> lc6 = CreateObject<LogicalLoraChannel> (867.5, 0, 5);
+  Ptr<LogicalLoraChannel> lc7 = CreateObject<LogicalLoraChannel> (867.7, 0, 5);
+  Ptr<LogicalLoraChannel> lc8 = CreateObject<LogicalLoraChannel> (867.9, 0, 5);
+  //channelHelper.AddChannel (lc4);
+  //channelHelper.AddChannel (lc5);
+  //channelHelper.AddChannel (lc6);
+  //channelHelper.AddChannel (lc7);
+  //channelHelper.AddChannel (lc8);
 
   lorawanMac->SetLogicalLoraChannelHelper (channelHelper);
 
@@ -354,7 +372,7 @@ LorawanMacHelper::ConfigureForSingleChannelRegion (Ptr<ClassAEndDeviceLorawanMac
   /////////////////////////////////////////////////////
   // TxPower -> Transmission power in dBm conversion //
   /////////////////////////////////////////////////////
-  edMac->SetTxDbmForTxPower (std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
+  edMac->SetTxDbmForTxPower (std::vector<double>{14, 12, 10, 8, 6, 4, 2, 0});
 
   ////////////////////////////////////////////////////////////
   // Matrix to know which DataRate the GW will respond with //
@@ -456,7 +474,7 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
 {
   NS_LOG_FUNCTION_NOARGS ();
 
-  std::vector<int> sfQuantity (7, 0);
+  std::vector<int> sfQuantity (6, 0);
   for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j)
     {
       Ptr<Node> object = *j;
@@ -473,7 +491,7 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
       Ptr<Node> bestGateway = gateways.Get (0);
       Ptr<MobilityModel> bestGatewayPosition = bestGateway->GetObject<MobilityModel> ();
 
-      // Assume devices transmit at 14 dBm
+      // Assume devices transmit at 14 dBm erp
       double highestRxPower = channel->GetRxPower (14, position, bestGatewayPosition);
 
       for (NodeContainer::Iterator currentGw = gateways.Begin () + 1; currentGw != gateways.End ();
@@ -495,98 +513,43 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
       // NS_LOG_DEBUG ("Rx Power: " << highestRxPower);
       double rxPower = highestRxPower;
 
-      // Get the ED sensitivity
-      Ptr<EndDeviceLoraPhy> edPhy = loraNetDevice->GetPhy ()->GetObject<EndDeviceLoraPhy> ();
-      const double *edSensitivity = edPhy->sensitivity;
+      std::vector<double> snrThresholds = {-7.5, -10, -12.5, -15, -17.5, -20}; // dB
+      double noise = -174.0 + 10 * log10 (125000.0) + 6; // dBm
+      double snr = rxPower - noise; // dB
 
-      if (rxPower > *edSensitivity)
-        {
-          mac->SetDataRate (5);
-          sfQuantity[0] = sfQuantity[0] + 1;
-        }
-      else if (rxPower > *(edSensitivity + 1))
-        {
-          mac->SetDataRate (4);
-          sfQuantity[1] = sfQuantity[1] + 1;
-        }
-      else if (rxPower > *(edSensitivity + 2))
-        {
-          mac->SetDataRate (3);
-          sfQuantity[2] = sfQuantity[2] + 1;
-        }
-      else if (rxPower > *(edSensitivity + 3))
-        {
-          mac->SetDataRate (2);
-          sfQuantity[3] = sfQuantity[3] + 1;
-        }
-      else if (rxPower > *(edSensitivity + 4))
-        {
-          mac->SetDataRate (1);
-          sfQuantity[4] = sfQuantity[4] + 1;
-        }
-      else if (rxPower > *(edSensitivity + 5))
-        {
-          mac->SetDataRate (0);
-          sfQuantity[5] = sfQuantity[5] + 1;
-        }
-      else // Device is out of range. Assign SF12.
-        {
-          // NS_LOG_DEBUG ("Device out of range");
-          mac->SetDataRate (0);
-          sfQuantity[6] = sfQuantity[6] + 1;
-          // NS_LOG_DEBUG ("sfQuantity[6] = " << sfQuantity[6]);
-        }
+      double prob_H = 0.98;
+      // dB, desired thermal gain for 0.98 PDR with rayleigh fading
+      double deviceMargin = 10 * log10 (-1 / log (prob_H));
+      double snrMargin = snr - deviceMargin;
 
-      /*
+      uint8_t datarate = 0; // SF12 by default
+      if (snrMargin > snrThresholds[0])
+        datarate = 5; // SF7
+      else if (snrMargin > snrThresholds[1])
+        datarate = 4; // SF8
+      else if (snrMargin > snrThresholds[2])
+        datarate = 3; // SF9
+      else if (snrMargin > snrThresholds[3])
+        datarate = 2; // SF10
+      else if (snrMargin > snrThresholds[4])
+        datarate = 1; // SF11
 
-      // Get the Gw sensitivity
-      Ptr<NetDevice> gatewayNetDevice = bestGateway->GetDevice (0);
-      Ptr<LoraNetDevice> gatewayLoraNetDevice = gatewayNetDevice->GetObject<LoraNetDevice> ();
-      Ptr<GatewayLoraPhy> gatewayPhy = gatewayLoraNetDevice->GetPhy ()->GetObject<GatewayLoraPhy> ();
-      const double *gwSensitivity = gatewayPhy->sensitivity;
+      mac->SetDataRate (datarate);
+      sfQuantity[datarate]++;
 
-      if(rxPower > *gwSensitivity)
+      // Minimize power
+      if (datarate != 6)
+        continue;
+      for (int j = 14; j >= 0; j -= 2)
         {
-          mac->SetDataRate (5);
-          sfQuantity[0] = sfQuantity[0] + 1;
-
+          snrMargin =
+              channel->GetRxPower (14, position, bestGatewayPosition) - noise - deviceMargin;
+          if (snrMargin > snrThresholds[0])
+            {
+              mac->SetTransmissionPower (14 - j);
+              break;
+            }
         }
-      else if (rxPower > *(gwSensitivity+1))
-        {
-          mac->SetDataRate (4);
-          sfQuantity[1] = sfQuantity[1] + 1;
-
-        }
-      else if (rxPower > *(gwSensitivity+2))
-        {
-          mac->SetDataRate (3);
-          sfQuantity[2] = sfQuantity[2] + 1;
-
-        }
-      else if (rxPower > *(gwSensitivity+3))
-        {
-          mac->SetDataRate (2);
-          sfQuantity[3] = sfQuantity[3] + 1;
-        }
-      else if (rxPower > *(gwSensitivity+4))
-        {
-          mac->SetDataRate (1);
-          sfQuantity[4] = sfQuantity[4] + 1;
-        }
-      else if (rxPower > *(gwSensitivity+5))
-        {
-          mac->SetDataRate (0);
-          sfQuantity[5] = sfQuantity[5] + 1;
-
-        }
-      else // Device is out of range. Assign SF12.
-        {
-          mac->SetDataRate (0);
-          sfQuantity[6] = sfQuantity[6] + 1;
-
-        }
-        */
-
     } // end loop on nodes
 
   return sfQuantity;
