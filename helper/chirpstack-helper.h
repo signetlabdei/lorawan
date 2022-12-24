@@ -25,6 +25,8 @@
 #include "ns3/node-container.h"
 #include "ns3/loragw_hal.h"
 
+#include <curl/curl.h>
+
 namespace ns3 {
 namespace lorawan {
 
@@ -80,9 +82,12 @@ private:
 
   int DELETE (const str &path, str &out) const;
 
+  static size_t StreamWriteCallback (char *buffer, size_t size, size_t nitems,
+                                     std::ostream *stream);
+
   str m_url;
-  std::list<str> m_header;
-  
+  struct curl_slist *m_header = NULL;
+
   session_t m_session;
 
   static const struct coord_s m_center;

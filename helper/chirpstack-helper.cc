@@ -25,12 +25,6 @@
 #include "ns3/lora-net-device.h"
 #include "chirpstack-helper.h"
 
-#include <curlpp/cURLpp.hpp>
-#include <curlpp/Easy.hpp>
-#include <curlpp/Options.hpp>
-#include <curlpp/Exception.hpp>
-#include <curlpp/Infos.hpp>
-
 #include "ns3/parson.h"
 
 namespace ns3 {
@@ -49,9 +43,9 @@ ChirpstackHelper::ChirpstackHelper ()
       "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9."
       "eyJhdWQiOiJjaGlycHN0YWNrIiwiaXNzIjoiY2hpcnBzdGFjayIsInN1YiI6Ijc4ZjA4Nzc0LTZjZjUtNDI0MC04ZWMx"
       "LWRmYTYwN2I5MmYwOCIsInR5cCI6ImtleSJ9.pNYLfS8PQ7A48T1_HRrgEJcGHnDlgEPwo18D7uauKOw";
-  m_header.push_back ("Authorization: Bearer " + token);
-  m_header.push_back ("Accept: application/json");
-  m_header.push_back ("Content-Type: application/json");
+  m_header = curl_slist_append (m_header, ("Authorization: Bearer " + token).c_str ());
+  m_header = curl_slist_append (m_header, "Accept: application/json");
+  m_header = curl_slist_append (m_header, "Content-Type: application/json");
 
   /* Initialize session keys */
   m_session.netKey = "2b7e151628aed2a6abf7158809cf4f3c";
@@ -60,7 +54,7 @@ ChirpstackHelper::ChirpstackHelper ()
 
 ChirpstackHelper::~ChirpstackHelper ()
 {
-  CloseConnection (0);
+  CloseConnection (EXIT_SUCCESS);
 }
 
 int
@@ -76,8 +70,8 @@ ChirpstackHelper::InitConnection (Ipv4Address ip, uint16_t port)
   m_url = url.str ();
   NS_LOG_INFO ("Chirpstack REST API URL set to: " << m_url);
 
-  /* Init curlpp */
-  curlpp::initialize ();
+  /* Init curl */
+  curl_global_init (CURL_GLOBAL_NOTHING);
 
   /* Create Ns-3 tenant */
   NewTenant ("Ns-3 Simulator");
@@ -100,8 +94,10 @@ ChirpstackHelper::CloseConnection (int signal) const
   if (DELETE ("/api/tenants/" + m_session.tenantId, reply) == EXIT_FAILURE)
     NS_LOG_ERROR ("Unable to unregister tenant, got reply: " << reply);
 
-  /* Terminate curlpp */
-  curlpp::terminate ();
+  /* Terminate curl */
+  curl_global_cleanup ();
+
+  curl_slist_free_all (m_header); /* free the header list */
 
 #ifdef NS3_LOG_ENABLE
   std::cout << "\nTear down process terminated after receiving signal " << signal << std::endl;
@@ -388,44 +384,46 @@ ChirpstackHelper::NewGateway (Ptr<Node> node) const
 int
 ChirpstackHelper::POST (const str &path, const str &body, str &out) const
 {
-  using namespace curlpp;
-
-  Easy request;
+  CURL *curl;
+  CURLcode res;
   std::stringstream ss;
-  try
+
+  /* get a curl handle */
+  curl = curl_easy_init ();
+  if (curl)
     {
+      /* Set the URL that is about to receive our POST. */
+      curl_easy_setopt (curl, CURLOPT_URL, (m_url + path).c_str ());
 
-      request.setOpt (new Options::Url (m_url + path));
-      request.setOpt (new Options::HttpHeader (m_header));
-      //request.setOpt (new Options::Verbose (true));
+      /* Specify the HEADER content */
+      curl_easy_setopt (curl, CURLOPT_HTTPHEADER, m_header);
 
+      /* Add body, if present */
       if (!body.empty ())
         {
-          request.setOpt (new Options::PostFields (body));
-          request.setOpt (new Options::PostFieldSize (body.size ()));
+          curl_easy_setopt (curl, CURLOPT_POSTFIELDS, body.c_str ());
+          curl_easy_setopt (curl, CURLOPT_POSTFIELDSIZE, (long) body.size ());
         }
 
-      request.setOpt (new Options::WriteStream (&ss));
+      /* Set reply stringstream */
+      curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, (void *) StreamWriteCallback);
+      curl_easy_setopt (curl, CURLOPT_WRITEDATA, (void *) &ss);
+
       NS_LOG_INFO ("Sending POST request to " << m_url << path << ", with body: " << body);
-      request.perform ();
-    }
-  catch (LogicError &e)
-    {
-      NS_LOG_ERROR (e.what ());
-      return EXIT_FAILURE;
-    }
-  catch (RuntimeError &e)
-    {
-      NS_LOG_ERROR (e.what ());
-      return EXIT_FAILURE;
+      /* Perform the request, res will get the return code */
+      res = curl_easy_perform (curl);
+
+      /* always cleanup */
+      curl_easy_cleanup (curl);
     }
 
   out = ss.str ();
   NS_LOG_INFO ("Received POST reply: " << out);
 
-  if (Infos::ResponseCode::get (request) != 200)
+  /* Check for errors */
+  if (res != CURLE_OK)
     {
-      NS_LOG_DEBUG ("Bad response code " << Infos::ResponseCode::get (request));
+      NS_LOG_ERROR ("curl_easy_perform() failed: " << curl_easy_strerror (res) << "\n");
       return EXIT_FAILURE;
     }
   return EXIT_SUCCESS;
@@ -434,42 +432,57 @@ ChirpstackHelper::POST (const str &path, const str &body, str &out) const
 int
 ChirpstackHelper::DELETE (const str &path, str &out) const
 {
-  using namespace curlpp;
-
-  Easy request;
+  CURL *curl;
+  CURLcode res;
   std::stringstream ss;
-  try
+
+  /* get a curl handle */
+  curl = curl_easy_init ();
+  if (curl)
     {
+      /* Set the URL that is about to receive our POST. */
+      curl_easy_setopt (curl, CURLOPT_URL, (m_url + path).c_str ());
 
-      request.setOpt (new Options::CustomRequest{"DELETE"});
-      request.setOpt (new Options::Url (m_url + path));
-      request.setOpt (new Options::HttpHeader (m_header));
-      //request.setOpt (new Options::Verbose (true));
+      /* Specify the HEADER content */
+      curl_easy_setopt (curl, CURLOPT_HTTPHEADER, m_header);
 
-      request.setOpt (new Options::WriteStream (&ss));
+      /* DELETE the given path */
+      curl_easy_setopt (curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+
+      /* Set reply stringstream */
+      curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, (void *) StreamWriteCallback);
+      curl_easy_setopt (curl, CURLOPT_WRITEDATA, (void *) &ss);
+
       NS_LOG_INFO ("Sending DELETE request to " << m_url << path);
-      request.perform ();
-    }
-  catch (LogicError &e)
-    {
-      NS_LOG_ERROR (e.what ());
-      return EXIT_FAILURE;
-    }
-  catch (RuntimeError &e)
-    {
-      NS_LOG_ERROR (e.what ());
-      return EXIT_FAILURE;
+      /* Perform the request, res will get the return code */
+      res = curl_easy_perform (curl);
+
+      /* always cleanup */
+      curl_easy_cleanup (curl);
     }
 
   out = ss.str ();
   NS_LOG_INFO ("Received DELETE reply: " << out);
 
-  if (Infos::ResponseCode::get (request) != 200)
+  /* Check for errors */
+  if (res != CURLE_OK)
     {
-      NS_LOG_DEBUG ("Bad response code " << Infos::ResponseCode::get (request));
+      NS_LOG_ERROR ("curl_easy_perform() failed: " << curl_easy_strerror (res) << "\n");
       return EXIT_FAILURE;
     }
   return EXIT_SUCCESS;
+}
+
+size_t
+ChirpstackHelper::StreamWriteCallback (char *buffer, size_t size, size_t nitems,
+                                       std::ostream *stream)
+{
+  size_t realwrote = size * nitems;
+  stream->write (buffer, static_cast<std::streamsize> (realwrote));
+  if (!(*stream))
+    realwrote = 0;
+
+  return realwrote;
 }
 
 } // namespace lorawan

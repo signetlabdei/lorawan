@@ -152,8 +152,8 @@ build_lib(
     ${libmobility}
     ${libapplications}
     ${libcsma}
+    ${curl_LIBRARIES}
     ${ortools_LIBRARIES}
-    ${curlpp_LIBRARIES}
   TEST_SOURCES
     test/utilities.cc
     test/lorawan-test-suite.cc

@@ -47,7 +47,7 @@ main (int argc, char *argv[])
    *  Simulation parameters  *
    ***************************/
 
-  int periods = 24; // H * D
+  double periods = 24; // H * D
   int gatewayRings = 1;
   double range = 2540.25; // Max range for downlink (!) coverage probability > 0.98 (with okumura)
   int nDevices = 1;
