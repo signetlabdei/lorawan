@@ -135,24 +135,24 @@ set(header_files
     external/packet_forwarder/trace.h
 )
 
-#build_lib(
-#  LIBNAME lorawan
-#  SOURCE_FILES ${source_files}
-#  HEADER_FILES ${header_files}
-#  LIBRARIES_TO_LINK
-#    ${libnetwork}
-#    ${libpropagation}
-#    ${libenergy}
-#    ${libpoint-to-point}
-#    ${libbuildings}
-#    ${libmobility}
-#    ${libapplications}
-#    ${libcsma}
-#    ${curl_LIBRARIES}
-#  TEST_SOURCES
-#    test/utilities.cc
-#    test/lorawan-test-suite.cc
-#    test/network-status-test-suite.cc
-#    test/network-scheduler-test-suite.cc
-#    test/network-server-test-suite.cc
-#)
+build_lib(
+  LIBNAME lorawan
+  SOURCE_FILES ${source_files}
+  HEADER_FILES ${header_files}
+  LIBRARIES_TO_LINK
+    ${libnetwork}
+    ${libpropagation}
+    ${libenergy}
+    ${libpoint-to-point}
+    ${libbuildings}
+    ${libmobility}
+    ${libapplications}
+    ${libcsma}
+    ${curl_LIBRARIES}
+  TEST_SOURCES
+    test/utilities.cc
+    test/lorawan-test-suite.cc
+    test/network-status-test-suite.cc
+    test/network-scheduler-test-suite.cc
+    test/network-server-test-suite.cc
+)
