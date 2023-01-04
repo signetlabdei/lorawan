@@ -100,7 +100,7 @@ EndDeviceLoraPhy::IsTransmitting (void)
 bool
 EndDeviceLoraPhy::IsOnFrequency (double frequencyMHz)
 {
-  return m_frequency == frequencyMHz;
+  return (int) 1.0e3 * m_frequency == (int) 1.0e3 * frequencyMHz;
 }
 
 void

@@ -206,7 +206,7 @@ EndDeviceLorawanMac::postponeTransmission (Time netxTxDelay, Ptr<Packet> packet)
   Simulator::Cancel (m_nextTx);
   m_nextTx = Simulator::Schedule (netxTxDelay, &EndDeviceLorawanMac::DoSend, this, packet);
   NS_LOG_DEBUG (
-      "Attempting to send, but the aggregate duty cycle won't allow it. Scheduling a tx in "
+      "Attempting to send, but the duty cycle won't allow it. Scheduling a tx in "
       << netxTxDelay.As (Time::S) << ".");
 }
 
