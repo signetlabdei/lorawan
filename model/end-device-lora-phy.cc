@@ -42,35 +42,31 @@ EndDeviceLoraPhyListener::~EndDeviceLoraPhyListener ()
 TypeId
 EndDeviceLoraPhy::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::EndDeviceLoraPhy")
-    .SetParent<LoraPhy> ()
-    .SetGroupName ("lorawan")
-    .AddTraceSource ("LostPacketBecauseWrongFrequency",
-                     "Trace source indicating a packet "
-                     "could not be correctly decoded because"
-                     "the ED was listening on a different frequency",
-                     MakeTraceSourceAccessor (&EndDeviceLoraPhy::m_wrongFrequency),
-                     "ns3::Packet::TracedCallback")
-    .AddTraceSource ("LostPacketBecauseWrongSpreadingFactor",
-                     "Trace source indicating a packet "
-                     "could not be correctly decoded because"
-                     "the ED was listening for a different Spreading Factor",
-                     MakeTraceSourceAccessor (&EndDeviceLoraPhy::m_wrongSf),
-                     "ns3::Packet::TracedCallback")
-    .AddTraceSource ("EndDeviceState",
-                     "The current state of the device",
-                     MakeTraceSourceAccessor
-                       (&EndDeviceLoraPhy::m_state),
-                     "ns3::TracedValueCallback::EndDeviceLoraPhy::State");
+  static TypeId tid =
+      TypeId ("ns3::EndDeviceLoraPhy")
+          .SetParent<LoraPhy> ()
+          .SetGroupName ("lorawan")
+          .AddTraceSource ("LostPacketBecauseWrongFrequency",
+                           "Trace source indicating a packet "
+                           "could not be correctly decoded because"
+                           "the ED was listening on a different frequency",
+                           MakeTraceSourceAccessor (&EndDeviceLoraPhy::m_wrongFrequency),
+                           "ns3::Packet::TracedCallback")
+          .AddTraceSource ("LostPacketBecauseWrongSpreadingFactor",
+                           "Trace source indicating a packet "
+                           "could not be correctly decoded because"
+                           "the ED was listening for a different Spreading Factor",
+                           MakeTraceSourceAccessor (&EndDeviceLoraPhy::m_wrongSf),
+                           "ns3::Packet::TracedCallback")
+          .AddTraceSource ("EndDeviceState", "The current state of the device",
+                           MakeTraceSourceAccessor (&EndDeviceLoraPhy::m_state),
+                           "ns3::TracedValueCallback::EndDeviceLoraPhy::State");
   return tid;
 }
 
 // Initialize the device with some common settings.
 // These will then be changed by helpers.
-EndDeviceLoraPhy::EndDeviceLoraPhy () :
-  m_state (SLEEP),
-  m_frequency (868.1),
-  m_sf (7)
+EndDeviceLoraPhy::EndDeviceLoraPhy () : m_state (SLEEP), m_frequency (868.1), m_sf (7)
 {
 }
 
@@ -81,8 +77,7 @@ EndDeviceLoraPhy::~EndDeviceLoraPhy ()
 // Downlink sensitivity (from SX1272 datasheet)
 // {SF7, SF8, SF9, SF10, SF11, SF12}
 // These sensitivites are for a bandwidth of 125000 Hz
-const double EndDeviceLoraPhy::sensitivity[6] =
-{-124, -127, -130, -133, -135, -137};
+const double EndDeviceLoraPhy::sensitivity[6] = {-124, -127, -130, -133, -135, -137};
 
 void
 EndDeviceLoraPhy::SetSpreadingFactor (uint8_t sf)
@@ -105,7 +100,7 @@ EndDeviceLoraPhy::IsTransmitting (void)
 bool
 EndDeviceLoraPhy::IsOnFrequency (double frequencyMHz)
 {
-  return m_frequency == frequencyMHz;
+  return (int) 1.0e3 * m_frequency == (int) 1.0e3 * frequencyMHz;
 }
 
 void
@@ -200,5 +195,5 @@ EndDeviceLoraPhy::UnregisterListener (EndDeviceLoraPhyListener *listener)
     }
 }
 
-}
-}
+} // namespace lorawan
+} // namespace ns3

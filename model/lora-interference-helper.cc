@@ -102,7 +102,7 @@ void
 LoraInterferenceHelper::Event::Print (std::ostream &stream) const
 {
   stream << "(" << m_startTime.GetSeconds () << " s - " << m_endTime.GetSeconds () << " s), SF"
-         << unsigned(m_sf) << ", " << m_rxPowerdBm << " dBm, " << m_frequencyMHz << " MHz";
+         << unsigned (m_sf) << ", " << m_rxPowerdBm << " dBm, " << m_frequencyMHz << " MHz";
 }
 
 std::ostream &
@@ -119,7 +119,7 @@ operator<< (std::ostream &os, const LoraInterferenceHelper::Event &event)
 // This collision matrix can be used for comparisons with the performance of Aloha
 // systems, where collisions imply the loss of both packets.
 double inf = std::numeric_limits<double>::max ();
-std::vector<std::vector<double>> LoraInterferenceHelper::collisionSnirAloha= {
+std::vector<std::vector<double>> LoraInterferenceHelper::collisionSnirAloha = {
     //   7   8   9  10  11  12
     {inf, -inf, -inf, -inf, -inf, -inf}, // SF7
     {-inf, inf, -inf, -inf, -inf, -inf}, // SF8
@@ -133,7 +133,7 @@ std::vector<std::vector<double>> LoraInterferenceHelper::collisionSnirAloha= {
 // Values are inverted w.r.t. the paper since here we interpret this as an
 // _isolation_ matrix instead of a cochannel _rejection_ matrix like in
 // Goursaud's paper.
-  std::vector<std::vector<double>> LoraInterferenceHelper::collisionSnirGoursaud= {
+std::vector<std::vector<double>> LoraInterferenceHelper::collisionSnirGoursaud = {
     // SF7  SF8  SF9  SF10 SF11 SF12
     {6, -16, -18, -19, -19, -20}, // SF7
     {-24, 6, -20, -22, -22, -22}, // SF8
@@ -144,7 +144,7 @@ std::vector<std::vector<double>> LoraInterferenceHelper::collisionSnirAloha= {
 };
 
 // LoRa Collision Matrix (Croce)
-  std::vector<std::vector<double>> LoraInterferenceHelper::collisionSnirCroce= {
+std::vector<std::vector<double>> LoraInterferenceHelper::collisionSnirCroce = {
     // SF7  SF8  SF9  SF10 SF11 SF12
     {1, -8, -9, -9, -9, -9}, // SF7
     {-11, 1, -11, -12, -13, -13}, // SF8
@@ -189,7 +189,8 @@ LoraInterferenceHelper::GetTypeId (void)
   return tid;
 }
 
-  LoraInterferenceHelper::LoraInterferenceHelper () : m_collisionSnir(LoraInterferenceHelper::collisionSnirGoursaud)
+LoraInterferenceHelper::LoraInterferenceHelper ()
+    : m_collisionSnir (LoraInterferenceHelper::collisionSnirGoursaud)
 {
   NS_LOG_FUNCTION (this);
 
@@ -208,7 +209,7 @@ LoraInterferenceHelper::Add (Time duration, double rxPower, uint8_t spreadingFac
                              Ptr<Packet> packet, double frequencyMHz)
 {
 
-  NS_LOG_FUNCTION (this << duration.GetSeconds () << rxPower << unsigned(spreadingFactor) << packet
+  NS_LOG_FUNCTION (this << duration.GetSeconds () << rxPower << unsigned (spreadingFactor) << packet
                         << frequencyMHz);
 
   // Create an event based on the parameters
@@ -303,7 +304,8 @@ LoraInterferenceHelper::IsDestroyedByInterference (Ptr<LoraInterferenceHelper::E
       // Only consider the current event if the channel is the same: we
       // assume there's no interchannel interference. Also skip the current
       // event if it's the same that we want to analyze.
-      if (!(interferer->GetFrequency () == frequency) || interferer == event)
+      if (!((int) 1.0e3 * interferer->GetFrequency () == (int) 1.0e3 * frequency) ||
+          interferer == event)
         {
           NS_LOG_DEBUG ("Different channel or same event");
           it++;
@@ -318,7 +320,7 @@ LoraInterferenceHelper::IsDestroyedByInterference (Ptr<LoraInterferenceHelper::E
       Time interfererStartTime = interferer->GetStartTime ();
       Time interfererEndTime = interferer->GetEndTime ();
 
-      NS_LOG_INFO ("Found an interferer: sf = " << unsigned(interfererSf)
+      NS_LOG_INFO ("Found an interferer: sf = " << unsigned (interfererSf)
                                                 << ", power = " << interfererPower
                                                 << ", start time = " << interfererStartTime
                                                 << ", end time = " << interfererEndTime);
@@ -334,7 +336,7 @@ LoraInterferenceHelper::IsDestroyedByInterference (Ptr<LoraInterferenceHelper::E
       double interfererPowerW = pow (10, interfererPower / 10) / 1000;
       // Energy [J] = Time [s] * Power [W]
       double interferenceEnergy = overlap.GetSeconds () * interfererPowerW;
-      cumulativeInterferenceEnergy.at (unsigned(interfererSf) - 7) += interferenceEnergy;
+      cumulativeInterferenceEnergy.at (unsigned (interfererSf) - 7) += interferenceEnergy;
       NS_LOG_DEBUG ("Interferer power in W: " << interfererPowerW);
       NS_LOG_DEBUG ("Interference energy: " << interferenceEnergy);
       it++;
@@ -344,7 +346,7 @@ LoraInterferenceHelper::IsDestroyedByInterference (Ptr<LoraInterferenceHelper::E
   for (uint8_t currentSf = uint8_t (7); currentSf <= uint8_t (12); currentSf++)
     {
       NS_LOG_DEBUG ("Cumulative Interference Energy: "
-                    << cumulativeInterferenceEnergy.at (unsigned(currentSf) - 7));
+                    << cumulativeInterferenceEnergy.at (unsigned (currentSf) - 7));
 
       // Use the computed cumulativeInterferenceEnergy to determine whether the
       // interference with this SF destroys the packet
@@ -354,20 +356,20 @@ LoraInterferenceHelper::IsDestroyedByInterference (Ptr<LoraInterferenceHelper::E
       NS_LOG_DEBUG ("Signal energy: " << signalEnergy);
 
       // Check whether the packet survives the interference of this SF
-      double snirIsolation = m_collisionSnir[unsigned(sf) - 7][unsigned(currentSf) - 7];
+      double snirIsolation = m_collisionSnir[unsigned (sf) - 7][unsigned (currentSf) - 7];
       NS_LOG_DEBUG ("The needed isolation to survive is " << snirIsolation << " dB");
       double snir =
-          10 * log10 (signalEnergy / cumulativeInterferenceEnergy.at (unsigned(currentSf) - 7));
+          10 * log10 (signalEnergy / cumulativeInterferenceEnergy.at (unsigned (currentSf) - 7));
       NS_LOG_DEBUG ("The current SNIR is " << snir << " dB");
 
       if (snir >= snirIsolation)
         {
           // Move on and check the rest of the interferers
-          NS_LOG_DEBUG ("Packet survived interference with SF " << unsigned(currentSf));
+          NS_LOG_DEBUG ("Packet survived interference with SF " << unsigned (currentSf));
         }
       else
         {
-          NS_LOG_DEBUG ("Packet destroyed by interference with SF" << unsigned(currentSf));
+          NS_LOG_DEBUG ("Packet destroyed by interference with SF" << unsigned (currentSf));
 
           return currentSf;
         }
