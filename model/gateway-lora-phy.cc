@@ -185,7 +185,7 @@ GatewayLoraPhy::IsOnFrequency (double frequencyMHz)
   // Look into our list of frequencies
   for (auto &f : m_frequencies)
     {
-      if ((int) 1.0e3 * f == (int) 1.0e3 * frequencyMHz)
+      if ((int) (1e6 * f + .5) == (int) (1e6 * frequencyMHz + .5))
         {
           return true;
         }
