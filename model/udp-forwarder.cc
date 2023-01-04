@@ -1738,7 +1738,7 @@ UdpForwarder::LgwSend (struct lgw_pkt_tx_s pkt_data)
       tag.SetSpreadingFactor (12);
       break;
     }
-  tag.SetFrequency ((double) pkt_data.freq_hz * 1e-6);
+  tag.SetFrequency ((double) pkt_data.freq_hz / 1e6);
 
   pkt = Create<Packet> (pkt_data.payload, pkt_data.size);
   pkt->AddPacketTag (tag);

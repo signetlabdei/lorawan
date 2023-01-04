@@ -304,7 +304,7 @@ LoraInterferenceHelper::IsDestroyedByInterference (Ptr<LoraInterferenceHelper::E
       // Only consider the current event if the channel is the same: we
       // assume there's no interchannel interference. Also skip the current
       // event if it's the same that we want to analyze.
-      if (!((int) 1.0e3 * interferer->GetFrequency () == (int) 1.0e3 * frequency) ||
+      if (!((int) (1e6 * interferer->GetFrequency () + .5) == (int) (1e6 * frequency + .5)) ||
           interferer == event)
         {
           NS_LOG_DEBUG ("Different channel or same event");
