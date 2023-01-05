@@ -41,8 +41,8 @@ ChirpstackHelper::ChirpstackHelper ()
   /* Initialize HTTP header fields */
   str token =
       "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9."
-      "eyJhdWQiOiJjaGlycHN0YWNrIiwiaXNzIjoiY2hpcnBzdGFjayIsInN1YiI6Ijc4ZjA4Nzc0LTZjZjUtNDI0MC04ZWMx"
-      "LWRmYTYwN2I5MmYwOCIsInR5cCI6ImtleSJ9.pNYLfS8PQ7A48T1_HRrgEJcGHnDlgEPwo18D7uauKOw";
+      "eyJhdWQiOiJjaGlycHN0YWNrIiwiaXNzIjoiY2hpcnBzdGFjayIsInN1YiI6IjE5ODA1YzUwLWEzNTYtNGMwNC1hZGU0"
+      "LWY5MWY5M2Y4YmU4MSIsInR5cCI6ImtleSJ9.cBIJwNG_iu6Ndr24SEFvpBoaZi9Md_i2DS8YdONV7Rg";
   m_header = curl_slist_append (m_header, ("Authorization: Bearer " + token).c_str ());
   m_header = curl_slist_append (m_header, "Accept: application/json");
   m_header = curl_slist_append (m_header, "Content-Type: application/json");
