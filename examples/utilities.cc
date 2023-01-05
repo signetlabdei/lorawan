@@ -9,6 +9,7 @@
 
 #include <unordered_map>
 #include <iomanip>
+#include <regex>
 #include <csignal>
 
 using namespace ns3;
@@ -119,3 +120,9 @@ ParseTraceLevels (std::string s)
 
   return out;
 }
+
+std::map<EndDeviceLoraPhy::State, std::string> stateMap = {
+    {EndDeviceLoraPhy::State::SLEEP, "SLEEP"},
+    {EndDeviceLoraPhy::State::TX, "TX"},
+    {EndDeviceLoraPhy::State::STANDBY, "STANDBY"},
+    {EndDeviceLoraPhy::State::RX, "RX"}};

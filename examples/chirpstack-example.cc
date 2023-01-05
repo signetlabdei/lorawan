@@ -37,7 +37,7 @@ ChirpstackHelper csHelper;
 void
 OnStateChange (EndDeviceLoraPhy::State oldS, EndDeviceLoraPhy::State newS)
 {
-  NS_LOG_DEBUG ("State change " << oldS << " -> " << newS);
+  NS_LOG_DEBUG ("State change " << stateMap.at (oldS) << " -> " << stateMap.at (newS));
 }
 
 int
@@ -78,9 +78,13 @@ main (int argc, char *argv[])
   /* Logging options */
   {
     //!> Requirement: build ns3 with debug option
-    //LogComponentEnable ("ChirpstackExample", LOG_LEVEL_ALL);
-    //LogComponentEnable ("UdpForwarder", LOG_LEVEL_DEBUG);
-    //LogComponentEnable ("SimpleEndDeviceLoraPhy", LOG_LEVEL_INFO);
+    LogComponentEnable ("UdpForwarder", LOG_LEVEL_DEBUG);
+    LogComponentEnable ("SimpleEndDeviceLoraPhy", LOG_LEVEL_INFO);
+    //LogComponentEnable ("ClassAEndDeviceLorawanMac", LOG_LEVEL_INFO);
+    //LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_INFO);
+    /* Monitor state changes of devices */
+    LogComponentEnable ("ChirpstackExample", LOG_LEVEL_ALL);
+    /* Formatting */
     LogComponentEnableAll (LOG_PREFIX_FUNC);
     LogComponentEnableAll (LOG_PREFIX_NODE);
     LogComponentEnableAll (LOG_PREFIX_TIME);
