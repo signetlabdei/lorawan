@@ -57,7 +57,7 @@ class CongestionControlComponent : public NetworkControllerComponent
     Time toa = Seconds (0); // Time on Air, useful to track disconnections
 
     // Changing with time
-    int fCnt = 0;
+    int fCnt = -1;
     uint8_t dutycycle = 0;
     bool active = false;
   };
