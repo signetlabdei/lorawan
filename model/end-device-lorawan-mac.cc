@@ -205,9 +205,8 @@ EndDeviceLorawanMac::postponeTransmission (Time netxTxDelay, Ptr<Packet> packet)
   // Delete previously scheduled transmissions if any.
   Simulator::Cancel (m_nextTx);
   m_nextTx = Simulator::Schedule (netxTxDelay, &EndDeviceLorawanMac::DoSend, this, packet);
-  NS_LOG_DEBUG (
-      "Attempting to send, but the duty cycle won't allow it. Scheduling a tx in "
-      << netxTxDelay.As (Time::S) << ".");
+  NS_LOG_DEBUG ("Attempting to send, but the duty cycle won't allow it. Scheduling a tx in "
+                << netxTxDelay.As (Time::S) << ".");
 }
 
 void
@@ -218,7 +217,6 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
   if (packet != m_retxParams.packet)
     {
       NS_LOG_DEBUG ("Received a new packet from application. Resetting retransmission parameters.");
-      m_currentFCnt++;
       NS_LOG_DEBUG ("APP packet: " << packet << ".");
 
       // Add the Lora Frame Header to the packet
@@ -337,6 +335,7 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           SendToPhy (m_retxParams.packet);
         }
     }
+  m_currentFCnt++;
 }
 
 void
