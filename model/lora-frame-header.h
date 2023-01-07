@@ -99,18 +99,18 @@ public:
   void SetAsDownlink (void);
 
   /**
-   * Set the FPort value.
+   * Set the FPort value. (absent by default)
    *
    * \param fPort The FPort to set.
    */
-  void SetFPort (uint8_t fPort);
+  void SetFPort (int fPort);
 
   /**
-   * Get the FPort value.
+   * Get the FPort value. (-1 means absent)
    *
    * \return The FPort value.
    */
-  uint8_t GetFPort (void) const;
+  int GetFPort (void) const;
 
   /**
    * Set the address.
@@ -296,7 +296,7 @@ public:
   void AddCommand (Ptr<MacCommand> macCommand);
 
 private:
-  uint8_t m_fPort;
+  int m_fPort;
 
   LoraDeviceAddress m_address;
 

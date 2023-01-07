@@ -29,7 +29,7 @@ NS_LOG_COMPONENT_DEFINE ("LoraFrameHeader");
 
 // Initialization list
 LoraFrameHeader::LoraFrameHeader () :
-  m_fPort     (0),
+  m_fPort     (-1),
   m_address   (LoraDeviceAddress (0,0)),
   m_adr       (0),
   m_adrAckReq (0),
@@ -66,8 +66,8 @@ LoraFrameHeader::GetSerializedSize (void) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Sizes in bytes:
-  // 4 for DevAddr + 1 for FCtrl + 2 for FCnt + 1 for FPort + 0-15 for FOpts
-  uint32_t size = 8 + m_fOptsLen;
+  // 4 for DevAddr + 1 for FCtrl + 2 for FCnt + 0-1 for FPort + 0-15 for FOpts
+  uint32_t size = 7 + (m_fPort > -1) + m_fOptsLen;
 
   NS_LOG_INFO ("LoraFrameHeader serialized size: " << size);
 
@@ -105,7 +105,8 @@ LoraFrameHeader::Serialize (Buffer::Iterator start) const
     }
 
   // FPort
-  start.WriteU8 (m_fPort);
+  if (m_fPort > -1)
+    start.WriteU8 ((uint8_t) m_fPort);
 
   NS_LOG_DEBUG ("Serializing the following data: ");
   NS_LOG_DEBUG ("Address: " << m_address.Print ());
@@ -115,6 +116,8 @@ LoraFrameHeader::Serialize (Buffer::Iterator start) const
   NS_LOG_DEBUG ("fPending: " << unsigned (m_fPending));
   NS_LOG_DEBUG ("fOptsLen: " << unsigned (m_fOptsLen));
   NS_LOG_DEBUG ("fCnt: " << unsigned (m_fCnt));
+  if (m_fPort > -1)
+    NS_LOG_DEBUG ("fPort: " << m_fPort);
 }
 
 uint32_t
@@ -319,9 +322,11 @@ LoraFrameHeader::Deserialize (Buffer::Iterator start)
         }
     }
 
-  m_fPort = uint8_t (start.ReadU8 ());
+  m_fPort = (start.IsEnd())? -1 : int (start.ReadU8 ());
+  if (m_fPort > -1)
+    NS_LOG_DEBUG ("fPort: " << m_fPort);
 
-  return 8 + m_fOptsLen;       // the number of bytes consumed.
+  return 8 + (m_fPort > -1) + m_fOptsLen;       // the number of bytes consumed.
 }
 
 void
@@ -342,7 +347,10 @@ LoraFrameHeader::Print (std::ostream &os) const
       (*it)->Print (os);
     }
 
-  os << "FPort=" << unsigned(m_fPort) << std::endl;
+  if (m_fPort > -1)
+    os << "FPort=" << m_fPort;
+
+  os << std::endl;
 }
 
 void
@@ -362,12 +370,12 @@ LoraFrameHeader::SetAsDownlink (void)
 }
 
 void
-LoraFrameHeader::SetFPort (uint8_t fPort)
+LoraFrameHeader::SetFPort (int fPort)
 {
   m_fPort = fPort;
 }
 
-uint8_t
+int
 LoraFrameHeader::GetFPort (void) const
 {
   return m_fPort;
