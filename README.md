@@ -26,10 +26,6 @@ To use this simulator you need to know the following:
 
 For information on how to use the underlying LoRaWAN module refer to the file `USAGE.md`, an updated version of the original module readme.
 
-## Known limitations ##
-
-The simulator is able to receive real downlink messages from the server. Theoretically, the server could be used to reconfigure the radio parameters of simulated devices with MAC commands. Unfortunately, at time of writing, there seems to be fluctuating non-synchronisation (few ms) between reception windows of devices, and gateways sending downlinks on the radio channel. This often causes downlinks to be lost. It could be solved by increasing the duration of reception windows.
-
 ## Getting help ##
 
 If you need any help, feel free to open an issue here.
