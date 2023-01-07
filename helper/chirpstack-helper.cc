@@ -159,7 +159,7 @@ ChirpstackHelper::NewDeviceProfile (const str &name)
 {
   str payload = "{"
                 "  \"deviceProfile\": {"
-                "    \"abpRx1Delay\": 0,"
+                "    \"abpRx1Delay\": 1,"
                 "    \"abpRx1DrOffset\": 0,"
                 "    \"abpRx2Dr\": 0,"
                 "    \"abpRx2Freq\": 869525000,"
