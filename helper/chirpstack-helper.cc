@@ -162,7 +162,7 @@ ChirpstackHelper::NewDeviceProfile (const str &name)
                 "    \"abpRx1Delay\": 0,"
                 "    \"abpRx1DrOffset\": 0,"
                 "    \"abpRx2Dr\": 0,"
-                "    \"abpRx2Freq\": 0,"
+                "    \"abpRx2Freq\": 869525000,"
                 "    \"adrAlgorithmId\": \"default\","
                 "    \"classBPingSlotDr\": 0,"
                 "    \"classBPingSlotFreq\": 0,"
