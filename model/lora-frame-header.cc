@@ -29,14 +29,15 @@ NS_LOG_COMPONENT_DEFINE ("LoraFrameHeader");
 
 // Initialization list
 LoraFrameHeader::LoraFrameHeader () :
-  m_fPort     (0),
-  m_address   (LoraDeviceAddress (0,0)),
-  m_adr       (0),
-  m_adrAckReq (0),
-  m_ack       (0),
-  m_fPending  (0),
-  m_fOptsLen  (0),
-  m_fCnt      (0)
+  m_fPort       (-1),
+  m_address     (LoraDeviceAddress (0,0)),
+  m_adr         (0),
+  m_adrAckReq   (0),
+  m_ack         (0),
+  m_fPending    (0),
+  m_fOptsLen    (0),
+  m_fCnt        (0),
+  m_frmpCmdsLen (0)
 {
 }
 
@@ -66,10 +67,10 @@ LoraFrameHeader::GetSerializedSize (void) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Sizes in bytes:
-  // 4 for DevAddr + 1 for FCtrl + 2 for FCnt + 1 for FPort + 0-15 for FOpts
-  uint32_t size = 8 + m_fOptsLen;
+  // 4 for DevAddr + 1 for FCtrl + 2 for FCnt + 0-1 for FPort + 0-15 for FOpts
+  uint32_t size = 7 + (m_fPort > -1 && !m_frmpCmdsLen) + m_fOptsLen;
 
-  NS_LOG_INFO ("LoraFrameHeader serialized size: " << size);
+  NS_LOG_INFO ("LoraFrameHeader serialized size: " << (unsigned) size);
 
   return size;
 }
@@ -105,7 +106,8 @@ LoraFrameHeader::Serialize (Buffer::Iterator start) const
     }
 
   // FPort
-  start.WriteU8 (m_fPort);
+  if (m_fPort > -1 && !m_frmpCmdsLen)
+    start.WriteU8 ((uint8_t) m_fPort);
 
   NS_LOG_DEBUG ("Serializing the following data: ");
   NS_LOG_DEBUG ("Address: " << m_address.Print ());
@@ -115,6 +117,8 @@ LoraFrameHeader::Serialize (Buffer::Iterator start) const
   NS_LOG_DEBUG ("fPending: " << unsigned (m_fPending));
   NS_LOG_DEBUG ("fOptsLen: " << unsigned (m_fOptsLen));
   NS_LOG_DEBUG ("fCnt: " << unsigned (m_fCnt));
+  if (m_fPort > -1)
+    NS_LOG_DEBUG ("fPort: " << m_fPort);
 }
 
 uint32_t
@@ -143,12 +147,12 @@ LoraFrameHeader::Deserialize (Buffer::Iterator start)
   NS_LOG_DEBUG ("ADRAckReq: " << unsigned (m_adrAckReq));
   NS_LOG_DEBUG ("Ack: " << unsigned (m_ack));
   NS_LOG_DEBUG ("fPending: " << unsigned (m_fPending));
-  NS_LOG_DEBUG ("fOptsLen: " << unsigned (m_fOptsLen));
+  NS_LOG_DEBUG ("fOptsLen: " << (unsigned) m_fOptsLen);
   NS_LOG_DEBUG ("fCnt: " << unsigned (m_fCnt));
 
   // Deserialize MAC commands
   NS_LOG_DEBUG ("Starting deserialization of MAC commands");
-  for (uint8_t byteNumber = 0; byteNumber < m_fOptsLen;)
+  for (uint8_t byteNumber = 0; byteNumber < m_fOptsLen + m_frmpCmdsLen;)
     {
       uint8_t cid = start.PeekU8 ();
       NS_LOG_DEBUG ("CID: " << unsigned(cid));
@@ -314,14 +318,26 @@ LoraFrameHeader::Deserialize (Buffer::Iterator start)
             default:
               {
                 NS_LOG_ERROR ("CID not recognized during deserialization");
+                byteNumber = m_fOptsLen + m_frmpCmdsLen;
+                break;
               }
             }
         }
     }
 
-  m_fPort = uint8_t (start.ReadU8 ());
 
-  return 8 + m_fOptsLen;       // the number of bytes consumed.
+  // If m_frmpCmdsLen > 0, we expect no FPort in buffer
+  if (!m_frmpCmdsLen) 
+    {
+      // "If the frame payload field is not empty, the port field SHALL be present"
+      // So, if there is more data in the buffer, it is FPort
+      m_fPort = (start.IsEnd())? -1 : int (start.ReadU8 ());
+    }
+
+  if (m_fPort > -1)
+    NS_LOG_DEBUG ("fPort: " << m_fPort);
+
+  return 7 + m_fOptsLen + (m_fPort > -1 && !m_frmpCmdsLen) + m_frmpCmdsLen; // the number of bytes consumed.
 }
 
 void
@@ -335,6 +351,7 @@ LoraFrameHeader::Print (std::ostream &os) const
   os << "ACK=" << m_ack << std::endl;
   os << "FPending=" << m_fPending << std::endl;
   os << "FOptsLen=" << unsigned(m_fOptsLen) << std::endl;
+  os << "(FRMPCmdsLen=" << unsigned(m_frmpCmdsLen) << ")" << std::endl;
   os << "FCnt=" << unsigned(m_fCnt) << std::endl;
 
   for (auto it = m_macCommands.begin (); it != m_macCommands.end (); it++)
@@ -342,7 +359,10 @@ LoraFrameHeader::Print (std::ostream &os) const
       (*it)->Print (os);
     }
 
-  os << "FPort=" << unsigned(m_fPort) << std::endl;
+  if (m_fPort > -1)
+    os << "FPort=" << m_fPort;
+
+  os << std::endl;
 }
 
 void
@@ -362,12 +382,12 @@ LoraFrameHeader::SetAsDownlink (void)
 }
 
 void
-LoraFrameHeader::SetFPort (uint8_t fPort)
+LoraFrameHeader::SetFPort (int fPort)
 {
   m_fPort = fPort;
 }
 
-uint8_t
+int
 LoraFrameHeader::GetFPort (void) const
 {
   return m_fPort;
@@ -454,6 +474,12 @@ uint16_t
 LoraFrameHeader::GetFCnt (void) const
 {
   return m_fCnt;
+}
+
+void 
+LoraFrameHeader::SetFRMPaylodCmdsLen (uint16_t frmpCmdsLen) 
+{
+  m_frmpCmdsLen = frmpCmdsLen;
 }
 
 void

@@ -21,6 +21,7 @@
 #include "ns3/lora-helper.h"
 #include "ns3/udp-forwarder-helper.h"
 #include "ns3/periodic-sender-helper.h"
+#include "ns3/urban-traffic-helper.h"
 #include "utilities.cc"
 
 // cpp imports
@@ -73,15 +74,15 @@ main (int argc, char *argv[])
   ///////////////// Real-time operation, necessary to interact with the outside world.
   GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
   GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true));
-  Config::SetDefault ("ns3::EndDeviceLorawanMac::EnableRealMIC", BooleanValue (true));
+  Config::SetDefault ("ns3::EndDeviceLorawanMac::EnableCryptography", BooleanValue (true));
 
   /* Logging options */
   {
     //!> Requirement: build ns3 with debug option
     LogComponentEnable ("UdpForwarder", LOG_LEVEL_DEBUG);
-    LogComponentEnable ("SimpleEndDeviceLoraPhy", LOG_LEVEL_INFO);
-    //LogComponentEnable ("ClassAEndDeviceLorawanMac", LOG_LEVEL_INFO);
+    LogComponentEnable ("ClassAEndDeviceLorawanMac", LOG_LEVEL_INFO);
     //LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_INFO);
+    //LogComponentEnable ("LoraFrameHeader", LOG_LEVEL_INFO);
     /* Monitor state changes of devices */
     LogComponentEnable ("ChirpstackExample", LOG_LEVEL_ALL);
     /* Formatting */
@@ -242,6 +243,7 @@ main (int argc, char *argv[])
         CreateObjectWithAttributes<ConstantRandomVariable> ("Constant", DoubleValue (5.0)));
     appHelper.SetPacketSizeGenerator (
         CreateObjectWithAttributes<ConstantRandomVariable> ("Constant", DoubleValue (5.0)));
+    //UrbanTrafficHelper appHelper;
     appHelper.Install (endDevices);
   }
 

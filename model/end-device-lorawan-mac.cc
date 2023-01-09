@@ -93,12 +93,12 @@ EndDeviceLorawanMac::GetTypeId (void)
                          MakeEnumAccessor (&EndDeviceLorawanMac::m_mType),
                          MakeEnumChecker (LorawanMacHeader::UNCONFIRMED_DATA_UP, "Unconfirmed",
                                           LorawanMacHeader::CONFIRMED_DATA_UP, "Confirmed"))
-          .AddAttribute ("EnableRealMIC",
-                         "Whether the End Device should compute the Message Integrity Code"
-                         "according to specifications, i.e. using real cryptographic"
-                         "libraries (slower).",
+          .AddAttribute ("EnableCryptography",
+                         "Whether the End Device should compute the uplink Message Integrity Code, "
+                         "and decode the downlink payload according to specifications, i.e. using "
+                         "real cryptographic libraries (slower).",
                          BooleanValue (false),
-                         MakeBooleanAccessor (&EndDeviceLorawanMac::m_realMIC),
+                         MakeBooleanAccessor (&EndDeviceLorawanMac::m_enableCrypto),
                          MakeBooleanChecker ())
           .AddConstructor<EndDeviceLorawanMac> ();
   return tid;
@@ -118,12 +118,12 @@ EndDeviceLorawanMac::EndDeviceLorawanMac ()
       m_receiveWindowDurationInSymbols (16),
       // LoraWAN default
       m_controlDataRate (false),
-      m_realMIC (false),
       m_lastKnownLinkMargin (0),
       m_lastKnownGatewayCount (0),
       m_aggregatedDutyCycle (1),
       m_mType (LorawanMacHeader::CONFIRMED_DATA_UP),
-      m_currentFCnt (0)
+      m_currentFCnt (0),
+      m_enableCrypto (false)
 {
   NS_LOG_FUNCTION (this);
 
@@ -224,7 +224,7 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       ApplyNecessaryOptions (frameHdr);
       packet->AddHeader (frameHdr);
 
-      NS_LOG_INFO ("Added frame header of size " << frameHdr.GetSerializedSize () << " bytes.");
+      NS_LOG_INFO ("Added frame header of size " <<  (unsigned) frameHdr.GetSerializedSize () << " bytes.");
 
       // Check that MACPayload length is below the allowed maximum
       if (packet->GetSize () > m_maxAppPayloadForDataRate.at (m_dataRate))
@@ -244,7 +244,7 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
 
       // 4 Bytes of MIC
       uint32_t mic = 0;
-      if (m_realMIC)
+      if (m_enableCrypto)
         {
           uint8_t buff[256];
           packet->CopyData (buff, 256);
@@ -321,7 +321,7 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           ApplyNecessaryOptions (frameHdr);
           packet->AddHeader (frameHdr);
 
-          NS_LOG_INFO ("Added frame header of size " << frameHdr.GetSerializedSize () << " bytes.");
+          NS_LOG_INFO ("Added frame header of size " << (unsigned) frameHdr.GetSerializedSize () << " bytes.");
 
           // Add the Lorawan Mac header to the packet
           macHdr = LorawanMacHeader ();
@@ -477,6 +477,38 @@ EndDeviceLorawanMac::ParseCommands (LoraFrameHeader frameHeader)
           }
         }
     }
+}
+
+void
+EndDeviceLorawanMac::ManageCmdsInFRMPayload (LoraFrameHeader &fHdr, uint8_t *cmds, uint32_t size)
+{
+  /* Decrypt payload if enabled */
+  if (m_enableCrypto)
+    {
+      char str[341];
+      str[size - 1] = 0;
+      for (uint32_t j = 0; j < size; j++)
+        sprintf (&str[2 * j], "%02X", cmds[j]);
+      NS_LOG_INFO ("Encrypted payload: " << std::hex << str << std::dec);
+
+      int result = m_crypto->PayloadEncrypt (cmds, size, F_NWK_S_INT_KEY, m_address.Get (),
+                                             DOWNLINK, fHdr.GetFCnt ());
+      
+      for (uint32_t j = 0; j < size; j++)
+        sprintf (&str[2 * j], "%02X", cmds[j]);
+      NS_LOG_INFO ("Decryption result: " << result << ", payload: " << std::hex << str << std::dec);
+    }
+
+  //! Trigger alternative de/serialization
+  fHdr.SetFRMPaylodCmdsLen (size);
+
+  /* Append commands to the frame header and deserialize it again */
+  auto buffer = Buffer (); //! Create buffer
+  buffer.AddAtStart (size); //! Allocate space for commands
+  buffer.Begin ().Write (cmds, size); //! Add serialized payload with commands
+  buffer.AddAtStart (fHdr.GetSerializedSize ()); //! Allocate space for header
+  fHdr.Serialize (buffer.Begin ()); //! Add frame header (but not FPort)
+  fHdr.Deserialize (buffer.Begin ());
 }
 
 void
@@ -784,7 +816,7 @@ EndDeviceLorawanMac::OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
   // Check the txPower
   ////////////////////
   // Check whether we can use this transmission power
-  if (GetDbmForTxPower (txPower) == 0)
+  if (GetDbmForTxPower (txPower) == -1)
     {
       txPowerOk = false;
     }

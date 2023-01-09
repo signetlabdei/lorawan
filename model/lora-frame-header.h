@@ -99,18 +99,18 @@ public:
   void SetAsDownlink (void);
 
   /**
-   * Set the FPort value.
+   * Set the FPort value. (absent by default)
    *
    * \param fPort The FPort to set.
    */
-  void SetFPort (uint8_t fPort);
+  void SetFPort (int fPort);
 
   /**
-   * Get the FPort value.
+   * Get the FPort value. (-1 means absent)
    *
    * \return The FPort value.
    */
-  uint8_t GetFPort (void) const;
+  int GetFPort (void) const;
 
   /**
    * Set the address.
@@ -213,6 +213,16 @@ public:
   inline Ptr<T> GetMacCommand (void);
 
   /**
+   * Byte lenght of serialized MacCommands coming from FRMPayload.
+   * Setting this to a value > 0 enables alternative buffer deserialization.
+   * (does not serialize FPort, and is able to decrypt payload commands 
+   * manually piggybacked in place of FOpts) 
+   * 
+   * \param frmpCmdsLen Lenght in bytes of manually piggybacked Mac commands
+   */
+  void SetFRMPaylodCmdsLen (uint16_t frmpCmdsLen);
+
+  /**
    * Add a LinkCheckReq command.
    */
   void AddLinkCheckReq (void);
@@ -296,7 +306,7 @@ public:
   void AddCommand (Ptr<MacCommand> macCommand);
 
 private:
-  uint8_t m_fPort;
+  int m_fPort;
 
   LoraDeviceAddress m_address;
 
@@ -317,6 +327,8 @@ private:
   std::list< Ptr< MacCommand> > m_macCommands;
 
   bool m_isUplink;
+
+  uint16_t m_frmpCmdsLen;
 };
 
 

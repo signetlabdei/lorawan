@@ -384,7 +384,7 @@ LoraHelper::DoPrintSFStatus (NodeContainer endDevices, NodeContainer gateways, s
 
   for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j)
     {
-      // Obtain device information
+      // Obtain device information      
       Ptr<Node> object = *j;
       Ptr<NetDevice> netDevice = object->GetDevice (0);
       Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();

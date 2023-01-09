@@ -256,6 +256,18 @@ public:
   void ParseCommands (LoraFrameHeader frameHeader);
 
   /**
+   * Manage the case of MAC commands being in the FRMPayload.
+   * 
+   * \brief Serialized MAC commands from the payload are fist decrypted (if requested),
+   *        piggybacked to the frame header, and then correctly deserialized into it.
+   * 
+   * \param fHdr The packet frame header
+   * \param cmds The serialized FRMPayload containing MAC commands
+   * \param size Size of the serialized FRMPayload
+   */
+  void ManageCmdsInFRMPayload (LoraFrameHeader &fHdr, uint8_t *cmds, uint32_t size);
+
+  /**
    * Perform the actions that need to be taken when receiving a LinkCheckAns command.
    *
    * \param margin The margin value of the command.
@@ -473,11 +485,6 @@ private:
   bool m_controlDataRate;
 
   /**
-   * Whether this device's MIC should be computed according to specifications.
-   */
-  bool m_realMIC;
-
-  /**
    * The event of retransmitting a packet in a consecutive moment if an ACK is not received.
    *
    * This Event is used to cancel the retransmission if the ACK is found in ParseCommand function and
@@ -521,6 +528,14 @@ private:
 
   uint16_t m_currentFCnt;
 
+  /**
+   * Whether this device's should use cryptography according to specifications.
+   */
+  bool m_enableCrypto;
+
+  /** 
+   * Class containing cryptographic keys and functions
+   */
   LoRaMacCrypto* m_crypto;
 };
 

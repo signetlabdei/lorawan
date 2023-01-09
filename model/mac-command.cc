@@ -887,9 +887,11 @@ NewChannelReq::Deserialize (Buffer::Iterator &start)
   // Read the data
   m_chIndex = start.ReadU8 ();
   uint32_t encodedFrequency = 0;
-  encodedFrequency |= uint32_t (start.ReadU16 ()) << 8;
+  // Frequency is in big endian
   encodedFrequency |= uint32_t (start.ReadU8 ());
-  m_frequency = double (encodedFrequency) * 100;
+  encodedFrequency |= uint32_t (start.ReadU8 ()) << 8;
+  encodedFrequency |= uint32_t (start.ReadU8 ()) << 16;
+  m_frequency = double (encodedFrequency) / 1.0e4;
   uint8_t dataRateByte = start.ReadU8 ();
   m_maxDataRate = dataRateByte >> 4;
   m_minDataRate = dataRateByte & 0xf;
