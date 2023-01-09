@@ -78,6 +78,54 @@ LoRaMacCrypto::~LoRaMacCrypto ()
 }
 
 LoRaMacCryptoStatus_t
+LoRaMacCrypto::PayloadEncrypt (uint8_t *buffer, int16_t size, KeyIdentifier_t keyID,
+                               uint32_t address, uint8_t dir, uint32_t frameCounter)
+{
+  if (buffer == 0)
+    {
+      return LORAMAC_CRYPTO_ERROR_NPE;
+    }
+
+  uint8_t bufferIndex = 0;
+  uint16_t ctr = 1;
+  uint8_t sBlock[16] = {0};
+  uint8_t aBlock[16] = {0};
+
+  aBlock[0] = 0x01;
+
+  aBlock[5] = dir;
+
+  aBlock[6] = address & 0xFF;
+  aBlock[7] = (address >> 8) & 0xFF;
+  aBlock[8] = (address >> 16) & 0xFF;
+  aBlock[9] = (address >> 24) & 0xFF;
+
+  aBlock[10] = frameCounter & 0xFF;
+  aBlock[11] = (frameCounter >> 8) & 0xFF;
+  aBlock[12] = (frameCounter >> 16) & 0xFF;
+  aBlock[13] = (frameCounter >> 24) & 0xFF;
+
+  while (size > 0)
+    {
+      aBlock[15] = ctr & 0xFF;
+      ctr++;
+      if (SecureElementAesEncrypt (aBlock, 16, keyID, sBlock) != SECURE_ELEMENT_SUCCESS)
+        {
+          return LORAMAC_CRYPTO_ERROR_SECURE_ELEMENT_FUNC;
+        }
+
+      for (uint8_t i = 0; i < ((size > 16) ? 16 : size); i++)
+        {
+          buffer[bufferIndex + i] = buffer[bufferIndex + i] ^ sBlock[i];
+        }
+      size -= 16;
+      bufferIndex += 16;
+    }
+
+  return LORAMAC_CRYPTO_SUCCESS;
+}
+
+LoRaMacCryptoStatus_t
 LoRaMacCrypto::ComputeCmacB0 (uint8_t *msg, uint16_t len, KeyIdentifier_t keyID, bool isAck,
                               uint8_t dir, uint32_t devAddr, uint32_t fCnt, uint32_t *cmac)
 {
@@ -100,6 +148,43 @@ LoRaMacCrypto::ComputeCmacB0 (uint8_t *msg, uint16_t len, KeyIdentifier_t keyID,
       return LORAMAC_CRYPTO_ERROR_SECURE_ELEMENT_FUNC;
     }
   return LORAMAC_CRYPTO_SUCCESS;
+}
+
+SecureElementStatus_t
+LoRaMacCrypto::SecureElementAesEncrypt (uint8_t *buffer, uint16_t size, KeyIdentifier_t keyID,
+                                        uint8_t *encBuffer)
+{
+  if (buffer == NULL || encBuffer == NULL)
+    {
+      return SECURE_ELEMENT_ERROR_NPE;
+    }
+
+  // Check if the size is divisible by 16,
+  if ((size % 16) != 0)
+    {
+      return SECURE_ELEMENT_ERROR_BUF_SIZE;
+    }
+
+  aes_context aesContext;
+  memset1 (aesContext.ksch, '\0', 240);
+
+  Key_t *pItem;
+  SecureElementStatus_t retval = GetKeyByID (keyID, &pItem);
+
+  if (retval == SECURE_ELEMENT_SUCCESS)
+    {
+      aes_set_key (pItem->KeyValue, 16, &aesContext);
+
+      uint8_t block = 0;
+
+      while (size != 0)
+        {
+          aes_encrypt (&buffer[block], &encBuffer[block], &aesContext);
+          block = block + 16;
+          size = size - 16;
+        }
+    }
+  return retval;
 }
 
 LoRaMacCryptoStatus_t

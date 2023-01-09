@@ -150,6 +150,9 @@ ClassAEndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
   // Work on a copy of the packet
   Ptr<Packet> packetCopy = packet->Copy ();
 
+  // Remove MIC (currently we do not check it)
+  packetCopy->RemoveAtEnd(4);
+
   // Remove the Mac Header to get some information
   LorawanMacHeader mHdr;
   packetCopy->RemoveHeader (mHdr);
@@ -164,9 +167,9 @@ ClassAEndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
       // Remove the Frame Header
       LoraFrameHeader fHdr;
       fHdr.SetAsDownlink ();
-      packetCopy->RemoveHeader (fHdr);
+      int deserialized = packetCopy->RemoveHeader (fHdr);
 
-      NS_LOG_DEBUG ("Frame Header: " << fHdr);
+      NS_LOG_DEBUG ("Deserialized bytes: " << deserialized << ", Frame Header:\n" << fHdr);
 
       // Determine whether this packet is for us
       bool messageForUs = (m_address == fHdr.GetAddress ());
@@ -178,9 +181,18 @@ ClassAEndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
           // If it exists, cancel the second receive window event
           // THIS WILL BE GetReceiveWindow()
           Simulator::Cancel (m_secondReceiveWindow);
-
-
+          
           // Parse the MAC commands
+          NS_ASSERT_MSG (not (fHdr.GetFOptsLen() > 0 and fHdr.GetFPort() == 0), 
+            "Error: FOptsLen > 0 and FPort == 0 (forbidden by specifications)");
+          uint32_t pSize = packetCopy->GetSize();
+          if (fHdr.GetFPort() == 0 and pSize > 0) // Commands are in the FRMPayload
+            {
+              NS_LOG_DEBUG ("Commands in the FRMPayload. Size = " << (unsigned) pSize);
+              uint8_t cmds[256];
+              packetCopy->CopyData (cmds, 256);
+              ManageCmdsInFRMPayload (fHdr, cmds, pSize);
+            }
           ParseCommands (fHdr);
 
           // TODO Pass the packet up to the NetDevice

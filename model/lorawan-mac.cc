@@ -139,7 +139,7 @@ LorawanMac::GetDbmForTxPower (uint8_t txPower)
 
   if (txPower > m_txDbmForTxPower.size ())
     {
-      return 0;
+      return -1;
     }
 
   return m_txDbmForTxPower.at (txPower);

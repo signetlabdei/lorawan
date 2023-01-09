@@ -213,6 +213,16 @@ public:
   inline Ptr<T> GetMacCommand (void);
 
   /**
+   * Byte lenght of serialized MacCommands coming from FRMPayload.
+   * Setting this to a value > 0 enables alternative buffer deserialization.
+   * (does not serialize FPort, and is able to decrypt payload commands 
+   * manually piggybacked in place of FOpts) 
+   * 
+   * \param frmpCmdsLen Lenght in bytes of manually piggybacked Mac commands
+   */
+  void SetFRMPaylodCmdsLen (uint16_t frmpCmdsLen);
+
+  /**
    * Add a LinkCheckReq command.
    */
   void AddLinkCheckReq (void);
@@ -317,6 +327,8 @@ private:
   std::list< Ptr< MacCommand> > m_macCommands;
 
   bool m_isUplink;
+
+  uint16_t m_frmpCmdsLen;
 };
 
 

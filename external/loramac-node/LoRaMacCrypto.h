@@ -345,6 +345,21 @@ public:
   ~LoRaMacCrypto ();
 
   /*
+   * Prepares B0 block for cmac computation.
+   *
+   * \param[IN]  msgLen         - Length of message
+   * \param[IN]  keyID          - Key identifier
+   * \param[IN]  isAck          - True if it is a acknowledge frame ( Sets ConfFCnt in B0 block )
+   * \param[IN]  devAddr        - Device address
+   * \param[IN]  dir            - Frame direction ( Uplink:0, Downlink:1 )
+   * \param[IN]  fCnt           - Frame counter
+   * \param[IN/OUT]  b0         - B0 block
+   * \retval                    - Status of the operation
+   */
+  LoRaMacCryptoStatus_t PayloadEncrypt (uint8_t *buffer, int16_t size, KeyIdentifier_t keyID,
+                                        uint32_t address, uint8_t dir, uint32_t frameCounter);
+
+  /*
    * Computes cmac with adding B0 block in front.
    *
    *  cmac = aes128_cmac(keyID, B0 | msg)
@@ -364,6 +379,18 @@ public:
                                        uint32_t *cmac);
 
 private:
+  /*!
+   * Encrypt a buffer
+   *
+   * \param[IN]  buffer         - Data buffer
+   * \param[IN]  size           - Data buffer size
+   * \param[IN]  keyID          - Key identifier to determine the AES key to be used
+   * \param[OUT] encBuffer      - Encrypted buffer
+   * \retval                    - Status of the operation
+   */
+  SecureElementStatus_t SecureElementAesEncrypt (uint8_t *buffer, uint16_t size,
+                                                 KeyIdentifier_t keyID, uint8_t *encBuffer);
+
   /*
    * Prepares B0 block for cmac computation.
    *

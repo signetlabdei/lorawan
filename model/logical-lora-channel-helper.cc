@@ -148,7 +148,7 @@ LogicalLoraChannelHelper::SetChannel (uint8_t chIndex,
 {
   NS_LOG_FUNCTION (this << chIndex << logicalChannel);
 
-  m_channelList.at (chIndex) = logicalChannel;
+  m_channelList.push_back(logicalChannel);
 }
 
 void
