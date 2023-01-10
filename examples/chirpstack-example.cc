@@ -55,6 +55,7 @@ main (int argc, char *argv[])
   std::string sir = "GOURSAUD";
   bool initializeSF = true;
   bool file = false; // Warning: will produce a file for each gateway
+  bool log = false;
 
   /* Expose parameters to command line */
   {
@@ -67,6 +68,7 @@ main (int argc, char *argv[])
     cmd.AddValue ("initSF", "Whether to initialize the SFs", initializeSF);
     cmd.AddValue ("adr", "ns3::EndDeviceLorawanMac::DRControl");
     cmd.AddValue ("file", "Whether to enable .pcap tracing on gateways", file);
+    cmd.AddValue ("log", "Whether to enable logs", log);
     cmd.Parse (argc, argv);
   }
 
@@ -77,19 +79,20 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::EndDeviceLorawanMac::EnableCryptography", BooleanValue (true));
 
   /* Logging options */
-  {
-    //!> Requirement: build ns3 with debug option
-    LogComponentEnable ("UdpForwarder", LOG_LEVEL_DEBUG);
-    LogComponentEnable ("ClassAEndDeviceLorawanMac", LOG_LEVEL_INFO);
-    //LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_INFO);
-    //LogComponentEnable ("LoraFrameHeader", LOG_LEVEL_INFO);
-    /* Monitor state changes of devices */
-    LogComponentEnable ("ChirpstackExample", LOG_LEVEL_ALL);
-    /* Formatting */
-    LogComponentEnableAll (LOG_PREFIX_FUNC);
-    LogComponentEnableAll (LOG_PREFIX_NODE);
-    LogComponentEnableAll (LOG_PREFIX_TIME);
-  }
+  if (log)
+    {
+      //!> Requirement: build ns3 with debug option
+      LogComponentEnable ("UdpForwarder", LOG_LEVEL_DEBUG);
+      LogComponentEnable ("ClassAEndDeviceLorawanMac", LOG_LEVEL_INFO);
+      LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_INFO);
+      //LogComponentEnable ("LoraFrameHeader", LOG_LEVEL_INFO);
+      /* Monitor state changes of devices */
+      LogComponentEnable ("ChirpstackExample", LOG_LEVEL_ALL);
+      /* Formatting */
+      LogComponentEnableAll (LOG_PREFIX_FUNC);
+      LogComponentEnableAll (LOG_PREFIX_NODE);
+      LogComponentEnableAll (LOG_PREFIX_TIME);
+    }
 
   /*******************
    *  Radio Channel  *
