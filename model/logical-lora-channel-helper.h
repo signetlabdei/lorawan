@@ -90,7 +90,7 @@ public:
    *
    * \return A list of the managed channels.
    */
-  std::vector<Ptr<LogicalLoraChannel> > GetChannelList (void);
+  std::vector<Ptr<LogicalLoraChannel>> GetChannelList (void);
 
   /**
    * Get the list of LogicalLoraChannels currently registered on this helper
@@ -98,7 +98,7 @@ public:
    *
    * \return A list of the managed channels enabled for Uplink transmission.
    */
-  std::vector<Ptr<LogicalLoraChannel> > GetEnabledChannelList (void);
+  std::vector<Ptr<LogicalLoraChannel>> GetEnabledChannelList (void);
 
   /**
    * Add a new channel to the list.
@@ -131,8 +131,8 @@ public:
    * \param maxTxPowerDbm The maximum transmission power [dBm] that can be used
    * on this SubBand.
    */
-  void AddSubBand (double firstFrequency, double lastFrequency,
-                   double dutyCycle, double maxTxPowerDbm);
+  void AddSubBand (double firstFrequency, double lastFrequency, double dutyCycle,
+                   double maxTxPowerDbm);
 
   /**
    * Add a new SubBand.
@@ -184,20 +184,20 @@ private:
   /**
    * A list of the SubBands that are currently registered within this helper.
    */
-  std::list<Ptr <SubBand> > m_subBandList;
+  std::list<Ptr<SubBand>> m_subBandList;
 
   /**
    * A vector of the LogicalLoraChannels that are currently registered within
    * this helper. This vector represents the node's channel mask. The first N
    * channels are the default ones for a fixed region.
    */
-  std::vector<Ptr <LogicalLoraChannel> > m_channelList;
+  std::map<uint16_t, Ptr<LogicalLoraChannel>> m_channelList;
 
   Time m_lastTxDuration; //!< Duration of the last frame (seconds).
 
   Time m_lastTxStart; //!< Timestamp of the last trasmission start.
 };
-}
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* LOGICAL_LORA_CHANNEL_HELPER_H */
