@@ -19,14 +19,18 @@
  *         Martina Capuzzo <capuzzom@dei.unipd.it>
  *
  * Modified by: Peggy Anderson <peggy.anderson@usask.ca>
+ *
+ * 11/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #ifndef CLASS_A_END_DEVICE_LORAWAN_MAC_H
 #define CLASS_A_END_DEVICE_LORAWAN_MAC_H
 
-#include "ns3/lorawan-mac.h"                // Packet
-#include "ns3/end-device-lorawan-mac.h"     // EndDeviceLorawanMac
-#include "ns3/lora-frame-header.h"          // RxParamSetupReq
+#include "ns3/lorawan-mac.h" // Packet
+#include "ns3/end-device-lorawan-mac.h" // EndDeviceLorawanMac
+#include "ns3/lora-frame-header.h" // RxParamSetupReq
 // #include "ns3/random-variable-stream.h"
 #include "ns3/lora-device-address.h"
 // #include "ns3/traced-value.h"
@@ -163,7 +167,6 @@ public:
   virtual void OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq);
 
 private:
-
   /**
    * The interval between when a packet is done sending and when the first
    * receive window is opened.
