@@ -167,30 +167,15 @@ EndDeviceLorawanMac::Send (Ptr<Packet> packet)
   Time netxTxDelay = Max (GetNextTransmissionDelay (), aggregatedDelay);
   if (netxTxDelay != Seconds (0))
     {
+      m_cannotSendBecauseDutyCycle (packet);
       postponeTransmission (netxTxDelay, packet);
-      return;
     }
-
-  // Pick a channel on which to transmit the packet
-  Ptr<LogicalLoraChannel> txChannel = GetChannelForTx ();
-
-  if (!(txChannel && m_retxParams.retxLeft > 0))
+  else if (m_retxParams.retxLeft == 0)
     {
-      if (!txChannel)
-        {
-          m_cannotSendBecauseDutyCycle (packet);
-        }
-      else
-        {
-          NS_LOG_INFO ("Max number of transmission achieved: packet not transmitted.");
-        }
+      NS_LOG_INFO ("Max number of transmission achieved: packet not transmitted.");
     }
-  else
-    // the transmitting channel is available and we have not run out the maximum number of retransmissions
+  else // the transmitting channel is available and we have not run out the maximum number of retransmissions
     {
-      // Make sure we can transmit at the current power on this channel
-      NS_ASSERT_MSG (m_txPower <= m_channelHelper.GetTxPowerForChannel (txChannel),
-                     " The selected power is too hight to be supported by this channel.");
       /* Extremely rare case: Send () happens after sending prev. pkt and before downlink 
          reception of dutycycle reconf. A big increase in dutycycle may allow next packet
          to be sent before current one, which has been postponed with old dutycycle conf. */
@@ -225,7 +210,8 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       ApplyNecessaryOptions (frameHdr);
       packet->AddHeader (frameHdr);
 
-      NS_LOG_INFO ("Added frame header of size " <<  (unsigned) frameHdr.GetSerializedSize () << " bytes.");
+      NS_LOG_INFO ("Added frame header of size " << (unsigned) frameHdr.GetSerializedSize ()
+                                                 << " bytes.");
 
       // Check that MACPayload length is below the allowed maximum
       if (packet->GetSize () > m_maxAppPayloadForDataRate.at (m_dataRate))
@@ -322,7 +308,8 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           ApplyNecessaryOptions (frameHdr);
           packet->AddHeader (frameHdr);
 
-          NS_LOG_INFO ("Added frame header of size " << (unsigned) frameHdr.GetSerializedSize () << " bytes.");
+          NS_LOG_INFO ("Added frame header of size " << (unsigned) frameHdr.GetSerializedSize ()
+                                                     << " bytes.");
 
           // Add the Lorawan Mac header to the packet
           macHdr = LorawanMacHeader ();
@@ -494,7 +481,7 @@ EndDeviceLorawanMac::ManageCmdsInFRMPayload (LoraFrameHeader &fHdr, uint8_t *cmd
 
       int result = m_crypto->PayloadEncrypt (cmds, size, F_NWK_S_INT_KEY, m_address.Get (),
                                              DOWNLINK, fHdr.GetFCnt ());
-      
+
       for (uint32_t j = 0; j < size; j++)
         sprintf (&str[2 * j], "%02X", cmds[j]);
       NS_LOG_INFO ("Decryption result: " << result << ", payload: " << std::hex << str << std::dec);
@@ -576,27 +563,12 @@ EndDeviceLorawanMac::GetNextTransmissionDelay (void)
   NS_LOG_FUNCTION_NOARGS ();
 
   //    Check duty cycle    //
-
-  // Pick a random channel to transmit on
-  std::vector<Ptr<LogicalLoraChannel>> logicalChannels;
-  logicalChannels =
-      m_channelHelper.GetEnabledChannelList (); // Use a separate list to do the shuffle
-  //logicalChannels = Shuffle (logicalChannels);
-
   Time waitingTime = Time::Max ();
-
-  // Try every channel
-  std::vector<Ptr<LogicalLoraChannel>>::iterator it;
-  for (it = logicalChannels.begin (); it != logicalChannels.end (); ++it)
+  for (auto const &llc : m_channelHelper.GetEnabledChannelList ())
     {
-      // Pointer to the current channel
-      Ptr<LogicalLoraChannel> logicalChannel = *it;
-      double frequency = logicalChannel->GetFrequency ();
-
-      waitingTime = std::min (waitingTime, m_channelHelper.GetWaitingTime (logicalChannel));
-
+      waitingTime = std::min (waitingTime, m_channelHelper.GetWaitingTime (llc));
       NS_LOG_DEBUG ("Waiting time before the next transmission in channel with frequecy "
-                    << frequency << " is = " << waitingTime.GetSeconds () << ".");
+                    << llc->GetFrequency () << " is = " << waitingTime.GetSeconds () << ".");
     }
 
   waitingTime = GetNextClassTransmissionDelay (waitingTime);
@@ -609,37 +581,21 @@ EndDeviceLorawanMac::GetChannelForTx (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
-  // Pick a random channel to transmit on
-  std::vector<Ptr<LogicalLoraChannel>> logicalChannels;
-  logicalChannels =
-      m_channelHelper.GetEnabledChannelList (); // Use a separate list to do the shuffle
-  logicalChannels = Shuffle (logicalChannels);
-
-  // Try every channel
-  std::vector<Ptr<LogicalLoraChannel>>::iterator it;
-  for (it = logicalChannels.begin (); it != logicalChannels.end (); ++it)
+  auto channels = Shuffle (m_channelHelper.GetEnabledChannelList ());
+  for (auto &llc : channels)
     {
-      // Pointer to the current channel
-      Ptr<LogicalLoraChannel> logicalChannel = *it;
-      double frequency = logicalChannel->GetFrequency ();
-
-      NS_LOG_DEBUG ("Frequency of the current channel: " << frequency);
+      NS_LOG_DEBUG ("Frequency of the current channel: " << llc->GetFrequency ());
 
       // Verify that we can send the packet
-      Time waitingTime = m_channelHelper.GetWaitingTime (logicalChannel);
-
+      Time waitingTime = m_channelHelper.GetWaitingTime (llc);
       NS_LOG_DEBUG ("Waiting time for current channel = " << waitingTime.GetSeconds ());
 
       // Send immediately if we can
       if (waitingTime == Seconds (0))
-        {
-          return *it;
-        }
+        return llc;
       else
-        {
-          NS_LOG_DEBUG ("Packet cannot be immediately transmitted on "
-                        << "the current channel because of duty cycle limitations.");
-        }
+        NS_LOG_DEBUG ("Packet cannot be immediately transmitted on "
+                      << "the current channel because of duty cycle limitations.");
     }
   return 0; // In this case, no suitable channel was found
 }
@@ -650,13 +606,12 @@ EndDeviceLorawanMac::Shuffle (std::vector<Ptr<LogicalLoraChannel>> vector)
   NS_LOG_FUNCTION_NOARGS ();
 
   int size = vector.size ();
-
   for (int i = 0; i < size; ++i)
     {
-      uint16_t random = std::floor (m_uniformRV->GetValue (0, size));
-      Ptr<LogicalLoraChannel> temp = vector.at (random);
+      uint16_t random = m_uniformRV->GetInteger (0, size - 1);
+      auto tmp = vector.at (random);
       vector.at (random) = vector.at (i);
-      vector.at (i) = temp;
+      vector.at (i) = tmp;
     }
 
   return vector;
@@ -885,7 +840,6 @@ EndDeviceLorawanMac::OnRxParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq)
 {
   NS_LOG_FUNCTION (this << rxParamSetupReq);
 
-  // static_cast<ClassAEndDeviceLorawanMac*>(this)->OnRxClassParamSetupReq (rxParamSetupReq);
   OnRxClassParamSetupReq (rxParamSetupReq);
 }
 
@@ -908,43 +862,34 @@ EndDeviceLorawanMac::OnNewChannelReq (uint8_t chIndex, double frequency, uint8_t
 {
   NS_LOG_FUNCTION (this);
 
-  bool dataRateRangeOk = true; // XXX Check whether the new data rate range is ok
-  bool channelFrequencyOk = true; // XXX Check whether the frequency is ok
-
-  // TODO Return false if one of the checks above failed
-  // TODO Create new channel in the LogicalLoraChannelHelper
-
-  SetLogicalChannel (chIndex, frequency, minDataRate, maxDataRate);
+  // Check whether the new data rate range is ok
+  bool dataRateRangeOk = (minDataRate >= 0 && maxDataRate <= 5);
+  // Check whether the frequency is ok
+  bool channelFrequencyOk = m_channelHelper.GetSubBandFromFrequency (frequency);
+  if (dataRateRangeOk && channelFrequencyOk)
+    AddLogicalChannel (chIndex, frequency, minDataRate, maxDataRate);
 
   NS_LOG_INFO ("Adding NewChannelAns reply");
   m_macCommandList.push_back (CreateObject<NewChannelAns> (dataRateRangeOk, channelFrequencyOk));
 }
 
 void
-EndDeviceLorawanMac::AddLogicalChannel (double frequency)
-{
-  NS_LOG_FUNCTION (this << frequency);
-
-  m_channelHelper.AddChannel (frequency);
-}
-
-void
-EndDeviceLorawanMac::AddLogicalChannel (Ptr<LogicalLoraChannel> logicalChannel)
+EndDeviceLorawanMac::AddLogicalChannel (uint16_t chIndex, Ptr<LogicalLoraChannel> logicalChannel)
 {
   NS_LOG_FUNCTION (this << logicalChannel);
 
-  m_channelHelper.AddChannel (logicalChannel);
+  m_channelHelper.AddChannel (chIndex, logicalChannel);
 }
 
 void
-EndDeviceLorawanMac::SetLogicalChannel (uint8_t chIndex, double frequency, uint8_t minDataRate,
+EndDeviceLorawanMac::AddLogicalChannel (uint16_t chIndex, double frequency, uint8_t minDataRate,
                                         uint8_t maxDataRate)
 {
   NS_LOG_FUNCTION (this << unsigned (chIndex) << frequency << unsigned (minDataRate)
                         << unsigned (maxDataRate));
 
-  m_channelHelper.SetChannel (
-      chIndex, CreateObject<LogicalLoraChannel> (frequency, minDataRate, maxDataRate));
+  AddLogicalChannel (chIndex,
+                     CreateObject<LogicalLoraChannel> (frequency, minDataRate, maxDataRate));
 }
 
 void

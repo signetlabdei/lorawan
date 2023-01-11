@@ -75,7 +75,7 @@ public:
    * \return A Time instance containing the waiting time before transmission is
    * allowed on the channel.
    */
-  Time GetWaitingTime (Ptr<LogicalLoraChannel> channel);
+  Time GetWaitingTime (const Ptr<LogicalLoraChannel> channel);
 
   /**
    * Register the transmission of a packet.
@@ -90,7 +90,7 @@ public:
    *
    * \return A list of the managed channels.
    */
-  std::vector<Ptr<LogicalLoraChannel> > GetChannelList (void);
+  std::vector<Ptr<LogicalLoraChannel>> GetChannelList (void);
 
   /**
    * Get the list of LogicalLoraChannels currently registered on this helper
@@ -98,29 +98,15 @@ public:
    *
    * \return A list of the managed channels enabled for Uplink transmission.
    */
-  std::vector<Ptr<LogicalLoraChannel> > GetEnabledChannelList (void);
+  std::vector<Ptr<LogicalLoraChannel>> GetEnabledChannelList (void);
 
   /**
-   * Add a new channel to the list.
-   *
-   * \param frequency The frequency of the channel to create.
-   */
-  void AddChannel (double frequency);
-
-  /**
-   * Add a new channel to the list.
-   *
-   * \param logicalChannel A pointer to the channel to add to the list.
-   */
-  void AddChannel (Ptr<LogicalLoraChannel> logicalChannel);
-
-  /**
-   * Set a new channel at a fixed index.
+   * Add a new channel at a fixed index.
    *
    * \param chIndex The index of the channel to substitute.
    * \param logicalChannel A pointer to the channel to add to the list.
    */
-  void SetChannel (uint8_t chIndex, Ptr<LogicalLoraChannel> logicalChannel);
+  void AddChannel (uint16_t chIndex, Ptr<LogicalLoraChannel> logicalChannel);
 
   /**
    * Add a new SubBand to this helper.
@@ -131,8 +117,8 @@ public:
    * \param maxTxPowerDbm The maximum transmission power [dBm] that can be used
    * on this SubBand.
    */
-  void AddSubBand (double firstFrequency, double lastFrequency,
-                   double dutyCycle, double maxTxPowerDbm);
+  void AddSubBand (double firstFrequency, double lastFrequency, double dutyCycle,
+                   double maxTxPowerDbm);
 
   /**
    * Add a new SubBand.
@@ -144,9 +130,9 @@ public:
   /**
    * Remove a channel.
    *
-   * \param channel A pointer to the channel we want to remove.
+   * \param chIndex Index of the channel we want to remove.
    */
-  void RemoveChannel (Ptr<LogicalLoraChannel> channel);
+  void RemoveChannel (uint16_t chIndex);
 
   /**
    * Returns the maximum transmission power [dBm] that is allowed on a channel.
@@ -163,7 +149,7 @@ public:
    * \param channel The channel whose SubBand we want to get.
    * \return The SubBand the channel belongs to.
    */
-  Ptr<SubBand> GetSubBandFromChannel (Ptr<LogicalLoraChannel> channel);
+  Ptr<SubBand> GetSubBandFromChannel (const Ptr<LogicalLoraChannel> channel);
 
   /**
    * Get the SubBand a frequency belongs to.
@@ -176,28 +162,28 @@ public:
   /**
    * Disable the channel at a specified index.
    *
-   * \param index The index of the channel to disable.
+   * \param chIndex The index of the channel to disable.
    */
-  void DisableChannel (int index);
+  void DisableChannel (uint16_t chIndex);
 
 private:
   /**
    * A list of the SubBands that are currently registered within this helper.
    */
-  std::list<Ptr <SubBand> > m_subBandList;
+  std::list<Ptr<SubBand>> m_subBandList;
 
   /**
    * A vector of the LogicalLoraChannels that are currently registered within
    * this helper. This vector represents the node's channel mask. The first N
    * channels are the default ones for a fixed region.
    */
-  std::vector<Ptr <LogicalLoraChannel> > m_channelList;
+  std::map<uint16_t, Ptr<LogicalLoraChannel>> m_channelList;
 
   Time m_lastTxDuration; //!< Duration of the last frame (seconds).
 
   Time m_lastTxStart; //!< Timestamp of the last trasmission start.
 };
-}
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* LOGICAL_LORA_CHANNEL_HELPER_H */

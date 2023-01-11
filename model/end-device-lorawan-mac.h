@@ -339,21 +339,14 @@ public:
   ////////////////////////////////////
 
   /**
-   * Add a logical channel to the helper.
-   *
-   * \param frequency The channel's center frequency.
-   */
-  void AddLogicalChannel (double frequency);
-
-  /**
-   * Set a new logical channel in the helper.
+   * Add a new logical channel in the helper.
    *
    * \param chIndex The channel's new index.
    * \param frequency The channel's center frequency.
    * \param minDataRate The minimum data rate allowed on the channel.
    * \param maxDataRate The maximum data rate allowed on the channel.
    */
-  void SetLogicalChannel (uint8_t chIndex, double frequency,
+  void AddLogicalChannel (uint16_t chIndex, double frequency,
                           uint8_t minDataRate, uint8_t maxDataRate);
 
   /**
@@ -361,7 +354,7 @@ public:
    *
    * \param frequency The channel's center frequency.
    */
-  void AddLogicalChannel (Ptr<LogicalLoraChannel> logicalChannel);
+  void AddLogicalChannel (uint16_t chIndex, Ptr<LogicalLoraChannel> logicalChannel);
 
   /**
    * Add a subband to the logical channel helper.

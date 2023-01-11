@@ -223,8 +223,8 @@ LorawanMacHelper::ApplyCommonAlohaConfigurations (Ptr<LorawanMac> lorawanMac) co
   //////////////////////
   // Default channels //
   //////////////////////
-  Ptr<LogicalLoraChannel> lc1 = CreateObject<LogicalLoraChannel> (868.1, 0, 5);
-  channelHelper.AddChannel (lc1);
+  Ptr<LogicalLoraChannel> lc0 = CreateObject<LogicalLoraChannel> (868.1, 0, 5);
+  channelHelper.AddChannel (0, lc0);
 
   lorawanMac->SetLogicalLoraChannelHelper (channelHelper);
 
@@ -334,27 +334,27 @@ LorawanMacHelper::ApplyCommonEuConfigurations (Ptr<LorawanMac> lorawanMac) const
   //////////////////////
   // Default channels //
   //////////////////////
-  Ptr<LogicalLoraChannel> lc1 = CreateObject<LogicalLoraChannel> (868.1, 0, 5);
-  Ptr<LogicalLoraChannel> lc2 = CreateObject<LogicalLoraChannel> (868.3, 0, 5);
-  Ptr<LogicalLoraChannel> lc3 = CreateObject<LogicalLoraChannel> (868.5, 0, 5);
-  channelHelper.AddChannel (lc1);
-  channelHelper.AddChannel (lc2);
-  channelHelper.AddChannel (lc3);
+  Ptr<LogicalLoraChannel> lc0 = CreateObject<LogicalLoraChannel> (868.1, 0, 5);
+  Ptr<LogicalLoraChannel> lc1 = CreateObject<LogicalLoraChannel> (868.3, 0, 5);
+  Ptr<LogicalLoraChannel> lc2 = CreateObject<LogicalLoraChannel> (868.5, 0, 5);
+  channelHelper.AddChannel (0, lc0);
+  channelHelper.AddChannel (1, lc1);
+  channelHelper.AddChannel (2, lc2);
 
   ////////////////////////
   // Addtional channels //
   ////////////////////////
 
-  Ptr<LogicalLoraChannel> lc4 = CreateObject<LogicalLoraChannel> (867.1, 0, 5);
-  Ptr<LogicalLoraChannel> lc5 = CreateObject<LogicalLoraChannel> (867.3, 0, 5);
-  Ptr<LogicalLoraChannel> lc6 = CreateObject<LogicalLoraChannel> (867.5, 0, 5);
-  Ptr<LogicalLoraChannel> lc7 = CreateObject<LogicalLoraChannel> (867.7, 0, 5);
-  Ptr<LogicalLoraChannel> lc8 = CreateObject<LogicalLoraChannel> (867.9, 0, 5);
-  //channelHelper.AddChannel (lc4);
-  //channelHelper.AddChannel (lc5);
-  //channelHelper.AddChannel (lc6);
-  //channelHelper.AddChannel (lc7);
-  //channelHelper.AddChannel (lc8);
+  Ptr<LogicalLoraChannel> lc3 = CreateObject<LogicalLoraChannel> (867.1, 0, 5);
+  Ptr<LogicalLoraChannel> lc4 = CreateObject<LogicalLoraChannel> (867.3, 0, 5);
+  Ptr<LogicalLoraChannel> lc5 = CreateObject<LogicalLoraChannel> (867.5, 0, 5);
+  Ptr<LogicalLoraChannel> lc6 = CreateObject<LogicalLoraChannel> (867.7, 0, 5);
+  Ptr<LogicalLoraChannel> lc7 = CreateObject<LogicalLoraChannel> (867.9, 0, 5);
+  //channelHelper.AddChannel (3, lc3);
+  //channelHelper.AddChannel (4, lc4);
+  //channelHelper.AddChannel (5, lc5);
+  //channelHelper.AddChannel (6, lc6);
+  //channelHelper.AddChannel (7, lc7);
 
   lorawanMac->SetLogicalLoraChannelHelper (channelHelper);
 
@@ -461,8 +461,8 @@ LorawanMacHelper::ApplyCommonSingleChannelConfigurations (Ptr<LorawanMac> lorawa
   //////////////////////
   // Default channels //
   //////////////////////
-  Ptr<LogicalLoraChannel> lc1 = CreateObject<LogicalLoraChannel> (868.1, 0, 5);
-  channelHelper.AddChannel (lc1);
+  Ptr<LogicalLoraChannel> lc0 = CreateObject<LogicalLoraChannel> (868.1, 0, 5);
+  channelHelper.AddChannel (0, lc0);
 
   lorawanMac->SetLogicalLoraChannelHelper (channelHelper);
 
