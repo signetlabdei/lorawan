@@ -16,6 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * 11/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #include "ns3/mac-command.h"
@@ -618,7 +622,7 @@ RxParamSetupReq::Deserialize (Buffer::Iterator &start)
   uint32_t secondByte = start.ReadU8 ();
   uint32_t thirdByte = start.ReadU8 ();
   uint32_t fourthByte = start.ReadU8 ();
-  uint32_t encodedFrequency = (secondByte << 16) | (thirdByte << 8) | fourthByte;
+  uint32_t encodedFrequency = (fourthByte << 16) | (thirdByte << 8) | secondByte;
   NS_LOG_DEBUG (std::bitset<32> (encodedFrequency));
   m_frequency = double(encodedFrequency) * 100;
 
