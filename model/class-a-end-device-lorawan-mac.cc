@@ -107,6 +107,9 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
   // Wake up PHY layer and directly send the packet
 
   Ptr<LogicalLoraChannel> txChannel = GetChannelForTx ();
+  // Make sure we can transmit at the current power on this channel
+  NS_ASSERT_MSG (m_txPower <= m_channelHelper.GetTxPowerForChannel (txChannel),
+                 " The selected power is too hight to be supported by this channel.");
 
   m_phy->Send (packetToSend, params, txChannel->GetFrequency (), m_txPower);
 

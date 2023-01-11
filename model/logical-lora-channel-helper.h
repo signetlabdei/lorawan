@@ -75,7 +75,7 @@ public:
    * \return A Time instance containing the waiting time before transmission is
    * allowed on the channel.
    */
-  Time GetWaitingTime (Ptr<LogicalLoraChannel> channel);
+  Time GetWaitingTime (const Ptr<LogicalLoraChannel> channel);
 
   /**
    * Register the transmission of a packet.
@@ -101,26 +101,12 @@ public:
   std::vector<Ptr<LogicalLoraChannel>> GetEnabledChannelList (void);
 
   /**
-   * Add a new channel to the list.
-   *
-   * \param frequency The frequency of the channel to create.
-   */
-  void AddChannel (double frequency);
-
-  /**
-   * Add a new channel to the list.
-   *
-   * \param logicalChannel A pointer to the channel to add to the list.
-   */
-  void AddChannel (Ptr<LogicalLoraChannel> logicalChannel);
-
-  /**
-   * Set a new channel at a fixed index.
+   * Add a new channel at a fixed index.
    *
    * \param chIndex The index of the channel to substitute.
    * \param logicalChannel A pointer to the channel to add to the list.
    */
-  void SetChannel (uint8_t chIndex, Ptr<LogicalLoraChannel> logicalChannel);
+  void AddChannel (uint16_t chIndex, Ptr<LogicalLoraChannel> logicalChannel);
 
   /**
    * Add a new SubBand to this helper.
@@ -144,9 +130,9 @@ public:
   /**
    * Remove a channel.
    *
-   * \param channel A pointer to the channel we want to remove.
+   * \param chIndex Index of the channel we want to remove.
    */
-  void RemoveChannel (Ptr<LogicalLoraChannel> channel);
+  void RemoveChannel (uint16_t chIndex);
 
   /**
    * Returns the maximum transmission power [dBm] that is allowed on a channel.
@@ -163,7 +149,7 @@ public:
    * \param channel The channel whose SubBand we want to get.
    * \return The SubBand the channel belongs to.
    */
-  Ptr<SubBand> GetSubBandFromChannel (Ptr<LogicalLoraChannel> channel);
+  Ptr<SubBand> GetSubBandFromChannel (const Ptr<LogicalLoraChannel> channel);
 
   /**
    * Get the SubBand a frequency belongs to.
@@ -176,9 +162,9 @@ public:
   /**
    * Disable the channel at a specified index.
    *
-   * \param index The index of the channel to disable.
+   * \param chIndex The index of the channel to disable.
    */
-  void DisableChannel (int index);
+  void DisableChannel (uint16_t chIndex);
 
 private:
   /**
