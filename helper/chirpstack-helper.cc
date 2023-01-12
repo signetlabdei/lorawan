@@ -41,8 +41,8 @@ ChirpstackHelper::ChirpstackHelper ()
   /* Initialize HTTP header fields */
   str token =
       "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9."
-      "eyJhdWQiOiJjaGlycHN0YWNrIiwiaXNzIjoiY2hpcnBzdGFjayIsInN1YiI6IjE5ODA1YzUwLWEzNTYtNGMwNC1hZGU0"
-      "LWY5MWY5M2Y4YmU4MSIsInR5cCI6ImtleSJ9.cBIJwNG_iu6Ndr24SEFvpBoaZi9Md_i2DS8YdONV7Rg";
+      "eyJhdWQiOiJjaGlycHN0YWNrIiwiaXNzIjoiY2hpcnBzdGFjayIsInN1YiI6IjZlMjQ4NjljLWQxMjItNDZkOS04NzE0"
+      "LTM5Yzc4Nzg4OTRhZCIsInR5cCI6ImtleSJ9.IB20o6Jrcwj5qZ9mPEuthzzqMyc3YNSl8by_ZXrjqhw";
   m_header = curl_slist_append (m_header, ("Authorization: Bearer " + token).c_str ());
   m_header = curl_slist_append (m_header, "Accept: application/json");
   m_header = curl_slist_append (m_header, "Content-Type: application/json");
@@ -189,7 +189,7 @@ ChirpstackHelper::NewDeviceProfile (const str &name)
                 "    \"tenantId\": \"" +
                 m_session.tenantId +
                 "\","
-                "    \"uplinkInterval\": 600"
+                "    \"uplinkInterval\": 86400"
                 "  }"
                 "}";
 
