@@ -20,6 +20,7 @@ Maintainer: Michael Coracin
 #define DEBUG_PKT_FWD   0
 #define DEBUG_JIT       0
 #define DEBUG_JIT_ERROR 0
+#define DEBUG_JIT_WARN  0
 #define DEBUG_TIMERSYNC 0
 #define DEBUG_BEACON    0
 #define DEBUG_LOG       1

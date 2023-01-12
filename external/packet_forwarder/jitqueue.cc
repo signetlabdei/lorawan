@@ -473,13 +473,13 @@ jit_peek (struct jit_queue_s *queue, struct timeval *time, int *pkt_idx)
           if (queue->nodes[i].pkt_type == JIT_PKT_TYPE_BEACON)
             {
               queue->num_beacon--;
-              MSG ("WARNING: --- Beacon dropped (current_time=%u, packet_time=%u) ---\n", time_us,
-                   queue->nodes[i].pkt.count_us);
+              MSG_DEBUG (DEBUG_JIT_WARN, "Beacon dropped (current_time=%u, packet_time=%u) ---\n",
+                         time_us, queue->nodes[i].pkt.count_us);
             }
           else
             {
-              MSG ("WARNING: --- Packet dropped (current_time=%u, packet_time=%u) ---\n", time_us,
-                   queue->nodes[i].pkt.count_us);
+              MSG_DEBUG (DEBUG_JIT_WARN, "Packet dropped (current_time=%u, packet_time=%u) ---\n",
+                         time_us, queue->nodes[i].pkt.count_us);
             }
 
           /* Replace dropped packet with last packet of the queue */
@@ -556,7 +556,7 @@ jit_get_print_queue (struct jit_queue_s *queue, bool show_all, int debug_level)
   int loop_end;
 
   if (!debug_level)
-    return ss.str();
+    return ss.str ();
 
   if (jit_queue_is_empty (queue))
     {
@@ -573,5 +573,5 @@ jit_get_print_queue (struct jit_queue_s *queue, bool show_all, int debug_level)
              << " - type=" << queue->nodes[i].pkt_type << "\n";
         }
     }
-  return ss.str();
+  return ss.str ();
 }
