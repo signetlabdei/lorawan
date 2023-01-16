@@ -34,6 +34,7 @@
 
 #include <cstdlib>
 #include <cstdio>
+#include <sys/time.h>   /* timeval */
 #include <arpa/inet.h>
 #include "ns3/base64.h"
 #include "ns3/parson.h"
@@ -176,7 +177,7 @@ UdpForwarder::StartApplication (void)
   net_mac_l = htonl ((uint32_t) (0xFFFFFFFF & lgwm));
 
   /* Socket up */
-  if (m_sockUp == 0)
+  if (bool (m_sockUp) == 0)
     {
       TypeId tid = TypeId::LookupByName ("ns3::UdpSocketFactory");
       m_sockUp = Socket::CreateSocket (GetNode (), tid);
@@ -194,7 +195,7 @@ UdpForwarder::StartApplication (void)
   m_sockUp->SetRecvCallback (MakeCallback (&UdpForwarder::ReceiveAck, this));
 
   /* Socket down */
-  if (m_sockDown == 0)
+  if (bool (m_sockDown) == 0)
     {
       TypeId tid = TypeId::LookupByName ("ns3::UdpSocketFactory");
       m_sockDown = Socket::CreateSocket (GetNode (), tid);
@@ -766,12 +767,12 @@ UdpForwarder::ReceiveAck (Ptr<Socket> sockUp)
   clock_gettime (CLOCK_MONOTONIC, &m_upRecvTime);
   if ((j < 4) || (buff_ack[0] != PROTOCOL_VERSION) || (buff_ack[3] != PKT_PUSH_ACK))
     {
-      //MSG("WARNING: [up] ignored invalid non-ACL packet");
+      //NS_LOG_WARN ("[up] ignored invalid non-ACL packet");
       m_remainingRecvAckAttempts--; /* continue; */
     }
   else if ((buff_ack[1] != m_upTokenH) || (buff_ack[2] != m_upTokenL))
     {
-      //MSG("WARNING: [up] ignored out-of sync ACK packet");
+      //NS_LOG_WARN ("[up] ignored out-of sync ACK packet");
       m_remainingRecvAckAttempts--; /* continue; */
     }
   else
@@ -789,6 +790,7 @@ UdpForwarder::ReceiveAck (Ptr<Socket> sockUp)
     }
 }
 
+/* The following function sends a PULL request to the server */
 void
 UdpForwarder::ThreadDown (void)
 {
@@ -856,8 +858,8 @@ UdpForwarder::CheckPullCondition (void)
     }
   else
     {
-      /* too much time passed between last datagram recv and last PULL request: new pull request */
-      ThreadDown ();
+      /* too much time passed between last datagram recv and last PULL request */
+      ThreadDown (); /* new pull request! */
     }
 }
 
@@ -875,7 +877,6 @@ UdpForwarder::ReceiveDatagram (Ptr<Socket> sockDown)
 
   /* configuration and metadata for an outbound packet */
   struct lgw_pkt_tx_s txpkt;
-  bool sent_immediate = false; /* option to sent the packet immediately */
 
   /* data buffers */
   uint8_t buff_down[1000]; /* buffer to receive downstream packets */
@@ -901,7 +902,7 @@ UdpForwarder::ReceiveDatagram (Ptr<Socket> sockDown)
   /* if no network message was received, got back to listening sock_down socket */
   if (msg_len == -1)
     {
-      //MSG("WARNING: [down] recv returned %s", strerror(errno)); /* too verbose */
+      //NS_LOG_WARN ("[down] recv returned %s", strerror(errno)); /* too verbose */
       return CheckPullCondition ();
     }
 
@@ -971,14 +972,16 @@ UdpForwarder::ReceiveDatagram (Ptr<Socket> sockDown)
       txpk_obj, "imme"); /* can be 1 if true, 0 if false, or -1 if not a JSON boolean */
   if (i == 1)
     {
-      /* TX procedure: send immediately */
-      sent_immediate = true;
-      downlink_type = JIT_PKT_TYPE_DOWNLINK_CLASS_C;
-      NS_LOG_INFO ("[down] a packet will be sent in \"immediate\" mode");
+      /* TX procedure: send immediately (Class C, not available) */
+      NS_LOG_WARN ("[down] class C not supported, TX aborted");
+      json_value_free (root_val);
+
+      /* send acknoledge datagram to server */
+      send_tx_ack (buff_down[1], buff_down[2], JIT_ERROR_INVALID);
+      return CheckPullCondition ();
     }
   else
     {
-      sent_immediate = false;
       val = json_object_get_value (txpk_obj, "tmst");
       if (val != NULL)
         {
@@ -1172,47 +1175,12 @@ UdpForwarder::ReceiveDatagram (Ptr<Socket> sockDown)
   else if (strcmp (str, "FSK") == 0)
     {
       /* FSK modulation */
-      txpkt.modulation = MOD_FSK;
+      NS_LOG_WARN ("[down] FSK modulation not supported, TX aborted");
+      json_value_free (root_val);
 
-      /* parse FSK bitrate (mandatory) */
-      val = json_object_get_value (txpk_obj, "datr");
-      if (val == NULL)
-        {
-          NS_LOG_WARN ("[down] no mandatory \"txpk.datr\" object in JSON, TX aborted");
-          json_value_free (root_val);
-          return CheckPullCondition ();
-        }
-      txpkt.datarate = (uint32_t) (json_value_get_number (val));
-
-      /* parse frequency deviation (mandatory) */
-      val = json_object_get_value (txpk_obj, "fdev");
-      if (val == NULL)
-        {
-          NS_LOG_WARN ("[down] no mandatory \"txpk.fdev\" object in JSON, TX aborted");
-          json_value_free (root_val);
-          return CheckPullCondition ();
-        }
-      txpkt.f_dev = (uint8_t) (json_value_get_number (val) /
-                               1000.0); /* JSON value in Hz, txpkt.f_dev in kHz */
-
-      /* parse FSK preamble length (optional field, optimum min value enforced) */
-      val = json_object_get_value (txpk_obj, "prea");
-      if (val != NULL)
-        {
-          i = (int) json_value_get_number (val);
-          if (i >= MIN_FSK_PREAMB)
-            {
-              txpkt.preamble = (uint16_t) i;
-            }
-          else
-            {
-              txpkt.preamble = (uint16_t) MIN_FSK_PREAMB;
-            }
-        }
-      else
-        {
-          txpkt.preamble = (uint16_t) STD_FSK_PREAMB;
-        }
+      /* send acknoledge datagram to server */
+      send_tx_ack (buff_down[1], buff_down[2], JIT_ERROR_INVALID);
+      return CheckPullCondition ();
     }
   else
     {
@@ -1249,14 +1217,7 @@ UdpForwarder::ReceiveDatagram (Ptr<Socket> sockDown)
   json_value_free (root_val);
 
   /* select TX mode */
-  if (sent_immediate)
-    {
-      txpkt.tx_mode = IMMEDIATE;
-    }
-  else
-    {
-      txpkt.tx_mode = TIMESTAMPED;
-    }
+  txpkt.tx_mode = IMMEDIATE;
 
   /* record measurement data */
   meas_dw_dgram_rcv += 1; /* count only datagrams with no JSON errors */
