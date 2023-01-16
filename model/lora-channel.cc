@@ -130,7 +130,7 @@ LoraChannel::Send (Ptr< LoraPhy > sender, Ptr< Packet > packet,
   // Get the mobility model of the sender
   Ptr<MobilityModel> senderMobility = sender->GetMobility ()->GetObject<MobilityModel> ();
 
-  NS_ASSERT (senderMobility != 0);     // Make sure it's available
+  NS_ASSERT (bool (senderMobility) != 0);     // Make sure it's available
 
   NS_LOG_INFO ("Starting cycle over all " << m_phyList.size () << " PHYs");
   NS_LOG_INFO ("Sender mobility: " << senderMobility->GetPosition ());
@@ -165,7 +165,7 @@ LoraChannel::Send (Ptr< LoraPhy > sender, Ptr< Packet > packet,
           // Get the id of the destination PHY to correctly format the context
           Ptr<NetDevice> dstNetDevice = m_phyList[j]->GetDevice ();
           uint32_t dstNode = 0;
-          if (dstNetDevice != 0)
+          if (bool (dstNetDevice) != 0)
             {
               NS_LOG_INFO ("Getting node index from NetDevice, since it exists");
               dstNode = dstNetDevice->GetNode ()->GetId ();
@@ -205,7 +205,7 @@ LoraChannel::SendDown (Ptr< LoraPhy > sender, Ptr< Packet > packet,
   // Get the mobility model of the sender
   Ptr<MobilityModel> senderMobility = sender->GetMobility ()->GetObject<MobilityModel> ();
 
-  NS_ASSERT (senderMobility != 0);     // Make sure it's available
+  NS_ASSERT (bool (senderMobility) != 0);     // Make sure it's available
 
   NS_LOG_INFO ("Starting cycle over all " << m_phyListDown.size () << " PHYs");
   NS_LOG_INFO ("Sender mobility: " << senderMobility->GetPosition ());
@@ -240,7 +240,7 @@ LoraChannel::SendDown (Ptr< LoraPhy > sender, Ptr< Packet > packet,
           // Get the id of the destination PHY to correctly format the context
           Ptr<NetDevice> dstNetDevice = m_phyListDown[j]->GetDevice ();
           uint32_t dstNode = 0;
-          if (dstNetDevice != 0)
+          if (bool (dstNetDevice) != 0)
             {
               NS_LOG_INFO ("Getting node index from NetDevice, since it exists");
               dstNode = dstNetDevice->GetNode ()->GetId ();

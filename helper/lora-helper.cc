@@ -65,7 +65,7 @@ LoraHelper::Install (const LoraPhyHelper &phyHelper, const LorawanMacHelper &mac
 
       // Create the PHY
       Ptr<LoraPhy> phy = phyHelper.Create (node, device);
-      NS_ASSERT (phy != 0);
+      NS_ASSERT (bool (phy) != 0);
       device->SetPhy (phy);
       NS_LOG_DEBUG ("Done creating the PHY");
 
@@ -103,7 +103,7 @@ LoraHelper::Install (const LoraPhyHelper &phyHelper, const LorawanMacHelper &mac
 
       // Create the MAC
       Ptr<LorawanMac> mac = macHelper.Create (node, device);
-      NS_ASSERT (mac != 0);
+      NS_ASSERT (bool (mac) != 0);
       mac->SetPhy (phy);
       NS_LOG_DEBUG ("Done creating the MAC");
       device->SetMac (mac);
@@ -219,10 +219,10 @@ LoraHelper::DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateway
     {
       Ptr<Node> object = *j;
       Ptr<MobilityModel> position = object->GetObject<MobilityModel> ();
-      NS_ASSERT (position != 0);
+      NS_ASSERT (bool (position) != 0);
       Ptr<NetDevice> netDevice = object->GetDevice (0);
       Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
-      NS_ASSERT (loraNetDevice != 0);
+      NS_ASSERT (bool (loraNetDevice) != 0);
       Ptr<ClassAEndDeviceLorawanMac> mac =
           loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
       int dr = int (mac->GetDataRate ());
@@ -388,7 +388,7 @@ LoraHelper::DoPrintSFStatus (NodeContainer endDevices, NodeContainer gateways, s
       Ptr<Node> object = *j;
       Ptr<NetDevice> netDevice = object->GetDevice (0);
       Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
-      NS_ASSERT (loraNetDevice != 0);
+      NS_ASSERT (bool (loraNetDevice) != 0);
       Ptr<ClassAEndDeviceLorawanMac> mac =
           loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
       Ptr<LoraApplication> app = object->GetApplication (0)->GetObject<LoraApplication> ();
@@ -478,7 +478,7 @@ LoraHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool prom
   // the system.  We can only deal with devices of type LoraNetDevice.
   //
   Ptr<LoraNetDevice> device = nd->GetObject<LoraNetDevice> ();
-  if (device == 0)
+  if (bool (device) == 0)
     {
       NS_LOG_INFO ("LoraHelper::EnablePcapInternal(): Device "
                    << device << " not of type ns3::LoraNetDevice");
@@ -486,7 +486,7 @@ LoraHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool prom
     }
 
   auto phy = device->GetPhy ();
-  NS_ABORT_MSG_IF (phy == 0,
+  NS_ABORT_MSG_IF (bool (phy) == 0,
                    "LoRaHelper::EnablePcapInternal(): Phy layer in LoraNetDevice must be set");
 
   PcapHelper pcapHelper;

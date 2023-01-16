@@ -121,7 +121,7 @@ LoraPhy::GetMobility (void)
 
   // If there is a mobility model associated to this PHY, take the mobility from
   // there
-  if (m_mobility != 0)
+  if (bool (m_mobility) != 0)
     {
       return m_mobility;
     }

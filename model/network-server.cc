@@ -92,7 +92,7 @@ NetworkServer::AddGateway (Ptr<Node> gateway, Ptr<NetDevice> netDevice)
   for (uint32_t i = 0; i < gateway->GetNDevices (); i++)
     {
       p2pNetDevice = gateway->GetDevice (i)->GetObject<PointToPointNetDevice> ();
-      if (p2pNetDevice != 0)
+      if (bool (p2pNetDevice) != 0)
         {
           // We found a p2pNetDevice on the gateway
           break;
@@ -103,7 +103,7 @@ NetworkServer::AddGateway (Ptr<Node> gateway, Ptr<NetDevice> netDevice)
   Ptr<GatewayLorawanMac> gwMac = 0;
   for (uint32_t i = 0; i < gateway->GetNDevices (); i++)
     {
-      if (gateway->GetDevice (i)->GetObject<LoraNetDevice> () != 0)
+      if (bool (gateway->GetDevice (i)->GetObject<LoraNetDevice> ()) != 0)
         {
           gwMac = gateway->GetDevice (i)
                       ->GetObject<LoraNetDevice> ()
@@ -147,7 +147,7 @@ NetworkServer::AddNode (Ptr<Node> node)
   for (uint32_t i = 0; i < node->GetNDevices (); i++)
     {
       loraNetDevice = node->GetDevice (i)->GetObject<LoraNetDevice> ();
-      if (loraNetDevice != 0)
+      if (bool (loraNetDevice) != 0)
         {
           // We found a LoraNetDevice on the node
           break;

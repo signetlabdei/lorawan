@@ -95,7 +95,7 @@ NetworkServerHelper::InstallPriv (Ptr<Node> node)
       
       // Register gateways
       Ptr<Channel> channel = currentNetDevice->GetChannel ();
-      NS_ASSERT_MSG (channel->GetObject<PointToPointChannel> () != 0, 
+      NS_ASSERT_MSG (bool (channel->GetObject<PointToPointChannel> ()) != 0, 
                      "Connection with gateways is not PointToPoint");
       for (uint32_t j = 0; j < channel->GetNDevices (); ++j)
         {

@@ -563,7 +563,7 @@ ClassAEndDeviceLorawanMac::OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamS
   bool dataRateOk =
       (GetSfFromDataRate (rx2DataRate) != 0 && GetBandwidthFromDataRate (rx2DataRate) != 0);
   // Check that channel is in known bands
-  bool channelOk = m_channelHelper.GetSubBandFromFrequency (frequency);
+  bool channelOk = bool (m_channelHelper.GetSubBandFromFrequency (frequency));
 
   if (offsetOk && dataRateOk && channelOk)
     {

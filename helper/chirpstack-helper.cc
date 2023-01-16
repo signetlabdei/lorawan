@@ -249,11 +249,11 @@ ChirpstackHelper::RegisterPriv (Ptr<Node> node) const
   for (int i = 0; i < (int) node->GetNDevices (); ++i)
     {
       netdev = node->GetDevice (i)->GetObject<LoraNetDevice> ();
-      if (netdev != 0)
+      if (bool (netdev) != 0)
         {
-          if (netdev->GetMac ()->GetObject<EndDeviceLorawanMac> () != 0)
+          if (bool (netdev->GetMac ()->GetObject<EndDeviceLorawanMac> ()) != 0)
             NewDevice (node);
-          else if (netdev->GetMac ()->GetObject<GatewayLorawanMac> () != 0)
+          else if (bool (netdev->GetMac ()->GetObject<GatewayLorawanMac> ()) != 0)
             NewGateway (node);
           else
             NS_FATAL_ERROR ("No LorawanMac installed (node id: " << (unsigned) node->GetId ()

@@ -141,7 +141,7 @@ RangePositionAllocator::GetNext (void) const
 {
   double x, y, z;
   
-  z = (m_zrv == 0) ? m_z : m_zrv->GetValue ();
+  z = (bool (m_zrv) == 0) ? m_z : m_zrv->GetValue ();
   do
     {
       x = m_rv->GetValue (-m_rho, m_rho);

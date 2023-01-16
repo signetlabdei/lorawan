@@ -864,7 +864,7 @@ EndDeviceLorawanMac::OnNewChannelReq (uint8_t chIndex, double frequency, uint8_t
   // Check whether the new data rate range is ok
   bool dataRateRangeOk = (minDataRate >= 0 && maxDataRate <= 5);
   // Check whether the frequency is ok
-  bool channelFrequencyOk = m_channelHelper.GetSubBandFromFrequency (frequency);
+  bool channelFrequencyOk = bool (m_channelHelper.GetSubBandFromFrequency (frequency));
   if (dataRateRangeOk && channelFrequencyOk)
     AddLogicalChannel (chIndex, frequency, minDataRate, maxDataRate);
 

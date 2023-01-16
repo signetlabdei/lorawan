@@ -82,13 +82,13 @@ UdpForwarderHelper::InstallPriv (Ptr<Node> node) const
   for (uint32_t i = 0; i < node->GetNDevices (); i++)
     {
       Ptr<NetDevice> currentNetDevice = node->GetDevice (i);
-      if (currentNetDevice->GetObject<LoraNetDevice> () != 0)
+      if (bool (currentNetDevice->GetObject<LoraNetDevice> ()) != 0)
         {
           Ptr<LoraNetDevice> loraNetDevice = currentNetDevice->GetObject<LoraNetDevice> ();
           app->SetLoraNetDevice (loraNetDevice);
           loraNetDevice->SetReceiveCallback (MakeCallback (&UdpForwarder::ReceiveFromLora, app));
         }
-      else if (currentNetDevice->GetObject<CsmaNetDevice> () != 0)
+      else if (bool (currentNetDevice->GetObject<CsmaNetDevice> ()) != 0)
         continue;
       else
         NS_LOG_ERROR ("Potential error: NetDevice is neither Lora nor Csma");
