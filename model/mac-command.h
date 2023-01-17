@@ -573,12 +573,12 @@ class RxTimingSetupAns : public MacCommand
 };
 
 /**
- * Implementation of the TxParamSetupAns LoRaWAN MAC command.
+ * Implementation of the TxParamSetupReq LoRaWAN MAC command.
  */
-class TxParamSetupAns : public MacCommand
+class TxParamSetupReq : public MacCommand
 {
   public:
-    TxParamSetupAns();
+    TxParamSetupReq();
 
     virtual void Serialize(Buffer::Iterator& start) const;
     virtual uint8_t Deserialize(Buffer::Iterator& start);
@@ -588,12 +588,12 @@ class TxParamSetupAns : public MacCommand
 };
 
 /**
- * Implementation of the TxParamSetupReq LoRaWAN MAC command.
+ * Implementation of the TxParamSetupAns LoRaWAN MAC command.
  */
-class TxParamSetupReq : public MacCommand
+class TxParamSetupAns : public MacCommand
 {
   public:
-    TxParamSetupReq();
+    TxParamSetupAns();
 
     virtual void Serialize(Buffer::Iterator& start) const;
     virtual uint8_t Deserialize(Buffer::Iterator& start);

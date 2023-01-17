@@ -302,14 +302,6 @@ ClassAEndDeviceLorawanMac::TxFinished(Ptr<const Packet> packet)
     m_secondReceiveWindow = Simulator::Schedule(m_receiveDelay2,
                                                 &ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow,
                                                 this);
-    // // Schedule the opening of the first receive window
-    // Simulator::Schedule (m_receiveDelay1,
-    //                      &ClassAEndDeviceLorawanMac::OpenFirstReceiveWindow, this);
-    //
-    // // Schedule the opening of the second receive window
-    // m_secondReceiveWindow = Simulator::Schedule (m_receiveDelay2,
-    //                                              &ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow,
-    //                                              this);
 
     // Switch the PHY to sleep
     m_phy->GetObject<EndDeviceLoraPhy>()->SwitchToSleep();
@@ -583,6 +575,17 @@ ClassAEndDeviceLorawanMac::OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSe
     // Craft a RxParamSetupAns as response
     NS_LOG_INFO("Adding RxParamSetupAns reply");
     m_macCommandList.push_back(CreateObject<RxParamSetupAns>(offsetOk, dataRateOk, channelOk));
+}
+
+void
+ClassAEndDeviceLorawanMac::OnRxTimingSetupReq(Time delay)
+{
+    NS_LOG_FUNCTION(this << delay);
+
+    m_receiveDelay1 = delay;
+
+    NS_LOG_INFO("Adding RxTimingSetupAns reply");
+    m_macCommandList.push_back(CreateObject<RxTimingSetupAns>());
 }
 
 } /* namespace lorawan */

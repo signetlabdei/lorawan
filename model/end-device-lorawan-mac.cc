@@ -405,91 +405,76 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
         {
         case (LINK_CHECK_ANS): {
             NS_LOG_DEBUG("Detected a LinkCheckAns command.");
-
             // Cast the command
             Ptr<LinkCheckAns> linkCheckAns = (*it)->GetObject<LinkCheckAns>();
-
             // Call the appropriate function to take action
             OnLinkCheckAns(linkCheckAns->GetMargin(), linkCheckAns->GetGwCnt());
-
             break;
         }
         case (LINK_ADR_REQ): {
             NS_LOG_DEBUG("Detected a LinkAdrReq command.");
-
             // Cast the command
             Ptr<LinkAdrReq> linkAdrReq = (*it)->GetObject<LinkAdrReq>();
-
             // Call the appropriate function to take action
             OnLinkAdrReq(linkAdrReq->GetDataRate(),
                          linkAdrReq->GetTxPower(),
                          linkAdrReq->GetEnabledChannelsList(),
                          linkAdrReq->GetRepetitions());
-
             break;
         }
         case (DUTY_CYCLE_REQ): {
             NS_LOG_DEBUG("Detected a DutyCycleReq command.");
-
             // Cast the command
             Ptr<DutyCycleReq> dutyCycleReq = (*it)->GetObject<DutyCycleReq>();
-
             // Call the appropriate function to take action
             OnDutyCycleReq(dutyCycleReq->GetMaximumAllowedDutyCycle());
-
             break;
         }
         case (RX_PARAM_SETUP_REQ): {
             NS_LOG_DEBUG("Detected a RxParamSetupReq command.");
-
             // Cast the command
             Ptr<RxParamSetupReq> rxParamSetupReq = (*it)->GetObject<RxParamSetupReq>();
-
             // Call the appropriate function to take action
             OnRxParamSetupReq(rxParamSetupReq);
-
             break;
         }
         case (DEV_STATUS_REQ): {
             NS_LOG_DEBUG("Detected a DevStatusReq command.");
-
             // Cast the command
             Ptr<DevStatusReq> devStatusReq = (*it)->GetObject<DevStatusReq>();
-
             // Call the appropriate function to take action
             OnDevStatusReq();
-
             break;
         }
         case (NEW_CHANNEL_REQ): {
             NS_LOG_DEBUG("Detected a NewChannelReq command.");
-
             // Cast the command
             Ptr<NewChannelReq> newChannelReq = (*it)->GetObject<NewChannelReq>();
-
             // Call the appropriate function to take action
             OnNewChannelReq(newChannelReq->GetChannelIndex(),
                             newChannelReq->GetFrequency(),
                             newChannelReq->GetMinDataRate(),
                             newChannelReq->GetMaxDataRate());
-
             break;
         }
         case (RX_TIMING_SETUP_REQ): {
+            NS_LOG_DEBUG("Detected a RxTimingSetupReq command.");
+            // Cast the command
+            auto rxTimingSetupReq = (*it)->GetObject<RxTimingSetupReq>();
+            // Call the appropriate function to take action
+            OnRxTimingSetupReq(rxTimingSetupReq->GetDelay());
             break;
         }
         case (TX_PARAM_SETUP_REQ): {
+            /* Not mandatory in the EU868 region */
             break;
         }
         case (DL_CHANNEL_REQ): {
             NS_LOG_DEBUG("Detected a DlChannelReq command.");
-
             // Cast the command
             auto dlChannelReq = (*it)->GetObject<DlChannelReq>();
-
             // Call the appropriate function to take action
             OnDlChannelReq(dlChannelReq->GetChannelIndex(), dlChannelReq->GetFrequency());
-
             break;
         }
         default: {
@@ -934,6 +919,11 @@ EndDeviceLorawanMac::AddLogicalChannel(uint8_t chIndex,
 
     AddLogicalChannel(chIndex,
                       CreateObject<LogicalLoraChannel>(frequency, minDataRate, maxDataRate));
+}
+
+void
+EndDeviceLorawanMac::OnRxTimingSetupReq(Time delay)
+{
 }
 
 void

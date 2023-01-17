@@ -302,6 +302,13 @@ LoraFrameHeader::Deserialize(Buffer::Iterator start)
                 m_macCommands.push_back(command);
                 break;
             }
+            case (0x0A): {
+                NS_LOG_DEBUG("Creating a DlChannelReq command");
+                Ptr<DlChannelReq> command = Create<DlChannelReq>();
+                byteNumber += command->Deserialize(start);
+                m_macCommands.push_back(command);
+                break;
+            }
             default: {
                 NS_LOG_ERROR("CID not recognized during deserialization");
                 byteNumber = m_fOptsLen + m_frmpCmdsLen;

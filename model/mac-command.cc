@@ -1051,6 +1051,7 @@ RxTimingSetupReq::Print(std::ostream& os) const
     NS_LOG_FUNCTION_NOARGS();
 
     os << "RxTimingSetupReq" << std::endl;
+    os << "Delay: " << unsigned((m_delay) ? m_delay : 1) << "s" << std::endl;
 }
 
 Time
@@ -1058,11 +1059,7 @@ RxTimingSetupReq::GetDelay(void)
 {
     NS_LOG_FUNCTION(this);
 
-    if (m_delay == 0)
-    {
-        return Seconds(1);
-    }
-    return Seconds(m_delay);
+    return Seconds((m_delay) ? m_delay : 1);
 }
 
 //////////////////
@@ -1114,7 +1111,7 @@ TxParamSetupReq::TxParamSetupReq()
     NS_LOG_FUNCTION(this);
 
     m_commandType = DEV_STATUS_REQ;
-    m_serializedSize = 1;
+    m_serializedSize = 2;
 }
 
 void

@@ -324,6 +324,10 @@ class EndDeviceLorawanMac : public LorawanMac
                          double frequency,
                          uint8_t minDataRate,
                          uint8_t maxDataRate);
+    /**
+     * Perform the actions that need to be taken when receiving a RxTimingSetupReq command.
+     */
+    virtual void OnRxTimingSetupReq(Time delay);
 
     /**
      * Perform the actions that need to be taken when receiving a DlChannelReq command.

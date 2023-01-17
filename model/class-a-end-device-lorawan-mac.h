@@ -168,6 +168,11 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      */
     virtual void OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq);
 
+    /**
+     * Perform the actions that need to be taken when receiving a RxTimingSetupReq command.
+     */
+    virtual void OnRxTimingSetupReq(Time delay);
+
   private:
     /**
      * The interval between when a packet is done sending and when the first
