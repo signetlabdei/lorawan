@@ -72,9 +72,9 @@ class LogicalLoraChannel : public Object
     /**
      * Set the reply frequency (MHz).
      *
-     * \param replyFrequencyMHz The center frequency this channel should receive replies on.
+     * \param replyFrequency The center frequency this channel should receive replies on.
      */
-    void SetReplyFrequency(double replyFrequencyMHz);
+    void SetReplyFrequency(double replyFrequency);
 
     /**
      * Get the reply frequency (MHz).

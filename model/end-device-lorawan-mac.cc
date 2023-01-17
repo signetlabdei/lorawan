@@ -937,7 +937,7 @@ EndDeviceLorawanMac::AddLogicalChannel(uint8_t chIndex,
 }
 
 void
-EndDeviceLorawanMac::OnDlChannelReq(uint8_t chIndex, double dlFrequency)
+EndDeviceLorawanMac::OnDlChannelReq(uint8_t chIndex, double frequency)
 {
     NS_LOG_FUNCTION(this << unsigned(chIndex) << frequency);
 
@@ -945,10 +945,10 @@ EndDeviceLorawanMac::OnDlChannelReq(uint8_t chIndex, double dlFrequency)
     bool uplinkFrequencyExists = bool(m_channelHelper.GetChannel(chIndex));
 
     // Check whether the downlink frequency can be used by this device
-    bool channelFrequencyOk = bool(m_channelHelper.GetSubBandFromFrequency(dlFrequency));
+    bool channelFrequencyOk = bool(m_channelHelper.GetSubBandFromFrequency(frequency));
 
     if (uplinkFrequencyExists && channelFrequencyOk)
-        m_channelHelper.SetReplyFrequency(chIndex, dlFrequency);
+        m_channelHelper.SetReplyFrequency(chIndex, frequency);
 
     NS_LOG_INFO("Adding DlChannelAns reply");
     m_macCommandList.push_back(

@@ -328,7 +328,7 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Perform the actions that need to be taken when receiving a DlChannelReq command.
      */
-    void OnDlChannelReq(uint8_t chIndex, double dlFrequency);
+    void OnDlChannelReq(uint8_t chIndex, double frequency);
 
     ////////////////////////////////////
     // Logical channel administration //

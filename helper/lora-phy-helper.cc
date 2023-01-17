@@ -90,12 +90,6 @@ LoraPhyHelper::Create(Ptr<Node> node, Ptr<NetDevice> device) const
         // Inform the channel of the presence of this PHY
         m_channel->Add(phy);
 
-        // For now, assume that the PHY will listen to the default EU channels
-        // with this ReceivePath configuration:
-        // 3 ReceivePaths on 868.1
-        // 3 ReceivePaths on 868.3
-        // 2 ReceivePaths on 868.5
-
         // We expect that MacHelper instances will overwrite this setting if the
         // device will operate in a different region
         std::vector<double> frequencies;

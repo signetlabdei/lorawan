@@ -127,6 +127,15 @@ LogicalLoraChannelHelper::AddSubBand(double firstFrequency,
 }
 
 void
+LogicalLoraChannelHelper::SetReplyFrequency(uint8_t chIndex, double replyFrequency)
+{
+    NS_LOG_FUNCTION(this << (unsigned)chIndex << replyFrequency);
+    auto channel = GetChannel(chIndex);
+    NS_ASSERT_MSG(bool(channel), "Selected uplink channel does not exist");
+    channel->SetReplyFrequency(replyFrequency);
+}
+
+void
 LogicalLoraChannelHelper::AddSubBand(Ptr<SubBand> subBand)
 {
     NS_LOG_FUNCTION(this << subBand);

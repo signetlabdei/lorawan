@@ -82,9 +82,9 @@ LogicalLoraChannel::GetFrequency(void) const
 }
 
 void
-LogicalLoraChannel::SetReplyFrequency(double replyFrequencyMHz)
+LogicalLoraChannel::SetReplyFrequency(double replyFrequency)
 {
-    m_replyFrequency = replyFrequencyMHz;
+    m_replyFrequency = replyFrequency;
 }
 
 double
