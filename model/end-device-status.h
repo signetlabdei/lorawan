@@ -16,6 +16,10 @@
  *
  * Authors: Martina Capuzzo <capuzzom@dei.unipd.it>
  *          Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #ifndef END_DEVICE_STATUS_H

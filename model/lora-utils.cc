@@ -10,6 +10,10 @@
  * GNU General Public License for more details.
  *
  * Author: Romagnolo Stefano <romagnolostefano93@gmail.com>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #include "lora-utils.h"

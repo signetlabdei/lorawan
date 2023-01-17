@@ -17,6 +17,10 @@
  * Authors: Davide Magrin <magrinda@dei.unipd.it>,
  *          Michele Luvisotto <michele.luvisotto@dei.unipd.it>
  *          Stefano Romagnolo <romagnolostefano93@gmail.com>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #ifndef END_DEVICE_LORA_PHY_H

@@ -16,6 +16,10 @@
  *
  * Authors: Davide Magrin <magrinda@dei.unipd.it>
  *          Martina Capuzzo <capuzzom@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #ifndef NETWORK_SERVER_H

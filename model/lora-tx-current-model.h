@@ -11,6 +11,10 @@
  *
  * Authors: Romagnolo Stefano <romagnolostefano93@gmail.com>
  *          Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #ifndef LORA_TX_CURRENT_MODEL_H
