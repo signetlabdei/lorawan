@@ -64,10 +64,10 @@ SimpleGatewayLoraPhy::~SimpleGatewayLoraPhy()
 void
 SimpleGatewayLoraPhy::Send(Ptr<Packet> packet,
                            LoraTxParameters txParams,
-                           double frequencyMHz,
+                           double frequency,
                            double txPowerDbm)
 {
-    NS_LOG_FUNCTION(this << packet << frequencyMHz << txPowerDbm);
+    NS_LOG_FUNCTION(this << packet << frequency << txPowerDbm);
 
     // Get the time a packet with these parameters will take to be transmitted
     Time duration = GetOnAirTime(packet, txParams);
@@ -104,7 +104,7 @@ SimpleGatewayLoraPhy::Send(Ptr<Packet> packet,
     }
 
     // Send the packet in the channel
-    m_channel->SendDown(this, packet, txPowerDbm, txParams, duration, frequencyMHz);
+    m_channel->SendDown(this, packet, txPowerDbm, txParams, duration, frequency);
 
     Simulator::Schedule(duration, &SimpleGatewayLoraPhy::TxFinished, this, packet);
 
@@ -132,9 +132,9 @@ SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
                                    double rxPowerDbm,
                                    uint8_t sf,
                                    Time duration,
-                                   double frequencyMHz)
+                                   double frequency)
 {
-    NS_LOG_FUNCTION(this << packet << rxPowerDbm << duration << frequencyMHz);
+    NS_LOG_FUNCTION(this << packet << rxPowerDbm << duration << frequency);
 
     // Fire the trace source
     m_phyRxBeginTrace(packet);
@@ -162,7 +162,7 @@ SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
 
     // Add the event to the LoraInterferenceHelper
     Ptr<LoraInterferenceHelper::Event> event;
-    event = m_interference.Add(duration, rxPowerDbm, sf, packet, frequencyMHz);
+    event = m_interference.Add(duration, rxPowerDbm, sf, packet, frequency);
 
     // Cycle over the receive paths to check availability to receive the packet
     std::list<Ptr<SimpleGatewayLoraPhy::ReceptionPath>>::iterator it;
@@ -220,8 +220,8 @@ SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
     }
     // If we get to this point, there are no demodulators we can use
     NS_LOG_INFO("Dropping packet reception of packet with sf = "
-                << unsigned(sf) << " and frequency " << frequencyMHz
-                << "MHz because no suitable demodulator was found");
+                << unsigned(sf) << " and frequency " << frequency
+                << "Hz because no suitable demodulator was found");
 
     // Fire the trace source
     if (m_device)

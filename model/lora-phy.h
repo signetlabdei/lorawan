@@ -119,13 +119,13 @@ class LoraPhy : public Object
      * for the whole reception).
      * \param sf The Spreading Factor of the arriving packet.
      * \param duration The on air time of this packet.
-     * \param frequencyMHz The frequency this packet is being transmitted on.
+     * \param frequency The frequency this packet is being transmitted on.
      */
     virtual void StartReceive(Ptr<Packet> packet,
                               double rxPowerDbm,
                               uint8_t sf,
                               Time duration,
-                              double frequencyMHz) = 0;
+                              double frequency) = 0;
 
     /**
      * Finish reception of a packet.
@@ -146,12 +146,12 @@ class LoraPhy : public Object
      *
      * \param packet The packet to send.
      * \param txParams The desired transmission parameters.
-     * \param frequencyMHz The frequency on which to transmit.
+     * \param frequency The frequency on which to transmit.
      * \param txPowerDbm The power in dBm with which to transmit the packet.
      */
     virtual void Send(Ptr<Packet> packet,
                       LoraTxParameters txParams,
-                      double frequencyMHz,
+                      double frequency,
                       double txPowerDbm) = 0;
 
     /**

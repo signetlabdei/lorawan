@@ -56,13 +56,13 @@ class SimpleGatewayLoraPhy : public GatewayLoraPhy
                               double rxPowerDbm,
                               uint8_t sf,
                               Time duration,
-                              double frequencyMHz);
+                              double frequency);
 
     virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event);
 
     virtual void Send(Ptr<Packet> packet,
                       LoraTxParameters txParams,
-                      double frequencyMHz,
+                      double frequency,
                       double txPowerDbm);
 
   private:

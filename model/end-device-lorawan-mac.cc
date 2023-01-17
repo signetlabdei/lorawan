@@ -469,7 +469,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
 
             // Call the appropriate function to take action
             OnNewChannelReq(newChannelReq->GetChannelIndex(),
-                            newChannelReq->GetFrequency() / 1e6,
+                            newChannelReq->GetFrequency(),
                             newChannelReq->GetMinDataRate(),
                             newChannelReq->GetMaxDataRate());
 
@@ -488,7 +488,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
             auto dlChannelReq = (*it)->GetObject<DlChannelReq>();
 
             // Call the appropriate function to take action
-            OnDlChannelReq(dlChannelReq->GetChannelIndex(), dlChannelReq->GetFrequency() / 1e6);
+            OnDlChannelReq(dlChannelReq->GetChannelIndex(), dlChannelReq->GetFrequency());
 
             break;
         }

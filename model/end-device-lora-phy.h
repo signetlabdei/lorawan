@@ -156,7 +156,7 @@ class EndDeviceLoraPhy : public LoraPhy
                               double rxPowerDbm,
                               uint8_t sf,
                               Time duration,
-                              double frequencyMHz) = 0;
+                              double frequency) = 0;
 
     // Implementation of LoraPhy's pure virtual functions
     virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) = 0;
@@ -164,11 +164,11 @@ class EndDeviceLoraPhy : public LoraPhy
     // Implementation of LoraPhy's pure virtual functions
     virtual void Send(Ptr<Packet> packet,
                       LoraTxParameters txParams,
-                      double frequencyMHz,
+                      double frequency,
                       double txPowerDbm) = 0;
 
     // Implementation of LoraPhy's pure virtual functions
-    virtual bool IsOnFrequency(double frequencyMHz);
+    virtual bool IsOnFrequency(double frequency);
 
     // Implementation of LoraPhy's pure virtual functions
     virtual bool IsTransmitting(void);
@@ -179,9 +179,9 @@ class EndDeviceLoraPhy : public LoraPhy
      * Should a packet be transmitted on a frequency different than that the
      * EndDeviceLoraPhy is listening on, the packet will be discarded.
      *
-     * \param The frequency [MHz] to listen to.
+     * \param frequency The frequency [Hz] to listen to.
      */
-    void SetFrequency(double frequencyMHz);
+    void SetFrequency(double frequency);
 
     /**
      * Set the Spreading Factor this EndDevice will listen for.

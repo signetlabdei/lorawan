@@ -121,15 +121,15 @@ class LogicalLoraChannelHelper : public Object
      * Set a different reply frequency of a channel.
      *
      * \param chIndex The index of the channel to change the reply freq. of.
-     * \param replyFrequency Frequency (MHz) to be set as reply freq.
+     * \param replyFrequency Frequency (Hz) to be set as reply freq.
      */
     void SetReplyFrequency(uint8_t chIndex, double replyFrequency);
 
     /**
      * Add a new SubBand to this helper.
      *
-     * \param firstFrequency The first frequency of the subband, in MHz.
-     * \param lastFrequency The last frequency of the subband, in MHz.
+     * \param firstFrequency The first frequency of the subband, in Hz.
+     * \param lastFrequency The last frequency of the subband, in Hz.
      * \param dutyCycle The duty cycle that needs to be enforced on this subband.
      * \param maxTxPowerDbm The maximum transmission power [dBm] that can be used
      * on this SubBand.

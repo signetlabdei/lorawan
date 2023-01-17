@@ -62,7 +62,7 @@ class LoraInterferenceHelper
               double rxPowerdBm,
               uint8_t spreadingFactor,
               Ptr<Packet> packet,
-              double frequencyMHz);
+              double frequency);
         ~Event();
 
         /**
@@ -134,7 +134,7 @@ class LoraInterferenceHelper
         /**
          * The frequency this event was on.
          */
-        double m_frequencyMHz;
+        double m_frequencyHz;
     };
 
     enum CollisionMatrix
@@ -156,7 +156,7 @@ class LoraInterferenceHelper
      * \param rxPower the received power in dBm.
      * \param spreadingFactor the spreading factor used by the transmission.
      * \param packet The packet carried by this transmission.
-     * \param frequencyMHz The frequency this event was sent at.
+     * \param frequency The frequency this event was sent at.
      *
      * \return the newly created event
      */
@@ -164,7 +164,7 @@ class LoraInterferenceHelper
                                            double rxPower,
                                            uint8_t spreadingFactor,
                                            Ptr<Packet> packet,
-                                           double frequencyMHz);
+                                           double frequency);
 
     /**
      * Get a list of the interferers currently registered at this

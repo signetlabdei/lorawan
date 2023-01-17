@@ -71,7 +71,7 @@ PeriodicSender::StartApplication(void)
     NS_LOG_FUNCTION(this);
 
     // Make sure we have a MAC layer
-    if (bool(m_mac) != 0)
+    if (bool(m_mac) == 0)
     {
         // Assumes there's only one device
         Ptr<LoraNetDevice> loraNetDevice = m_node->GetDevice(0)->GetObject<LoraNetDevice>();
@@ -112,6 +112,7 @@ PeriodicSender::SendPacket(void)
         packet = Create<Packet>(m_basePktSize);
     }
     m_mac->Send(packet);
+    std::cout << std::flush << "HELLO BITCHES" << std::endl;
 
     // Schedule the next SendPacket event
     m_sendEvent = Simulator::Schedule(m_avgInterval, &PeriodicSender::SendPacket, this);

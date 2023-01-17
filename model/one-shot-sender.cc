@@ -95,7 +95,7 @@ OneShotSender::StartApplication(void)
         Ptr<LoraNetDevice> loraNetDevice = m_node->GetDevice(0)->GetObject<LoraNetDevice>();
 
         m_mac = loraNetDevice->GetMac();
-        NS_ASSERT(bool(m_mac) != 0);
+        NS_ASSERT(bool(m_mac) == 0);
     }
 
     // Schedule the next SendPacket event

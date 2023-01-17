@@ -539,9 +539,9 @@ ClassAEndDeviceLorawanMac::GetSecondReceiveWindowDataRate(void)
 }
 
 void
-ClassAEndDeviceLorawanMac::SetSecondReceiveWindowFrequency(double frequencyMHz)
+ClassAEndDeviceLorawanMac::SetSecondReceiveWindowFrequency(double frequency)
 {
-    m_secondReceiveWindowFrequency = frequencyMHz;
+    m_secondReceiveWindowFrequency = frequency;
 }
 
 double
@@ -577,7 +577,7 @@ ClassAEndDeviceLorawanMac::OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSe
     {
         m_rx1DrOffset = rx1DrOffset;
         m_secondReceiveWindowDataRate = rx2DataRate;
-        m_secondReceiveWindowFrequency = frequency / 1e6;
+        m_secondReceiveWindowFrequency = frequency;
     }
 
     // Craft a RxParamSetupAns as response

@@ -44,13 +44,13 @@ LoraInterferenceHelper::Event::Event(Time duration,
                                      double rxPowerdBm,
                                      uint8_t spreadingFactor,
                                      Ptr<Packet> packet,
-                                     double frequencyMHz)
+                                     double frequency)
     : m_startTime(Simulator::Now()),
       m_endTime(m_startTime + duration),
       m_sf(spreadingFactor),
       m_rxPowerdBm(rxPowerdBm),
       m_packet(packet),
-      m_frequencyMHz(frequencyMHz)
+      m_frequencyHz(frequency)
 {
     // NS_LOG_FUNCTION_NOARGS ();
 }
@@ -101,14 +101,14 @@ LoraInterferenceHelper::Event::GetPacket(void) const
 double
 LoraInterferenceHelper::Event::GetFrequency(void) const
 {
-    return m_frequencyMHz;
+    return m_frequencyHz;
 }
 
 void
 LoraInterferenceHelper::Event::Print(std::ostream& stream) const
 {
     stream << "(" << m_startTime.GetSeconds() << " s - " << m_endTime.GetSeconds() << " s), SF"
-           << unsigned(m_sf) << ", " << m_rxPowerdBm << " dBm, " << m_frequencyMHz << " MHz";
+           << unsigned(m_sf) << ", " << m_rxPowerdBm << " dBm, " << m_frequencyHz << " Hz";
 }
 
 std::ostream&
@@ -215,10 +215,10 @@ LoraInterferenceHelper::Add(Time duration,
                             double rxPower,
                             uint8_t spreadingFactor,
                             Ptr<Packet> packet,
-                            double frequencyMHz)
+                            double frequency)
 {
     NS_LOG_FUNCTION(this << duration.GetSeconds() << rxPower << unsigned(spreadingFactor) << packet
-                         << frequencyMHz);
+                         << frequency);
 
     // Create an event based on the parameters
     Ptr<LoraInterferenceHelper::Event> event =
@@ -226,7 +226,7 @@ LoraInterferenceHelper::Add(Time duration,
                                               rxPower,
                                               spreadingFactor,
                                               packet,
-                                              frequencyMHz);
+                                              frequency);
 
     // Add the event to the list
     m_events.push_back(event);

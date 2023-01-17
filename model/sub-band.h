@@ -133,8 +133,8 @@ class SubBand : public Object
     double GetMaxTxPowerDbm(void);
 
   private:
-    double m_firstFrequency;     //!< Starting frequency of the subband, in MHz
-    double m_lastFrequency;      //!< Ending frequency of the subband, in MHz
+    double m_firstFrequency;     //!< Starting frequency of the subband, in Hz
+    double m_lastFrequency;      //!< Ending frequency of the subband, in Hz
     double m_dutyCycle;          //!< The duty cycle that needs to be enforced on this subband
     Time m_nextTransmissionTime; //!< The next time a transmission will be allowed in this subband
     double m_maxTxPowerDbm; //!< The maximum transmission power that is admitted on this subband

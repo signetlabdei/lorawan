@@ -321,7 +321,7 @@ class EndDeviceStatus : public Object
     uint8_t m_firstReceiveWindowSpreadingFactor = 0;
     double m_firstReceiveWindowFrequency = 0;
     uint8_t m_secondReceiveWindowOffset = 0;
-    double m_secondReceiveWindowFrequency = 869.525;
+    double m_secondReceiveWindowFrequency = 869525000;
     EventId m_receiveWindowEvent;
 
     ReceivedPacketList m_receivedPacketList; //<! List of received packets

@@ -70,7 +70,7 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
     NS_LOG_DEBUG("DR: " << unsigned(dataRate));
     NS_LOG_DEBUG("SF: " << unsigned(GetSfFromDataRate(dataRate)));
     NS_LOG_DEBUG("BW: " << GetBandwidthFromDataRate(dataRate));
-    NS_LOG_DEBUG("Freq: " << frequency << " MHz");
+    NS_LOG_DEBUG("Freq: " << frequency << " Hz");
     packet->AddPacketTag(tag);
 
     LoraTxParameters params;

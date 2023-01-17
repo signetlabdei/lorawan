@@ -63,20 +63,20 @@ class GatewayLoraPhy : public LoraPhy
                               double rxPowerDbm,
                               uint8_t sf,
                               Time duration,
-                              double frequencyMHz) = 0;
+                              double frequency) = 0;
 
     virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) = 0;
 
     virtual void Send(Ptr<Packet> packet,
                       LoraTxParameters txParams,
-                      double frequencyMHz,
+                      double frequency,
                       double txPowerDbm) = 0;
 
     virtual void TxFinished(Ptr<Packet> packet);
 
     bool IsTransmitting(void);
 
-    virtual bool IsOnFrequency(double frequencyMHz);
+    virtual bool IsOnFrequency(double frequency);
 
     /**
      * Add a reception path, locked on a specific frequency.
@@ -93,7 +93,7 @@ class GatewayLoraPhy : public LoraPhy
     /**
      * Add a frequency to the list of frequencies we are listening to.
      */
-    void AddFrequency(double frequencyMHz);
+    void AddFrequency(double frequency);
 
     /**
      * A vector containing the sensitivities required to correctly decode

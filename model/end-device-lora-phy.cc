@@ -76,7 +76,7 @@ EndDeviceLoraPhy::GetTypeId(void)
 // These will then be changed by helpers.
 EndDeviceLoraPhy::EndDeviceLoraPhy()
     : m_state(SLEEP),
-      m_frequency(868.1),
+      m_frequency(868100000),
       m_sf(7)
 {
 }
@@ -109,15 +109,15 @@ EndDeviceLoraPhy::IsTransmitting(void)
 }
 
 bool
-EndDeviceLoraPhy::IsOnFrequency(double frequencyMHz)
+EndDeviceLoraPhy::IsOnFrequency(double frequency)
 {
-    return (int)(1e6 * m_frequency + .5) == (int)(1e6 * frequencyMHz + .5);
+    return (int)(m_frequency + .5) == (int)(frequency + .5);
 }
 
 void
-EndDeviceLoraPhy::SetFrequency(double frequencyMHz)
+EndDeviceLoraPhy::SetFrequency(double frequency)
 {
-    m_frequency = frequencyMHz;
+    m_frequency = frequency;
 }
 
 void

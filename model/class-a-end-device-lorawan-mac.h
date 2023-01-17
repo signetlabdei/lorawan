@@ -142,14 +142,14 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /**
      * Set the frequency that will be used for the second receive window.
      *
-     * \param frequencyMHz the Frequency.
+     * \param frequency the Frequency.
      */
-    void SetSecondReceiveWindowFrequency(double frequencyMHz);
+    void SetSecondReceiveWindowFrequency(double frequency);
 
     /**
      * Get the frequency that is used for the second receive window.
      *
-     * @return The frequency, in MHz
+     * @return The frequency, in Hz
      */
     double GetSecondReceiveWindowFrequency(void);
 

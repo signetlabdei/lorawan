@@ -63,32 +63,32 @@ class LogicalLoraChannel : public Object
     LogicalLoraChannel(double frequency, uint8_t minDataRate, uint8_t maxDataRate);
 
     /**
-     * Get the frequency (MHz).
+     * Get the frequency (Hz).
      *
      * \return The center frequency of this channel.
      */
     double GetFrequency(void) const;
 
     /**
-     * Set the reply frequency (MHz).
+     * Set the reply frequency (Hz).
      *
      * \param replyFrequency The center frequency this channel should receive replies on.
      */
     void SetReplyFrequency(double replyFrequency);
 
     /**
-     * Get the reply frequency (MHz).
+     * Get the reply frequency (Hz).
      *
      * \return The center frequency of replies of this channel.
      */
     double GetReplyFrequency(void) const;
 
     /**
-     * Set the frequency (MHz).
+     * Set the frequency (Hz).
      *
-     * \param frequencyMHz The center frequency this channel should be at.
+     * \param frequency The center frequency this channel should be at.
      */
-    // void SetFrequency (double frequencyMHz);
+    // void SetFrequency (double frequency);
 
     /**
      * Set the minimum Data Rate that is allowed on this channel.
@@ -127,12 +127,12 @@ class LogicalLoraChannel : public Object
 
   private:
     /**
-     * The central frequency for transmission of this channel, in MHz.
+     * The central frequency for transmission of this channel, in Hz.
      */
     double m_frequency;
 
     /**
-     * The central frequency on which we receive replies when using this channel, in MHz.
+     * The central frequency on which we receive replies when using this channel, in Hz.
      */
     double m_replyFrequency;
 

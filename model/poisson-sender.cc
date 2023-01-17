@@ -60,7 +60,7 @@ PoissonSender::StartApplication(void)
     m_interval->SetAttribute("Mean", DoubleValue(m_avgInterval.ToDouble(Time::S)));
 
     // Make sure we have a MAC layer
-    if (bool(m_mac) != 0)
+    if (bool(m_mac) == 0)
     {
         // Assumes there's only one device
         Ptr<LoraNetDevice> loraNetDevice = m_node->GetDevice(0)->GetObject<LoraNetDevice>();

@@ -125,7 +125,7 @@ UdpForwarder::ReceiveFromLora(Ptr<NetDevice> loraNetDevice,
     gettimeofday(&raw_time, NULL);
 
     lgw_pkt_rx_s p;
-    p.freq_hz = (uint32_t)((double)(1.0e6) * tag.GetFrequency());
+    p.freq_hz = (uint32_t) tag.GetFrequency() + 0.5;
     p.if_chain = 0;
     p.status = STAT_CRC_OK;
     p.count_us = raw_time.tv_sec * 1000000UL + raw_time.tv_usec; /* convert time in µs */
@@ -1773,7 +1773,7 @@ UdpForwarder::LgwSend(struct lgw_pkt_tx_s pkt_data)
         tag.SetSpreadingFactor(12);
         break;
     }
-    tag.SetFrequency((double)pkt_data.freq_hz / 1e6);
+    tag.SetFrequency((double)pkt_data.freq_hz);
 
     pkt = Create<Packet>(pkt_data.payload, pkt_data.size);
     pkt->AddPacketTag(tag);

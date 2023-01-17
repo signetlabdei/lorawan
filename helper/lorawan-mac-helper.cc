@@ -174,7 +174,7 @@ LorawanMacHelper::ConfigureForAlohaRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) 
     // Second receive window parameters //
     //////////////////////////////////////
     edMac->SetSecondReceiveWindowDataRate(0);
-    edMac->SetSecondReceiveWindowFrequency(869.525);
+    edMac->SetSecondReceiveWindowFrequency(869525000);
 }
 
 void
@@ -202,7 +202,7 @@ LorawanMacHelper::ConfigureForAlohaRegion(Ptr<GatewayLorawanMac> gwMac) const
             gwPhy->GetObject<GatewayLoraPhy>()->AddReceptionPath();
             receptionPaths++;
         }
-        gwPhy->AddFrequency(868.1);
+        gwPhy->AddFrequency(868100000);
     }
 }
 
@@ -216,12 +216,12 @@ LorawanMacHelper::ApplyCommonAlohaConfigurations(Ptr<LorawanMac> lorawanMac) con
     //////////////
 
     LogicalLoraChannelHelper channelHelper;
-    channelHelper.AddSubBand(868, 868.6, 1, 14);
+    channelHelper.AddSubBand(868000000, 868600000, 1, 14);
 
     //////////////////////
     // Default channels //
     //////////////////////
-    Ptr<LogicalLoraChannel> lc0 = CreateObject<LogicalLoraChannel>(868.1, 0, 5);
+    Ptr<LogicalLoraChannel> lc0 = CreateObject<LogicalLoraChannel>(868100000, 0, 5);
     channelHelper.AddChannel(0, lc0);
 
     lorawanMac->SetLogicalLoraChannelHelper(channelHelper);
@@ -271,7 +271,7 @@ LorawanMacHelper::ConfigureForEuRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) con
     // Second receive window parameters //
     //////////////////////////////////////
     edMac->SetSecondReceiveWindowDataRate(0);
-    edMac->SetSecondReceiveWindowFrequency(869.525);
+    edMac->SetSecondReceiveWindowFrequency(869525000);
 }
 
 void
@@ -293,9 +293,9 @@ LorawanMacHelper::ConfigureForEuRegion(Ptr<GatewayLorawanMac> gwMac) const
         gwPhy->ResetReceptionPaths();
 
         std::vector<double> frequencies;
-        frequencies.push_back(868.1);
-        frequencies.push_back(868.3);
-        frequencies.push_back(868.5);
+        frequencies.push_back(868100000);
+        frequencies.push_back(868300000);
+        frequencies.push_back(868500000);
 
         for (auto& f : frequencies)
         {
@@ -322,19 +322,19 @@ LorawanMacHelper::ApplyCommonEuConfigurations(Ptr<LorawanMac> lorawanMac) const
     //////////////
 
     LogicalLoraChannelHelper channelHelper;
-    channelHelper.AddSubBand(863, 865, 0.001, 14);
-    channelHelper.AddSubBand(865, 868, 0.01, 14);
-    channelHelper.AddSubBand(868, 868.6, 0.01, 14);
-    channelHelper.AddSubBand(868.7, 869.2, 0.001, 14);
-    channelHelper.AddSubBand(869.4, 869.65, 0.1, 27);
-    channelHelper.AddSubBand(869.7, 870, 0.01, 14);
+    channelHelper.AddSubBand(863000000, 865000000, 0.001, 14);
+    channelHelper.AddSubBand(865000000, 868000000, 0.01, 14);
+    channelHelper.AddSubBand(868000000, 868600000, 0.01, 14);
+    channelHelper.AddSubBand(868700000, 869200000, 0.001, 14);
+    channelHelper.AddSubBand(869400000, 869650000, 0.1, 27);
+    channelHelper.AddSubBand(869700000, 870000000, 0.01, 14);
 
     //////////////////////
     // Default channels //
     //////////////////////
-    Ptr<LogicalLoraChannel> lc0 = CreateObject<LogicalLoraChannel>(868.1, 0, 5);
-    Ptr<LogicalLoraChannel> lc1 = CreateObject<LogicalLoraChannel>(868.3, 0, 5);
-    Ptr<LogicalLoraChannel> lc2 = CreateObject<LogicalLoraChannel>(868.5, 0, 5);
+    Ptr<LogicalLoraChannel> lc0 = CreateObject<LogicalLoraChannel>(868100000, 0, 5);
+    Ptr<LogicalLoraChannel> lc1 = CreateObject<LogicalLoraChannel>(868300000, 0, 5);
+    Ptr<LogicalLoraChannel> lc2 = CreateObject<LogicalLoraChannel>(868500000, 0, 5);
     channelHelper.AddChannel(0, lc0);
     channelHelper.AddChannel(1, lc1);
     channelHelper.AddChannel(2, lc2);
@@ -343,11 +343,11 @@ LorawanMacHelper::ApplyCommonEuConfigurations(Ptr<LorawanMac> lorawanMac) const
     // Addtional channels //
     ////////////////////////
 
-    Ptr<LogicalLoraChannel> lc3 = CreateObject<LogicalLoraChannel>(867.1, 0, 5);
-    Ptr<LogicalLoraChannel> lc4 = CreateObject<LogicalLoraChannel>(867.3, 0, 5);
-    Ptr<LogicalLoraChannel> lc5 = CreateObject<LogicalLoraChannel>(867.5, 0, 5);
-    Ptr<LogicalLoraChannel> lc6 = CreateObject<LogicalLoraChannel>(867.7, 0, 5);
-    Ptr<LogicalLoraChannel> lc7 = CreateObject<LogicalLoraChannel>(867.9, 0, 5);
+    Ptr<LogicalLoraChannel> lc3 = CreateObject<LogicalLoraChannel>(867100000, 0, 5);
+    Ptr<LogicalLoraChannel> lc4 = CreateObject<LogicalLoraChannel>(867300000, 0, 5);
+    Ptr<LogicalLoraChannel> lc5 = CreateObject<LogicalLoraChannel>(867500000, 0, 5);
+    Ptr<LogicalLoraChannel> lc6 = CreateObject<LogicalLoraChannel>(867700000, 0, 5);
+    Ptr<LogicalLoraChannel> lc7 = CreateObject<LogicalLoraChannel>(867900000, 0, 5);
     // channelHelper.AddChannel (3, lc3);
     // channelHelper.AddChannel (4, lc4);
     // channelHelper.AddChannel (5, lc5);
@@ -403,7 +403,7 @@ LorawanMacHelper::ConfigureForSingleChannelRegion(Ptr<ClassAEndDeviceLorawanMac>
     // Second receive window parameters //
     //////////////////////////////////////
     edMac->SetSecondReceiveWindowDataRate(0);
-    edMac->SetSecondReceiveWindowFrequency(869.525);
+    edMac->SetSecondReceiveWindowFrequency(869525000);
 }
 
 void
@@ -425,7 +425,7 @@ LorawanMacHelper::ConfigureForSingleChannelRegion(Ptr<GatewayLorawanMac> gwMac) 
         gwPhy->ResetReceptionPaths();
 
         std::vector<double> frequencies;
-        frequencies.push_back(868.1);
+        frequencies.push_back(868100000);
 
         for (auto& f : frequencies)
         {
@@ -452,14 +452,14 @@ LorawanMacHelper::ApplyCommonSingleChannelConfigurations(Ptr<LorawanMac> lorawan
     //////////////
 
     LogicalLoraChannelHelper channelHelper;
-    channelHelper.AddSubBand(868, 868.6, 0.01, 14);
-    channelHelper.AddSubBand(868.7, 869.2, 0.001, 14);
-    channelHelper.AddSubBand(869.4, 869.65, 0.1, 27);
+    channelHelper.AddSubBand(868000000, 868600000, 0.01, 14);
+    channelHelper.AddSubBand(868700000, 869200000, 0.001, 14);
+    channelHelper.AddSubBand(869400000, 869650000, 0.1, 27);
 
     //////////////////////
     // Default channels //
     //////////////////////
-    Ptr<LogicalLoraChannel> lc0 = CreateObject<LogicalLoraChannel>(868.1, 0, 5);
+    Ptr<LogicalLoraChannel> lc0 = CreateObject<LogicalLoraChannel>(868100000, 0, 5);
     channelHelper.AddChannel(0, lc0);
 
     lorawanMac->SetLogicalLoraChannelHelper(channelHelper);
