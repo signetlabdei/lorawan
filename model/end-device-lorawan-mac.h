@@ -320,6 +320,11 @@ public:
   void OnNewChannelReq (uint8_t chIndex, double frequency, uint8_t minDataRate,
                         uint8_t maxDataRate);
 
+  /**
+   * Perform the actions that need to be taken when receiving a DlChannelReq command.
+   */
+  void OnDlChannelReq (uint8_t chIndex, double dlFrequency);
+
   ////////////////////////////////////
   // Logical channel administration //
   ////////////////////////////////////
@@ -332,7 +337,7 @@ public:
    * \param minDataRate The minimum data rate allowed on the channel.
    * \param maxDataRate The maximum data rate allowed on the channel.
    */
-  void AddLogicalChannel (uint16_t chIndex, double frequency,
+  void AddLogicalChannel (uint8_t chIndex, double frequency,
                           uint8_t minDataRate, uint8_t maxDataRate);
 
   /**
@@ -340,7 +345,7 @@ public:
    *
    * \param frequency The channel's center frequency.
    */
-  void AddLogicalChannel (uint16_t chIndex, Ptr<LogicalLoraChannel> logicalChannel);
+  void AddLogicalChannel (uint8_t chIndex, Ptr<LogicalLoraChannel> logicalChannel);
 
   /**
    * Add a subband to the logical channel helper.

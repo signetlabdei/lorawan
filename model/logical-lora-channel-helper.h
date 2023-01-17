@@ -101,12 +101,27 @@ public:
   std::vector<Ptr<LogicalLoraChannel>> GetEnabledChannelList (void);
 
   /**
+   *  Get a pointer to the LogicalLoraChannel at a certain index.
+   * 
+   *  \param chIndex The index of the channel to get.
+   */
+  Ptr<LogicalLoraChannel> GetChannel (uint8_t chIndex);
+
+  /**
    * Add a new channel at a fixed index.
    *
    * \param chIndex The index of the channel to substitute.
    * \param logicalChannel A pointer to the channel to add to the list.
    */
-  void AddChannel (uint16_t chIndex, Ptr<LogicalLoraChannel> logicalChannel);
+  void AddChannel (uint8_t chIndex, Ptr<LogicalLoraChannel> logicalChannel);
+
+  /**
+   * Set a different reply frequency of a channel.
+   *
+   * \param chIndex The index of the channel to change the reply freq. of.
+   * \param replyFrequency Frequency (MHz) to be set as reply freq.
+   */
+  void SetReplyFrequency (uint8_t chIndex, double replyFrequency);
 
   /**
    * Add a new SubBand to this helper.
@@ -132,7 +147,7 @@ public:
    *
    * \param chIndex Index of the channel we want to remove.
    */
-  void RemoveChannel (uint16_t chIndex);
+  void RemoveChannel (uint8_t chIndex);
 
   /**
    * Returns the maximum transmission power [dBm] that is allowed on a channel.
@@ -164,7 +179,7 @@ public:
    *
    * \param chIndex The index of the channel to disable.
    */
-  void DisableChannel (uint16_t chIndex);
+  void DisableChannel (uint8_t chIndex);
 
 private:
   /**
@@ -177,7 +192,7 @@ private:
    * this helper. This vector represents the node's channel mask. The first N
    * channels are the default ones for a fixed region.
    */
-  std::map<uint16_t, Ptr<LogicalLoraChannel>> m_channelList;
+  std::map<uint8_t, Ptr<LogicalLoraChannel>> m_channelList;
 
   Time m_lastTxDuration; //!< Duration of the last frame (seconds).
 

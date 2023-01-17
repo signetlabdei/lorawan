@@ -76,6 +76,14 @@ LogicalLoraChannelHelper::GetEnabledChannelList (void)
   return vector;
 }
 
+Ptr<LogicalLoraChannel> 
+LogicalLoraChannelHelper::GetChannel (uint8_t chIndex)
+{
+  NS_LOG_FUNCTION (this);
+
+  return (m_channelList.count (chIndex))? m_channelList.at (chIndex) : 0;
+}
+
 Ptr<SubBand>
 LogicalLoraChannelHelper::GetSubBandFromChannel (const Ptr<LogicalLoraChannel> channel)
 {
@@ -97,7 +105,7 @@ LogicalLoraChannelHelper::GetSubBandFromFrequency (double frequency)
 }
 
 void
-LogicalLoraChannelHelper::AddChannel (uint16_t chIndex, Ptr<LogicalLoraChannel> logicalChannel)
+LogicalLoraChannelHelper::AddChannel (uint8_t chIndex, Ptr<LogicalLoraChannel> logicalChannel)
 {
   NS_LOG_FUNCTION (this << (unsigned) chIndex << logicalChannel);
   m_channelList[chIndex] = logicalChannel;
@@ -121,7 +129,7 @@ LogicalLoraChannelHelper::AddSubBand (Ptr<SubBand> subBand)
 }
 
 void
-LogicalLoraChannelHelper::RemoveChannel (uint16_t chIndex)
+LogicalLoraChannelHelper::RemoveChannel (uint8_t chIndex)
 {
   // Search and remove the channel from the list
   m_channelList.erase (chIndex);
@@ -199,7 +207,7 @@ LogicalLoraChannelHelper::GetTxPowerForChannel (Ptr<LogicalLoraChannel> logicalC
 }
 
 void
-LogicalLoraChannelHelper::DisableChannel (uint16_t chIndex)
+LogicalLoraChannelHelper::DisableChannel (uint8_t chIndex)
 {
   NS_LOG_FUNCTION (this << (unsigned) chIndex);
   m_channelList.at (chIndex)->DisableForUplink ();

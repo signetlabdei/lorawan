@@ -895,7 +895,7 @@ NewChannelReq::Deserialize (Buffer::Iterator &start)
   encodedFrequency |= uint32_t (start.ReadU8 ());
   encodedFrequency |= uint32_t (start.ReadU8 ()) << 8;
   encodedFrequency |= uint32_t (start.ReadU8 ()) << 16;
-  m_frequency = double (encodedFrequency) / 1.0e4;
+  m_frequency = double (encodedFrequency) * 100;
   uint8_t dataRateByte = start.ReadU8 ();
   m_maxDataRate = dataRateByte >> 4;
   m_minDataRate = dataRateByte & 0xf;
@@ -909,7 +909,10 @@ NewChannelReq::Print (std::ostream &os) const
   NS_LOG_FUNCTION_NOARGS ();
 
   os << "NewChannelReq" << std::endl;
-
+  os << "ChIndex: " << (unsigned) m_chIndex << std::endl;
+  os << "Frequency: " << m_frequency << std::endl;
+  os << "MaxDR: " << (unsigned) m_maxDataRate << std::endl;
+  os << "MinDR: " << (unsigned) m_minDataRate << std::endl;
 }
 
 uint8_t
@@ -1108,46 +1111,6 @@ RxTimingSetupAns::Print (std::ostream &os) const
 }
 
 //////////////////
-// DlChannelAns //
-//////////////////
-
-DlChannelAns::DlChannelAns ()
-{
-  NS_LOG_FUNCTION (this);
-
-  m_commandType = DEV_STATUS_REQ;
-  m_serializedSize = 1;
-}
-
-void
-DlChannelAns::Serialize (Buffer::Iterator &start) const
-{
-  NS_LOG_FUNCTION_NOARGS ();
-
-  // Write the CID
-  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
-}
-
-uint8_t
-DlChannelAns::Deserialize (Buffer::Iterator &start)
-{
-  NS_LOG_FUNCTION_NOARGS ();
-
-  // Consume the CID
-  start.ReadU8 ();
-
-  return m_serializedSize;
-}
-
-void
-DlChannelAns::Print (std::ostream &os) const
-{
-  NS_LOG_FUNCTION_NOARGS ();
-
-  os << "DlChannelAns" << std::endl;
-}
-
-//////////////////
 // TxParamSetupReq //
 //////////////////
 
@@ -1225,6 +1188,147 @@ TxParamSetupAns::Print (std::ostream &os) const
   NS_LOG_FUNCTION_NOARGS ();
 
   os << "TxParamSetupAns" << std::endl;
+}
+
+//////////////////
+// DlChannelReq //
+//////////////////
+
+DlChannelReq::DlChannelReq ()
+{
+  NS_LOG_FUNCTION (this);
+
+  m_commandType = DL_CHANNEL_REQ;
+  m_serializedSize = 5;
+}
+
+DlChannelReq::DlChannelReq (uint8_t chIndex, double frequency) :
+  m_chIndex (chIndex),
+  m_frequency (frequency)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_commandType = DL_CHANNEL_REQ;
+  m_serializedSize = 5;
+}
+
+void
+DlChannelReq::Serialize (Buffer::Iterator &start) const
+{
+  NS_LOG_FUNCTION_NOARGS ();
+
+  // Write the CID
+  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
+
+  start.WriteU8 (m_chIndex);
+  uint32_t encodedFrequency = uint32_t (m_frequency / 100);
+  start.WriteU8 ((encodedFrequency & 0xff0000) >> 16);
+  start.WriteU8 ((encodedFrequency & 0xff00) >> 8);
+  start.WriteU8 (encodedFrequency & 0xff);
+}
+
+uint8_t
+DlChannelReq::Deserialize (Buffer::Iterator &start)
+{
+  NS_LOG_FUNCTION_NOARGS ();
+
+  // Consume the CID
+  start.ReadU8 ();
+  // Read the data
+  m_chIndex = start.ReadU8 ();
+  uint32_t encodedFrequency = 0;
+  // Frequency is in big endian
+  encodedFrequency |= uint32_t (start.ReadU8 ());
+  encodedFrequency |= uint32_t (start.ReadU8 ()) << 8;
+  encodedFrequency |= uint32_t (start.ReadU8 ()) << 16;
+  m_frequency = double (encodedFrequency) * 100;
+
+  return m_serializedSize;
+}
+
+void
+DlChannelReq::Print (std::ostream &os) const
+{
+  NS_LOG_FUNCTION_NOARGS ();
+
+  os << "DlChannelReq" << std::endl;
+  os << "ChIndex: " << (unsigned) m_chIndex << std::endl;
+  os << "Frequency: " << m_frequency << std::endl;
+}
+
+uint8_t
+DlChannelReq::GetChannelIndex (void)
+{
+  NS_LOG_FUNCTION_NOARGS ();
+
+  return m_chIndex;
+}
+
+double
+DlChannelReq::GetFrequency (void)
+{
+  NS_LOG_FUNCTION_NOARGS ();
+
+  return m_frequency;
+}
+
+//////////////////
+// DlChannelAns //
+//////////////////
+
+DlChannelAns::DlChannelAns ()
+{
+  NS_LOG_FUNCTION (this);
+
+  m_commandType = DL_CHANNEL_ANS;
+  m_serializedSize = 2;
+}
+
+DlChannelAns::DlChannelAns (bool uplinkFrequencyExists, bool channelFrequencyOk) :
+  m_uplinkFrequencyExists (uplinkFrequencyExists),
+  m_channelFrequencyOk (channelFrequencyOk)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_commandType = DL_CHANNEL_ANS;
+  m_serializedSize = 2;
+}
+
+void
+DlChannelAns::Serialize (Buffer::Iterator &start) const
+{
+  NS_LOG_FUNCTION_NOARGS ();
+
+  // Write the CID
+  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
+
+  start.WriteU8 ((uint8_t (m_uplinkFrequencyExists) << 1) |
+                 uint8_t (m_channelFrequencyOk));
+}
+
+uint8_t
+DlChannelAns::Deserialize (Buffer::Iterator &start)
+{
+  NS_LOG_FUNCTION_NOARGS ();
+
+  // Consume the CID
+  start.ReadU8 ();
+  // Read the data
+  uint8_t byte = start.ReadU8 ();
+  m_uplinkFrequencyExists = (byte & 0b10) >> 1;
+  m_channelFrequencyOk = (byte & 0b1);
+
+  return m_serializedSize;
+}
+
+void
+DlChannelAns::Print (std::ostream &os) const
+{
+  NS_LOG_FUNCTION_NOARGS ();
+
+  os << "DlChannelAns" << std::endl;
+  os << "UplinkFrequencyExists: " << m_uplinkFrequencyExists << std::endl;
+  os << "ChannelFrequencyOk: " << m_channelFrequencyOk << std::endl;
 }
 
 }

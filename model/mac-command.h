@@ -469,7 +469,7 @@ public:
    * Constructor providing initialization of all parameters.
    *
    * \param chIndex The index of the channel this command wants to operate on.
-   * \param frequency The new frequency for this channel.
+   * \param frequency The new frequency for this channel, in Hz.
    * \param minDataRate The minimum data rate allowed on this channel.
    * \param maxDataRate The minimum data rate allowed on this channel.
    */
@@ -596,6 +596,34 @@ private:
 };
 
 /**
+ * Implementation of the DlChannelReq LoRaWAN MAC command.
+ */
+class DlChannelReq : public MacCommand
+{
+public:
+  DlChannelReq ();
+
+  /**
+   * Constructor providing initialization of all parameters.
+   *
+   * \param chIndex The index of the channel this command wants to operate on.
+   * \param frequency The new downlink frequency for this channel, in Hz.
+   */
+  DlChannelReq (uint8_t chIndex, double frequency);
+
+  virtual void Serialize (Buffer::Iterator &start) const;
+  virtual uint8_t Deserialize (Buffer::Iterator &start);
+  virtual void Print (std::ostream &os) const;
+
+  uint8_t GetChannelIndex (void);
+  double GetFrequency (void);
+
+private:
+  uint8_t m_chIndex;
+  double m_frequency;
+};
+
+/**
  * Implementation of the DlChannelAns LoRaWAN MAC command.
  */
 class DlChannelAns : public MacCommand
@@ -603,12 +631,25 @@ class DlChannelAns : public MacCommand
 public:
   DlChannelAns ();
 
+  /**
+   * Constructor providing initialization of all parameters.
+   *
+   * \param uplinkFrequencyExists Whether the uplink frequency exists for the channel.
+   * \param channelFrequencyOk Whether the downlink frequency can be used by this device.
+   */
+  DlChannelAns (bool uplinkFrequencyExists, bool channelFrequencyOk);
+
   virtual void Serialize (Buffer::Iterator &start) const;
   virtual uint8_t Deserialize (Buffer::Iterator &start);
   virtual void Print (std::ostream &os) const;
 
 private:
+  bool m_uplinkFrequencyExists;
+  bool m_channelFrequencyOk;
 };
+
+
+
 }
 
 }

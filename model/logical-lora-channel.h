@@ -66,6 +66,20 @@ public:
   double GetFrequency (void) const;
 
   /**
+   * Set the reply frequency (MHz).
+   *
+   * \param replyFrequencyMHz The center frequency this channel should receive replies on.
+   */
+  void SetReplyFrequency (double replyFrequencyMHz);
+
+  /**
+   * Get the reply frequency (MHz).
+   *
+   * \return The center frequency of replies of this channel.
+   */
+  double GetReplyFrequency (void) const;
+
+  /**
    * Set the frequency (MHz).
    *
    * \param frequencyMHz The center frequency this channel should be at.
@@ -109,9 +123,14 @@ public:
 
 private:
   /**
-   * The central frequency of this channel, in MHz.
+   * The central frequency for transmission of this channel, in MHz.
    */
   double m_frequency;
+
+  /**
+   * The central frequency on which we receive replies when using this channel, in MHz.
+   */
+  double m_replyFrequency;
 
   /**
    * The minimum Data Rate that is allowed on this channel.

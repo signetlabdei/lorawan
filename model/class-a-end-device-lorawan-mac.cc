@@ -128,7 +128,7 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
   //////////////////////////////
 
   // Switch the PHY to the channel so that it will listen here for downlink
-  m_phy->GetObject<EndDeviceLoraPhy> ()->SetFrequency (txChannel->GetFrequency ());
+  m_phy->GetObject<EndDeviceLoraPhy> ()->SetFrequency (txChannel->GetReplyFrequency());
 
   // Instruct the PHY on the right Spreading Factor to listen for during the window
   // create a SetReplyDataRate function?

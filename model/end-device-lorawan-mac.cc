@@ -444,7 +444,7 @@ EndDeviceLorawanMac::ParseCommands (LoraFrameHeader frameHeader)
             Ptr<NewChannelReq> newChannelReq = (*it)->GetObject<NewChannelReq> ();
 
             // Call the appropriate function to take action
-            OnNewChannelReq (newChannelReq->GetChannelIndex (), newChannelReq->GetFrequency (),
+            OnNewChannelReq (newChannelReq->GetChannelIndex (), newChannelReq->GetFrequency () / 1e6,
                              newChannelReq->GetMinDataRate (), newChannelReq->GetMaxDataRate ());
 
             break;
@@ -456,6 +456,14 @@ EndDeviceLorawanMac::ParseCommands (LoraFrameHeader frameHeader)
             break;
           }
           case (DL_CHANNEL_REQ): {
+            NS_LOG_DEBUG ("Detected a DlChannelReq command.");
+
+            // Cast the command
+            auto dlChannelReq = (*it)->GetObject<DlChannelReq> ();
+
+            // Call the appropriate function to take action
+            OnDlChannelReq (dlChannelReq->GetChannelIndex (), dlChannelReq->GetFrequency () / 1e6);
+
             break;
           }
           default: {
@@ -607,7 +615,7 @@ EndDeviceLorawanMac::Shuffle (std::vector<Ptr<LogicalLoraChannel>> vector)
   int size = vector.size ();
   for (int i = 0; i < size; ++i)
     {
-      uint16_t random = m_uniformRV->GetInteger (0, size - 1);
+      uint8_t random = m_uniformRV->GetInteger (0, size - 1);
       auto tmp = vector.at (random);
       vector.at (random) = vector.at (i);
       vector.at (i) = tmp;
@@ -873,7 +881,7 @@ EndDeviceLorawanMac::OnNewChannelReq (uint8_t chIndex, double frequency, uint8_t
 }
 
 void
-EndDeviceLorawanMac::AddLogicalChannel (uint16_t chIndex, Ptr<LogicalLoraChannel> logicalChannel)
+EndDeviceLorawanMac::AddLogicalChannel (uint8_t chIndex, Ptr<LogicalLoraChannel> logicalChannel)
 {
   NS_LOG_FUNCTION (this << logicalChannel);
 
@@ -881,7 +889,7 @@ EndDeviceLorawanMac::AddLogicalChannel (uint16_t chIndex, Ptr<LogicalLoraChannel
 }
 
 void
-EndDeviceLorawanMac::AddLogicalChannel (uint16_t chIndex, double frequency, uint8_t minDataRate,
+EndDeviceLorawanMac::AddLogicalChannel (uint8_t chIndex, double frequency, uint8_t minDataRate,
                                         uint8_t maxDataRate)
 {
   NS_LOG_FUNCTION (this << unsigned (chIndex) << frequency << unsigned (minDataRate)
@@ -889,6 +897,24 @@ EndDeviceLorawanMac::AddLogicalChannel (uint16_t chIndex, double frequency, uint
 
   AddLogicalChannel (chIndex,
                      CreateObject<LogicalLoraChannel> (frequency, minDataRate, maxDataRate));
+}
+
+void 
+EndDeviceLorawanMac::OnDlChannelReq (uint8_t chIndex, double dlFrequency)
+{
+  NS_LOG_FUNCTION (this << unsigned (chIndex) << frequency);
+
+  // Check whether the uplink frequency exists in this channel
+  bool uplinkFrequencyExists = bool (m_channelHelper.GetChannel (chIndex));
+
+  // Check whether the downlink frequency can be used by this device
+  bool channelFrequencyOk = bool (m_channelHelper.GetSubBandFromFrequency (dlFrequency));
+
+  if (uplinkFrequencyExists && channelFrequencyOk)
+    m_channelHelper.SetReplyFrequency (chIndex, dlFrequency);
+
+  NS_LOG_INFO ("Adding DlChannelAns reply");
+  m_macCommandList.push_back (CreateObject<DlChannelAns> (uplinkFrequencyExists, channelFrequencyOk));
 }
 
 void

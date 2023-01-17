@@ -39,6 +39,7 @@ LogicalLoraChannel::GetTypeId (void)
 
 LogicalLoraChannel::LogicalLoraChannel () :
   m_frequency (0),
+  m_replyFrequency (0),
   m_minDataRate (0),
   m_maxDataRate (5),
   m_enabledForUplink (true)
@@ -53,6 +54,7 @@ LogicalLoraChannel::~LogicalLoraChannel ()
 
 LogicalLoraChannel::LogicalLoraChannel (double frequency) :
   m_frequency (frequency),
+  m_replyFrequency (frequency),
   m_enabledForUplink (true)
 {
   NS_LOG_FUNCTION (this);
@@ -61,6 +63,7 @@ LogicalLoraChannel::LogicalLoraChannel (double frequency) :
 LogicalLoraChannel::LogicalLoraChannel (double frequency, uint8_t minDataRate,
                                         uint8_t maxDataRate) :
   m_frequency (frequency),
+  m_replyFrequency (frequency),
   m_minDataRate (minDataRate),
   m_maxDataRate (maxDataRate),
   m_enabledForUplink (true)
@@ -72,6 +75,18 @@ double
 LogicalLoraChannel::GetFrequency (void) const
 {
   return m_frequency;
+}
+
+void
+LogicalLoraChannel::SetReplyFrequency (double replyFrequencyMHz)
+{
+  m_replyFrequency = replyFrequencyMHz;
+}
+
+double
+LogicalLoraChannel::GetReplyFrequency (void) const
+{
+  return m_replyFrequency;
 }
 
 void
