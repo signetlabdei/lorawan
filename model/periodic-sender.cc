@@ -112,7 +112,6 @@ PeriodicSender::SendPacket(void)
         packet = Create<Packet>(m_basePktSize);
     }
     m_mac->Send(packet);
-    std::cout << std::flush << "HELLO BITCHES" << std::endl;
 
     // Schedule the next SendPacket event
     m_sendEvent = Simulator::Schedule(m_avgInterval, &PeriodicSender::SendPacket, this);
