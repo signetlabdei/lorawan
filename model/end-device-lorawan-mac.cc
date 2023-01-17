@@ -541,7 +541,7 @@ EndDeviceLorawanMac::ApplyNecessaryOptions(LoraFrameHeader& frameHeader)
     std::list<Ptr<MacCommand>> tmpCmdList;
 
     // Add listed MAC commands to header
-    for (const auto& command : tmpCmdList)
+    for (const auto& command : m_macCommandList)
     {
         auto type = command->GetCommandType();
         NS_LOG_INFO("Applying a MAC Command of CID "
