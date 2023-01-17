@@ -21,13 +21,15 @@
 #ifndef NETWORK_CONTROLLER_H
 #define NETWORK_CONTROLLER_H
 
+#include "ns3/network-controller-components.h"
+#include "ns3/network-status.h"
 #include "ns3/object.h"
 #include "ns3/packet.h"
-#include "ns3/network-status.h"
-#include "ns3/network-controller-components.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
 class NetworkStatus;
 class NetworkControllerComponent;
@@ -39,37 +41,37 @@ class NetworkControllerComponent;
  */
 class NetworkController : public Object
 {
-public:
-  static TypeId GetTypeId (void);
+  public:
+    static TypeId GetTypeId(void);
 
-  NetworkController ();
-  NetworkController (Ptr<NetworkStatus> networkStatus);
-  virtual ~NetworkController ();
+    NetworkController();
+    NetworkController(Ptr<NetworkStatus> networkStatus);
+    virtual ~NetworkController();
 
-  /**
-   * Add a new NetworkControllerComponent
-   */
-  void Install (Ptr<NetworkControllerComponent> component);
+    /**
+     * Add a new NetworkControllerComponent
+     */
+    void Install(Ptr<NetworkControllerComponent> component);
 
-  /**
-   * Method that is called by the NetworkServer when a new packet is received.
-   *
-   * \param packet The newly received packet.
-   */
-  void OnNewPacket (Ptr<Packet const> packet);
+    /**
+     * Method that is called by the NetworkServer when a new packet is received.
+     *
+     * \param packet The newly received packet.
+     */
+    void OnNewPacket(Ptr<const Packet> packet);
 
-  /**
-   * Method that is called by the NetworkScheduler just before sending a reply
-   * to a certain End Device.
-   */
-  void BeforeSendingReply (Ptr<EndDeviceStatus> endDeviceStatus);
+    /**
+     * Method that is called by the NetworkScheduler just before sending a reply
+     * to a certain End Device.
+     */
+    void BeforeSendingReply(Ptr<EndDeviceStatus> endDeviceStatus);
 
-private:
-  Ptr<NetworkStatus> m_status;
-  std::list<Ptr<NetworkControllerComponent> > m_components;
+  private:
+    Ptr<NetworkStatus> m_status;
+    std::list<Ptr<NetworkControllerComponent>> m_components;
 };
 
-} /* namespace ns3 */
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* NETWORK_CONTROLLER_H */

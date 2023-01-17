@@ -19,90 +19,92 @@
  */
 
 #include "ns3/one-shot-sender.h"
+
 #include "ns3/class-a-end-device-lorawan-mac.h"
-#include "ns3/pointer.h"
-#include "ns3/log.h"
 #include "ns3/double.h"
-#include "ns3/string.h"
+#include "ns3/log.h"
 #include "ns3/lora-net-device.h"
+#include "ns3/pointer.h"
+#include "ns3/string.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
-NS_LOG_COMPONENT_DEFINE ("OneShotSender");
+NS_LOG_COMPONENT_DEFINE("OneShotSender");
 
-NS_OBJECT_ENSURE_REGISTERED (OneShotSender);
+NS_OBJECT_ENSURE_REGISTERED(OneShotSender);
 
 TypeId
-OneShotSender::GetTypeId (void)
+OneShotSender::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::OneShotSender")
-    .SetParent<Application> ()
-    .AddConstructor<OneShotSender> ()
-    .SetGroupName ("lorawan");
-  return tid;
+    static TypeId tid = TypeId("ns3::OneShotSender")
+                            .SetParent<Application>()
+                            .AddConstructor<OneShotSender>()
+                            .SetGroupName("lorawan");
+    return tid;
 }
 
-OneShotSender::OneShotSender ()
+OneShotSender::OneShotSender()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 }
 
-OneShotSender::OneShotSender (Time sendTime)
-  : m_sendTime (sendTime)
+OneShotSender::OneShotSender(Time sendTime)
+    : m_sendTime(sendTime)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 }
 
-OneShotSender::~OneShotSender ()
+OneShotSender::~OneShotSender()
 {
-  NS_LOG_FUNCTION_NOARGS ();
-}
-
-void
-OneShotSender::SetSendTime (Time sendTime)
-{
-  NS_LOG_FUNCTION (this << sendTime);
-
-  m_sendTime = sendTime;
+    NS_LOG_FUNCTION_NOARGS();
 }
 
 void
-OneShotSender::SendPacket (void)
+OneShotSender::SetSendTime(Time sendTime)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this << sendTime);
 
-  // Create and send a new packet
-  Ptr<Packet> packet = Create<Packet> (10);
-  m_mac->Send (packet);
+    m_sendTime = sendTime;
 }
 
 void
-OneShotSender::StartApplication (void)
+OneShotSender::SendPacket(void)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  // Make sure we have a MAC layer
-  if (bool (m_mac) != 0)
+    // Create and send a new packet
+    Ptr<Packet> packet = Create<Packet>(10);
+    m_mac->Send(packet);
+}
+
+void
+OneShotSender::StartApplication(void)
+{
+    NS_LOG_FUNCTION(this);
+
+    // Make sure we have a MAC layer
+    if (bool(m_mac) != 0)
     {
-      // Assumes there's only one device
-      Ptr<LoraNetDevice> loraNetDevice = m_node->GetDevice (0)->GetObject<LoraNetDevice> ();
+        // Assumes there's only one device
+        Ptr<LoraNetDevice> loraNetDevice = m_node->GetDevice(0)->GetObject<LoraNetDevice>();
 
-      m_mac = loraNetDevice->GetMac ();
-      NS_ASSERT (bool (m_mac) != 0);
+        m_mac = loraNetDevice->GetMac();
+        NS_ASSERT(bool(m_mac) != 0);
     }
 
-  // Schedule the next SendPacket event
-  Simulator::Cancel (m_sendEvent);
-  m_sendEvent = Simulator::Schedule (m_sendTime, &OneShotSender::SendPacket,
-                                     this);
+    // Schedule the next SendPacket event
+    Simulator::Cancel(m_sendEvent);
+    m_sendEvent = Simulator::Schedule(m_sendTime, &OneShotSender::SendPacket, this);
 }
 
 void
-OneShotSender::StopApplication (void)
+OneShotSender::StopApplication(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  Simulator::Cancel (m_sendEvent);
+    NS_LOG_FUNCTION_NOARGS();
+    Simulator::Cancel(m_sendEvent);
 }
-}
-}
+} // namespace lorawan
+} // namespace ns3

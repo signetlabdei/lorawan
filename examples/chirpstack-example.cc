@@ -1,28 +1,29 @@
 /*
  * This program produces real-time traffic to an external chirpstack server.
- * Key elements are preceded by a comment with lots of dashes ( ///////////// ) 
+ * Key elements are preceded by a comment with lots of dashes ( ///////////// )
  */
 
 // ns3 imports
 #include "ns3/core-module.h"
-#include "ns3/okumura-hata-propagation-loss-model.h"
-#include "ns3/propagation-delay-model.h"
-#include "ns3/mobility-helper.h"
 #include "ns3/csma-helper.h"
 #include "ns3/internet-stack-helper.h"
 #include "ns3/ipv4-address-helper.h"
 #include "ns3/ipv4-global-routing-helper.h"
+#include "ns3/mobility-helper.h"
+#include "ns3/okumura-hata-propagation-loss-model.h"
+#include "ns3/propagation-delay-model.h"
 #include "ns3/tap-bridge-helper.h"
 
 // lorawan imports
+#include "utilities.cc"
+
 #include "ns3/chirpstack-helper.h"
 #include "ns3/hex-grid-position-allocator.h"
-#include "ns3/range-position-allocator.h"
 #include "ns3/lora-helper.h"
-#include "ns3/udp-forwarder-helper.h"
 #include "ns3/periodic-sender-helper.h"
+#include "ns3/range-position-allocator.h"
+#include "ns3/udp-forwarder-helper.h"
 #include "ns3/urban-traffic-helper.h"
-#include "utilities.cc"
 
 // cpp imports
 #include <unordered_map>
@@ -30,260 +31,261 @@
 using namespace ns3;
 using namespace lorawan;
 
-NS_LOG_COMPONENT_DEFINE ("ChirpstackExample");
+NS_LOG_COMPONENT_DEFINE("ChirpstackExample");
 
 /* Global declaration of connection helper for signal handling */
 ChirpstackHelper csHelper;
 
 void
-OnStateChange (EndDeviceLoraPhy::State oldS, EndDeviceLoraPhy::State newS)
+OnStateChange(EndDeviceLoraPhy::State oldS, EndDeviceLoraPhy::State newS)
 {
-  NS_LOG_DEBUG ("State change " << stateMap.at (oldS) << " -> " << stateMap.at (newS));
+    NS_LOG_DEBUG("State change " << stateMap.at(oldS) << " -> " << stateMap.at(newS));
 }
 
 int
-main (int argc, char *argv[])
+main(int argc, char* argv[])
 {
-  /***************************
-   *  Simulation parameters  *
-   ***************************/
+    /***************************
+     *  Simulation parameters  *
+     ***************************/
 
-  double periods = 24; // H * D
-  int gatewayRings = 1;
-  double range = 2540.25; // Max range for downlink (!) coverage probability > 0.98 (with okumura)
-  int nDevices = 1;
-  std::string sir = "GOURSAUD";
-  bool initializeSF = true;
-  bool file = false; // Warning: will produce a file for each gateway
-  bool log = false;
+    double periods = 24; // H * D
+    int gatewayRings = 1;
+    double range = 2540.25; // Max range for downlink (!) coverage probability > 0.98 (with okumura)
+    int nDevices = 1;
+    std::string sir = "GOURSAUD";
+    bool initializeSF = true;
+    bool file = false; // Warning: will produce a file for each gateway
+    bool log = false;
 
-  /* Expose parameters to command line */
-  {
-    CommandLine cmd (__FILE__);
-    cmd.AddValue ("periods", "Number of periods to simulate (1 period = 1 hour)", periods);
-    cmd.AddValue ("rings", "Number of gateway rings in hexagonal topology", gatewayRings);
-    cmd.AddValue ("range", "Radius of the device allocation disk around a gateway)", range);
-    cmd.AddValue ("devices", "Number of end devices to include in the simulation", nDevices);
-    cmd.AddValue ("sir", "Signal to Interference Ratio matrix used for interference", sir);
-    cmd.AddValue ("initSF", "Whether to initialize the SFs", initializeSF);
-    cmd.AddValue ("adr", "ns3::EndDeviceLorawanMac::DRControl");
-    cmd.AddValue ("file", "Whether to enable .pcap tracing on gateways", file);
-    cmd.AddValue ("log", "Whether to enable logs", log);
-    cmd.Parse (argc, argv);
-  }
-
-  /* Apply global configurations */
-  ///////////////// Real-time operation, necessary to interact with the outside world.
-  GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
-  GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true));
-  Config::SetDefault ("ns3::EndDeviceLorawanMac::EnableCryptography", BooleanValue (true));
-
-  /* Logging options */
-  if (log)
+    /* Expose parameters to command line */
     {
-      //!> Requirement: build ns3 with debug option
-      LogComponentEnable ("UdpForwarder", LOG_LEVEL_DEBUG);
-      LogComponentEnable ("ClassAEndDeviceLorawanMac", LOG_LEVEL_INFO);
-      LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_INFO);
-      //LogComponentEnable ("LoraFrameHeader", LOG_LEVEL_INFO);
-      /* Monitor state changes of devices */
-      LogComponentEnable ("ChirpstackExample", LOG_LEVEL_ALL);
-      /* Formatting */
-      LogComponentEnableAll (LOG_PREFIX_FUNC);
-      LogComponentEnableAll (LOG_PREFIX_NODE);
-      LogComponentEnableAll (LOG_PREFIX_TIME);
+        CommandLine cmd(__FILE__);
+        cmd.AddValue("periods", "Number of periods to simulate (1 period = 1 hour)", periods);
+        cmd.AddValue("rings", "Number of gateway rings in hexagonal topology", gatewayRings);
+        cmd.AddValue("range", "Radius of the device allocation disk around a gateway)", range);
+        cmd.AddValue("devices", "Number of end devices to include in the simulation", nDevices);
+        cmd.AddValue("sir", "Signal to Interference Ratio matrix used for interference", sir);
+        cmd.AddValue("initSF", "Whether to initialize the SFs", initializeSF);
+        cmd.AddValue("adr", "ns3::EndDeviceLorawanMac::DRControl");
+        cmd.AddValue("file", "Whether to enable .pcap tracing on gateways", file);
+        cmd.AddValue("log", "Whether to enable logs", log);
+        cmd.Parse(argc, argv);
     }
 
-  /*******************
-   *  Radio Channel  *
-   *******************/
+    /* Apply global configurations */
+    ///////////////// Real-time operation, necessary to interact with the outside world.
+    GlobalValue::Bind("SimulatorImplementationType", StringValue("ns3::RealtimeSimulatorImpl"));
+    GlobalValue::Bind("ChecksumEnabled", BooleanValue(true));
+    Config::SetDefault("ns3::EndDeviceLorawanMac::EnableCryptography", BooleanValue(true));
 
-  Ptr<OkumuraHataPropagationLossModel> loss;
-  Ptr<NakagamiPropagationLossModel> rayleigh;
-  Ptr<LoraChannel> channel;
-  {
-    LoraInterferenceHelper::collisionMatrix = sirMap.at (sir);
+    /* Logging options */
+    if (log)
+    {
+        //!> Requirement: build ns3 with debug option
+        LogComponentEnable("UdpForwarder", LOG_LEVEL_DEBUG);
+        LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_INFO);
+        LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_INFO);
+        // LogComponentEnable ("LoraFrameHeader", LOG_LEVEL_INFO);
+        /* Monitor state changes of devices */
+        LogComponentEnable("ChirpstackExample", LOG_LEVEL_ALL);
+        /* Formatting */
+        LogComponentEnableAll(LOG_PREFIX_FUNC);
+        LogComponentEnableAll(LOG_PREFIX_NODE);
+        LogComponentEnableAll(LOG_PREFIX_TIME);
+    }
 
-    // Delay obtained from distance and speed of light in vacuum (constant)
-    Ptr<PropagationDelayModel> delay = CreateObject<ConstantSpeedPropagationDelayModel> ();
+    /*******************
+     *  Radio Channel  *
+     *******************/
 
-    // This one is empirical and it encompasses average loss due to distance, shadowing (i.e. obstacles), weather, height
-    loss = CreateObject<OkumuraHataPropagationLossModel> ();
-    loss->SetAttribute ("Frequency", DoubleValue (868000000.0));
-    loss->SetAttribute ("Environment", EnumValue (EnvironmentType::UrbanEnvironment));
-    loss->SetAttribute ("CitySize", EnumValue (CitySize::LargeCity));
+    Ptr<OkumuraHataPropagationLossModel> loss;
+    Ptr<NakagamiPropagationLossModel> rayleigh;
+    Ptr<LoraChannel> channel;
+    {
+        LoraInterferenceHelper::collisionMatrix = sirMap.at(sir);
 
-    // Here we can add variance to the propagation model with multipath Rayleigh fading
-    rayleigh = CreateObject<NakagamiPropagationLossModel> ();
-    rayleigh->SetAttribute ("m0", DoubleValue (1.0));
-    rayleigh->SetAttribute ("m1", DoubleValue (1.0));
-    rayleigh->SetAttribute ("m2", DoubleValue (1.0));
+        // Delay obtained from distance and speed of light in vacuum (constant)
+        Ptr<PropagationDelayModel> delay = CreateObject<ConstantSpeedPropagationDelayModel>();
 
-    channel = CreateObject<LoraChannel> (loss, delay);
-  }
+        // This one is empirical and it encompasses average loss due to distance, shadowing (i.e.
+        // obstacles), weather, height
+        loss = CreateObject<OkumuraHataPropagationLossModel>();
+        loss->SetAttribute("Frequency", DoubleValue(868000000.0));
+        loss->SetAttribute("Environment", EnumValue(EnvironmentType::UrbanEnvironment));
+        loss->SetAttribute("CitySize", EnumValue(CitySize::LargeCity));
 
-  /*************************
-   *  Position & mobility  *
-   *************************/
+        // Here we can add variance to the propagation model with multipath Rayleigh fading
+        rayleigh = CreateObject<NakagamiPropagationLossModel>();
+        rayleigh->SetAttribute("m0", DoubleValue(1.0));
+        rayleigh->SetAttribute("m1", DoubleValue(1.0));
+        rayleigh->SetAttribute("m2", DoubleValue(1.0));
 
-  MobilityHelper mobilityEd, mobilityGw;
-  Ptr<RangePositionAllocator> rangeAllocator;
-  {
-    // Gateway mobility
-    mobilityGw.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
-    // In hex tiling, distance = range * cos (pi/6) * 2 to have no holes
-    double gatewayDistance = range * std::cos (M_PI / 6) * 2;
-    auto hexAllocator = CreateObject<HexGridPositionAllocator> ();
-    hexAllocator->SetAttribute ("Z", DoubleValue (15.0));
-    hexAllocator->SetAttribute ("distance", DoubleValue (gatewayDistance));
-    mobilityGw.SetPositionAllocator (hexAllocator);
+        channel = CreateObject<LoraChannel>(loss, delay);
+    }
 
-    // End Device mobility
-    mobilityEd.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
-    // We define rho to generalize the allocation disk for any number of gateway rings
-    double rho = range + 2.0 * gatewayDistance * (gatewayRings - 1);
-    rangeAllocator = CreateObject<RangePositionAllocator> ();
-    rangeAllocator->SetAttribute ("rho", DoubleValue (rho));
-    rangeAllocator->SetAttribute ("Z", DoubleValue (15.0));
-    rangeAllocator->SetAttribute ("range", DoubleValue (range));
-    mobilityEd.SetPositionAllocator (rangeAllocator);
-  }
+    /*************************
+     *  Position & mobility  *
+     *************************/
 
-  /******************
-   *  Create Nodes  *
-   ******************/
+    MobilityHelper mobilityEd, mobilityGw;
+    Ptr<RangePositionAllocator> rangeAllocator;
+    {
+        // Gateway mobility
+        mobilityGw.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+        // In hex tiling, distance = range * cos (pi/6) * 2 to have no holes
+        double gatewayDistance = range * std::cos(M_PI / 6) * 2;
+        auto hexAllocator = CreateObject<HexGridPositionAllocator>();
+        hexAllocator->SetAttribute("Z", DoubleValue(15.0));
+        hexAllocator->SetAttribute("distance", DoubleValue(gatewayDistance));
+        mobilityGw.SetPositionAllocator(hexAllocator);
 
-  Ptr<Node> networkServer;
-  NodeContainer gateways;
-  NodeContainer endDevices;
-  {
-    networkServer = CreateObject<Node> ();
+        // End Device mobility
+        mobilityEd.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+        // We define rho to generalize the allocation disk for any number of gateway rings
+        double rho = range + 2.0 * gatewayDistance * (gatewayRings - 1);
+        rangeAllocator = CreateObject<RangePositionAllocator>();
+        rangeAllocator->SetAttribute("rho", DoubleValue(rho));
+        rangeAllocator->SetAttribute("Z", DoubleValue(15.0));
+        rangeAllocator->SetAttribute("range", DoubleValue(range));
+        mobilityEd.SetPositionAllocator(rangeAllocator);
+    }
 
-    int nGateways = 3 * gatewayRings * gatewayRings - 3 * gatewayRings + 1;
-    gateways.Create (nGateways);
-    mobilityGw.Install (gateways);
-    rangeAllocator->SetNodes (gateways);
+    /******************
+     *  Create Nodes  *
+     ******************/
 
-    endDevices.Create (nDevices);
-    mobilityEd.Install (endDevices);
-  }
+    Ptr<Node> networkServer;
+    NodeContainer gateways;
+    NodeContainer endDevices;
+    {
+        networkServer = CreateObject<Node>();
 
-  /************************
-   *  Create Net Devices  *
-   ************************/
+        int nGateways = 3 * gatewayRings * gatewayRings - 3 * gatewayRings + 1;
+        gateways.Create(nGateways);
+        mobilityGw.Install(gateways);
+        rangeAllocator->SetNodes(gateways);
 
-  /* Csma between gateways and server (represented by tap-bridge) */
-  {
-    NodeContainer csmaNodes (NodeContainer (networkServer), gateways);
+        endDevices.Create(nDevices);
+        mobilityEd.Install(endDevices);
+    }
 
-    // Connect the Server to the Gateways with csma
-    CsmaHelper csma;
-    csma.SetChannelAttribute ("DataRate", DataRateValue (DataRate (5000000)));
-    csma.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
-    csma.SetDeviceAttribute ("Mtu", UintegerValue (1500));
-    auto csmaNetDevs = csma.Install (csmaNodes);
+    /************************
+     *  Create Net Devices  *
+     ************************/
 
-    // Install and initialize internet stack on gateways and server nodes
-    InternetStackHelper internet;
-    internet.Install (csmaNodes);
+    /* Csma between gateways and server (represented by tap-bridge) */
+    {
+        NodeContainer csmaNodes(NodeContainer(networkServer), gateways);
 
-    Ipv4AddressHelper addresses;
-    addresses.SetBase ("10.1.2.0", "255.255.255.0");
-    addresses.Assign (csmaNetDevs);
+        // Connect the Server to the Gateways with csma
+        CsmaHelper csma;
+        csma.SetChannelAttribute("DataRate", DataRateValue(DataRate(5000000)));
+        csma.SetChannelAttribute("Delay", TimeValue(MilliSeconds(2)));
+        csma.SetDeviceAttribute("Mtu", UintegerValue(1500));
+        auto csmaNetDevs = csma.Install(csmaNodes);
 
-    Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
-  }
+        // Install and initialize internet stack on gateways and server nodes
+        InternetStackHelper internet;
+        internet.Install(csmaNodes);
 
-  ///////////////// Attach a Tap-bridge to outside the simulation to the server csma device
-  TapBridgeHelper tapBridge;
-  tapBridge.SetAttribute ("Mode", StringValue ("ConfigureLocal"));
-  tapBridge.SetAttribute ("DeviceName", StringValue ("ns3-tap"));
-  tapBridge.Install (networkServer, networkServer->GetDevice (0));
+        Ipv4AddressHelper addresses;
+        addresses.SetBase("10.1.2.0", "255.255.255.0");
+        addresses.Assign(csmaNetDevs);
 
-  /* Radio side (between end devicees and gateways) */
-  LoraHelper helper;
-  LorawanMacHelper macHelper;
-  NetDeviceContainer gwNetDev;
-  {
-    // Physiscal layer settings
-    LoraPhyHelper phyHelper;
-    phyHelper.SetChannel (channel);
+        Ipv4GlobalRoutingHelper::PopulateRoutingTables();
+    }
 
-    // Create a LoraDeviceAddressGenerator
-    uint8_t nwkId = 54;
-    uint32_t nwkAddr = 1864;
-    auto addrGen = CreateObject<LoraDeviceAddressGenerator> (nwkId, nwkAddr);
+    ///////////////// Attach a Tap-bridge to outside the simulation to the server csma device
+    TapBridgeHelper tapBridge;
+    tapBridge.SetAttribute("Mode", StringValue("ConfigureLocal"));
+    tapBridge.SetAttribute("DeviceName", StringValue("ns3-tap"));
+    tapBridge.Install(networkServer, networkServer->GetDevice(0));
 
-    // Mac layer settings
-    macHelper.SetRegion (LorawanMacHelper::EU);
-    macHelper.SetAddressGenerator (addrGen);
+    /* Radio side (between end devicees and gateways) */
+    LoraHelper helper;
+    LorawanMacHelper macHelper;
+    NetDeviceContainer gwNetDev;
+    {
+        // Physiscal layer settings
+        LoraPhyHelper phyHelper;
+        phyHelper.SetChannel(channel);
 
-    // Create the LoraNetDevices of the gateways
-    phyHelper.SetDeviceType (LoraPhyHelper::GW);
-    macHelper.SetDeviceType (LorawanMacHelper::GW);
-    gwNetDev = helper.Install (phyHelper, macHelper, gateways);
+        // Create a LoraDeviceAddressGenerator
+        uint8_t nwkId = 54;
+        uint32_t nwkAddr = 1864;
+        auto addrGen = CreateObject<LoraDeviceAddressGenerator>(nwkId, nwkAddr);
 
-    // Create the LoraNetDevices of the end devices
-    phyHelper.SetDeviceType (LoraPhyHelper::ED);
-    macHelper.SetDeviceType (LorawanMacHelper::ED_A);
-    helper.Install (phyHelper, macHelper, endDevices);
-  }
+        // Mac layer settings
+        macHelper.SetRegion(LorawanMacHelper::EU);
+        macHelper.SetAddressGenerator(addrGen);
 
-  /*************************
-   *  Create Applications  *
-   *************************/
+        // Create the LoraNetDevices of the gateways
+        phyHelper.SetDeviceType(LoraPhyHelper::GW);
+        macHelper.SetDeviceType(LorawanMacHelper::GW);
+        gwNetDev = helper.Install(phyHelper, macHelper, gateways);
 
-  {
-    // Install UDP forwarders in gateways
-    UdpForwarderHelper forwarderHelper;
-    forwarderHelper.SetAttribute ("RemoteAddress", AddressValue (Ipv4Address ("10.1.2.1")));
-    forwarderHelper.SetAttribute ("RemotePort", UintegerValue (1700));
-    forwarderHelper.Install (gateways);
+        // Create the LoraNetDevices of the end devices
+        phyHelper.SetDeviceType(LoraPhyHelper::ED);
+        macHelper.SetDeviceType(LorawanMacHelper::ED_A);
+        helper.Install(phyHelper, macHelper, endDevices);
+    }
 
-    // Install applications in EDs
-    PeriodicSenderHelper appHelper;
-    appHelper.SetPeriodGenerator (
-        CreateObjectWithAttributes<ConstantRandomVariable> ("Constant", DoubleValue (5.0)));
-    appHelper.SetPacketSizeGenerator (
-        CreateObjectWithAttributes<ConstantRandomVariable> ("Constant", DoubleValue (5.0)));
-    //UrbanTrafficHelper appHelper;
-    appHelper.Install (endDevices);
-  }
+    /*************************
+     *  Create Applications  *
+     *************************/
 
-  /***************************
-   *  Simulation and metrics *
-   ***************************/
+    {
+        // Install UDP forwarders in gateways
+        UdpForwarderHelper forwarderHelper;
+        forwarderHelper.SetAttribute("RemoteAddress", AddressValue(Ipv4Address("10.1.2.1")));
+        forwarderHelper.SetAttribute("RemotePort", UintegerValue(1700));
+        forwarderHelper.Install(gateways);
 
-  ///////////////////// Signal handling
-  OnInterrupt ([] (int signal) { csHelper.CloseConnection (signal); });
-  ///////////////////// Register tenant, gateways, and devices on the real server
-  csHelper.InitConnection (Ipv4Address ("127.0.0.1"), 8090);
-  csHelper.Register (NodeContainer (endDevices, gateways));
+        // Install applications in EDs
+        PeriodicSenderHelper appHelper;
+        appHelper.SetPeriodGenerator(
+            CreateObjectWithAttributes<ConstantRandomVariable>("Constant", DoubleValue(5.0)));
+        appHelper.SetPacketSizeGenerator(
+            CreateObjectWithAttributes<ConstantRandomVariable>("Constant", DoubleValue(5.0)));
+        // UrbanTrafficHelper appHelper;
+        appHelper.Install(endDevices);
+    }
 
-  // Initialize SF emulating the ADR algorithm, then add variance to path loss
-  std::vector<int> devPerSF (1, nDevices);
-  if (initializeSF)
-    devPerSF = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel);
-  loss->SetNext (rayleigh);
+    /***************************
+     *  Simulation and metrics *
+     ***************************/
+
+    ///////////////////// Signal handling
+    OnInterrupt([](int signal) { csHelper.CloseConnection(signal); });
+    ///////////////////// Register tenant, gateways, and devices on the real server
+    csHelper.InitConnection(Ipv4Address("127.0.0.1"), 8090);
+    csHelper.Register(NodeContainer(endDevices, gateways));
+
+    // Initialize SF emulating the ADR algorithm, then add variance to path loss
+    std::vector<int> devPerSF(1, nDevices);
+    if (initializeSF)
+        devPerSF = macHelper.SetSpreadingFactorsUp(endDevices, gateways, channel);
+    loss->SetNext(rayleigh);
 
 #ifdef NS3_LOG_ENABLE
-  // Print current configuration
-  PrintConfigSetup (nDevices, range, gatewayRings, devPerSF);
-  helper.EnableSimulationTimePrinting (Seconds (3600));
+    // Print current configuration
+    PrintConfigSetup(nDevices, range, gatewayRings, devPerSF);
+    helper.EnableSimulationTimePrinting(Seconds(3600));
 #endif // NS3_LOG_ENABLE
 
-  Config::ConnectWithoutContext (
-      "/NodeList/*/DeviceList/0/$ns3::LoraNetDevice/Phy/$ns3::EndDeviceLoraPhy/EndDeviceState",
-      MakeCallback (&OnStateChange));
+    Config::ConnectWithoutContext(
+        "/NodeList/*/DeviceList/0/$ns3::LoraNetDevice/Phy/$ns3::EndDeviceLoraPhy/EndDeviceState",
+        MakeCallback(&OnStateChange));
 
-  if (file)
-    helper.EnablePcap ("lora", gwNetDev);
+    if (file)
+        helper.EnablePcap("lora", gwNetDev);
 
-  Simulator::Stop (Hours (1) * periods);
+    Simulator::Stop(Hours(1) * periods);
 
-  // Start simulation
-  Simulator::Run ();
-  Simulator::Destroy ();
+    // Start simulation
+    Simulator::Run();
+    Simulator::Destroy();
 
-  return 0;
+    return 0;
 }

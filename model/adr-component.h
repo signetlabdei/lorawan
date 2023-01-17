@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Matteo Perin <matteo.perin.2@studenti.unipd.2>
- * 
+ *
  * 23/12/2022
  * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
  *                              <alessandro.aimi@cnam.fr>
@@ -25,14 +25,16 @@
 #ifndef ADR_COMPONENT_H
 #define ADR_COMPONENT_H
 
-#include "ns3/object.h"
 #include "ns3/log.h"
-#include "ns3/packet.h"
-#include "ns3/network-status.h"
 #include "ns3/network-controller-components.h"
+#include "ns3/network-status.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
 ////////////////////////////////////////
 // LinkAdrRequest commands management //
@@ -40,96 +42,90 @@ namespace lorawan {
 
 class AdrComponent : public NetworkControllerComponent
 {
-  enum CombiningMethod
-  {
-    AVERAGE,
-    MAXIMUM,
-    MINIMUM,
-  };
+    enum CombiningMethod
+    {
+        AVERAGE,
+        MAXIMUM,
+        MINIMUM,
+    };
 
-public:
-  static TypeId GetTypeId (void);
+  public:
+    static TypeId GetTypeId(void);
 
-  //Constructor
-  AdrComponent ();
-  //Destructor
-  virtual ~AdrComponent ();
+    // Constructor
+    AdrComponent();
+    // Destructor
+    virtual ~AdrComponent();
 
-  void OnReceivedPacket (Ptr<const Packet> packet,
-                         Ptr<EndDeviceStatus> status,
-                         Ptr<NetworkStatus> networkStatus);
+    void OnReceivedPacket(Ptr<const Packet> packet,
+                          Ptr<EndDeviceStatus> status,
+                          Ptr<NetworkStatus> networkStatus);
 
-  void BeforeSendingReply (Ptr<EndDeviceStatus> status,
-                           Ptr<NetworkStatus> networkStatus);
+    void BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus);
 
-  void OnFailedReply (Ptr<EndDeviceStatus> status,
-                      Ptr<NetworkStatus> networkStatus);
-private:
-  void AdrImplementation (uint8_t *newDataRate,
-                          uint8_t *newTxPower,
-                          Ptr<EndDeviceStatus> status);
+    void OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus);
 
-  uint8_t SfToDr (uint8_t sf);
+  private:
+    void AdrImplementation(uint8_t* newDataRate, uint8_t* newTxPower, Ptr<EndDeviceStatus> status);
 
-  double RxPowerToSNR (double transmissionPower);
+    uint8_t SfToDr(uint8_t sf);
 
-  double GetMinTxFromGateways (EndDeviceStatus::GatewayList gwList);
+    double RxPowerToSNR(double transmissionPower);
 
-  double GetMaxTxFromGateways (EndDeviceStatus::GatewayList gwList);
+    double GetMinTxFromGateways(EndDeviceStatus::GatewayList gwList);
 
-  double GetAverageTxFromGateways (EndDeviceStatus::GatewayList gwList);
+    double GetMaxTxFromGateways(EndDeviceStatus::GatewayList gwList);
 
-  double GetReceivedPower (EndDeviceStatus::GatewayList gwList);
+    double GetAverageTxFromGateways(EndDeviceStatus::GatewayList gwList);
 
-  double GetMinSNR (EndDeviceStatus::ReceivedPacketList packetList,
-                    int historyRange);
+    double GetReceivedPower(EndDeviceStatus::GatewayList gwList);
 
-  double GetMaxSNR (EndDeviceStatus::ReceivedPacketList packetList,
-                    int historyRange);
+    double GetMinSNR(EndDeviceStatus::ReceivedPacketList packetList, int historyRange);
 
-  double GetAverageSNR (EndDeviceStatus::ReceivedPacketList packetList,
-                        int historyRange);
+    double GetMaxSNR(EndDeviceStatus::ReceivedPacketList packetList, int historyRange);
 
-  int GetTxPowerIndex (int txPower);
+    double GetAverageSNR(EndDeviceStatus::ReceivedPacketList packetList, int historyRange);
 
-  //TX power from gateways policy
-  enum CombiningMethod tpAveraging;
+    int GetTxPowerIndex(int txPower);
 
-  //Number of previous packets to consider
-  int historyRange;
+    // TX power from gateways policy
+    enum CombiningMethod tpAveraging;
 
-  //Received SNR history policy
-  enum CombiningMethod historyAveraging;
+    // Number of previous packets to consider
+    int historyRange;
 
-  //SF lower limit
-  const int min_spreadingFactor = 7;
+    // Received SNR history policy
+    enum CombiningMethod historyAveraging;
 
-  //Minimum transmission power (dBm e.r.p) (Europe)
-  const int min_transmissionPower = 0;
+    // SF lower limit
+    const int min_spreadingFactor = 7;
 
-  //Maximum transmission power (dBm e.r.p) (Europe)
-  const int max_transmissionPower = 14;
+    // Minimum transmission power (dBm e.r.p) (Europe)
+    const int min_transmissionPower = 0;
 
-  //Device specific SNR margin (dB)
-  // const int offset = 10;
+    // Maximum transmission power (dBm e.r.p) (Europe)
+    const int max_transmissionPower = 14;
 
-  //Bandwidth (Hz)
-  const int B = 125000;
+    // Device specific SNR margin (dB)
+    //  const int offset = 10;
 
-  //Noise Figure (dB)
-  const int NF = 6;
+    // Bandwidth (Hz)
+    const int B = 125000;
 
-  //Vector containing the required SNR for the 6 allowed SF levels
-  //ranging from 7 to 12 (the SNR values are in dB).
-  double treshold[6] = {-20.0, -17.5, -15.0, -12.5, -10.0, -7.5};
+    // Noise Figure (dB)
+    const int NF = 6;
 
-  //Regulate power in the ADR algorithm
-  bool m_toggleTxPower;
+    // Vector containing the required SNR for the 6 allowed SF levels
+    // ranging from 7 to 12 (the SNR values are in dB).
+    double treshold[6] = {-20.0, -17.5, -15.0, -12.5, -10.0, -7.5};
 
-  //Additional SNR margin to decrease SF/TXPower
-  double m_deviceMargin;
+    // Regulate power in the ADR algorithm
+    bool m_toggleTxPower;
+
+    // Additional SNR margin to decrease SF/TXPower
+    double m_deviceMargin;
 };
-}
-}
+} // namespace lorawan
+} // namespace ns3
 
 #endif

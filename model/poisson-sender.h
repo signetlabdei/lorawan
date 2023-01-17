@@ -25,39 +25,41 @@
 #include "ns3/lora-application.h"
 #include "ns3/lorawan-mac.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
 class PoissonSender : public LoraApplication
 {
-public:
-  PoissonSender ();
-  ~PoissonSender ();
+  public:
+    PoissonSender();
+    ~PoissonSender();
 
-  static TypeId GetTypeId (void);
+    static TypeId GetTypeId(void);
 
-private:
-  /**
-   * Start the application by scheduling the first SendPacket event
-   */
-  void StartApplication (void);
+  private:
+    /**
+     * Start the application by scheduling the first SendPacket event
+     */
+    void StartApplication(void);
 
-  /**
-   * Stop the application
-   */
-  void StopApplication (void);
+    /**
+     * Stop the application
+     */
+    void StopApplication(void);
 
-  /**
-   * Send a packet using the LoraNetDevice's Send method
-   */
-  void SendPacket (void);
+    /**
+     * Send a packet using the LoraNetDevice's Send method
+     */
+    void SendPacket(void);
 
-  Ptr<ExponentialRandomVariable> m_interval; //!< Random variable modeling packet inter-send time
+    Ptr<ExponentialRandomVariable> m_interval; //!< Random variable modeling packet inter-send time
 
-  /**
-   * The MAC layer of this node
-   */
-  Ptr<LorawanMac> m_mac;
+    /**
+     * The MAC layer of this node
+     */
+    Ptr<LorawanMac> m_mac;
 };
 
 } // namespace lorawan

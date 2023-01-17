@@ -16,104 +16,108 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
- * 
+ *
  * 23/12/2022
  * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
  *                              <alessandro.aimi@cnam.fr>
  */
 
 #include "periodic-sender.h"
+
 #include "ns3/lora-net-device.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
-NS_LOG_COMPONENT_DEFINE ("PeriodicSender");
+NS_LOG_COMPONENT_DEFINE("PeriodicSender");
 
-NS_OBJECT_ENSURE_REGISTERED (PeriodicSender);
+NS_OBJECT_ENSURE_REGISTERED(PeriodicSender);
 
 TypeId
-PeriodicSender::GetTypeId (void)
+PeriodicSender::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::PeriodicSender")
-                          .SetParent<LoraApplication> ()
-                          .AddConstructor<PeriodicSender> ()
-                          .SetGroupName ("lorawan");
-  // .AddAttribute ("PacketSizeRandomVariable", "The random variable that determines the shape of the packet size, in bytes",
-  //                StringValue ("ns3::UniformRandomVariable[Min=0,Max=10]"),
-  //                MakePointerAccessor (&PeriodicSender::m_pktSizeRV),
-  //                MakePointerChecker <RandomVariableStream>());
-  return tid;
+    static TypeId tid = TypeId("ns3::PeriodicSender")
+                            .SetParent<LoraApplication>()
+                            .AddConstructor<PeriodicSender>()
+                            .SetGroupName("lorawan");
+    // .AddAttribute ("PacketSizeRandomVariable", "The random variable that determines the shape of
+    // the packet size, in bytes",
+    //                StringValue ("ns3::UniformRandomVariable[Min=0,Max=10]"),
+    //                MakePointerAccessor (&PeriodicSender::m_pktSizeRV),
+    //                MakePointerChecker <RandomVariableStream>());
+    return tid;
 }
 
-PeriodicSender::PeriodicSender ()
+PeriodicSender::PeriodicSender()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 }
 
-PeriodicSender::~PeriodicSender ()
+PeriodicSender::~PeriodicSender()
 {
-  NS_LOG_FUNCTION_NOARGS ();
-}
-
-void
-PeriodicSender::SetPacketSizeRandomVariable (Ptr<RandomVariableStream> rv)
-{
-  m_pktSizeRV = rv;
+    NS_LOG_FUNCTION_NOARGS();
 }
 
 void
-PeriodicSender::StartApplication (void)
+PeriodicSender::SetPacketSizeRandomVariable(Ptr<RandomVariableStream> rv)
 {
-  NS_LOG_FUNCTION (this);
+    m_pktSizeRV = rv;
+}
 
-  // Make sure we have a MAC layer
-  if (bool (m_mac) != 0)
+void
+PeriodicSender::StartApplication(void)
+{
+    NS_LOG_FUNCTION(this);
+
+    // Make sure we have a MAC layer
+    if (bool(m_mac) != 0)
     {
-      // Assumes there's only one device
-      Ptr<LoraNetDevice> loraNetDevice = m_node->GetDevice (0)->GetObject<LoraNetDevice> ();
+        // Assumes there's only one device
+        Ptr<LoraNetDevice> loraNetDevice = m_node->GetDevice(0)->GetObject<LoraNetDevice>();
 
-      m_mac = loraNetDevice->GetMac ();
-      NS_ASSERT (bool (m_mac) != 0);
+        m_mac = loraNetDevice->GetMac();
+        NS_ASSERT(bool(m_mac) != 0);
     }
 
-  // Schedule the next SendPacket event
-  Simulator::Cancel (m_sendEvent);
-  NS_LOG_DEBUG ("Starting up application with a first event with a " << m_initialDelay.GetSeconds ()
-                                                                     << " seconds delay");
-  m_sendEvent = Simulator::Schedule (m_initialDelay, &PeriodicSender::SendPacket, this);
-  NS_LOG_DEBUG ("Event Id: " << m_sendEvent.GetUid ());
+    // Schedule the next SendPacket event
+    Simulator::Cancel(m_sendEvent);
+    NS_LOG_DEBUG("Starting up application with a first event with a " << m_initialDelay.GetSeconds()
+                                                                      << " seconds delay");
+    m_sendEvent = Simulator::Schedule(m_initialDelay, &PeriodicSender::SendPacket, this);
+    NS_LOG_DEBUG("Event Id: " << m_sendEvent.GetUid());
 }
 
 void
-PeriodicSender::StopApplication (void)
+PeriodicSender::StopApplication(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  Simulator::Cancel (m_sendEvent);
+    NS_LOG_FUNCTION_NOARGS();
+    Simulator::Cancel(m_sendEvent);
 }
 
 void
-PeriodicSender::SendPacket (void)
+PeriodicSender::SendPacket(void)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  // Create and send a new packet
-  Ptr<Packet> packet;
-  if (m_pktSizeRV)
+    // Create and send a new packet
+    Ptr<Packet> packet;
+    if (m_pktSizeRV)
     {
-      int randomsize = m_pktSizeRV->GetInteger ();
-      packet = Create<Packet> (m_basePktSize + randomsize);
+        int randomsize = m_pktSizeRV->GetInteger();
+        packet = Create<Packet>(m_basePktSize + randomsize);
     }
-  else
+    else
     {
-      packet = Create<Packet> (m_basePktSize);
+        packet = Create<Packet>(m_basePktSize);
     }
-  m_mac->Send (packet);
+    m_mac->Send(packet);
 
-  // Schedule the next SendPacket event
-  m_sendEvent = Simulator::Schedule (m_avgInterval, &PeriodicSender::SendPacket, this);
+    // Schedule the next SendPacket event
+    m_sendEvent = Simulator::Schedule(m_avgInterval, &PeriodicSender::SendPacket, this);
 
-  NS_LOG_DEBUG ("Sent a packet of size " << packet->GetSize ());
+    NS_LOG_DEBUG("Sent a packet of size " << packet->GetSize());
 }
 
 } // namespace lorawan

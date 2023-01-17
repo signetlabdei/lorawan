@@ -21,13 +21,15 @@
 #ifndef NETWORK_CONTROLLER_COMPONENTS_H
 #define NETWORK_CONTROLLER_COMPONENTS_H
 
-#include "ns3/object.h"
 #include "ns3/log.h"
-#include "ns3/packet.h"
 #include "ns3/network-status.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
 class NetworkStatus;
 
@@ -44,36 +46,35 @@ class NetworkStatus;
  */
 class NetworkControllerComponent : public Object
 {
-public:
-  static TypeId GetTypeId (void);
+  public:
+    static TypeId GetTypeId(void);
 
-  // Constructor and destructor
-  NetworkControllerComponent ();
-  virtual ~NetworkControllerComponent ();
+    // Constructor and destructor
+    NetworkControllerComponent();
+    virtual ~NetworkControllerComponent();
 
-  // Virtual methods whose implementation is left to child classes
-  /**
-   * Method that is called when a new packet is received by the NetworkServer.
-   *
-   * \param packet The newly received packet
-   * \param networkStatus A pointer to the NetworkStatus object
-   */
-  virtual void OnReceivedPacket (Ptr<const Packet> packet,
-                                 Ptr<EndDeviceStatus> status,
-                                 Ptr<NetworkStatus> networkStatus) = 0;
+    // Virtual methods whose implementation is left to child classes
+    /**
+     * Method that is called when a new packet is received by the NetworkServer.
+     *
+     * \param packet The newly received packet
+     * \param networkStatus A pointer to the NetworkStatus object
+     */
+    virtual void OnReceivedPacket(Ptr<const Packet> packet,
+                                  Ptr<EndDeviceStatus> status,
+                                  Ptr<NetworkStatus> networkStatus) = 0;
 
-  virtual void BeforeSendingReply (Ptr<EndDeviceStatus> status,
-                                   Ptr<NetworkStatus> networkStatus) = 0;
+    virtual void BeforeSendingReply(Ptr<EndDeviceStatus> status,
+                                    Ptr<NetworkStatus> networkStatus) = 0;
 
-  /**
-   * Method that is called when a packet cannot be sent in the downlink.
-   *
-   * \param status The EndDeviceStatus of the device to which it was
-   *               impossible to send a reply.
-   * \param networkStatus A pointer to the NetworkStatus object
-   */
-  virtual void OnFailedReply (Ptr<EndDeviceStatus> status,
-                              Ptr<NetworkStatus> networkStatus) = 0;
+    /**
+     * Method that is called when a packet cannot be sent in the downlink.
+     *
+     * \param status The EndDeviceStatus of the device to which it was
+     *               impossible to send a reply.
+     * \param networkStatus A pointer to the NetworkStatus object
+     */
+    virtual void OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus) = 0;
 };
 
 ///////////////////////////////
@@ -82,29 +83,27 @@ public:
 
 class ConfirmedMessagesComponent : public NetworkControllerComponent
 {
-public:
-  static TypeId GetTypeId (void);
+  public:
+    static TypeId GetTypeId(void);
 
-  // Constructor and destructor
-  ConfirmedMessagesComponent ();
-  virtual ~ConfirmedMessagesComponent ();
+    // Constructor and destructor
+    ConfirmedMessagesComponent();
+    virtual ~ConfirmedMessagesComponent();
 
-  /**
-   * This method checks whether the received packet requires an acknowledgment
-   * and sets up the appropriate reply in case it does.
-   *
-   * \param packet The newly received packet
-   * \param networkStatus A pointer to the NetworkStatus object
-   */
-  void OnReceivedPacket (Ptr<const Packet> packet,
-                         Ptr<EndDeviceStatus> status,
-                         Ptr<NetworkStatus> networkStatus);
+    /**
+     * This method checks whether the received packet requires an acknowledgment
+     * and sets up the appropriate reply in case it does.
+     *
+     * \param packet The newly received packet
+     * \param networkStatus A pointer to the NetworkStatus object
+     */
+    void OnReceivedPacket(Ptr<const Packet> packet,
+                          Ptr<EndDeviceStatus> status,
+                          Ptr<NetworkStatus> networkStatus);
 
-  void BeforeSendingReply (Ptr<EndDeviceStatus> status,
-                           Ptr<NetworkStatus> networkStatus);
+    void BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus);
 
-  void OnFailedReply (Ptr<EndDeviceStatus> status,
-                      Ptr<NetworkStatus> networkStatus);
+    void OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus);
 };
 
 ///////////////////////////////////
@@ -113,35 +112,32 @@ public:
 
 class LinkCheckComponent : public NetworkControllerComponent
 {
-public:
-  static TypeId GetTypeId (void);
+  public:
+    static TypeId GetTypeId(void);
 
-  // Constructor and destructor
-  LinkCheckComponent ();
-  virtual ~LinkCheckComponent ();
+    // Constructor and destructor
+    LinkCheckComponent();
+    virtual ~LinkCheckComponent();
 
-  /**
-   * This method checks whether the received packet requires an acknowledgment
-   * and sets up the appropriate reply in case it does.
-   *
-   * \param packet The newly received packet
-   * \param networkStatus A pointer to the NetworkStatus object
-   */
-  void OnReceivedPacket (Ptr<const Packet> packet,
-                         Ptr<EndDeviceStatus> status,
-                         Ptr<NetworkStatus> networkStatus);
+    /**
+     * This method checks whether the received packet requires an acknowledgment
+     * and sets up the appropriate reply in case it does.
+     *
+     * \param packet The newly received packet
+     * \param networkStatus A pointer to the NetworkStatus object
+     */
+    void OnReceivedPacket(Ptr<const Packet> packet,
+                          Ptr<EndDeviceStatus> status,
+                          Ptr<NetworkStatus> networkStatus);
 
-  void BeforeSendingReply (Ptr<EndDeviceStatus> status,
-                           Ptr<NetworkStatus> networkStatus);
+    void BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus);
 
-  void OnFailedReply (Ptr<EndDeviceStatus> status,
-                      Ptr<NetworkStatus> networkStatus);
+    void OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus);
 
-private:
-  void UpdateLinkCheckAns (Ptr<Packet const> packet,
-                           Ptr<EndDeviceStatus> status);
+  private:
+    void UpdateLinkCheckAns(Ptr<const Packet> packet, Ptr<EndDeviceStatus> status);
 };
-}
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif

@@ -19,8 +19,10 @@
 #include "ns3/nstime.h"
 #include "ns3/uinteger.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
 /**
  * Convert from dBm to Watts.
@@ -29,7 +31,7 @@ namespace lorawan {
  *
  * \return the equivalent Watts for the given dBm
  */
-double DbmToW (double dbm);
+double DbmToW(double dbm);
 /**
  * Convert from dB to ratio.
  *
@@ -37,7 +39,7 @@ double DbmToW (double dbm);
  *
  * \return ratio
  */
-double DbToRatio (double db);
+double DbToRatio(double db);
 /**
  * Convert from Watts to dBm.
  *
@@ -45,7 +47,7 @@ double DbToRatio (double db);
  *
  * \return the equivalent dBm for the given Watts
  */
-double WToDbm (double w);
+double WToDbm(double w);
 /**
  * Convert from ratio to dB.
  *
@@ -53,9 +55,9 @@ double WToDbm (double w);
  *
  * \return dB
  */
-double RatioToDb (double ratio);
+double RatioToDb(double ratio);
 
-}   // namespace ns3
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* LORA_UTILS_H */

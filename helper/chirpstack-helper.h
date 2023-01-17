@@ -22,75 +22,79 @@
 #ifndef CHIRPSTACK_HELPER_H
 #define CHIRPSTACK_HELPER_H
 
-#include "ns3/node-container.h"
 #include "ns3/loragw_hal.h"
+#include "ns3/node-container.h"
 
 #include <curl/curl.h>
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
 /**
- * This class can be used to install devices and gateways on a real 
- * chirpstack network server using the REST API. 
+ * This class can be used to install devices and gateways on a real
+ * chirpstack network server using the REST API.
  * Requires libcurlpp and libcurl installed.
  */
 class ChirpstackHelper
 {
-  using str = std::string;
-  using query_t = std::vector<std::pair<str, str>>;
+    using str = std::string;
+    using query_t = std::vector<std::pair<str, str>>;
 
-  struct session_t
-  {
-    // Tenant information
-    str tenantId;
-    str devProfId;
-    str appId;
+    struct session_t
+    {
+        // Tenant information
+        str tenantId;
+        str devProfId;
+        str appId;
 
-    // Session keys
-    str netKey;
-    str appKey;
-  };
+        // Session keys
+        str netKey;
+        str appKey;
+    };
 
-public:
-  ChirpstackHelper ();
+  public:
+    ChirpstackHelper();
 
-  ~ChirpstackHelper ();
+    ~ChirpstackHelper();
 
-  int InitConnection (Ipv4Address ip, uint16_t port);
+    int InitConnection(Ipv4Address ip, uint16_t port);
 
-  void CloseConnection (int signal) const;
+    void CloseConnection(int signal) const;
 
-  int Register (NodeContainer c) const;
+    int Register(NodeContainer c) const;
 
-  int Register (Ptr<Node> node) const;
+    int Register(Ptr<Node> node) const;
 
-private:
-  int NewTenant (const str &name);
+  private:
+    int NewTenant(const str& name);
 
-  int NewDeviceProfile (const str &name);
+    int NewDeviceProfile(const str& name);
 
-  int NewApplication (const str &name);
+    int NewApplication(const str& name);
 
-  int RegisterPriv (Ptr<Node> node) const;
+    int RegisterPriv(Ptr<Node> node) const;
 
-  int NewDevice (Ptr<Node> node) const;
+    int NewDevice(Ptr<Node> node) const;
 
-  int NewGateway (Ptr<Node> node) const;
+    int NewGateway(Ptr<Node> node) const;
 
-  int POST (const str &path, const str &body, str &out) const;
+    int POST(const str& path, const str& body, str& out) const;
 
-  int DELETE (const str &path, str &out) const;
+    int DELETE(const str& path, str& out) const;
 
-  static size_t StreamWriteCallback (char *buffer, size_t size, size_t nitems,
-                                     std::ostream *stream);
+    static size_t StreamWriteCallback(char* buffer,
+                                      size_t size,
+                                      size_t nitems,
+                                      std::ostream* stream);
 
-  str m_url;
-  struct curl_slist *m_header = NULL;
+    str m_url;
+    struct curl_slist* m_header = NULL;
 
-  session_t m_session;
+    session_t m_session;
 
-  static const struct coord_s m_center;
+    static const struct coord_s m_center;
 };
 
 } // namespace lorawan
