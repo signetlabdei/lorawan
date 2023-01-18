@@ -24,16 +24,10 @@
 #ifndef LORA_PHY_H
 #define LORA_PHY_H
 
-#include "ns3/callback.h"
-#include "ns3/lora-channel.h"
 #include "ns3/lora-interference-helper.h"
-#include "ns3/mobility-model.h"
 #include "ns3/net-device.h"
-#include "ns3/node.h"
-#include "ns3/nstime.h"
-#include "ns3/object.h"
-
-#include <list>
+#include "ns3/mobility-model.h"
+#include "ns3/lora-channel.h"
 
 namespace ns3
 {

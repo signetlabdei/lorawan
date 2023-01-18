@@ -35,7 +35,6 @@ main(int argc, char* argv[])
     // LogComponentEnable ("LoraPhy", LOG_LEVEL_ALL);
     // LogComponentEnable ("EndDeviceLoraPhy", LOG_LEVEL_ALL);
     LogComponentEnable("GatewayLoraPhy", LOG_LEVEL_ALL);
-    LogComponentEnable("SimpleGatewayLoraPhy", LOG_LEVEL_ALL);
     // LogComponentEnable ("LoraInterferenceHelper", LOG_LEVEL_ALL);
     // LogComponentEnable ("LorawanMac", LOG_LEVEL_ALL);
     // LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_ALL);

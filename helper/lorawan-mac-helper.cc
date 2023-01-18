@@ -182,28 +182,7 @@ LorawanMacHelper::ConfigureForAlohaRegion(Ptr<GatewayLorawanMac> gwMac) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    ///////////////////////////////
-    // ReceivePath configuration //
-    ///////////////////////////////
-    Ptr<GatewayLoraPhy> gwPhy =
-        gwMac->GetDevice()->GetObject<LoraNetDevice>()->GetPhy()->GetObject<GatewayLoraPhy>();
-
     ApplyCommonAlohaConfigurations(gwMac);
-
-    if (gwPhy) // If cast is successful, there's a GatewayLoraPhy
-    {
-        NS_LOG_DEBUG("Resetting reception paths");
-        gwPhy->ResetReceptionPaths();
-
-        int receptionPaths = 0;
-        int maxReceptionPaths = 1;
-        while (receptionPaths < maxReceptionPaths)
-        {
-            gwPhy->GetObject<GatewayLoraPhy>()->AddReceptionPath();
-            receptionPaths++;
-        }
-        gwPhy->AddFrequency(868100000);
-    }
 }
 
 void
@@ -279,37 +258,7 @@ LorawanMacHelper::ConfigureForEuRegion(Ptr<GatewayLorawanMac> gwMac) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    ///////////////////////////////
-    // ReceivePath configuration //
-    ///////////////////////////////
-    Ptr<GatewayLoraPhy> gwPhy =
-        gwMac->GetDevice()->GetObject<LoraNetDevice>()->GetPhy()->GetObject<GatewayLoraPhy>();
-
     ApplyCommonEuConfigurations(gwMac);
-
-    if (gwPhy) // If cast is successful, there's a GatewayLoraPhy
-    {
-        NS_LOG_DEBUG("Resetting reception paths");
-        gwPhy->ResetReceptionPaths();
-
-        std::vector<double> frequencies;
-        frequencies.push_back(868100000);
-        frequencies.push_back(868300000);
-        frequencies.push_back(868500000);
-
-        for (auto& f : frequencies)
-        {
-            gwPhy->AddFrequency(f);
-        }
-
-        int receptionPaths = 0;
-        int maxReceptionPaths = 8;
-        while (receptionPaths < maxReceptionPaths)
-        {
-            gwPhy->GetObject<GatewayLoraPhy>()->AddReceptionPath();
-            receptionPaths++;
-        }
-    }
 }
 
 void
@@ -410,36 +359,8 @@ void
 LorawanMacHelper::ConfigureForSingleChannelRegion(Ptr<GatewayLorawanMac> gwMac) const
 {
     NS_LOG_FUNCTION_NOARGS();
-
-    ///////////////////////////////
-    // ReceivePath configuration //
-    ///////////////////////////////
-    Ptr<GatewayLoraPhy> gwPhy =
-        gwMac->GetDevice()->GetObject<LoraNetDevice>()->GetPhy()->GetObject<GatewayLoraPhy>();
-
+    
     ApplyCommonEuConfigurations(gwMac);
-
-    if (gwPhy) // If cast is successful, there's a GatewayLoraPhy
-    {
-        NS_LOG_DEBUG("Resetting reception paths");
-        gwPhy->ResetReceptionPaths();
-
-        std::vector<double> frequencies;
-        frequencies.push_back(868100000);
-
-        for (auto& f : frequencies)
-        {
-            gwPhy->AddFrequency(f);
-        }
-
-        int receptionPaths = 0;
-        int maxReceptionPaths = 8;
-        while (receptionPaths < maxReceptionPaths)
-        {
-            gwPhy->GetObject<GatewayLoraPhy>()->AddReceptionPath();
-            receptionPaths++;
-        }
-    }
 }
 
 void

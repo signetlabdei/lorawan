@@ -30,7 +30,7 @@
 #include "ns3/net-device.h"
 #include "ns3/object-factory.h"
 #include "ns3/simple-end-device-lora-phy.h"
-#include "ns3/simple-gateway-lora-phy.h"
+#include "ns3/gateway-lora-phy.h"
 
 namespace ns3
 {

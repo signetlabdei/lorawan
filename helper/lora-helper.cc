@@ -81,7 +81,7 @@ LoraHelper::Install(const LoraPhyHelper& phyHelper,
                     "StartSending",
                     MakeCallback(&LoraPacketTracker::TransmissionCallback, m_packetTracker));
             }
-            else if (phyHelper.GetDeviceType() == TypeId::LookupByName("ns3::SimpleGatewayLoraPhy"))
+            else if (phyHelper.GetDeviceType() == TypeId::LookupByName("ns3::GatewayLoraPhy"))
             {
                 phy->TraceConnectWithoutContext(
                     "StartSending",
@@ -124,7 +124,7 @@ LoraHelper::Install(const LoraPhyHelper& phyHelper,
                     MakeCallback(&LoraPacketTracker::RequiredTransmissionsCallback,
                                  m_packetTracker));
             }
-            else if (phyHelper.GetDeviceType() == TypeId::LookupByName("ns3::SimpleGatewayLoraPhy"))
+            else if (phyHelper.GetDeviceType() == TypeId::LookupByName("ns3::GatewayLoraPhy"))
             {
                 mac->TraceConnectWithoutContext(
                     "SentNewPacket",

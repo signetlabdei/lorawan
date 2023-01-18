@@ -22,11 +22,7 @@
  */
 
 #include "ns3/lora-phy.h"
-
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-
-#include <algorithm>
+#include "ns3/node.h"
 
 namespace ns3
 {

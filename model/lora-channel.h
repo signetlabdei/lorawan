@@ -28,23 +28,16 @@
 #define LORA_CHANNEL_H
 
 #include "ns3/channel.h"
-#include "ns3/logical-lora-channel.h"
+#include "ns3/log.h"
 #include "ns3/lora-phy.h"
 #include "ns3/mobility-model.h"
-#include "ns3/net-device.h"
 #include "ns3/nstime.h"
 #include "ns3/packet.h"
 #include "ns3/propagation-delay-model.h"
 #include "ns3/propagation-loss-model.h"
 
-#include <vector>
-
 namespace ns3
 {
-class NetDevice;
-class PropagationLossModel;
-class PropagationDelayModel;
-
 namespace lorawan
 {
 
@@ -57,10 +50,10 @@ struct LoraTxParameters;
  */
 struct LoraChannelParameters
 {
-    double rxPowerDbm;   //!< The reception power.
-    uint8_t sf;          //!< The Spreading Factor of this transmission.
-    Time duration;       //!< The duration of the transmission.
-    double frequency; //!< The frequency [Hz] of this transmission.
+    double rxPowerDbm; //!< The reception power.
+    uint8_t sf;        //!< The Spreading Factor of this transmission.
+    Time duration;     //!< The duration of the transmission.
+    double frequency;  //!< The frequency [Hz] of this transmission.
 };
 
 /**
@@ -106,10 +99,9 @@ class LoraChannel : public Channel
      * of incoming transmissions.
      *
      * \param phy The physical layer to add.
+     * \param down The direction of transmission (uplink/downlink).
      */
-    void Add(Ptr<LoraPhy> phy);
-
-    void AddDown(Ptr<LoraPhy> phy);
+    void Add(Ptr<LoraPhy> phy, bool down = false);
 
     /**
      * Remove a physical layer from the LoraChannel.
@@ -119,8 +111,9 @@ class LoraChannel : public Channel
      * it is not necessary to notify them about each transmission.
      *
      * \param phy The physical layer to remove.
+     * \param down The direction of transmission (uplink/downlink).
      */
-    void Remove(Ptr<LoraPhy> phy);
+    void Remove(Ptr<LoraPhy> phy, bool down = false);
 
     /**
      * Send a packet in the channel.
@@ -136,6 +129,7 @@ class LoraChannel : public Channel
      * \param txParams The set of parameters that are used by the transmitter.
      * \param duration The on-air duration of this packet.
      * \param frequency The frequency this transmission will happen at.
+     * \param down The direction of the transmission (uplink/downlink).
      *
      * \internal
      *
@@ -147,14 +141,8 @@ class LoraChannel : public Channel
               double txPowerDbm,
               LoraTxParameters txParams,
               Time duration,
-              double frequency) const;
-
-    void SendDown(Ptr<LoraPhy> sender,
-                  Ptr<Packet> packet,
-                  double txPowerDbm,
-                  LoraTxParameters txParams,
-                  Time duration,
-                  double frequency) const;
+              double frequency,
+              bool down = false) const;
 
     /**
      * Compute the received power when transmitting from a point to another one.
@@ -183,17 +171,18 @@ class LoraChannel : public Channel
      * \param i The index of the phy to start reception on.
      * \param packet The packet the phy will receive.
      * \param parameters The parameters that characterize this transmission
+     * \param down The direction of the transmission (uplink/downlink).
      */
-    void Receive(uint32_t i, Ptr<Packet> packet, LoraChannelParameters parameters) const;
-
-    void ReceiveDown(uint32_t i, Ptr<Packet> packet, LoraChannelParameters parameters) const;
+    void Receive(uint32_t i,
+                 Ptr<Packet> packet,
+                 LoraChannelParameters parameters,
+                 bool down = false) const;
 
     /**
      * The vector containing the PHYs that are currently connected to the
      * channel.
      */
     std::vector<Ptr<LoraPhy>> m_phyList;
-
     std::vector<Ptr<LoraPhy>> m_phyListDown;
 
     /**

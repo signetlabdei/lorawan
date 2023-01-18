@@ -25,21 +25,12 @@
 #define GATEWAY_LORA_PHY_H
 
 #include "ns3/lora-phy.h"
-#include "ns3/mobility-model.h"
-#include "ns3/net-device.h"
-#include "ns3/node.h"
-#include "ns3/nstime.h"
-#include "ns3/object.h"
 #include "ns3/traced-value.h"
-
-#include <list>
 
 namespace ns3
 {
 namespace lorawan
 {
-
-class LoraChannel;
 
 /**
  * Class modeling a Lora SX1301 chip.
@@ -63,43 +54,25 @@ class GatewayLoraPhy : public LoraPhy
                               double rxPowerDbm,
                               uint8_t sf,
                               Time duration,
-                              double frequency) = 0;
+                              double frequency);
 
-    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) = 0;
+    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event);
 
     virtual void Send(Ptr<Packet> packet,
                       LoraTxParameters txParams,
                       double frequency,
-                      double txPowerDbm) = 0;
+                      double txPowerDbm);
 
-    virtual void TxFinished(Ptr<Packet> packet);
+    /**
+     * Create a certain number of reception paths.
+     * (deletes previous existing paths)
+     */
+    void CreateReceptionPaths(uint8_t number);
 
+    /**
+     * Used to check the gateway transmission state by the outside
+     */
     bool IsTransmitting(void);
-
-    virtual bool IsOnFrequency(double frequency);
-
-    /**
-     * Add a reception path, locked on a specific frequency.
-     */
-    void AddReceptionPath();
-
-    /**
-     * Reset the list of reception paths.
-     *
-     * This method deletes all currently available ReceptionPath objects.
-     */
-    void ResetReceptionPaths(void);
-
-    /**
-     * Add a frequency to the list of frequencies we are listening to.
-     */
-    void AddFrequency(double frequency);
-
-    /**
-     * A vector containing the sensitivities required to correctly decode
-     * different spreading factors.
-     */
-    static const double sensitivity[6];
 
   protected:
     /**
@@ -143,13 +116,6 @@ class GatewayLoraPhy : public LoraPhy
         void LockOnEvent(Ptr<LoraInterferenceHelper::Event> event);
 
         /**
-         * Set the event this reception path is currently on.
-         *
-         * \param event the event to lock this ReceptionPath on.
-         */
-        void SetEvent(Ptr<LoraInterferenceHelper::Event> event);
-
-        /**
          * Get the event this reception path is currently on.
          *
          * \returns 0 if no event is currently being received, a pointer to
@@ -188,10 +154,18 @@ class GatewayLoraPhy : public LoraPhy
     };
 
     /**
-     * A list containing the various parallel receivers that are managed by this
+     * A vector containing the various parallel receivers that are managed by this
      * Gateway.
      */
-    std::list<Ptr<ReceptionPath>> m_receptionPaths;
+    std::vector<Ptr<ReceptionPath>> m_receptionPaths;
+
+    bool m_isTransmitting; //!< Flag indicating whether a transmission is going on
+
+    /**
+     * A vector containing the sensitivities required to correctly decode
+     * different spreading factors.
+     */
+    static const double sensitivity[6];
 
     /**
      * The number of occupied reception paths.
@@ -214,9 +188,11 @@ class GatewayLoraPhy : public LoraPhy
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_noReceptionBecauseTransmitting;
 
-    bool m_isTransmitting; //!< Flag indicating whether a transmission is going on
-
-    std::list<double> m_frequencies;
+  private:
+    /**
+     * Used to schedule a change in the gateway transmission state
+     */
+    void TxFinished(void);
 };
 
 } // namespace lorawan
