@@ -229,11 +229,11 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
                                                   << " bytes.");
 
         // Check that MACPayload length is below the allowed maximum
-        if (packet->GetSize() > m_maxAppPayloadForDataRate.at(m_dataRate))
+        if (packet->GetSize() > m_maxMacPayloadForDataRate.at(m_dataRate))
         {
             NS_LOG_WARN("Attempting to send a packet ("
                         << (unsigned)packet->GetSize() << "B) larger than the maximum allowed"
-                        << " size (" << (unsigned)m_maxAppPayloadForDataRate.at(m_dataRate)
+                        << " size (" << (unsigned)m_maxMacPayloadForDataRate.at(m_dataRate)
                         << "B) at this DataRate (DR" << unsigned(m_dataRate)
                         << "). Transmission canceled.");
             return;

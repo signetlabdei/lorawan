@@ -165,9 +165,9 @@ LorawanMac::SetBandwidthForDataRate(std::vector<double> bandwidthForDataRate)
 }
 
 void
-LorawanMac::SetMaxAppPayloadForDataRate(std::vector<uint32_t> maxAppPayloadForDataRate)
+LorawanMac::SetMaxMacPayloadForDataRate(std::vector<uint32_t> maxMacPayloadForDataRate)
 {
-    m_maxAppPayloadForDataRate = maxAppPayloadForDataRate;
+    m_maxMacPayloadForDataRate = maxMacPayloadForDataRate;
 }
 
 void

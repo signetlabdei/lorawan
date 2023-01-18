@@ -176,11 +176,11 @@ class LorawanMac : public Object
     /**
      * Set the maximum App layer payload for a set DataRate.
      *
-     * \param maxAppPayloadForDataRate A vector that contains at position i the
+     * \param maxMacPayloadForDataRate A vector that contains at position i the
      * maximum Application layer payload that should correspond to DR i in this
      * MAC's region.
      */
-    void SetMaxAppPayloadForDataRate(std::vector<uint32_t> maxAppPayloadForDataRate);
+    void SetMaxMacPayloadForDataRate(std::vector<uint32_t> maxMacPayloadForDataRate);
 
     /**
      * Set the vector to use to check up which transmission power in Dbm
@@ -264,7 +264,7 @@ class LorawanMac : public Object
      * A vector holding the maximum app payload size that corresponds to a
      * certain DataRate.
      */
-    std::vector<uint32_t> m_maxAppPayloadForDataRate;
+    std::vector<uint32_t> m_maxMacPayloadForDataRate;
 
     /**
      * The number of symbols to use in the PHY preamble.
