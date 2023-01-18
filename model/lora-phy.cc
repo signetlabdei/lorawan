@@ -98,9 +98,24 @@ LoraPhy::~LoraPhy()
 {
 }
 
+Ptr<LoraChannel>
+LoraPhy::GetChannel(void) const
+{
+    NS_LOG_FUNCTION_NOARGS();
+    return m_channel;
+}
+
+void
+LoraPhy::SetChannel(Ptr<LoraChannel> channel)
+{
+    NS_LOG_FUNCTION(this << channel);
+    m_channel = channel;
+}
+
 Ptr<NetDevice>
 LoraPhy::GetDevice(void) const
 {
+    NS_LOG_FUNCTION_NOARGS();
     return m_device;
 }
 
@@ -108,72 +123,49 @@ void
 LoraPhy::SetDevice(Ptr<NetDevice> device)
 {
     NS_LOG_FUNCTION(this << device);
-
     m_device = device;
-}
-
-Ptr<LoraChannel>
-LoraPhy::GetChannel(void) const
-{
-    NS_LOG_FUNCTION_NOARGS();
-
-    return m_channel;
+    m_mobility = m_device->GetNode()->GetObject<MobilityModel>();
 }
 
 Ptr<MobilityModel>
-LoraPhy::GetMobility(void)
+LoraPhy::GetMobility(void) const
 {
     NS_LOG_FUNCTION_NOARGS();
-
-    // If there is a mobility model associated to this PHY, take the mobility from
-    // there
-    if (bool(m_mobility) != 0)
-    {
-        return m_mobility;
-    }
-    else // Else, take it from the node
-    {
-        return m_device->GetNode()->GetObject<MobilityModel>();
-    }
+    return m_mobility;
 }
 
 void
 LoraPhy::SetMobility(Ptr<MobilityModel> mobility)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this << mobility);
     m_mobility = mobility;
-}
-
-void
-LoraPhy::SetChannel(Ptr<LoraChannel> channel)
-{
-    NS_LOG_FUNCTION(this << channel);
-
-    m_channel = channel;
 }
 
 void
 LoraPhy::SetReceiveOkCallback(RxOkCallback callback)
 {
+    NS_LOG_FUNCTION_NOARGS();
     m_rxOkCallback = callback;
 }
 
 void
 LoraPhy::SetReceiveFailedCallback(RxFailedCallback callback)
 {
+    NS_LOG_FUNCTION_NOARGS();
     m_rxFailedCallback = callback;
 }
 
 void
 LoraPhy::SetTxFinishedCallback(TxFinishedCallback callback)
 {
+    NS_LOG_FUNCTION_NOARGS();
     m_txFinishedCallback = callback;
 }
 
 Time
 LoraPhy::GetTSym(LoraTxParameters txParams)
 {
+    NS_LOG_FUNCTION(txParams);
     return Seconds(pow(2, int(txParams.sf)) / (txParams.bandwidthHz));
 }
 
@@ -225,6 +217,7 @@ LoraPhy::GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams)
 double
 LoraPhy::RxPowerToSNR(double transmissionPower)
 {
+    NS_LOG_FUNCTION(transmissionPower);
     // The following conversion ignores interfering packets
     return transmissionPower + 174 - 10 * log10(B) - NF;
 }

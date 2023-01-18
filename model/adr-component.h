@@ -69,8 +69,6 @@ class AdrComponent : public NetworkControllerComponent
 
     uint8_t SfToDr(uint8_t sf);
 
-    double RxPowerToSNR(double transmissionPower);
-
     double GetMinTxFromGateways(EndDeviceStatus::GatewayList gwList);
 
     double GetMaxTxFromGateways(EndDeviceStatus::GatewayList gwList);

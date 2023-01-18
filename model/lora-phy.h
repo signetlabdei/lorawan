@@ -86,30 +86,6 @@ class LoraPhy : public Object
     virtual ~LoraPhy();
 
     /**
-     * Type definition for a callback for when a packet is correctly received.
-     *
-     * This callback can be set by an upper layer that wishes to be informed of
-     * correct reception events.
-     */
-    typedef Callback<void, Ptr<const Packet>> RxOkCallback;
-
-    /**
-     * Type definition for a callback for when a packet reception fails.
-     *
-     * This callback can be set by an upper layer that wishes to be informed of
-     * failed reception events.
-     */
-    typedef Callback<void, Ptr<const Packet>> RxFailedCallback;
-
-    /**
-     * Type definition for a callback to call when a packet has finished sending.
-     *
-     * This callback is used by the MAC layer, to determine when to open a receive
-     * window.
-     */
-    typedef Callback<void, Ptr<const Packet>> TxFinishedCallback;
-
-    /**
      * Start receiving a packet.
      *
      * This method is typically called by LoraChannel.
@@ -163,13 +139,12 @@ class LoraPhy : public Object
     virtual bool IsTransmitting(void) = 0;
 
     /**
-     * Whether this device is listening on the specified frequency or not.
+     * Type definition for a callback for when a packet is correctly received.
      *
-     * \param frequency The frequency to query.
-     * \returns true if the device is listening on that frequency, false
-     * otherwise.
+     * This callback can be set by an upper layer that wishes to be informed of
+     * correct reception events.
      */
-    virtual bool IsOnFrequency(double frequency) = 0;
+    typedef Callback<void, Ptr<const Packet>> RxOkCallback;
 
     /**
      * Set the callback to call upon successful reception of a packet.
@@ -178,6 +153,14 @@ class LoraPhy : public Object
      * notified after the successful reception of a packet.
      */
     void SetReceiveOkCallback(RxOkCallback callback);
+
+    /**
+     * Type definition for a callback for when a packet reception fails.
+     *
+     * This callback can be set by an upper layer that wishes to be informed of
+     * failed reception events.
+     */
+    typedef Callback<void, Ptr<const Packet>> RxFailedCallback;
 
     /**
      * Set the callback to call upon failed reception of a packet we were
@@ -189,26 +172,20 @@ class LoraPhy : public Object
     void SetReceiveFailedCallback(RxFailedCallback callback);
 
     /**
+     * Type definition for a callback to call when a packet has finished sending.
+     *
+     * This callback is used by the MAC layer, to determine when to open a receive
+     * window.
+     */
+    typedef Callback<void, Ptr<const Packet>> TxFinishedCallback;
+
+    /**
      * Set the callback to call after transmission of a packet.
      *
      * This method is typically called by an upper MAC layer that wants to be
      * notified after the transmission of a packet.
      */
     void SetTxFinishedCallback(TxFinishedCallback callback);
-
-    /**
-     * Get the mobility model associated to this PHY.
-     *
-     * \return The MobilityModel associated to this PHY.
-     */
-    Ptr<MobilityModel> GetMobility();
-
-    /**
-     * Set the mobility model associated to this PHY.
-     *
-     * \param mobility The mobility model to associate to this PHY.
-     */
-    void SetMobility(Ptr<MobilityModel> mobility);
 
     /**
      * Set the LoraChannel instance PHY transmits on.
@@ -241,6 +218,20 @@ class LoraPhy : public Object
     void SetDevice(Ptr<NetDevice> device);
 
     /**
+     * Get the mobility model associated to this PHY.
+     *
+     * \return The MobilityModel associated to this PHY.
+     */
+    Ptr<MobilityModel> GetMobility() const;
+
+    /**
+     * Set the mobility model associated to this PHY.
+     *
+     * \param mobility The mobility model to associate to this PHY.
+     */
+    void SetMobility(Ptr<MobilityModel> mobility);
+
+    /**
      * Compute the symbol time from SF and BW.
      *
      * \param txParams The parameters for transmission
@@ -262,10 +253,6 @@ class LoraPhy : public Object
      */
     static Time GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams);
 
-  private:
-    Ptr<MobilityModel> m_mobility; //!< The mobility model associated to this PHY.
-
-  protected:
     /**
      * Compute the Signal to Noise Ratio (SNR) from the transmission power
      * measured at packet reception.
@@ -273,22 +260,22 @@ class LoraPhy : public Object
      * \param transmissionPower The reception transmission power (dBm)
      * \return The SNR value in dB.
      */
-    double RxPowerToSNR(double transmissionPower);
+    static double RxPowerToSNR(double transmissionPower);
 
+  protected:
     // Member objects
-
-    Ptr<NetDevice> m_device; //!< The net device this PHY is attached to.
-
-    Ptr<LoraChannel> m_channel; //!< The channel this PHY transmits on.
-
-    LoraInterferenceHelper m_interference; //!< The LoraInterferenceHelper
-    //! associated to this PHY.
+    Ptr<NetDevice> m_device;               //!< The net device this PHY is attached to.
+    Ptr<LoraChannel> m_channel;            //!< The channel this PHY transmits on.
+    LoraInterferenceHelper m_interference; //!< The LoraInterferenceHelper associated to this PHY.
 
     // Constants
+    static const int B = 125000; //! Bandwidth (Hz)
+    static const int NF = 6;     //! Noise Figure (dB)
 
-    const int B = 125000; //! Bandwidth (Hz)
-
-    const int NF = 6; //! Noise Figure (dB)
+    // Callbacks (communication with MAC layer)
+    RxOkCallback m_rxOkCallback;             //! Callback to perform upon correct reception
+    RxFailedCallback m_rxFailedCallback;     //! Callback to perform upon failed reception
+    TxFinishedCallback m_txFinishedCallback; //! Callback to perform upon transmission end
 
     // Trace sources
 
@@ -351,22 +338,8 @@ class LoraPhy : public Object
      */
     TracedCallback<Ptr<const Packet>> m_phySniffTxTrace;
 
-    // Callbacks
-
-    /**
-     * The callback to perform upon correct reception of a packet.
-     */
-    RxOkCallback m_rxOkCallback;
-
-    /**
-     * The callback to perform upon failed reception of a packet we were locked on.
-     */
-    RxFailedCallback m_rxFailedCallback;
-
-    /**
-     * The callback to perform upon the end of a transmission.
-     */
-    TxFinishedCallback m_txFinishedCallback;
+  private:
+    Ptr<MobilityModel> m_mobility; //!< The mobility model associated to this PHY.
 };
 
 } // namespace lorawan
