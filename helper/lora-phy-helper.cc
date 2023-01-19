@@ -23,7 +23,6 @@
 
 #include "ns3/lora-phy-helper.h"
 
-
 namespace ns3
 {
 namespace lorawan
@@ -79,10 +78,10 @@ LoraPhyHelper::Create(Ptr<Node> node, Ptr<NetDevice> device) const
 {
     NS_LOG_FUNCTION(this << node->GetId() << device);
     // Create the PHY and set its channel
-    Ptr<LoraPhy> phy = m_phy.Create<LoraPhy>();
+    auto phy = m_phy.Create<LoraPhy>();
     phy->SetChannel(m_channel);
     // Configuration is different based on the kind of device we have to create
-    std::string typeId = m_phy.GetTypeId().GetName();
+    auto typeId = m_phy.GetTypeId().GetName();
     if (typeId == "ns3::GatewayLoraPhy")
     {
         // Inform the channel of the presence of this PHY
@@ -100,6 +99,7 @@ LoraPhyHelper::Create(Ptr<Node> node, Ptr<NetDevice> device) const
     }
     // Link the PHY to its net device
     phy->SetDevice(device);
+    phy->SetMobility(node->GetObject<MobilityModel>());
     return phy;
 }
 

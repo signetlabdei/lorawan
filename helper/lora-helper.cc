@@ -64,7 +64,7 @@ LoraHelper::Install(const LoraPhyHelper& phyHelper,
         Ptr<Node> node = *i;
 
         // Create the LoraNetDevice
-        Ptr<LoraNetDevice> device = CreateObject<LoraNetDevice>();
+        auto device = CreateObject<LoraNetDevice>();
 
         // Create the PHY
         Ptr<LoraPhy> phy = phyHelper.Create(node, device);

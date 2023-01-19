@@ -98,6 +98,7 @@ GatewayLoraPhy::GetTypeId(void)
         TypeId("ns3::GatewayLoraPhy")
             .SetParent<LoraPhy>()
             .SetGroupName("lorawan")
+            .AddConstructor<GatewayLoraPhy>()
             .AddTraceSource(
                 "NoReceptionBecauseTransmitting",
                 "Trace source indicating a packet "

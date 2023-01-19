@@ -120,7 +120,6 @@ LoraPhy::SetDevice(Ptr<NetDevice> device)
 {
     NS_LOG_FUNCTION(this << device);
     m_device = device;
-    m_mobility = m_device->GetNode()->GetObject<MobilityModel>();
 }
 
 Ptr<MobilityModel>
