@@ -22,8 +22,9 @@
  */
 
 #include "ns3/gateway-lora-phy.h"
-#include "ns3/node.h"
+
 #include "ns3/lora-tag.h"
+#include "ns3/node.h"
 
 namespace ns3
 {
@@ -99,6 +100,11 @@ GatewayLoraPhy::GetTypeId(void)
             .SetParent<LoraPhy>()
             .SetGroupName("lorawan")
             .AddConstructor<GatewayLoraPhy>()
+            .AddAttribute("numReceptionPaths",
+                          "Set a certain number of parallel reception paths",
+                          UintegerValue(8),
+                          MakeUintegerAccessor(&GatewayLoraPhy::SetReceptionPaths),
+                          MakeUintegerChecker<uint8_t>(1))
             .AddTraceSource(
                 "NoReceptionBecauseTransmitting",
                 "Trace source indicating a packet "
@@ -276,15 +282,6 @@ GatewayLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event
         }
 }
 
-void
-GatewayLoraPhy::CreateReceptionPaths(uint8_t number)
-{
-    NS_LOG_FUNCTION(this << (unsigned)number);
-    m_receptionPaths.clear();
-    for (uint8_t i = 0; i < number; ++i)
-        m_receptionPaths.push_back(Create<GatewayLoraPhy::ReceptionPath>());
-}
-
 bool
 GatewayLoraPhy::IsTransmitting(void)
 {
@@ -293,16 +290,31 @@ GatewayLoraPhy::IsTransmitting(void)
 }
 
 void
-GatewayLoraPhy::TxFinished(void)
+GatewayLoraPhy::SetChannel(Ptr<LoraChannel> channel)
 {
-    NS_LOG_FUNCTION_NOARGS();
-    m_isTransmitting = false;
+    NS_LOG_FUNCTION(this << channel);
+    m_channel = channel;
+    m_channel->Add(this);
 }
 
 // Uplink sensitivity (Source: SX1301 datasheet)
 // {SF7, SF8, SF9, SF10, SF11, SF12}
 // These sensitivities are for a bandwidth of 125000 Hz
 const double GatewayLoraPhy::sensitivity[6] = {-126.5, -129, -131.5, -134, -136.5, -139.5};
+
+void
+GatewayLoraPhy::TxFinished(void)
+{
+    NS_LOG_FUNCTION_NOARGS();
+    m_isTransmitting = false;
+}
+
+void
+GatewayLoraPhy::SetReceptionPaths(UintegerValue number)
+{
+    NS_LOG_FUNCTION(this << (unsigned)number.Get());
+    m_receptionPaths = std::vector<Ptr<ReceptionPath>>(number.Get(), Create<ReceptionPath>());
+}
 
 } // namespace lorawan
 } // namespace ns3

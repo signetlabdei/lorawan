@@ -22,6 +22,7 @@
  */
 
 #include "ns3/lora-phy.h"
+
 #include "ns3/node.h"
 
 namespace ns3
@@ -101,11 +102,18 @@ LoraPhy::GetChannel(void) const
     return m_channel;
 }
 
-void
-LoraPhy::SetChannel(Ptr<LoraChannel> channel)
+Ptr<MobilityModel>
+LoraPhy::GetMobility(void) const
 {
-    NS_LOG_FUNCTION(this << channel);
-    m_channel = channel;
+    NS_LOG_FUNCTION_NOARGS();
+    return m_mobility;
+}
+
+void
+LoraPhy::SetMobility(Ptr<MobilityModel> mobility)
+{
+    NS_LOG_FUNCTION(this << mobility);
+    m_mobility = mobility;
 }
 
 Ptr<NetDevice>
@@ -120,20 +128,6 @@ LoraPhy::SetDevice(Ptr<NetDevice> device)
 {
     NS_LOG_FUNCTION(this << device);
     m_device = device;
-}
-
-Ptr<MobilityModel>
-LoraPhy::GetMobility(void) const
-{
-    NS_LOG_FUNCTION_NOARGS();
-    return m_mobility;
-}
-
-void
-LoraPhy::SetMobility(Ptr<MobilityModel> mobility)
-{
-    NS_LOG_FUNCTION(this << mobility);
-    m_mobility = mobility;
 }
 
 void

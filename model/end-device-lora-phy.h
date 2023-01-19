@@ -173,6 +173,9 @@ class EndDeviceLoraPhy : public LoraPhy
     // Implementation of LoraPhy's pure virtual functions
     virtual bool IsTransmitting(void);
 
+    // Overrides LoraPhy's SetChannel to register itself for downlink reception
+    void SetChannel(Ptr<LoraChannel> channel);
+
     /**
      * Set the frequency this EndDevice will listen on.
      *

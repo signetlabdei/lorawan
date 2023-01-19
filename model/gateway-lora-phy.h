@@ -64,15 +64,12 @@ class GatewayLoraPhy : public LoraPhy
                       double txPowerDbm);
 
     /**
-     * Create a certain number of reception paths.
-     * (deletes previous existing paths)
-     */
-    void CreateReceptionPaths(uint8_t number);
-
-    /**
      * Used to check the gateway transmission state by the outside
      */
     bool IsTransmitting(void);
+
+    // Overrides LoraPhy's SetChannel to register itself for uplink reception
+    void SetChannel(Ptr<LoraChannel> channel);
 
   protected:
     /**
@@ -193,6 +190,11 @@ class GatewayLoraPhy : public LoraPhy
      * Used to schedule a change in the gateway transmission state
      */
     void TxFinished(void);
+
+    /**
+     * Set a certain number of reception paths.
+     */
+    void SetReceptionPaths(UintegerValue number);
 };
 
 } // namespace lorawan

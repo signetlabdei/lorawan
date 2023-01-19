@@ -30,7 +30,7 @@
 #include "ns3/lora-device-address-generator.h"
 #include "ns3/lora-phy.h"
 #include "ns3/lorawan-mac.h"
-#include "ns3/net-device.h"
+#include "ns3/lora-net-device.h"
 #include "ns3/node-container.h"
 #include "ns3/random-variable-stream.h"
 
@@ -102,11 +102,10 @@ class LorawanMacHelper
     /**
      * Create the LorawanMac instance and connect it to a device
      *
-     * \param node the node on which we wish to create a wifi MAC.
      * \param device the device within which this MAC will be created.
      * \returns a newly-created LorawanMac object.
      */
-    Ptr<LorawanMac> Create(Ptr<Node> node, Ptr<NetDevice> device) const;
+    Ptr<LorawanMac> Create(Ptr<LoraNetDevice> device) const;
 
     /**
      * Set up the end device's data rates

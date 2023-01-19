@@ -56,20 +56,6 @@ class LorawanMac : public Object
     typedef std::array<std::array<uint8_t, 6>, 8> ReplyDataRateMatrix;
 
     /**
-     * Set the underlying PHY layer
-     *
-     * \param phy the phy layer
-     */
-    void SetPhy(Ptr<LoraPhy> phy);
-
-    /**
-     * Get the underlying PHY layer
-     *
-     * \return The PHY layer that this MAC is connected to.
-     */
-    Ptr<LoraPhy> GetPhy(void);
-
-    /**
      * Send a packet.
      *
      * \param packet The packet to send.
@@ -111,6 +97,20 @@ class LorawanMac : public Object
      * \return The NetDevice this MAC layer will refer to.
      */
     Ptr<NetDevice> GetDevice(void);
+
+    /**
+     * Set the underlying PHY layer
+     *
+     * \param phy the phy layer
+     */
+    void SetPhy(Ptr<LoraPhy> phy);
+
+    /**
+     * Get the underlying PHY layer
+     *
+     * \return The PHY layer that this MAC is connected to.
+     */
+    Ptr<LoraPhy> GetPhy(void);
 
     /**
      * Get the logical lora channel helper associated with this MAC.

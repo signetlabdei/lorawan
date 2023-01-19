@@ -44,9 +44,6 @@ class GatewayLorawanMac : public LorawanMac
     virtual void Send(Ptr<Packet> packet);
 
     // Implementation of the LorawanMac interface
-    bool IsTransmitting(void);
-
-    // Implementation of the LorawanMac interface
     virtual void Receive(Ptr<const Packet> packet);
 
     // Implementation of the LorawanMac interface
@@ -54,6 +51,9 @@ class GatewayLorawanMac : public LorawanMac
 
     // Implementation of the LorawanMac interface
     virtual void TxFinished(Ptr<const Packet> packet);
+
+    // Check whether the physiscal layer is currently transmitting
+    bool IsTransmitting(void);
 
     /**
      * Return the next time at which we will be able to transmit.

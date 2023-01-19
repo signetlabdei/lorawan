@@ -85,6 +85,18 @@ EndDeviceLoraPhy::~EndDeviceLoraPhy()
 {
 }
 
+void
+EndDeviceLoraPhy::SetChannel(Ptr<LoraChannel> channel)
+{
+    NS_LOG_FUNCTION(this << channel);
+    m_channel = channel;
+    // The line below can be commented to speed up uplink-only simulations.
+    // This implies that the LoraChannel instance will only know about
+    // Gateways, and it will not lose time delivering packets and interference
+    // information to devices which will never listen.
+    m_channel->Add(this, true);
+}
+
 // Downlink sensitivity (from SX1272 datasheet)
 // {SF7, SF8, SF9, SF10, SF11, SF12}
 // These sensitivites are for a bandwidth of 125000 Hz

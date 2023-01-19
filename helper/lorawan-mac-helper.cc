@@ -78,63 +78,45 @@ LorawanMacHelper::SetRegion(enum LorawanMacHelper::Regions region)
 }
 
 Ptr<LorawanMac>
-LorawanMacHelper::Create(Ptr<Node> node, Ptr<NetDevice> device) const
+LorawanMacHelper::Create(Ptr<LoraNetDevice> device) const
 {
     Ptr<LorawanMac> mac = m_mac.Create<LorawanMac>();
     mac->SetDevice(device);
-
-    // If we are operating on an end device, add an address to it
-    if (m_deviceType == ED_A && bool(m_addrGen) != 0)
+    device->SetMac(mac);
+    if (auto edMac = DynamicCast<ClassAEndDeviceLorawanMac>(mac); edMac != nullptr)
     {
-        mac->GetObject<ClassAEndDeviceLorawanMac>()->SetDeviceAddress(m_addrGen->NextAddress());
-    }
-
-    // Add a basic list of channels based on the region where the device is
-    // operating
-    if (m_deviceType == ED_A)
-    {
-        Ptr<ClassAEndDeviceLorawanMac> edMac = mac->GetObject<ClassAEndDeviceLorawanMac>();
+        if (m_addrGen)
+            edMac->SetDeviceAddress(m_addrGen->NextAddress());
         switch (m_region)
         {
-        case LorawanMacHelper::EU: {
+        case LorawanMacHelper::EU:
             ConfigureForEuRegion(edMac);
             break;
-        }
-        case LorawanMacHelper::SingleChannel: {
+        case LorawanMacHelper::SingleChannel:
             ConfigureForSingleChannelRegion(edMac);
             break;
-        }
-        case LorawanMacHelper::ALOHA: {
+        case LorawanMacHelper::ALOHA:
             ConfigureForAlohaRegion(edMac);
             break;
-        }
-        default: {
+        default:
             NS_LOG_ERROR("This region isn't supported yet!");
-            break;
-        }
         }
     }
-    else
+    else if (auto gwMac = DynamicCast<GatewayLorawanMac>(mac); gwMac != nullptr)
     {
-        Ptr<GatewayLorawanMac> gwMac = mac->GetObject<GatewayLorawanMac>();
         switch (m_region)
         {
-        case LorawanMacHelper::EU: {
+        case LorawanMacHelper::EU:
             ConfigureForEuRegion(gwMac);
             break;
-        }
-        case LorawanMacHelper::SingleChannel: {
+        case LorawanMacHelper::SingleChannel:
             ConfigureForSingleChannelRegion(gwMac);
             break;
-        }
-        case LorawanMacHelper::ALOHA: {
+        case LorawanMacHelper::ALOHA:
             ConfigureForAlohaRegion(gwMac);
             break;
-        }
-        default: {
+        default:
             NS_LOG_ERROR("This region isn't supported yet!");
-            break;
-        }
         }
     }
     return mac;
@@ -212,8 +194,7 @@ LorawanMacHelper::ApplyCommonAlohaConfigurations(Ptr<LorawanMac> lorawanMac) con
     lorawanMac->SetSfForDataRate(std::vector<uint8_t>{12, 11, 10, 9, 8, 7});
     lorawanMac->SetBandwidthForDataRate(
         std::vector<double>{125000, 125000, 125000, 125000, 125000, 125000});
-    lorawanMac->SetMaxMacPayloadForDataRate(
-        std::vector<uint32_t>{59, 59, 59, 123, 230, 230});
+    lorawanMac->SetMaxMacPayloadForDataRate(std::vector<uint32_t>{59, 59, 59, 123, 230, 230});
 }
 
 void
@@ -312,8 +293,7 @@ LorawanMacHelper::ApplyCommonEuConfigurations(Ptr<LorawanMac> lorawanMac) const
     lorawanMac->SetSfForDataRate(std::vector<uint8_t>{12, 11, 10, 9, 8, 7});
     lorawanMac->SetBandwidthForDataRate(
         std::vector<double>{125000, 125000, 125000, 125000, 125000, 125000});
-    lorawanMac->SetMaxMacPayloadForDataRate(
-        std::vector<uint32_t>{59, 59, 59, 123, 230, 230});
+    lorawanMac->SetMaxMacPayloadForDataRate(std::vector<uint32_t>{59, 59, 59, 123, 230, 230});
 }
 
 ///////////////////////////////
@@ -359,7 +339,7 @@ void
 LorawanMacHelper::ConfigureForSingleChannelRegion(Ptr<GatewayLorawanMac> gwMac) const
 {
     NS_LOG_FUNCTION_NOARGS();
-    
+
     ApplyCommonEuConfigurations(gwMac);
 }
 
@@ -392,8 +372,7 @@ LorawanMacHelper::ApplyCommonSingleChannelConfigurations(Ptr<LorawanMac> lorawan
     lorawanMac->SetSfForDataRate(std::vector<uint8_t>{12, 11, 10, 9, 8, 7});
     lorawanMac->SetBandwidthForDataRate(
         std::vector<double>{125000, 125000, 125000, 125000, 125000, 125000});
-    lorawanMac->SetMaxMacPayloadForDataRate(
-        std::vector<uint32_t>{59, 59, 59, 123, 230, 230});
+    lorawanMac->SetMaxMacPayloadForDataRate(std::vector<uint32_t>{59, 59, 59, 123, 230, 230});
 }
 
 std::vector<int>

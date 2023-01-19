@@ -67,7 +67,7 @@ LoraNetDevice::LoraNetDevice()
     : m_node(0),
       m_phy(0),
       m_mac(0),
-      m_configComplete(0)
+      m_configComplete(false)
 {
     NS_LOG_FUNCTION_NOARGS();
 }
@@ -81,6 +81,7 @@ void
 LoraNetDevice::SetMac(Ptr<LorawanMac> mac)
 {
     m_mac = mac;
+    CompleteConfig();
 }
 
 Ptr<LorawanMac>
@@ -93,6 +94,7 @@ void
 LoraNetDevice::SetPhy(Ptr<LoraPhy> phy)
 {
     m_phy = phy;
+    CompleteConfig();
 }
 
 Ptr<LoraPhy>
@@ -104,14 +106,8 @@ LoraNetDevice::GetPhy(void) const
 void
 LoraNetDevice::CompleteConfig(void)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Verify we have all the necessary pieces
-    if (bool(m_mac) == 0 || bool(m_phy) == 0 || bool(m_node) == 0 || m_configComplete)
-    {
+    if (!m_mac || !m_phy || !m_node || m_configComplete)
         return;
-    }
-
     m_mac->SetPhy(m_phy);
     m_configComplete = true;
 }

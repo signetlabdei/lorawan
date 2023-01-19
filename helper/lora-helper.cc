@@ -54,34 +54,30 @@ LoraHelper::Install(const LoraPhyHelper& phyHelper,
                     const LorawanMacHelper& macHelper,
                     NodeContainer c) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
     NetDeviceContainer devices;
-
-    // Go over the various nodes in which to install the NetDevice
     for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i)
     {
         Ptr<Node> node = *i;
-
-        // Create the LoraNetDevice
-        auto device = CreateObject<LoraNetDevice>();
-
-        // Create the PHY
+        Ptr<LoraNetDevice> device = CreateObject<LoraNetDevice>();
+        node->AddDevice(device);
         Ptr<LoraPhy> phy = phyHelper.Create(node, device);
-        NS_ASSERT(bool(phy) != 0);
-        device->SetPhy(phy);
-        NS_LOG_DEBUG("Done creating the PHY");
-
-        // Connect Trace Sources if necessary
+        Ptr<LorawanMac> mac = macHelper.Create(device);
         if (m_packetTracker)
         {
-            if (phyHelper.GetDeviceType() == TypeId::LookupByName("ns3::SimpleEndDeviceLoraPhy"))
+            if (DynamicCast<SimpleEndDeviceLoraPhy>(phy) != nullptr)
             {
                 phy->TraceConnectWithoutContext(
                     "StartSending",
                     MakeCallback(&LoraPacketTracker::TransmissionCallback, m_packetTracker));
+                mac->TraceConnectWithoutContext(
+                    "SentNewPacket",
+                    MakeCallback(&LoraPacketTracker::MacTransmissionCallback, m_packetTracker));
+                mac->TraceConnectWithoutContext(
+                    "RequiredTransmissions",
+                    MakeCallback(&LoraPacketTracker::RequiredTransmissionsCallback,
+                                 m_packetTracker));
             }
-            else if (phyHelper.GetDeviceType() == TypeId::LookupByName("ns3::GatewayLoraPhy"))
+            else if (DynamicCast<GatewayLoraPhy>(phy) != nullptr)
             {
                 phy->TraceConnectWithoutContext(
                     "StartSending",
@@ -101,45 +97,16 @@ LoraHelper::Install(const LoraPhyHelper& phyHelper,
                 phy->TraceConnectWithoutContext(
                     "NoReceptionBecauseTransmitting",
                     MakeCallback(&LoraPacketTracker::LostBecauseTxCallback, m_packetTracker));
-            }
-        }
-
-        // Create the MAC
-        Ptr<LorawanMac> mac = macHelper.Create(node, device);
-        NS_ASSERT(bool(mac) != 0);
-        mac->SetPhy(phy);
-        NS_LOG_DEBUG("Done creating the MAC");
-        device->SetMac(mac);
-
-        if (m_packetTracker)
-        {
-            if (phyHelper.GetDeviceType() == TypeId::LookupByName("ns3::SimpleEndDeviceLoraPhy"))
-            {
                 mac->TraceConnectWithoutContext(
                     "SentNewPacket",
                     MakeCallback(&LoraPacketTracker::MacTransmissionCallback, m_packetTracker));
-
-                mac->TraceConnectWithoutContext(
-                    "RequiredTransmissions",
-                    MakeCallback(&LoraPacketTracker::RequiredTransmissionsCallback,
-                                 m_packetTracker));
-            }
-            else if (phyHelper.GetDeviceType() == TypeId::LookupByName("ns3::GatewayLoraPhy"))
-            {
-                mac->TraceConnectWithoutContext(
-                    "SentNewPacket",
-                    MakeCallback(&LoraPacketTracker::MacTransmissionCallback, m_packetTracker));
-
                 mac->TraceConnectWithoutContext(
                     "ReceivedPacket",
                     MakeCallback(&LoraPacketTracker::MacGwReceptionCallback, m_packetTracker));
             }
         }
-
-        node->AddDevice(device);
         devices.Add(device);
-        NS_LOG_DEBUG("node=" << node
-                             << ", mob=" << node->GetObject<MobilityModel>()->GetPosition());
+        NS_LOG_DEBUG("node=" << node << ", mob=" << node->GetObject<MobilityModel>());
     }
     return devices;
 }

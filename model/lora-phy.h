@@ -188,7 +188,7 @@ class LoraPhy : public Object
      *
      * \param channel The LoraChannel instance this PHY will transmit on.
      */
-    void SetChannel(Ptr<LoraChannel> channel);
+    virtual void SetChannel(Ptr<LoraChannel> channel) = 0;
 
     /**
      * Get the channel instance associated to this PHY.
@@ -196,20 +196,6 @@ class LoraPhy : public Object
      * \return The LoraChannel instance this PHY transmits on.
      */
     Ptr<LoraChannel> GetChannel(void) const;
-
-    /**
-     * Get the NetDevice associated to this PHY.
-     *
-     * \return The NetDevice associated to this PHY.
-     */
-    Ptr<NetDevice> GetDevice(void) const;
-
-    /**
-     * Set the NetDevice that owns this PHY.
-     *
-     * \param device The NetDevice this PHY will reference as its owner.
-     */
-    void SetDevice(Ptr<NetDevice> device);
 
     /**
      * Get the mobility model associated to this PHY.
@@ -224,6 +210,20 @@ class LoraPhy : public Object
      * \param mobility The mobility model to associate to this PHY.
      */
     void SetMobility(Ptr<MobilityModel> mobility);
+
+    /**
+     * Get the NetDevice associated to this PHY.
+     *
+     * \return The NetDevice associated to this PHY.
+     */
+    Ptr<NetDevice> GetDevice(void) const;
+
+    /**
+     * Set the NetDevice that owns this PHY.
+     *
+     * \param device The NetDevice this PHY will reference as its owner.
+     */
+    void SetDevice(Ptr<NetDevice> device);
 
     /**
      * Compute the symbol time from SF and BW.
