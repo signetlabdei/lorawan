@@ -109,7 +109,7 @@ main(int argc, char* argv[])
     mobility.Install(endDevices);
 
     // Create the LoraNetDevices of the end devices
-    phyHelper.SetType("ns3::SimpleEndDeviceLoraPhy");
+    phyHelper.SetType("ns3::EndDeviceLoraPhy");
     macHelper.SetType("ns3::ClassAEndDeviceLorawanMac");
     NetDeviceContainer endDevicesNetDevices = helper.Install(phyHelper, macHelper, endDevices);
 

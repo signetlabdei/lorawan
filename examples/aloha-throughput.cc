@@ -68,13 +68,13 @@ OnPacketReceptionCallback(Ptr<const Packet> packet, uint32_t systemId)
 int
 main(int argc, char* argv[])
 {
-    std::string interferenceMatrix = "aloha";
+    std::string interferenceMatrix = "ALOHA";
 
     CommandLine cmd;
     cmd.AddValue("nDevices", "Number of end devices to include in the simulation", nDevices);
     cmd.AddValue("simulationTime", "Simulation Time", simulationTime);
     cmd.AddValue("interferenceMatrix",
-                 "Interference matrix to use [aloha, goursaud]",
+                 "Interference matrix to use [ALOHA, GOURSAUD]",
                  interferenceMatrix);
     cmd.AddValue("radius", "Radius of the deployment", radius);
     cmd.Parse(argc, argv);
@@ -86,15 +86,6 @@ main(int argc, char* argv[])
 
     // Make all devices use SF7 (i.e., DR5)
     // Config::SetDefault ("ns3::EndDeviceLorawanMac::DataRate", UintegerValue (5));
-
-    if (interferenceMatrix == "aloha")
-    {
-        LoraInterferenceHelper::collisionMatrix = LoraInterferenceHelper::ALOHA;
-    }
-    else if (interferenceMatrix == "goursaud")
-    {
-        LoraInterferenceHelper::collisionMatrix = LoraInterferenceHelper::GOURSAUD;
-    }
 
     /***********
      *  Setup  *
@@ -145,6 +136,7 @@ main(int argc, char* argv[])
 
     // Create the LoraPhyHelper
     LoraPhyHelper phyHelper = LoraPhyHelper();
+    phyHelper.SetInterference("CollisionMatrix", interferenceMatrix);
     phyHelper.SetChannel(channel);
 
     // Create the LorawanMacHelper
@@ -189,7 +181,7 @@ main(int argc, char* argv[])
 
     // Create the LoraNetDevices of the end devices
     macHelper.SetAddressGenerator(addrGen);
-    phyHelper.SetType("ns3::SimpleEndDeviceLoraPhy");
+    phyHelper.SetType("ns3::EndDeviceLoraPhy");
     macHelper.SetType("ns3::ClassAEndDeviceLorawanMac");
     helper.Install(phyHelper, macHelper, endDevices);
 

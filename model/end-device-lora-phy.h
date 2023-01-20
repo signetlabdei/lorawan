@@ -101,10 +101,6 @@ class EndDeviceLoraPhyListener
  * is delegateed to an upper layer, which can modify the state of the device
  * through the public SwitchToSleep and SwitchToStandby methods. In SLEEP
  * mode, the device cannot lock on a packet and start reception.
- *
- * Peculiarities about the error model and about how errors are handled are
- * supposed to be handled by classes extending this one, like
- * SimpleEndDeviceLoraPhy or SpectrumEndDeviceLoraPhy. These classes need to
  */
 class EndDeviceLoraPhy : public LoraPhy
 {
@@ -152,29 +148,30 @@ class EndDeviceLoraPhy : public LoraPhy
     virtual ~EndDeviceLoraPhy();
 
     // Implementation of LoraPhy's pure virtual functions
+    virtual void Send(Ptr<Packet> packet,
+                      LoraTxParameters txParams,
+                      double frequency,
+                      double txPowerDbm);
+
+    // Implementation of LoraPhy's pure virtual functions
     virtual void StartReceive(Ptr<Packet> packet,
                               double rxPowerDbm,
                               uint8_t sf,
                               Time duration,
-                              double frequency) = 0;
-
-    // Implementation of LoraPhy's pure virtual functions
-    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) = 0;
-
-    // Implementation of LoraPhy's pure virtual functions
-    virtual void Send(Ptr<Packet> packet,
-                      LoraTxParameters txParams,
-                      double frequency,
-                      double txPowerDbm) = 0;
-
-    // Implementation of LoraPhy's pure virtual functions
-    virtual bool IsOnFrequency(double frequency);
+                              double frequency);
 
     // Implementation of LoraPhy's pure virtual functions
     virtual bool IsTransmitting(void);
 
-    // Overrides LoraPhy's SetChannel to register itself for downlink reception
-    void SetChannel(Ptr<LoraChannel> channel);
+    /**
+     * Switch to the STANDBY state.
+     */
+    void SwitchToStandby(void);
+
+    /**
+     * Switch to the SLEEP state.
+     */
+    void SwitchToSleep(void);
 
     /**
      * Set the frequency this EndDevice will listen on.
@@ -197,28 +194,11 @@ class EndDeviceLoraPhy : public LoraPhy
     void SetSpreadingFactor(uint8_t sf);
 
     /**
-     * Get the Spreading Factor this EndDevice is listening for.
-     *
-     * \return The Spreading Factor we are listening for.
-     */
-    uint8_t GetSpreadingFactor(void);
-
-    /**
      * Return the state this End Device is currently in.
      *
      * \return The state this EndDeviceLoraPhy is currently in.
      */
     EndDeviceLoraPhy::State GetState(void);
-
-    /**
-     * Switch to the STANDBY state.
-     */
-    void SwitchToStandby(void);
-
-    /**
-     * Switch to the SLEEP state.
-     */
-    void SwitchToSleep(void);
 
     /**
      * Add the input listener to the list of objects to be notified of PHY-level
@@ -236,9 +216,10 @@ class EndDeviceLoraPhy : public LoraPhy
      */
     void UnregisterListener(EndDeviceLoraPhyListener* listener);
 
-    static const double sensitivity[6]; //!< The sensitivity vector of this device to different SFs
-
   protected:
+    // Implementation of LoraPhy's pure virtual functions
+    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event);
+
     /**
      * Switch to the RX state
      */
@@ -248,6 +229,15 @@ class EndDeviceLoraPhy : public LoraPhy
      * Switch to the TX state
      */
     void SwitchToTx(double txPowerDbm);
+
+    double m_frequency; //!< The frequency this device is listening on
+    uint8_t m_sf;       //!< The Spreading Factor this device is listening for
+
+    static const double sensitivity[6]; //!< The sensitivity vector of this device to different SFs
+
+    std::vector<EndDeviceLoraPhyListener*> m_listeners; //!< PHY listeners
+
+    TracedValue<State> m_state; //!< The state this PHY is currently in.
 
     /**
      * Trace source for when a packet is lost because it was using a SF different from
@@ -261,26 +251,6 @@ class EndDeviceLoraPhy : public LoraPhy
      * listen on.
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_wrongFrequency;
-
-    TracedValue<State> m_state; //!< The state this PHY is currently in.
-
-    // static const double sensitivity[6]; //!< The sensitivity vector of this device to different
-    // SFs
-
-    double m_frequency; //!< The frequency this device is listening on
-
-    uint8_t m_sf; //!< The Spreading Factor this device is listening for
-
-    /**
-     * typedef for a list of EndDeviceLoraPhyListener
-     */
-    typedef std::vector<EndDeviceLoraPhyListener*> Listeners;
-    /**
-     * typedef for a list of EndDeviceLoraPhyListener iterator
-     */
-    typedef std::vector<EndDeviceLoraPhyListener*>::iterator ListenersI;
-
-    Listeners m_listeners; //!< PHY listeners
 };
 
 } // namespace lorawan

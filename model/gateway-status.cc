@@ -24,6 +24,7 @@
 #include "ns3/gateway-status.h"
 
 #include "ns3/log.h"
+#include "ns3/simulator.h"
 
 namespace ns3
 {

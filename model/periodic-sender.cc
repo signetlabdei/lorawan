@@ -24,6 +24,7 @@
 #include "periodic-sender.h"
 
 #include "ns3/lora-net-device.h"
+#include "ns3/simulator.h"
 
 namespace ns3
 {

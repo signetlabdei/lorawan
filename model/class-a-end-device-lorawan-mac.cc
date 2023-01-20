@@ -30,6 +30,7 @@
 #include "ns3/end-device-lora-phy.h"
 #include "ns3/end-device-lorawan-mac.h"
 #include "ns3/log.h"
+#include "ns3/simulator.h"
 
 #include <algorithm>
 

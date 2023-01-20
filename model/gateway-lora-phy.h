@@ -56,8 +56,6 @@ class GatewayLoraPhy : public LoraPhy
                               Time duration,
                               double frequency);
 
-    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event);
-
     virtual void Send(Ptr<Packet> packet,
                       LoraTxParameters txParams,
                       double frequency,
@@ -68,10 +66,9 @@ class GatewayLoraPhy : public LoraPhy
      */
     bool IsTransmitting(void);
 
-    // Overrides LoraPhy's SetChannel to register itself for uplink reception
-    void SetChannel(Ptr<LoraChannel> channel);
-
   protected:
+    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event);
+
     /**
      * This class represents a configurable reception path.
      *

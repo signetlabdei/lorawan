@@ -125,7 +125,7 @@ main(int argc, char* argv[])
 
     // Create the LoraNetDevices of the end devices
     macHelper.SetAddressGenerator(addrGen);
-    phyHelper.SetType("ns3::SimpleEndDeviceLoraPhy");
+    phyHelper.SetType("ns3::EndDeviceLoraPhy");
     macHelper.SetType("ns3::ClassAEndDeviceLorawanMac");
     helper.Install(phyHelper, macHelper, endDevices);
 

@@ -45,23 +45,6 @@ class LoraPhy;
 struct LoraTxParameters;
 
 /**
- * A struct that holds meaningful parameters for transmission on a
- * LoraChannel.
- */
-struct LoraChannelParameters
-{
-    double rxPowerDbm; //!< The reception power.
-    uint8_t sf;        //!< The Spreading Factor of this transmission.
-    Time duration;     //!< The duration of the transmission.
-    double frequency;  //!< The frequency [Hz] of this transmission.
-};
-
-/**
- * Allow logging of LoraChannelParameters like with any other data type.
- */
-std::ostream& operator<<(std::ostream& os, const LoraChannelParameters& params);
-
-/**
  * The class that delivers packets among PHY layers.
  *
  * This class is tasked with taking packets that PHY layers want to send and,
@@ -99,9 +82,8 @@ class LoraChannel : public Channel
      * of incoming transmissions.
      *
      * \param phy The physical layer to add.
-     * \param down The direction of transmission (uplink/downlink).
      */
-    void Add(Ptr<LoraPhy> phy, bool down = false);
+    void Add(Ptr<LoraPhy> phy);
 
     /**
      * Remove a physical layer from the LoraChannel.
@@ -111,9 +93,8 @@ class LoraChannel : public Channel
      * it is not necessary to notify them about each transmission.
      *
      * \param phy The physical layer to remove.
-     * \param down The direction of transmission (uplink/downlink).
      */
-    void Remove(Ptr<LoraPhy> phy, bool down = false);
+    void Remove(Ptr<LoraPhy> phy);
 
     /**
      * Send a packet in the channel.
@@ -126,10 +107,9 @@ class LoraChannel : public Channel
      * \param sender The phy that is sending this packet.
      * \param packet The PHY layer packet that is being sent over the channel.
      * \param txPowerDbm The power of the transmission.
-     * \param txParams The set of parameters that are used by the transmitter.
+     * \param sf The SF that is used by the transmitter.
      * \param duration The on-air duration of this packet.
      * \param frequency The frequency this transmission will happen at.
-     * \param down The direction of the transmission (uplink/downlink).
      *
      * \internal
      *
@@ -139,10 +119,9 @@ class LoraChannel : public Channel
     void Send(Ptr<LoraPhy> sender,
               Ptr<Packet> packet,
               double txPowerDbm,
-              LoraTxParameters txParams,
+              uint8_t sf,
               Time duration,
-              double frequency,
-              bool down = false) const;
+              double frequency) const;
 
     /**
      * Compute the received power when transmitting from a point to another one.
@@ -162,27 +141,10 @@ class LoraChannel : public Channel
 
   private:
     /**
-     * Private method that is scheduled by LoraChannel's Send method to happen
-     * after the channel delay, for each of the connected PHY layers.
-     *
-     * It's here that the Receive method of the PHY is called to initiate packet
-     * reception at the PHY.
-     *
-     * \param i The index of the phy to start reception on.
-     * \param packet The packet the phy will receive.
-     * \param parameters The parameters that characterize this transmission
-     * \param down The direction of the transmission (uplink/downlink).
-     */
-    void Receive(uint32_t i,
-                 Ptr<Packet> packet,
-                 LoraChannelParameters parameters,
-                 bool down = false) const;
-
-    /**
      * The vector containing the PHYs that are currently connected to the
      * channel.
      */
-    std::vector<Ptr<LoraPhy>> m_phyList;
+    std::vector<Ptr<LoraPhy>> m_phyListUp;
     std::vector<Ptr<LoraPhy>> m_phyListDown;
 
     /**

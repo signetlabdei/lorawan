@@ -65,7 +65,7 @@ LoraHelper::Install(const LoraPhyHelper& phyHelper,
         Ptr<LorawanMac> mac = macHelper.Create(device);
         if (m_packetTracker)
         {
-            if (DynamicCast<SimpleEndDeviceLoraPhy>(phy) != nullptr)
+            if (DynamicCast<EndDeviceLoraPhy>(phy) != nullptr)
             {
                 phy->TraceConnectWithoutContext(
                     "StartSending",
@@ -81,9 +81,6 @@ LoraHelper::Install(const LoraPhyHelper& phyHelper,
             else if (DynamicCast<GatewayLoraPhy>(phy) != nullptr)
             {
                 phy->TraceConnectWithoutContext(
-                    "StartSending",
-                    MakeCallback(&LoraPacketTracker::TransmissionCallback, m_packetTracker));
-                phy->TraceConnectWithoutContext(
                     "ReceivedPacket",
                     MakeCallback(&LoraPacketTracker::PacketReceptionCallback, m_packetTracker));
                 phy->TraceConnectWithoutContext(
@@ -98,9 +95,6 @@ LoraHelper::Install(const LoraPhyHelper& phyHelper,
                 phy->TraceConnectWithoutContext(
                     "NoReceptionBecauseTransmitting",
                     MakeCallback(&LoraPacketTracker::LostBecauseTxCallback, m_packetTracker));
-                mac->TraceConnectWithoutContext(
-                    "SentNewPacket",
-                    MakeCallback(&LoraPacketTracker::MacTransmissionCallback, m_packetTracker));
                 mac->TraceConnectWithoutContext(
                     "ReceivedPacket",
                     MakeCallback(&LoraPacketTracker::MacGwReceptionCallback, m_packetTracker));

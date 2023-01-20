@@ -53,7 +53,7 @@ main(int argc, char* argv[])
     int gatewayRings = 1;
     double range = 2540.25; // Max range for downlink (!) coverage probability > 0.98 (with okumura)
     int nDevices = 1;
-    std::string sir = "GOURSAUD";
+    std::string sir = "CROCE";
     bool initializeSF = true;
     bool file = false; // Warning: will produce a file for each gateway
     bool log = false;
@@ -103,8 +103,6 @@ main(int argc, char* argv[])
     Ptr<NakagamiPropagationLossModel> rayleigh;
     Ptr<LoraChannel> channel;
     {
-        LoraInterferenceHelper::collisionMatrix = sirMap.at(sir);
-
         // Delay obtained from distance and speed of light in vacuum (constant)
         Ptr<PropagationDelayModel> delay = CreateObject<ConstantSpeedPropagationDelayModel>();
 
@@ -209,6 +207,7 @@ main(int argc, char* argv[])
     {
         // Physiscal layer settings
         LoraPhyHelper phyHelper;
+        phyHelper.SetInterference("CollisionMatrix", sir);
         phyHelper.SetChannel(channel);
 
         // Create a LoraDeviceAddressGenerator
@@ -226,7 +225,7 @@ main(int argc, char* argv[])
         gwNetDev = helper.Install(phyHelper, macHelper, gateways);
 
         // Create the LoraNetDevices of the end devices
-        phyHelper.SetType("ns3::SimpleEndDeviceLoraPhy");
+        phyHelper.SetType("ns3::EndDeviceLoraPhy");
         macHelper.SetType("ns3::ClassAEndDeviceLorawanMac");
         helper.Install(phyHelper, macHelper, endDevices);
     }

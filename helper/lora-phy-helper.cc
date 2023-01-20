@@ -32,22 +32,29 @@ NS_LOG_COMPONENT_DEFINE("LoraPhyHelper");
 
 LoraPhyHelper::LoraPhyHelper()
 {
+    m_interferenceHelper.SetTypeId("ns3::LoraInterferenceHelper");
 }
 
-void
-LoraPhyHelper::SetChannel(Ptr<LoraChannel> channel)
+LoraPhyHelper::~LoraPhyHelper()
 {
-    m_channel = channel;
 }
 
 Ptr<LoraPhy>
 LoraPhyHelper::Create(Ptr<Node> node, Ptr<LoraNetDevice> device) const
 {
     auto phy = m_phy.Create<LoraPhy>();
+    auto interference = m_interferenceHelper.Create<LoraInterferenceHelper>();
+    phy->SetInterferenceHelper(interference);
     phy->SetChannel(m_channel);
     phy->SetDevice(device);
     device->SetPhy(phy);
     return phy;
+}
+
+void
+LoraPhyHelper::SetChannel(Ptr<LoraChannel> channel)
+{
+    m_channel = channel;
 }
 
 } // namespace lorawan

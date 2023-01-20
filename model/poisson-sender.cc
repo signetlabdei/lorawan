@@ -22,6 +22,7 @@
 
 #include "ns3/double.h"
 #include "ns3/lora-net-device.h"
+#include "ns3/simulator.h"
 
 namespace ns3
 {

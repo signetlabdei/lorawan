@@ -39,7 +39,7 @@ CreateEndDevices(int nDevices, MobilityHelper mobility, Ptr<LoraChannel> channel
     mobility.Install(endDevices);
 
     // Create the LoraNetDevices of the end devices
-    phyHelper.SetType("ns3::SimpleEndDeviceLoraPhy");
+    phyHelper.SetType("ns3::EndDeviceLoraPhy");
     macHelper.SetType("ns3::ClassAEndDeviceLorawanMac");
     helper.Install(phyHelper, macHelper, endDevices);
 

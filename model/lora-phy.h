@@ -24,10 +24,10 @@
 #ifndef LORA_PHY_H
 #define LORA_PHY_H
 
-#include "ns3/lora-interference-helper.h"
-#include "ns3/net-device.h"
-#include "ns3/mobility-model.h"
 #include "ns3/lora-channel.h"
+#include "ns3/lora-interference-helper.h"
+#include "ns3/mobility-model.h"
+#include "ns3/net-device.h"
 
 namespace ns3
 {
@@ -80,6 +80,19 @@ class LoraPhy : public Object
     virtual ~LoraPhy();
 
     /**
+     * Instruct the PHY to send a packet according to some parameters.
+     *
+     * \param packet The packet to send.
+     * \param txParams The desired transmission parameters.
+     * \param frequency The frequency on which to transmit.
+     * \param txPowerDbm The power in dBm with which to transmit the packet.
+     */
+    virtual void Send(Ptr<Packet> packet,
+                      LoraTxParameters txParams,
+                      double frequency,
+                      double txPowerDbm) = 0;
+
+    /**
      * Start receiving a packet.
      *
      * This method is typically called by LoraChannel.
@@ -96,33 +109,6 @@ class LoraPhy : public Object
                               uint8_t sf,
                               Time duration,
                               double frequency) = 0;
-
-    /**
-     * Finish reception of a packet.
-     *
-     * This method is scheduled by StartReceive, based on the packet duration. By
-     * passing a LoraInterferenceHelper Event to this method, the class will be
-     * able to identify the packet that is being received among all those that
-     * were registered as interference by StartReceive.
-     *
-     * \param packet The received packet.
-     * \param event The event that is tied to this packet in the
-     * LoraInterferenceHelper.
-     */
-    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) = 0;
-
-    /**
-     * Instruct the PHY to send a packet according to some parameters.
-     *
-     * \param packet The packet to send.
-     * \param txParams The desired transmission parameters.
-     * \param frequency The frequency on which to transmit.
-     * \param txPowerDbm The power in dBm with which to transmit the packet.
-     */
-    virtual void Send(Ptr<Packet> packet,
-                      LoraTxParameters txParams,
-                      double frequency,
-                      double txPowerDbm) = 0;
 
     /**
      * Whether this device is transmitting or not.
@@ -182,13 +168,20 @@ class LoraPhy : public Object
     void SetTxFinishedCallback(TxFinishedCallback callback);
 
     /**
+     * Sets the interference helper.
+     *
+     * \param helper the interference helper
+     */
+    virtual void SetInterferenceHelper(const Ptr<LoraInterferenceHelper> helper);
+
+    /**
      * Set the LoraChannel instance PHY transmits on.
      *
      * Typically, there is only one instance per simulation.
      *
      * \param channel The LoraChannel instance this PHY will transmit on.
      */
-    virtual void SetChannel(Ptr<LoraChannel> channel) = 0;
+    virtual void SetChannel(Ptr<LoraChannel> channel);
 
     /**
      * Get the channel instance associated to this PHY.
@@ -259,10 +252,24 @@ class LoraPhy : public Object
   protected:
     void DoInitialize() override;
 
+    /**
+     * Finish reception of a packet.
+     *
+     * This method is scheduled by StartReceive, based on the packet duration. By
+     * passing a LoraInterferenceHelper Event to this method, the class will be
+     * able to identify the packet that is being received among all those that
+     * were registered as interference by StartReceive.
+     *
+     * \param packet The received packet.
+     * \param event The event that is tied to this packet in the
+     * LoraInterferenceHelper.
+     */
+    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) = 0;
+
     // Member objects
-    Ptr<NetDevice> m_device;               //!< The net device this PHY is attached to.
-    Ptr<LoraChannel> m_channel;            //!< The channel this PHY transmits on.
-    LoraInterferenceHelper m_interference; //!< The LoraInterferenceHelper associated to this PHY.
+    Ptr<NetDevice> m_device;                    //!< The net device this PHY is attached to.
+    Ptr<LoraChannel> m_channel;                 //!< The channel this PHY transmits on.
+    Ptr<LoraInterferenceHelper> m_interference; //!< The InterferenceHelper associated to this PHY.
 
     // Constants
     static const int B = 125000; //! Bandwidth (Hz)
@@ -333,6 +340,8 @@ class LoraPhy : public Object
      * \see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>> m_phySniffTxTrace;
+
+    uint32_t m_context; //!< Node Id to correctly format context in traced callbacks
 
   private:
     Ptr<MobilityModel> m_mobility; //!< The mobility model associated to this PHY.

@@ -227,7 +227,7 @@ main(int argc, char* argv[])
         CreateObject<LoraDeviceAddressGenerator>(nwkId, nwkAddr);
 
     // Create the LoraNetDevices of the end devices
-    phyHelper.SetType("ns3::SimpleEndDeviceLoraPhy");
+    phyHelper.SetType("ns3::EndDeviceLoraPhy");
     macHelper.SetType("ns3::ClassAEndDeviceLorawanMac");
     macHelper.SetAddressGenerator(addrGen);
     macHelper.SetRegion(LorawanMacHelper::EU);

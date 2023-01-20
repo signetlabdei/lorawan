@@ -11,7 +11,6 @@ set(source_files
     model/class-a-end-device-lorawan-mac.cc
     model/gateway-lora-phy.cc
     model/end-device-lora-phy.cc
-    model/simple-end-device-lora-phy.cc
     model/sub-band.cc
     model/logical-lora-channel.cc
     model/logical-lora-channel-helper.cc
@@ -77,7 +76,6 @@ set(header_files
     model/class-a-end-device-lorawan-mac.h
     model/gateway-lora-phy.h
     model/end-device-lora-phy.h
-    model/simple-end-device-lora-phy.h
     model/sub-band.h
     model/logical-lora-channel.h
     model/logical-lora-channel-helper.h

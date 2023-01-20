@@ -5,7 +5,7 @@
 #include "ns3/lora-helper.h"
 #include "ns3/mobility-helper.h"
 #include "ns3/one-shot-sender-helper.h"
-#include "ns3/simple-end-device-lora-phy.h"
+#include "ns3/end-device-lora-phy.h"
 #include "ns3/gateway-lora-phy.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/lorawan-mac-header.h"
@@ -1071,9 +1071,9 @@ class PhyConnectivityTest : public TestCase
   private:
     virtual void DoRun(void);
     Ptr<LoraChannel> channel;
-    Ptr<SimpleEndDeviceLoraPhy> edPhy1;
-    Ptr<SimpleEndDeviceLoraPhy> edPhy2;
-    Ptr<SimpleEndDeviceLoraPhy> edPhy3;
+    Ptr<EndDeviceLoraPhy> edPhy1;
+    Ptr<EndDeviceLoraPhy> edPhy2;
+    Ptr<EndDeviceLoraPhy> edPhy3;
 
     Ptr<Packet> m_latestReceivedPacket;
     int m_receivedPacketCalls = 0;
@@ -1191,9 +1191,9 @@ PhyConnectivityTest::Reset(void)
     channel = CreateObject<LoraChannel>(loss, delay);
 
     // Connect PHYs
-    edPhy1 = CreateObject<SimpleEndDeviceLoraPhy>();
-    edPhy2 = CreateObject<SimpleEndDeviceLoraPhy>();
-    edPhy3 = CreateObject<SimpleEndDeviceLoraPhy>();
+    edPhy1 = CreateObject<EndDeviceLoraPhy>();
+    edPhy2 = CreateObject<EndDeviceLoraPhy>();
+    edPhy3 = CreateObject<EndDeviceLoraPhy>();
 
     edPhy1->SetFrequency(868100000);
     edPhy2->SetFrequency(868100000);
@@ -1304,7 +1304,7 @@ PhyConnectivityTest::DoRun(void)
     /////////////////////////////
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         txParams,
@@ -1327,7 +1327,7 @@ PhyConnectivityTest::DoRun(void)
     edPhy2->SwitchToSleep();
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         txParams,
@@ -1353,7 +1353,7 @@ PhyConnectivityTest::DoRun(void)
         Vector(2990, 0, 0));
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         txParams,
@@ -1378,7 +1378,7 @@ PhyConnectivityTest::DoRun(void)
         Vector(2990, 0, 0));
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         txParams,
@@ -1399,14 +1399,14 @@ PhyConnectivityTest::DoRun(void)
 
     txParams.sf = 12;
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         txParams,
                         868100000,
                         14);
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy3,
                         packet,
                         txParams,
@@ -1426,7 +1426,7 @@ PhyConnectivityTest::DoRun(void)
     // Packets can be lost because the PHY is not listening on the right frequency
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         txParams,
@@ -1447,7 +1447,7 @@ PhyConnectivityTest::DoRun(void)
 
     txParams.sf = 8; // Send with 8, listening for 12
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         txParams,
@@ -1469,7 +1469,7 @@ PhyConnectivityTest::DoRun(void)
 
     // The very same packet arrives at the other PHY
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         txParams,
@@ -1492,7 +1492,7 @@ PhyConnectivityTest::DoRun(void)
     // PHY switches to STANDBY after TX and RX
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         txParams,
@@ -1504,10 +1504,10 @@ PhyConnectivityTest::DoRun(void)
     Simulator::Destroy();
 
     NS_TEST_EXPECT_MSG_EQ(edPhy1->GetState(),
-                          SimpleEndDeviceLoraPhy::STANDBY,
+                          EndDeviceLoraPhy::STANDBY,
                           "State didn't switch to STANDBY as expected");
     NS_TEST_EXPECT_MSG_EQ(edPhy2->GetState(),
-                          SimpleEndDeviceLoraPhy::STANDBY,
+                          EndDeviceLoraPhy::STANDBY,
                           "State didn't switch to STANDBY as expected");
 }
 

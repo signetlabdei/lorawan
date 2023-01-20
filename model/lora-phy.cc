@@ -88,6 +88,7 @@ LoraPhy::GetTypeId(void)
 }
 
 LoraPhy::LoraPhy()
+    : m_context(0)
 {
 }
 
@@ -118,6 +119,25 @@ LoraPhy::DoInitialize()
             NS_LOG_WARN("Mobility not found, propagation models might not work properly");
         }
     }
+
+    // Get node id (if possible) to format context in tracing callbacks
+    if (m_device && m_device->GetNode())
+        m_context = m_device->GetNode()->GetId();
+
+}
+
+void
+LoraPhy::SetInterferenceHelper(const Ptr<LoraInterferenceHelper> helper)
+{
+    m_interference = helper;
+}
+
+void
+LoraPhy::SetChannel(Ptr<LoraChannel> channel)
+{
+    NS_LOG_FUNCTION(this << channel);
+    m_channel = channel;
+    m_channel->Add(this);
 }
 
 Ptr<LoraChannel>

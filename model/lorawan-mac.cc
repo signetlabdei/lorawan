@@ -43,7 +43,7 @@ LorawanMac::GetTypeId(void)
             .SetGroupName("lorawan")
             .AddTraceSource("SentNewPacket",
                             "Trace source indicating a new packet "
-                            "arrived at the MAC layer",
+                            "is sent by the MAC layer",
                             MakeTraceSourceAccessor(&LorawanMac::m_sentNewPacket),
                             "ns3::Packet::TracedCallback")
             .AddTraceSource("ReceivedPacket",

@@ -24,13 +24,13 @@
 #ifndef LORA_PHY_HELPER_H
 #define LORA_PHY_HELPER_H
 
+#include "ns3/end-device-lora-phy.h"
 #include "ns3/gateway-lora-phy.h"
 #include "ns3/lora-channel.h"
 #include "ns3/lora-net-device.h"
 #include "ns3/lora-phy.h"
 #include "ns3/lorawan-mac.h"
 #include "ns3/object-factory.h"
-#include "ns3/simple-end-device-lora-phy.h"
 
 namespace ns3
 {
@@ -48,15 +48,16 @@ class LoraPhyHelper
      * them all to be able to call Install later.
      */
     LoraPhyHelper();
+    ~LoraPhyHelper();
 
     /**
-     * Set the LoraChannel to connect the PHYs to.
+     * Crate a LoraPhy and connect it to a device on a node.
      *
-     * Every PHY created by a call to Install is associated to this channel.
-     *
-     * \param channel the channel to associate to this helper.
+     * \param node the node on which we wish to create a wifi PHY.
+     * \param device the device within which this PHY will be created.
+     * \return a newly-created PHY object.
      */
-    void SetChannel(Ptr<LoraChannel> channel);
+    Ptr<LoraPhy> Create(Ptr<Node> node, Ptr<LoraNetDevice> device) const;
 
     /**
      * \tparam Args \deduced Template type parameter pack for the sequence of name-value pairs.
@@ -70,19 +71,29 @@ class LoraPhyHelper
     void SetType(std::string type, Args&&... args);
 
     /**
-     * Crate a LoraPhy and connect it to a device on a node.
+     * Helper function used to set the interference helper attributes.
      *
-     * \param node the node on which we wish to create a wifi PHY.
-     * \param device the device within which this PHY will be created.
-     * \return a newly-created PHY object.
+     * \tparam Args \deduced Template type parameter pack for the sequence of name-value pairs.
+     * \param args A sequence of name-value pairs of the attributes to set.
      */
-    Ptr<LoraPhy> Create(Ptr<Node> node, Ptr<LoraNetDevice> device) const;
+    template <typename... Args>
+    void SetInterference(Args&&... args);
+
+    /**
+     * Set the LoraChannel to connect the PHYs to.
+     *
+     * Every PHY created by a call to Install is associated to this channel.
+     *
+     * \param channel the channel to associate to this helper.
+     */
+    void SetChannel(Ptr<LoraChannel> channel);
 
   private:
     /**
      * The PHY layer factory object.
      */
     ObjectFactory m_phy;
+    ObjectFactory m_interferenceHelper; ///< interference helper
 
     /**
      * The channel instance the PHYs will be connected to.
@@ -96,6 +107,13 @@ LoraPhyHelper::SetType(std::string type, Args&&... args)
 {
     m_phy.SetTypeId(type);
     m_phy.Set(args...);
+}
+
+template <typename... Args>
+void
+LoraPhyHelper::SetInterference(Args&&... args)
+{
+    m_interferenceHelper.Set(args...);
 }
 
 } // namespace lorawan

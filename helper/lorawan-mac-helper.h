@@ -27,6 +27,7 @@
 #include "ns3/lora-device-address-generator.h"
 #include "ns3/lora-net-device.h"
 #include "ns3/node-container.h"
+#include "ns3/object-factory.h"
 
 namespace ns3
 {
