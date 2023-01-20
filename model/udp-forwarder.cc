@@ -1669,7 +1669,6 @@ UdpForwarder::LgwSend(struct lgw_pkt_tx_s pkt_data)
     bool lgw_is_started = true;
     LoraTag tag;
     Ptr<Packet> pkt;
-    Ptr<GatewayLorawanMac> mac = m_loraNetDevice->GetMac()->GetObject<GatewayLorawanMac>();
     bool tx_allowed = false;
 
     /* check if the concentrator is running */
@@ -1782,7 +1781,7 @@ UdpForwarder::LgwSend(struct lgw_pkt_tx_s pkt_data)
     tx_allowed = true;
     if (tx_allowed == true)
     {
-        mac->Send(pkt);
+        m_loraNetDevice->Send(pkt);
     }
     else
     {

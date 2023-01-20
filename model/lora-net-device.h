@@ -113,16 +113,6 @@ class LoraNetDevice : public NetDevice
   protected:
     void DoInitialize() override;
 
-    /**
-     * Receive a packet from the lower layer and pass the
-     * packet up the stack.
-     *
-     * \param packet The packet we need to forward.
-     * \param from The from address.
-     * \param to The to address.
-     */
-    void ForwardUp(Ptr<Packet> packet, Mac48Address from, Mac48Address to);
-
   private:
     /**
      * Return the LoraChannel this device is connected to.

@@ -7,6 +7,8 @@
 #include "ns3/one-shot-sender-helper.h"
 #include "ns3/simple-end-device-lora-phy.h"
 #include "ns3/gateway-lora-phy.h"
+#include "ns3/lora-frame-header.h"
+#include "ns3/lorawan-mac-header.h"
 
 // An essential include is test.h
 #include "ns3/test.h"

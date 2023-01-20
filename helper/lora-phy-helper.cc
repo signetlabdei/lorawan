@@ -40,26 +40,6 @@ LoraPhyHelper::SetChannel(Ptr<LoraChannel> channel)
     m_channel = channel;
 }
 
-void
-LoraPhyHelper::SetDeviceType(enum DeviceType dt)
-{
-    switch (dt)
-    {
-    case GW:
-        m_phy.SetTypeId("ns3::GatewayLoraPhy");
-        break;
-    case ED:
-        m_phy.SetTypeId("ns3::SimpleEndDeviceLoraPhy");
-        break;
-    }
-}
-
-void
-LoraPhyHelper::Set(std::string name, const AttributeValue& v)
-{
-    m_phy.Set(name, v);
-}
-
 Ptr<LoraPhy>
 LoraPhyHelper::Create(Ptr<Node> node, Ptr<LoraNetDevice> device) const
 {

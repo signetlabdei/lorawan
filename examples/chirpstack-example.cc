@@ -221,12 +221,12 @@ main(int argc, char* argv[])
         macHelper.SetAddressGenerator(addrGen);
 
         // Create the LoraNetDevices of the gateways
-        phyHelper.SetDeviceType(LoraPhyHelper::GW);
+        phyHelper.SetType("ns3::GatewayLoraPhy");
         macHelper.SetType("ns3::GatewayLorawanMac");
         gwNetDev = helper.Install(phyHelper, macHelper, gateways);
 
         // Create the LoraNetDevices of the end devices
-        phyHelper.SetDeviceType(LoraPhyHelper::ED);
+        phyHelper.SetType("ns3::SimpleEndDeviceLoraPhy");
         macHelper.SetType("ns3::ClassAEndDeviceLorawanMac");
         helper.Install(phyHelper, macHelper, endDevices);
     }

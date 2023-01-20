@@ -117,7 +117,7 @@ main(int argc, char* argv[])
         CreateObject<LoraDeviceAddressGenerator>(nwkId, nwkAddr);
 
     // Create the LoraNetDevices of the end devices
-    phyHelper.SetDeviceType(LoraPhyHelper::ED);
+    phyHelper.SetType("ns3::SimpleEndDeviceLoraPhy");
     macHelper.SetType("ns3::ClassAEndDeviceLorawanMac");
     macHelper.SetAddressGenerator(addrGen);
     macHelper.SetRegion(LorawanMacHelper::EU);
@@ -148,7 +148,7 @@ main(int argc, char* argv[])
     mobilityGw.Install(gateways);
 
     // Create the LoraNetDevices of the gateways
-    phyHelper.SetDeviceType(LoraPhyHelper::GW);
+    phyHelper.SetType("ns3::GatewayLoraPhy");
     macHelper.SetType("ns3::GatewayLorawanMac");
     helper.Install(phyHelper, macHelper, gateways);
 

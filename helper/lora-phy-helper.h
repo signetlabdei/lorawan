@@ -26,9 +26,9 @@
 
 #include "ns3/gateway-lora-phy.h"
 #include "ns3/lora-channel.h"
+#include "ns3/lora-net-device.h"
 #include "ns3/lora-phy.h"
 #include "ns3/lorawan-mac.h"
-#include "ns3/lora-net-device.h"
 #include "ns3/object-factory.h"
 #include "ns3/simple-end-device-lora-phy.h"
 
@@ -43,15 +43,6 @@ namespace lorawan
 class LoraPhyHelper
 {
   public:
-    /**
-     * Enum for the type of device: End Device (ED) or Gateway (GW)
-     */
-    enum DeviceType
-    {
-        GW,
-        ED
-    };
-
     /**
      * Create a phy helper without any parameter set. The user must set
      * them all to be able to call Install later.
@@ -68,19 +59,15 @@ class LoraPhyHelper
     void SetChannel(Ptr<LoraChannel> channel);
 
     /**
-     * Set the kind of PHY this helper will create.
+     * \tparam Args \deduced Template type parameter pack for the sequence of name-value pairs.
+     * \param type the type of ns3::LoraPhy to create.
+     * \param args A sequence of name-value pairs of the attributes to set.
      *
-     * \param dt the device type.
+     * All the attributes specified in this method should exist
+     * in the requested PHY.
      */
-    void SetDeviceType(enum DeviceType dt);
-
-    /**
-     * Set an attribute of the underlying PHY object.
-     *
-     * \param name the name of the attribute to set.
-     * \param v the value of the attribute.
-     */
-    void Set(std::string name, const AttributeValue& v);
+    template <typename... Args>
+    void SetType(std::string type, Args&&... args);
 
     /**
      * Crate a LoraPhy and connect it to a device on a node.
@@ -102,6 +89,14 @@ class LoraPhyHelper
      */
     Ptr<LoraChannel> m_channel;
 };
+
+template <typename... Args>
+void
+LoraPhyHelper::SetType(std::string type, Args&&... args)
+{
+    m_phy.SetTypeId(type);
+    m_phy.Set(args...);
+}
 
 } // namespace lorawan
 
