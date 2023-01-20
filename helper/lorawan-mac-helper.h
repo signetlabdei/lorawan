@@ -24,15 +24,9 @@
 #ifndef LORAWAN_MAC_HELPER_H
 #define LORAWAN_MAC_HELPER_H
 
-#include "ns3/class-a-end-device-lorawan-mac.h"
-#include "ns3/gateway-lorawan-mac.h"
-#include "ns3/lora-channel.h"
 #include "ns3/lora-device-address-generator.h"
 #include "ns3/lora-net-device.h"
-#include "ns3/lora-phy.h"
-#include "ns3/lorawan-mac.h"
 #include "ns3/node-container.h"
-#include "ns3/random-variable-stream.h"
 
 namespace ns3
 {
@@ -100,12 +94,6 @@ class LorawanMacHelper
     static std::vector<int> SetSpreadingFactorsUp(NodeContainer endDevices,
                                                   NodeContainer gateways,
                                                   Ptr<LoraChannel> channel);
-    /**
-     * Set up the end device's data rates according to the given distribution.
-     */
-    static std::vector<int> SetSpreadingFactorsGivenDistribution(NodeContainer endDevices,
-                                                                 NodeContainer gateways,
-                                                                 std::vector<double> distribution);
 
   private:
     /**

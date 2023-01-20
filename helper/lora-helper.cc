@@ -23,6 +23,7 @@
 
 #include "ns3/lora-helper.h"
 
+#include "ns3/class-a-end-device-lorawan-mac.h"
 #include "ns3/energy-source-container.h"
 #include "ns3/log.h"
 #include "ns3/lora-application.h"
