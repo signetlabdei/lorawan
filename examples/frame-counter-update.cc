@@ -175,8 +175,7 @@ main(int argc, char* argv[])
     // Create the LoraNetDevices of the end devices
     macHelper.SetAddressGenerator(addrGen);
     phyHelper.SetDeviceType(LoraPhyHelper::ED);
-    macHelper.SetDeviceType(LorawanMacHelper::ED_A);
-    macHelper.Set("DataRate", UintegerValue(5));
+    macHelper.SetType("ns3::ClassAEndDeviceLorawanMac", "DataRate", UintegerValue(5));
     helper.Install(phyHelper, macHelper, endDevices);
 
     // Connect trace sources
@@ -200,7 +199,7 @@ main(int argc, char* argv[])
 
     // Create a netdevice for each gateway
     phyHelper.SetDeviceType(LoraPhyHelper::GW);
-    macHelper.SetDeviceType(LorawanMacHelper::GW);
+    macHelper.SetType("ns3::GatewayLorawanMac");
     helper.Install(phyHelper, macHelper, gateways);
 
     NS_LOG_INFO("Completed configuration");

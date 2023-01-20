@@ -105,7 +105,7 @@ main(int argc, char* argv[])
 
     // Create the LoraNetDevices of the end devices
     phyHelper.SetDeviceType(LoraPhyHelper::ED);
-    macHelper.SetDeviceType(LorawanMacHelper::ED_A);
+    macHelper.SetType("ns3::ClassAEndDeviceLorawanMac");
     helper.Install(phyHelper, macHelper, endDevices);
 
     /*********************
@@ -120,7 +120,7 @@ main(int argc, char* argv[])
 
     // Create a netdevice for each gateway
     phyHelper.SetDeviceType(LoraPhyHelper::GW);
-    macHelper.SetDeviceType(LorawanMacHelper::GW);
+    macHelper.SetType("ns3::GatewayLorawanMac");
     helper.Install(phyHelper, macHelper, gateways);
 
     /*********************************************
