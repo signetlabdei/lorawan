@@ -104,13 +104,55 @@ class LoraNetDevice : public NetDevice
      */
     void Receive(Ptr<Packet> packet);
 
-    // From class NetDevice. Some of these have little meaning for a LoRaWAN
-    // network device (since, for instance, IP is not used in the standard)
+    // From class NetDevice.
     virtual void SetReceiveCallback(NetDevice::ReceiveCallback cb);
     virtual Ptr<Channel> GetChannel(void) const;
     virtual void SetNode(Ptr<Node> node);
     virtual Ptr<Node> GetNode(void) const;
 
+  protected:
+    void DoInitialize() override;
+
+    /**
+     * Receive a packet from the lower layer and pass the
+     * packet up the stack.
+     *
+     * \param packet The packet we need to forward.
+     * \param from The from address.
+     * \param to The to address.
+     */
+    void ForwardUp(Ptr<Packet> packet, Mac48Address from, Mac48Address to);
+
+  private:
+    /**
+     * Return the LoraChannel this device is connected to.
+     * Used by attribute system
+     */
+    Ptr<LoraChannel> DoGetChannel(void) const;
+
+    /**
+     * Complete the configuration of this LoRa device by connecting all lower
+     * components (PHY, MAC, Channel) together.
+     */
+    void CompleteConfig(void);
+
+    // Member variables
+    Ptr<Node> m_node;      //!< The Node this NetDevice is connected to.
+    Ptr<LoraPhy> m_phy;    //!< The LoraPhy this NetDevice is connected to.
+    Ptr<LorawanMac> m_mac; //!< The LorawanMac this NetDevice is connected to.
+    bool m_configComplete; //!< Whether the configuration was already completed.
+
+    /**
+     * Upper layer callback used for notification of new data packet arrivals.
+     */
+    NetDevice::ReceiveCallback m_receiveCallback;
+
+    /**
+     * Inherited by NetDevice. Some of these have little meaning for a LoRaWAN 
+     * network device (since, for instance, IP is not used in the standard)
+     * 
+     * Set to private to avoid exposing them.
+     */
     virtual void SetIfIndex(const uint32_t index);
     virtual uint32_t GetIfIndex(void) const;
     virtual void SetAddress(Address address);
@@ -133,40 +175,6 @@ class LoraNetDevice : public NetDevice
     virtual bool NeedsArp(void) const;
     virtual void SetPromiscReceiveCallback(PromiscReceiveCallback cb);
     virtual bool SupportsSendFrom(void) const;
-
-  protected:
-    /**
-     * Receive a packet from the lower layer and pass the
-     * packet up the stack.
-     *
-     * \param packet The packet we need to forward.
-     * \param from The from address.
-     * \param to The to address.
-     */
-    void ForwardUp(Ptr<Packet> packet, Mac48Address from, Mac48Address to);
-
-  private:
-    /**
-     * Return the LoraChannel this device is connected to.
-     */
-    Ptr<LoraChannel> DoGetChannel(void) const;
-
-    /**
-     * Complete the configuration of this LoRa device by connecting all lower
-     * components (PHY, MAC, Channel) together.
-     */
-    void CompleteConfig(void);
-
-    // Member variables
-    Ptr<Node> m_node;      //!< The Node this NetDevice is connected to.
-    Ptr<LoraPhy> m_phy;    //!< The LoraPhy this NetDevice is connected to.
-    Ptr<LorawanMac> m_mac; //!< The LorawanMac this NetDevice is connected to.
-    bool m_configComplete; //!< Whether the configuration was already completed.
-
-    /**
-     * Upper layer callback used for notification of new data packet arrivals.
-     */
-    NetDevice::ReceiveCallback m_receiveCallback;
 };
 
 } // namespace lorawan

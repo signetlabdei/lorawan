@@ -257,6 +257,8 @@ class LoraPhy : public Object
     static double RxPowerToSNR(double transmissionPower);
 
   protected:
+    void DoInitialize() override;
+
     // Member objects
     Ptr<NetDevice> m_device;               //!< The net device this PHY is attached to.
     Ptr<LoraChannel> m_channel;            //!< The channel this PHY transmits on.

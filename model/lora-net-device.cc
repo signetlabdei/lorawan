@@ -78,6 +78,22 @@ LoraNetDevice::~LoraNetDevice()
 }
 
 void
+LoraNetDevice::DoInitialize()
+{
+    NS_LOG_FUNCTION_NOARGS();
+
+    if (m_phy)
+    {
+        m_phy->Initialize();
+    }
+    if (m_mac)
+    {
+        m_mac->Initialize();
+    }
+    NetDevice::DoInitialize();
+}
+
+void
 LoraNetDevice::SetMac(Ptr<LorawanMac> mac)
 {
     m_mac = mac;
@@ -140,7 +156,7 @@ Ptr<Channel>
 LoraNetDevice::GetChannel(void) const
 {
     NS_LOG_FUNCTION(this);
-    return m_phy->GetChannel();
+    return DoGetChannel();
 }
 
 Ptr<LoraChannel>

@@ -66,7 +66,6 @@ LoraPhyHelper::Create(Ptr<Node> node, Ptr<LoraNetDevice> device) const
     auto phy = m_phy.Create<LoraPhy>();
     phy->SetChannel(m_channel);
     phy->SetDevice(device);
-    phy->SetMobility(node->GetObject<MobilityModel>());
     device->SetPhy(phy);
     return phy;
 }

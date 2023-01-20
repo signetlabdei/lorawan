@@ -95,6 +95,31 @@ LoraPhy::~LoraPhy()
 {
 }
 
+void
+LoraPhy::DoInitialize()
+{
+    NS_LOG_FUNCTION(this);
+
+    // This method ensures that the local mobility model pointer holds
+    // a pointer to the Node's aggregated mobility model (if one exists)
+    // in the case that the user has not directly called SetMobility()
+    // on this WifiPhy during simulation setup.  If the mobility model
+    // needs to be added or changed during simulation runtime, users must
+    // call SetMobility() on this object.
+
+    if (!m_mobility)
+    {
+        NS_ABORT_MSG_UNLESS(m_device && m_device->GetNode(),
+                            "Either install a MobilityModel on this object or ensure that this "
+                            "object is part of a Node and NetDevice");
+        m_mobility = m_device->GetNode()->GetObject<MobilityModel>();
+        if (!m_mobility)
+        {
+            NS_LOG_WARN("Mobility not found, propagation models might not work properly");
+        }
+    }
+}
+
 Ptr<LoraChannel>
 LoraPhy::GetChannel(void) const
 {
