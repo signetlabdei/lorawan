@@ -26,7 +26,7 @@
 
 #include "ns3/application.h"
 #include "ns3/attribute.h"
-#include "ns3/lora-net-device.h"
+#include "ns3/gateway-lorawan-mac.h"
 #include "ns3/nstime.h"
 #include "ns3/point-to-point-net-device.h"
 
@@ -36,8 +36,8 @@ namespace lorawan
 {
 
 /**
- * This application forwards packets between NetDevices:
- * LoraNetDevice -> PointToPointNetDevice and vice versa.
+ * This application forwards packets between :
+ * GatewayLorawanMac <-> PointToPointNetDevice
  */
 class Forwarder : public Application
 {
@@ -48,11 +48,11 @@ class Forwarder : public Application
     static TypeId GetTypeId(void);
 
     /**
-     * Sets the device to use to communicate with the EDs.
+     * Sets the mac to use to communicate with the EDs.
      *
-     * \param loraNetDevice The LoraNetDevice on this node.
+     * \param mac The GatewayLorawanMac on this node.
      */
-    void SetLoraNetDevice(Ptr<LoraNetDevice> loraNetDevice);
+    void SetGatewayLorawanMac(Ptr<GatewayLorawanMac> mac);
 
     /**
      * Sets the P2P device to use to communicate with the NS.
@@ -62,18 +62,11 @@ class Forwarder : public Application
     void SetPointToPointNetDevice(Ptr<PointToPointNetDevice> pointToPointNetDevice);
 
     /**
-     * Receive a packet from the LoraNetDevice.
+     * Receive a packet from the GatewayLorawanMac.
      *
-     * \param loraNetDevice The LoraNetDevice we received the packet from.
      * \param packet The packet we received.
-     * \param protocol The protocol number associated to this packet.
-     * \param sender The address of the sender.
-     * \returns True if we can handle the packet, false otherwise.
      */
-    bool ReceiveFromLora(Ptr<NetDevice> loraNetDevice,
-                         Ptr<const Packet> packet,
-                         uint16_t protocol,
-                         const Address& sender);
+    bool ReceiveFromLora(Ptr<GatewayLorawanMac> mac, Ptr<const Packet> packet);
 
     /**
      * Receive a packet from the PointToPointNetDevice
@@ -94,11 +87,8 @@ class Forwarder : public Application
     void StopApplication(void);
 
   private:
-    Ptr<LoraNetDevice> m_loraNetDevice; //!< Pointer to the node's LoraNetDevice
-
-    Ptr<PointToPointNetDevice> m_pointToPointNetDevice; //!< Pointer to the
-                                                        //! P2PNetDevice we use to
-    //! communicate with the NS
+    Ptr<LorawanMac> m_mac;                              //!< Pointer to the node's lorawan mac
+    Ptr<PointToPointNetDevice> m_pointToPointNetDevice; //!< Pointer to the P2PNetDevice to the NS
 };
 
 } // namespace lorawan

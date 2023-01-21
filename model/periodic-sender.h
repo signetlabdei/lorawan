@@ -25,7 +25,6 @@
 #define PERIODIC_SENDER_H
 
 #include "ns3/lora-application.h"
-#include "ns3/lorawan-mac.h"
 
 namespace ns3
 {
@@ -60,11 +59,6 @@ class PeriodicSender : public LoraApplication
      * Send a packet using the LoraNetDevice's Send method
      */
     void SendPacket(void);
-
-    /**
-     * The MAC layer of this node
-     */
-    Ptr<LorawanMac> m_mac;
 
     /**
      * The random variable that adds bytes to the packet size

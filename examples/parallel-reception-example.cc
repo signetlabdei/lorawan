@@ -40,8 +40,8 @@ main(int argc, char* argv[])
     // LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_ALL);
     // LogComponentEnable ("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
     LogComponentEnable("GatewayLorawanMac", LOG_LEVEL_ALL);
-    // LogComponentEnable ("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
-    // LogComponentEnable ("LogicalLoraChannel", LOG_LEVEL_ALL);
+    // LogComponentEnable ("LogicalChannelManager", LOG_LEVEL_ALL);
+    // LogComponentEnable ("LogicalChannel", LOG_LEVEL_ALL);
     // LogComponentEnable ("LoraHelper", LOG_LEVEL_ALL);
     // LogComponentEnable ("LoraPhyHelper", LOG_LEVEL_ALL);
     // LogComponentEnable ("LorawanMacHelper", LOG_LEVEL_ALL);
@@ -138,11 +138,8 @@ main(int argc, char* argv[])
      ******************/
     for (uint32_t i = 0; i < endDevices.GetN(); i++)
     {
-        endDevices.Get(i)
-            ->GetDevice(0)
-            ->GetObject<LoraNetDevice>()
-            ->GetMac()
-            ->GetObject<EndDeviceLorawanMac>()
+        DynamicCast<EndDeviceLorawanMac>(
+            DynamicCast<LoraNetDevice>(endDevices.Get(i)->GetDevice(0))->GetMac())
             ->SetDataRate(5 - i);
     }
 

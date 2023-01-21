@@ -53,11 +53,10 @@ class LoraPhyHelper
     /**
      * Crate a LoraPhy and connect it to a device on a node.
      *
-     * \param node the node on which we wish to create a wifi PHY.
      * \param device the device within which this PHY will be created.
      * \return a newly-created PHY object.
      */
-    Ptr<LoraPhy> Create(Ptr<Node> node, Ptr<LoraNetDevice> device) const;
+    Ptr<LoraPhy> Create(Ptr<LoraNetDevice> device) const;
 
     /**
      * \tparam Args \deduced Template type parameter pack for the sequence of name-value pairs.
@@ -77,7 +76,7 @@ class LoraPhyHelper
      * \param args A sequence of name-value pairs of the attributes to set.
      */
     template <typename... Args>
-    void SetInterference(Args&&... args);
+    void SetInterference(const std::string& name, const AttributeValue& value, Args&&... args);
 
     /**
      * Set the LoraChannel to connect the PHYs to.
@@ -111,9 +110,9 @@ LoraPhyHelper::SetType(std::string type, Args&&... args)
 
 template <typename... Args>
 void
-LoraPhyHelper::SetInterference(Args&&... args)
+LoraPhyHelper::SetInterference(const std::string& name, const AttributeValue& value, Args&&... args)
 {
-    m_interferenceHelper.Set(args...);
+    m_interferenceHelper.Set(name, value, args...);
 }
 
 } // namespace lorawan

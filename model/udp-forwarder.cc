@@ -102,20 +102,16 @@ UdpForwarder::SetRemote(Address addr)
 }
 
 void
-UdpForwarder::SetLoraNetDevice(Ptr<LoraNetDevice> loraNetDevice)
+UdpForwarder::SetGatewayLorawanMac(Ptr<GatewayLorawanMac> mac)
 {
-    NS_LOG_FUNCTION(this << loraNetDevice);
-
-    m_loraNetDevice = loraNetDevice;
+    NS_LOG_FUNCTION(this << mac);
+    m_mac = mac;
 }
 
 bool
-UdpForwarder::ReceiveFromLora(Ptr<NetDevice> loraNetDevice,
-                              Ptr<const Packet> packet,
-                              uint16_t protocol,
-                              const Address& sender)
+UdpForwarder::ReceiveFromLora(Ptr<GatewayLorawanMac> mac, Ptr<const Packet> packet)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << packet);
     Ptr<Packet> pktcpy = packet->Copy();
 
     LoraTag tag;
@@ -125,7 +121,7 @@ UdpForwarder::ReceiveFromLora(Ptr<NetDevice> loraNetDevice,
     gettimeofday(&raw_time, NULL);
 
     lgw_pkt_rx_s p;
-    p.freq_hz = (uint32_t) tag.GetFrequency() + 0.5;
+    p.freq_hz = (uint32_t)tag.GetFrequency() + 0.5;
     p.if_chain = 0;
     p.status = STAT_CRC_OK;
     p.count_us = raw_time.tv_sec * 1000000UL + raw_time.tv_usec; /* convert time in µs */
@@ -1624,7 +1620,6 @@ int
 UdpForwarder::LgwStatus(uint8_t select, uint8_t* code)
 {
     bool lgw_is_started = true;
-    Ptr<GatewayLorawanMac> mac = m_loraNetDevice->GetMac()->GetObject<GatewayLorawanMac>();
     int32_t read_value;
 
     /* check input variables */
@@ -1632,7 +1627,7 @@ UdpForwarder::LgwStatus(uint8_t select, uint8_t* code)
 
     if (select == TX_STATUS)
     {
-        read_value = (mac->IsTransmitting()) ? 0x70 : 0x0;
+        read_value = (m_mac->IsTransmitting()) ? 0x70 : 0x0;
         if (lgw_is_started == false)
         {
             *code = TX_OFF;
@@ -1781,7 +1776,7 @@ UdpForwarder::LgwSend(struct lgw_pkt_tx_s pkt_data)
     tx_allowed = true;
     if (tx_allowed == true)
     {
-        m_loraNetDevice->Send(pkt);
+        m_mac->Send(pkt);
     }
     else
     {

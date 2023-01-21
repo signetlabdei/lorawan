@@ -21,15 +21,9 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/one-shot-sender.h"
+#include "one-shot-sender.h"
 
-#include "ns3/class-a-end-device-lorawan-mac.h"
-#include "ns3/double.h"
-#include "ns3/log.h"
-#include "ns3/lora-net-device.h"
-#include "ns3/pointer.h"
 #include "ns3/simulator.h"
-#include "ns3/string.h"
 
 namespace ns3
 {
@@ -44,7 +38,7 @@ TypeId
 OneShotSender::GetTypeId(void)
 {
     static TypeId tid = TypeId("ns3::OneShotSender")
-                            .SetParent<Application>()
+                            .SetParent<LoraApplication>()
                             .AddConstructor<OneShotSender>()
                             .SetGroupName("lorawan");
     return tid;
@@ -52,26 +46,25 @@ OneShotSender::GetTypeId(void)
 
 OneShotSender::OneShotSender()
 {
-    NS_LOG_FUNCTION_NOARGS();
+    SetInitialDelay(Seconds(0));
+    SetPacketSize(10);
 }
 
 OneShotSender::OneShotSender(Time sendTime)
-    : m_sendTime(sendTime)
 {
-    NS_LOG_FUNCTION_NOARGS();
+    SetInitialDelay(sendTime);
+    SetPacketSize(10);
 }
 
 OneShotSender::~OneShotSender()
 {
-    NS_LOG_FUNCTION_NOARGS();
 }
 
 void
 OneShotSender::SetSendTime(Time sendTime)
 {
     NS_LOG_FUNCTION(this << sendTime);
-
-    m_sendTime = sendTime;
+    SetInitialDelay(sendTime);
 }
 
 void
@@ -80,7 +73,7 @@ OneShotSender::SendPacket(void)
     NS_LOG_FUNCTION(this);
 
     // Create and send a new packet
-    Ptr<Packet> packet = Create<Packet>(10);
+    Ptr<Packet> packet = Create<Packet>(m_basePktSize);
     m_mac->Send(packet);
 }
 
@@ -88,20 +81,9 @@ void
 OneShotSender::StartApplication(void)
 {
     NS_LOG_FUNCTION(this);
-
-    // Make sure we have a MAC layer
-    if (bool(m_mac) != 0)
-    {
-        // Assumes there's only one device
-        Ptr<LoraNetDevice> loraNetDevice = m_node->GetDevice(0)->GetObject<LoraNetDevice>();
-
-        m_mac = loraNetDevice->GetMac();
-        NS_ASSERT(bool(m_mac) == 0);
-    }
-
     // Schedule the next SendPacket event
     Simulator::Cancel(m_sendEvent);
-    m_sendEvent = Simulator::Schedule(m_sendTime, &OneShotSender::SendPacket, this);
+    m_sendEvent = Simulator::Schedule(m_initialDelay, &OneShotSender::SendPacket, this);
 }
 
 void

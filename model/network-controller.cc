@@ -36,6 +36,7 @@ TypeId
 NetworkController::GetTypeId(void)
 {
     static TypeId tid = TypeId("ns3::NetworkController")
+                            .SetParent<Object>()
                             .AddConstructor<NetworkController>()
                             .SetGroupName("lorawan");
     return tid;

@@ -36,8 +36,10 @@ NS_LOG_COMPONENT_DEFINE("GatewayStatus");
 TypeId
 GatewayStatus::GetTypeId(void)
 {
-    static TypeId tid =
-        TypeId("ns3::GatewayStatus").AddConstructor<GatewayStatus>().SetGroupName("lorawan");
+    static TypeId tid = TypeId("ns3::GatewayStatus")
+                            .SetParent<Object>()
+                            .AddConstructor<GatewayStatus>()
+                            .SetGroupName("lorawan");
     return tid;
 }
 

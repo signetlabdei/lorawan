@@ -92,23 +92,22 @@ LorawanMac::SetPhy(Ptr<LoraPhy> phy)
 {
     // Set the phy
     m_phy = phy;
-
     // Connect the receive callbacks
     m_phy->SetReceiveOkCallback(MakeCallback(&LorawanMac::Receive, this));
     m_phy->SetReceiveFailedCallback(MakeCallback(&LorawanMac::FailedReception, this));
     m_phy->SetTxFinishedCallback(MakeCallback(&LorawanMac::TxFinished, this));
 }
 
-LogicalLoraChannelHelper
-LorawanMac::GetLogicalLoraChannelHelper(void)
+Ptr<LogicalChannelManager>
+LorawanMac::GetLogicalChannelManager(void)
 {
-    return m_channelHelper;
+    return m_channelManager;
 }
 
 void
-LorawanMac::SetLogicalLoraChannelHelper(LogicalLoraChannelHelper helper)
+LorawanMac::SetLogicalChannelManager(Ptr<LogicalChannelManager> helper)
 {
-    m_channelHelper = helper;
+    m_channelManager = helper;
 }
 
 uint8_t
@@ -193,5 +192,13 @@ LorawanMac::SetReplyDataRateMatrix(ReplyDataRateMatrix replyDataRateMatrix)
 {
     m_replyDataRateMatrix = replyDataRateMatrix;
 }
+
+void
+LorawanMac::SetReceiveCallback(ReceiveCallback cb)
+{
+    NS_LOG_FUNCTION_NOARGS();
+    m_receiveCallback = cb;
+}
+
 } // namespace lorawan
 } // namespace ns3

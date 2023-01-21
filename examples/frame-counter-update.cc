@@ -181,10 +181,10 @@ main(int argc, char* argv[])
     // Connect trace sources
     for (NodeContainer::Iterator j = endDevices.Begin(); j != endDevices.End(); ++j)
     {
-        Ptr<Node> node = *j;
-        Ptr<LoraNetDevice> loraNetDevice = node->GetDevice(0)->GetObject<LoraNetDevice>();
-        Ptr<LoraPhy> phy = loraNetDevice->GetPhy();
-        Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac()->GetObject<EndDeviceLorawanMac>();
+        auto node = *j;
+        auto loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(0));
+        auto phy = loraNetDevice->GetPhy();
+        auto mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
         phy->TraceConnectWithoutContext("StartSending", MakeCallback(&OnPhySentPacket));
         mac->TraceConnectWithoutContext("RequiredTransmissions", MakeCallback(&OnMacPacketOutcome));
     }

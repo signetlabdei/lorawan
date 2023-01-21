@@ -83,30 +83,7 @@ class LoraNetDevice : public NetDevice
      */
     Ptr<LoraPhy> GetPhy(void) const;
 
-    /**
-     * Send a packet through the LoRaWAN stack.
-     *
-     * \param packet The packet to send.
-     */
-    void Send(Ptr<Packet> packet);
-
-    /**
-     * This function is implemented to achieve compliance with the NetDevice
-     * interface. Note that the dest and protocolNumber args are ignored.
-     */
-    bool Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
-
-    /**
-     * Callback the Mac layer calls whenever a packet arrives and needs to be
-     * forwarded up the stack.
-     *
-     * \param packet The packet that was received.
-     */
-    void Receive(Ptr<Packet> packet);
-
     // From class NetDevice.
-    virtual void SetReceiveCallback(NetDevice::ReceiveCallback cb);
-    virtual Ptr<Channel> GetChannel(void) const;
     virtual void SetNode(Ptr<Node> node);
     virtual Ptr<Node> GetNode(void) const;
 
@@ -138,11 +115,12 @@ class LoraNetDevice : public NetDevice
     NetDevice::ReceiveCallback m_receiveCallback;
 
     /**
-     * Inherited by NetDevice. Some of these have little meaning for a LoRaWAN 
+     * Inherited by NetDevice. Some of these have little meaning for a LoRaWAN
      * network device (since, for instance, IP is not used in the standard)
-     * 
+     *
      * Set to private to avoid exposing them.
      */
+    virtual Ptr<Channel> GetChannel(void) const;
     virtual void SetIfIndex(const uint32_t index);
     virtual uint32_t GetIfIndex(void) const;
     virtual void SetAddress(Address address);
@@ -158,11 +136,13 @@ class LoraNetDevice : public NetDevice
     virtual Address GetMulticast(Ipv6Address addr) const;
     virtual bool IsBridge(void) const;
     virtual bool IsPointToPoint(void) const;
+    virtual bool Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
     virtual bool SendFrom(Ptr<Packet> packet,
                           const Address& source,
                           const Address& dest,
                           uint16_t protocolNumber);
     virtual bool NeedsArp(void) const;
+    virtual void SetReceiveCallback(NetDevice::ReceiveCallback cb);
     virtual void SetPromiscReceiveCallback(PromiscReceiveCallback cb);
     virtual bool SupportsSendFrom(void) const;
 };

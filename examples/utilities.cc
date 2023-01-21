@@ -43,6 +43,14 @@ ComputeArea(double range, int rings)
 }
 
 /**
+ * Possible interference matrices
+ */
+const std::unordered_map<std::string, LoraInterferenceHelper::CollisionMatrix> sirMap = {
+    {"CROCE", LoraInterferenceHelper::CROCE},
+    {"GOURSAUD", LoraInterferenceHelper::GOURSAUD},
+    {"ALOHA", LoraInterferenceHelper::ALOHA}};
+
+/**
  * Print initial configuration
  */
 void

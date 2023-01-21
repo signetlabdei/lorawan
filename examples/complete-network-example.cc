@@ -73,8 +73,8 @@ main(int argc, char* argv[])
     // LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_ALL);
     // LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
     // LogComponentEnable("GatewayLorawanMac", LOG_LEVEL_ALL);
-    // LogComponentEnable("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
-    // LogComponentEnable("LogicalLoraChannel", LOG_LEVEL_ALL);
+    // LogComponentEnable("LogicalChannelManager", LOG_LEVEL_ALL);
+    // LogComponentEnable("LogicalChannel", LOG_LEVEL_ALL);
     // LogComponentEnable("LoraHelper", LOG_LEVEL_ALL);
     // LogComponentEnable("LoraPhyHelper", LOG_LEVEL_ALL);
     // LogComponentEnable("LorawanMacHelper", LOG_LEVEL_ALL);
@@ -193,7 +193,7 @@ main(int argc, char* argv[])
     for (NodeContainer::Iterator j = endDevices.Begin(); j != endDevices.End(); ++j)
     {
         Ptr<Node> node = *j;
-        Ptr<LoraNetDevice> loraNetDevice = node->GetDevice(0)->GetObject<LoraNetDevice>();
+        Ptr<LoraNetDevice> loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(0));
         Ptr<LoraPhy> phy = loraNetDevice->GetPhy();
     }
 

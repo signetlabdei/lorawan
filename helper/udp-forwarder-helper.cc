@@ -66,7 +66,6 @@ UdpForwarderHelper::Install(NodeContainer c) const
     {
         apps.Add(InstallPriv(*i));
     }
-
     return apps;
 }
 
@@ -74,28 +73,25 @@ Ptr<Application>
 UdpForwarderHelper::InstallPriv(Ptr<Node> node) const
 {
     NS_LOG_FUNCTION(this << node);
-
     Ptr<UdpForwarder> app = m_factory.Create<UdpForwarder>();
-
     app->SetNode(node);
     node->AddApplication(app);
-
-    // Link the Forwarder to the NetDevices
+    // Link the Forwarder to the NetDevice and GatewayLorawanMac
     for (uint32_t i = 0; i < node->GetNDevices(); i++)
     {
-        Ptr<NetDevice> currentNetDevice = node->GetDevice(i);
-        if (bool(currentNetDevice->GetObject<LoraNetDevice>()) != 0)
+        Ptr<NetDevice> currNetDev = node->GetDevice(i);
+        if (auto loraNetDev = DynamicCast<LoraNetDevice>(currNetDev); loraNetDev != nullptr)
         {
-            Ptr<LoraNetDevice> loraNetDevice = currentNetDevice->GetObject<LoraNetDevice>();
-            app->SetLoraNetDevice(loraNetDevice);
-            loraNetDevice->SetReceiveCallback(MakeCallback(&UdpForwarder::ReceiveFromLora, app));
+            auto mac = DynamicCast<GatewayLorawanMac>(loraNetDev->GetMac());
+            NS_ASSERT(bool (mac));
+            app->SetGatewayLorawanMac(mac);
+            mac->SetReceiveCallback(MakeCallback(&UdpForwarder::ReceiveFromLora, app));
         }
-        else if (bool(currentNetDevice->GetObject<CsmaNetDevice>()) != 0)
+        else if (DynamicCast<CsmaNetDevice>(currNetDev))
             continue;
         else
             NS_LOG_ERROR("Potential error: NetDevice is neither Lora nor Csma");
     }
-
     return app;
 }
 

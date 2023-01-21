@@ -248,20 +248,17 @@ ChirpstackHelper::RegisterPriv(Ptr<Node> node) const
     Ptr<LoraNetDevice> netdev;
     // We assume nodes can have at max 1 LoraNetDevice
     for (int i = 0; i < (int)node->GetNDevices(); ++i)
-    {
-        netdev = node->GetDevice(i)->GetObject<LoraNetDevice>();
-        if (bool(netdev) != 0)
+        if (netdev = DynamicCast<LoraNetDevice>(node->GetDevice(i)); bool(netdev))
         {
-            if (bool(netdev->GetMac()->GetObject<EndDeviceLorawanMac>()) != 0)
+            if (bool(DynamicCast<EndDeviceLorawanMac>(netdev->GetMac())))
                 NewDevice(node);
-            else if (bool(netdev->GetMac()->GetObject<GatewayLorawanMac>()) != 0)
+            else if (bool(DynamicCast<GatewayLorawanMac>(netdev->GetMac())))
                 NewGateway(node);
             else
                 NS_FATAL_ERROR("No LorawanMac installed (node id: " << (unsigned)node->GetId()
                                                                     << ")");
             return EXIT_SUCCESS;
         }
-    }
 
     NS_LOG_DEBUG("No LoraNetDevice installed (node id: " << (unsigned)node->GetId() << ")");
     return EXIT_FAILURE;
@@ -301,8 +298,8 @@ ChirpstackHelper::NewDevice(Ptr<Node> node) const
         NS_FATAL_ERROR("Unable to register device " << str(eui) << ", reply: " << reply);
 
     char devAddr[9];
-    Ptr<LoraNetDevice> netdev = node->GetDevice(0)->GetObject<LoraNetDevice>();
-    Ptr<EndDeviceLorawanMac> mac = netdev->GetMac()->GetObject<EndDeviceLorawanMac>();
+    auto netdev = DynamicCast<LoraNetDevice>(node->GetDevice(0));
+    auto mac = DynamicCast<EndDeviceLorawanMac>(netdev->GetMac());
     snprintf(devAddr, 9, "%08x", mac->GetDeviceAddress().Get());
 
     payload = "{"

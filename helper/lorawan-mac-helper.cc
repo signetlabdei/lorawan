@@ -55,9 +55,6 @@ Ptr<LorawanMac>
 LorawanMacHelper::Create(Ptr<LoraNetDevice> device) const
 {
     Ptr<LorawanMac> mac = m_mac.Create<LorawanMac>();
-    mac->SetDevice(device);
-    device->SetMac(mac);
-
     switch (m_region)
     {
     case LorawanMacHelper::EU:
@@ -72,7 +69,7 @@ LorawanMacHelper::Create(Ptr<LoraNetDevice> device) const
     default:
         NS_LOG_ERROR("This region isn't supported yet!");
     }
-
+    device->SetMac(mac);
     return mac;
 }
 
@@ -83,17 +80,17 @@ LorawanMacHelper::ConfigureForAlohaRegion(Ptr<LorawanMac> mac) const
     // SubBands //
     //////////////
 
-    LogicalLoraChannelHelper channelHelper;
-    channelHelper.AddSubBand(868000000, 868600000, 1, 14);
+    auto channelHelper = CreateObject<LogicalChannelManager>();
+    channelHelper->AddSubBand(868000000, 868600000, 1, 14);
 
     //////////////////////
     // Default channels //
     //////////////////////
 
-    Ptr<LogicalLoraChannel> lc0 = CreateObject<LogicalLoraChannel>(868100000, 0, 5);
-    channelHelper.AddChannel(0, lc0);
+    Ptr<LogicalChannel> lc0 = CreateObject<LogicalChannel>(868100000, 0, 5);
+    channelHelper->AddChannel(0, lc0);
 
-    mac->SetLogicalLoraChannelHelper(channelHelper);
+    mac->SetLogicalChannelManager(channelHelper);
 
     ///////////////////////////////////////////////
     // DataRate -> SF, DataRate -> Bandwidth     //
@@ -158,41 +155,41 @@ LorawanMacHelper::ConfigureForEuRegion(Ptr<LorawanMac> mac) const
     // SubBands //
     //////////////
 
-    LogicalLoraChannelHelper channelHelper;
-    channelHelper.AddSubBand(863000000, 865000000, 0.001, 14);
-    channelHelper.AddSubBand(865000000, 868000000, 0.01, 14);
-    channelHelper.AddSubBand(868000000, 868600000, 0.01, 14);
-    channelHelper.AddSubBand(868700000, 869200000, 0.001, 14);
-    channelHelper.AddSubBand(869400000, 869650000, 0.1, 27);
-    channelHelper.AddSubBand(869700000, 870000000, 0.01, 14);
+    auto channelHelper = CreateObject<LogicalChannelManager>();
+    channelHelper->AddSubBand(863000000, 865000000, 0.001, 14);
+    channelHelper->AddSubBand(865000000, 868000000, 0.01, 14);
+    channelHelper->AddSubBand(868000000, 868600000, 0.01, 14);
+    channelHelper->AddSubBand(868700000, 869200000, 0.001, 14);
+    channelHelper->AddSubBand(869400000, 869650000, 0.1, 27);
+    channelHelper->AddSubBand(869700000, 870000000, 0.01, 14);
 
     //////////////////////
     // Default channels //
     //////////////////////
 
-    Ptr<LogicalLoraChannel> lc0 = CreateObject<LogicalLoraChannel>(868100000, 0, 5);
-    Ptr<LogicalLoraChannel> lc1 = CreateObject<LogicalLoraChannel>(868300000, 0, 5);
-    Ptr<LogicalLoraChannel> lc2 = CreateObject<LogicalLoraChannel>(868500000, 0, 5);
-    channelHelper.AddChannel(0, lc0);
-    channelHelper.AddChannel(1, lc1);
-    channelHelper.AddChannel(2, lc2);
+    Ptr<LogicalChannel> lc0 = CreateObject<LogicalChannel>(868100000, 0, 5);
+    Ptr<LogicalChannel> lc1 = CreateObject<LogicalChannel>(868300000, 0, 5);
+    Ptr<LogicalChannel> lc2 = CreateObject<LogicalChannel>(868500000, 0, 5);
+    channelHelper->AddChannel(0, lc0);
+    channelHelper->AddChannel(1, lc1);
+    channelHelper->AddChannel(2, lc2);
 
     ////////////////////////
     // Addtional channels //
     ////////////////////////
 
-    Ptr<LogicalLoraChannel> lc3 = CreateObject<LogicalLoraChannel>(867100000, 0, 5);
-    Ptr<LogicalLoraChannel> lc4 = CreateObject<LogicalLoraChannel>(867300000, 0, 5);
-    Ptr<LogicalLoraChannel> lc5 = CreateObject<LogicalLoraChannel>(867500000, 0, 5);
-    Ptr<LogicalLoraChannel> lc6 = CreateObject<LogicalLoraChannel>(867700000, 0, 5);
-    Ptr<LogicalLoraChannel> lc7 = CreateObject<LogicalLoraChannel>(867900000, 0, 5);
-    // channelHelper.AddChannel (3, lc3);
-    // channelHelper.AddChannel (4, lc4);
-    // channelHelper.AddChannel (5, lc5);
-    // channelHelper.AddChannel (6, lc6);
-    // channelHelper.AddChannel (7, lc7);
+    Ptr<LogicalChannel> lc3 = CreateObject<LogicalChannel>(867100000, 0, 5);
+    Ptr<LogicalChannel> lc4 = CreateObject<LogicalChannel>(867300000, 0, 5);
+    Ptr<LogicalChannel> lc5 = CreateObject<LogicalChannel>(867500000, 0, 5);
+    Ptr<LogicalChannel> lc6 = CreateObject<LogicalChannel>(867700000, 0, 5);
+    Ptr<LogicalChannel> lc7 = CreateObject<LogicalChannel>(867900000, 0, 5);
+    // channelHelper->AddChannel (3, lc3);
+    // channelHelper->AddChannel (4, lc4);
+    // channelHelper->AddChannel (5, lc5);
+    // channelHelper->AddChannel (6, lc6);
+    // channelHelper->AddChannel (7, lc7);
 
-    mac->SetLogicalLoraChannelHelper(channelHelper);
+    mac->SetLogicalChannelManager(channelHelper);
 
     ///////////////////////////////////////////////
     // DataRate -> SF, DataRate -> Bandwidth     //
@@ -259,19 +256,19 @@ LorawanMacHelper::ConfigureForSingleChannelRegion(Ptr<LorawanMac> mac) const
     // SubBands //
     //////////////
 
-    LogicalLoraChannelHelper channelHelper;
-    channelHelper.AddSubBand(868000000, 868600000, 0.01, 14);
-    channelHelper.AddSubBand(868700000, 869200000, 0.001, 14);
-    channelHelper.AddSubBand(869400000, 869650000, 0.1, 27);
+    auto channelHelper = CreateObject<LogicalChannelManager>();
+    channelHelper->AddSubBand(868000000, 868600000, 0.01, 14);
+    channelHelper->AddSubBand(868700000, 869200000, 0.001, 14);
+    channelHelper->AddSubBand(869400000, 869650000, 0.1, 27);
 
     //////////////////////
     // Default channels //
     //////////////////////
 
-    Ptr<LogicalLoraChannel> lc0 = CreateObject<LogicalLoraChannel>(868100000, 0, 5);
-    channelHelper.AddChannel(0, lc0);
+    Ptr<LogicalChannel> lc0 = CreateObject<LogicalChannel>(868100000, 0, 5);
+    channelHelper->AddChannel(0, lc0);
 
-    mac->SetLogicalLoraChannelHelper(channelHelper);
+    mac->SetLogicalChannelManager(channelHelper);
 
     ///////////////////////////////////////////////
     // DataRate -> SF, DataRate -> Bandwidth     //
@@ -341,31 +338,26 @@ LorawanMacHelper::SetSpreadingFactorsUp(NodeContainer endDevices,
     std::vector<int> sfQuantity(6, 0);
     for (NodeContainer::Iterator j = endDevices.Begin(); j != endDevices.End(); ++j)
     {
-        Ptr<Node> object = *j;
-        Ptr<MobilityModel> position = object->GetObject<MobilityModel>();
+        auto node = *j;
+        auto position = node->GetObject<MobilityModel>();
         NS_ASSERT(bool(position) != 0);
-        Ptr<NetDevice> netDevice = object->GetDevice(0);
-        Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice>();
+        auto loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(0));
         NS_ASSERT(bool(loraNetDevice) != 0);
-        Ptr<ClassAEndDeviceLorawanMac> mac =
-            loraNetDevice->GetMac()->GetObject<ClassAEndDeviceLorawanMac>();
+        auto mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
         NS_ASSERT(bool(mac) != 0);
 
         // Try computing the distance from each gateway and find the best one
-        Ptr<Node> bestGateway = gateways.Get(0);
-        Ptr<MobilityModel> bestGatewayPosition = bestGateway->GetObject<MobilityModel>();
-
+        auto bestGateway = gateways.Get(0);
+        auto bestGatewayPosition = bestGateway->GetObject<MobilityModel>();
         // Assume devices transmit at 14 dBm erp
         double highestRxPower = channel->GetRxPower(14, position, bestGatewayPosition);
-
         for (NodeContainer::Iterator currentGw = gateways.Begin() + 1; currentGw != gateways.End();
              ++currentGw)
         {
             // Compute the power received from the current gateway
-            Ptr<Node> curr = *currentGw;
-            Ptr<MobilityModel> currPosition = curr->GetObject<MobilityModel>();
+            auto curr = *currentGw;
+            auto currPosition = curr->GetObject<MobilityModel>();
             double currentRxPower = channel->GetRxPower(14, position, currPosition); // dBm
-
             if (currentRxPower > highestRxPower)
             {
                 bestGateway = curr;
@@ -373,8 +365,6 @@ LorawanMacHelper::SetSpreadingFactorsUp(NodeContainer endDevices,
                 highestRxPower = currentRxPower;
             }
         }
-
-        // NS_LOG_DEBUG ("Rx Power: " << highestRxPower);
         double rxPower = highestRxPower;
 
         std::vector<double> snrThresholds = {-7.5, -10, -12.5, -15, -17.5, -20}; // dB

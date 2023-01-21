@@ -61,7 +61,7 @@ LoraHelper::Install(const LoraPhyHelper& phyHelper,
         Ptr<Node> node = *i;
         Ptr<LoraNetDevice> device = CreateObject<LoraNetDevice>();
         node->AddDevice(device);
-        Ptr<LoraPhy> phy = phyHelper.Create(node, device);
+        Ptr<LoraPhy> phy = phyHelper.Create(device);
         Ptr<LorawanMac> mac = macHelper.Create(device);
         if (m_packetTracker)
         {
@@ -191,22 +191,25 @@ LoraHelper::DoPrintDeviceStatus(NodeContainer endDevices,
 
     for (NodeContainer::Iterator j = endDevices.Begin(); j != endDevices.End(); ++j)
     {
-        Ptr<Node> object = *j;
-        Ptr<MobilityModel> position = object->GetObject<MobilityModel>();
-        NS_ASSERT(bool(position) != 0);
-        Ptr<NetDevice> netDevice = object->GetDevice(0);
-        Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice>();
-        NS_ASSERT(bool(loraNetDevice) != 0);
-        Ptr<ClassAEndDeviceLorawanMac> mac =
-            loraNetDevice->GetMac()->GetObject<ClassAEndDeviceLorawanMac>();
-        int dr = int(mac->GetDataRate());
-        double txPower = mac->GetTransmissionPower();
+        auto node = *j;
+        auto position = node->GetObject<MobilityModel>();
+        auto loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(0));
+        auto mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
+        auto app = DynamicCast<LoraApplication>(node->GetApplication(0));
+
         Vector pos = position->GetPosition();
+
         double gwdist = std::numeric_limits<double>::max();
         for (auto gw = gateways.Begin(); gw != gateways.End(); ++gw)
             gwdist = std::min(gwdist, (*gw)->GetObject<MobilityModel>()->GetDistanceFrom(position));
+
+        int dr = int(mac->GetDataRate());
+
+        double txPower = mac->GetTransmissionPower();
+
+        devCount_t& count = devPktCount[node->GetId()];
+
         // Add: #sent, #received, max-offered-traffic, duty-cycle
-        Ptr<LoraApplication> app = object->GetApplication(0)->GetObject<LoraApplication>();
         uint8_t size = app->GetPacketSize();
         double interval = app->GetInterval().GetSeconds();
         LoraTxParameters params;
@@ -216,10 +219,11 @@ LoraHelper::DoPrintDeviceStatus(NodeContainer endDevices,
         double maxot =
             LoraPhy::GetOnAirTime(Create<Packet>(size + 13), params).GetSeconds() / interval;
         maxot = std::min(maxot, 0.01);
+        
         double ot = mac->GetAggregatedDutyCycle();
         ot = std::min(ot, maxot);
-        devCount_t& count = devPktCount[object->GetId()];
-        outputFile << currentTime.GetSeconds() << " " << object->GetId() << " " << pos.x << " "
+
+        outputFile << currentTime.GetSeconds() << " " << node->GetId() << " " << pos.x << " "
                    << pos.y << " " << pos.z << " " << gwdist << " " << dr << " "
                    << unsigned(txPower) << " " << count.sent << " " << count.received << " "
                    << maxot << " " << ot << std::endl;
@@ -374,19 +378,16 @@ LoraHelper::DoPrintSFStatus(NodeContainer endDevices, NodeContainer gateways, st
     for (NodeContainer::Iterator j = endDevices.Begin(); j != endDevices.End(); ++j)
     {
         // Obtain device information
-        Ptr<Node> object = *j;
-        Ptr<NetDevice> netDevice = object->GetDevice(0);
-        Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice>();
-        NS_ASSERT(bool(loraNetDevice) != 0);
-        Ptr<ClassAEndDeviceLorawanMac> mac =
-            loraNetDevice->GetMac()->GetObject<ClassAEndDeviceLorawanMac>();
-        Ptr<LoraApplication> app = object->GetApplication(0)->GetObject<LoraApplication>();
+        auto node = *j;
+        auto loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(0));
+        auto mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
+        auto app = DynamicCast<LoraApplication>(node->GetApplication(0));
 
         int dr = int(mac->GetDataRate());
         sfStatus_t& sfstat = sfmap[dr];
 
         // Sent, received
-        devCount_t& count = devPktCount[object->GetId()];
+        devCount_t& count = devPktCount[node->GetId()];
         sfstat.sent += count.sent;
         sfstat.received += count.received;
 
@@ -406,7 +407,7 @@ LoraHelper::DoPrintSFStatus(NodeContainer endDevices, NodeContainer gateways, st
         sfstat.totAggDC += ot;
 
         // Total energy consumed
-        if (auto esc = object->GetObject<EnergySourceContainer>())
+        if (auto esc = node->GetObject<EnergySourceContainer>())
         {
             auto demc = esc->Get(0)->FindDeviceEnergyModels("ns3::LoraRadioEnergyModel");
             if (demc.GetN())
@@ -472,7 +473,7 @@ LoraHelper::EnablePcapInternal(std::string prefix,
     // that are wandering through all of devices on perhaps all of the nodes in
     // the system.  We can only deal with devices of type LoraNetDevice.
     //
-    Ptr<LoraNetDevice> device = nd->GetObject<LoraNetDevice>();
+    Ptr<LoraNetDevice> device = DynamicCast<LoraNetDevice>(nd);
     if (bool(device) == 0)
     {
         NS_LOG_INFO("LoraHelper::EnablePcapInternal(): Device "

@@ -50,7 +50,7 @@ main(int argc, char* argv[])
     // LogComponentEnable("LoraPhy", LOG_LEVEL_ALL);
     // LogComponentEnable("LoraChannel", LOG_LEVEL_ALL);
     // LogComponentEnable("EndDeviceLoraPhy", LOG_LEVEL_ALL);
-    // LogComponentEnable("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
+    // LogComponentEnable("LogicalChannelManager", LOG_LEVEL_ALL);
     LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_ALL);
     LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
     // LogComponentEnable ("OneShotSender", LOG_LEVEL_ALL);
@@ -124,8 +124,8 @@ main(int argc, char* argv[])
     helper.Install(phyHelper, macHelper, endDevices);
 
     // Set message type (Default is unconfirmed)
-    Ptr<LorawanMac> edMac1 = endDevices.Get(1)->GetDevice(0)->GetObject<LoraNetDevice>()->GetMac();
-    Ptr<ClassAEndDeviceLorawanMac> edLorawanMac1 = edMac1->GetObject<ClassAEndDeviceLorawanMac>();
+    Ptr<LorawanMac> edMac1 = DynamicCast<LoraNetDevice>(endDevices.Get(1)->GetDevice(0))->GetMac();
+    Ptr<ClassAEndDeviceLorawanMac> edLorawanMac1 = DynamicCast<ClassAEndDeviceLorawanMac>(edMac1);
     edLorawanMac1->SetMType(LorawanMacHeader::CONFIRMED_DATA_UP);
 
     // Install applications in EDs

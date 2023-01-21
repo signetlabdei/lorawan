@@ -1,3 +1,5 @@
+#include "utilities.cc"
+
 #include "ns3/building-allocator.h"
 #include "ns3/building-penetration-loss.h"
 #include "ns3/buildings-helper.h"
@@ -136,7 +138,7 @@ main(int argc, char* argv[])
 
     // Create the LoraPhyHelper
     LoraPhyHelper phyHelper = LoraPhyHelper();
-    phyHelper.SetInterference("CollisionMatrix", interferenceMatrix);
+    phyHelper.SetInterference("CollisionMatrix", EnumValue(sirMap.at(interferenceMatrix)));
     phyHelper.SetChannel(channel);
 
     // Create the LorawanMacHelper
@@ -191,7 +193,7 @@ main(int argc, char* argv[])
     for (NodeContainer::Iterator j = endDevices.Begin(); j != endDevices.End(); ++j)
     {
         Ptr<Node> node = *j;
-        Ptr<LoraNetDevice> loraNetDevice = node->GetDevice(0)->GetObject<LoraNetDevice>();
+        Ptr<LoraNetDevice> loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(0));
         Ptr<LoraPhy> phy = loraNetDevice->GetPhy();
     }
 
@@ -289,17 +291,17 @@ main(int argc, char* argv[])
     // Install trace sources
     for (NodeContainer::Iterator node = gateways.Begin(); node != gateways.End(); node++)
     {
-        (*node)->GetDevice(0)->GetObject<LoraNetDevice>()->GetPhy()->TraceConnectWithoutContext(
-            "ReceivedPacket",
-            MakeCallback(OnPacketReceptionCallback));
+        DynamicCast<LoraNetDevice>((*node)->GetDevice(0))
+            ->GetPhy()
+            ->TraceConnectWithoutContext("ReceivedPacket", MakeCallback(OnPacketReceptionCallback));
     }
 
     // Install trace sources
     for (NodeContainer::Iterator node = endDevices.Begin(); node != endDevices.End(); node++)
     {
-        (*node)->GetDevice(0)->GetObject<LoraNetDevice>()->GetPhy()->TraceConnectWithoutContext(
-            "StartSending",
-            MakeCallback(OnTransmissionCallback));
+        DynamicCast<LoraNetDevice>((*node)->GetDevice(0))
+            ->GetPhy()
+            ->TraceConnectWithoutContext("StartSending", MakeCallback(OnTransmissionCallback));
     }
 
     macHelper.SetSpreadingFactorsUp(endDevices, gateways, channel);

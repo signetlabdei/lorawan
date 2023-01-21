@@ -24,9 +24,9 @@
 
 #include "ns3/application.h"
 #include "ns3/event-id.h"
+#include "ns3/gateway-lorawan-mac.h"
 #include "ns3/ipv4-address.h"
 #include "ns3/jitqueue.h"
-#include "ns3/lora-net-device.h"
 #include "ns3/loragw_hal.h"
 #include "ns3/packet.h"
 #include "ns3/ptr.h"
@@ -127,25 +127,18 @@ class UdpForwarder : public Application
     void SetRemote(Address addr);
 
     /**
-     * Sets the device to use to communicate with the EDs.
+     * Sets the mac to use to communicate with the EDs.
      *
-     * \param loraNetDevice The LoraNetDevice on this node.
+     * \param mac The GatewayLorawanMac on this node.
      */
-    void SetLoraNetDevice(Ptr<LoraNetDevice> loraNetDevice);
+    void SetGatewayLorawanMac(Ptr<GatewayLorawanMac> mac);
 
     /**
-     * Receive a packet from the LoraNetDevice.
+     * Receive a packet from the GatewayLorawanMac.
      *
-     * \param loraNetDevice The LoraNetDevice we received the packet from.
      * \param packet The packet we received.
-     * \param protocol The protocol number associated to this packet.
-     * \param sender The address of the sender.
-     * \returns True if we can handle the packet, false otherwise.
      */
-    bool ReceiveFromLora(Ptr<NetDevice> loraNetDevice,
-                         Ptr<const Packet> packet,
-                         uint16_t protocol,
-                         const Address& sender);
+    bool ReceiveFromLora(Ptr<GatewayLorawanMac> mac, Ptr<const Packet> packet);
 
   protected:
     virtual void DoDispose(void);
@@ -160,7 +153,7 @@ class UdpForwarder : public Application
     std::string m_peerAddressString; //!< Remote peer address string
 #endif                               // NS3_LOG_ENABLE
 
-    Ptr<LoraNetDevice> m_loraNetDevice; //!< Pointer to the node's LoraNetDevice
+    Ptr<GatewayLorawanMac> m_mac; //!< Pointer to the node's GatewayLorawanMac
 
     /* -------------------------------------------------------------------------- */
     /* ---------------- Ns-3 INTEGRATION of lora_pkt_fwd.c ---------------------- */

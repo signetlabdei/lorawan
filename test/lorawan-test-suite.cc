@@ -1,14 +1,14 @@
 
 // Include headers of classes to test
 #include "ns3/constant-position-mobility-model.h"
-#include "ns3/log.h"
-#include "ns3/lora-helper.h"
-#include "ns3/mobility-helper.h"
-#include "ns3/one-shot-sender-helper.h"
 #include "ns3/end-device-lora-phy.h"
 #include "ns3/gateway-lora-phy.h"
+#include "ns3/log.h"
 #include "ns3/lora-frame-header.h"
+#include "ns3/lora-helper.h"
 #include "ns3/lorawan-mac-header.h"
+#include "ns3/mobility-helper.h"
+#include "ns3/one-shot-sender-helper.h"
 
 // An essential include is test.h
 #include "ns3/test.h"
@@ -335,7 +335,7 @@ HeaderTest::DoRun(void)
     // Deserialization
     frameHdr.Deserialize(serialized);
 
-    Ptr<LinkCheckAns> command = (*(frameHdr.GetCommands().begin()))->GetObject<LinkCheckAns>();
+    Ptr<LinkCheckAns> command = DynamicCast<LinkCheckAns>(*(frameHdr.GetCommands().begin()));
     uint8_t margin = command->GetMargin();
     uint8_t gwCnt = command->GetGwCnt();
 
@@ -377,8 +377,7 @@ HeaderTest::DoRun(void)
     frameHdr1.SetAsDownlink();
 
     pkt->RemoveHeader(frameHdr1);
-    Ptr<LinkCheckAns> linkCheckAns =
-        (*(frameHdr1.GetCommands().begin()))->GetObject<LinkCheckAns>();
+    Ptr<LinkCheckAns> linkCheckAns = DynamicCast<LinkCheckAns>(*(frameHdr1.GetCommands().begin()));
 
     NS_TEST_EXPECT_MSG_EQ((pkt->GetSize()),
                           10,
@@ -817,46 +816,46 @@ ReceivePathTest::DoRun(void)
 }
 
 /**************************
- * LogicalLoraChannelTest *
+ * LogicalChannelTest *
  **************************/
 
-class LogicalLoraChannelTest : public TestCase
+class LogicalChannelTest : public TestCase
 {
   public:
-    LogicalLoraChannelTest();
-    virtual ~LogicalLoraChannelTest();
+    LogicalChannelTest();
+    virtual ~LogicalChannelTest();
 
   private:
     virtual void DoRun(void);
 };
 
 // Add some help text to this case to describe what it is intended to test
-LogicalLoraChannelTest::LogicalLoraChannelTest()
-    : TestCase("Verify that LogicalLoraChannel and LogicalLoraChannelHelper work as expected")
+LogicalChannelTest::LogicalChannelTest()
+    : TestCase("Verify that LogicalChannel and LogicalChannelManager work as expected")
 {
 }
 
 // Reminder that the test case should clean up after itself
-LogicalLoraChannelTest::~LogicalLoraChannelTest()
+LogicalChannelTest::~LogicalChannelTest()
 {
 }
 
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-LogicalLoraChannelTest::DoRun(void)
+LogicalChannelTest::DoRun(void)
 {
-    NS_LOG_DEBUG("LogicalLoraChannelTest");
+    NS_LOG_DEBUG("LogicalChannelTest");
 
     /////////////////////////////
-    // Test LogicalLoraChannel //
+    // Test LogicalChannel //
     /////////////////////////////
 
     // Setup
-    Ptr<LogicalLoraChannel> channel0 = CreateObject<LogicalLoraChannel>(868000000);
-    Ptr<LogicalLoraChannel> channel1 = CreateObject<LogicalLoraChannel>(868000000);
-    Ptr<LogicalLoraChannel> channel2 = CreateObject<LogicalLoraChannel>(868100000);
-    Ptr<LogicalLoraChannel> channel3 = CreateObject<LogicalLoraChannel>(868001000);
+    Ptr<LogicalChannel> channel0 = CreateObject<LogicalChannel>(868000000);
+    Ptr<LogicalChannel> channel1 = CreateObject<LogicalChannel>(868000000);
+    Ptr<LogicalChannel> channel2 = CreateObject<LogicalChannel>(868100000);
+    Ptr<LogicalChannel> channel3 = CreateObject<LogicalChannel>(868001000);
 
     // Equality between channels
     // Test the == and != operators
@@ -870,7 +869,7 @@ LogicalLoraChannelTest::DoRun(void)
 
     // Setup
     SubBand subBand0(868000000, 868700000, 0.01, 14);
-    Ptr<LogicalLoraChannel> channel4 = CreateObject<LogicalLoraChannel>(870);
+    Ptr<LogicalChannel> channel4 = CreateObject<LogicalChannel>(870);
 
     // Test BelongsToSubBand
     NS_TEST_EXPECT_MSG_EQ(subBand0.BelongsToSubBand(channel2),
@@ -884,24 +883,24 @@ LogicalLoraChannelTest::DoRun(void)
                           "BelongsToSubBand does not behave as expected");
 
     ///////////////////////////////////
-    // Test LogicalLoraChannelHelper //
+    // Test LogicalChannelManager //
     ///////////////////////////////////
 
     // Setup
-    Ptr<LogicalLoraChannelHelper> channelHelper = CreateObject<LogicalLoraChannelHelper>();
+    Ptr<LogicalChannelManager> channelHelper = CreateObject<LogicalChannelManager>();
     SubBand subBand1(869000000, 869400000, 0.1, 27);
-    channel0 = CreateObject<LogicalLoraChannel>(868100000);
-    channel1 = CreateObject<LogicalLoraChannel>(868300000);
-    channel2 = CreateObject<LogicalLoraChannel>(868500000);
-    channel3 = CreateObject<LogicalLoraChannel>(869100000);
-    channel4 = CreateObject<LogicalLoraChannel>(869300000);
+    channel0 = CreateObject<LogicalChannel>(868100000);
+    channel1 = CreateObject<LogicalChannel>(868300000);
+    channel2 = CreateObject<LogicalChannel>(868500000);
+    channel3 = CreateObject<LogicalChannel>(869100000);
+    channel4 = CreateObject<LogicalChannel>(869300000);
 
     // Channel diagram
     //
     // Channels      0      1      2                     3       4
     // SubBands  868 ----- 0.1% ----- 868.7       869 ----- 1% ----- 869.4
 
-    // Add SubBands and LogicalLoraChannels to the helper
+    // Add SubBands and LogicalChannels to the helper
     channelHelper->AddSubBand(&subBand0);
     channelHelper->AddSubBand(&subBand1);
     channelHelper->AddChannel(0, channel0);
@@ -1349,8 +1348,8 @@ PhyConnectivityTest::DoRun(void)
 
     txParams.sf = 7;
     edPhy2->SetSpreadingFactor(7);
-    edPhy2->GetMobility()->GetObject<ConstantPositionMobilityModel>()->SetPosition(
-        Vector(2990, 0, 0));
+    DynamicCast<ConstantPositionMobilityModel>(edPhy2->GetMobility())
+        ->SetPosition(Vector(2990, 0, 0));
 
     Simulator::Schedule(Seconds(2),
                         &EndDeviceLoraPhy::Send,
@@ -1374,8 +1373,8 @@ PhyConnectivityTest::DoRun(void)
     // Try again using a packet with higher SF
     txParams.sf = 8;
     edPhy2->SetSpreadingFactor(8);
-    edPhy2->GetMobility()->GetObject<ConstantPositionMobilityModel>()->SetPosition(
-        Vector(2990, 0, 0));
+    DynamicCast<ConstantPositionMobilityModel>(edPhy2->GetMobility())
+        ->SetPosition(Vector(2990, 0, 0));
 
     Simulator::Schedule(Seconds(2),
                         &EndDeviceLoraPhy::Send,
@@ -1567,7 +1566,7 @@ LorawanTestSuite::LorawanTestSuite()
     AddTestCase(new AddressTest, TestCase::QUICK);
     AddTestCase(new HeaderTest, TestCase::QUICK);
     AddTestCase(new ReceivePathTest, TestCase::QUICK);
-    AddTestCase(new LogicalLoraChannelTest, TestCase::QUICK);
+    AddTestCase(new LogicalChannelTest, TestCase::QUICK);
     AddTestCase(new TimeOnAirTest, TestCase::QUICK);
     AddTestCase(new PhyConnectivityTest, TestCase::QUICK);
 }

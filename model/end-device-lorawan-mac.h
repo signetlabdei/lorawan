@@ -356,7 +356,7 @@ class EndDeviceLorawanMac : public LorawanMac
      *
      * \param frequency The channel's center frequency.
      */
-    void AddLogicalChannel(uint8_t chIndex, Ptr<LogicalLoraChannel> logicalChannel);
+    void AddLogicalChannel(uint8_t chIndex, Ptr<LogicalChannel> logicalChannel);
 
     /**
      * Add a subband to the logical channel helper.
@@ -433,10 +433,10 @@ class EndDeviceLorawanMac : public LorawanMac
 
     /**
      * Find a suitable channel for transmission. The channel is chosen among the
-     * ones that are available in the ED's LogicalLoraChannel, based on their duty
+     * ones that are available in the ED's LogicalChannel, based on their duty
      * cycle limitations.
      */
-    Ptr<LogicalLoraChannel> GetChannelForTx(void);
+    Ptr<LogicalChannel> GetChannelForTx(void);
 
     /**
      * The duration of a receive window in number of symbols. This should be
@@ -479,11 +479,11 @@ class EndDeviceLorawanMac : public LorawanMac
 
   private:
     /**
-     * Randomly shuffle a Ptr<LogicalLoraChannel> vector.
+     * Randomly shuffle a Ptr<LogicalChannel> vector.
      *
      * Used to pick a random channel on which to send the packet.
      */
-    std::vector<Ptr<LogicalLoraChannel>> Shuffle(std::vector<Ptr<LogicalLoraChannel>> vector);
+    std::vector<Ptr<LogicalChannel>> Shuffle(std::vector<Ptr<LogicalChannel>> vector);
 
     /**
      * Find the minimum waiting time before the next possible transmission.

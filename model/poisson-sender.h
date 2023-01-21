@@ -22,7 +22,6 @@
 #define POISSON_SENDER_H
 
 #include "ns3/lora-application.h"
-#include "ns3/lorawan-mac.h"
 
 namespace ns3
 {
@@ -54,11 +53,6 @@ class PoissonSender : public LoraApplication
     void SendPacket(void);
 
     Ptr<ExponentialRandomVariable> m_interval; //!< Random variable modeling packet inter-send time
-
-    /**
-     * The MAC layer of this node
-     */
-    Ptr<LorawanMac> m_mac;
 };
 
 } // namespace lorawan

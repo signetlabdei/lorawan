@@ -94,15 +94,14 @@ LoraRadioEnergyModelHelper::DoInstall(Ptr<NetDevice> device, Ptr<EnergySource> s
         NS_FATAL_ERROR("NetDevice type is not LoraNetDevice!");
     }
     Ptr<Node> node = device->GetNode();
-    Ptr<LoraRadioEnergyModel> model = m_radioEnergy.Create()->GetObject<LoraRadioEnergyModel>();
+    Ptr<LoraRadioEnergyModel> model = DynamicCast<LoraRadioEnergyModel>(m_radioEnergy.Create());
     NS_ASSERT(model != NULL);
     // set energy source pointer
     model->SetEnergySource(source);
 
     // set energy depletion callback
     // if none is specified, make a callback to EndDeviceLoraPhy::SetSleepMode
-    Ptr<LoraNetDevice> loraDevice = device->GetObject<LoraNetDevice>();
-    Ptr<EndDeviceLoraPhy> loraPhy = loraDevice->GetPhy()->GetObject<EndDeviceLoraPhy>();
+    auto loraPhy = DynamicCast<EndDeviceLoraPhy>(DynamicCast<LoraNetDevice>(device)->GetPhy());
     // add model to device model list in energy source
     source->AppendDeviceEnergyModel(model);
     // create and register energy model phy listener

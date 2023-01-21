@@ -348,15 +348,9 @@ Ptr<T>
 LoraFrameHeader::GetMacCommand()
 {
     // Iterate on MAC commands and try casting
-    std::list<Ptr<MacCommand>>::const_iterator it;
-    for (it = m_macCommands.begin(); it != m_macCommands.end(); ++it)
-    {
-        if (bool((*it)->GetObject<T>()) != 0)
-        {
-            return (*it)->GetObject<T>();
-        }
-    }
-
+    for (const auto& cmd : m_macCommands)
+        if (auto deriv = DynamicCast<T>(cmd); bool(deriv))
+            return deriv;
     // If no command was found, return 0
     return 0;
 }

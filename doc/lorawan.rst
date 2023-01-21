@@ -268,10 +268,10 @@ Logical channels and duty cycle
 Since LoRaWAN operates in unlicensed bands that are subject to restrictions on
 duty cycle, a series of objects were created to keep track of available
 transmission time and limit transmission at the MAC layer in case the layers
-above aren't aware of these limitations. A ``LogicalLoraChannelHelper`` is
+above aren't aware of these limitations. A ``LogicalChannelManager`` is
 assigned to each ``LorawanMac`` instance, and is tasked with keeping track of all
 available logical channels (which can be added and modified with MAC commands,
-and are represented by the ``LogicalLoraChannel`` class) and is aware of the
+and are represented by the ``LogicalChannel`` class) and is aware of the
 sub-band they are in (through instances of the ``SubBand`` class).
 
 Additionally, in order to enforce duty cycle limitations, this object also
@@ -514,7 +514,7 @@ cover the following classes:
 - ``LoraDeviceAddress`` and ``LoraDeviceAddressHelper``
 - ``LoraFrameHeader`` and ``LorawanMacHeader``
 - ``ReceivePath`` and ``GatewayLoraPhy``
-- ``LogicalLoraChannel`` and ``LogicalLoraChannelHelper``
+- ``LogicalChannel`` and ``LogicalChannelManager``
 - ``LoraPhy``
 - ``EndDeviceLoraPhy`` and ``LoraChannel``
 

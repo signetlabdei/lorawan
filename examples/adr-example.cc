@@ -102,7 +102,7 @@ main(int argc, char* argv[])
     // LogComponentEnable ("EndDeviceStatus", LOG_LEVEL_ALL);
     LogComponentEnable("AdrComponent", LOG_LEVEL_ALL);
     // LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
-    // LogComponentEnable ("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
+    // LogComponentEnable ("LogicalChannelManager", LOG_LEVEL_ALL);
     // LogComponentEnable ("MacCommand", LOG_LEVEL_ALL);
     // LogComponentEnable ("AdrExploraSf", LOG_LEVEL_ALL);
     // LogComponentEnable ("AdrExploraAt", LOG_LEVEL_ALL);

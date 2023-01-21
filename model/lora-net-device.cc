@@ -45,11 +45,6 @@ LoraNetDevice::GetTypeId(void)
             .SetParent<NetDevice>()
             .AddConstructor<LoraNetDevice>()
             .SetGroupName("lorawan")
-            .AddAttribute("Channel",
-                          "The channel attached to this device",
-                          PointerValue(),
-                          MakePointerAccessor(&LoraNetDevice::DoGetChannel),
-                          MakePointerChecker<LoraChannel>())
             .AddAttribute("Phy",
                           "The PHY layer attached to this device.",
                           PointerValue(),
@@ -97,6 +92,7 @@ void
 LoraNetDevice::SetMac(Ptr<LorawanMac> mac)
 {
     m_mac = mac;
+    mac->SetDevice(this);
     CompleteConfig();
 }
 
@@ -110,6 +106,7 @@ void
 LoraNetDevice::SetPhy(Ptr<LoraPhy> phy)
 {
     m_phy = phy;
+    phy->SetDevice(this);
     CompleteConfig();
 }
 
@@ -128,39 +125,12 @@ LoraNetDevice::CompleteConfig(void)
     m_configComplete = true;
 }
 
-void
-LoraNetDevice::Send(Ptr<Packet> packet)
-{
-    NS_LOG_FUNCTION(this << packet);
-
-    // Send the packet to the MAC layer, if it exists
-    NS_ASSERT(bool(m_mac) != 0);
-    m_mac->Send(packet);
-}
-
-void
-LoraNetDevice::Receive(Ptr<Packet> packet)
-{
-    NS_LOG_FUNCTION(this << packet);
-
-    // Fill protocol and address with empty stuff
-    NS_LOG_DEBUG("Calling receiveCallback");
-    m_receiveCallback(this, packet, 0x0800, Address());
-}
-
 /******************************************
  *    Methods inherited from NetDevice    *
  ******************************************/
 
 Ptr<Channel>
 LoraNetDevice::GetChannel(void) const
-{
-    NS_LOG_FUNCTION(this);
-    return DoGetChannel();
-}
-
-Ptr<LoraChannel>
-LoraNetDevice::DoGetChannel(void) const
 {
     NS_LOG_FUNCTION(this);
     return m_phy->GetChannel();
@@ -286,10 +256,7 @@ LoraNetDevice::Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNu
 {
     NS_LOG_FUNCTION(this << packet << dest << protocolNumber);
 
-    // Fallback to the vanilla Send method
-    Send(packet);
-
-    return true;
+    return false;
 }
 
 bool

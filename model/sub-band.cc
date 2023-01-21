@@ -83,7 +83,7 @@ SubBand::BelongsToSubBand(double frequency)
 }
 
 bool
-SubBand::BelongsToSubBand(Ptr<LogicalLoraChannel> logicalChannel)
+SubBand::BelongsToSubBand(Ptr<LogicalChannel> logicalChannel)
 {
     double frequency = logicalChannel->GetFrequency();
     return BelongsToSubBand(frequency);

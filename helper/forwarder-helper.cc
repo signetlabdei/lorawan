@@ -26,6 +26,7 @@
 #include "ns3/double.h"
 #include "ns3/forwarder.h"
 #include "ns3/log.h"
+#include "ns3/lora-net-device.h"
 #include "ns3/random-variable-stream.h"
 #include "ns3/simulator.h"
 #include "ns3/string.h"
@@ -84,22 +85,19 @@ ForwarderHelper::InstallPriv(Ptr<Node> node) const
     // Link the Forwarder to the NetDevices
     for (uint32_t i = 0; i < node->GetNDevices(); i++)
     {
-        Ptr<NetDevice> currentNetDevice = node->GetDevice(i);
-        if (bool(currentNetDevice->GetObject<LoraNetDevice>()) != 0)
+        Ptr<NetDevice> currNetDev = node->GetDevice(i);
+        if (auto loraNetDev = DynamicCast<LoraNetDevice>(currNetDev); loraNetDev != nullptr)
         {
-            Ptr<LoraNetDevice> loraNetDevice = currentNetDevice->GetObject<LoraNetDevice>();
-            app->SetLoraNetDevice(loraNetDevice);
-            loraNetDevice->SetReceiveCallback(MakeCallback(&Forwarder::ReceiveFromLora, app));
+            auto mac = DynamicCast<GatewayLorawanMac>(loraNetDev->GetMac());
+            NS_ASSERT(bool(mac));
+            app->SetGatewayLorawanMac(mac);
+            mac->SetReceiveCallback(MakeCallback(&Forwarder::ReceiveFromLora, app));
         }
-        else if (bool(currentNetDevice->GetObject<PointToPointNetDevice>()) != 0)
+        else if (auto p2pNetDev = DynamicCast<PointToPointNetDevice>(currNetDev);
+                 p2pNetDev != nullptr)
         {
-            Ptr<PointToPointNetDevice> pointToPointNetDevice =
-                currentNetDevice->GetObject<PointToPointNetDevice>();
-
-            app->SetPointToPointNetDevice(pointToPointNetDevice);
-
-            pointToPointNetDevice->SetReceiveCallback(
-                MakeCallback(&Forwarder::ReceiveFromPointToPoint, app));
+            app->SetPointToPointNetDevice(p2pNetDev);
+            p2pNetDev->SetReceiveCallback(MakeCallback(&Forwarder::ReceiveFromPointToPoint, app));
         }
         else
         {

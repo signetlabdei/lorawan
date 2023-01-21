@@ -176,7 +176,7 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
     // or because we are receiving, schedule a tx/retx later
 
     // Check m_aggregatedDutyCycle
-    Time aggregatedDelay = m_channelHelper.GetAggregatedWaitingTime(m_aggregatedDutyCycle);
+    Time aggregatedDelay = m_channelManager->GetAggregatedWaitingTime(m_aggregatedDutyCycle);
     Time netxTxDelay = Max(GetNextTransmissionDelay(), aggregatedDelay);
     if (netxTxDelay != Seconds(0))
     {
@@ -407,7 +407,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
         case (LINK_CHECK_ANS): {
             NS_LOG_DEBUG("Detected a LinkCheckAns command.");
             // Cast the command
-            Ptr<LinkCheckAns> linkCheckAns = cmd->GetObject<LinkCheckAns>();
+            auto linkCheckAns = DynamicCast<LinkCheckAns>(cmd);
             // Call the appropriate function to take action
             OnLinkCheckAns(linkCheckAns->GetMargin(), linkCheckAns->GetGwCnt());
             break;
@@ -415,7 +415,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
         case (LINK_ADR_REQ): {
             NS_LOG_DEBUG("Detected a LinkAdrReq command.");
             // Cast the command
-            Ptr<LinkAdrReq> linkAdrReq = cmd->GetObject<LinkAdrReq>();
+            auto linkAdrReq = DynamicCast<LinkAdrReq>(cmd);
             // Call the appropriate function to take action
             OnLinkAdrReq(linkAdrReq->GetDataRate(),
                          linkAdrReq->GetTxPower(),
@@ -426,7 +426,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
         case (DUTY_CYCLE_REQ): {
             NS_LOG_DEBUG("Detected a DutyCycleReq command.");
             // Cast the command
-            Ptr<DutyCycleReq> dutyCycleReq = cmd->GetObject<DutyCycleReq>();
+            auto dutyCycleReq = DynamicCast<DutyCycleReq>(cmd);
             // Call the appropriate function to take action
             OnDutyCycleReq(dutyCycleReq->GetMaximumAllowedDutyCycle());
             break;
@@ -434,7 +434,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
         case (RX_PARAM_SETUP_REQ): {
             NS_LOG_DEBUG("Detected a RxParamSetupReq command.");
             // Cast the command
-            Ptr<RxParamSetupReq> rxParamSetupReq = cmd->GetObject<RxParamSetupReq>();
+            auto rxParamSetupReq = DynamicCast<RxParamSetupReq>(cmd);
             // Call the appropriate function to take action
             OnRxParamSetupReq(rxParamSetupReq);
             break;
@@ -442,7 +442,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
         case (DEV_STATUS_REQ): {
             NS_LOG_DEBUG("Detected a DevStatusReq command.");
             // Cast the command
-            Ptr<DevStatusReq> devStatusReq = cmd->GetObject<DevStatusReq>();
+            auto devStatusReq = DynamicCast<DevStatusReq>(cmd);
             // Call the appropriate function to take action
             OnDevStatusReq();
             break;
@@ -450,7 +450,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
         case (NEW_CHANNEL_REQ): {
             NS_LOG_DEBUG("Detected a NewChannelReq command.");
             // Cast the command
-            Ptr<NewChannelReq> newChannelReq = cmd->GetObject<NewChannelReq>();
+            auto newChannelReq = DynamicCast<NewChannelReq>(cmd);
             // Call the appropriate function to take action
             OnNewChannelReq(newChannelReq->GetChannelIndex(),
                             newChannelReq->GetFrequency(),
@@ -461,7 +461,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
         case (RX_TIMING_SETUP_REQ): {
             NS_LOG_DEBUG("Detected a RxTimingSetupReq command.");
             // Cast the command
-            auto rxTimingSetupReq = cmd->GetObject<RxTimingSetupReq>();
+            auto rxTimingSetupReq = DynamicCast<RxTimingSetupReq>(cmd);
             // Call the appropriate function to take action
             OnRxTimingSetupReq(rxTimingSetupReq->GetDelay());
             break;
@@ -473,7 +473,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
         case (DL_CHANNEL_REQ): {
             NS_LOG_DEBUG("Detected a DlChannelReq command.");
             // Cast the command
-            auto dlChannelReq = cmd->GetObject<DlChannelReq>();
+            auto dlChannelReq = DynamicCast<DlChannelReq>(cmd);
             // Call the appropriate function to take action
             OnDlChannelReq(dlChannelReq->GetChannelIndex(), dlChannelReq->GetFrequency());
             break;
@@ -598,9 +598,9 @@ EndDeviceLorawanMac::GetNextTransmissionDelay(void)
 
     //    Check duty cycle    //
     Time waitingTime = Time::Max();
-    for (const auto& llc : m_channelHelper.GetEnabledChannelList())
+    for (const auto& llc : m_channelManager->GetEnabledChannelList())
     {
-        waitingTime = std::min(waitingTime, m_channelHelper.GetWaitingTime(llc));
+        waitingTime = std::min(waitingTime, m_channelManager->GetWaitingTime(llc));
         NS_LOG_DEBUG("Waiting time before the next transmission in channel with frequecy "
                      << llc->GetFrequency() << " is = " << waitingTime.GetSeconds() << ".");
     }
@@ -610,18 +610,18 @@ EndDeviceLorawanMac::GetNextTransmissionDelay(void)
     return waitingTime;
 }
 
-Ptr<LogicalLoraChannel>
+Ptr<LogicalChannel>
 EndDeviceLorawanMac::GetChannelForTx(void)
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    auto channels = Shuffle(m_channelHelper.GetEnabledChannelList());
+    auto channels = Shuffle(m_channelManager->GetEnabledChannelList());
     for (auto& llc : channels)
     {
         NS_LOG_DEBUG("Frequency of the current channel: " << llc->GetFrequency());
 
         // Verify that we can send the packet
-        Time waitingTime = m_channelHelper.GetWaitingTime(llc);
+        Time waitingTime = m_channelManager->GetWaitingTime(llc);
         NS_LOG_DEBUG("Waiting time for current channel = " << waitingTime.GetSeconds());
 
         // Send immediately if we can
@@ -634,8 +634,8 @@ EndDeviceLorawanMac::GetChannelForTx(void)
     return 0; // In this case, no suitable channel was found
 }
 
-std::vector<Ptr<LogicalLoraChannel>>
-EndDeviceLorawanMac::Shuffle(std::vector<Ptr<LogicalLoraChannel>> vector)
+std::vector<Ptr<LogicalChannel>>
+EndDeviceLorawanMac::Shuffle(std::vector<Ptr<LogicalChannel>> vector)
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -753,7 +753,7 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
     /////////////////////////
     // Check whether all specified channels exist on this device
     for (auto& chIndex : enabledChannels)
-        if (!m_channelHelper.GetChannel(chIndex))
+        if (!m_channelManager->GetChannel(chIndex))
         {
             channelMaskOk = false;
             break;
@@ -783,11 +783,10 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
         bool foundAvailableChannel = false;
         for (auto& chIndex : enabledChannels)
         {
-            auto ch = m_channelHelper.GetChannel(chIndex);
+            auto ch = m_channelManager->GetChannel(chIndex);
             NS_LOG_DEBUG("MinDR: " << unsigned(ch->GetMinimumDataRate()));
             NS_LOG_DEBUG("MaxDR: " << unsigned(ch->GetMaximumDataRate()));
-            if (ch->GetMinimumDataRate() <= dataRate &&
-                ch->GetMaximumDataRate() >= dataRate)
+            if (ch->GetMinimumDataRate() <= dataRate && ch->GetMaximumDataRate() >= dataRate)
             {
                 foundAvailableChannel = true;
                 break;
@@ -819,17 +818,17 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
     if (channelMaskOk && dataRateOk && txPowerOk)
     {
         // Cycle over all channels in the list
-        for (uint32_t i = 0; i < m_channelHelper.GetChannelList().size(); i++)
+        for (uint32_t i = 0; i < m_channelManager->GetChannelList().size(); i++)
         {
             if (std::find(enabledChannels.begin(), enabledChannels.end(), i) !=
                 enabledChannels.end())
             {
-                m_channelHelper.GetChannelList().at(i)->SetEnabledForUplink();
+                m_channelManager->GetChannelList().at(i)->SetEnabledForUplink();
                 NS_LOG_DEBUG("Channel " << i << " enabled");
             }
             else
             {
-                m_channelHelper.GetChannelList().at(i)->DisableForUplink();
+                m_channelManager->GetChannelList().at(i)->DisableForUplink();
                 NS_LOG_DEBUG("Channel " << i << " disabled");
             }
         }
@@ -899,7 +898,7 @@ EndDeviceLorawanMac::OnNewChannelReq(uint8_t chIndex,
     // Check whether the new data rate range is ok
     bool dataRateRangeOk = (minDataRate >= 0 && maxDataRate <= 5);
     // Check whether the frequency is ok
-    bool channelFrequencyOk = bool(m_channelHelper.GetSubBandFromFrequency(frequency));
+    bool channelFrequencyOk = bool(m_channelManager->GetSubBandFromFrequency(frequency));
     if (dataRateRangeOk && channelFrequencyOk)
         AddLogicalChannel(chIndex, frequency, minDataRate, maxDataRate);
 
@@ -908,11 +907,11 @@ EndDeviceLorawanMac::OnNewChannelReq(uint8_t chIndex,
 }
 
 void
-EndDeviceLorawanMac::AddLogicalChannel(uint8_t chIndex, Ptr<LogicalLoraChannel> logicalChannel)
+EndDeviceLorawanMac::AddLogicalChannel(uint8_t chIndex, Ptr<LogicalChannel> logicalChannel)
 {
     NS_LOG_FUNCTION(this << logicalChannel);
 
-    m_channelHelper.AddChannel(chIndex, logicalChannel);
+    m_channelManager->AddChannel(chIndex, logicalChannel);
 }
 
 void
@@ -924,8 +923,7 @@ EndDeviceLorawanMac::AddLogicalChannel(uint8_t chIndex,
     NS_LOG_FUNCTION(this << unsigned(chIndex) << frequency << unsigned(minDataRate)
                          << unsigned(maxDataRate));
 
-    AddLogicalChannel(chIndex,
-                      CreateObject<LogicalLoraChannel>(frequency, minDataRate, maxDataRate));
+    AddLogicalChannel(chIndex, CreateObject<LogicalChannel>(frequency, minDataRate, maxDataRate));
 }
 
 void
@@ -939,13 +937,13 @@ EndDeviceLorawanMac::OnDlChannelReq(uint8_t chIndex, double frequency)
     NS_LOG_FUNCTION(this << unsigned(chIndex) << frequency);
 
     // Check whether the uplink frequency exists in this channel
-    bool uplinkFrequencyExists = bool(m_channelHelper.GetChannel(chIndex));
+    bool uplinkFrequencyExists = bool(m_channelManager->GetChannel(chIndex));
 
     // Check whether the downlink frequency can be used by this device
-    bool channelFrequencyOk = bool(m_channelHelper.GetSubBandFromFrequency(frequency));
+    bool channelFrequencyOk = bool(m_channelManager->GetSubBandFromFrequency(frequency));
 
     if (uplinkFrequencyExists && channelFrequencyOk)
-        m_channelHelper.SetReplyFrequency(chIndex, frequency);
+        m_channelManager->SetReplyFrequency(chIndex, frequency);
 
     NS_LOG_INFO("Adding DlChannelAns reply");
     m_macCommandList.push_back(
@@ -960,7 +958,7 @@ EndDeviceLorawanMac::AddSubBand(double startFrequency,
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    m_channelHelper.AddSubBand(startFrequency, endFrequency, dutyCycle, maxTxPowerDbm);
+    m_channelManager->AddSubBand(startFrequency, endFrequency, dutyCycle, maxTxPowerDbm);
 }
 
 double

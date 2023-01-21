@@ -90,10 +90,10 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
 
     // Find the channel with the desired frequency
     double sendingPower =
-        m_channelHelper.GetTxPowerForChannel(CreateObject<LogicalLoraChannel>(frequency));
+        m_channelManager->GetTxPowerForChannel(CreateObject<LogicalChannel>(frequency));
 
     // Add the event to the channelHelper to keep track of duty cycle
-    m_channelHelper.AddEvent(duration, CreateObject<LogicalLoraChannel>(frequency));
+    m_channelManager->AddEvent(duration, CreateObject<LogicalChannel>(frequency));
 
     // Send the packet to the PHY layer to send it on the channel
     m_phy->Send(packet, params, frequency, sendingPower);
@@ -121,7 +121,7 @@ GatewayLorawanMac::Receive(Ptr<const Packet> packet)
 
     if (macHdr.IsUplink())
     {
-        m_device->GetObject<LoraNetDevice>()->Receive(packetCopy);
+        m_receiveCallback (this, packetCopy);
 
         NS_LOG_DEBUG("Received packet: " << packet);
 
@@ -150,7 +150,7 @@ GatewayLorawanMac::GetWaitingTime(double frequency)
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    return m_channelHelper.GetWaitingTime(CreateObject<LogicalLoraChannel>(frequency));
+    return m_channelManager->GetWaitingTime(CreateObject<LogicalChannel>(frequency));
 }
 } // namespace lorawan
 } // namespace ns3

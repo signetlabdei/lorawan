@@ -98,11 +98,12 @@ NetworkServerHelper::InstallPriv(Ptr<Node> node)
 
         // Register gateways
         Ptr<Channel> channel = currentNetDevice->GetChannel();
-        NS_ASSERT_MSG(bool(channel->GetObject<PointToPointChannel>()) != 0,
+        NS_ASSERT_MSG(bool(DynamicCast<PointToPointChannel>(channel)),
                       "Connection with gateways is not PointToPoint");
         for (uint32_t j = 0; j < channel->GetNDevices(); ++j)
         {
             Ptr<Node> gwNode = channel->GetDevice(j)->GetNode();
+            // Point to point, so channel only holds 2 devices
             if (gwNode->GetId() != node->GetId())
             {
                 // Add the gateway to the NS list

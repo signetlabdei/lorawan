@@ -207,7 +207,7 @@ main(int argc, char* argv[])
     {
         // Physiscal layer settings
         LoraPhyHelper phyHelper;
-        phyHelper.SetInterference("CollisionMatrix", sir);
+        phyHelper.SetInterference("CollisionMatrix", EnumValue(sirMap.at(sir)));
         phyHelper.SetChannel(channel);
 
         // Create a LoraDeviceAddressGenerator
