@@ -200,7 +200,8 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
             }
             ParseCommands(fHdr);
 
-            m_receiveCallback(this, packetCopy);
+            if (!m_receiveCallback.IsNull())
+                m_receiveCallback(this, packetCopy);
 
             // Call the trace source
             m_receivedPacket(packet);

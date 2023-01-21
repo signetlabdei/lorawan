@@ -121,7 +121,8 @@ GatewayLorawanMac::Receive(Ptr<const Packet> packet)
 
     if (macHdr.IsUplink())
     {
-        m_receiveCallback (this, packetCopy);
+        if (!m_receiveCallback.IsNull())
+            m_receiveCallback(this, packetCopy);
 
         NS_LOG_DEBUG("Received packet: " << packet);
 
