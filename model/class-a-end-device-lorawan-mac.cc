@@ -188,10 +188,10 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
             Simulator::Cancel(m_secondReceiveWindow);
 
             // Parse the MAC commands
-            NS_ASSERT_MSG(not(fHdr.GetFOptsLen() > 0 and fHdr.GetFPort() == 0),
+            NS_ASSERT_MSG(!(fHdr.GetFOptsLen() > 0 && fHdr.GetFPort() == 0),
                           "Error: FOptsLen > 0 and FPort == 0 (forbidden by specifications)");
             uint32_t pSize = packetCopy->GetSize();
-            if (fHdr.GetFPort() == 0 and pSize > 0) // Commands are in the FRMPayload
+            if (fHdr.GetFPort() == 0 && pSize > 0) // Commands are in the FRMPayload
             {
                 NS_LOG_DEBUG("Commands in the FRMPayload. Size = " << (unsigned)pSize);
                 uint8_t cmds[256];

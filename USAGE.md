@@ -4,19 +4,19 @@ This is an [ns-3](https://www.nsnam.org "ns-3 Website") module that can be used
 to perform simulations of a [LoRaWAN](http://www.lora-alliance.org/technology
 "LoRa Alliance") network.
 
-This version has been modified to implement a traffic generator for the [Chirpstack server stack](https://www.chirpstack.io/ "ChirpStack, open-source LoRaWAN® Network Server").
+This version has been modified to implement a traffic emulator for the [Chirpstack server stack](https://www.chirpstack.io/ "ChirpStack, open-source LoRaWAN® Network Server").
 
 [Original repository](https://github.com/signetlabdei/lorawan "LoRaWAN ns-3 module").
 
 [API documentation](https://signetlabdei.github.io/lorawan-docs/html/index.html) (not up to date with this fork).
 
-[Module Documentation](https://signetlabdei.github.io/lorawan-docs/models/build/html/lorawan.html) (currently not up to date).
+[Module Documentation](https://signetlabdei.github.io/lorawan-docs/models/build/html/lorawan.html) (currently not up to date with the original module).
 
 ## Getting started ##
 
 ### Prerequisites ###
 
-If not already, install the `curl` package in your linux distribution.
+If not already, install the `libcurl` library in your linux distribution.
 
 To run simulations using this module, you will need to install ns-3, and clone
 this repository inside the `contrib` directory:
@@ -57,7 +57,7 @@ For a complete description of the module, refer to `doc/lorawan.rst` (currently 
 
 - [ns-3 tutorial](https://www.nsnam.org/docs/tutorial/html "ns-3 Tutorial")
 - [ns-3 manual](https://www.nsnam.org/docs/manual/html "ns-3 Manual")
-- The LoRaWAN specification can be requested at the [LoRa Alliance
+- The LoRaWAN specification can be found on the [LoRa Alliance
   website](http://www.lora-alliance.org)
 
 ## License ##
