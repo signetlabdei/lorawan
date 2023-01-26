@@ -297,6 +297,9 @@ ClassAEndDeviceLorawanMac::TxFinished(Ptr<const Packet> packet)
 {
     NS_LOG_FUNCTION_NOARGS();
 
+    // Switch the PHY to sleep
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->SwitchToSleep();
+
     // Schedule the opening of the first receive window
     Simulator::Schedule(m_receiveDelay1, &ClassAEndDeviceLorawanMac::OpenFirstReceiveWindow, this);
 
@@ -304,9 +307,6 @@ ClassAEndDeviceLorawanMac::TxFinished(Ptr<const Packet> packet)
     m_secondReceiveWindow = Simulator::Schedule(m_receiveDelay2,
                                                 &ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow,
                                                 this);
-
-    // Switch the PHY to sleep
-    DynamicCast<EndDeviceLoraPhy>(m_phy)->SwitchToSleep();
 }
 
 void

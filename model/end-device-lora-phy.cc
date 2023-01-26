@@ -78,7 +78,7 @@ EndDeviceLoraPhy::GetTypeId(void)
 EndDeviceLoraPhy::EndDeviceLoraPhy()
     : m_frequency(868100000),
       m_sf(7),
-      m_state(SLEEP) 
+      m_state(SLEEP)
 {
 }
 
@@ -112,22 +112,10 @@ EndDeviceLoraPhy::Send(Ptr<Packet> packet,
     // Send the packet over the channel
     NS_LOG_INFO("Sending the packet in the channel");
     m_channel->Send(this, packet, txPowerDbm, txParams.sf, duration, frequency);
-    // Schedule the switch back to STANDBY mode.
-    // For reference see SX1272 datasheet, section 4.1.6
-    Simulator::Schedule(duration, &EndDeviceLoraPhy::SwitchToStandby, this);
-    // Schedule the txFinished callback, if it was set. The call is scheduled just after the switch
-    // to standby in case the upper layer wishes to change the state. This ensures that it will find
-    // a PHY in STANDBY mode.
-    if (!m_txFinishedCallback.IsNull())
-        Simulator::Schedule(duration + NanoSeconds(10),
-                            &EndDeviceLoraPhy::m_txFinishedCallback,
-                            this,
-                            packet);
+    // Schedule the txFinished call
+    Simulator::Schedule(duration, &EndDeviceLoraPhy::TxFinished, this, packet);
     // Call the trace source
     m_startSending(packet, m_context);
-    // Schedule the sniffer trace source
-    if (!m_phySniffTxTrace.IsEmpty())
-        Simulator::Schedule(duration, &EndDeviceLoraPhy::m_phySniffTxTrace, this, packet);
 }
 
 void
@@ -332,6 +320,20 @@ EndDeviceLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Eve
         if (!m_phySniffRxTrace.IsEmpty())
             m_phySniffRxTrace(packet);
     }
+}
+
+void
+EndDeviceLoraPhy::TxFinished(Ptr<Packet> packet)
+{
+    // Switch back to STANDBY mode.
+    // For reference see SX1272 datasheet, section 4.1.6
+    SwitchToStandby();
+    // Forward packet to the upper layer
+    if (!m_txFinishedCallback.IsNull())
+        m_txFinishedCallback(packet);
+    // Schedule the sniffer trace source
+    if (!m_phySniffTxTrace.IsEmpty())
+        m_phySniffTxTrace(packet);
 }
 
 void

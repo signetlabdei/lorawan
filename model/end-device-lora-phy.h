@@ -221,6 +221,11 @@ class EndDeviceLoraPhy : public LoraPhy
     virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event);
 
     /**
+     * Internal call when transmission finishes. 
+     */
+    void TxFinished(Ptr<Packet> packet);
+
+    /**
      * Switch to the RX state
      */
     void SwitchToRx();

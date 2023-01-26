@@ -172,30 +172,37 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
 {
     NS_LOG_FUNCTION(this << packet);
 
-    // If it is not possible to transmit now because of the duty cycle,
-    // or because we are receiving, schedule a tx/retx later
-
-    // Check m_aggregatedDutyCycle
-    Time aggregatedDelay = m_channelManager->GetAggregatedWaitingTime(m_aggregatedDutyCycle);
-    Time netxTxDelay = Max(GetNextTransmissionDelay(), aggregatedDelay);
-    if (netxTxDelay != Seconds(0))
-    {
-        m_cannotSendBecauseDutyCycle(packet);
-        postponeTransmission(netxTxDelay, packet);
-    }
-    else if (m_retxParams.retxLeft == 0)
+    if (m_retxParams.retxLeft == 0)
     {
         NS_LOG_INFO("Max number of transmission achieved: packet not transmitted.");
+        return;
     }
-    else // the transmitting channel is available and we have not run out the maximum number of
-         // retransmissions
+
+    // If we are not in SLEEP or STANDBY state, schedule a tx/retx later
+    if (auto s = DynamicCast<EndDeviceLoraPhy>(m_phy)->GetState();
+        s != EndDeviceLoraPhy::State::SLEEP && s != EndDeviceLoraPhy::State::SLEEP)
     {
-        /* Extremely rare case: Send () happens after sending prev. pkt and before downlink
-           reception of dutycycle reconf. A big increase in dutycycle may allow next packet
-           to be sent before current one, which has been postponed with old dutycycle conf. */
-        Simulator::Cancel(m_nextTx);
-        DoSend(packet);
+        postponeTransmission(Seconds(2), packet);
+        return;
     }
+
+    // If it is not possible to transmit now because of the duty cycle,
+    Time aggregatedDelay = m_channelManager->GetAggregatedWaitingTime(m_aggregatedDutyCycle);
+    Time netxTxDelay = Max(GetNextTransmissionDelay(), aggregatedDelay);
+    if (netxTxDelay > Seconds(0))
+    {
+        m_cannotSendBecauseDutyCycle(packet);
+        postponeTransmission(netxTxDelay + NanoSeconds(10), packet);
+        return;
+    }
+
+    /**
+     * Extremely rare case: Send () happens after sending prev. pkt and before downlink
+     * reception of dutycycle reconf. A big increase in dutycycle may allow next packet
+     * to be sent before current one, which has been postponed with old dutycycle conf.
+     */
+    Simulator::Cancel(m_nextTx);
+    DoSend(packet);
 }
 
 void
@@ -204,7 +211,7 @@ EndDeviceLorawanMac::postponeTransmission(Time netxTxDelay, Ptr<Packet> packet)
     NS_LOG_FUNCTION(this);
     // Delete previously scheduled transmissions if any.
     Simulator::Cancel(m_nextTx);
-    m_nextTx = Simulator::Schedule(netxTxDelay, &EndDeviceLorawanMac::DoSend, this, packet);
+    m_nextTx = Simulator::Schedule(netxTxDelay, &EndDeviceLorawanMac::Send, this, packet);
     NS_LOG_DEBUG("Attempting to send, but the duty cycle won't allow it. Scheduling a tx in "
                  << netxTxDelay.As(Time::S) << ".");
 }
