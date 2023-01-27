@@ -83,9 +83,6 @@ ChirpstackHelper::InitConnection(Ipv4Address ip, uint16_t port)
     /* Create Ns-3 application */
     NewApplication("Ns-3 Application");
 
-    /* Terminate curl */
-    curl_global_cleanup();
-
     return EXIT_SUCCESS;
 }
 
@@ -93,9 +90,6 @@ void
 ChirpstackHelper::CloseConnection(int signal) const
 {
     str reply;
-
-    /* Init curl */
-    curl_global_init(CURL_GLOBAL_NOTHING);
 
     /* Remove tentant */
     if (DELETE("/api/tenants/" + m_session.tenantId, reply) == EXIT_FAILURE)
