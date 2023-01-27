@@ -110,8 +110,8 @@ main(int argc, char* argv[])
         // obstacles), weather, height
         loss = CreateObject<OkumuraHataPropagationLossModel>();
         loss->SetAttribute("Frequency", DoubleValue(868000000.0));
-        loss->SetAttribute("Environment", EnumValue(EnvironmentType::UrbanEnvironment));
-        loss->SetAttribute("CitySize", EnumValue(CitySize::LargeCity));
+        loss->SetAttribute("Environment", EnumValue(UrbanEnvironment));
+        loss->SetAttribute("CitySize", EnumValue(LargeCity));
 
         // Here we can add variance to the propagation model with multipath Rayleigh fading
         rayleigh = CreateObject<NakagamiPropagationLossModel>();
@@ -247,7 +247,8 @@ main(int argc, char* argv[])
             CreateObjectWithAttributes<ConstantRandomVariable>("Constant", DoubleValue(5.0)));
         appHelper.SetPacketSizeGenerator(
             CreateObjectWithAttributes<ConstantRandomVariable>("Constant", DoubleValue(5.0)));
-        // UrbanTrafficHelper appHelper;
+        //UrbanTrafficHelper appHelper;
+        //appHelper.SetDeviceGroups(Commercial);
         appHelper.Install(endDevices);
     }
 
