@@ -55,6 +55,7 @@ main(int argc, char* argv[])
     int nDevices = 1;
     std::string sir = "CROCE";
     bool initializeSF = true;
+    bool testDev = false;
     bool file = false; // Warning: will produce a file for each gateway
     bool log = false;
 
@@ -68,6 +69,7 @@ main(int argc, char* argv[])
         cmd.AddValue("sir", "Signal to Interference Ratio matrix used for interference", sir);
         cmd.AddValue("initSF", "Whether to initialize the SFs", initializeSF);
         cmd.AddValue("adr", "ns3::EndDeviceLorawanMac::DRControl");
+        cmd.AddValue("test", "Use test devices (5s period, 5B payload)", testDev);
         cmd.AddValue("file", "Whether to enable .pcap tracing on gateways", file);
         cmd.AddValue("log", "Whether to enable logs", log);
         cmd.Parse(argc, argv);
@@ -109,7 +111,7 @@ main(int argc, char* argv[])
         // This one is empirical and it encompasses average loss due to distance, shadowing (i.e.
         // obstacles), weather, height
         loss = CreateObject<OkumuraHataPropagationLossModel>();
-        loss->SetAttribute("Frequency", DoubleValue(868000000.0));
+        loss->SetAttribute("Frequency", DoubleValue(868100000.0));
         loss->SetAttribute("Environment", EnumValue(UrbanEnvironment));
         loss->SetAttribute("CitySize", EnumValue(LargeCity));
 
@@ -134,7 +136,7 @@ main(int argc, char* argv[])
         // In hex tiling, distance = range * cos (pi/6) * 2 to have no holes
         double gatewayDistance = range * std::cos(M_PI / 6) * 2;
         auto hexAllocator = CreateObject<HexGridPositionAllocator>();
-        hexAllocator->SetAttribute("Z", DoubleValue(15.0));
+        hexAllocator->SetAttribute("Z", DoubleValue(30.0));
         hexAllocator->SetAttribute("distance", DoubleValue(gatewayDistance));
         mobilityGw.SetPositionAllocator(hexAllocator);
 
@@ -144,7 +146,8 @@ main(int argc, char* argv[])
         double rho = range + 2.0 * gatewayDistance * (gatewayRings - 1);
         rangeAllocator = CreateObject<RangePositionAllocator>();
         rangeAllocator->SetAttribute("rho", DoubleValue(rho));
-        rangeAllocator->SetAttribute("Z", DoubleValue(15.0));
+        rangeAllocator->SetAttribute("ZRV",
+                                     StringValue("ns3::UniformRandomVariable[Min=1|Max=10]"));
         rangeAllocator->SetAttribute("range", DoubleValue(range));
         mobilityEd.SetPositionAllocator(rangeAllocator);
     }
@@ -242,14 +245,21 @@ main(int argc, char* argv[])
         forwarderHelper.Install(gateways);
 
         // Install applications in EDs
-        PeriodicSenderHelper appHelper;
-        appHelper.SetPeriodGenerator(
-            CreateObjectWithAttributes<ConstantRandomVariable>("Constant", DoubleValue(5.0)));
-        appHelper.SetPacketSizeGenerator(
-            CreateObjectWithAttributes<ConstantRandomVariable>("Constant", DoubleValue(5.0)));
-        //UrbanTrafficHelper appHelper;
-        //appHelper.SetDeviceGroups(Commercial);
-        appHelper.Install(endDevices);
+        if (testDev)
+        {
+            PeriodicSenderHelper appHelper;
+            appHelper.SetPeriodGenerator(
+                CreateObjectWithAttributes<ConstantRandomVariable>("Constant", DoubleValue(5.0)));
+            appHelper.SetPacketSizeGenerator(
+                CreateObjectWithAttributes<ConstantRandomVariable>("Constant", DoubleValue(5.0)));
+            appHelper.Install(endDevices);
+        }
+        else
+        {
+            UrbanTrafficHelper appHelper;
+            appHelper.SetDeviceGroups(Commercial);
+            appHelper.Install(endDevices);
+        }
     }
 
     /***************************
