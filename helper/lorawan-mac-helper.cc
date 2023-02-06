@@ -336,23 +336,21 @@ LorawanMacHelper::SetSpreadingFactorsUp(NodeContainer endDevices,
     NS_LOG_FUNCTION_NOARGS();
 
     std::vector<int> sfQuantity(6, 0);
-    for (NodeContainer::Iterator j = endDevices.Begin(); j != endDevices.End(); ++j)
+    for (auto j = endDevices.Begin(); j != endDevices.End(); ++j)
     {
         auto node = *j;
-        auto position = node->GetObject<MobilityModel>();
-        NS_ASSERT(bool(position) != 0);
         auto loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(0));
-        NS_ASSERT(bool(loraNetDevice) != 0);
+        NS_ASSERT(bool(loraNetDevice));
+        auto position = node->GetObject<MobilityModel>();
         auto mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
-        NS_ASSERT(bool(mac) != 0);
+        NS_ASSERT(bool(position) && bool(mac));
 
         // Try computing the distance from each gateway and find the best one
         auto bestGateway = gateways.Get(0);
         auto bestGatewayPosition = bestGateway->GetObject<MobilityModel>();
         // Assume devices transmit at 14 dBm erp
         double highestRxPower = channel->GetRxPower(14, position, bestGatewayPosition);
-        for (NodeContainer::Iterator currentGw = gateways.Begin() + 1; currentGw != gateways.End();
-             ++currentGw)
+        for (auto currentGw = gateways.Begin() + 1; currentGw != gateways.End(); ++currentGw)
         {
             // Compute the power received from the current gateway
             auto curr = *currentGw;

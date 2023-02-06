@@ -84,7 +84,7 @@ void
 LoraChannel::Add(Ptr<LoraPhy> phy)
 {
     NS_LOG_FUNCTION(this << phy);
-    // Add the new phy to the right vector
+    // Add the new phy to the right destination vector
     ((DynamicCast<EndDeviceLoraPhy>(phy)) ? m_phyListDown : m_phyListUp).push_back(phy);
 }
 

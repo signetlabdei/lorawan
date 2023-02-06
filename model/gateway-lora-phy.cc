@@ -307,7 +307,9 @@ void
 GatewayLoraPhy::SetReceptionPaths(UintegerValue number)
 {
     NS_LOG_FUNCTION(this << (unsigned)number.Get());
-    m_receptionPaths = std::vector<Ptr<ReceptionPath>>(number.Get(), Create<ReceptionPath>());
+    m_receptionPaths.clear();
+    for (uint32_t i = 0; i < number.Get(); ++i)
+        m_receptionPaths.push_back(Create<ReceptionPath>());
 }
 
 } // namespace lorawan

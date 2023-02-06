@@ -180,7 +180,7 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
 
     // If we are not in SLEEP or STANDBY state, schedule a tx/retx later
     if (auto s = DynamicCast<EndDeviceLoraPhy>(m_phy)->GetState();
-        s != EndDeviceLoraPhy::State::SLEEP && s != EndDeviceLoraPhy::State::SLEEP)
+        s != EndDeviceLoraPhy::State::SLEEP && s != EndDeviceLoraPhy::State::STANDBY)
     {
         postponeTransmission(Seconds(2), packet);
         return;
