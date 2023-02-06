@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2018 University of Padova
  *
@@ -17,6 +16,10 @@
  *
  * Authors: Martina Capuzzo <capuzzom@dei.unipd.it>
  *          Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #ifndef NETWORK_STATUS_H

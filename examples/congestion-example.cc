@@ -42,7 +42,7 @@ main(int argc, char* argv[])
     int gatewayRings = 1;
     double range = 2426.85; // Max range for downlink (!) coverage probability > 0.98 (with okumura)
     int nDevices = 100;
-    std::string sir = "GOURSAUD";
+    std::string sir = "CROCE";
     bool adrEnabled = false;
     bool initializeSF = true;
 
@@ -164,8 +164,6 @@ main(int argc, char* argv[])
     Ptr<NakagamiPropagationLossModel> rayleigh;
     Ptr<LoraChannel> channel;
     {
-        LoraInterferenceHelper::collisionMatrix = sirMap.at(sir);
-
         // Delay obtained from distance and speed of light in vacuum (constant)
         Ptr<PropagationDelayModel> delay = CreateObject<ConstantSpeedPropagationDelayModel>();
 
@@ -173,8 +171,8 @@ main(int argc, char* argv[])
         // obstacles), weather, height
         loss = CreateObject<OkumuraHataPropagationLossModel>();
         loss->SetAttribute("Frequency", DoubleValue(868100000.0));
-        loss->SetAttribute("Environment", EnumValue(EnvironmentType::UrbanEnvironment));
-        loss->SetAttribute("CitySize", EnumValue(CitySize::LargeCity));
+        loss->SetAttribute("Environment", EnumValue(UrbanEnvironment));
+        loss->SetAttribute("CitySize", EnumValue(LargeCity));
 
         // Here we can add variance to the propagation model with multipath Rayleigh fading
         rayleigh = CreateObject<NakagamiPropagationLossModel>();
@@ -265,17 +263,17 @@ main(int argc, char* argv[])
 
         // Physiscal layer settings
         LoraPhyHelper phyHelper;
+        phyHelper.SetInterference("CollisionMatrix", EnumValue(sirMap.at(sir)));
         phyHelper.SetChannel(channel);
-        phyHelper.SetDuplexMode(!model);
 
         // Create the LoraNetDevices of the gateways
-        phyHelper.SetDeviceType(LoraPhyHelper::GW);
-        macHelper.SetDeviceType(LorawanMacHelper::GW);
+        phyHelper.SetType("ns3::GatewayLoraPhy", "numReceptionPaths", UintegerValue(32));
+        macHelper.SetType("ns3::GatewayLorawanMac");
         loraHelper.Install(phyHelper, macHelper, gateways);
 
         // Create the LoraNetDevices of the end devices
-        phyHelper.SetDeviceType(LoraPhyHelper::ED);
-        macHelper.SetDeviceType(LorawanMacHelper::ED_A);
+        phyHelper.SetType("ns3::EndDeviceLoraPhy");
+        macHelper.SetType("ns3::ClassAEndDeviceLorawanMac");
         edNetDevices = loraHelper.Install(phyHelper, macHelper, endDevices);
     }
 

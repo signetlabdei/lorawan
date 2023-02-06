@@ -174,18 +174,17 @@ main(int argc, char* argv[])
 
     // Create the LoraNetDevices of the end devices
     macHelper.SetAddressGenerator(addrGen);
-    phyHelper.SetDeviceType(LoraPhyHelper::ED);
-    macHelper.SetDeviceType(LorawanMacHelper::ED_A);
-    macHelper.Set("DataRate", UintegerValue(5));
+    phyHelper.SetType("ns3::EndDeviceLoraPhy");
+    macHelper.SetType("ns3::ClassAEndDeviceLorawanMac", "DataRate", UintegerValue(5));
     helper.Install(phyHelper, macHelper, endDevices);
 
     // Connect trace sources
     for (NodeContainer::Iterator j = endDevices.Begin(); j != endDevices.End(); ++j)
     {
-        Ptr<Node> node = *j;
-        Ptr<LoraNetDevice> loraNetDevice = node->GetDevice(0)->GetObject<LoraNetDevice>();
-        Ptr<LoraPhy> phy = loraNetDevice->GetPhy();
-        Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac()->GetObject<EndDeviceLorawanMac>();
+        auto node = *j;
+        auto loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(0));
+        auto phy = loraNetDevice->GetPhy();
+        auto mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
         phy->TraceConnectWithoutContext("StartSending", MakeCallback(&OnPhySentPacket));
         mac->TraceConnectWithoutContext("RequiredTransmissions", MakeCallback(&OnMacPacketOutcome));
     }
@@ -199,8 +198,8 @@ main(int argc, char* argv[])
     mobility.Install(gateways);
 
     // Create a netdevice for each gateway
-    phyHelper.SetDeviceType(LoraPhyHelper::GW);
-    macHelper.SetDeviceType(LorawanMacHelper::GW);
+    phyHelper.SetType("ns3::GatewayLoraPhy");
+    macHelper.SetType("ns3::GatewayLorawanMac");
     helper.Install(phyHelper, macHelper, gateways);
 
     NS_LOG_INFO("Completed configuration");

@@ -1,3 +1,5 @@
+#include "utilities.cc"
+
 #include "ns3/building-allocator.h"
 #include "ns3/building-penetration-loss.h"
 #include "ns3/buildings-helper.h"
@@ -68,13 +70,13 @@ OnPacketReceptionCallback(Ptr<const Packet> packet, uint32_t systemId)
 int
 main(int argc, char* argv[])
 {
-    std::string interferenceMatrix = "aloha";
+    std::string interferenceMatrix = "ALOHA";
 
     CommandLine cmd;
     cmd.AddValue("nDevices", "Number of end devices to include in the simulation", nDevices);
     cmd.AddValue("simulationTime", "Simulation Time", simulationTime);
     cmd.AddValue("interferenceMatrix",
-                 "Interference matrix to use [aloha, goursaud]",
+                 "Interference matrix to use [ALOHA, GOURSAUD]",
                  interferenceMatrix);
     cmd.AddValue("radius", "Radius of the deployment", radius);
     cmd.Parse(argc, argv);
@@ -86,15 +88,6 @@ main(int argc, char* argv[])
 
     // Make all devices use SF7 (i.e., DR5)
     // Config::SetDefault ("ns3::EndDeviceLorawanMac::DataRate", UintegerValue (5));
-
-    if (interferenceMatrix == "aloha")
-    {
-        LoraInterferenceHelper::collisionMatrix = LoraInterferenceHelper::ALOHA;
-    }
-    else if (interferenceMatrix == "goursaud")
-    {
-        LoraInterferenceHelper::collisionMatrix = LoraInterferenceHelper::GOURSAUD;
-    }
 
     /***********
      *  Setup  *
@@ -145,6 +138,7 @@ main(int argc, char* argv[])
 
     // Create the LoraPhyHelper
     LoraPhyHelper phyHelper = LoraPhyHelper();
+    phyHelper.SetInterference("CollisionMatrix", EnumValue(sirMap.at(interferenceMatrix)));
     phyHelper.SetChannel(channel);
 
     // Create the LorawanMacHelper
@@ -189,8 +183,8 @@ main(int argc, char* argv[])
 
     // Create the LoraNetDevices of the end devices
     macHelper.SetAddressGenerator(addrGen);
-    phyHelper.SetDeviceType(LoraPhyHelper::ED);
-    macHelper.SetDeviceType(LorawanMacHelper::ED_A);
+    phyHelper.SetType("ns3::EndDeviceLoraPhy");
+    macHelper.SetType("ns3::ClassAEndDeviceLorawanMac");
     helper.Install(phyHelper, macHelper, endDevices);
 
     // Now end devices are connected to the channel
@@ -199,7 +193,7 @@ main(int argc, char* argv[])
     for (NodeContainer::Iterator j = endDevices.Begin(); j != endDevices.End(); ++j)
     {
         Ptr<Node> node = *j;
-        Ptr<LoraNetDevice> loraNetDevice = node->GetDevice(0)->GetObject<LoraNetDevice>();
+        Ptr<LoraNetDevice> loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(0));
         Ptr<LoraPhy> phy = loraNetDevice->GetPhy();
     }
 
@@ -218,8 +212,8 @@ main(int argc, char* argv[])
     mobility.Install(gateways);
 
     // Create a netdevice for each gateway
-    phyHelper.SetDeviceType(LoraPhyHelper::GW);
-    macHelper.SetDeviceType(LorawanMacHelper::GW);
+    phyHelper.SetType("ns3::GatewayLoraPhy");
+    macHelper.SetType("ns3::GatewayLorawanMac");
     helper.Install(phyHelper, macHelper, gateways);
 
     NS_LOG_DEBUG("Completed configuration");
@@ -297,17 +291,17 @@ main(int argc, char* argv[])
     // Install trace sources
     for (NodeContainer::Iterator node = gateways.Begin(); node != gateways.End(); node++)
     {
-        (*node)->GetDevice(0)->GetObject<LoraNetDevice>()->GetPhy()->TraceConnectWithoutContext(
-            "ReceivedPacket",
-            MakeCallback(OnPacketReceptionCallback));
+        DynamicCast<LoraNetDevice>((*node)->GetDevice(0))
+            ->GetPhy()
+            ->TraceConnectWithoutContext("ReceivedPacket", MakeCallback(OnPacketReceptionCallback));
     }
 
     // Install trace sources
     for (NodeContainer::Iterator node = endDevices.Begin(); node != endDevices.End(); node++)
     {
-        (*node)->GetDevice(0)->GetObject<LoraNetDevice>()->GetPhy()->TraceConnectWithoutContext(
-            "StartSending",
-            MakeCallback(OnTransmissionCallback));
+        DynamicCast<LoraNetDevice>((*node)->GetDevice(0))
+            ->GetPhy()
+            ->TraceConnectWithoutContext("StartSending", MakeCallback(OnTransmissionCallback));
     }
 
     macHelper.SetSpreadingFactorsUp(endDevices, gateways, channel);

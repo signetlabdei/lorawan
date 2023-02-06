@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -69,8 +68,6 @@ class AdrComponent : public NetworkControllerComponent
     void AdrImplementation(uint8_t* newDataRate, uint8_t* newTxPower, Ptr<EndDeviceStatus> status);
 
     uint8_t SfToDr(uint8_t sf);
-
-    double RxPowerToSNR(double transmissionPower);
 
     double GetMinTxFromGateways(EndDeviceStatus::GatewayList gwList);
 

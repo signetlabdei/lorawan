@@ -44,8 +44,8 @@ main(int argc, char* argv[])
     // LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_ALL);
     // LogComponentEnable ("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
     // LogComponentEnable ("GatewayLorawanMac", LOG_LEVEL_ALL);
-    // LogComponentEnable ("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
-    // LogComponentEnable ("LogicalLoraChannel", LOG_LEVEL_ALL);
+    // LogComponentEnable ("LogicalChannelManager", LOG_LEVEL_ALL);
+    // LogComponentEnable ("LogicalChannel", LOG_LEVEL_ALL);
     // LogComponentEnable ("LoraHelper", LOG_LEVEL_ALL);
     // LogComponentEnable ("LoraPhyHelper", LOG_LEVEL_ALL);
     // LogComponentEnable ("LorawanMacHelper", LOG_LEVEL_ALL);
@@ -109,8 +109,8 @@ main(int argc, char* argv[])
     mobility.Install(endDevices);
 
     // Create the LoraNetDevices of the end devices
-    phyHelper.SetDeviceType(LoraPhyHelper::ED);
-    macHelper.SetDeviceType(LorawanMacHelper::ED_A);
+    phyHelper.SetType("ns3::EndDeviceLoraPhy");
+    macHelper.SetType("ns3::ClassAEndDeviceLorawanMac");
     NetDeviceContainer endDevicesNetDevices = helper.Install(phyHelper, macHelper, endDevices);
 
     /*********************
@@ -125,8 +125,8 @@ main(int argc, char* argv[])
     mobility.Install(gateways);
 
     // Create a netdevice for each gateway
-    phyHelper.SetDeviceType(LoraPhyHelper::GW);
-    macHelper.SetDeviceType(LorawanMacHelper::GW);
+    phyHelper.SetType("ns3::GatewayLoraPhy");
+    macHelper.SetType("ns3::GatewayLorawanMac");
     helper.Install(phyHelper, macHelper, gateways);
 
     macHelper.SetSpreadingFactorsUp(endDevices, gateways, channel);

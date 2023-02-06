@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2022 Orange SA
  *
@@ -38,6 +37,14 @@ namespace lorawan
  * on a wide range of nodes. Traffic types and their distribution are from
  * [IEEE C802.16p-11/0102r2] for the urban scenario
  */
+
+enum M2MDeviceGroups
+{
+    All,
+    InHouse,
+    Commercial
+};
+
 class UrbanTrafficHelper
 {
   public:
@@ -48,6 +55,8 @@ class UrbanTrafficHelper
     ApplicationContainer Install(NodeContainer c) const;
 
     ApplicationContainer Install(Ptr<Node> node) const;
+
+    void SetDeviceGroups(M2MDeviceGroups groups);
 
   private:
     Ptr<Application> InstallPriv(Ptr<Node> node) const;

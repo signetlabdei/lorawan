@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -16,6 +15,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #ifndef GATEWAY_LORAWAN_MAC_H
@@ -41,9 +44,6 @@ class GatewayLorawanMac : public LorawanMac
     virtual void Send(Ptr<Packet> packet);
 
     // Implementation of the LorawanMac interface
-    bool IsTransmitting(void);
-
-    // Implementation of the LorawanMac interface
     virtual void Receive(Ptr<const Packet> packet);
 
     // Implementation of the LorawanMac interface
@@ -51,6 +51,9 @@ class GatewayLorawanMac : public LorawanMac
 
     // Implementation of the LorawanMac interface
     virtual void TxFinished(Ptr<const Packet> packet);
+
+    // Check whether the physiscal layer is currently transmitting
+    bool IsTransmitting(void);
 
     /**
      * Return the next time at which we will be able to transmit.

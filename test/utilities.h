@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2018 University of Padova
  *
@@ -51,7 +50,7 @@ template <typename T>
 Ptr<T>
 GetMacLayerFromNode(Ptr<Node> n)
 {
-    return n->GetDevice(0)->GetObject<LoraNetDevice>()->GetMac()->GetObject<T>();
+    return DynamicCast<T>(DynamicCast<LoraNetDevice>(n->GetDevice(0))->GetMac());
 }
 
 NetworkComponents InitializeNetwork(int nDevices, int nGateways);

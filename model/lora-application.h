@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2022 Orange SA
  *
@@ -23,6 +22,7 @@
 #define LORA_APPLICATION_H
 
 #include "ns3/application.h"
+#include "ns3/end-device-lorawan-mac.h"
 
 namespace ns3
 {
@@ -73,6 +73,8 @@ class LoraApplication : public Application
     bool IsRunning(void);
 
   protected:
+    void DoInitialize() override;
+
     /**
      * Start the application by scheduling the first SendPacket event
      */
@@ -107,6 +109,11 @@ class LoraApplication : public Application
      * The packet size.
      */
     uint8_t m_basePktSize;
+
+    /**
+     * The MAC layer of this node
+     */
+    Ptr<EndDeviceLorawanMac> m_mac;
 };
 
 } // namespace lorawan

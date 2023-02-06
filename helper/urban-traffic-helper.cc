@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2022 Orange SA
  *
@@ -41,10 +40,7 @@ NS_LOG_COMPONENT_DEFINE("UrbanTrafficHelper");
 
 UrbanTrafficHelper::UrbanTrafficHelper()
 {
-    m_intervalProb = CreateObject<UniformRandomVariable>();
-    m_intervalProb->SetAttribute("Min", DoubleValue(0));
-    m_intervalProb->SetAttribute("Max", DoubleValue(1));
-
+    // Number of occurencies
     const std::vector<double> pdf = {20.947,
                                      2200.0,
                                      316.47,
@@ -58,19 +54,48 @@ UrbanTrafficHelper::UrbanTrafficHelper()
                                      26915.0,
                                      7690.0,
                                      11535.0};
-    m_cdf = std::vector<double>(pdf.size(), 0.0);
-    double sum = 0.0;
+
+    // Cumulative distribution
+    double tot = 0.0;
+    m_cdf = std::vector<double>(pdf.size());
     for (size_t i = 0; i < pdf.size(); ++i)
     {
-        sum += pdf[i];
-        m_cdf[i] += sum;
+        tot += pdf[i];
+        m_cdf[i] = tot;
     }
-    for (size_t i = 0; i < pdf.size(); ++i)
-        m_cdf[i] /= sum;
+
+    m_intervalProb = CreateObject<UniformRandomVariable>();
+    m_intervalProb->SetAttribute("Min", DoubleValue(0));
+    m_intervalProb->SetAttribute("Max", DoubleValue(m_cdf[12]));
 }
 
 UrbanTrafficHelper::~UrbanTrafficHelper()
 {
+}
+
+void
+UrbanTrafficHelper::SetDeviceGroups(M2MDeviceGroups groups)
+{
+    /**
+     * Note: with UniformRandomVariable, the low end of the range is
+     * always included and the high end of the range is always excluded.
+     */
+    switch (groups)
+    {
+    case Commercial:
+        m_intervalProb->SetAttribute("Min", DoubleValue(0));
+        m_intervalProb->SetAttribute("Max", DoubleValue(m_cdf[5]));
+        break;
+    case InHouse:
+        m_intervalProb->SetAttribute("Min", DoubleValue(m_cdf[5]));
+        m_intervalProb->SetAttribute("Max", DoubleValue(m_cdf[12]));
+        break;
+    case All:
+    default:
+        m_intervalProb->SetAttribute("Min", DoubleValue(0));
+        m_intervalProb->SetAttribute("Max", DoubleValue(m_cdf[12]));
+        break;
+    }
 }
 
 ApplicationContainer
@@ -110,26 +135,35 @@ UrbanTrafficHelper::InstallPriv(Ptr<Node> node) const
      *
      * ------------------------------------------------------------------------------------
      * |        Application       |   Density   | Interval | PacketSize |     Traffic     |
-     * Discussion: |  (Commercial, In-House)  | [nodes/km2] |   [s]    |    [B]     | |
+     * |  (Commercial, In-House)  | [nodes/km2] |   [s]    |    [B]     |                 |
      * ------------------------------------------------------------------------------------
      * | Credit machine (grocery) | 20.947      | 120      | 24         | Poisson         |
-     * reliability critical, duty-cycle limited on SF12 | Credit machine (shop)    | 2200.0      |
-     * 1800     | 24         | Poisson         | reliability critical | Roadway sign             |
-     * 316.47      | 30       | 1          | Uniform         | duty-cycle limited on SF11 & SF12 |
-     * Traffic light            | 15.03       | 60       | 1          | Uniform         | duty-cycle
-     * limited on SF12 | Traffic sensor           | 15.03       | 60       | 1          | Poisson |
-     * duty-cycle limited on SF12 | Movie rental machine     | 69.823      | 21600    | 38         |
-     * Poisson         | do they actually still exist?
+     * | Credit machine (shop)    | 2200.0      | 1800     | 24         | Poisson         |
+     * | Roadway sign             | 316.47      | 30       | 1          | Uniform         |
+     * | Traffic light            | 15.03       | 60       | 1          | Uniform         |
+     * | Traffic sensor           | 15.03       | 60       | 1          | Poisson         |
+     * | Movie rental machine     | 69.823      | 21600    | 38         | Poisson         |
      * ------------------------------------------------------------------------------------
      * | Home security system     | 3845.0      | 600      | 20         | Poisson/uniform |
-     * reliability critical | Elderly sensor device    | 384.5       | 20       | 43         |
-     * Poisson/uniform | reliability critical, duty-cycle limited from SF9 | Refrigerator | 3845.0
-     * | 3600     | 30         | Poisson/uniform | | Freezer                  | 3845.0      | 86400
-     * | 30         | Poisson/uniform | | Other house appliance    | 26915.0     | 86400    | 8 |
-     * Poisson/uniform | | PHEV charging station    | 7690.0      | 1400     | 32         |
-     * Poisson/uniform | | Smart meter              | 11535.0     | 150      | 34         |
-     * Poisson/uniform |
+     * | Elderly sensor device    | 384.5       | 20       | 43         | Poisson/uniform |
+     * | Refrigerator             | 3845.0      | 3600     | 30         | Poisson/uniform |
+     * | Freezer                  | 3845.0      | 86400    | 30         | Poisson/uniform |
+     * | Other house appliance    | 26915.0     | 86400    | 8          | Poisson/uniform |
+     * | PHEV charging station    | 7690.0      | 1400     | 32         | Poisson/uniform |
+     * | Smart meter              | 11535.0     | 150      | 34         | Poisson/uniform |
      * ------------------------------------------------------------------------------------
+     *
+     * Total density: 56851.8 nodes/km2
+     *
+     * Discussion:
+     * Credit machine (grocery) - reliability critical, duty-cycle limited on SF12
+     * Credit machine (shop)    - reliability critical
+     * Roadway sign             - duty-cycle limited on SF11 & SF12
+     * Traffic light            - duty-cycle limited on SF12
+     * Traffic sensor           - duty-cycle limited on SF12
+     * Movie rental machine     - do they actually still exist?
+     * Home security system     - reliability critical
+     * Elderly sensor device    - reliability critical, duty-cycle limited from SF9
      *
      * We could implement packet fragmentation...
      */

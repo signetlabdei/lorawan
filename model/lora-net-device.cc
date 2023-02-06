@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -46,11 +45,6 @@ LoraNetDevice::GetTypeId(void)
             .SetParent<NetDevice>()
             .AddConstructor<LoraNetDevice>()
             .SetGroupName("lorawan")
-            .AddAttribute("Channel",
-                          "The channel attached to this device",
-                          PointerValue(),
-                          MakePointerAccessor(&LoraNetDevice::DoGetChannel),
-                          MakePointerChecker<LoraChannel>())
             .AddAttribute("Phy",
                           "The PHY layer attached to this device.",
                           PointerValue(),
@@ -68,7 +62,7 @@ LoraNetDevice::LoraNetDevice()
     : m_node(0),
       m_phy(0),
       m_mac(0),
-      m_configComplete(0)
+      m_configComplete(false)
 {
     NS_LOG_FUNCTION_NOARGS();
 }
@@ -79,9 +73,27 @@ LoraNetDevice::~LoraNetDevice()
 }
 
 void
+LoraNetDevice::DoInitialize()
+{
+    NS_LOG_FUNCTION_NOARGS();
+
+    if (m_phy)
+    {
+        m_phy->Initialize();
+    }
+    if (m_mac)
+    {
+        m_mac->Initialize();
+    }
+    NetDevice::DoInitialize();
+}
+
+void
 LoraNetDevice::SetMac(Ptr<LorawanMac> mac)
 {
     m_mac = mac;
+    mac->SetDevice(this);
+    CompleteConfig();
 }
 
 Ptr<LorawanMac>
@@ -94,6 +106,8 @@ void
 LoraNetDevice::SetPhy(Ptr<LoraPhy> phy)
 {
     m_phy = phy;
+    phy->SetDevice(this);
+    CompleteConfig();
 }
 
 Ptr<LoraPhy>
@@ -105,36 +119,10 @@ LoraNetDevice::GetPhy(void) const
 void
 LoraNetDevice::CompleteConfig(void)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Verify we have all the necessary pieces
-    if (m_mac == 0 || m_phy == 0 || m_node == 0 || m_configComplete)
-    {
+    if (!m_mac || !m_phy || !m_node || m_configComplete)
         return;
-    }
-
     m_mac->SetPhy(m_phy);
     m_configComplete = true;
-}
-
-void
-LoraNetDevice::Send(Ptr<Packet> packet)
-{
-    NS_LOG_FUNCTION(this << packet);
-
-    // Send the packet to the MAC layer, if it exists
-    NS_ASSERT(m_mac != 0);
-    m_mac->Send(packet);
-}
-
-void
-LoraNetDevice::Receive(Ptr<Packet> packet)
-{
-    NS_LOG_FUNCTION(this << packet);
-
-    // Fill protocol and address with empty stuff
-    NS_LOG_DEBUG("Calling receiveCallback");
-    m_receiveCallback(this, packet, 0x0800, Address());
 }
 
 /******************************************
@@ -143,13 +131,6 @@ LoraNetDevice::Receive(Ptr<Packet> packet)
 
 Ptr<Channel>
 LoraNetDevice::GetChannel(void) const
-{
-    NS_LOG_FUNCTION(this);
-    return m_phy->GetChannel();
-}
-
-Ptr<LoraChannel>
-LoraNetDevice::DoGetChannel(void) const
 {
     NS_LOG_FUNCTION(this);
     return m_phy->GetChannel();
@@ -204,7 +185,7 @@ LoraNetDevice::IsLinkUp(void) const
 {
     NS_LOG_FUNCTION(this);
 
-    return m_phy != 0;
+    return bool(m_phy) != 0;
 }
 
 void
@@ -275,10 +256,7 @@ LoraNetDevice::Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNu
 {
     NS_LOG_FUNCTION(this << packet << dest << protocolNumber);
 
-    // Fallback to the vanilla Send method
-    Send(packet);
-
-    return true;
+    return false;
 }
 
 bool

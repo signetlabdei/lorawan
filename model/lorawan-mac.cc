@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -44,7 +43,7 @@ LorawanMac::GetTypeId(void)
             .SetGroupName("lorawan")
             .AddTraceSource("SentNewPacket",
                             "Trace source indicating a new packet "
-                            "arrived at the MAC layer",
+                            "is sent by the MAC layer",
                             MakeTraceSourceAccessor(&LorawanMac::m_sentNewPacket),
                             "ns3::Packet::TracedCallback")
             .AddTraceSource("ReceivedPacket",
@@ -93,23 +92,22 @@ LorawanMac::SetPhy(Ptr<LoraPhy> phy)
 {
     // Set the phy
     m_phy = phy;
-
     // Connect the receive callbacks
     m_phy->SetReceiveOkCallback(MakeCallback(&LorawanMac::Receive, this));
     m_phy->SetReceiveFailedCallback(MakeCallback(&LorawanMac::FailedReception, this));
     m_phy->SetTxFinishedCallback(MakeCallback(&LorawanMac::TxFinished, this));
 }
 
-LogicalLoraChannelHelper
-LorawanMac::GetLogicalLoraChannelHelper(void)
+Ptr<LogicalChannelManager>
+LorawanMac::GetLogicalChannelManager(void)
 {
-    return m_channelHelper;
+    return m_channelManager;
 }
 
 void
-LorawanMac::SetLogicalLoraChannelHelper(LogicalLoraChannelHelper helper)
+LorawanMac::SetLogicalChannelManager(Ptr<LogicalChannelManager> helper)
 {
-    m_channelHelper = helper;
+    m_channelManager = helper;
 }
 
 uint8_t
@@ -166,9 +164,9 @@ LorawanMac::SetBandwidthForDataRate(std::vector<double> bandwidthForDataRate)
 }
 
 void
-LorawanMac::SetMaxAppPayloadForDataRate(std::vector<uint32_t> maxAppPayloadForDataRate)
+LorawanMac::SetMaxMacPayloadForDataRate(std::vector<uint32_t> maxMacPayloadForDataRate)
 {
-    m_maxAppPayloadForDataRate = maxAppPayloadForDataRate;
+    m_maxMacPayloadForDataRate = maxMacPayloadForDataRate;
 }
 
 void
@@ -194,5 +192,13 @@ LorawanMac::SetReplyDataRateMatrix(ReplyDataRateMatrix replyDataRateMatrix)
 {
     m_replyDataRateMatrix = replyDataRateMatrix;
 }
+
+void
+LorawanMac::SetReceiveCallback(ReceiveCallback cb)
+{
+    NS_LOG_FUNCTION_NOARGS();
+    m_receiveCallback = cb;
+}
+
 } // namespace lorawan
 } // namespace ns3

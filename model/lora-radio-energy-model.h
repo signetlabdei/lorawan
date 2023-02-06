@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  *
  * This program is free software; you can redistribute it and/or modify
@@ -12,6 +11,10 @@
  *
  * Authors: Romagnolo Stefano <romagnolostefano93@gmail.com>
  *          Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #ifndef LORA_RADIO_ENERGY_MODEL_H

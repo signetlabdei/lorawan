@@ -16,6 +16,10 @@
  *
  * Authors: Martina Capuzzo <capuzzom@dei.unipd.it>
  *          Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #ifndef END_DEVICE_STATUS_H
@@ -319,7 +323,7 @@ class EndDeviceStatus : public Object
     uint8_t m_firstReceiveWindowSpreadingFactor = 0;
     double m_firstReceiveWindowFrequency = 0;
     uint8_t m_secondReceiveWindowOffset = 0;
-    double m_secondReceiveWindowFrequency = 869.525;
+    double m_secondReceiveWindowFrequency = 869525000;
     EventId m_receiveWindowEvent;
 
     ReceivedPacketList m_receivedPacketList; //<! List of received packets

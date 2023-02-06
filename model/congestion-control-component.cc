@@ -266,7 +266,7 @@ CongestionControlComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status,
             {
                 auto mac = networkStatus->GetEndDeviceStatus(d.first)->GetMac();
                 auto node = mac->GetDevice()->GetNode();
-                auto app = node->GetApplication(0)->GetObject<LoraApplication>();
+                auto app = DynamicCast<LoraApplication>(node->GetApplication(0));
                 NS_LOG_LOGIC((unsigned)node->GetId() << " " << (unsigned)d.second << " "
                                                      << log2(1.0 / mac->GetAggregatedDutyCycle())
                                                      << " " << app->GetInterval().As(Time::H) << " "
@@ -443,7 +443,7 @@ CongestionControlComponent::InitializeData(Ptr<NetworkStatus> status)
         // Compute offered traffic
         devinfo_t& devinfo = m_devStatus[ed.first.Get()];
         Ptr<Node> node = ed.second->GetMac()->GetDevice()->GetNode();
-        Ptr<LoraApplication> app = node->GetApplication(0)->GetObject<LoraApplication>();
+        Ptr<LoraApplication> app = DynamicCast<LoraApplication>(node->GetApplication(0));
 
         devinfo.datarate = ed.second->GetMac()->GetDataRate();
         devinfo.cluster = ed.second->GetMac()->GetCluster();
@@ -511,11 +511,8 @@ CongestionControlComponent::LookForChanges(Ptr<NetworkStatus> status,
         std::vector<uint32_t> tmp;
         for (const auto& ed : m_unactive[bestGw][cluster])
         {
-            auto app = ed.second->GetMac()
-                           ->GetDevice()
-                           ->GetNode()
-                           ->GetApplication(0)
-                           ->GetObject<LoraApplication>();
+            auto app = DynamicCast<LoraApplication>(
+                ed.second->GetMac()->GetDevice()->GetNode()->GetApplication(0));
             if (!app->IsRunning())
                 continue;
             AddNewDevice(ed.first);
@@ -531,11 +528,8 @@ CongestionControlComponent::LookForChanges(Ptr<NetworkStatus> status,
     {
         auto IsDisconnected = [this, &status, &bestGw, &cluster](std::pair<uint32_t, double>& dev) {
             auto devstatus = status->m_endDeviceStatuses.at(LoraDeviceAddress(dev.first));
-            auto app = devstatus->GetMac()
-                           ->GetDevice()
-                           ->GetNode()
-                           ->GetApplication(0)
-                           ->GetObject<LoraApplication>();
+            auto app = DynamicCast<LoraApplication>(
+                devstatus->GetMac()->GetDevice()->GetNode()->GetApplication(0));
 
             if (app->IsRunning()) // Is still connected
                 return false;

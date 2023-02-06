@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -29,45 +28,21 @@
 #define LORA_CHANNEL_H
 
 #include "ns3/channel.h"
-#include "ns3/logical-lora-channel.h"
+#include "ns3/log.h"
 #include "ns3/lora-phy.h"
 #include "ns3/mobility-model.h"
-#include "ns3/net-device.h"
 #include "ns3/nstime.h"
 #include "ns3/packet.h"
 #include "ns3/propagation-delay-model.h"
 #include "ns3/propagation-loss-model.h"
 
-#include <vector>
-
 namespace ns3
 {
-class NetDevice;
-class PropagationLossModel;
-class PropagationDelayModel;
-
 namespace lorawan
 {
 
 class LoraPhy;
 struct LoraTxParameters;
-
-/**
- * A struct that holds meaningful parameters for transmission on a
- * LoraChannel.
- */
-struct LoraChannelParameters
-{
-    double rxPowerDbm;   //!< The reception power.
-    uint8_t sf;          //!< The Spreading Factor of this transmission.
-    Time duration;       //!< The duration of the transmission.
-    double frequencyMHz; //!< The frequency [MHz] of this transmission.
-};
-
-/**
- * Allow logging of LoraChannelParameters like with any other data type.
- */
-std::ostream& operator<<(std::ostream& os, const LoraChannelParameters& params);
 
 /**
  * The class that delivers packets among PHY layers.
@@ -110,8 +85,6 @@ class LoraChannel : public Channel
      */
     void Add(Ptr<LoraPhy> phy);
 
-    void AddDown(Ptr<LoraPhy> phy);
-
     /**
      * Remove a physical layer from the LoraChannel.
      *
@@ -134,9 +107,9 @@ class LoraChannel : public Channel
      * \param sender The phy that is sending this packet.
      * \param packet The PHY layer packet that is being sent over the channel.
      * \param txPowerDbm The power of the transmission.
-     * \param txParams The set of parameters that are used by the transmitter.
+     * \param sf The SF that is used by the transmitter.
      * \param duration The on-air duration of this packet.
-     * \param frequencyMHz The frequency this transmission will happen at.
+     * \param frequency The frequency this transmission will happen at.
      *
      * \internal
      *
@@ -146,16 +119,9 @@ class LoraChannel : public Channel
     void Send(Ptr<LoraPhy> sender,
               Ptr<Packet> packet,
               double txPowerDbm,
-              LoraTxParameters txParams,
+              uint8_t sf,
               Time duration,
-              double frequencyMHz) const;
-
-    void SendDown(Ptr<LoraPhy> sender,
-                  Ptr<Packet> packet,
-                  double txPowerDbm,
-                  LoraTxParameters txParams,
-                  Time duration,
-                  double frequencyMHz) const;
+              double frequency) const;
 
     /**
      * Compute the received power when transmitting from a point to another one.
@@ -175,26 +141,10 @@ class LoraChannel : public Channel
 
   private:
     /**
-     * Private method that is scheduled by LoraChannel's Send method to happen
-     * after the channel delay, for each of the connected PHY layers.
-     *
-     * It's here that the Receive method of the PHY is called to initiate packet
-     * reception at the PHY.
-     *
-     * \param i The index of the phy to start reception on.
-     * \param packet The packet the phy will receive.
-     * \param parameters The parameters that characterize this transmission
-     */
-    void Receive(uint32_t i, Ptr<Packet> packet, LoraChannelParameters parameters) const;
-
-    void ReceiveDown(uint32_t i, Ptr<Packet> packet, LoraChannelParameters parameters) const;
-
-    /**
      * The vector containing the PHYs that are currently connected to the
      * channel.
      */
-    std::vector<Ptr<LoraPhy>> m_phyList;
-
+    std::vector<Ptr<LoraPhy>> m_phyListUp;
     std::vector<Ptr<LoraPhy>> m_phyListDown;
 
     /**

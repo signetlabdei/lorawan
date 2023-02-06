@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -16,6 +15,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #include "ns3/forwarder.h"
@@ -43,42 +46,32 @@ Forwarder::GetTypeId(void)
 
 Forwarder::Forwarder()
 {
-    NS_LOG_FUNCTION_NOARGS();
 }
 
 Forwarder::~Forwarder()
 {
-    NS_LOG_FUNCTION_NOARGS();
 }
 
 void
 Forwarder::SetPointToPointNetDevice(Ptr<PointToPointNetDevice> pointToPointNetDevice)
 {
     NS_LOG_FUNCTION(this << pointToPointNetDevice);
-
     m_pointToPointNetDevice = pointToPointNetDevice;
 }
 
 void
-Forwarder::SetLoraNetDevice(Ptr<LoraNetDevice> loraNetDevice)
+Forwarder::SetGatewayLorawanMac(Ptr<GatewayLorawanMac> mac)
 {
-    NS_LOG_FUNCTION(this << loraNetDevice);
-
-    m_loraNetDevice = loraNetDevice;
+    NS_LOG_FUNCTION(this << mac);
+    m_mac = mac;
 }
 
 bool
-Forwarder::ReceiveFromLora(Ptr<NetDevice> loraNetDevice,
-                           Ptr<const Packet> packet,
-                           uint16_t protocol,
-                           const Address& sender)
+Forwarder::ReceiveFromLora(Ptr<GatewayLorawanMac> mac, Ptr<const Packet> packet)
 {
-    NS_LOG_FUNCTION(this << packet << protocol << sender);
-
+    NS_LOG_FUNCTION(this << packet);
     Ptr<Packet> packetCopy = packet->Copy();
-
     m_pointToPointNetDevice->Send(packetCopy, m_pointToPointNetDevice->GetBroadcast(), 0x800);
-
     return true;
 }
 
@@ -89,11 +82,8 @@ Forwarder::ReceiveFromPointToPoint(Ptr<NetDevice> pointToPointNetDevice,
                                    const Address& sender)
 {
     NS_LOG_FUNCTION(this << packet << protocol << sender);
-
     Ptr<Packet> packetCopy = packet->Copy();
-
-    m_loraNetDevice->Send(packetCopy);
-
+    m_mac->Send(packetCopy);
     return true;
 }
 
@@ -101,8 +91,8 @@ void
 Forwarder::StartApplication(void)
 {
     NS_LOG_FUNCTION(this);
-
-    // TODO Make sure we are connected to both needed devices
+    NS_ASSERT_MSG(m_mac, "GatewayLorawanMac is not set.");
+    NS_ASSERT_MSG(m_pointToPointNetDevice, "PointToPointNetDevice not set.");
 }
 
 void

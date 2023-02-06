@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2018 University of Padova
  *
@@ -16,6 +15,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #include "ns3/network-controller-components.h"
@@ -180,7 +183,7 @@ LinkCheckComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status,
         // margin
         uint8_t gwCount = status->GetLastReceivedPacketInfo().gwList.size();
 
-        Ptr<LinkCheckAns> replyCommand = Create<LinkCheckAns>();
+        Ptr<LinkCheckAns> replyCommand = CreateObject<LinkCheckAns>();
         replyCommand->SetGwCnt(gwCount);
         status->m_reply.frameHeader.SetAsDownlink();
         status->m_reply.frameHeader.AddCommand(replyCommand);

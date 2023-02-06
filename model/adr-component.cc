@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2018 University of Padova
  *
@@ -269,34 +268,7 @@ AdrComponent::AdrImplementation(uint8_t* newDataRate,
 uint8_t
 AdrComponent::SfToDr(uint8_t sf)
 {
-    switch (sf)
-    {
-    case 12:
-        return 0;
-        break;
-    case 11:
-        return 1;
-        break;
-    case 10:
-        return 2;
-        break;
-    case 9:
-        return 3;
-        break;
-    case 8:
-        return 4;
-        break;
-    default:
-        return 5;
-        break;
-    }
-}
-
-double
-AdrComponent::RxPowerToSNR(double transmissionPower)
-{
-    // The following conversion ignores interfering packets
-    return transmissionPower + 174 - 10 * log10(B) - NF;
+    return 12 - sf;
 }
 
 // Get the maximum received power (it considers the values in dB!)
@@ -378,11 +350,11 @@ AdrComponent::GetMinSNR(EndDeviceStatus::ReceivedPacketList packetList, int hist
 
     // Take elements from the list starting at the end
     auto it = packetList.rbegin();
-    double min = RxPowerToSNR(GetReceivedPower(it->second.gwList));
+    double min = LoraPhy::RxPowerToSNR(GetReceivedPower(it->second.gwList));
 
     for (int i = 0; i < historyRange; i++, it++)
     {
-        m_SNR = RxPowerToSNR(GetReceivedPower(it->second.gwList));
+        m_SNR = LoraPhy::RxPowerToSNR(GetReceivedPower(it->second.gwList));
 
         NS_LOG_DEBUG("Received power: " << GetReceivedPower(it->second.gwList));
         NS_LOG_DEBUG("m_SNR = " << m_SNR);
@@ -405,11 +377,11 @@ AdrComponent::GetMaxSNR(EndDeviceStatus::ReceivedPacketList packetList, int hist
 
     // Take elements from the list starting at the end
     auto it = packetList.rbegin();
-    double max = RxPowerToSNR(GetReceivedPower(it->second.gwList));
+    double max = LoraPhy::RxPowerToSNR(GetReceivedPower(it->second.gwList));
 
     for (int i = 0; i < historyRange; i++, it++)
     {
-        m_SNR = RxPowerToSNR(GetReceivedPower(it->second.gwList));
+        m_SNR = LoraPhy::RxPowerToSNR(GetReceivedPower(it->second.gwList));
 
         NS_LOG_DEBUG("Received power: " << GetReceivedPower(it->second.gwList));
         NS_LOG_DEBUG("m_SNR = " << m_SNR);
@@ -435,7 +407,7 @@ AdrComponent::GetAverageSNR(EndDeviceStatus::ReceivedPacketList packetList, int 
     auto it = packetList.rbegin();
     for (int i = 0; i < historyRange; i++, it++)
     {
-        m_SNR = RxPowerToSNR(GetReceivedPower(it->second.gwList));
+        m_SNR = LoraPhy::RxPowerToSNR(GetReceivedPower(it->second.gwList));
 
         NS_LOG_DEBUG("Received power: " << GetReceivedPower(it->second.gwList));
         NS_LOG_DEBUG("m_SNR = " << m_SNR);

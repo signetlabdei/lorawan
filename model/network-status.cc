@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2018 University of Padova
  *
@@ -17,6 +16,10 @@
  *
  * Authors: Davide Magrin <magrinda@dei.unipd.it>
  *          Martina Capuzzo <capuzzom@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #include "ns3/network-status.h"
@@ -42,8 +45,10 @@ NS_OBJECT_ENSURE_REGISTERED(NetworkStatus);
 TypeId
 NetworkStatus::GetTypeId(void)
 {
-    static TypeId tid =
-        TypeId("ns3::NetworkStatus").AddConstructor<NetworkStatus>().SetGroupName("lorawan");
+    static TypeId tid = TypeId("ns3::NetworkStatus")
+                            .SetParent<Object>()
+                            .AddConstructor<NetworkStatus>()
+                            .SetGroupName("lorawan");
     return tid;
 }
 
@@ -61,18 +66,14 @@ void
 NetworkStatus::AddNode(Ptr<ClassAEndDeviceLorawanMac> edMac)
 {
     NS_LOG_FUNCTION(this << edMac);
-
     // Check whether this device already exists in our list
     LoraDeviceAddress edAddress = edMac->GetDeviceAddress();
     if (m_endDeviceStatuses.find(edAddress) == m_endDeviceStatuses.end())
     {
         // The device doesn't exist. Create new EndDeviceStatus
-        Ptr<EndDeviceStatus> edStatus =
-            CreateObject<EndDeviceStatus>(edAddress, edMac->GetObject<ClassAEndDeviceLorawanMac>());
-
+        auto edStatus = CreateObject<EndDeviceStatus>(edAddress, edMac);
         // Add it to the map
-        m_endDeviceStatuses.insert(
-            std::pair<LoraDeviceAddress, Ptr<EndDeviceStatus>>(edAddress, edStatus));
+        m_endDeviceStatuses.insert({edAddress, edStatus});
         NS_LOG_DEBUG("Added to the list a device with address " << edAddress.Print());
     }
 }

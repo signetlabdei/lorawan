@@ -102,7 +102,7 @@ main(int argc, char* argv[])
     // LogComponentEnable ("EndDeviceStatus", LOG_LEVEL_ALL);
     LogComponentEnable("AdrComponent", LOG_LEVEL_ALL);
     // LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
-    // LogComponentEnable ("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
+    // LogComponentEnable ("LogicalChannelManager", LOG_LEVEL_ALL);
     // LogComponentEnable ("MacCommand", LOG_LEVEL_ALL);
     // LogComponentEnable ("AdrExploraSf", LOG_LEVEL_ALL);
     // LogComponentEnable ("AdrExploraAt", LOG_LEVEL_ALL);
@@ -186,8 +186,8 @@ main(int argc, char* argv[])
     mobilityGw.Install(gateways);
 
     // Create the LoraNetDevices of the gateways
-    phyHelper.SetDeviceType(LoraPhyHelper::GW);
-    macHelper.SetDeviceType(LorawanMacHelper::GW);
+    phyHelper.SetType("ns3::GatewayLoraPhy");
+    macHelper.SetType("ns3::GatewayLorawanMac");
     helper.Install(phyHelper, macHelper, gateways);
 
     // Create EDs
@@ -227,8 +227,8 @@ main(int argc, char* argv[])
         CreateObject<LoraDeviceAddressGenerator>(nwkId, nwkAddr);
 
     // Create the LoraNetDevices of the end devices
-    phyHelper.SetDeviceType(LoraPhyHelper::ED);
-    macHelper.SetDeviceType(LorawanMacHelper::ED_A);
+    phyHelper.SetType("ns3::EndDeviceLoraPhy");
+    macHelper.SetType("ns3::ClassAEndDeviceLorawanMac");
     macHelper.SetAddressGenerator(addrGen);
     macHelper.SetRegion(LorawanMacHelper::EU);
     helper.Install(phyHelper, macHelper, endDevices);

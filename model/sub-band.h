@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -16,12 +15,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #ifndef SUB_BAND_H
 #define SUB_BAND_H
 
-#include "ns3/logical-lora-channel.h"
+#include "ns3/logical-channel.h"
 #include "ns3/nstime.h"
 #include "ns3/object.h"
 
@@ -30,7 +33,7 @@ namespace ns3
 namespace lorawan
 {
 
-class LogicalLoraChannel;
+class LogicalChannel;
 
 /**
  * Class representing a SubBand, i.e., a frequency band subject to some
@@ -80,7 +83,7 @@ class SubBand : public Object
     /**
      * Update the next transmission time.
      *
-     * This function is used by LogicalLoraChannelHelper, which computes the time
+     * This function is used by LogicalChannelManager, which computes the time
      * based on the SubBand's duty cycle and on the transmission duration.
      *
      * \param nextTime The future time from which transmission should be allowed
@@ -113,7 +116,7 @@ class SubBand : public Object
      * \return True if the channel's center frequency is between firstFrequency
      * and lastFrequency, false otherwise.
      */
-    bool BelongsToSubBand(Ptr<LogicalLoraChannel> channel);
+    bool BelongsToSubBand(Ptr<LogicalChannel> channel);
 
     /**
      * Set the maximum transmission power that is allowed on this SubBand.
@@ -130,8 +133,8 @@ class SubBand : public Object
     double GetMaxTxPowerDbm(void);
 
   private:
-    double m_firstFrequency;     //!< Starting frequency of the subband, in MHz
-    double m_lastFrequency;      //!< Ending frequency of the subband, in MHz
+    double m_firstFrequency;     //!< Starting frequency of the subband, in Hz
+    double m_lastFrequency;      //!< Ending frequency of the subband, in Hz
     double m_dutyCycle;          //!< The duty cycle that needs to be enforced on this subband
     Time m_nextTransmissionTime; //!< The next time a transmission will be allowed in this subband
     double m_maxTxPowerDbm; //!< The maximum transmission power that is admitted on this subband

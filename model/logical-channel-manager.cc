@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -22,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/logical-lora-channel-helper.h"
+#include "ns3/logical-channel-manager.h"
 
 #include "ns3/log.h"
 #include "ns3/simulator.h"
@@ -32,48 +31,50 @@ namespace ns3
 namespace lorawan
 {
 
-NS_LOG_COMPONENT_DEFINE("LogicalLoraChannelHelper");
+NS_LOG_COMPONENT_DEFINE("LogicalChannelManager");
 
-NS_OBJECT_ENSURE_REGISTERED(LogicalLoraChannelHelper);
+NS_OBJECT_ENSURE_REGISTERED(LogicalChannelManager);
 
 TypeId
-LogicalLoraChannelHelper::GetTypeId(void)
+LogicalChannelManager::GetTypeId(void)
 {
-    static TypeId tid =
-        TypeId("ns3::LogicalLoraChannelHelper").SetParent<Object>().SetGroupName("lorawan");
+    static TypeId tid = TypeId("ns3::LogicalChannelManager")
+                            .SetParent<Object>()
+                            .SetGroupName("lorawan")
+                            .AddConstructor<LogicalChannelManager>();
     return tid;
 }
 
-LogicalLoraChannelHelper::LogicalLoraChannelHelper()
+LogicalChannelManager::LogicalChannelManager()
     : m_lastTxDuration(0),
       m_lastTxStart(0)
 {
     NS_LOG_FUNCTION(this);
 }
 
-LogicalLoraChannelHelper::~LogicalLoraChannelHelper()
+LogicalChannelManager::~LogicalChannelManager()
 {
     NS_LOG_FUNCTION(this);
 }
 
-std::vector<Ptr<LogicalLoraChannel>>
-LogicalLoraChannelHelper::GetChannelList(void)
+std::vector<Ptr<LogicalChannel>>
+LogicalChannelManager::GetChannelList(void)
 {
     NS_LOG_FUNCTION(this);
 
-    std::vector<Ptr<LogicalLoraChannel>> vector;
+    std::vector<Ptr<LogicalChannel>> vector;
     for (auto& llc : m_channelList)
         vector.push_back(llc.second);
 
     return vector;
 }
 
-std::vector<Ptr<LogicalLoraChannel>>
-LogicalLoraChannelHelper::GetEnabledChannelList(void)
+std::vector<Ptr<LogicalChannel>>
+LogicalChannelManager::GetEnabledChannelList(void)
 {
     NS_LOG_FUNCTION(this);
 
-    std::vector<Ptr<LogicalLoraChannel>> vector;
+    std::vector<Ptr<LogicalChannel>> vector;
     for (auto& llc : m_channelList)
         if (llc.second->IsEnabledForUplink())
             vector.push_back(llc.second);
@@ -81,14 +82,22 @@ LogicalLoraChannelHelper::GetEnabledChannelList(void)
     return vector;
 }
 
+Ptr<LogicalChannel>
+LogicalChannelManager::GetChannel(uint8_t chIndex)
+{
+    NS_LOG_FUNCTION(this);
+
+    return (m_channelList.count(chIndex)) ? m_channelList.at(chIndex) : 0;
+}
+
 Ptr<SubBand>
-LogicalLoraChannelHelper::GetSubBandFromChannel(const Ptr<LogicalLoraChannel> channel)
+LogicalChannelManager::GetSubBandFromChannel(const Ptr<LogicalChannel> channel)
 {
     return GetSubBandFromFrequency(channel->GetFrequency());
 }
 
 Ptr<SubBand>
-LogicalLoraChannelHelper::GetSubBandFromFrequency(double frequency)
+LogicalChannelManager::GetSubBandFromFrequency(double frequency)
 {
     // Get the SubBand this frequency belongs to
     for (auto& sub : m_subBandList)
@@ -102,25 +111,35 @@ LogicalLoraChannelHelper::GetSubBandFromFrequency(double frequency)
 }
 
 void
-LogicalLoraChannelHelper::AddChannel(uint16_t chIndex, Ptr<LogicalLoraChannel> logicalChannel)
+LogicalChannelManager::AddChannel(uint8_t chIndex, Ptr<LogicalChannel> logicalChannel)
 {
     NS_LOG_FUNCTION(this << (unsigned)chIndex << logicalChannel);
     m_channelList[chIndex] = logicalChannel;
 }
 
 void
-LogicalLoraChannelHelper::AddSubBand(double firstFrequency,
-                                     double lastFrequency,
-                                     double dutyCycle,
-                                     double maxTxPowerDbm)
+LogicalChannelManager::AddSubBand(double firstFrequency,
+                                  double lastFrequency,
+                                  double dutyCycle,
+                                  double maxTxPowerDbm)
 {
     NS_LOG_FUNCTION(this << firstFrequency << lastFrequency);
-    Ptr<SubBand> subBand = Create<SubBand>(firstFrequency, lastFrequency, dutyCycle, maxTxPowerDbm);
+    Ptr<SubBand> subBand =
+        CreateObject<SubBand>(firstFrequency, lastFrequency, dutyCycle, maxTxPowerDbm);
     AddSubBand(subBand);
 }
 
 void
-LogicalLoraChannelHelper::AddSubBand(Ptr<SubBand> subBand)
+LogicalChannelManager::SetReplyFrequency(uint8_t chIndex, double replyFrequency)
+{
+    NS_LOG_FUNCTION(this << (unsigned)chIndex << replyFrequency);
+    auto channel = GetChannel(chIndex);
+    NS_ASSERT_MSG(bool(channel), "Selected uplink channel does not exist");
+    channel->SetReplyFrequency(replyFrequency);
+}
+
+void
+LogicalChannelManager::AddSubBand(Ptr<SubBand> subBand)
 {
     NS_LOG_FUNCTION(this << subBand);
 
@@ -128,14 +147,14 @@ LogicalLoraChannelHelper::AddSubBand(Ptr<SubBand> subBand)
 }
 
 void
-LogicalLoraChannelHelper::RemoveChannel(uint16_t chIndex)
+LogicalChannelManager::RemoveChannel(uint8_t chIndex)
 {
     // Search and remove the channel from the list
     m_channelList.erase(chIndex);
 }
 
 Time
-LogicalLoraChannelHelper::GetAggregatedWaitingTime(double aggregatedDutyCycle)
+LogicalChannelManager::GetAggregatedWaitingTime(double aggregatedDutyCycle)
 {
     NS_LOG_FUNCTION("Aggregated duty-cycle: " + std::to_string(aggregatedDutyCycle));
 
@@ -154,7 +173,7 @@ LogicalLoraChannelHelper::GetAggregatedWaitingTime(double aggregatedDutyCycle)
 }
 
 Time
-LogicalLoraChannelHelper::GetWaitingTime(const Ptr<LogicalLoraChannel> channel)
+LogicalChannelManager::GetWaitingTime(const Ptr<LogicalChannel> channel)
 {
     NS_LOG_FUNCTION(this << channel);
 
@@ -171,7 +190,7 @@ LogicalLoraChannelHelper::GetWaitingTime(const Ptr<LogicalLoraChannel> channel)
 }
 
 void
-LogicalLoraChannelHelper::AddEvent(Time duration, Ptr<LogicalLoraChannel> channel)
+LogicalChannelManager::AddEvent(Time duration, Ptr<LogicalChannel> channel)
 {
     NS_LOG_FUNCTION(this << duration << channel);
 
@@ -191,7 +210,7 @@ LogicalLoraChannelHelper::AddEvent(Time duration, Ptr<LogicalLoraChannel> channe
 }
 
 double
-LogicalLoraChannelHelper::GetTxPowerForChannel(Ptr<LogicalLoraChannel> logicalChannel)
+LogicalChannelManager::GetTxPowerForChannel(Ptr<LogicalChannel> logicalChannel)
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -207,7 +226,7 @@ LogicalLoraChannelHelper::GetTxPowerForChannel(Ptr<LogicalLoraChannel> logicalCh
 }
 
 void
-LogicalLoraChannelHelper::DisableChannel(uint16_t chIndex)
+LogicalChannelManager::DisableChannel(uint8_t chIndex)
 {
     NS_LOG_FUNCTION(this << (unsigned)chIndex);
     m_channelList.at(chIndex)->DisableForUplink();

@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -16,10 +15,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
-#ifndef LOGICAL_LORA_CHANNEL_H
-#define LOGICAL_LORA_CHANNEL_H
+#ifndef LOGICAL_CHANNEL_H
+#define LOGICAL_CHANNEL_H
 
 #include "ns3/object.h"
 #include "ns3/sub-band.h"
@@ -37,18 +40,18 @@ class SubBand;
  * A logical channel is characterized by a central frequency and a range of data
  * rates that can be sent on it.
  *
- * Furthermore, a LogicalLoraChannel can be marked as enabled or disabled for
+ * Furthermore, a LogicalChannel can be marked as enabled or disabled for
  * uplink transmission.
  */
-class LogicalLoraChannel : public Object
+class LogicalChannel : public Object
 {
   public:
     static TypeId GetTypeId(void);
 
-    LogicalLoraChannel();
-    virtual ~LogicalLoraChannel();
+    LogicalChannel();
+    virtual ~LogicalChannel();
 
-    LogicalLoraChannel(double frequency);
+    LogicalChannel(double frequency);
 
     /**
      * Constructor providing initialization of frequency and data rate limits.
@@ -57,21 +60,35 @@ class LogicalLoraChannel : public Object
      * \param minDataRate This channel's minimum data rate.
      * \param maxDataRate This channel's maximum data rate.
      */
-    LogicalLoraChannel(double frequency, uint8_t minDataRate, uint8_t maxDataRate);
+    LogicalChannel(double frequency, uint8_t minDataRate, uint8_t maxDataRate);
 
     /**
-     * Get the frequency (MHz).
+     * Get the frequency (Hz).
      *
      * \return The center frequency of this channel.
      */
     double GetFrequency(void) const;
 
     /**
-     * Set the frequency (MHz).
+     * Set the reply frequency (Hz).
      *
-     * \param frequencyMHz The center frequency this channel should be at.
+     * \param replyFrequency The center frequency this channel should receive replies on.
      */
-    // void SetFrequency (double frequencyMHz);
+    void SetReplyFrequency(double replyFrequency);
+
+    /**
+     * Get the reply frequency (Hz).
+     *
+     * \return The center frequency of replies of this channel.
+     */
+    double GetReplyFrequency(void) const;
+
+    /**
+     * Set the frequency (Hz).
+     *
+     * \param frequency The center frequency this channel should be at.
+     */
+    // void SetFrequency (double frequency);
 
     /**
      * Set the minimum Data Rate that is allowed on this channel.
@@ -110,9 +127,14 @@ class LogicalLoraChannel : public Object
 
   private:
     /**
-     * The central frequency of this channel, in MHz.
+     * The central frequency for transmission of this channel, in Hz.
      */
     double m_frequency;
+
+    /**
+     * The central frequency on which we receive replies when using this channel, in Hz.
+     */
+    double m_replyFrequency;
 
     /**
      * The minimum Data Rate that is allowed on this channel.
@@ -131,16 +153,16 @@ class LogicalLoraChannel : public Object
 };
 
 /**
- * Overload of the == operator to compare different instances of the same LogicalLoraChannel
+ * Overload of the == operator to compare different instances of the same LogicalChannel
  */
-bool operator==(const Ptr<LogicalLoraChannel>& first, const Ptr<LogicalLoraChannel>& second);
+bool operator==(const Ptr<LogicalChannel>& first, const Ptr<LogicalChannel>& second);
 
 /**
- * Overload the != operator to compare different instances of the same LogicalLoraChannel
+ * Overload the != operator to compare different instances of the same LogicalChannel
  */
-bool operator!=(const Ptr<LogicalLoraChannel>& first, const Ptr<LogicalLoraChannel>& second);
+bool operator!=(const Ptr<LogicalChannel>& first, const Ptr<LogicalChannel>& second);
 
 } // namespace lorawan
 
 } // namespace ns3
-#endif /* LOGICAL_LORA_CHANNEL_H */
+#endif /* LOGICAL_CHANNEL_H */

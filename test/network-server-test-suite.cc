@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * This file includes testing for the following components:
  * - EndDeviceServer
@@ -6,6 +5,10 @@
  * - NetworkServer
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 // Include headers of classes to test
@@ -65,7 +68,8 @@ UplinkPacketTest::ReceivedPacket(Ptr<const Packet> packet)
 void
 UplinkPacketTest::SendPacket(Ptr<Node> endDevice)
 {
-    endDevice->GetDevice(0)->Send(Create<Packet>(20), Address(), 0);
+    auto loraNetDev = DynamicCast<LoraNetDevice>(endDevice->GetDevice(0));
+    loraNetDev->GetMac()->Send(Create<Packet>(20));
 }
 
 // This method is the pure virtual method from class TestCase that every
@@ -145,15 +149,10 @@ DownlinkPacketTest::ReceivedPacketAtEndDevice(uint8_t requiredTransmissions,
 void
 DownlinkPacketTest::SendPacket(Ptr<Node> endDevice, bool requestAck)
 {
+    auto mac = DynamicCast<LoraNetDevice>(endDevice->GetDevice(0))->GetMac();
     if (requestAck)
-    {
-        endDevice->GetDevice(0)
-            ->GetObject<LoraNetDevice>()
-            ->GetMac()
-            ->GetObject<EndDeviceLorawanMac>()
-            ->SetMType(LorawanMacHeader::CONFIRMED_DATA_UP);
-    }
-    endDevice->GetDevice(0)->Send(Create<Packet>(20), Address(), 0);
+        DynamicCast<EndDeviceLorawanMac>(mac)->SetMType(LorawanMacHeader::CONFIRMED_DATA_UP);
+    mac->Send(Create<Packet>(20));
 }
 
 // This method is the pure virtual method from class TestCase that every
@@ -172,11 +171,8 @@ DownlinkPacketTest::DoRun(void)
     Ptr<Node> nsNode = components.nsNode;
 
     // Connect the ED's trace source for received packets
-    endDevices.Get(0)
-        ->GetDevice(0)
-        ->GetObject<LoraNetDevice>()
-        ->GetMac()
-        ->GetObject<EndDeviceLorawanMac>()
+    DynamicCast<EndDeviceLorawanMac>(
+        DynamicCast<LoraNetDevice>(endDevices.Get(0)->GetDevice(0))->GetMac())
         ->TraceConnectWithoutContext(
             "RequiredTransmissions",
             MakeCallback(&DownlinkPacketTest::ReceivedPacketAtEndDevice, this));
@@ -235,19 +231,12 @@ LinkCheckTest::LastKnownGatewayCount(int newValue, int oldValue)
 void
 LinkCheckTest::SendPacket(Ptr<Node> endDevice, bool requestAck)
 {
-    Ptr<EndDeviceLorawanMac> macLayer = endDevice->GetDevice(0)
-                                            ->GetObject<LoraNetDevice>()
-                                            ->GetMac()
-                                            ->GetObject<EndDeviceLorawanMac>();
-
+    auto macLayer = DynamicCast<EndDeviceLorawanMac>(
+        DynamicCast<LoraNetDevice>(endDevice->GetDevice(0))->GetMac());
     if (requestAck)
-    {
         macLayer->SetMType(LorawanMacHeader::CONFIRMED_DATA_UP);
-    }
-
-    macLayer->AddMacCommand(Create<LinkCheckReq>());
-
-    endDevice->GetDevice(0)->Send(Create<Packet>(20), Address(), 0);
+    macLayer->AddMacCommand(CreateObject<LinkCheckReq>());
+    macLayer->Send(Create<Packet>(20));
 }
 
 // This method is the pure virtual method from class TestCase that every
@@ -266,11 +255,8 @@ LinkCheckTest::DoRun(void)
     Ptr<Node> nsNode = components.nsNode;
 
     // Connect the ED's trace source for Last known Gateway Count
-    endDevices.Get(0)
-        ->GetDevice(0)
-        ->GetObject<LoraNetDevice>()
-        ->GetMac()
-        ->GetObject<EndDeviceLorawanMac>()
+    DynamicCast<EndDeviceLorawanMac>(
+        DynamicCast<LoraNetDevice>(endDevices.Get(0)->GetDevice(0))->GetMac())
         ->TraceConnectWithoutContext("LastKnownGatewayCount",
                                      MakeCallback(&LinkCheckTest::LastKnownGatewayCount, this));
 

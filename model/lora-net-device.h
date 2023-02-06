@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -84,71 +83,17 @@ class LoraNetDevice : public NetDevice
      */
     Ptr<LoraPhy> GetPhy(void) const;
 
-    /**
-     * Send a packet through the LoRaWAN stack.
-     *
-     * \param packet The packet to send.
-     */
-    void Send(Ptr<Packet> packet);
-
-    /**
-     * This function is implemented to achieve compliance with the NetDevice
-     * interface. Note that the dest and protocolNumber args are ignored.
-     */
-    bool Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
-
-    /**
-     * Callback the Mac layer calls whenever a packet arrives and needs to be
-     * forwarded up the stack.
-     *
-     * \param packet The packet that was received.
-     */
-    void Receive(Ptr<Packet> packet);
-
-    // From class NetDevice. Some of these have little meaning for a LoRaWAN
-    // network device (since, for instance, IP is not used in the standard)
-    virtual void SetReceiveCallback(NetDevice::ReceiveCallback cb);
-    virtual Ptr<Channel> GetChannel(void) const;
+    // From class NetDevice.
     virtual void SetNode(Ptr<Node> node);
     virtual Ptr<Node> GetNode(void) const;
 
-    virtual void SetIfIndex(const uint32_t index);
-    virtual uint32_t GetIfIndex(void) const;
-    virtual void SetAddress(Address address);
-    virtual Address GetAddress(void) const;
-    virtual bool SetMtu(const uint16_t mtu);
-    virtual uint16_t GetMtu(void) const;
-    virtual bool IsLinkUp(void) const;
-    virtual void AddLinkChangeCallback(Callback<void> callback);
-    virtual bool IsBroadcast(void) const;
-    virtual Address GetBroadcast(void) const;
-    virtual bool IsMulticast(void) const;
-    virtual Address GetMulticast(Ipv4Address multicastGroup) const;
-    virtual Address GetMulticast(Ipv6Address addr) const;
-    virtual bool IsBridge(void) const;
-    virtual bool IsPointToPoint(void) const;
-    virtual bool SendFrom(Ptr<Packet> packet,
-                          const Address& source,
-                          const Address& dest,
-                          uint16_t protocolNumber);
-    virtual bool NeedsArp(void) const;
-    virtual void SetPromiscReceiveCallback(PromiscReceiveCallback cb);
-    virtual bool SupportsSendFrom(void) const;
-
   protected:
-    /**
-     * Receive a packet from the lower layer and pass the
-     * packet up the stack.
-     *
-     * \param packet The packet we need to forward.
-     * \param from The from address.
-     * \param to The to address.
-     */
-    void ForwardUp(Ptr<Packet> packet, Mac48Address from, Mac48Address to);
+    void DoInitialize() override;
 
   private:
     /**
      * Return the LoraChannel this device is connected to.
+     * Used by attribute system
      */
     Ptr<LoraChannel> DoGetChannel(void) const;
 
@@ -168,6 +113,38 @@ class LoraNetDevice : public NetDevice
      * Upper layer callback used for notification of new data packet arrivals.
      */
     NetDevice::ReceiveCallback m_receiveCallback;
+
+    /**
+     * Inherited by NetDevice. Some of these have little meaning for a LoRaWAN
+     * network device (since, for instance, IP is not used in the standard)
+     *
+     * Set to private to avoid exposing them.
+     */
+    virtual Ptr<Channel> GetChannel(void) const;
+    virtual void SetIfIndex(const uint32_t index);
+    virtual uint32_t GetIfIndex(void) const;
+    virtual void SetAddress(Address address);
+    virtual Address GetAddress(void) const;
+    virtual bool SetMtu(const uint16_t mtu);
+    virtual uint16_t GetMtu(void) const;
+    virtual bool IsLinkUp(void) const;
+    virtual void AddLinkChangeCallback(Callback<void> callback);
+    virtual bool IsBroadcast(void) const;
+    virtual Address GetBroadcast(void) const;
+    virtual bool IsMulticast(void) const;
+    virtual Address GetMulticast(Ipv4Address multicastGroup) const;
+    virtual Address GetMulticast(Ipv6Address addr) const;
+    virtual bool IsBridge(void) const;
+    virtual bool IsPointToPoint(void) const;
+    virtual bool Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
+    virtual bool SendFrom(Ptr<Packet> packet,
+                          const Address& source,
+                          const Address& dest,
+                          uint16_t protocolNumber);
+    virtual bool NeedsArp(void) const;
+    virtual void SetReceiveCallback(NetDevice::ReceiveCallback cb);
+    virtual void SetPromiscReceiveCallback(PromiscReceiveCallback cb);
+    virtual bool SupportsSendFrom(void) const;
 };
 
 } // namespace lorawan

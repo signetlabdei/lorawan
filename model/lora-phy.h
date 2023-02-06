@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -16,21 +15,19 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #ifndef LORA_PHY_H
 #define LORA_PHY_H
 
-#include "ns3/callback.h"
 #include "ns3/lora-channel.h"
 #include "ns3/lora-interference-helper.h"
 #include "ns3/mobility-model.h"
 #include "ns3/net-device.h"
-#include "ns3/node.h"
-#include "ns3/nstime.h"
-#include "ns3/object.h"
-
-#include <list>
 
 namespace ns3
 {
@@ -83,28 +80,17 @@ class LoraPhy : public Object
     virtual ~LoraPhy();
 
     /**
-     * Type definition for a callback for when a packet is correctly received.
+     * Instruct the PHY to send a packet according to some parameters.
      *
-     * This callback can be set by an upper layer that wishes to be informed of
-     * correct reception events.
+     * \param packet The packet to send.
+     * \param txParams The desired transmission parameters.
+     * \param frequency The frequency on which to transmit.
+     * \param txPowerDbm The power in dBm with which to transmit the packet.
      */
-    typedef Callback<void, Ptr<const Packet>> RxOkCallback;
-
-    /**
-     * Type definition for a callback for when a packet reception fails.
-     *
-     * This callback can be set by an upper layer that wishes to be informed of
-     * failed reception events.
-     */
-    typedef Callback<void, Ptr<const Packet>> RxFailedCallback;
-
-    /**
-     * Type definition for a callback to call when a packet has finished sending.
-     *
-     * This callback is used by the MAC layer, to determine when to open a receive
-     * window.
-     */
-    typedef Callback<void, Ptr<const Packet>> TxFinishedCallback;
+    virtual void Send(Ptr<Packet> packet,
+                      LoraTxParameters txParams,
+                      double frequency,
+                      double txPowerDbm) = 0;
 
     /**
      * Start receiving a packet.
@@ -116,40 +102,13 @@ class LoraPhy : public Object
      * for the whole reception).
      * \param sf The Spreading Factor of the arriving packet.
      * \param duration The on air time of this packet.
-     * \param frequencyMHz The frequency this packet is being transmitted on.
+     * \param frequency The frequency this packet is being transmitted on.
      */
     virtual void StartReceive(Ptr<Packet> packet,
                               double rxPowerDbm,
                               uint8_t sf,
                               Time duration,
-                              double frequencyMHz) = 0;
-
-    /**
-     * Finish reception of a packet.
-     *
-     * This method is scheduled by StartReceive, based on the packet duration. By
-     * passing a LoraInterferenceHelper Event to this method, the class will be
-     * able to identify the packet that is being received among all those that
-     * were registered as interference by StartReceive.
-     *
-     * \param packet The received packet.
-     * \param event The event that is tied to this packet in the
-     * LoraInterferenceHelper.
-     */
-    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) = 0;
-
-    /**
-     * Instruct the PHY to send a packet according to some parameters.
-     *
-     * \param packet The packet to send.
-     * \param txParams The desired transmission parameters.
-     * \param frequencyMHz The frequency on which to transmit.
-     * \param txPowerDbm The power in dBm with which to transmit the packet.
-     */
-    virtual void Send(Ptr<Packet> packet,
-                      LoraTxParameters txParams,
-                      double frequencyMHz,
-                      double txPowerDbm) = 0;
+                              double frequency) = 0;
 
     /**
      * Whether this device is transmitting or not.
@@ -160,13 +119,12 @@ class LoraPhy : public Object
     virtual bool IsTransmitting(void) = 0;
 
     /**
-     * Whether this device is listening on the specified frequency or not.
+     * Type definition for a callback for when a packet is correctly received.
      *
-     * \param frequency The frequency to query.
-     * \returns true if the device is listening on that frequency, false
-     * otherwise.
+     * This callback can be set by an upper layer that wishes to be informed of
+     * correct reception events.
      */
-    virtual bool IsOnFrequency(double frequency) = 0;
+    typedef Callback<void, Ptr<const Packet>> RxOkCallback;
 
     /**
      * Set the callback to call upon successful reception of a packet.
@@ -175,6 +133,14 @@ class LoraPhy : public Object
      * notified after the successful reception of a packet.
      */
     void SetReceiveOkCallback(RxOkCallback callback);
+
+    /**
+     * Type definition for a callback for when a packet reception fails.
+     *
+     * This callback can be set by an upper layer that wishes to be informed of
+     * failed reception events.
+     */
+    typedef Callback<void, Ptr<const Packet>> RxFailedCallback;
 
     /**
      * Set the callback to call upon failed reception of a packet we were
@@ -186,6 +152,14 @@ class LoraPhy : public Object
     void SetReceiveFailedCallback(RxFailedCallback callback);
 
     /**
+     * Type definition for a callback to call when a packet has finished sending.
+     *
+     * This callback is used by the MAC layer, to determine when to open a receive
+     * window.
+     */
+    typedef Callback<void, Ptr<const Packet>> TxFinishedCallback;
+
+    /**
      * Set the callback to call after transmission of a packet.
      *
      * This method is typically called by an upper MAC layer that wants to be
@@ -194,18 +168,11 @@ class LoraPhy : public Object
     void SetTxFinishedCallback(TxFinishedCallback callback);
 
     /**
-     * Get the mobility model associated to this PHY.
+     * Sets the interference helper.
      *
-     * \return The MobilityModel associated to this PHY.
+     * \param helper the interference helper
      */
-    Ptr<MobilityModel> GetMobility();
-
-    /**
-     * Set the mobility model associated to this PHY.
-     *
-     * \param mobility The mobility model to associate to this PHY.
-     */
-    void SetMobility(Ptr<MobilityModel> mobility);
+    virtual void SetInterferenceHelper(const Ptr<LoraInterferenceHelper> helper);
 
     /**
      * Set the LoraChannel instance PHY transmits on.
@@ -214,7 +181,7 @@ class LoraPhy : public Object
      *
      * \param channel The LoraChannel instance this PHY will transmit on.
      */
-    void SetChannel(Ptr<LoraChannel> channel);
+    virtual void SetChannel(Ptr<LoraChannel> channel);
 
     /**
      * Get the channel instance associated to this PHY.
@@ -222,6 +189,20 @@ class LoraPhy : public Object
      * \return The LoraChannel instance this PHY transmits on.
      */
     Ptr<LoraChannel> GetChannel(void) const;
+
+    /**
+     * Get the mobility model associated to this PHY.
+     *
+     * \return The MobilityModel associated to this PHY.
+     */
+    Ptr<MobilityModel> GetMobility() const;
+
+    /**
+     * Set the mobility model associated to this PHY.
+     *
+     * \param mobility The mobility model to associate to this PHY.
+     */
+    void SetMobility(Ptr<MobilityModel> mobility);
 
     /**
      * Get the NetDevice associated to this PHY.
@@ -259,10 +240,6 @@ class LoraPhy : public Object
      */
     static Time GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams);
 
-  private:
-    Ptr<MobilityModel> m_mobility; //!< The mobility model associated to this PHY.
-
-  protected:
     /**
      * Compute the Signal to Noise Ratio (SNR) from the transmission power
      * measured at packet reception.
@@ -270,22 +247,38 @@ class LoraPhy : public Object
      * \param transmissionPower The reception transmission power (dBm)
      * \return The SNR value in dB.
      */
-    double RxPowerToSNR(double transmissionPower);
+    static double RxPowerToSNR(double transmissionPower);
+
+  protected:
+    void DoInitialize() override;
+
+    /**
+     * Finish reception of a packet.
+     *
+     * This method is scheduled by StartReceive, based on the packet duration. By
+     * passing a LoraInterferenceHelper Event to this method, the class will be
+     * able to identify the packet that is being received among all those that
+     * were registered as interference by StartReceive.
+     *
+     * \param packet The received packet.
+     * \param event The event that is tied to this packet in the
+     * LoraInterferenceHelper.
+     */
+    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) = 0;
 
     // Member objects
-
-    Ptr<NetDevice> m_device; //!< The net device this PHY is attached to.
-
-    Ptr<LoraChannel> m_channel; //!< The channel this PHY transmits on.
-
-    LoraInterferenceHelper m_interference; //!< The LoraInterferenceHelper
-    //! associated to this PHY.
+    Ptr<NetDevice> m_device;                    //!< The net device this PHY is attached to.
+    Ptr<LoraChannel> m_channel;                 //!< The channel this PHY transmits on.
+    Ptr<LoraInterferenceHelper> m_interference; //!< The InterferenceHelper associated to this PHY.
 
     // Constants
+    static const int B = 125000; //! Bandwidth (Hz)
+    static const int NF = 6;     //! Noise Figure (dB)
 
-    const int B = 125000; //! Bandwidth (Hz)
-
-    const int NF = 6; //! Noise Figure (dB)
+    // Callbacks (communication with MAC layer)
+    RxOkCallback m_rxOkCallback;             //! Callback to perform upon correct reception
+    RxFailedCallback m_rxFailedCallback;     //! Callback to perform upon failed reception
+    TxFinishedCallback m_txFinishedCallback; //! Callback to perform upon transmission end
 
     // Trace sources
 
@@ -348,22 +341,10 @@ class LoraPhy : public Object
      */
     TracedCallback<Ptr<const Packet>> m_phySniffTxTrace;
 
-    // Callbacks
+    uint32_t m_context; //!< Node Id to correctly format context in traced callbacks
 
-    /**
-     * The callback to perform upon correct reception of a packet.
-     */
-    RxOkCallback m_rxOkCallback;
-
-    /**
-     * The callback to perform upon failed reception of a packet we were locked on.
-     */
-    RxFailedCallback m_rxFailedCallback;
-
-    /**
-     * The callback to perform upon the end of a transmission.
-     */
-    TxFinishedCallback m_txFinishedCallback;
+  private:
+    Ptr<MobilityModel> m_mobility; //!< The mobility model associated to this PHY.
 };
 
 } // namespace lorawan

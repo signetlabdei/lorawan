@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -102,11 +101,12 @@ NetworkServerHelper::InstallPriv(Ptr<Node> node)
 
         // Register gateways
         Ptr<Channel> channel = currentNetDevice->GetChannel();
-        NS_ASSERT_MSG(channel->GetObject<PointToPointChannel>() != 0,
+        NS_ASSERT_MSG(bool(DynamicCast<PointToPointChannel>(channel)),
                       "Connection with gateways is not PointToPoint");
         for (uint32_t j = 0; j < channel->GetNDevices(); ++j)
         {
             Ptr<Node> gwNode = channel->GetDevice(j)->GetNode();
+            // Point to point, so channel only holds 2 devices
             if (gwNode->GetId() != node->GetId())
             {
                 // Add the gateway to the NS list
@@ -156,25 +156,21 @@ NetworkServerHelper::AssignClusters(cluster_t clustersInfo)
     int nClusters = clustersInfo.size();
     NS_ASSERT_MSG(nClusters <= 3, "For the moment only up to 3 clusters are supported.");
     NS_ASSERT_MSG(m_endDevices.GetN() > 0, "Devices must be set before assigning clusters.");
-
     double devWeight = double(100.0) / m_endDevices.GetN();
-
     uint8_t currCluster = 0;
     double totWeight = 0;
-    for (NodeContainer::Iterator i = m_endDevices.Begin(); i != m_endDevices.End(); ++i)
+    for (auto i = m_endDevices.Begin(); i != m_endDevices.End(); ++i)
     {
         if (clustersInfo[currCluster].first == 0.0)
             currCluster++;
-
-        Ptr<EndDeviceLorawanMac> mac = (*i)->GetDevice(0)
-                                           ->GetObject<LoraNetDevice>()
-                                           ->GetMac()
-                                           ->GetObject<EndDeviceLorawanMac>();
+        auto loraNetDevice = DynamicCast<LoraNetDevice>((*i)->GetDevice(0));
+        NS_ASSERT(bool(loraNetDevice));
+        auto mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
+        NS_ASSERT(bool(mac));
         mac->SetCluster(currCluster);
-
         // Assign one frequency to each cluster
         int chid = 0;
-        for (auto& ch : mac->GetLogicalLoraChannelHelper().GetChannelList())
+        for (auto& ch : mac->GetLogicalChannelManager()->GetChannelList())
         {
             if (chid == currCluster)
                 ch->SetEnabledForUplink();
@@ -182,9 +178,7 @@ NetworkServerHelper::AssignClusters(cluster_t clustersInfo)
                 ch->DisableForUplink();
             chid++;
         }
-
         totWeight += devWeight;
-
         if (currCluster < nClusters - 1 and
             totWeight >= clustersInfo[currCluster].first - devWeight / 2)
         {
@@ -192,7 +186,6 @@ NetworkServerHelper::AssignClusters(cluster_t clustersInfo)
             totWeight = 0;
         }
     }
-
     m_clusterTargets.clear();
     for (const auto& cluster : clustersInfo)
         m_clusterTargets.push_back(cluster.second);

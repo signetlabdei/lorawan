@@ -1,13 +1,14 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 // Include headers of classes to test
 #include "ns3/constant-position-mobility-model.h"
+#include "ns3/end-device-lora-phy.h"
+#include "ns3/gateway-lora-phy.h"
 #include "ns3/log.h"
+#include "ns3/lora-frame-header.h"
 #include "ns3/lora-helper.h"
+#include "ns3/lorawan-mac-header.h"
 #include "ns3/mobility-helper.h"
 #include "ns3/one-shot-sender-helper.h"
-#include "ns3/simple-end-device-lora-phy.h"
-#include "ns3/simple-gateway-lora-phy.h"
 
 // An essential include is test.h
 #include "ns3/test.h"
@@ -51,8 +52,8 @@ InterferenceTest::DoRun(void)
 
     LoraInterferenceHelper interferenceHelper;
 
-    double frequency = 868.1;
-    double differentFrequency = 868.3;
+    double frequency = 868100000;
+    double differentFrequency = 868300000;
 
     Ptr<LoraInterferenceHelper::Event> event;
     Ptr<LoraInterferenceHelper::Event> event1;
@@ -334,7 +335,7 @@ HeaderTest::DoRun(void)
     // Deserialization
     frameHdr.Deserialize(serialized);
 
-    Ptr<LinkCheckAns> command = (*(frameHdr.GetCommands().begin()))->GetObject<LinkCheckAns>();
+    Ptr<LinkCheckAns> command = DynamicCast<LinkCheckAns>(*(frameHdr.GetCommands().begin()));
     uint8_t margin = command->GetMargin();
     uint8_t gwCnt = command->GetGwCnt();
 
@@ -376,8 +377,7 @@ HeaderTest::DoRun(void)
     frameHdr1.SetAsDownlink();
 
     pkt->RemoveHeader(frameHdr1);
-    Ptr<LinkCheckAns> linkCheckAns =
-        (*(frameHdr1.GetCommands().begin()))->GetObject<LinkCheckAns>();
+    Ptr<LinkCheckAns> linkCheckAns = DynamicCast<LinkCheckAns>(*(frameHdr1.GetCommands().begin()));
 
     NS_TEST_EXPECT_MSG_EQ((pkt->GetSize()),
                           10,
@@ -430,7 +430,7 @@ class ReceivePathTest : public TestCase
     void Interference(Ptr<const Packet> packet, uint32_t node);
     void ReceivedPacket(Ptr<const Packet> packet, uint32_t node);
 
-    Ptr<SimpleGatewayLoraPhy> gatewayPhy;
+    Ptr<GatewayLoraPhy> gatewayPhy;
     int m_noMoreDemodulatorsCalls = 0;
     int m_interferenceCalls = 0;
     int m_receivedPacketCalls = 0;
@@ -457,7 +457,7 @@ ReceivePathTest::Reset(void)
     // m_receivedPacketCalls = 0;
     // m_maxOccupiedReceptionPaths = 0;
 
-    // gatewayPhy = CreateObject<SimpleGatewayLoraPhy> ();
+    // gatewayPhy = CreateObject<GatewayLoraPhy> ();
     // gatewayPhy->TraceConnectWithoutContext (
     //     "LostPacketBecauseNoMoreReceivers",
     //     MakeCallback (&ReceivePathTest::NoMoreDemodulators, this));
@@ -529,7 +529,7 @@ ReceivePathTest::DoRun(void)
     // // If no ReceptionPath is configured to listen on a frequency, no packet is received
     // //////////////////////////////////////////////////////////////////////////////////
 
-    // Simulator::Schedule (Seconds (1), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (1), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 7,
     //                      Seconds (1), frequency4);
 
@@ -545,22 +545,22 @@ ReceivePathTest::DoRun(void)
     // // A ReceptionPath can receive a packet of any SF without any preconfiguration
     // //////////////////////////////////////////////////////////////////////////////
 
-    // Simulator::Schedule (Seconds (1), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (1), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 7,
     //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (3), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (3), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 8,
     //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (5), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (5), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 9,
     //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (7), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (7), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 10,
     //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (9), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (9), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 11,
     //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (11), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (11), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14,
     //                      12, Seconds (1), frequency1);
 
@@ -577,10 +577,10 @@ ReceivePathTest::DoRun(void)
     // // Schedule two reception events at the first frequency, where there are two
     // // reception paths listening. Each packet should be received correctly.
     // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 7,
     //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (3), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (3), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 9,
     //                      Seconds (4), frequency1);
 
@@ -596,10 +596,10 @@ ReceivePathTest::DoRun(void)
     // ///////////////////////////////////////////////////////////////////////////
     // // Interference between packets on the same frequency and different ReceptionPaths
     // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 7,
     //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (3), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (3), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 7,
     //                      Seconds (4), frequency1);
 
@@ -615,13 +615,13 @@ ReceivePathTest::DoRun(void)
     // ///////////////////////////////////////////////////////////////////////////
     // // Three receptions where only two receivePaths are available
     // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 7,
     //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 7,
     //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (3), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (3), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 7,
     //                      Seconds (4), frequency1);
 
@@ -636,10 +636,10 @@ ReceivePathTest::DoRun(void)
     // ///////////////////////////////////////////////////////////////////////////
     // // Packets that are on different frequencys do not interfere
     // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 7,
     //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 7,
     //                      Seconds (4), frequency2);
 
@@ -654,22 +654,22 @@ ReceivePathTest::DoRun(void)
     // ///////////////////////////////////////////////////////////////////////////
     // // Full capacity
     // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 7,
     //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 8,
     //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 9,
     //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 10,
     //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 11,
     //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 12,
     //                      Seconds (4), frequency3);
 
@@ -686,25 +686,25 @@ ReceivePathTest::DoRun(void)
     // ///////////////////////////////////////////////////////////////////////////
     // // Full capacity + 1
     // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 7,
     //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 8,
     //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 9,
     //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 10,
     //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 11,
     //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 12,
     //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 10,
     //                      Seconds (4), frequency3);
 
@@ -721,41 +721,41 @@ ReceivePathTest::DoRun(void)
     // ///////////////////////////////////////////////////////////////////////////
     // // Receive Paths are correctly freed
     // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 7,
     //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 8,
     //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 9,
     //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 10,
     //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 11,
     //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 12,
     //                      Seconds (4), frequency3);
 
-    // Simulator::Schedule (Seconds (8), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (8), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 7,
     //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (8), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (8), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 8,
     //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (8), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (8), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 9,
     //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (8), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (8), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 10,
     //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (8), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (8), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 11,
     //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (8), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (8), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 12,
     //                      Seconds (4), frequency3);
 
@@ -773,19 +773,19 @@ ReceivePathTest::DoRun(void)
     // // Receive Paths stay occupied exactly for the necessary time
     // // Occupy both ReceptionPaths centered at frequency1
     // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 7,
     //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 8,
     //                      Seconds (4), frequency1);
 
     // // This packet will find no free ReceptionPaths
-    // Simulator::Schedule (Seconds (2 + 4) - NanoSeconds (1), &SimpleGatewayLoraPhy::StartReceive,
+    // Simulator::Schedule (Seconds (2 + 4) - NanoSeconds (1), &GatewayLoraPhy::StartReceive,
     //                      gatewayPhy, packet, 14, 9, Seconds (4), frequency1);
 
     // // This packet will find a free ReceptionPath
-    // Simulator::Schedule (Seconds (2 + 4) + NanoSeconds (1), &SimpleGatewayLoraPhy::StartReceive,
+    // Simulator::Schedule (Seconds (2 + 4) + NanoSeconds (1), &GatewayLoraPhy::StartReceive,
     //                      gatewayPhy, packet, 14, 10, Seconds (4), frequency1);
 
     // Simulator::Stop (Hours (2));
@@ -801,7 +801,7 @@ ReceivePathTest::DoRun(void)
     // ///////////////////////////////////////////////////////////////////////////
     // // Only one ReceivePath locks on the incoming packet
     // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
+    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
     // 14, 7,
     //                      Seconds (4), frequency1);
 
@@ -816,46 +816,46 @@ ReceivePathTest::DoRun(void)
 }
 
 /**************************
- * LogicalLoraChannelTest *
+ * LogicalChannelTest *
  **************************/
 
-class LogicalLoraChannelTest : public TestCase
+class LogicalChannelTest : public TestCase
 {
   public:
-    LogicalLoraChannelTest();
-    virtual ~LogicalLoraChannelTest();
+    LogicalChannelTest();
+    virtual ~LogicalChannelTest();
 
   private:
     virtual void DoRun(void);
 };
 
 // Add some help text to this case to describe what it is intended to test
-LogicalLoraChannelTest::LogicalLoraChannelTest()
-    : TestCase("Verify that LogicalLoraChannel and LogicalLoraChannelHelper work as expected")
+LogicalChannelTest::LogicalChannelTest()
+    : TestCase("Verify that LogicalChannel and LogicalChannelManager work as expected")
 {
 }
 
 // Reminder that the test case should clean up after itself
-LogicalLoraChannelTest::~LogicalLoraChannelTest()
+LogicalChannelTest::~LogicalChannelTest()
 {
 }
 
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-LogicalLoraChannelTest::DoRun(void)
+LogicalChannelTest::DoRun(void)
 {
-    NS_LOG_DEBUG("LogicalLoraChannelTest");
+    NS_LOG_DEBUG("LogicalChannelTest");
 
     /////////////////////////////
-    // Test LogicalLoraChannel //
+    // Test LogicalChannel //
     /////////////////////////////
 
     // Setup
-    Ptr<LogicalLoraChannel> channel0 = CreateObject<LogicalLoraChannel>(868);
-    Ptr<LogicalLoraChannel> channel1 = CreateObject<LogicalLoraChannel>(868);
-    Ptr<LogicalLoraChannel> channel2 = CreateObject<LogicalLoraChannel>(868.1);
-    Ptr<LogicalLoraChannel> channel3 = CreateObject<LogicalLoraChannel>(868.001);
+    Ptr<LogicalChannel> channel0 = CreateObject<LogicalChannel>(868000000);
+    Ptr<LogicalChannel> channel1 = CreateObject<LogicalChannel>(868000000);
+    Ptr<LogicalChannel> channel2 = CreateObject<LogicalChannel>(868100000);
+    Ptr<LogicalChannel> channel3 = CreateObject<LogicalChannel>(868001000);
 
     // Equality between channels
     // Test the == and != operators
@@ -868,8 +868,8 @@ LogicalLoraChannelTest::DoRun(void)
     //////////////////
 
     // Setup
-    SubBand subBand0(868, 868.7, 0.01, 14);
-    Ptr<LogicalLoraChannel> channel4 = CreateObject<LogicalLoraChannel>(870);
+    SubBand subBand0(868000000, 868700000, 0.01, 14);
+    Ptr<LogicalChannel> channel4 = CreateObject<LogicalChannel>(870);
 
     // Test BelongsToSubBand
     NS_TEST_EXPECT_MSG_EQ(subBand0.BelongsToSubBand(channel2),
@@ -883,24 +883,24 @@ LogicalLoraChannelTest::DoRun(void)
                           "BelongsToSubBand does not behave as expected");
 
     ///////////////////////////////////
-    // Test LogicalLoraChannelHelper //
+    // Test LogicalChannelManager //
     ///////////////////////////////////
 
     // Setup
-    Ptr<LogicalLoraChannelHelper> channelHelper = CreateObject<LogicalLoraChannelHelper>();
-    SubBand subBand1(869, 869.4, 0.1, 27);
-    channel0 = CreateObject<LogicalLoraChannel>(868.1);
-    channel1 = CreateObject<LogicalLoraChannel>(868.3);
-    channel2 = CreateObject<LogicalLoraChannel>(868.5);
-    channel3 = CreateObject<LogicalLoraChannel>(869.1);
-    channel4 = CreateObject<LogicalLoraChannel>(869.3);
+    Ptr<LogicalChannelManager> channelHelper = CreateObject<LogicalChannelManager>();
+    SubBand subBand1(869000000, 869400000, 0.1, 27);
+    channel0 = CreateObject<LogicalChannel>(868100000);
+    channel1 = CreateObject<LogicalChannel>(868300000);
+    channel2 = CreateObject<LogicalChannel>(868500000);
+    channel3 = CreateObject<LogicalChannel>(869100000);
+    channel4 = CreateObject<LogicalChannel>(869300000);
 
     // Channel diagram
     //
     // Channels      0      1      2                     3       4
     // SubBands  868 ----- 0.1% ----- 868.7       869 ----- 1% ----- 869.4
 
-    // Add SubBands and LogicalLoraChannels to the helper
+    // Add SubBands and LogicalChannels to the helper
     channelHelper->AddSubBand(&subBand0);
     channelHelper->AddSubBand(&subBand1);
     channelHelper->AddChannel(0, channel0);
@@ -1070,9 +1070,9 @@ class PhyConnectivityTest : public TestCase
   private:
     virtual void DoRun(void);
     Ptr<LoraChannel> channel;
-    Ptr<SimpleEndDeviceLoraPhy> edPhy1;
-    Ptr<SimpleEndDeviceLoraPhy> edPhy2;
-    Ptr<SimpleEndDeviceLoraPhy> edPhy3;
+    Ptr<EndDeviceLoraPhy> edPhy1;
+    Ptr<EndDeviceLoraPhy> edPhy2;
+    Ptr<EndDeviceLoraPhy> edPhy3;
 
     Ptr<Packet> m_latestReceivedPacket;
     int m_receivedPacketCalls = 0;
@@ -1190,13 +1190,13 @@ PhyConnectivityTest::Reset(void)
     channel = CreateObject<LoraChannel>(loss, delay);
 
     // Connect PHYs
-    edPhy1 = CreateObject<SimpleEndDeviceLoraPhy>();
-    edPhy2 = CreateObject<SimpleEndDeviceLoraPhy>();
-    edPhy3 = CreateObject<SimpleEndDeviceLoraPhy>();
+    edPhy1 = CreateObject<EndDeviceLoraPhy>();
+    edPhy2 = CreateObject<EndDeviceLoraPhy>();
+    edPhy3 = CreateObject<EndDeviceLoraPhy>();
 
-    edPhy1->SetFrequency(868.1);
-    edPhy2->SetFrequency(868.1);
-    edPhy3->SetFrequency(868.1);
+    edPhy1->SetFrequency(868100000);
+    edPhy2->SetFrequency(868100000);
+    edPhy3->SetFrequency(868100000);
 
     Ptr<ConstantPositionMobilityModel> mob1 = CreateObject<ConstantPositionMobilityModel>();
     Ptr<ConstantPositionMobilityModel> mob2 = CreateObject<ConstantPositionMobilityModel>();
@@ -1228,9 +1228,9 @@ PhyConnectivityTest::Reset(void)
     edPhy3->SetSpreadingFactor(12);
 
     // Listen on a specific frequency
-    edPhy1->SetFrequency(868.1);
-    edPhy2->SetFrequency(868.1);
-    edPhy3->SetFrequency(868.1);
+    edPhy1->SetFrequency(868100000);
+    edPhy2->SetFrequency(868100000);
+    edPhy3->SetFrequency(868100000);
 
     edPhy1->TraceConnectWithoutContext("ReceivedPacket",
                                        MakeCallback(&PhyConnectivityTest::ReceivedPacket, this));
@@ -1303,11 +1303,11 @@ PhyConnectivityTest::DoRun(void)
     /////////////////////////////
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1326,11 +1326,11 @@ PhyConnectivityTest::DoRun(void)
     edPhy2->SwitchToSleep();
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1348,15 +1348,15 @@ PhyConnectivityTest::DoRun(void)
 
     txParams.sf = 7;
     edPhy2->SetSpreadingFactor(7);
-    edPhy2->GetMobility()->GetObject<ConstantPositionMobilityModel>()->SetPosition(
-        Vector(2990, 0, 0));
+    DynamicCast<ConstantPositionMobilityModel>(edPhy2->GetMobility())
+        ->SetPosition(Vector(2990, 0, 0));
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1373,15 +1373,15 @@ PhyConnectivityTest::DoRun(void)
     // Try again using a packet with higher SF
     txParams.sf = 8;
     edPhy2->SetSpreadingFactor(8);
-    edPhy2->GetMobility()->GetObject<ConstantPositionMobilityModel>()->SetPosition(
-        Vector(2990, 0, 0));
+    DynamicCast<ConstantPositionMobilityModel>(edPhy2->GetMobility())
+        ->SetPosition(Vector(2990, 0, 0));
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1398,18 +1398,18 @@ PhyConnectivityTest::DoRun(void)
 
     txParams.sf = 12;
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy3,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1425,11 +1425,11 @@ PhyConnectivityTest::DoRun(void)
     // Packets can be lost because the PHY is not listening on the right frequency
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         txParams,
-                        868.3,
+                        868300000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1446,11 +1446,11 @@ PhyConnectivityTest::DoRun(void)
 
     txParams.sf = 8; // Send with 8, listening for 12
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1468,11 +1468,11 @@ PhyConnectivityTest::DoRun(void)
 
     // The very same packet arrives at the other PHY
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1491,11 +1491,11 @@ PhyConnectivityTest::DoRun(void)
     // PHY switches to STANDBY after TX and RX
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1503,10 +1503,10 @@ PhyConnectivityTest::DoRun(void)
     Simulator::Destroy();
 
     NS_TEST_EXPECT_MSG_EQ(edPhy1->GetState(),
-                          SimpleEndDeviceLoraPhy::STANDBY,
+                          EndDeviceLoraPhy::STANDBY,
                           "State didn't switch to STANDBY as expected");
     NS_TEST_EXPECT_MSG_EQ(edPhy2->GetState(),
-                          SimpleEndDeviceLoraPhy::STANDBY,
+                          EndDeviceLoraPhy::STANDBY,
                           "State didn't switch to STANDBY as expected");
 }
 
@@ -1566,7 +1566,7 @@ LorawanTestSuite::LorawanTestSuite()
     AddTestCase(new AddressTest, TestCase::QUICK);
     AddTestCase(new HeaderTest, TestCase::QUICK);
     AddTestCase(new ReceivePathTest, TestCase::QUICK);
-    AddTestCase(new LogicalLoraChannelTest, TestCase::QUICK);
+    AddTestCase(new LogicalChannelTest, TestCase::QUICK);
     AddTestCase(new TimeOnAirTest, TestCase::QUICK);
     AddTestCase(new PhyConnectivityTest, TestCase::QUICK);
 }

@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -16,6 +15,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #include "network-controller.h"
@@ -33,6 +36,7 @@ TypeId
 NetworkController::GetTypeId(void)
 {
     static TypeId tid = TypeId("ns3::NetworkController")
+                            .SetParent<Object>()
                             .AddConstructor<NetworkController>()
                             .SetGroupName("lorawan");
     return tid;

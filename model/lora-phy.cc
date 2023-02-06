@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -16,14 +15,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #include "ns3/lora-phy.h"
 
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-
-#include <algorithm>
+#include "ns3/node.h"
 
 namespace ns3
 {
@@ -88,6 +88,7 @@ LoraPhy::GetTypeId(void)
 }
 
 LoraPhy::LoraPhy()
+    : m_context(0)
 {
 }
 
@@ -95,9 +96,75 @@ LoraPhy::~LoraPhy()
 {
 }
 
+void
+LoraPhy::DoInitialize()
+{
+    NS_LOG_FUNCTION(this);
+
+    // This method ensures that the local mobility model pointer holds
+    // a pointer to the Node's aggregated mobility model (if one exists)
+    // in the case that the user has not directly called SetMobility()
+    // on this WifiPhy during simulation setup.  If the mobility model
+    // needs to be added or changed during simulation runtime, users must
+    // call SetMobility() on this object.
+
+    if (!m_mobility)
+    {
+        NS_ABORT_MSG_UNLESS(m_device && m_device->GetNode(),
+                            "Either install a MobilityModel on this object or ensure that this "
+                            "object is part of a Node and NetDevice");
+        m_mobility = m_device->GetNode()->GetObject<MobilityModel>();
+        if (!m_mobility)
+        {
+            NS_LOG_WARN("Mobility not found, propagation models might not work properly");
+        }
+    }
+
+    // Get node id (if possible) to format context in tracing callbacks
+    if (m_device && m_device->GetNode())
+        m_context = m_device->GetNode()->GetId();
+
+}
+
+void
+LoraPhy::SetInterferenceHelper(const Ptr<LoraInterferenceHelper> helper)
+{
+    m_interference = helper;
+}
+
+void
+LoraPhy::SetChannel(Ptr<LoraChannel> channel)
+{
+    NS_LOG_FUNCTION(this << channel);
+    m_channel = channel;
+    m_channel->Add(this);
+}
+
+Ptr<LoraChannel>
+LoraPhy::GetChannel(void) const
+{
+    NS_LOG_FUNCTION_NOARGS();
+    return m_channel;
+}
+
+Ptr<MobilityModel>
+LoraPhy::GetMobility(void) const
+{
+    NS_LOG_FUNCTION_NOARGS();
+    return m_mobility;
+}
+
+void
+LoraPhy::SetMobility(Ptr<MobilityModel> mobility)
+{
+    NS_LOG_FUNCTION(this << mobility);
+    m_mobility = mobility;
+}
+
 Ptr<NetDevice>
 LoraPhy::GetDevice(void) const
 {
+    NS_LOG_FUNCTION_NOARGS();
     return m_device;
 }
 
@@ -105,72 +172,34 @@ void
 LoraPhy::SetDevice(Ptr<NetDevice> device)
 {
     NS_LOG_FUNCTION(this << device);
-
     m_device = device;
-}
-
-Ptr<LoraChannel>
-LoraPhy::GetChannel(void) const
-{
-    NS_LOG_FUNCTION_NOARGS();
-
-    return m_channel;
-}
-
-Ptr<MobilityModel>
-LoraPhy::GetMobility(void)
-{
-    NS_LOG_FUNCTION_NOARGS();
-
-    // If there is a mobility model associated to this PHY, take the mobility from
-    // there
-    if (m_mobility != 0)
-    {
-        return m_mobility;
-    }
-    else // Else, take it from the node
-    {
-        return m_device->GetNode()->GetObject<MobilityModel>();
-    }
-}
-
-void
-LoraPhy::SetMobility(Ptr<MobilityModel> mobility)
-{
-    NS_LOG_FUNCTION_NOARGS();
-
-    m_mobility = mobility;
-}
-
-void
-LoraPhy::SetChannel(Ptr<LoraChannel> channel)
-{
-    NS_LOG_FUNCTION(this << channel);
-
-    m_channel = channel;
 }
 
 void
 LoraPhy::SetReceiveOkCallback(RxOkCallback callback)
 {
+    NS_LOG_FUNCTION_NOARGS();
     m_rxOkCallback = callback;
 }
 
 void
 LoraPhy::SetReceiveFailedCallback(RxFailedCallback callback)
 {
+    NS_LOG_FUNCTION_NOARGS();
     m_rxFailedCallback = callback;
 }
 
 void
 LoraPhy::SetTxFinishedCallback(TxFinishedCallback callback)
 {
+    NS_LOG_FUNCTION_NOARGS();
     m_txFinishedCallback = callback;
 }
 
 Time
 LoraPhy::GetTSym(LoraTxParameters txParams)
 {
+    NS_LOG_FUNCTION(txParams);
     return Seconds(pow(2, int(txParams.sf)) / (txParams.bandwidthHz));
 }
 
@@ -222,6 +251,7 @@ LoraPhy::GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams)
 double
 LoraPhy::RxPowerToSNR(double transmissionPower)
 {
+    NS_LOG_FUNCTION(transmissionPower);
     // The following conversion ignores interfering packets
     return transmissionPower + 174 - 10 * log10(B) - NF;
 }

@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -22,10 +21,10 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#ifndef LOGICAL_LORA_CHANNEL_HELPER_H
-#define LOGICAL_LORA_CHANNEL_HELPER_H
+#ifndef LOGICAL_CHANNEL_MANAGER_H
+#define LOGICAL_CHANNEL_MANAGER_H
 
-#include "ns3/logical-lora-channel.h"
+#include "ns3/logical-channel.h"
 #include "ns3/nstime.h"
 #include "ns3/object.h"
 #include "ns3/packet.h"
@@ -49,13 +48,13 @@ namespace lorawan
  * of SubBand objects and providing methods to query whether transmission on a
  * set channel is admissible or not.
  */
-class LogicalLoraChannelHelper : public Object
+class LogicalChannelManager : public Object
 {
   public:
     static TypeId GetTypeId(void);
 
-    LogicalLoraChannelHelper();
-    virtual ~LogicalLoraChannelHelper();
+    LogicalChannelManager();
+    virtual ~LogicalChannelManager();
 
     /**
      * Get the time it is necessary to wait before transmitting again, according
@@ -78,7 +77,7 @@ class LogicalLoraChannelHelper : public Object
      * \return A Time instance containing the waiting time before transmission is
      * allowed on the channel.
      */
-    Time GetWaitingTime(const Ptr<LogicalLoraChannel> channel);
+    Time GetWaitingTime(const Ptr<LogicalChannel> channel);
 
     /**
      * Register the transmission of a packet.
@@ -86,22 +85,29 @@ class LogicalLoraChannelHelper : public Object
      * \param duration The duration of the transmission event.
      * \param channel The channel the transmission was made on.
      */
-    void AddEvent(Time duration, Ptr<LogicalLoraChannel> channel);
+    void AddEvent(Time duration, Ptr<LogicalChannel> channel);
 
     /**
-     * Get the list of LogicalLoraChannels currently registered on this helper.
+     * Get the list of LogicalChannels currently registered on this helper.
      *
      * \return A list of the managed channels.
      */
-    std::vector<Ptr<LogicalLoraChannel>> GetChannelList(void);
+    std::vector<Ptr<LogicalChannel>> GetChannelList(void);
 
     /**
-     * Get the list of LogicalLoraChannels currently registered on this helper
+     * Get the list of LogicalChannels currently registered on this helper
      * that have been enabled for Uplink transmission with the channel mask.
      *
      * \return A list of the managed channels enabled for Uplink transmission.
      */
-    std::vector<Ptr<LogicalLoraChannel>> GetEnabledChannelList(void);
+    std::vector<Ptr<LogicalChannel>> GetEnabledChannelList(void);
+
+    /**
+     *  Get a pointer to the LogicalChannel at a certain index.
+     *
+     *  \param chIndex The index of the channel to get.
+     */
+    Ptr<LogicalChannel> GetChannel(uint8_t chIndex);
 
     /**
      * Add a new channel at a fixed index.
@@ -109,13 +115,21 @@ class LogicalLoraChannelHelper : public Object
      * \param chIndex The index of the channel to substitute.
      * \param logicalChannel A pointer to the channel to add to the list.
      */
-    void AddChannel(uint16_t chIndex, Ptr<LogicalLoraChannel> logicalChannel);
+    void AddChannel(uint8_t chIndex, Ptr<LogicalChannel> logicalChannel);
+
+    /**
+     * Set a different reply frequency of a channel.
+     *
+     * \param chIndex The index of the channel to change the reply freq. of.
+     * \param replyFrequency Frequency (Hz) to be set as reply freq.
+     */
+    void SetReplyFrequency(uint8_t chIndex, double replyFrequency);
 
     /**
      * Add a new SubBand to this helper.
      *
-     * \param firstFrequency The first frequency of the subband, in MHz.
-     * \param lastFrequency The last frequency of the subband, in MHz.
+     * \param firstFrequency The first frequency of the subband, in Hz.
+     * \param lastFrequency The last frequency of the subband, in Hz.
      * \param dutyCycle The duty cycle that needs to be enforced on this subband.
      * \param maxTxPowerDbm The maximum transmission power [dBm] that can be used
      * on this SubBand.
@@ -137,7 +151,7 @@ class LogicalLoraChannelHelper : public Object
      *
      * \param chIndex Index of the channel we want to remove.
      */
-    void RemoveChannel(uint16_t chIndex);
+    void RemoveChannel(uint8_t chIndex);
 
     /**
      * Returns the maximum transmission power [dBm] that is allowed on a channel.
@@ -146,7 +160,7 @@ class LogicalLoraChannelHelper : public Object
      * transmission power.
      * \return The power in dBm.
      */
-    double GetTxPowerForChannel(Ptr<LogicalLoraChannel> logicalChannel);
+    double GetTxPowerForChannel(Ptr<LogicalChannel> logicalChannel);
 
     /**
      * Get the SubBand a channel belongs to.
@@ -154,7 +168,7 @@ class LogicalLoraChannelHelper : public Object
      * \param channel The channel whose SubBand we want to get.
      * \return The SubBand the channel belongs to.
      */
-    Ptr<SubBand> GetSubBandFromChannel(const Ptr<LogicalLoraChannel> channel);
+    Ptr<SubBand> GetSubBandFromChannel(const Ptr<LogicalChannel> channel);
 
     /**
      * Get the SubBand a frequency belongs to.
@@ -169,7 +183,7 @@ class LogicalLoraChannelHelper : public Object
      *
      * \param chIndex The index of the channel to disable.
      */
-    void DisableChannel(uint16_t chIndex);
+    void DisableChannel(uint8_t chIndex);
 
   private:
     /**
@@ -178,11 +192,11 @@ class LogicalLoraChannelHelper : public Object
     std::list<Ptr<SubBand>> m_subBandList;
 
     /**
-     * A vector of the LogicalLoraChannels that are currently registered within
+     * A vector of the LogicalChannels that are currently registered within
      * this helper. This vector represents the node's channel mask. The first N
      * channels are the default ones for a fixed region.
      */
-    std::map<uint16_t, Ptr<LogicalLoraChannel>> m_channelList;
+    std::map<uint8_t, Ptr<LogicalChannel>> m_channelList;
 
     Time m_lastTxDuration; //!< Duration of the last frame (seconds).
 
@@ -191,4 +205,4 @@ class LogicalLoraChannelHelper : public Object
 } // namespace lorawan
 
 } // namespace ns3
-#endif /* LOGICAL_LORA_CHANNEL_HELPER_H */
+#endif /* LOGICAL_CHANNEL_MANAGER_H */

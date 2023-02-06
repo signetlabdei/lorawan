@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -25,15 +24,10 @@
 #ifndef LORA_INTERFERENCE_HELPER_H
 #define LORA_INTERFERENCE_HELPER_H
 
-#include "ns3/callback.h"
-#include "ns3/logical-lora-channel.h"
+#include "ns3/enum.h"
 #include "ns3/nstime.h"
-#include "ns3/object.h"
 #include "ns3/packet.h"
-#include "ns3/simulator.h"
-#include "ns3/traced-callback.h"
-
-#include <list>
+#include "ns3/object.h"
 
 namespace ns3
 {
@@ -47,7 +41,7 @@ namespace lorawan
  * device, in order to compute which ones can be correctly received and which
  * ones are lost due to interference.
  */
-class LoraInterferenceHelper
+class LoraInterferenceHelper : public Object
 {
   public:
     /**
@@ -63,7 +57,7 @@ class LoraInterferenceHelper
               double rxPowerdBm,
               uint8_t spreadingFactor,
               Ptr<Packet> packet,
-              double frequencyMHz);
+              double frequency);
         ~Event();
 
         /**
@@ -135,7 +129,7 @@ class LoraInterferenceHelper
         /**
          * The frequency this event was on.
          */
-        double m_frequencyMHz;
+        double m_frequencyHz;
     };
 
     enum CollisionMatrix
@@ -145,6 +139,7 @@ class LoraInterferenceHelper
         ALOHA,
     };
 
+    // TypeId
     static TypeId GetTypeId(void);
 
     LoraInterferenceHelper();
@@ -157,7 +152,7 @@ class LoraInterferenceHelper
      * \param rxPower the received power in dBm.
      * \param spreadingFactor the spreading factor used by the transmission.
      * \param packet The packet carried by this transmission.
-     * \param frequencyMHz The frequency this event was sent at.
+     * \param frequency The frequency this event was sent at.
      *
      * \return the newly created event
      */
@@ -165,7 +160,18 @@ class LoraInterferenceHelper
                                            double rxPower,
                                            uint8_t spreadingFactor,
                                            Ptr<Packet> packet,
-                                           double frequencyMHz);
+                                           double frequency);
+
+    /**
+     * Determine whether the event was destroyed by interference or not. This is
+     * the method where the SIR tables come into play and the computations
+     * regarding power are performed.
+
+     * \param event The event for which to check the outcome.
+     * \return The sf of the packets that caused the loss, or 0 if there was no
+     * loss.
+     */
+    uint8_t IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Event> event);
 
     /**
      * Get a list of the interferers currently registered at this
@@ -177,17 +183,6 @@ class LoraInterferenceHelper
      * Print the events that are saved in this helper in a human readable format.
      */
     void PrintEvents(std::ostream& stream);
-
-    /**
-     * Determine whether the event was destroyed by interference or not. This is
-     * the method where the SNIR tables come into play and the computations
-     * regarding power are performed.
-
-     * \param event The event for which to check the outcome.
-     * \return The sf of the packets that caused the loss, or 0 if there was no
-     * loss.
-     */
-    uint8_t IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Event> event);
 
     /**
      * Compute the time duration in which two given events are overlapping.
@@ -205,21 +200,16 @@ class LoraInterferenceHelper
      */
     void ClearAllEvents(void);
 
+  private:
     /**
      * Delete old events in this LoraInterferenceHelper.
      */
     void CleanOldEvents(void);
 
-    static CollisionMatrix collisionMatrix;
-
-    static std::vector<std::vector<double>> collisionSnirAloha;
-    static std::vector<std::vector<double>> collisionSnirGoursaud;
-    static std::vector<std::vector<double>> collisionSnirCroce;
-
-  private:
-    void SetCollisionMatrix(enum CollisionMatrix collisionMatrix);
-
-    std::vector<std::vector<double>> m_collisionSnir;
+    /**
+     * Set the SIR collision matrix
+     */
+    void SetCollisionMatrix(EnumValue matrix);
 
     /**
      * A list of the events this LoraInterferenceHelper is keeping track of.
@@ -227,13 +217,20 @@ class LoraInterferenceHelper
     std::list<Ptr<LoraInterferenceHelper::Event>> m_events;
 
     /**
-     * The matrix containing information about how packets survive interference.
+     * The SIR matrix used to determine if packets survive interference.
      */
+    std::vector<std::vector<double>> m_collisionSir;
+
     /**
      * The threshold after which an event is considered old and removed from the
      * list.
      */
-    static Time oldEventThreshold;
+    static const Time m_oldEventThreshold;
+
+    /* Collision matrices */
+    static const std::vector<std::vector<double>> m_collisionSirAloha;
+    static const std::vector<std::vector<double>> m_collisionSirGoursaud;
+    static const std::vector<std::vector<double>> m_collisionSirCroce;
 };
 
 /**

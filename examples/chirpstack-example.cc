@@ -53,9 +53,11 @@ main(int argc, char* argv[])
     int gatewayRings = 1;
     double range = 2540.25; // Max range for downlink (!) coverage probability > 0.98 (with okumura)
     int nDevices = 1;
-    std::string sir = "GOURSAUD";
+    std::string sir = "CROCE";
     bool initializeSF = true;
+    bool testDev = false;
     bool file = false; // Warning: will produce a file for each gateway
+    bool log = false;
 
     /* Expose parameters to command line */
     {
@@ -67,7 +69,9 @@ main(int argc, char* argv[])
         cmd.AddValue("sir", "Signal to Interference Ratio matrix used for interference", sir);
         cmd.AddValue("initSF", "Whether to initialize the SFs", initializeSF);
         cmd.AddValue("adr", "ns3::EndDeviceLorawanMac::DRControl");
+        cmd.AddValue("test", "Use test devices (5s period, 5B payload)", testDev);
         cmd.AddValue("file", "Whether to enable .pcap tracing on gateways", file);
+        cmd.AddValue("log", "Whether to enable logs", log);
         cmd.Parse(argc, argv);
     }
 
@@ -78,11 +82,12 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::EndDeviceLorawanMac::EnableCryptography", BooleanValue(true));
 
     /* Logging options */
+    if (log)
     {
         //!> Requirement: build ns3 with debug option
         LogComponentEnable("UdpForwarder", LOG_LEVEL_DEBUG);
         LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_INFO);
-        // LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_INFO);
+        LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_INFO);
         // LogComponentEnable ("LoraFrameHeader", LOG_LEVEL_INFO);
         /* Monitor state changes of devices */
         LogComponentEnable("ChirpstackExample", LOG_LEVEL_ALL);
@@ -100,17 +105,15 @@ main(int argc, char* argv[])
     Ptr<NakagamiPropagationLossModel> rayleigh;
     Ptr<LoraChannel> channel;
     {
-        LoraInterferenceHelper::collisionMatrix = sirMap.at(sir);
-
         // Delay obtained from distance and speed of light in vacuum (constant)
         Ptr<PropagationDelayModel> delay = CreateObject<ConstantSpeedPropagationDelayModel>();
 
         // This one is empirical and it encompasses average loss due to distance, shadowing (i.e.
         // obstacles), weather, height
         loss = CreateObject<OkumuraHataPropagationLossModel>();
-        loss->SetAttribute("Frequency", DoubleValue(868000000.0));
-        loss->SetAttribute("Environment", EnumValue(EnvironmentType::UrbanEnvironment));
-        loss->SetAttribute("CitySize", EnumValue(CitySize::LargeCity));
+        loss->SetAttribute("Frequency", DoubleValue(868100000.0));
+        loss->SetAttribute("Environment", EnumValue(UrbanEnvironment));
+        loss->SetAttribute("CitySize", EnumValue(LargeCity));
 
         // Here we can add variance to the propagation model with multipath Rayleigh fading
         rayleigh = CreateObject<NakagamiPropagationLossModel>();
@@ -133,7 +136,7 @@ main(int argc, char* argv[])
         // In hex tiling, distance = range * cos (pi/6) * 2 to have no holes
         double gatewayDistance = range * std::cos(M_PI / 6) * 2;
         auto hexAllocator = CreateObject<HexGridPositionAllocator>();
-        hexAllocator->SetAttribute("Z", DoubleValue(15.0));
+        hexAllocator->SetAttribute("Z", DoubleValue(30.0));
         hexAllocator->SetAttribute("distance", DoubleValue(gatewayDistance));
         mobilityGw.SetPositionAllocator(hexAllocator);
 
@@ -143,7 +146,8 @@ main(int argc, char* argv[])
         double rho = range + 2.0 * gatewayDistance * (gatewayRings - 1);
         rangeAllocator = CreateObject<RangePositionAllocator>();
         rangeAllocator->SetAttribute("rho", DoubleValue(rho));
-        rangeAllocator->SetAttribute("Z", DoubleValue(15.0));
+        rangeAllocator->SetAttribute("ZRV",
+                                     StringValue("ns3::UniformRandomVariable[Min=1|Max=10]"));
         rangeAllocator->SetAttribute("range", DoubleValue(range));
         mobilityEd.SetPositionAllocator(rangeAllocator);
     }
@@ -206,6 +210,7 @@ main(int argc, char* argv[])
     {
         // Physiscal layer settings
         LoraPhyHelper phyHelper;
+        phyHelper.SetInterference("CollisionMatrix", EnumValue(sirMap.at(sir)));
         phyHelper.SetChannel(channel);
 
         // Create a LoraDeviceAddressGenerator
@@ -218,13 +223,13 @@ main(int argc, char* argv[])
         macHelper.SetAddressGenerator(addrGen);
 
         // Create the LoraNetDevices of the gateways
-        phyHelper.SetDeviceType(LoraPhyHelper::GW);
-        macHelper.SetDeviceType(LorawanMacHelper::GW);
+        phyHelper.SetType("ns3::GatewayLoraPhy");
+        macHelper.SetType("ns3::GatewayLorawanMac");
         gwNetDev = helper.Install(phyHelper, macHelper, gateways);
 
         // Create the LoraNetDevices of the end devices
-        phyHelper.SetDeviceType(LoraPhyHelper::ED);
-        macHelper.SetDeviceType(LorawanMacHelper::ED_A);
+        phyHelper.SetType("ns3::EndDeviceLoraPhy");
+        macHelper.SetType("ns3::ClassAEndDeviceLorawanMac");
         helper.Install(phyHelper, macHelper, endDevices);
     }
 
@@ -240,13 +245,21 @@ main(int argc, char* argv[])
         forwarderHelper.Install(gateways);
 
         // Install applications in EDs
-        PeriodicSenderHelper appHelper;
-        appHelper.SetPeriodGenerator(
-            CreateObjectWithAttributes<ConstantRandomVariable>("Constant", DoubleValue(5.0)));
-        appHelper.SetPacketSizeGenerator(
-            CreateObjectWithAttributes<ConstantRandomVariable>("Constant", DoubleValue(5.0)));
-        // UrbanTrafficHelper appHelper;
-        appHelper.Install(endDevices);
+        if (testDev)
+        {
+            PeriodicSenderHelper appHelper;
+            appHelper.SetPeriodGenerator(
+                CreateObjectWithAttributes<ConstantRandomVariable>("Constant", DoubleValue(5.0)));
+            appHelper.SetPacketSizeGenerator(
+                CreateObjectWithAttributes<ConstantRandomVariable>("Constant", DoubleValue(5.0)));
+            appHelper.Install(endDevices);
+        }
+        else
+        {
+            UrbanTrafficHelper appHelper;
+            appHelper.SetDeviceGroups(Commercial);
+            appHelper.Install(endDevices);
+        }
     }
 
     /***************************

@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2018 University of Padova
  *
@@ -62,9 +61,9 @@ NetworkServer::GetTypeId(void)
 }
 
 NetworkServer::NetworkServer()
-    : m_status(Create<NetworkStatus>()),
-      m_controller(Create<NetworkController>(m_status)),
-      m_scheduler(Create<NetworkScheduler>(m_status, m_controller))
+    : m_status(CreateObject<NetworkStatus>()),
+      m_controller(CreateObject<NetworkController>(m_status)),
+      m_scheduler(CreateObject<NetworkScheduler>(m_status, m_controller))
 {
     NS_LOG_FUNCTION_NOARGS();
 }
@@ -90,39 +89,28 @@ void
 NetworkServer::AddGateway(Ptr<Node> gateway, Ptr<NetDevice> netDevice)
 {
     NS_LOG_FUNCTION(this << gateway);
-
     // Get the PointToPointNetDevice
     Ptr<PointToPointNetDevice> p2pNetDevice;
     for (uint32_t i = 0; i < gateway->GetNDevices(); i++)
-    {
-        p2pNetDevice = gateway->GetDevice(i)->GetObject<PointToPointNetDevice>();
-        if (p2pNetDevice != 0)
+        if (p2pNetDevice = DynamicCast<PointToPointNetDevice>(gateway->GetDevice(i));
+            bool(p2pNetDevice))
         {
             // We found a p2pNetDevice on the gateway
             break;
         }
-    }
-
     // Get the gateway's LoRa MAC layer
     Ptr<GatewayLorawanMac> gwMac = 0;
     for (uint32_t i = 0; i < gateway->GetNDevices(); i++)
-    {
-        if (gateway->GetDevice(i)->GetObject<LoraNetDevice>() != 0)
+        if (bool(DynamicCast<LoraNetDevice>(gateway->GetDevice(i))))
         {
-            gwMac = gateway->GetDevice(i)
-                        ->GetObject<LoraNetDevice>()
-                        ->GetMac()
-                        ->GetObject<GatewayLorawanMac>();
+            gwMac = DynamicCast<GatewayLorawanMac>(
+                DynamicCast<LoraNetDevice>(gateway->GetDevice(i))->GetMac());
             break;
         }
-    }
-
     // Get the Address
     Address gatewayAddress = p2pNetDevice->GetAddress();
-
     // Create new gatewayStatus
-    Ptr<GatewayStatus> gwStatus = Create<GatewayStatus>(gatewayAddress, netDevice, gwMac);
-
+    auto gwStatus = CreateObject<GatewayStatus>(gatewayAddress, netDevice, gwMac);
     m_status->AddGateway(gatewayAddress, gwStatus);
 }
 
@@ -143,25 +131,17 @@ void
 NetworkServer::AddNode(Ptr<Node> node)
 {
     NS_LOG_FUNCTION(this << node);
-
     // Get the LoraNetDevice
     Ptr<LoraNetDevice> loraNetDevice;
     for (uint32_t i = 0; i < node->GetNDevices(); i++)
-    {
-        loraNetDevice = node->GetDevice(i)->GetObject<LoraNetDevice>();
-        if (loraNetDevice != 0)
+        if (loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(i));
+            bool(loraNetDevice) != 0)
         {
             // We found a LoraNetDevice on the node
             break;
         }
-    }
-
-    // Get the MAC
-    Ptr<ClassAEndDeviceLorawanMac> edLorawanMac =
-        loraNetDevice->GetMac()->GetObject<ClassAEndDeviceLorawanMac>();
-
-    // Update the NetworkStatus about the existence of this node
-    m_status->AddNode(edLorawanMac);
+    // Get the MAC and update the NetworkStatus about the existence of this node
+    m_status->AddNode(DynamicCast<ClassAEndDeviceLorawanMac>(loraNetDevice->GetMac()));
 }
 
 bool

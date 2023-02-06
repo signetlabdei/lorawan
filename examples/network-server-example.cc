@@ -50,7 +50,7 @@ main(int argc, char* argv[])
     // LogComponentEnable("LoraPhy", LOG_LEVEL_ALL);
     // LogComponentEnable("LoraChannel", LOG_LEVEL_ALL);
     // LogComponentEnable("EndDeviceLoraPhy", LOG_LEVEL_ALL);
-    // LogComponentEnable("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
+    // LogComponentEnable("LogicalChannelManager", LOG_LEVEL_ALL);
     LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_ALL);
     LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
     // LogComponentEnable ("OneShotSender", LOG_LEVEL_ALL);
@@ -117,15 +117,15 @@ main(int argc, char* argv[])
         CreateObject<LoraDeviceAddressGenerator>(nwkId, nwkAddr);
 
     // Create the LoraNetDevices of the end devices
-    phyHelper.SetDeviceType(LoraPhyHelper::ED);
-    macHelper.SetDeviceType(LorawanMacHelper::ED_A);
+    phyHelper.SetType("ns3::EndDeviceLoraPhy");
+    macHelper.SetType("ns3::ClassAEndDeviceLorawanMac");
     macHelper.SetAddressGenerator(addrGen);
     macHelper.SetRegion(LorawanMacHelper::EU);
     helper.Install(phyHelper, macHelper, endDevices);
 
     // Set message type (Default is unconfirmed)
-    Ptr<LorawanMac> edMac1 = endDevices.Get(1)->GetDevice(0)->GetObject<LoraNetDevice>()->GetMac();
-    Ptr<ClassAEndDeviceLorawanMac> edLorawanMac1 = edMac1->GetObject<ClassAEndDeviceLorawanMac>();
+    Ptr<LorawanMac> edMac1 = DynamicCast<LoraNetDevice>(endDevices.Get(1)->GetDevice(0))->GetMac();
+    Ptr<ClassAEndDeviceLorawanMac> edLorawanMac1 = DynamicCast<ClassAEndDeviceLorawanMac>(edMac1);
     edLorawanMac1->SetMType(LorawanMacHeader::CONFIRMED_DATA_UP);
 
     // Install applications in EDs
@@ -148,8 +148,8 @@ main(int argc, char* argv[])
     mobilityGw.Install(gateways);
 
     // Create the LoraNetDevices of the gateways
-    phyHelper.SetDeviceType(LoraPhyHelper::GW);
-    macHelper.SetDeviceType(LorawanMacHelper::GW);
+    phyHelper.SetType("ns3::GatewayLoraPhy");
+    macHelper.SetType("ns3::GatewayLorawanMac");
     helper.Install(phyHelper, macHelper, gateways);
 
     // Set spreading factors up

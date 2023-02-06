@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2022 Orange SA
  *
@@ -21,6 +20,7 @@
 
 #include "lora-application.h"
 
+#include "ns3/lora-net-device.h"
 #include "ns3/uinteger.h"
 
 namespace ns3
@@ -105,6 +105,22 @@ LoraApplication::IsRunning(void)
 {
     NS_LOG_FUNCTION(this);
     return m_sendEvent.IsRunning();
+}
+
+void
+LoraApplication::DoInitialize()
+{
+    NS_LOG_FUNCTION(this);
+    // Make sure we have a MAC layer
+    if (bool(m_mac) == 0)
+    {
+        NS_ASSERT(m_node->GetNDevices() == 1);
+        // Assumes there's only one device, force it to be an end device
+        auto loraNetDevice = DynamicCast<LoraNetDevice>(m_node->GetDevice(0));
+        m_mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
+        NS_ASSERT(bool(m_mac) != 0);
+    }
+    Application::DoInitialize();
 }
 
 // Protected methods

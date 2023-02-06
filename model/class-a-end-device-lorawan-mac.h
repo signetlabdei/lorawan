@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -143,14 +142,14 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /**
      * Set the frequency that will be used for the second receive window.
      *
-     * \param frequencyMHz the Frequency.
+     * \param frequency the Frequency.
      */
-    void SetSecondReceiveWindowFrequency(double frequencyMHz);
+    void SetSecondReceiveWindowFrequency(double frequency);
 
     /**
      * Get the frequency that is used for the second receive window.
      *
-     * @return The frequency, in MHz
+     * @return The frequency, in Hz
      */
     double GetSecondReceiveWindowFrequency(void);
 
@@ -168,6 +167,11 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      *                            - The frequency to use for the second receive window.
      */
     virtual void OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq);
+
+    /**
+     * Perform the actions that need to be taken when receiving a RxTimingSetupReq command.
+     */
+    virtual void OnRxTimingSetupReq(Time delay);
 
   private:
     /**

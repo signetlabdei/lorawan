@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -16,22 +15,23 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #ifndef ONE_SHOT_SENDER_H
 #define ONE_SHOT_SENDER_H
 
-#include "ns3/application.h"
-#include "ns3/attribute.h"
-#include "ns3/lorawan-mac.h"
-#include "ns3/nstime.h"
+#include "ns3/lora-application.h"
 
 namespace ns3
 {
 namespace lorawan
 {
 
-class OneShotSender : public Application
+class OneShotSender : public LoraApplication
 {
   public:
     OneShotSender();
@@ -59,22 +59,6 @@ class OneShotSender : public Application
      * Stop the application.
      */
     void StopApplication(void);
-
-  private:
-    /**
-     * The time at which to send the packet.
-     */
-    Time m_sendTime;
-
-    /**
-     * The sending event.
-     */
-    EventId m_sendEvent;
-
-    /**
-     * The MAC layer of this node.
-     */
-    Ptr<LorawanMac> m_mac;
 };
 
 } // namespace lorawan

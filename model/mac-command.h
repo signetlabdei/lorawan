@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -16,6 +15,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #ifndef MAC_COMMAND_H
@@ -473,7 +476,7 @@ class NewChannelReq : public MacCommand
      * Constructor providing initialization of all parameters.
      *
      * \param chIndex The index of the channel this command wants to operate on.
-     * \param frequency The new frequency for this channel.
+     * \param frequency The new frequency for this channel, in Hz.
      * \param minDataRate The minimum data rate allowed on this channel.
      * \param maxDataRate The minimum data rate allowed on this channel.
      */
@@ -570,21 +573,6 @@ class RxTimingSetupAns : public MacCommand
 };
 
 /**
- * Implementation of the TxParamSetupAns LoRaWAN MAC command.
- */
-class TxParamSetupAns : public MacCommand
-{
-  public:
-    TxParamSetupAns();
-
-    virtual void Serialize(Buffer::Iterator& start) const;
-    virtual uint8_t Deserialize(Buffer::Iterator& start);
-    virtual void Print(std::ostream& os) const;
-
-  private:
-};
-
-/**
  * Implementation of the TxParamSetupReq LoRaWAN MAC command.
  */
 class TxParamSetupReq : public MacCommand
@@ -600,12 +588,12 @@ class TxParamSetupReq : public MacCommand
 };
 
 /**
- * Implementation of the DlChannelAns LoRaWAN MAC command.
+ * Implementation of the TxParamSetupAns LoRaWAN MAC command.
  */
-class DlChannelAns : public MacCommand
+class TxParamSetupAns : public MacCommand
 {
   public:
-    DlChannelAns();
+    TxParamSetupAns();
 
     virtual void Serialize(Buffer::Iterator& start) const;
     virtual uint8_t Deserialize(Buffer::Iterator& start);
@@ -613,6 +601,60 @@ class DlChannelAns : public MacCommand
 
   private:
 };
+
+/**
+ * Implementation of the DlChannelReq LoRaWAN MAC command.
+ */
+class DlChannelReq : public MacCommand
+{
+  public:
+    DlChannelReq();
+
+    /**
+     * Constructor providing initialization of all parameters.
+     *
+     * \param chIndex The index of the channel this command wants to operate on.
+     * \param frequency The new downlink frequency for this channel, in Hz.
+     */
+    DlChannelReq(uint8_t chIndex, double frequency);
+
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
+
+    uint8_t GetChannelIndex(void);
+    double GetFrequency(void);
+
+  private:
+    uint8_t m_chIndex;
+    double m_frequency;
+};
+
+/**
+ * Implementation of the DlChannelAns LoRaWAN MAC command.
+ */
+class DlChannelAns : public MacCommand
+{
+  public:
+    DlChannelAns();
+
+    /**
+     * Constructor providing initialization of all parameters.
+     *
+     * \param uplinkFrequencyExists Whether the uplink frequency exists for the channel.
+     * \param channelFrequencyOk Whether the downlink frequency can be used by this device.
+     */
+    DlChannelAns(bool uplinkFrequencyExists, bool channelFrequencyOk);
+
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
+
+  private:
+    bool m_uplinkFrequencyExists;
+    bool m_channelFrequencyOk;
+};
+
 } // namespace lorawan
 
 } // namespace ns3

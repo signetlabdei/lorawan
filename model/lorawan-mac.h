@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2017 University of Padova
  *
@@ -16,12 +15,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * 17/01/2023
+ * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
+ *                              <alessandro.aimi@cnam.fr>
  */
 
 #ifndef LORAWAN_MAC_H
 #define LORAWAN_MAC_H
 
-#include "ns3/logical-lora-channel-helper.h"
+#include "ns3/logical-channel-manager.h"
 #include "ns3/lora-phy.h"
 #include "ns3/object.h"
 #include "ns3/packet.h"
@@ -51,20 +54,6 @@ class LorawanMac : public Object
     virtual ~LorawanMac();
 
     typedef std::array<std::array<uint8_t, 6>, 8> ReplyDataRateMatrix;
-
-    /**
-     * Set the underlying PHY layer
-     *
-     * \param phy the phy layer
-     */
-    void SetPhy(Ptr<LoraPhy> phy);
-
-    /**
-     * Get the underlying PHY layer
-     *
-     * \return The PHY layer that this MAC is connected to.
-     */
-    Ptr<LoraPhy> GetPhy(void);
 
     /**
      * Send a packet.
@@ -110,18 +99,32 @@ class LorawanMac : public Object
     Ptr<NetDevice> GetDevice(void);
 
     /**
-     * Get the logical lora channel helper associated with this MAC.
+     * Set the underlying PHY layer
      *
-     * \return The instance of LogicalLoraChannelHelper that this MAC is using.
+     * \param phy the phy layer
      */
-    LogicalLoraChannelHelper GetLogicalLoraChannelHelper(void);
+    void SetPhy(Ptr<LoraPhy> phy);
 
     /**
-     * Set the LogicalLoraChannelHelper this MAC instance will use.
+     * Get the underlying PHY layer
+     *
+     * \return The PHY layer that this MAC is connected to.
+     */
+    Ptr<LoraPhy> GetPhy(void);
+
+    /**
+     * Get the logical lora channel helper associated with this MAC.
+     *
+     * \return The instance of LogicalChannelManager that this MAC is using.
+     */
+    Ptr<LogicalChannelManager> GetLogicalChannelManager(void);
+
+    /**
+     * Set the LogicalChannelManager this MAC instance will use.
      *
      * \param helper The instance of the helper to use.
      */
-    void SetLogicalLoraChannelHelper(LogicalLoraChannelHelper helper);
+    void SetLogicalChannelManager(Ptr<LogicalChannelManager> helper);
 
     /**
      * Get the SF corresponding to a data rate, based on this MAC's region.
@@ -173,11 +176,11 @@ class LorawanMac : public Object
     /**
      * Set the maximum App layer payload for a set DataRate.
      *
-     * \param maxAppPayloadForDataRate A vector that contains at position i the
+     * \param maxMacPayloadForDataRate A vector that contains at position i the
      * maximum Application layer payload that should correspond to DR i in this
      * MAC's region.
      */
-    void SetMaxAppPayloadForDataRate(std::vector<uint32_t> maxAppPayloadForDataRate);
+    void SetMaxMacPayloadForDataRate(std::vector<uint32_t> maxMacPayloadForDataRate);
 
     /**
      * Set the vector to use to check up which transmission power in Dbm
@@ -212,6 +215,23 @@ class LorawanMac : public Object
      */
     int GetNPreambleSymbols(void);
 
+    /**
+     * \param mac a pointer to the mac which is calling this callback
+     * \param packet the packet received
+     * \returns true if the callback could handle the packet successfully, false
+     *          otherwise.
+     */
+    typedef Callback<bool, Ptr<LorawanMac>, Ptr<const Packet>> ReceiveCallback;
+
+    /**
+     * \param cb callback to invoke whenever a packet has been received and must
+     *        be forwarded to the higher layers.
+     *
+     * Set the callback to be used to notify higher layers when a packet has been
+     * received.
+     */
+    virtual void SetReceiveCallback(ReceiveCallback cb);
+
   protected:
     /**
      * The trace source that is fired when a packet cannot be sent because of duty
@@ -243,9 +263,9 @@ class LorawanMac : public Object
     Ptr<NetDevice> m_device;
 
     /**
-     * The LogicalLoraChannelHelper instance that is assigned to this MAC.
+     * The LogicalChannelManager instance that is assigned to this MAC.
      */
-    LogicalLoraChannelHelper m_channelHelper;
+    Ptr<LogicalChannelManager> m_channelManager;
 
     /**
      * A vector holding the SF each Data Rate corresponds to.
@@ -261,7 +281,7 @@ class LorawanMac : public Object
      * A vector holding the maximum app payload size that corresponds to a
      * certain DataRate.
      */
-    std::vector<uint32_t> m_maxAppPayloadForDataRate;
+    std::vector<uint32_t> m_maxMacPayloadForDataRate;
 
     /**
      * The number of symbols to use in the PHY preamble.
@@ -278,6 +298,8 @@ class LorawanMac : public Object
      * sending DR and on the value of the RX1DROffset parameter.
      */
     ReplyDataRateMatrix m_replyDataRateMatrix;
+
+    ReceiveCallback m_receiveCallback; ///<! Callback to forward to upper layers
 };
 
 } // namespace lorawan

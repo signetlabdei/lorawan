@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2022 Orange SA
  *
@@ -22,7 +21,7 @@
 #include "poisson-sender.h"
 
 #include "ns3/double.h"
-#include "ns3/lora-net-device.h"
+#include "ns3/simulator.h"
 
 namespace ns3
 {
@@ -50,25 +49,13 @@ PoissonSender::PoissonSender()
 
 PoissonSender::~PoissonSender()
 {
-    NS_LOG_FUNCTION_NOARGS();
 }
 
 void
 PoissonSender::StartApplication(void)
 {
     NS_LOG_FUNCTION(this);
-
     m_interval->SetAttribute("Mean", DoubleValue(m_avgInterval.ToDouble(Time::S)));
-
-    // Make sure we have a MAC layer
-    if (m_mac == 0)
-    {
-        // Assumes there's only one device
-        Ptr<LoraNetDevice> loraNetDevice = m_node->GetDevice(0)->GetObject<LoraNetDevice>();
-
-        m_mac = loraNetDevice->GetMac();
-        NS_ASSERT(m_mac != 0);
-    }
 
     // Schedule the next SendPacket event
     Simulator::Cancel(m_sendEvent);
