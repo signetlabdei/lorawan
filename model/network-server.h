@@ -22,22 +22,24 @@
 #ifndef NETWORK_SERVER_H
 #define NETWORK_SERVER_H
 
-#include "ns3/object.h"
 #include "ns3/application.h"
-#include "ns3/net-device.h"
-#include "ns3/point-to-point-net-device.h"
-#include "ns3/packet.h"
-#include "ns3/lora-device-address.h"
-#include "ns3/gateway-status.h"
-#include "ns3/network-status.h"
-#include "ns3/network-scheduler.h"
-#include "ns3/network-controller.h"
-#include "ns3/node-container.h"
-#include "ns3/log.h"
 #include "ns3/class-a-end-device-lorawan-mac.h"
+#include "ns3/gateway-status.h"
+#include "ns3/log.h"
+#include "ns3/lora-device-address.h"
+#include "ns3/net-device.h"
+#include "ns3/network-controller.h"
+#include "ns3/network-scheduler.h"
+#include "ns3/network-status.h"
+#include "ns3/node-container.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
+#include "ns3/point-to-point-net-device.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
 /**
  * The NetworkServer is an application standing on top of a node equipped with
@@ -48,63 +50,65 @@ namespace lorawan {
  */
 class NetworkServer : public Application
 {
-public:
-  static TypeId GetTypeId (void);
+  public:
+    static TypeId GetTypeId(void);
 
-  NetworkServer ();
-  virtual ~NetworkServer ();
+    NetworkServer();
+    virtual ~NetworkServer();
 
-  /**
-   * Start the NS application.
-   */
-  void StartApplication (void);
+    /**
+     * Start the NS application.
+     */
+    void StartApplication(void);
 
-  /**
-   * Stop the NS application.
-   */
-  void StopApplication (void);
+    /**
+     * Stop the NS application.
+     */
+    void StopApplication(void);
 
-  /**
-   * Inform the NetworkServer that these nodes are connected to the network.
-   *
-   * This method will create a DeviceStatus object for each new node, and add
-   * it to the list.
-   */
-  void AddNodes (NodeContainer nodes);
+    /**
+     * Inform the NetworkServer that these nodes are connected to the network.
+     *
+     * This method will create a DeviceStatus object for each new node, and add
+     * it to the list.
+     */
+    void AddNodes(NodeContainer nodes);
 
-  /**
-   * Inform the NetworkServer that this node is connected to the network.
-   * This method will create a DeviceStatus object for the new node (if it
-   * doesn't already exist).
-   */
-  void AddNode (Ptr<Node> node);
+    /**
+     * Inform the NetworkServer that this node is connected to the network.
+     * This method will create a DeviceStatus object for the new node (if it
+     * doesn't already exist).
+     */
+    void AddNode(Ptr<Node> node);
 
-  /**
-   * Add this gateway to the list of gateways connected to this NS.
-   * Each GW is identified by its Address in the NS-GWs network.
-   */
-  void AddGateway (Ptr<Node> gateway, Ptr<NetDevice> netDevice);
+    /**
+     * Add this gateway to the list of gateways connected to this NS.
+     * Each GW is identified by its Address in the NS-GWs network.
+     */
+    void AddGateway(Ptr<Node> gateway, Ptr<NetDevice> netDevice);
 
-  /**
-   * A NetworkControllerComponent to this NetworkServer instance.
-   */
-  void AddComponent (Ptr<NetworkControllerComponent> component);
+    /**
+     * A NetworkControllerComponent to this NetworkServer instance.
+     */
+    void AddComponent(Ptr<NetworkControllerComponent> component);
 
-  /**
-   * Receive a packet from a gateway.
-   * \param packet the received packet
-   */
-  bool Receive (Ptr<NetDevice> device, Ptr<const Packet> packet, uint16_t protocol,
-                const Address &address);
+    /**
+     * Receive a packet from a gateway.
+     * \param packet the received packet
+     */
+    bool Receive(Ptr<NetDevice> device,
+                 Ptr<const Packet> packet,
+                 uint16_t protocol,
+                 const Address& address);
 
-  Ptr<NetworkStatus> GetNetworkStatus (void);
+    Ptr<NetworkStatus> GetNetworkStatus(void);
 
-protected:
-  Ptr<NetworkStatus> m_status;
-  Ptr<NetworkController> m_controller;
-  Ptr<NetworkScheduler> m_scheduler;
+  protected:
+    Ptr<NetworkStatus> m_status;
+    Ptr<NetworkController> m_controller;
+    Ptr<NetworkScheduler> m_scheduler;
 
-  TracedCallback<Ptr<const Packet>> m_receivedPacket;
+    TracedCallback<Ptr<const Packet>> m_receivedPacket;
 };
 
 } // namespace lorawan

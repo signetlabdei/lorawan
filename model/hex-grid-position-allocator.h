@@ -26,64 +26,65 @@
 
 #include <cmath>
 
-namespace ns3 {
+namespace ns3
+{
 
 /**
-   * This class is an iterable generator for hexagonal grid positions
-   */
+ * This class is an iterable generator for hexagonal grid positions
+ */
 class HexGridPositionAllocator : public PositionAllocator
 {
-public:
-  static TypeId GetTypeId (void);
+  public:
+    static TypeId GetTypeId(void);
 
-  HexGridPositionAllocator ();
-  ~HexGridPositionAllocator ();
+    HexGridPositionAllocator();
+    ~HexGridPositionAllocator();
 
-  virtual Vector GetNext (void) const;
+    virtual Vector GetNext(void) const;
 
-  virtual int64_t AssignStreams (int64_t stream);
+    virtual int64_t AssignStreams(int64_t stream);
 
-  void SetDistance (double distance);
+    void SetDistance(double distance);
 
-  void SetZ (double z);
+    void SetZ(double z);
 
-private:
-  /**
-   * Refer to hexagonal tiling. We build concentric rings 
-   * of hexagon starting from one hexagon in the center. 
-   * Hexagons are placed from the center-top of the last 
-   * ring, in counter-clockwise fashion.
-   * 
-   * We compute the position tracking:
-   *  - the index of the ring of hexagons, 
-   *  - the sector (the 6 sides of the ring 
-   *    which is itself a hexagon),
-   *  - the hexagon index in the ring line
-   *    orthogonal to the radius.
-   * 
-   * With this information we build 2 vectors, one radial 
-   * and the other fase-shifted counter-clockwise by 120 deg.
-   */
-  Vector ObtainCurrentPosition (void) const;
+  private:
+    /**
+     * Refer to hexagonal tiling. We build concentric rings
+     * of hexagon starting from one hexagon in the center.
+     * Hexagons are placed from the center-top of the last
+     * ring, in counter-clockwise fashion.
+     *
+     * We compute the position tracking:
+     *  - the index of the ring of hexagons,
+     *  - the sector (the 6 sides of the ring
+     *    which is itself a hexagon),
+     *  - the hexagon index in the ring line
+     *    orthogonal to the radius.
+     *
+     * With this information we build 2 vectors, one radial
+     * and the other fase-shifted counter-clockwise by 120 deg.
+     */
+    Vector ObtainCurrentPosition(void) const;
 
-  void ResetCoordinates (void);
+    void ResetCoordinates(void);
 
-  /**
+    /**
      * The distance between two adjacent nodes
      */
-  double m_d;
+    double m_d;
 
-  /**
+    /**
      * The vertical position of allocated nodes
      */
-  double m_z;
+    double m_z;
 
-  /**
+    /**
      * The coordinates used to keep track of allocation progress
      */
-  mutable int m_ring, m_sector, m_hex;
+    mutable int m_ring, m_sector, m_hex;
 
-  const double p3 = M_PI / 3.0;
+    const double p3 = M_PI / 3.0;
 };
 
 } // namespace ns3

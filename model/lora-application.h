@@ -24,87 +24,89 @@
 
 #include "ns3/application.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
 class LoraApplication : public Application
 {
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  LoraApplication ();
-  virtual ~LoraApplication ();
+  public:
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
+    LoraApplication();
+    virtual ~LoraApplication();
 
-  /**
-   * Set the sending interval
-   * \param interval the interval between two packet sendings
-   */
-  void SetInterval (Time interval);
+    /**
+     * Set the sending interval
+     * \param interval the interval between two packet sendings
+     */
+    void SetInterval(Time interval);
 
-  /**
-   * Get the sending inteval
-   * \returns the interval between two packet sends
-   */
-  Time GetInterval (void) const;
+    /**
+     * Get the sending inteval
+     * \returns the interval between two packet sends
+     */
+    Time GetInterval(void) const;
 
-  /**
-   * Set the initial delay of this application
-   */
-  void SetInitialDelay (Time delay);
+    /**
+     * Set the initial delay of this application
+     */
+    void SetInitialDelay(Time delay);
 
-  /**
-   * Set packet size
-   */
-  void SetPacketSize (uint8_t size);
+    /**
+     * Set packet size
+     */
+    void SetPacketSize(uint8_t size);
 
-  /**
-   * Get packet size
-   */
-  uint8_t GetPacketSize (void) const;
+    /**
+     * Get packet size
+     */
+    uint8_t GetPacketSize(void) const;
 
-  /** 
-   * True if the application is currently running
-   */
-  bool IsRunning (void);
+    /**
+     * True if the application is currently running
+     */
+    bool IsRunning(void);
 
-protected:
-  /**
-   * Start the application by scheduling the first SendPacket event
-   */
-  virtual void StartApplication (void);
+  protected:
+    /**
+     * Start the application by scheduling the first SendPacket event
+     */
+    virtual void StartApplication(void);
 
-  /**
-   * Stop the application
-   */
-  virtual void StopApplication (void);
+    /**
+     * Stop the application
+     */
+    virtual void StopApplication(void);
 
-  /**
-   * Send a packet using the LoraNetDevice's Send method
-   */
-  virtual void SendPacket (void);
+    /**
+     * Send a packet using the LoraNetDevice's Send method
+     */
+    virtual void SendPacket(void);
 
-  /**
-   * The average interval between to consecutive send events
-   */
-  Time m_avgInterval;
+    /**
+     * The average interval between to consecutive send events
+     */
+    Time m_avgInterval;
 
-  /**
-   * The initial delay of this application
-   */
-  Time m_initialDelay;
+    /**
+     * The initial delay of this application
+     */
+    Time m_initialDelay;
 
-  /**
-   * The sending event scheduled as next
-   */
-  EventId m_sendEvent;
+    /**
+     * The sending event scheduled as next
+     */
+    EventId m_sendEvent;
 
-  /**
-   * The packet size.
-   */
-  uint8_t m_basePktSize;
+    /**
+     * The packet size.
+     */
+    uint8_t m_basePktSize;
 };
 
 } // namespace lorawan

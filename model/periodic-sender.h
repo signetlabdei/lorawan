@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
- * 
+ *
  * 23/12/2022
  * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
  *                              <alessandro.aimi@cnam.fr>
@@ -28,47 +28,49 @@
 #include "ns3/lora-application.h"
 #include "ns3/lorawan-mac.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
 class PeriodicSender : public LoraApplication
 {
-public:
-  PeriodicSender ();
-  ~PeriodicSender ();
+  public:
+    PeriodicSender();
+    ~PeriodicSender();
 
-  static TypeId GetTypeId (void);
+    static TypeId GetTypeId(void);
 
-  /**
-   * Set if using randomness in the packet size
-   */
-  void SetPacketSizeRandomVariable (Ptr<RandomVariableStream> rv);
+    /**
+     * Set if using randomness in the packet size
+     */
+    void SetPacketSizeRandomVariable(Ptr<RandomVariableStream> rv);
 
-private:
-  /**
-   * Start the application by scheduling the first SendPacket event
-   */
-  void StartApplication (void);
+  private:
+    /**
+     * Start the application by scheduling the first SendPacket event
+     */
+    void StartApplication(void);
 
-  /**
-   * Stop the application
-   */
-  void StopApplication (void);
+    /**
+     * Stop the application
+     */
+    void StopApplication(void);
 
-  /**
-   * Send a packet using the LoraNetDevice's Send method
-   */
-  void SendPacket (void);
+    /**
+     * Send a packet using the LoraNetDevice's Send method
+     */
+    void SendPacket(void);
 
-  /**
-   * The MAC layer of this node
-   */
-  Ptr<LorawanMac> m_mac;
+    /**
+     * The MAC layer of this node
+     */
+    Ptr<LorawanMac> m_mac;
 
-  /**
-   * The random variable that adds bytes to the packet size
-   */
-  Ptr<RandomVariableStream> m_pktSizeRV;
+    /**
+     * The random variable that adds bytes to the packet size
+     */
+    Ptr<RandomVariableStream> m_pktSizeRV;
 };
 
 } // namespace lorawan

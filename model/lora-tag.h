@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
- * 
+ *
  * 23/12/2022
  * Modified by: Alessandro Aimi <alessandro.aimi@orange.com>
  *                              <alessandro.aimi@cnam.fr>
@@ -25,11 +25,13 @@
 #ifndef LORA_TAG_H
 #define LORA_TAG_H
 
-#include "ns3/tag.h"
 #include "ns3/nstime.h"
+#include "ns3/tag.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
 /**
  * Tag used to save various data about a packet, like its Spreading Factor and
@@ -37,135 +39,135 @@ namespace lorawan {
  */
 class LoraTag : public Tag
 {
-public:
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
-
-  /**
-   * Create a LoraTag with a given spreading factor and collision.
-   *
-   * \param sf The Spreading Factor.
-   * \param destroyedBy The SF this tag's packet was destroyed by.
-   */
-  LoraTag (uint8_t sf = 0, uint8_t destroyedBy = 0);
-
-  virtual ~LoraTag ();
-
-  virtual void Serialize (TagBuffer i) const;
-  virtual void Deserialize (TagBuffer i);
-  virtual uint32_t GetSerializedSize () const;
-  virtual void Print (std::ostream &os) const;
-
-  /**
-   * Read which Spreading Factor this packet was transmitted with.
-   *
-   * \return This tag's packet's SF.
-   */
-  uint8_t GetSpreadingFactor () const;
-
-  /**
-   * Read which Spreading Factor this packet was destroyed by.
-   *
-   * \return The SF this packet was destroyed by.
-   */
-  uint8_t GetDestroyedBy () const;
-
-  /**
-   * Read the power this packet arrived with.
-   *
-   * \return This tag's packet received power.
-   */
-  double GetReceivePower () const;
-
-  /**
-   * Set which Spreading Factor this packet was transmitted with.
-   *
-   * \param sf The Spreading Factor.
-   */
-  void SetSpreadingFactor (uint8_t sf);
-
-  /**
-   * Set which Spreading Factor this packet was destroyed by.
-   *
-   * \param sf The Spreading Factor.
-   */
-  void SetDestroyedBy (uint8_t sf);
-
-  /**
-   * Set the power this packet was received with.
-   *
-   * \param receivePower The power, in dBm.
-   */
-  void SetReceivePower (double receivePower);
-
-  /**
-   * Set the frequency of the packet.
-   *
-   * This value works in two ways:
-   * - It is used by the GW to signal to the NS the frequency of the uplink
-       packet
-   * - It is used by the NS to signal to the GW the freqeuncy of a downlink
-       packet
-   */
-  void SetFrequency (double frequency);
-
-  /**
-   * Get the frequency of the packet.
-   */
-  double GetFrequency (void);
-
-  /**
-   * Get the data rate for this packet.
-   *
-   * \return The data rate that needs to be employed for this packet.
-   */
-  uint8_t GetDataRate (void);
-
-  /**
-   * Set the data rate for this packet.
-   *
-   * \param dataRate The data rate.
-   */
-  void SetDataRate (uint8_t dataRate);
-
-  /**
-   * Get the SNR for this packet.
-   *
-   * \return The SNR measured during demodulation of this packet.
-   */
-  double GetSnr (void);
-
-  /**
-   * Set the SNR for this packet.
-   *
-   * \param snr The SNR.
-   */
-  void SetSnr (double snr);
+  public:
+    static TypeId GetTypeId(void);
+    virtual TypeId GetInstanceTypeId(void) const;
 
     /**
-   * Get the reception time (demodulation end) for this packet.
-   *
-   * \return The timestamp at demodulation end of this packet.
-   */
-  Time GetReceptionTime (void);
+     * Create a LoraTag with a given spreading factor and collision.
+     *
+     * \param sf The Spreading Factor.
+     * \param destroyedBy The SF this tag's packet was destroyed by.
+     */
+    LoraTag(uint8_t sf = 0, uint8_t destroyedBy = 0);
 
-  /**
-   * Set the reception time for this packet.
-   *
-   * \param receptionTime The reception time.
-   */
-  void SetReceptionTime (Time receptionTime);
+    virtual ~LoraTag();
 
-private:
-  uint8_t m_sf; //!< The Spreading Factor used by the packet.
-  uint8_t m_destroyedBy; //!< The Spreading Factor that destroyed the packet.
-  double m_receivePower; //!< The reception power of this packet.
-  uint8_t m_dataRate; //!< The Data Rate that needs to be used to send this
-  //!packet.
-  double m_frequency; //!< The frequency of this packet
-  double m_snr; //!< The SNR of this packet during demodulation
-  Time m_receptionTime;
+    virtual void Serialize(TagBuffer i) const;
+    virtual void Deserialize(TagBuffer i);
+    virtual uint32_t GetSerializedSize() const;
+    virtual void Print(std::ostream& os) const;
+
+    /**
+     * Read which Spreading Factor this packet was transmitted with.
+     *
+     * \return This tag's packet's SF.
+     */
+    uint8_t GetSpreadingFactor() const;
+
+    /**
+     * Read which Spreading Factor this packet was destroyed by.
+     *
+     * \return The SF this packet was destroyed by.
+     */
+    uint8_t GetDestroyedBy() const;
+
+    /**
+     * Read the power this packet arrived with.
+     *
+     * \return This tag's packet received power.
+     */
+    double GetReceivePower() const;
+
+    /**
+     * Set which Spreading Factor this packet was transmitted with.
+     *
+     * \param sf The Spreading Factor.
+     */
+    void SetSpreadingFactor(uint8_t sf);
+
+    /**
+     * Set which Spreading Factor this packet was destroyed by.
+     *
+     * \param sf The Spreading Factor.
+     */
+    void SetDestroyedBy(uint8_t sf);
+
+    /**
+     * Set the power this packet was received with.
+     *
+     * \param receivePower The power, in dBm.
+     */
+    void SetReceivePower(double receivePower);
+
+    /**
+     * Set the frequency of the packet.
+     *
+     * This value works in two ways:
+     * - It is used by the GW to signal to the NS the frequency of the uplink
+         packet
+     * - It is used by the NS to signal to the GW the freqeuncy of a downlink
+         packet
+     */
+    void SetFrequency(double frequency);
+
+    /**
+     * Get the frequency of the packet.
+     */
+    double GetFrequency(void);
+
+    /**
+     * Get the data rate for this packet.
+     *
+     * \return The data rate that needs to be employed for this packet.
+     */
+    uint8_t GetDataRate(void);
+
+    /**
+     * Set the data rate for this packet.
+     *
+     * \param dataRate The data rate.
+     */
+    void SetDataRate(uint8_t dataRate);
+
+    /**
+     * Get the SNR for this packet.
+     *
+     * \return The SNR measured during demodulation of this packet.
+     */
+    double GetSnr(void);
+
+    /**
+     * Set the SNR for this packet.
+     *
+     * \param snr The SNR.
+     */
+    void SetSnr(double snr);
+
+    /**
+     * Get the reception time (demodulation end) for this packet.
+     *
+     * \return The timestamp at demodulation end of this packet.
+     */
+    Time GetReceptionTime(void);
+
+    /**
+     * Set the reception time for this packet.
+     *
+     * \param receptionTime The reception time.
+     */
+    void SetReceptionTime(Time receptionTime);
+
+  private:
+    uint8_t m_sf;          //!< The Spreading Factor used by the packet.
+    uint8_t m_destroyedBy; //!< The Spreading Factor that destroyed the packet.
+    double m_receivePower; //!< The reception power of this packet.
+    uint8_t m_dataRate;    //!< The Data Rate that needs to be used to send this
+    //! packet.
+    double m_frequency; //!< The frequency of this packet
+    double m_snr;       //!< The SNR of this packet during demodulation
+    Time m_receptionTime;
 };
+} // namespace lorawan
 } // namespace ns3
-}
 #endif

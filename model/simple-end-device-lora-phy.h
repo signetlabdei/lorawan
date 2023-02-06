@@ -21,16 +21,18 @@
 #ifndef SIMPLE_END_DEVICE_LORA_PHY_H
 #define SIMPLE_END_DEVICE_LORA_PHY_H
 
+#include "ns3/end-device-lora-phy.h"
+#include "ns3/mobility-model.h"
+#include "ns3/net-device.h"
+#include "ns3/node.h"
+#include "ns3/nstime.h"
 #include "ns3/object.h"
 #include "ns3/traced-value.h"
-#include "ns3/net-device.h"
-#include "ns3/nstime.h"
-#include "ns3/mobility-model.h"
-#include "ns3/node.h"
-#include "ns3/end-device-lora-phy.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
 class LoraChannel;
 
@@ -40,29 +42,33 @@ class LoraChannel;
  */
 class SimpleEndDeviceLoraPhy : public EndDeviceLoraPhy
 {
-public:
-  static TypeId GetTypeId (void);
+  public:
+    static TypeId GetTypeId(void);
 
-  // Constructor and destructor
-  SimpleEndDeviceLoraPhy ();
-  virtual ~SimpleEndDeviceLoraPhy ();
+    // Constructor and destructor
+    SimpleEndDeviceLoraPhy();
+    virtual ~SimpleEndDeviceLoraPhy();
 
-  // Implementation of EndDeviceLoraPhy's pure virtual functions
-  virtual void StartReceive (Ptr<Packet> packet, double rxPowerDbm,
-                             uint8_t sf, Time duration, double frequencyMHz);
+    // Implementation of EndDeviceLoraPhy's pure virtual functions
+    virtual void StartReceive(Ptr<Packet> packet,
+                              double rxPowerDbm,
+                              uint8_t sf,
+                              Time duration,
+                              double frequencyMHz);
 
-  // Implementation of LoraPhy's pure virtual functions
-  virtual void EndReceive (Ptr<Packet> packet,
-                           Ptr<LoraInterferenceHelper::Event> event);
+    // Implementation of LoraPhy's pure virtual functions
+    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event);
 
-  // Implementation of LoraPhy's pure virtual functions
-  virtual void Send (Ptr<Packet> packet, LoraTxParameters txParams,
-                     double frequencyMHz, double txPowerDbm);
+    // Implementation of LoraPhy's pure virtual functions
+    virtual void Send(Ptr<Packet> packet,
+                      LoraTxParameters txParams,
+                      double frequencyMHz,
+                      double txPowerDbm);
 
-private:
+  private:
 };
 
-} /* namespace ns3 */
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* SIMPLE_END_DEVICE_LORA_PHY_H */

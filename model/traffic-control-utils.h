@@ -24,40 +24,43 @@
 
 #include <unordered_map>
 
-namespace ns3 {
+namespace ns3
+{
 
 class TrafficControlUtils
 {
-  using devices_t = std::vector<std::pair<uint32_t, double>>;
-  using output_t = std::unordered_map<uint32_t, uint8_t>;
+    using devices_t = std::vector<std::pair<uint32_t, double>>;
+    using output_t = std::unordered_map<uint32_t, uint8_t>;
 
-  // Optimization input data
-  struct datamodel_t
-  {
-    // Capacity value to be assigned
-    double limit;
-    // Device offered traffic
-    std::vector<double> deltas;
-    // Number of devices
-    int bound;
-  };
+    // Optimization input data
+    struct datamodel_t
+    {
+        // Capacity value to be assigned
+        double limit;
+        // Device offered traffic
+        std::vector<double> deltas;
+        // Number of devices
+        int bound;
+    };
 
-public:
-  static double OptimizeDutyCycleMaxMin (const devices_t &devs, const double limit, output_t &output);
+  public:
+    static double OptimizeDutyCycleMaxMin(const devices_t& devs,
+                                          const double limit,
+                                          output_t& output);
 
-  static void OptimizeDutyCycleMax (const devices_t &devs, const double limit, output_t &output);
+    static void OptimizeDutyCycleMax(const devices_t& devs, const double limit, output_t& output);
 
-private:
-  TrafficControlUtils ()
-  {
-  }
+  private:
+    TrafficControlUtils()
+    {
+    }
 
-  virtual ~TrafficControlUtils ()
-  {
-  }
+    virtual ~TrafficControlUtils()
+    {
+    }
 
-  // Hard coded parameters
-  static const std::vector<double> m_dutycycles;
+    // Hard coded parameters
+    static const std::vector<double> m_dutycycles;
 };
 
 } // namespace ns3

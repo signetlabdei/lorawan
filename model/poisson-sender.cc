@@ -20,84 +20,87 @@
  */
 
 #include "poisson-sender.h"
-#include "ns3/lora-net-device.h"
+
 #include "ns3/double.h"
+#include "ns3/lora-net-device.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
-NS_LOG_COMPONENT_DEFINE ("PoissonSender");
+NS_LOG_COMPONENT_DEFINE("PoissonSender");
 
-NS_OBJECT_ENSURE_REGISTERED (PoissonSender);
+NS_OBJECT_ENSURE_REGISTERED(PoissonSender);
 
 TypeId
-PoissonSender::GetTypeId (void)
+PoissonSender::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::PoissonSender")
-                          .SetParent<LoraApplication> ()
-                          .AddConstructor<PoissonSender> ()
-                          .SetGroupName ("lorawan");
-  return tid;
+    static TypeId tid = TypeId("ns3::PoissonSender")
+                            .SetParent<LoraApplication>()
+                            .AddConstructor<PoissonSender>()
+                            .SetGroupName("lorawan");
+    return tid;
 }
 
-PoissonSender::PoissonSender ()
+PoissonSender::PoissonSender()
 {
-  m_interval = CreateObject<ExponentialRandomVariable> ();
+    m_interval = CreateObject<ExponentialRandomVariable>();
 }
 
-PoissonSender::~PoissonSender ()
+PoissonSender::~PoissonSender()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 }
 
 void
-PoissonSender::StartApplication (void)
+PoissonSender::StartApplication(void)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_interval->SetAttribute ("Mean", DoubleValue (m_avgInterval.ToDouble (Time::S)));
+    m_interval->SetAttribute("Mean", DoubleValue(m_avgInterval.ToDouble(Time::S)));
 
-  // Make sure we have a MAC layer
-  if (m_mac == 0)
+    // Make sure we have a MAC layer
+    if (m_mac == 0)
     {
-      // Assumes there's only one device
-      Ptr<LoraNetDevice> loraNetDevice = m_node->GetDevice (0)->GetObject<LoraNetDevice> ();
+        // Assumes there's only one device
+        Ptr<LoraNetDevice> loraNetDevice = m_node->GetDevice(0)->GetObject<LoraNetDevice>();
 
-      m_mac = loraNetDevice->GetMac ();
-      NS_ASSERT (m_mac != 0);
+        m_mac = loraNetDevice->GetMac();
+        NS_ASSERT(m_mac != 0);
     }
 
-  // Schedule the next SendPacket event
-  Simulator::Cancel (m_sendEvent);
-  NS_LOG_DEBUG ("Starting up application with a first event with a " << m_initialDelay.GetSeconds ()
-                                                                     << " seconds delay");
-  m_sendEvent = Simulator::Schedule (m_initialDelay, &PoissonSender::SendPacket, this);
-  NS_LOG_DEBUG ("Event Id: " << m_sendEvent.GetUid ());
+    // Schedule the next SendPacket event
+    Simulator::Cancel(m_sendEvent);
+    NS_LOG_DEBUG("Starting up application with a first event with a " << m_initialDelay.GetSeconds()
+                                                                      << " seconds delay");
+    m_sendEvent = Simulator::Schedule(m_initialDelay, &PoissonSender::SendPacket, this);
+    NS_LOG_DEBUG("Event Id: " << m_sendEvent.GetUid());
 }
 
 void
-PoissonSender::StopApplication (void)
+PoissonSender::StopApplication(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  Simulator::Cancel (m_sendEvent);
+    NS_LOG_FUNCTION_NOARGS();
+    Simulator::Cancel(m_sendEvent);
 }
 
 void
-PoissonSender::SendPacket (void)
+PoissonSender::SendPacket(void)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  // Create and send a new packet
-  Ptr<Packet> packet;
-  packet = Create<Packet> (m_basePktSize);
-  m_mac->Send (packet);
+    // Create and send a new packet
+    Ptr<Packet> packet;
+    packet = Create<Packet>(m_basePktSize);
+    m_mac->Send(packet);
 
-  Time interval = Min (Seconds (m_interval->GetValue ()), Days (1));
+    Time interval = Min(Seconds(m_interval->GetValue()), Days(1));
 
-  // Schedule the next SendPacket event
-  m_sendEvent = Simulator::Schedule (interval, &PoissonSender::SendPacket, this);
+    // Schedule the next SendPacket event
+    m_sendEvent = Simulator::Schedule(interval, &PoissonSender::SendPacket, this);
 
-  NS_LOG_DEBUG ("Sent a packet of size " << packet->GetSize ());
+    NS_LOG_DEBUG("Sent a packet of size " << packet->GetSize());
 }
 
 } // namespace lorawan

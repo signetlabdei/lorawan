@@ -22,59 +22,67 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include <algorithm>
 #include "ns3/end-device-lora-phy.h"
-#include "ns3/simulator.h"
-#include "ns3/lora-tag.h"
+
 #include "ns3/log.h"
+#include "ns3/lora-tag.h"
+#include "ns3/simulator.h"
 
-namespace ns3 {
-namespace lorawan {
+#include <algorithm>
 
-NS_LOG_COMPONENT_DEFINE ("EndDeviceLoraPhy");
+namespace ns3
+{
+namespace lorawan
+{
 
-NS_OBJECT_ENSURE_REGISTERED (EndDeviceLoraPhy);
+NS_LOG_COMPONENT_DEFINE("EndDeviceLoraPhy");
+
+NS_OBJECT_ENSURE_REGISTERED(EndDeviceLoraPhy);
 
 /**************************
  *  Listener destructor  *
  *************************/
 
-EndDeviceLoraPhyListener::~EndDeviceLoraPhyListener ()
+EndDeviceLoraPhyListener::~EndDeviceLoraPhyListener()
 {
 }
 
 TypeId
-EndDeviceLoraPhy::GetTypeId (void)
+EndDeviceLoraPhy::GetTypeId(void)
 {
-  static TypeId tid =
-      TypeId ("ns3::EndDeviceLoraPhy")
-          .SetParent<LoraPhy> ()
-          .SetGroupName ("lorawan")
-          .AddTraceSource ("LostPacketBecauseWrongFrequency",
-                           "Trace source indicating a packet "
-                           "could not be correctly decoded because"
-                           "the ED was listening on a different frequency",
-                           MakeTraceSourceAccessor (&EndDeviceLoraPhy::m_wrongFrequency),
-                           "ns3::Packet::TracedCallback")
-          .AddTraceSource ("LostPacketBecauseWrongSpreadingFactor",
-                           "Trace source indicating a packet "
-                           "could not be correctly decoded because"
-                           "the ED was listening for a different Spreading Factor",
-                           MakeTraceSourceAccessor (&EndDeviceLoraPhy::m_wrongSf),
-                           "ns3::Packet::TracedCallback")
-          .AddTraceSource ("EndDeviceState", "The current state of the device",
-                           MakeTraceSourceAccessor (&EndDeviceLoraPhy::m_state),
-                           "ns3::TracedValueCallback::EndDeviceLoraPhy::State");
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::EndDeviceLoraPhy")
+            .SetParent<LoraPhy>()
+            .SetGroupName("lorawan")
+            .AddTraceSource("LostPacketBecauseWrongFrequency",
+                            "Trace source indicating a packet "
+                            "could not be correctly decoded because"
+                            "the ED was listening on a different frequency",
+                            MakeTraceSourceAccessor(&EndDeviceLoraPhy::m_wrongFrequency),
+                            "ns3::Packet::TracedCallback")
+            .AddTraceSource("LostPacketBecauseWrongSpreadingFactor",
+                            "Trace source indicating a packet "
+                            "could not be correctly decoded because"
+                            "the ED was listening for a different Spreading Factor",
+                            MakeTraceSourceAccessor(&EndDeviceLoraPhy::m_wrongSf),
+                            "ns3::Packet::TracedCallback")
+            .AddTraceSource("EndDeviceState",
+                            "The current state of the device",
+                            MakeTraceSourceAccessor(&EndDeviceLoraPhy::m_state),
+                            "ns3::TracedValueCallback::EndDeviceLoraPhy::State");
+    return tid;
 }
 
 // Initialize the device with some common settings.
 // These will then be changed by helpers.
-EndDeviceLoraPhy::EndDeviceLoraPhy () : m_state (SLEEP), m_frequency (868.1), m_sf (7)
+EndDeviceLoraPhy::EndDeviceLoraPhy()
+    : m_state(SLEEP),
+      m_frequency(868.1),
+      m_sf(7)
 {
 }
 
-EndDeviceLoraPhy::~EndDeviceLoraPhy ()
+EndDeviceLoraPhy::~EndDeviceLoraPhy()
 {
 }
 
@@ -84,118 +92,118 @@ EndDeviceLoraPhy::~EndDeviceLoraPhy ()
 const double EndDeviceLoraPhy::sensitivity[6] = {-124, -127, -130, -133, -135, -137};
 
 void
-EndDeviceLoraPhy::SetSpreadingFactor (uint8_t sf)
+EndDeviceLoraPhy::SetSpreadingFactor(uint8_t sf)
 {
-  m_sf = sf;
+    m_sf = sf;
 }
 
 uint8_t
-EndDeviceLoraPhy::GetSpreadingFactor (void)
+EndDeviceLoraPhy::GetSpreadingFactor(void)
 {
-  return m_sf;
+    return m_sf;
 }
 
 bool
-EndDeviceLoraPhy::IsTransmitting (void)
+EndDeviceLoraPhy::IsTransmitting(void)
 {
-  return m_state == TX;
+    return m_state == TX;
 }
 
 bool
-EndDeviceLoraPhy::IsOnFrequency (double frequencyMHz)
+EndDeviceLoraPhy::IsOnFrequency(double frequencyMHz)
 {
-  return (int) (1e6 * m_frequency + .5) == (int) (1e6 * frequencyMHz + .5);
+    return (int)(1e6 * m_frequency + .5) == (int)(1e6 * frequencyMHz + .5);
 }
 
 void
-EndDeviceLoraPhy::SetFrequency (double frequencyMHz)
+EndDeviceLoraPhy::SetFrequency(double frequencyMHz)
 {
-  m_frequency = frequencyMHz;
+    m_frequency = frequencyMHz;
 }
 
 void
-EndDeviceLoraPhy::SwitchToStandby (void)
+EndDeviceLoraPhy::SwitchToStandby(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  m_state = STANDBY;
+    m_state = STANDBY;
 
-  // Notify listeners of the state change
-  for (Listeners::const_iterator i = m_listeners.begin (); i != m_listeners.end (); i++)
+    // Notify listeners of the state change
+    for (Listeners::const_iterator i = m_listeners.begin(); i != m_listeners.end(); i++)
     {
-      (*i)->NotifyStandby ();
+        (*i)->NotifyStandby();
     }
 }
 
 void
-EndDeviceLoraPhy::SwitchToRx (void)
+EndDeviceLoraPhy::SwitchToRx(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  NS_ASSERT (m_state == STANDBY);
+    NS_ASSERT(m_state == STANDBY);
 
-  m_state = RX;
+    m_state = RX;
 
-  // Notify listeners of the state change
-  for (Listeners::const_iterator i = m_listeners.begin (); i != m_listeners.end (); i++)
+    // Notify listeners of the state change
+    for (Listeners::const_iterator i = m_listeners.begin(); i != m_listeners.end(); i++)
     {
-      (*i)->NotifyRxStart ();
+        (*i)->NotifyRxStart();
     }
 }
 
 void
-EndDeviceLoraPhy::SwitchToTx (double txPowerDbm)
+EndDeviceLoraPhy::SwitchToTx(double txPowerDbm)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  NS_ASSERT (m_state != RX);
+    NS_ASSERT(m_state != RX);
 
-  m_state = TX;
+    m_state = TX;
 
-  // Notify listeners of the state change
-  for (Listeners::const_iterator i = m_listeners.begin (); i != m_listeners.end (); i++)
+    // Notify listeners of the state change
+    for (Listeners::const_iterator i = m_listeners.begin(); i != m_listeners.end(); i++)
     {
-      (*i)->NotifyTxStart (txPowerDbm);
+        (*i)->NotifyTxStart(txPowerDbm);
     }
 }
 
 void
-EndDeviceLoraPhy::SwitchToSleep (void)
+EndDeviceLoraPhy::SwitchToSleep(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  NS_ASSERT (m_state == STANDBY);
+    NS_ASSERT(m_state == STANDBY);
 
-  m_state = SLEEP;
+    m_state = SLEEP;
 
-  // Notify listeners of the state change
-  for (Listeners::const_iterator i = m_listeners.begin (); i != m_listeners.end (); i++)
+    // Notify listeners of the state change
+    for (Listeners::const_iterator i = m_listeners.begin(); i != m_listeners.end(); i++)
     {
-      (*i)->NotifySleep ();
+        (*i)->NotifySleep();
     }
 }
 
 EndDeviceLoraPhy::State
-EndDeviceLoraPhy::GetState (void)
+EndDeviceLoraPhy::GetState(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  return m_state;
+    return m_state;
 }
 
 void
-EndDeviceLoraPhy::RegisterListener (EndDeviceLoraPhyListener *listener)
+EndDeviceLoraPhy::RegisterListener(EndDeviceLoraPhyListener* listener)
 {
-  m_listeners.push_back (listener);
+    m_listeners.push_back(listener);
 }
 
 void
-EndDeviceLoraPhy::UnregisterListener (EndDeviceLoraPhyListener *listener)
+EndDeviceLoraPhy::UnregisterListener(EndDeviceLoraPhyListener* listener)
 {
-  ListenersI i = find (m_listeners.begin (), m_listeners.end (), listener);
-  if (i != m_listeners.end ())
+    ListenersI i = find(m_listeners.begin(), m_listeners.end(), listener);
+    if (i != m_listeners.end())
     {
-      m_listeners.erase (i);
+        m_listeners.erase(i);
     }
 }
 

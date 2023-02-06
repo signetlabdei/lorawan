@@ -23,133 +23,135 @@
  */
 
 #include "ns3/gateway-lorawan-mac.h"
-#include "ns3/lorawan-mac-header.h"
-#include "ns3/lora-net-device.h"
-#include "ns3/lora-frame-header.h"
+
 #include "ns3/log.h"
+#include "ns3/lora-frame-header.h"
+#include "ns3/lora-net-device.h"
+#include "ns3/lorawan-mac-header.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
-NS_LOG_COMPONENT_DEFINE ("GatewayLorawanMac");
+NS_LOG_COMPONENT_DEFINE("GatewayLorawanMac");
 
-NS_OBJECT_ENSURE_REGISTERED (GatewayLorawanMac);
+NS_OBJECT_ENSURE_REGISTERED(GatewayLorawanMac);
 
 TypeId
-GatewayLorawanMac::GetTypeId (void)
+GatewayLorawanMac::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::GatewayLorawanMac")
-    .SetParent<LorawanMac> ()
-    .AddConstructor<GatewayLorawanMac> ()
-    .SetGroupName ("lorawan");
-  return tid;
+    static TypeId tid = TypeId("ns3::GatewayLorawanMac")
+                            .SetParent<LorawanMac>()
+                            .AddConstructor<GatewayLorawanMac>()
+                            .SetGroupName("lorawan");
+    return tid;
 }
 
-GatewayLorawanMac::GatewayLorawanMac ()
+GatewayLorawanMac::GatewayLorawanMac()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-GatewayLorawanMac::~GatewayLorawanMac ()
+GatewayLorawanMac::~GatewayLorawanMac()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 void
-GatewayLorawanMac::Send (Ptr<Packet> packet)
+GatewayLorawanMac::Send(Ptr<Packet> packet)
 {
-  NS_LOG_FUNCTION (this << packet);
+    NS_LOG_FUNCTION(this << packet);
 
-  // Get DataRate to send this packet with
-  LoraTag tag;
-  packet->RemovePacketTag (tag);
-  uint8_t dataRate = tag.GetDataRate ();
-  double frequency = tag.GetFrequency ();
-  NS_LOG_DEBUG ("DR: " << unsigned (dataRate));
-  NS_LOG_DEBUG ("SF: " << unsigned (GetSfFromDataRate (dataRate)));
-  NS_LOG_DEBUG ("BW: " << GetBandwidthFromDataRate (dataRate));
-  NS_LOG_DEBUG ("Freq: " << frequency << " MHz");
-  packet->AddPacketTag (tag);
+    // Get DataRate to send this packet with
+    LoraTag tag;
+    packet->RemovePacketTag(tag);
+    uint8_t dataRate = tag.GetDataRate();
+    double frequency = tag.GetFrequency();
+    NS_LOG_DEBUG("DR: " << unsigned(dataRate));
+    NS_LOG_DEBUG("SF: " << unsigned(GetSfFromDataRate(dataRate)));
+    NS_LOG_DEBUG("BW: " << GetBandwidthFromDataRate(dataRate));
+    NS_LOG_DEBUG("Freq: " << frequency << " MHz");
+    packet->AddPacketTag(tag);
 
-  LoraTxParameters params;
-  params.sf = GetSfFromDataRate (dataRate);
-  params.headerDisabled = false;
-  params.codingRate = 1;
-  params.bandwidthHz = GetBandwidthFromDataRate (dataRate);
-  params.nPreamble = 8;
-  params.crcEnabled = 1;
-  params.lowDataRateOptimizationEnabled = LoraPhy::GetTSym (params) > MilliSeconds (16) ? true : false;
+    LoraTxParameters params;
+    params.sf = GetSfFromDataRate(dataRate);
+    params.headerDisabled = false;
+    params.codingRate = 1;
+    params.bandwidthHz = GetBandwidthFromDataRate(dataRate);
+    params.nPreamble = 8;
+    params.crcEnabled = 1;
+    params.lowDataRateOptimizationEnabled =
+        LoraPhy::GetTSym(params) > MilliSeconds(16) ? true : false;
 
-  // Get the duration
-  Time duration = m_phy->GetOnAirTime (packet, params);
+    // Get the duration
+    Time duration = m_phy->GetOnAirTime(packet, params);
 
-  NS_LOG_DEBUG ("Duration: " << duration.GetSeconds ());
+    NS_LOG_DEBUG("Duration: " << duration.GetSeconds());
 
-  // Find the channel with the desired frequency
-  double sendingPower = m_channelHelper.GetTxPowerForChannel
-      (CreateObject<LogicalLoraChannel> (frequency));
+    // Find the channel with the desired frequency
+    double sendingPower =
+        m_channelHelper.GetTxPowerForChannel(CreateObject<LogicalLoraChannel>(frequency));
 
-  // Add the event to the channelHelper to keep track of duty cycle
-  m_channelHelper.AddEvent (duration, CreateObject<LogicalLoraChannel>
-                              (frequency));
+    // Add the event to the channelHelper to keep track of duty cycle
+    m_channelHelper.AddEvent(duration, CreateObject<LogicalLoraChannel>(frequency));
 
-  // Send the packet to the PHY layer to send it on the channel
-  m_phy->Send (packet, params, frequency, sendingPower);
+    // Send the packet to the PHY layer to send it on the channel
+    m_phy->Send(packet, params, frequency, sendingPower);
 
-  m_sentNewPacket (packet);
+    m_sentNewPacket(packet);
 }
 
 bool
-GatewayLorawanMac::IsTransmitting (void)
+GatewayLorawanMac::IsTransmitting(void)
 {
-  return m_phy->IsTransmitting ();
+    return m_phy->IsTransmitting();
 }
 
 void
-GatewayLorawanMac::Receive (Ptr<Packet const> packet)
+GatewayLorawanMac::Receive(Ptr<const Packet> packet)
 {
-  NS_LOG_FUNCTION (this << packet);
+    NS_LOG_FUNCTION(this << packet);
 
-  // Make a copy of the packet to work on
-  Ptr<Packet> packetCopy = packet->Copy ();
+    // Make a copy of the packet to work on
+    Ptr<Packet> packetCopy = packet->Copy();
 
-  // Only forward the packet if it's uplink
-  LorawanMacHeader macHdr;
-  packetCopy->PeekHeader (macHdr);
+    // Only forward the packet if it's uplink
+    LorawanMacHeader macHdr;
+    packetCopy->PeekHeader(macHdr);
 
-  if (macHdr.IsUplink ())
+    if (macHdr.IsUplink())
     {
-      m_device->GetObject<LoraNetDevice> ()->Receive (packetCopy);
+        m_device->GetObject<LoraNetDevice>()->Receive(packetCopy);
 
-      NS_LOG_DEBUG ("Received packet: " << packet);
+        NS_LOG_DEBUG("Received packet: " << packet);
 
-      m_receivedPacket (packet);
+        m_receivedPacket(packet);
     }
-  else
+    else
     {
-      NS_LOG_DEBUG ("Not forwarding downlink message to NetDevice");
+        NS_LOG_DEBUG("Not forwarding downlink message to NetDevice");
     }
 }
 
 void
-GatewayLorawanMac::FailedReception (Ptr<Packet const> packet)
+GatewayLorawanMac::FailedReception(Ptr<const Packet> packet)
 {
-  NS_LOG_FUNCTION (this << packet);
+    NS_LOG_FUNCTION(this << packet);
 }
 
 void
-GatewayLorawanMac::TxFinished (Ptr<const Packet> packet)
+GatewayLorawanMac::TxFinished(Ptr<const Packet> packet)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 }
 
 Time
-GatewayLorawanMac::GetWaitingTime (double frequency)
+GatewayLorawanMac::GetWaitingTime(double frequency)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  return m_channelHelper.GetWaitingTime (CreateObject<LogicalLoraChannel>
-                                           (frequency));
+    return m_channelHelper.GetWaitingTime(CreateObject<LogicalLoraChannel>(frequency));
 }
-}
-}
+} // namespace lorawan
+} // namespace ns3

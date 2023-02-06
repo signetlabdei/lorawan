@@ -22,13 +22,15 @@
 #ifndef UDP_FORWARDER_HELPER_H
 #define UDP_FORWARDER_HELPER_H
 
-#include "ns3/object-factory.h"
+#include "ns3/application-container.h"
 #include "ns3/attribute.h"
 #include "ns3/node-container.h"
-#include "ns3/application-container.h"
+#include "ns3/object-factory.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
 /**
  * This class can be used to install UDP Forwarder applications on a set of
@@ -36,21 +38,21 @@ namespace lorawan {
  */
 class UdpForwarderHelper
 {
-public:
-  UdpForwarderHelper ();
+  public:
+    UdpForwarderHelper();
 
-  ~UdpForwarderHelper ();
+    ~UdpForwarderHelper();
 
-  void SetAttribute (std::string name, const AttributeValue &value);
+    void SetAttribute(std::string name, const AttributeValue& value);
 
-  ApplicationContainer Install (NodeContainer c) const;
+    ApplicationContainer Install(NodeContainer c) const;
 
-  ApplicationContainer Install (Ptr<Node> node) const;
+    ApplicationContainer Install(Ptr<Node> node) const;
 
-private:
-  Ptr<Application> InstallPriv (Ptr<Node> node) const;
+  private:
+    Ptr<Application> InstallPriv(Ptr<Node> node) const;
 
-  ObjectFactory m_factory;
+    ObjectFactory m_factory;
 };
 
 } // namespace lorawan

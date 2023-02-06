@@ -20,106 +20,111 @@
  */
 
 #include "lora-application.h"
+
 #include "ns3/uinteger.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
-NS_LOG_COMPONENT_DEFINE ("LoraApplication");
+NS_LOG_COMPONENT_DEFINE("LoraApplication");
 
-NS_OBJECT_ENSURE_REGISTERED (LoraApplication);
+NS_OBJECT_ENSURE_REGISTERED(LoraApplication);
 
 TypeId
-LoraApplication::GetTypeId (void)
+LoraApplication::GetTypeId(void)
 {
-  static TypeId tid =
-      TypeId ("ns3::LoraApplication")
-          .SetParent<Application> ()
-          .AddConstructor<LoraApplication> ()
-          .SetGroupName ("lorawan")
-          .AddAttribute ("Interval", "The average time to wait between packets",
-                         TimeValue (Seconds (600.0)),
-                         MakeTimeAccessor (&LoraApplication::m_avgInterval), MakeTimeChecker ())
-          .AddAttribute ("PacketSize",
-                         "Size of packets generated. The minimum packet size is 12 bytes which is "
-                         "the size of the header carrying the sequence number and the time stamp.",
-                         UintegerValue (18),
-                         MakeUintegerAccessor (&LoraApplication::GetPacketSize,
+    static TypeId tid =
+        TypeId("ns3::LoraApplication")
+            .SetParent<Application>()
+            .AddConstructor<LoraApplication>()
+            .SetGroupName("lorawan")
+            .AddAttribute("Interval",
+                          "The average time to wait between packets",
+                          TimeValue(Seconds(600.0)),
+                          MakeTimeAccessor(&LoraApplication::m_avgInterval),
+                          MakeTimeChecker())
+            .AddAttribute("PacketSize",
+                          "Size of packets generated. The minimum packet size is 12 bytes which is "
+                          "the size of the header carrying the sequence number and the time stamp.",
+                          UintegerValue(18),
+                          MakeUintegerAccessor(&LoraApplication::GetPacketSize,
                                                &LoraApplication::SetPacketSize),
-                         MakeUintegerChecker<uint32_t> ());
-  return tid;
+                          MakeUintegerChecker<uint32_t>());
+    return tid;
 }
 
-LoraApplication::LoraApplication ()
+LoraApplication::LoraApplication()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-LoraApplication::~LoraApplication ()
+LoraApplication::~LoraApplication()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 void
-LoraApplication::SetInterval (Time interval)
+LoraApplication::SetInterval(Time interval)
 {
-  NS_LOG_FUNCTION (this << interval);
-  m_avgInterval = interval;
+    NS_LOG_FUNCTION(this << interval);
+    m_avgInterval = interval;
 }
 
 Time
-LoraApplication::GetInterval (void) const
+LoraApplication::GetInterval(void) const
 {
-  NS_LOG_FUNCTION (this);
-  return m_avgInterval;
+    NS_LOG_FUNCTION(this);
+    return m_avgInterval;
 }
 
 void
-LoraApplication::SetInitialDelay (Time delay)
+LoraApplication::SetInitialDelay(Time delay)
 {
-  NS_LOG_FUNCTION (this << delay);
-  m_initialDelay = delay;
+    NS_LOG_FUNCTION(this << delay);
+    m_initialDelay = delay;
 }
 
 void
-LoraApplication::SetPacketSize (uint8_t size)
+LoraApplication::SetPacketSize(uint8_t size)
 {
-  NS_LOG_FUNCTION (this << (unsigned) size);
-  m_basePktSize = size;
+    NS_LOG_FUNCTION(this << (unsigned)size);
+    m_basePktSize = size;
 }
 
 uint8_t
-LoraApplication::GetPacketSize (void) const
+LoraApplication::GetPacketSize(void) const
 {
-  NS_LOG_FUNCTION (this);
-  return m_basePktSize;
+    NS_LOG_FUNCTION(this);
+    return m_basePktSize;
 }
 
 bool
-LoraApplication::IsRunning (void)
+LoraApplication::IsRunning(void)
 {
-  NS_LOG_FUNCTION (this);
-  return m_sendEvent.IsRunning ();
+    NS_LOG_FUNCTION(this);
+    return m_sendEvent.IsRunning();
 }
 
 // Protected methods
 // StartApp, StopApp and Send will likely be overridden by lora application subclasses
 void
-LoraApplication::StartApplication (void)
+LoraApplication::StartApplication(void)
 { // Provide null functionality in case subclass is not interested
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 void
-LoraApplication::StopApplication (void)
+LoraApplication::StopApplication(void)
 { // Provide null functionality in case subclass is not interested
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 }
 
 void
-LoraApplication::SendPacket (void)
+LoraApplication::SendPacket(void)
 { // Provide null functionality in case subclass is not interested
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 } // namespace lorawan
