@@ -71,19 +71,21 @@ ChirpstackHelper::InitConnection(Ipv4Address ip, uint16_t port)
     m_url = url.str();
     NS_LOG_INFO("Chirpstack REST API URL set to: " << m_url);
 
-    /* Init curl */
-    curl_global_init(CURL_GLOBAL_NOTHING);
+    return DoConnect();
+}
 
-    /* Create Ns-3 tenant */
-    NewTenant("Ns-3 Simulator");
+int
+ChirpstackHelper::InitConnection(const char* domain, uint16_t port)
+{
+    NS_LOG_FUNCTION(this << domain << (unsigned)port);
 
-    /* Create Ns-3 device profile */
-    NewDeviceProfile("Ns-3 Device Profile");
+    /* Setup base URL string with IP and port */
+    std::stringstream url;
+    url << "http://" << domain << ":" << (unsigned)port;
+    m_url = url.str();
+    NS_LOG_INFO("Chirpstack REST API URL set to: " << m_url);
 
-    /* Create Ns-3 application */
-    NewApplication("Ns-3 Application");
-
-    return EXIT_SUCCESS;
+    return DoConnect();
 }
 
 void
@@ -119,6 +121,21 @@ ChirpstackHelper::Register(NodeContainer c) const
         if (RegisterPriv(*i) == EXIT_FAILURE)
             return EXIT_FAILURE;
     }
+
+    return EXIT_SUCCESS;
+}
+
+int
+ChirpstackHelper::DoConnect(void)
+{
+    /* Init curl */
+    curl_global_init(CURL_GLOBAL_NOTHING);
+    /* Create Ns-3 tenant */
+    NewTenant("Ns-3 Simulator");
+    /* Create Ns-3 device profile */
+    NewDeviceProfile("Ns-3 Device Profile");
+    /* Create Ns-3 application */
+    NewApplication("Ns-3 Application");
 
     return EXIT_SUCCESS;
 }

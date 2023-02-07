@@ -60,6 +60,8 @@ class ChirpstackHelper
 
     int InitConnection(Ipv4Address ip, uint16_t port);
 
+    int InitConnection(const char* domain, uint16_t port);
+
     void CloseConnection(int signal) const;
 
     int Register(NodeContainer c) const;
@@ -67,6 +69,8 @@ class ChirpstackHelper
     int Register(Ptr<Node> node) const;
 
   private:
+    int DoConnect(void);
+
     int NewTenant(const str& name);
 
     int NewDeviceProfile(const str& name);
