@@ -418,6 +418,11 @@ ChirpstackHelper::POST(const str& path, const str& body, str& out) const
         /* always cleanup */
         curl_easy_cleanup(curl);
     }
+    else
+    {
+        NS_LOG_ERROR("curl_easy_init() failed\n");
+        return EXIT_FAILURE;
+    }
 
     out = ss.str();
     NS_LOG_INFO("Received POST reply: " << out);
@@ -461,6 +466,11 @@ ChirpstackHelper::DELETE(const str& path, str& out) const
 
         /* always cleanup */
         curl_easy_cleanup(curl);
+    }
+    else
+    {
+        NS_LOG_ERROR("curl_easy_init() failed\n");
+        return EXIT_FAILURE;
     }
 
     out = ss.str();
