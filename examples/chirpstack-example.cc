@@ -156,11 +156,11 @@ main(int argc, char* argv[])
      *  Create Nodes  *
      ******************/
 
-    Ptr<Node> networkServer;
+    Ptr<Node> bridge;
     NodeContainer gateways;
     NodeContainer endDevices;
     {
-        networkServer = CreateObject<Node>();
+        bridge = CreateObject<Node>();
 
         int nGateways = 3 * gatewayRings * gatewayRings - 3 * gatewayRings + 1;
         gateways.Create(nGateways);
@@ -175,18 +175,18 @@ main(int argc, char* argv[])
      *  Create Net Devices  *
      ************************/
 
-    /* Csma between gateways and server (represented by tap-bridge) */
+    /* Csma between gateways and gateway-bridge (represented by tap-bridge) */
     {
-        NodeContainer csmaNodes(NodeContainer(networkServer), gateways);
+        NodeContainer csmaNodes(NodeContainer(bridge), gateways);
 
-        // Connect the Server to the Gateways with csma
+        // Connect the bridge to the gateways with csma
         CsmaHelper csma;
         csma.SetChannelAttribute("DataRate", DataRateValue(DataRate(5000000)));
         csma.SetChannelAttribute("Delay", TimeValue(MilliSeconds(2)));
         csma.SetDeviceAttribute("Mtu", UintegerValue(1500));
         auto csmaNetDevs = csma.Install(csmaNodes);
 
-        // Install and initialize internet stack on gateways and server nodes
+        // Install and initialize internet stack on gateways and bridge nodes
         InternetStackHelper internet;
         internet.Install(csmaNodes);
 
@@ -197,11 +197,11 @@ main(int argc, char* argv[])
         Ipv4GlobalRoutingHelper::PopulateRoutingTables();
     }
 
-    ///////////////// Attach a Tap-bridge to outside the simulation to the server csma device
+    ///////////////// Attach a Tap-bridge to outside the simulation to the bridge csma device
     TapBridgeHelper tapBridge;
     tapBridge.SetAttribute("Mode", StringValue("ConfigureLocal"));
-    tapBridge.SetAttribute("DeviceName", StringValue("ns3-tap"));
-    tapBridge.Install(networkServer, networkServer->GetDevice(0));
+    tapBridge.SetAttribute("DeviceName", StringValue("ns3"));
+    tapBridge.Install(bridge, bridge->GetDevice(0));
 
     /* Radio side (between end devicees and gateways) */
     LoraHelper helper;
