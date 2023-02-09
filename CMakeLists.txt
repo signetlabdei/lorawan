@@ -143,6 +143,7 @@ build_lib(
     ${libbuildings}
     ${libmobility}
     ${libapplications}
+    ${libtap-bridge}
     ${libcsma}
     ${curl_LIBRARIES}
   TEST_SOURCES
