@@ -76,5 +76,4 @@ build_lib_example(
   LIBRARIES_TO_LINK
     ${libcore}
     ${liblorawan}
-    ${libtap-bridge}
 )
