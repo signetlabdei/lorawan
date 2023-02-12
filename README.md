@@ -1,12 +1,12 @@
-# ELoRa: LoRaWAN emulator for ChirpStack network server #
+# ELoRa: An end-to-end LoRaWAN emulator for the ChirpStack network server
+
+>**If you just want to create scenarios using the emulator, and you are not interested in tinkering with it, we refer you to a quicker installation running the [emulator image with Docker Compose](https://github.com/non-det-alle/elora-docker).**
 
 This is a traffic emulator for the [Chirpstack server stack](https://www.chirpstack.io/ "ChirpStack, open-source LoRaWAN® Network Server"). 
 
-The code is a direct extension of the ns-3 [LoRaWAN module](https://github.com/signetlabdei/lorawan "LoRaWAN ns-3 module").
+This software can be used to simulate in real-time multiple devices and gateways sharing a radio channel with very high flexibility in terms of possible configurations. LoRaWAN traffic is then UDP-encapsulated by gateways and forwarded outside the simulation. If a Chirpstack network server is in place, it will think the traffic is coming from a real network. All Class A MAC primitives used in the UE868 region are supported: radio transmission parameters of simulated devices can be changed by the downlink LoRaWAN traffic of the real server. 
 
-This module can be used to simulate in real-time multiple devices and gateways sharing a radio channel with very high flexibility in terms of possible configurations. LoRaWAN traffic is then UDP-encapsulated by gateways and forwarded outside the simulation. If a Chirpstack network server is in place, it will think the traffic is coming from a real network. All Class A MAC primitives used in the UE868 region are supported: radio transmission parameters of simulated devices can be changed by the downlink LoRaWAN traffic of the real server. 
-
-In addition to what is provided by the original LoRaWAN module, the following changes/additions were made:
+The code is an extension of the ns-3 [LoRaWAN module](https://github.com/signetlabdei/lorawan "LoRaWAN ns-3 module"). In addition to what is provided by the original LoRaWAN module, the following changes/additions were made:
 
 * A gateway application implementing the [UDP forwarder protocol](https://github.com/Lora-net/packet_forwarder/blob/master/PROTOCOL.TXT "Semtech packet forwarder implementation") running on real gateways
 * An helper to register devices and gateways in the server using the included [REST API](https://github.com/chirpstack/chirpstack-rest-api "ChirpStack gRPC to REST API proxy")
@@ -15,8 +15,6 @@ In addition to what is provided by the original LoRaWAN module, the following ch
 * Many improvements and corrections of features of the original module, such that traffic could be transparently be accepted by the server
 
 ## Prerequisites ##
-
-**If you just want to create scenarios using the emulator, and you are not interested in tinkering with it, we refer you to a quicker installation and running using the [packaged version using Docker compose](https://github.com/non-det-alle/elora-docker).**
 
 To use this simulator you need to know the following:
 
