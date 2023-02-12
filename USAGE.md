@@ -16,10 +16,10 @@ This version has been modified to implement a traffic emulator for the [Chirpsta
 
 ### Prerequisites ###
 
-If not already, install the `libcurl` library in your linux distribution.
+If not already, install the `libcurl` development library in your linux distribution (`libcurl4-gnutls-dev` on Ubuntu, `curl-dev` on Alpine).
 
 To run simulations using this module, you will need to install ns-3, and clone
-this repository inside the `contrib` directory:
+this repository inside the `contrib` or `src` directory:
 
 ```bash
 git clone https://gitlab.com/non-det-alle/ns-3-dev
@@ -38,7 +38,7 @@ git checkout chirpstack
 To compile, move to the `ns-3-dev` folder, configure and then build ns-3:
 
 ```bash
-./ns3 configure -d debug --enable-examples --enable-sudo
+./ns3 configure -d debug --enable-examples
 ./ns3 build
 ```
 ## Usage examples ##
@@ -47,7 +47,7 @@ The module includes the following example:
 
 - `chirpstack-example`
 
-Examples can be run via the `./ns3 run "chirpstack-example [options]"` command.
+Examples can be run via the `./ns3 run --enable-sudo "chirpstack-example [options]"` command.
 
 Options can be retrived with `./ns3 run "chirpstack-example --help"`.
 

@@ -16,15 +16,18 @@ In addition to what is provided by the original LoRaWAN module, the following ch
 
 ## Prerequisites ##
 
+**If you just want to create scenarios using the emulator, and you are not interested in tinkering with it, we refer you to a quicker installation and running using the [packaged version using Docker compose](https://github.com/non-det-alle/elora-docker).**
+
 To use this simulator you need to know the following:
 
 * The ChirpStack server needs to be running somewhere (reachable by the simulation via network)
 * The registration helper (`chirpstack-helper` class) uses the cURL library to speak to the server. [Ns-3](https://gitlab.com/nsnam/ns-3-dev "The Network Simulator, Version 3") does not support cURL by default so a minor modification is needed in the ns-3 CMake code. This change has been made in [this fork of the ns-3 repository](https://gitlab.com/non-det-alle/ns-3-dev "Ns-3 fork supporting cURL"), that has been used to test the emulator. Use the forked version which is maintaned by us, or reproduce the simple changes in your ns-3 version
 * The simulator works as is with the default configuration of Chirpstark v4 on `localhost:8080`. It has been tested with the [docker-compose installation](https://www.chirpstack.io/docs/getting-started/docker.html "Chirpstack docs: Quickstart Docker Compose") of the server. To test a distributed version of the setup, the server/port address needs to be changed in `chirpstack-example`, and ChirpStack needs to be set up such that a Gateway Bridge container remains co-located on the same machine of the ELoRa process
 * An authentification token needs to be generated in the server (API keys section), and needs to be copy-pasted in the constructor of `chirpstack-helper` class
-* Ns-3 needs to be pre-configured with the `--enable-sudo` option
+* Ns-3 needs to run with the `--enable-sudo` option
 
 ## Usage ##
+
 For detailed information on how to run ELoRa refer to the [USAGE.md](USAGE.md) file.
 
 For more information on how to use the underlying LoRaWAN module refer to the [original module readme](https://github.com/signetlabdei/lorawan/blob/e8f7a21044418e92759d5c7c4bcab147cdaf05b3/README.md "LoRaWAN ns-3 module README").
