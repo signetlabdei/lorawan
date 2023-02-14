@@ -63,9 +63,7 @@ class ChirpstackHelper
 
     ~ChirpstackHelper();
 
-    int InitConnection(Ipv4Address ip, uint16_t port);
-
-    int InitConnection(const char* domain, uint16_t port);
+    int InitConnection(const str address, uint16_t port);
 
     void CloseConnection(int signal) const;
 

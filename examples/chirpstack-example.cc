@@ -274,7 +274,7 @@ main(int argc, char* argv[])
         "eyJhdWQiOiJjaGlycHN0YWNrIiwiaXNzIjoiY2hpcnBzdGFjayIsInN1YiI6IjZlMjQ4NjljLWQxMjItNDZkOS04Nz"
         "E0LTM5Yzc4Nzg4OTRhZCIsInR5cCI6ImtleSJ9.IB20o6Jrcwj5qZ9mPEuthzzqMyc3YNSl8by_ZXrjqhw";
     csHelper.SetToken(token);
-    csHelper.InitConnection(Ipv4Address("127.0.0.1"), 8090);
+    csHelper.InitConnection("127.0.0.1", 8090);
     csHelper.Register(NodeContainer(endDevices, gateways));
 
     // Initialize SF emulating the ADR algorithm, then add variance to path loss

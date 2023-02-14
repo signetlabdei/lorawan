@@ -52,16 +52,13 @@ ChirpstackHelper::~ChirpstackHelper()
 }
 
 int
-ChirpstackHelper::InitConnection(Ipv4Address ip, uint16_t port)
+ChirpstackHelper::InitConnection(const str address, uint16_t port)
 {
-    NS_LOG_FUNCTION(this << ip << (unsigned)port);
+    NS_LOG_FUNCTION(this << address << (unsigned)port);
 
     /* Setup base URL string with IP and port */
-    std::stringstream url;
-    url << "http://";
-    ip.Print(url);
-    url << ":" << (unsigned)port;
-    m_url = url.str();
+
+    m_url = "http://" + address + ":" + std::to_string(port);
     NS_LOG_INFO("Chirpstack REST API URL set to: " << m_url);
 
     /* Initialize HTTP header fields */
@@ -70,20 +67,6 @@ ChirpstackHelper::InitConnection(Ipv4Address ip, uint16_t port)
     m_header = curl_slist_append(m_header, ("Authorization: Bearer " + m_token).c_str());
     m_header = curl_slist_append(m_header, "Accept: application/json");
     m_header = curl_slist_append(m_header, "Content-Type: application/json");
-
-    return DoConnect();
-}
-
-int
-ChirpstackHelper::InitConnection(const char* domain, uint16_t port)
-{
-    NS_LOG_FUNCTION(this << domain << (unsigned)port);
-
-    /* Setup base URL string with IP and port */
-    std::stringstream url;
-    url << "http://" << domain << ":" << (unsigned)port;
-    m_url = url.str();
-    NS_LOG_INFO("Chirpstack REST API URL set to: " << m_url);
 
     return DoConnect();
 }
