@@ -23,6 +23,7 @@
 #define TRAFFIC_CONTROL_UTILS_H
 
 #include <unordered_map>
+#include <vector>
 
 namespace ns3
 {

@@ -43,7 +43,12 @@ class ChirpstackHelper
 
     struct session_t
     {
-        // Tenant information
+        // Registration info
+        str tenant = "Ns-3 Simulator";
+        str devProf = "Ns-3 Device Profile";
+        str app = "Ns-3 Application";
+
+        // Session IDs
         str tenantId;
         str devProfId;
         str appId;
@@ -58,7 +63,7 @@ class ChirpstackHelper
 
     ~ChirpstackHelper();
 
-    int InitConnection(Ipv4Address ip, uint16_t port);
+    int InitConnection(const str address, uint16_t port);
 
     void CloseConnection(int signal) const;
 
@@ -66,7 +71,17 @@ class ChirpstackHelper
 
     int Register(Ptr<Node> node) const;
 
+    void SetToken (str& token);
+    
+    void SetTenant (str& name);
+
+    void SetDeviceProfile (str& name);
+
+    void SetApplication (str& name);
+
   private:
+    int DoConnect(void);
+
     int NewTenant(const str& name);
 
     int NewDeviceProfile(const str& name);
@@ -89,6 +104,7 @@ class ChirpstackHelper
                                       std::ostream* stream);
 
     str m_url;
+    str m_token;
     struct curl_slist* m_header = NULL;
 
     session_t m_session;

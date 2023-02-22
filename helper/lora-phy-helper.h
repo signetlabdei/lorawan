@@ -86,7 +86,7 @@ class LoraPhyHelper
      * \param channel the channel to associate to this helper.
      */
     void SetChannel(Ptr<LoraChannel> channel);
-    
+
   private:
     /**
      * The PHY layer factory object.

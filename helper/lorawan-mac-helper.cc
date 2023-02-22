@@ -135,6 +135,7 @@ LorawanMacHelper::ConfigureForAlohaRegion(Ptr<LorawanMac> mac) const
         /////////////////////
         // Preamble length //
         /////////////////////
+
         edMac->SetNPreambleSymbols(8);
 
         //////////////////////////////////////
@@ -409,7 +410,6 @@ LorawanMacHelper::SetSpreadingFactorsUp(NodeContainer endDevices,
     } // end loop on nodes
 
     return sfQuantity;
-
 } //  end function
 
 void

@@ -39,14 +39,7 @@ ChirpstackHelper::ChirpstackHelper()
 {
     m_url = "http://localhost:8090/";
 
-    /* Initialize HTTP header fields */
-    str token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9."
-                "eyJhdWQiOiJjaGlycHN0YWNrIiwiaXNzIjoiY2hpcnBzdGFjayIsInN1YiI6IjZlMjQ4NjljLWQxMjItND"
-                "ZkOS04NzE0"
-                "LTM5Yzc4Nzg4OTRhZCIsInR5cCI6ImtleSJ9.IB20o6Jrcwj5qZ9mPEuthzzqMyc3YNSl8by_ZXrjqhw";
-    m_header = curl_slist_append(m_header, ("Authorization: Bearer " + token).c_str());
-    m_header = curl_slist_append(m_header, "Accept: application/json");
-    m_header = curl_slist_append(m_header, "Content-Type: application/json");
+    m_token = "";
 
     /* Initialize session keys */
     m_session.netKey = "2b7e151628aed2a6abf7158809cf4f3c";
@@ -59,31 +52,23 @@ ChirpstackHelper::~ChirpstackHelper()
 }
 
 int
-ChirpstackHelper::InitConnection(Ipv4Address ip, uint16_t port)
+ChirpstackHelper::InitConnection(const str address, uint16_t port)
 {
-    NS_LOG_FUNCTION(this << ip << (unsigned)port);
+    NS_LOG_FUNCTION(this << address << (unsigned)port);
 
     /* Setup base URL string with IP and port */
-    std::stringstream url;
-    url << "http://";
-    ip.Print(url);
-    url << ":" << (unsigned)port;
-    m_url = url.str();
+
+    m_url = "http://" + address + ":" + std::to_string(port);
     NS_LOG_INFO("Chirpstack REST API URL set to: " << m_url);
 
-    /* Init curl */
-    curl_global_init(CURL_GLOBAL_NOTHING);
+    /* Initialize HTTP header fields */
+    curl_slist_free_all(m_header); /* free the header list if previously set */
+    NS_ASSERT_MSG(!m_token.empty(), "API token was not set.");
+    m_header = curl_slist_append(m_header, ("Authorization: Bearer " + m_token).c_str());
+    m_header = curl_slist_append(m_header, "Accept: application/json");
+    m_header = curl_slist_append(m_header, "Content-Type: application/json");
 
-    /* Create Ns-3 tenant */
-    NewTenant("Ns-3 Simulator");
-
-    /* Create Ns-3 device profile */
-    NewDeviceProfile("Ns-3 Device Profile");
-
-    /* Create Ns-3 application */
-    NewApplication("Ns-3 Application");
-
-    return EXIT_SUCCESS;
+    return DoConnect();
 }
 
 void
@@ -119,6 +104,45 @@ ChirpstackHelper::Register(NodeContainer c) const
         if (RegisterPriv(*i) == EXIT_FAILURE)
             return EXIT_FAILURE;
     }
+
+    return EXIT_SUCCESS;
+}
+
+void
+ChirpstackHelper::SetToken(str& token)
+{
+    m_token = token;
+}
+
+void
+ChirpstackHelper::SetTenant(str& name)
+{
+    m_session.tenant = name;
+}
+
+void
+ChirpstackHelper::SetDeviceProfile(str& name)
+{
+    m_session.devProf = name;
+}
+
+void
+ChirpstackHelper::SetApplication(str& name)
+{
+    m_session.app = name;
+}
+
+int
+ChirpstackHelper::DoConnect(void)
+{
+    /* Init curl */
+    curl_global_init(CURL_GLOBAL_NOTHING);
+    /* Create Ns-3 tenant */
+    NewTenant(m_session.tenant);
+    /* Create Ns-3 device profile */
+    NewDeviceProfile(m_session.devProf);
+    /* Create Ns-3 application */
+    NewApplication(m_session.app);
 
     return EXIT_SUCCESS;
 }

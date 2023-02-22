@@ -136,7 +136,7 @@ set(header_files
 )
 
 build_lib(
-  LIBNAME lorawan
+  LIBNAME lorawan-priv
   SOURCE_FILES ${source_files}
   HEADER_FILES ${header_files}
   LIBRARIES_TO_LINK
@@ -147,6 +147,7 @@ build_lib(
     ${libbuildings}
     ${libmobility}
     ${libapplications}
+    ${libtap-bridge}
     ${libcsma}
     ${curl_LIBRARIES}
     ${ortools_LIBRARIES}
