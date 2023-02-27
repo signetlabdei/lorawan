@@ -63,6 +63,9 @@ class NetworkScheduler : public Object
      */
     void OnReceiveWindowOpportunity(LoraDeviceAddress deviceAddress, int window);
 
+  protected:
+    void DoDispose() override;
+
   private:
     TracedCallback<Ptr<const Packet>> m_receiveWindowOpened;
     Ptr<NetworkStatus> m_status;

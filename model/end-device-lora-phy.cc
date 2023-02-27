@@ -280,6 +280,18 @@ EndDeviceLoraPhy::UnregisterListener(EndDeviceLoraPhyListener* listener)
 }
 
 void
+EndDeviceLoraPhy::DoDispose()
+{
+    NS_LOG_FUNCTION(this);
+    for (auto l : m_listeners)
+    {
+        delete l;
+    }
+    m_listeners.clear();
+    LoraPhy::DoDispose();
+}
+
+void
 EndDeviceLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event)
 {
     NS_LOG_FUNCTION(this << packet << event);

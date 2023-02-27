@@ -32,15 +32,6 @@ namespace lorawan
 
 NS_LOG_COMPONENT_DEFINE("SubBand");
 
-NS_OBJECT_ENSURE_REGISTERED(SubBand);
-
-TypeId
-SubBand::GetTypeId(void)
-{
-    static TypeId tid = TypeId("ns3::SubBand").SetParent<Object>().SetGroupName("lorawan");
-    return tid;
-}
-
 SubBand::SubBand()
 {
     NS_LOG_FUNCTION(this);

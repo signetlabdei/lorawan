@@ -235,7 +235,7 @@ LinkCheckTest::SendPacket(Ptr<Node> endDevice, bool requestAck)
         DynamicCast<LoraNetDevice>(endDevice->GetDevice(0))->GetMac());
     if (requestAck)
         macLayer->SetMType(LorawanMacHeader::CONFIRMED_DATA_UP);
-    macLayer->AddMacCommand(CreateObject<LinkCheckReq>());
+    macLayer->AddMacCommand(Create<LinkCheckReq>());
     macLayer->Send(Create<Packet>(20));
 }
 

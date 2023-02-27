@@ -184,5 +184,34 @@ NetworkServer::GetNetworkStatus(void)
     return m_status;
 }
 
+void
+NetworkServer::DoInitialize(void)
+{
+    NS_LOG_FUNCTION(this);
+    Application::DoInitialize();
+}
+
+void
+NetworkServer::DoDispose(void)
+{
+    NS_LOG_FUNCTION(this);
+    if (m_status)
+    {
+        m_status->Dispose();
+    }
+    m_status = nullptr;
+    if (m_controller)
+    {
+        m_controller->Dispose();
+    }
+    m_controller = nullptr;
+    if (m_scheduler)
+    {
+        m_scheduler->Dispose();
+    }
+    m_scheduler = nullptr;
+    Application::DoDispose();
+}
+
 } // namespace lorawan
 } // namespace ns3

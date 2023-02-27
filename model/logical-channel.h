@@ -43,11 +43,9 @@ class SubBand;
  * Furthermore, a LogicalChannel can be marked as enabled or disabled for
  * uplink transmission.
  */
-class LogicalChannel : public Object
+class LogicalChannel : public SimpleRefCount<LogicalChannel>
 {
   public:
-    static TypeId GetTypeId(void);
-
     LogicalChannel();
     virtual ~LogicalChannel();
 

@@ -48,6 +48,7 @@ LoraHelper::LoraHelper()
 
 LoraHelper::~LoraHelper()
 {
+    delete m_packetTracker;
 }
 
 NetDeviceContainer
@@ -61,8 +62,8 @@ LoraHelper::Install(const LoraPhyHelper& phyHelper,
         Ptr<Node> node = *i;
         Ptr<LoraNetDevice> device = CreateObject<LoraNetDevice>();
         node->AddDevice(device);
-        Ptr<LoraPhy> phy = phyHelper.Create(device);
-        Ptr<LorawanMac> mac = macHelper.Create(device);
+        Ptr<LoraPhy> phy = phyHelper.Install(device);
+        Ptr<LorawanMac> mac = macHelper.Install(device);
         if (m_packetTracker)
         {
             if (DynamicCast<EndDeviceLoraPhy>(phy) != nullptr)

@@ -291,6 +291,14 @@ CongestionControlComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status,
 }
 
 void
+CongestionControlComponent::DoDispose()
+{
+    NS_LOG_FUNCTION(this);
+    m_disabled.clear();
+    NetworkControllerComponent::DoDispose();
+}
+
+void
 CongestionControlComponent::StartSampling(Address bestGw, uint8_t cluster)
 {
     NS_LOG_DEBUG("Duty-cycle configuration terminated in "

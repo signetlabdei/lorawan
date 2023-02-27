@@ -124,8 +124,7 @@ LogicalChannelManager::AddSubBand(double firstFrequency,
                                   double maxTxPowerDbm)
 {
     NS_LOG_FUNCTION(this << firstFrequency << lastFrequency);
-    Ptr<SubBand> subBand =
-        CreateObject<SubBand>(firstFrequency, lastFrequency, dutyCycle, maxTxPowerDbm);
+    Ptr<SubBand> subBand = Create<SubBand>(firstFrequency, lastFrequency, dutyCycle, maxTxPowerDbm);
     AddSubBand(subBand);
 }
 
@@ -230,6 +229,15 @@ LogicalChannelManager::DisableChannel(uint8_t chIndex)
 {
     NS_LOG_FUNCTION(this << (unsigned)chIndex);
     m_channelList.at(chIndex)->DisableForUplink();
+}
+
+void
+LogicalChannelManager::DoDispose()
+{
+    NS_LOG_FUNCTION(this);
+    m_subBandList.clear();
+    m_channelList.clear();
+    Object::DoDispose();
 }
 
 } // namespace lorawan

@@ -75,9 +75,6 @@ class PeriodicSenderHelper
     // Extract different constant packet size for each device from a distribution
     void SetPacketSizeGenerator(Ptr<RandomVariableStream> rv);
 
-    // Give devices a distribution to pick a different packet size on each transmission
-    void SetPacketSizeRandomVariable(Ptr<RandomVariableStream> rv);
-
   private:
     Ptr<Application> InstallPriv(Ptr<Node> node) const;
 
@@ -89,9 +86,6 @@ class PeriodicSenderHelper
 
     Time m_period; //!< The period with which the application will be set to send
                    // messages
-
-    Ptr<RandomVariableStream>
-        m_pktSizeRV; // whether or not a random component is added to the packet size
 
     uint8_t m_pktSize; // the packet size.
 

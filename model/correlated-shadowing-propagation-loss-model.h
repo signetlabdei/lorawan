@@ -117,6 +117,7 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
      * Constructor.
      */
     CorrelatedShadowingPropagationLossModel();
+    virtual ~CorrelatedShadowingPropagationLossModel();
 
     /**
      * Set the correlation distance for newly created ShadowingMap instances

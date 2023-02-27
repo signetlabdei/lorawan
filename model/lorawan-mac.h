@@ -233,6 +233,8 @@ class LorawanMac : public Object
     virtual void SetReceiveCallback(ReceiveCallback cb);
 
   protected:
+    void DoDispose() override;
+
     /**
      * The trace source that is fired when a packet cannot be sent because of duty
      * cycle limitations.

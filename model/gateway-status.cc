@@ -135,5 +135,15 @@ GatewayStatus::SetNextTransmissionTime(Time nextTransmissionTime)
 {
     m_nextTransmissionTime = nextTransmissionTime;
 }
+
+void
+GatewayStatus::DoDispose(void)
+{
+    NS_LOG_FUNCTION(this);
+    m_netDevice = nullptr;
+    m_gatewayMac = nullptr;
+    Object::DoDispose();
+}
+
 } // namespace lorawan
 } // namespace ns3

@@ -185,7 +185,7 @@ EndDeviceStatus::GetMac(void)
     return m_mac;
 }
 
-EndDeviceStatus::ReceivedPacketList
+const EndDeviceStatus::ReceivedPacketList&
 EndDeviceStatus::GetReceivedPacketList()
 {
     NS_LOG_FUNCTION_NOARGS();
@@ -271,7 +271,6 @@ EndDeviceStatus::InsertReceivedPacket(Ptr<const Packet> receivedPacket, const Ad
     ReceivedPacketInfo info;
     info.sf = tag.GetSpreadingFactor();
     info.frequency = tag.GetFrequency();
-    info.packet = receivedPacket;
 
     double rcvPower = tag.GetReceivePower();
 
@@ -409,6 +408,16 @@ EndDeviceStatus::GetPowerGatewayMap(void)
     }
 
     return gatewayPowers;
+}
+
+void
+EndDeviceStatus::DoDispose(void)
+{
+    NS_LOG_FUNCTION(this);
+    m_receiveWindowEvent.Cancel();
+    m_receivedPacketList.clear();
+    m_mac = nullptr;
+    Object::DoDispose();
 }
 
 std::ostream&

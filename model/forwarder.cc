@@ -88,6 +88,15 @@ Forwarder::ReceiveFromPointToPoint(Ptr<NetDevice> pointToPointNetDevice,
 }
 
 void
+Forwarder::DoDispose()
+{
+    NS_LOG_FUNCTION(this);
+    m_mac = nullptr;
+    m_pointToPointNetDevice = nullptr;
+    Application::DoDispose();
+}
+
+void
 Forwarder::StartApplication(void)
 {
     NS_LOG_FUNCTION(this);

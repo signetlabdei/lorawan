@@ -71,6 +71,8 @@ LoraChannel::~LoraChannel()
     NS_LOG_FUNCTION_NOARGS();
     m_phyListUp.clear();
     m_phyListDown.clear();
+    m_delay = nullptr;
+    m_loss = nullptr;
 }
 
 LoraChannel::LoraChannel(Ptr<PropagationLossModel> loss, Ptr<PropagationDelayModel> delay)

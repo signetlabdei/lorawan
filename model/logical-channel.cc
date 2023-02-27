@@ -32,16 +32,6 @@ namespace lorawan
 
 NS_LOG_COMPONENT_DEFINE("LogicalChannel");
 
-NS_OBJECT_ENSURE_REGISTERED(LogicalChannel);
-
-TypeId
-LogicalChannel::GetTypeId(void)
-{
-    static TypeId tid =
-        TypeId("ns3::LogicalChannel").SetParent<Object>().SetGroupName("lorawan");
-    return tid;
-}
-
 LogicalChannel::LogicalChannel()
     : m_frequency(0),
       m_replyFrequency(0),

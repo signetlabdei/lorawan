@@ -183,7 +183,7 @@ LinkCheckComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status,
         // margin
         uint8_t gwCount = status->GetLastReceivedPacketInfo().gwList.size();
 
-        Ptr<LinkCheckAns> replyCommand = CreateObject<LinkCheckAns>();
+        Ptr<LinkCheckAns> replyCommand = Create<LinkCheckAns>();
         replyCommand->SetGwCnt(gwCount);
         status->m_reply.frameHeader.SetAsDownlink();
         status->m_reply.frameHeader.AddCommand(replyCommand);

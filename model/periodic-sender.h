@@ -39,11 +39,6 @@ class PeriodicSender : public LoraApplication
 
     static TypeId GetTypeId(void);
 
-    /**
-     * Set if using randomness in the packet size
-     */
-    void SetPacketSizeRandomVariable(Ptr<RandomVariableStream> rv);
-
   private:
     /**
      * Start the application by scheduling the first SendPacket event
@@ -51,19 +46,9 @@ class PeriodicSender : public LoraApplication
     void StartApplication(void);
 
     /**
-     * Stop the application
-     */
-    void StopApplication(void);
-
-    /**
      * Send a packet using the LoraNetDevice's Send method
      */
     void SendPacket(void);
-
-    /**
-     * The random variable that adds bytes to the packet size
-     */
-    Ptr<RandomVariableStream> m_pktSizeRV;
 };
 
 } // namespace lorawan

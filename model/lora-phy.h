@@ -251,6 +251,7 @@ class LoraPhy : public Object
 
   protected:
     void DoInitialize() override;
+    void DoDispose() override;
 
     /**
      * Finish reception of a packet.

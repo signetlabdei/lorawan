@@ -137,6 +137,9 @@ class CongestionControlComponent : public NetworkControllerComponent
 
     static double CapacityForPDRModel(double pdr);
 
+  protected:
+    void DoDispose() override;
+
   private:
     void StartSampling(Address bestGw, uint8_t cluster);
 

@@ -37,10 +37,11 @@ LoraPhyHelper::LoraPhyHelper()
 
 LoraPhyHelper::~LoraPhyHelper()
 {
+    m_channel = nullptr;
 }
 
 Ptr<LoraPhy>
-LoraPhyHelper::Create(Ptr<LoraNetDevice> device) const
+LoraPhyHelper::Install(Ptr<LoraNetDevice> device) const
 {
     auto phy = m_phy.Create<LoraPhy>();
     auto interference = m_interferenceHelper.Create<LoraInterferenceHelper>();

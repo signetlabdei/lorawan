@@ -83,6 +83,9 @@ void
 UdpForwarder::DoDispose(void)
 {
     NS_LOG_FUNCTION(this);
+    m_sockUp = nullptr;
+    m_sockDown = nullptr;
+    m_mac = nullptr;
     Application::DoDispose();
 }
 

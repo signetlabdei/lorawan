@@ -66,11 +66,9 @@ enum MacCommandType
  * common features are supposed to be defined in detail by child classes, based
  * on that MAC command's attributes and structure.
  */
-class MacCommand : public Object
+class MacCommand : public SimpleRefCount<MacCommand>
 {
   public:
-    static TypeId GetTypeId(void);
-
     MacCommand();
     virtual ~MacCommand();
 
@@ -139,7 +137,6 @@ class LinkCheckReq : public MacCommand
 {
   public:
     LinkCheckReq();
-    ~LinkCheckReq();
     virtual void Serialize(Buffer::Iterator& start) const;
     virtual uint8_t Deserialize(Buffer::Iterator& start);
     virtual void Print(std::ostream& os) const;

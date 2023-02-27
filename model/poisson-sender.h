@@ -36,16 +36,15 @@ class PoissonSender : public LoraApplication
 
     static TypeId GetTypeId(void);
 
+  protected:
+    void DoInitialize() override;
+    void DoDispose() override;
+
   private:
     /**
      * Start the application by scheduling the first SendPacket event
      */
     void StartApplication(void);
-
-    /**
-     * Stop the application
-     */
-    void StopApplication(void);
 
     /**
      * Send a packet using the LoraNetDevice's Send method

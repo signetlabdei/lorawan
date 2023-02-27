@@ -123,7 +123,21 @@ LoraPhy::DoInitialize()
     // Get node id (if possible) to format context in tracing callbacks
     if (m_device && m_device->GetNode())
         m_context = m_device->GetNode()->GetId();
+}
 
+void
+LoraPhy::DoDispose()
+{
+    NS_LOG_FUNCTION(this);
+    m_device = nullptr;
+    m_mobility = nullptr;
+    if (m_interference)
+    {
+        m_interference->Dispose();
+    }
+    m_interference = nullptr;
+    m_channel = nullptr;
+    Object::DoDispose();
 }
 
 void

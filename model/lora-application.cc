@@ -42,20 +42,25 @@ LoraApplication::GetTypeId(void)
             .SetGroupName("lorawan")
             .AddAttribute("Interval",
                           "The average time to wait between packets",
-                          TimeValue(Seconds(600.0)),
+                          TimeValue(Seconds(600)),
                           MakeTimeAccessor(&LoraApplication::m_avgInterval),
                           MakeTimeChecker())
             .AddAttribute("PacketSize",
                           "Size of packets generated. The minimum packet size is 12 bytes which is "
                           "the size of the header carrying the sequence number and the time stamp.",
                           UintegerValue(18),
-                          MakeUintegerAccessor(&LoraApplication::GetPacketSize,
-                                               &LoraApplication::SetPacketSize),
-                          MakeUintegerChecker<uint32_t>());
+                          MakeUintegerAccessor(&LoraApplication::m_basePktSize),
+                          MakeUintegerChecker<uint8_t>());
     return tid;
 }
 
 LoraApplication::LoraApplication()
+    : m_avgInterval(Seconds(600)),
+      m_initialDelay(Seconds(0)),
+      m_sendEvent(EventId()),
+      m_basePktSize(18),
+      m_mac(nullptr)
+
 {
     NS_LOG_FUNCTION(this);
 }
@@ -123,6 +128,14 @@ LoraApplication::DoInitialize()
     Application::DoInitialize();
 }
 
+void
+LoraApplication::DoDispose()
+{
+    NS_LOG_FUNCTION(this);
+    m_mac = nullptr;
+    Application::DoDispose();
+}
+
 // Protected methods
 // StartApp, StopApp and Send will likely be overridden by lora application subclasses
 void
@@ -133,8 +146,9 @@ LoraApplication::StartApplication(void)
 
 void
 LoraApplication::StopApplication(void)
-{ // Provide null functionality in case subclass is not interested
+{
     NS_LOG_FUNCTION_NOARGS();
+    m_sendEvent.Cancel();
 }
 
 void

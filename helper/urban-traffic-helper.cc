@@ -71,6 +71,7 @@ UrbanTrafficHelper::UrbanTrafficHelper()
 
 UrbanTrafficHelper::~UrbanTrafficHelper()
 {
+    m_intervalProb = nullptr;
 }
 
 void

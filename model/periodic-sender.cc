@@ -55,12 +55,6 @@ PeriodicSender::~PeriodicSender()
 }
 
 void
-PeriodicSender::SetPacketSizeRandomVariable(Ptr<RandomVariableStream> rv)
-{
-    m_pktSizeRV = rv;
-}
-
-void
 PeriodicSender::StartApplication(void)
 {
     NS_LOG_FUNCTION(this);
@@ -70,13 +64,6 @@ PeriodicSender::StartApplication(void)
                                                                       << " seconds delay");
     m_sendEvent = Simulator::Schedule(m_initialDelay, &PeriodicSender::SendPacket, this);
     NS_LOG_DEBUG("Event Id: " << m_sendEvent.GetUid());
-}
-
-void
-PeriodicSender::StopApplication(void)
-{
-    NS_LOG_FUNCTION_NOARGS();
-    Simulator::Cancel(m_sendEvent);
 }
 
 void

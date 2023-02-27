@@ -311,6 +311,14 @@ LoraInterferenceHelper::ClearAllEvents(void)
 }
 
 void
+LoraInterferenceHelper::DoDispose()
+{
+    NS_LOG_FUNCTION(this);
+    ClearAllEvents();
+    Object::DoDispose();
+}
+
+void
 LoraInterferenceHelper::CleanOldEvents(void)
 {
     NS_LOG_FUNCTION(this);

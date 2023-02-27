@@ -26,8 +26,8 @@
 
 #include "ns3/enum.h"
 #include "ns3/nstime.h"
-#include "ns3/packet.h"
 #include "ns3/object.h"
+#include "ns3/packet.h"
 
 namespace ns3
 {
@@ -199,6 +199,9 @@ class LoraInterferenceHelper : public Object
      * Delete all events in the LoraInterferenceHelper.
      */
     void ClearAllEvents(void);
+
+  protected:
+    void DoDispose() override;
 
   private:
     /**

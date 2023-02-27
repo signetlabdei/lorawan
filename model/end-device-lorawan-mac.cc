@@ -141,7 +141,6 @@ EndDeviceLorawanMac::EndDeviceLorawanMac()
       m_enableCrypto(false)
 {
     NS_LOG_FUNCTION(this);
-
     // Initialize the random variable we'll use to decide which channel to
     // transmit on.
     m_uniformRV = CreateObject<UniformRandomVariable>();
@@ -160,8 +159,6 @@ EndDeviceLorawanMac::EndDeviceLorawanMac()
 EndDeviceLorawanMac::~EndDeviceLorawanMac()
 {
     NS_LOG_FUNCTION_NOARGS();
-
-    delete m_crypto;
 }
 
 ////////////////////////
@@ -850,7 +847,7 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
 
     // Craft a LinkAdrAns MAC command as a response
     ///////////////////////////////////////////////
-    m_macCommandList.push_back(CreateObject<LinkAdrAns>(txPowerOk, dataRateOk, channelMaskOk));
+    m_macCommandList.push_back(Create<LinkAdrAns>(txPowerOk, dataRateOk, channelMaskOk));
 }
 
 void
@@ -866,7 +863,7 @@ EndDeviceLorawanMac::OnDutyCycleReq(double dutyCycle)
 
     // Craft a DutyCycleAns as response
     NS_LOG_INFO("Adding DutyCycleAns reply");
-    m_macCommandList.push_back(CreateObject<DutyCycleAns>());
+    m_macCommandList.push_back(Create<DutyCycleAns>());
 }
 
 void
@@ -892,7 +889,7 @@ EndDeviceLorawanMac::OnDevStatusReq(void)
 
     // Craft a RxParamSetupAns as response
     NS_LOG_INFO("Adding DevStatusAns reply");
-    m_macCommandList.push_back(CreateObject<DevStatusAns>(battery, margin));
+    m_macCommandList.push_back(Create<DevStatusAns>(battery, margin));
 }
 
 void
@@ -911,7 +908,7 @@ EndDeviceLorawanMac::OnNewChannelReq(uint8_t chIndex,
         AddLogicalChannel(chIndex, frequency, minDataRate, maxDataRate);
 
     NS_LOG_INFO("Adding NewChannelAns reply");
-    m_macCommandList.push_back(CreateObject<NewChannelAns>(dataRateRangeOk, channelFrequencyOk));
+    m_macCommandList.push_back(Create<NewChannelAns>(dataRateRangeOk, channelFrequencyOk));
 }
 
 void
@@ -931,7 +928,7 @@ EndDeviceLorawanMac::AddLogicalChannel(uint8_t chIndex,
     NS_LOG_FUNCTION(this << unsigned(chIndex) << frequency << unsigned(minDataRate)
                          << unsigned(maxDataRate));
 
-    AddLogicalChannel(chIndex, CreateObject<LogicalChannel>(frequency, minDataRate, maxDataRate));
+    AddLogicalChannel(chIndex, Create<LogicalChannel>(frequency, minDataRate, maxDataRate));
 }
 
 void
@@ -954,8 +951,7 @@ EndDeviceLorawanMac::OnDlChannelReq(uint8_t chIndex, double frequency)
         m_channelManager->SetReplyFrequency(chIndex, frequency);
 
     NS_LOG_INFO("Adding DlChannelAns reply");
-    m_macCommandList.push_back(
-        CreateObject<DlChannelAns>(uplinkFrequencyExists, channelFrequencyOk));
+    m_macCommandList.push_back(Create<DlChannelAns>(uplinkFrequencyExists, channelFrequencyOk));
 }
 
 void
@@ -1019,6 +1015,18 @@ EndDeviceLorawanMac::SetCluster(uint8_t clusterId)
     NS_LOG_FUNCTION(this << unsigned(clusterId));
 
     m_cluster = clusterId;
+}
+
+void
+EndDeviceLorawanMac::DoDispose()
+{
+    NS_LOG_FUNCTION(this);
+    m_macCommandList.clear();
+    m_retxParams.packet = nullptr;
+    m_uniformRV = nullptr;
+    m_nextTx.Cancel();
+    delete m_crypto;
+    LorawanMac::DoDispose();
 }
 
 } // namespace lorawan

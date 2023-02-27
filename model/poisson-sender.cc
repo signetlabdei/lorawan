@@ -44,7 +44,6 @@ PoissonSender::GetTypeId(void)
 
 PoissonSender::PoissonSender()
 {
-    m_interval = CreateObject<ExponentialRandomVariable>();
 }
 
 PoissonSender::~PoissonSender()
@@ -52,24 +51,33 @@ PoissonSender::~PoissonSender()
 }
 
 void
+PoissonSender::DoInitialize()
+{
+    NS_LOG_FUNCTION(this);
+    m_interval = CreateObjectWithAttributes<ExponentialRandomVariable>(
+        "Mean",
+        DoubleValue(m_avgInterval.GetSeconds()));
+    LoraApplication::DoInitialize();
+}
+
+void
+PoissonSender::DoDispose()
+{
+    NS_LOG_FUNCTION(this);
+    m_interval = nullptr;
+    LoraApplication::DoDispose();
+}
+
+void
 PoissonSender::StartApplication(void)
 {
     NS_LOG_FUNCTION(this);
-    m_interval->SetAttribute("Mean", DoubleValue(m_avgInterval.ToDouble(Time::S)));
-
     // Schedule the next SendPacket event
     Simulator::Cancel(m_sendEvent);
     NS_LOG_DEBUG("Starting up application with a first event with a " << m_initialDelay.GetSeconds()
                                                                       << " seconds delay");
     m_sendEvent = Simulator::Schedule(m_initialDelay, &PoissonSender::SendPacket, this);
     NS_LOG_DEBUG("Event Id: " << m_sendEvent.GetUid());
-}
-
-void
-PoissonSender::StopApplication(void)
-{
-    NS_LOG_FUNCTION_NOARGS();
-    Simulator::Cancel(m_sendEvent);
 }
 
 void

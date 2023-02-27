@@ -56,7 +56,7 @@ class LoraPhyHelper
      * \param device the device within which this PHY will be created.
      * \return a newly-created PHY object.
      */
-    Ptr<LoraPhy> Create(Ptr<LoraNetDevice> device) const;
+    Ptr<LoraPhy> Install(Ptr<LoraNetDevice> device) const;
 
     /**
      * \tparam Args \deduced Template type parameter pack for the sequence of name-value pairs.

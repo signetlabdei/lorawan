@@ -69,6 +69,9 @@ class NetworkController : public Object
      */
     void BeforeSendingReply(Ptr<EndDeviceStatus> endDeviceStatus);
 
+  protected:
+    void DoDispose() override;
+
   private:
     Ptr<NetworkStatus> m_status;
     std::list<Ptr<NetworkControllerComponent>> m_components;

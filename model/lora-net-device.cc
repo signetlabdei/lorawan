@@ -89,6 +89,24 @@ LoraNetDevice::DoInitialize()
 }
 
 void
+LoraNetDevice::DoDispose()
+{
+    NS_LOG_FUNCTION_NOARGS();
+    m_node = nullptr;
+    if (m_mac)
+    {
+        m_mac->Dispose();
+        m_mac = nullptr;
+    }
+    if (m_phy)
+    {
+        m_phy->Dispose();
+        m_phy = nullptr;
+    }
+    NetDevice::DoDispose();
+}
+
+void
 LoraNetDevice::SetMac(Ptr<LorawanMac> mac)
 {
     m_mac = mac;

@@ -173,6 +173,9 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      */
     virtual void OnRxTimingSetupReq(Time delay);
 
+  protected:
+    void DoDispose() override;
+
   private:
     /**
      * The interval between when a packet is done sending and when the first

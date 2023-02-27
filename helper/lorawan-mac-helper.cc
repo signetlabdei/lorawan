@@ -43,6 +43,11 @@ LorawanMacHelper::LorawanMacHelper()
     SetType("ns3::ClassAEndDeviceLorawanMac");
 }
 
+LorawanMacHelper::~LorawanMacHelper()
+{
+    m_addrGen = nullptr;
+}
+
 void
 LorawanMacHelper::SetRegion(enum LorawanMacHelper::Regions region)
 {
@@ -56,7 +61,7 @@ LorawanMacHelper::SetAddressGenerator(Ptr<LoraDeviceAddressGenerator> addrGen)
 }
 
 Ptr<LorawanMac>
-LorawanMacHelper::Create(Ptr<LoraNetDevice> device) const
+LorawanMacHelper::Install(Ptr<LoraNetDevice> device) const
 {
     Ptr<LorawanMac> mac = m_mac.Create<LorawanMac>();
     switch (m_region)
@@ -91,7 +96,7 @@ LorawanMacHelper::ConfigureForAlohaRegion(Ptr<LorawanMac> mac) const
     // Default channels //
     //////////////////////
 
-    Ptr<LogicalChannel> lc0 = CreateObject<LogicalChannel>(868100000, 0, 5);
+    Ptr<LogicalChannel> lc0 = Create<LogicalChannel>(868100000, 0, 5);
     channelHelper->AddChannel(0, lc0);
 
     mac->SetLogicalChannelManager(channelHelper);
@@ -172,9 +177,9 @@ LorawanMacHelper::ConfigureForEuRegion(Ptr<LorawanMac> mac) const
     // Default channels //
     //////////////////////
 
-    Ptr<LogicalChannel> lc0 = CreateObject<LogicalChannel>(868100000, 0, 5);
-    Ptr<LogicalChannel> lc1 = CreateObject<LogicalChannel>(868300000, 0, 5);
-    Ptr<LogicalChannel> lc2 = CreateObject<LogicalChannel>(868500000, 0, 5);
+    Ptr<LogicalChannel> lc0 = Create<LogicalChannel>(868100000, 0, 5);
+    Ptr<LogicalChannel> lc1 = Create<LogicalChannel>(868300000, 0, 5);
+    Ptr<LogicalChannel> lc2 = Create<LogicalChannel>(868500000, 0, 5);
     channelHelper->AddChannel(0, lc0);
     channelHelper->AddChannel(1, lc1);
     channelHelper->AddChannel(2, lc2);
@@ -183,11 +188,11 @@ LorawanMacHelper::ConfigureForEuRegion(Ptr<LorawanMac> mac) const
     // Addtional channels //
     ////////////////////////
 
-    Ptr<LogicalChannel> lc3 = CreateObject<LogicalChannel>(867100000, 0, 5);
-    Ptr<LogicalChannel> lc4 = CreateObject<LogicalChannel>(867300000, 0, 5);
-    Ptr<LogicalChannel> lc5 = CreateObject<LogicalChannel>(867500000, 0, 5);
-    Ptr<LogicalChannel> lc6 = CreateObject<LogicalChannel>(867700000, 0, 5);
-    Ptr<LogicalChannel> lc7 = CreateObject<LogicalChannel>(867900000, 0, 5);
+    Ptr<LogicalChannel> lc3 = Create<LogicalChannel>(867100000, 0, 5);
+    Ptr<LogicalChannel> lc4 = Create<LogicalChannel>(867300000, 0, 5);
+    Ptr<LogicalChannel> lc5 = Create<LogicalChannel>(867500000, 0, 5);
+    Ptr<LogicalChannel> lc6 = Create<LogicalChannel>(867700000, 0, 5);
+    Ptr<LogicalChannel> lc7 = Create<LogicalChannel>(867900000, 0, 5);
     // channelHelper->AddChannel (3, lc3);
     // channelHelper->AddChannel (4, lc4);
     // channelHelper->AddChannel (5, lc5);
@@ -270,7 +275,7 @@ LorawanMacHelper::ConfigureForSingleChannelRegion(Ptr<LorawanMac> mac) const
     // Default channels //
     //////////////////////
 
-    Ptr<LogicalChannel> lc0 = CreateObject<LogicalChannel>(868100000, 0, 5);
+    Ptr<LogicalChannel> lc0 = Create<LogicalChannel>(868100000, 0, 5);
     channelHelper->AddChannel(0, lc0);
 
     mac->SetLogicalChannelManager(channelHelper);
@@ -457,7 +462,7 @@ LorawanMacHelper::SetDutyCyclesWithCapacityModel(NodeContainer endDevices,
                 bestGateway = curr;
         }
 
-        auto tmp = ns3::Create<Packet>(app->GetPacketSize() + 13);
+        auto tmp = Create<Packet>(app->GetPacketSize() + 13);
         LoraTxParameters params;
         params.sf = 12 - mac->GetDataRate();
         params.lowDataRateOptimizationEnabled =

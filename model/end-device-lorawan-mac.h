@@ -392,6 +392,8 @@ class EndDeviceLorawanMac : public LorawanMac
     void AddMacCommand(Ptr<MacCommand> macCommand);
 
   protected:
+    void DoDispose() override;
+
     /**
      * Structure representing the parameters that will be used in the
      * retransmission procedure.
@@ -510,21 +512,13 @@ class EndDeviceLorawanMac : public LorawanMac
     bool m_controlDataRate;
 
     /**
-     * The event of retransmitting a packet in a consecutive moment if an ACK is not received.
+     * The event of transmitting a packet in a consecutive moment, when the duty cycle let us
+     * transmit or if an ACK is not received.
      *
-     * This Event is used to cancel the retransmission if the ACK is found in ParseCommand function
-     * and if a newer packet is delivered from the application to be sent.
+     * This Event is also used to cancel the transmission of this packet if a newer packet is
+     * delivered from the application to be sent.
      */
     EventId m_nextTx;
-
-    /**
-     * The event of transmitting a packet in a consecutive moment, when the duty cycle let us
-     * transmit.
-     *
-     * This Event is used to cancel the transmission of this packet if a newer packet is delivered
-     * from the application to be sent.
-     */
-    EventId m_nextRetx;
 
     /**
      * The last known link margin.

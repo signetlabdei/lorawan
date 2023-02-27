@@ -182,6 +182,9 @@ class GatewayLoraPhy : public LoraPhy
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_noReceptionBecauseTransmitting;
 
+  protected:
+    void DoDispose() override;
+
   private:
     /**
      * Used to schedule a change in the gateway transmission state

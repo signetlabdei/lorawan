@@ -852,10 +852,10 @@ LogicalChannelTest::DoRun(void)
     /////////////////////////////
 
     // Setup
-    Ptr<LogicalChannel> channel0 = CreateObject<LogicalChannel>(868000000);
-    Ptr<LogicalChannel> channel1 = CreateObject<LogicalChannel>(868000000);
-    Ptr<LogicalChannel> channel2 = CreateObject<LogicalChannel>(868100000);
-    Ptr<LogicalChannel> channel3 = CreateObject<LogicalChannel>(868001000);
+    Ptr<LogicalChannel> channel0 = Create<LogicalChannel>(868000000);
+    Ptr<LogicalChannel> channel1 = Create<LogicalChannel>(868000000);
+    Ptr<LogicalChannel> channel2 = Create<LogicalChannel>(868100000);
+    Ptr<LogicalChannel> channel3 = Create<LogicalChannel>(868001000);
 
     // Equality between channels
     // Test the == and != operators
@@ -869,7 +869,7 @@ LogicalChannelTest::DoRun(void)
 
     // Setup
     SubBand subBand0(868000000, 868700000, 0.01, 14);
-    Ptr<LogicalChannel> channel4 = CreateObject<LogicalChannel>(870);
+    Ptr<LogicalChannel> channel4 = Create<LogicalChannel>(870000000);
 
     // Test BelongsToSubBand
     NS_TEST_EXPECT_MSG_EQ(subBand0.BelongsToSubBand(channel2),
@@ -889,11 +889,11 @@ LogicalChannelTest::DoRun(void)
     // Setup
     Ptr<LogicalChannelManager> channelHelper = CreateObject<LogicalChannelManager>();
     SubBand subBand1(869000000, 869400000, 0.1, 27);
-    channel0 = CreateObject<LogicalChannel>(868100000);
-    channel1 = CreateObject<LogicalChannel>(868300000);
-    channel2 = CreateObject<LogicalChannel>(868500000);
-    channel3 = CreateObject<LogicalChannel>(869100000);
-    channel4 = CreateObject<LogicalChannel>(869300000);
+    channel0 = Create<LogicalChannel>(868100000);
+    channel1 = Create<LogicalChannel>(868300000);
+    channel2 = Create<LogicalChannel>(868500000);
+    channel3 = Create<LogicalChannel>(869100000);
+    channel4 = Create<LogicalChannel>(869300000);
 
     // Channel diagram
     //
