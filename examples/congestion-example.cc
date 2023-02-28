@@ -13,8 +13,6 @@
 #include "ns3/propagation-delay-model.h"
 
 // lorawan imports
-#include "utilities.cc"
-
 #include "ns3/basic-energy-source-helper.h"
 #include "ns3/forwarder-helper.h"
 #include "ns3/hex-grid-position-allocator.h"
@@ -30,6 +28,7 @@ using namespace ns3;
 using namespace lorawan;
 
 NS_LOG_COMPONENT_DEFINE("CongestionExample");
+#include "utilities.cc"
 
 int
 main(int argc, char* argv[])

@@ -1,5 +1,3 @@
-#include "utilities.cc"
-
 #include "ns3/building-allocator.h"
 #include "ns3/building-penetration-loss.h"
 #include "ns3/buildings-helper.h"
@@ -36,6 +34,7 @@ using namespace ns3;
 using namespace lorawan;
 
 NS_LOG_COMPONENT_DEFINE("AlohaThroughput");
+#include "utilities.cc"
 
 // Network settings
 int nDevices = 200;
@@ -45,27 +44,6 @@ double simulationTime = 100;
 
 // Channel model
 bool realisticChannelModel = false;
-
-std::vector<int> packetsSent(6, 0);
-std::vector<int> packetsReceived(6, 0);
-
-void
-OnTransmissionCallback(Ptr<const Packet> packet, uint32_t systemId)
-{
-    NS_LOG_FUNCTION(packet << systemId);
-    LoraTag tag;
-    packet->PeekPacketTag(tag);
-    packetsSent.at(tag.GetSpreadingFactor() - 7)++;
-}
-
-void
-OnPacketReceptionCallback(Ptr<const Packet> packet, uint32_t systemId)
-{
-    NS_LOG_FUNCTION(packet << systemId);
-    LoraTag tag;
-    packet->PeekPacketTag(tag);
-    packetsReceived.at(tag.GetSpreadingFactor() - 7)++;
-}
 
 int
 main(int argc, char* argv[])

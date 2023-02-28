@@ -15,8 +15,6 @@
 #include "ns3/tap-bridge-helper.h"
 
 // lorawan imports
-#include "utilities.cc"
-
 #include "ns3/chirpstack-helper.h"
 #include "ns3/hex-grid-position-allocator.h"
 #include "ns3/lora-helper.h"
@@ -32,15 +30,10 @@ using namespace ns3;
 using namespace lorawan;
 
 NS_LOG_COMPONENT_DEFINE("ChirpstackExample");
+#include "utilities.cc"
 
 /* Global declaration of connection helper for signal handling */
 ChirpstackHelper csHelper;
-
-void
-OnStateChange(EndDeviceLoraPhy::State oldS, EndDeviceLoraPhy::State newS)
-{
-    NS_LOG_DEBUG("State change " << stateMap.at(oldS) << " -> " << stateMap.at(newS));
-}
 
 int
 main(int argc, char* argv[])
