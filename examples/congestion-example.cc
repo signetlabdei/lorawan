@@ -292,7 +292,8 @@ main(int argc, char* argv[])
         serverHelper.SetEndDevices(endDevices); // Register devices (saves mac layer)
         serverHelper.EnableAdr(adrEnabled);
         serverHelper.EnableCongestionControl(congest);
-        serverHelper.AssignClusters(clusters); // Assignes one freq. by default
+        serverHelper.AssignClusters(clusters); 
+        serverHelper.AssignSingleFrequency(); // Assignes one freq. per cluster
         serverHelper.Install(server);
 
         // Install the Forwarder application on the gateways
@@ -316,6 +317,7 @@ main(int argc, char* argv[])
                                                              "Bound",
                                                              DoubleValue(18)));
         // UrbanTrafficHelper appHelper = UrbanTrafficHelper ();
+        // appHelper.SetDeviceGroups(Commercial); 
         ApplicationContainer apps = appHelper.Install(endDevices);
 
         // Late (dis)activation of devices

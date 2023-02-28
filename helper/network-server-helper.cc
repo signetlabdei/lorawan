@@ -168,16 +168,6 @@ NetworkServerHelper::AssignClusters(cluster_t clustersInfo)
         auto mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
         NS_ASSERT(bool(mac));
         mac->SetCluster(currCluster);
-        // Assign one frequency to each cluster
-        int chid = 0;
-        for (auto& ch : mac->GetLogicalChannelManager()->GetChannelList())
-        {
-            if (chid == currCluster)
-                ch->SetEnabledForUplink();
-            else
-                ch->DisableForUplink();
-            chid++;
-        }
         totWeight += devWeight;
         if (currCluster < nClusters - 1 and
             totWeight >= clustersInfo[currCluster].first - devWeight / 2)
@@ -189,6 +179,29 @@ NetworkServerHelper::AssignClusters(cluster_t clustersInfo)
     m_clusterTargets.clear();
     for (const auto& cluster : clustersInfo)
         m_clusterTargets.push_back(cluster.second);
+}
+
+void
+NetworkServerHelper::AssignSingleFrequency()
+{
+    NS_ASSERT_MSG(m_endDevices.GetN() > 0, "Devices must be set before assigning frequencies.");
+    for (auto i = m_endDevices.Begin(); i != m_endDevices.End(); ++i)
+    {
+        auto loraNetDevice = DynamicCast<LoraNetDevice>((*i)->GetDevice(0));
+        NS_ASSERT(bool(loraNetDevice));
+        auto mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
+        NS_ASSERT(bool(mac));
+        // Assign one frequency to each cluster
+        int chid = 0;
+        for (auto& ch : mac->GetLogicalChannelManager()->GetChannelList())
+        {
+            if (chid == mac->GetCluster())
+                ch->SetEnabledForUplink();
+            else
+                ch->DisableForUplink();
+            chid++;
+        }
+    }
 }
 
 void

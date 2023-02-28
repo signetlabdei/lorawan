@@ -87,6 +87,11 @@ class NetworkServerHelper
      */
     void AssignClusters(cluster_t clustersInfo);
 
+    /**
+     * Assign one frequency to each cluster to create interference domains.
+     */
+    void AssignSingleFrequency(void);
+
   private:
     void InstallComponents(Ptr<NetworkServer> netServer);
     Ptr<Application> InstallPriv(Ptr<Node> node);
