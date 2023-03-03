@@ -344,7 +344,7 @@ AdrComponent::GetReceivedPower(EndDeviceStatus::GatewayList gwList)
 
 // TODO Make this more elegant
 double
-AdrComponent::GetMinSNR(EndDeviceStatus::ReceivedPacketList packetList, int historyRange)
+AdrComponent::GetMinSNR(const EndDeviceStatus::ReceivedPacketList& packetList, int historyRange)
 {
     double m_SNR;
 
@@ -371,7 +371,7 @@ AdrComponent::GetMinSNR(EndDeviceStatus::ReceivedPacketList packetList, int hist
 }
 
 double
-AdrComponent::GetMaxSNR(EndDeviceStatus::ReceivedPacketList packetList, int historyRange)
+AdrComponent::GetMaxSNR(const EndDeviceStatus::ReceivedPacketList& packetList, int historyRange)
 {
     double m_SNR;
 
@@ -398,7 +398,7 @@ AdrComponent::GetMaxSNR(EndDeviceStatus::ReceivedPacketList packetList, int hist
 }
 
 double
-AdrComponent::GetAverageSNR(EndDeviceStatus::ReceivedPacketList packetList, int historyRange)
+AdrComponent::GetAverageSNR(const EndDeviceStatus::ReceivedPacketList& packetList, int historyRange)
 {
     double sum = 0;
     double m_SNR;

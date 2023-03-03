@@ -77,11 +77,11 @@ class AdrComponent : public NetworkControllerComponent
 
     double GetReceivedPower(EndDeviceStatus::GatewayList gwList);
 
-    double GetMinSNR(EndDeviceStatus::ReceivedPacketList packetList, int historyRange);
+    double GetMinSNR(const EndDeviceStatus::ReceivedPacketList& packetList, int historyRange);
 
-    double GetMaxSNR(EndDeviceStatus::ReceivedPacketList packetList, int historyRange);
+    double GetMaxSNR(const EndDeviceStatus::ReceivedPacketList& packetList, int historyRange);
 
-    double GetAverageSNR(EndDeviceStatus::ReceivedPacketList packetList, int historyRange);
+    double GetAverageSNR(const EndDeviceStatus::ReceivedPacketList& packetList, int historyRange);
 
     int GetTxPowerIndex(int txPower);
 
