@@ -55,10 +55,6 @@ class OneShotSender : public LoraApplication
      */
     void StartApplication(void);
 
-    /**
-     * Stop the application.
-     */
-    void StopApplication(void);
 };
 
 } // namespace lorawan

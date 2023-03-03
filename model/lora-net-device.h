@@ -89,14 +89,9 @@ class LoraNetDevice : public NetDevice
 
   protected:
     void DoInitialize() override;
+    void DoDispose() override;
 
   private:
-    /**
-     * Return the LoraChannel this device is connected to.
-     * Used by attribute system
-     */
-    Ptr<LoraChannel> DoGetChannel(void) const;
-
     /**
      * Complete the configuration of this LoRa device by connecting all lower
      * components (PHY, MAC, Channel) together.

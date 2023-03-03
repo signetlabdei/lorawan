@@ -86,11 +86,5 @@ OneShotSender::StartApplication(void)
     m_sendEvent = Simulator::Schedule(m_initialDelay, &OneShotSender::SendPacket, this);
 }
 
-void
-OneShotSender::StopApplication(void)
-{
-    NS_LOG_FUNCTION_NOARGS();
-    Simulator::Cancel(m_sendEvent);
-}
 } // namespace lorawan
 } // namespace ns3

@@ -93,5 +93,18 @@ NetworkController::BeforeSendingReply(Ptr<EndDeviceStatus> endDeviceStatus)
     }
 }
 
+void
+NetworkController::DoDispose(void)
+{
+    NS_LOG_FUNCTION(this);
+    for (auto c : m_components)
+    {
+        c->Dispose();
+    }
+    m_components.clear();
+    m_status = nullptr;
+    Object::DoDispose();
+}
+
 } // namespace lorawan
 } // namespace ns3

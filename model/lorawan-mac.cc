@@ -200,5 +200,21 @@ LorawanMac::SetReceiveCallback(ReceiveCallback cb)
     m_receiveCallback = cb;
 }
 
+void
+LorawanMac::DoDispose()
+{
+    NS_LOG_FUNCTION(this);
+
+    if (m_channelManager)
+    {
+        m_channelManager->Dispose();
+    }
+    m_channelManager = nullptr;
+    
+    m_phy = nullptr;
+    m_device = nullptr;
+    Object::DoDispose();
+}
+
 } // namespace lorawan
 } // namespace ns3

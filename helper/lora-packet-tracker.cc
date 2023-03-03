@@ -48,6 +48,9 @@ LoraPacketTracker::LoraPacketTracker()
 LoraPacketTracker::~LoraPacketTracker()
 {
     NS_LOG_FUNCTION(this);
+    m_packetTracker.clear();
+    m_macPacketTracker.clear();
+    m_reTransmissionTracker.clear();
 }
 
 /////////////////

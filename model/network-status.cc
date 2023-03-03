@@ -245,5 +245,23 @@ NetworkStatus::CountEndDevices(void)
 
     return m_endDeviceStatuses.size();
 }
+
+void
+NetworkStatus::DoDispose(void)
+{
+    NS_LOG_FUNCTION(this);
+    for (auto dev : m_endDeviceStatuses)
+    {
+        dev.second->Dispose();
+    }
+    m_endDeviceStatuses.clear();
+    for (auto gw : m_gatewayStatuses)
+    {
+        gw.second->Dispose();
+    }
+    m_gatewayStatuses.clear();
+    Object::DoDispose();
+}
+
 } // namespace lorawan
 } // namespace ns3

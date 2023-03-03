@@ -35,15 +35,6 @@ namespace lorawan
 
 NS_LOG_COMPONENT_DEFINE("MacCommand");
 
-NS_OBJECT_ENSURE_REGISTERED(MacCommand);
-
-TypeId
-MacCommand::GetTypeId(void)
-{
-    static TypeId tid = TypeId("ns3::MacCommand").SetParent<Object>().SetGroupName("lorawan");
-    return tid;
-}
-
 MacCommand::MacCommand()
 {
     NS_LOG_FUNCTION(this);
@@ -129,11 +120,6 @@ LinkCheckReq::LinkCheckReq()
     NS_LOG_FUNCTION_NOARGS();
     m_commandType = LINK_CHECK_REQ;
     m_serializedSize = 1;
-}
-
-LinkCheckReq::~LinkCheckReq()
-{
-    NS_LOG_FUNCTION_NOARGS();
 }
 
 void

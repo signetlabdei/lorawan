@@ -172,7 +172,6 @@ class EndDeviceStatus : public Object
     struct ReceivedPacketInfo
     {
         // Members
-        Ptr<const Packet> packet = 0; //!< The received packet
         GatewayList gwList;           //!< List of gateways that received this packet.
         uint8_t sf;
         double frequency;
@@ -222,7 +221,7 @@ class EndDeviceStatus : public Object
      *
      * \return The received packet list.
      */
-    ReceivedPacketList GetReceivedPacketList(void);
+    const ReceivedPacketList& GetReceivedPacketList(void);
 
     /**
      * Set the spreading factor this device is using in the first receive window.
@@ -292,11 +291,6 @@ class EndDeviceStatus : public Object
     void AddMACCommand(Ptr<MacCommand> macCommand);
 
     /**
-     * Update Gateway data when more then one gateway receive the same packet.
-     */
-    void UpdateGatewayData(GatewayList gwList, Address gwAddress, double rcvPower);
-
-    /**
      * Returns whether we already decided we will schedule a transmission to this ED
      */
     bool HasReceiveWindowOpportunityScheduled();
@@ -315,6 +309,9 @@ class EndDeviceStatus : public Object
     LoraDeviceAddress m_endDeviceAddress; //<! The address of this device
 
     friend std::ostream& operator<<(std::ostream& os, const EndDeviceStatus& status);
+
+  protected:
+    void DoDispose() override;
 
   private:
     // Receive window data

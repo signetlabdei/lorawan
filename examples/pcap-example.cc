@@ -4,11 +4,14 @@
  * network.
  */
 
-#include "ns3/application-container.h"
 #include "ns3/core-module.h"
-#include "ns3/lorawan-module.h"
-#include "ns3/mobility-module.h"
-#include "ns3/propagation-module.h"
+#include "ns3/propagation-loss-model.h"
+#include "ns3/mobility-helper.h"
+#include "ns3/lora-helper.h"
+#include "ns3/network-server-helper.h"
+#include "ns3/forwarder-helper.h"
+#include "ns3/periodic-sender-helper.h"
+#include "ns3/point-to-point-helper.h"
 
 using namespace ns3;
 using namespace lorawan;

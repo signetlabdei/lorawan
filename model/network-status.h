@@ -119,6 +119,9 @@ class NetworkStatus : public Object
      */
     int CountEndDevices(void);
 
+  protected:
+    void DoDispose() override;
+
   public:
     std::map<LoraDeviceAddress, Ptr<EndDeviceStatus>> m_endDeviceStatuses;
     std::map<Address, Ptr<GatewayStatus>> m_gatewayStatuses;

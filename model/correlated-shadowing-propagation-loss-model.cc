@@ -55,6 +55,13 @@ CorrelatedShadowingPropagationLossModel::GetTypeId(void)
 
 CorrelatedShadowingPropagationLossModel::CorrelatedShadowingPropagationLossModel()
 {
+    NS_LOG_FUNCTION_NOARGS();
+}
+
+CorrelatedShadowingPropagationLossModel::~CorrelatedShadowingPropagationLossModel()
+{
+    NS_LOG_FUNCTION_NOARGS();
+    m_shadowingGrid.clear();
 }
 
 double
@@ -155,6 +162,8 @@ CorrelatedShadowingPropagationLossModel::ShadowingMap::ShadowingMap()
 CorrelatedShadowingPropagationLossModel::ShadowingMap::~ShadowingMap()
 {
     NS_LOG_FUNCTION_NOARGS();
+    m_shadowingMap.clear();
+    m_shadowingValue = nullptr;
 }
 
 double

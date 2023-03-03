@@ -74,6 +74,7 @@ class LoraApplication : public Application
 
   protected:
     void DoInitialize() override;
+    void DoDispose() override;
 
     /**
      * Start the application by scheduling the first SendPacket event

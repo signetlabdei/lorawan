@@ -57,6 +57,9 @@ BuildingPenetrationLoss::BuildingPenetrationLoss()
 BuildingPenetrationLoss::~BuildingPenetrationLoss()
 {
     NS_LOG_FUNCTION_NOARGS();
+    m_uniformRV = nullptr;
+    m_pMap.clear();
+    m_wallLossMap.clear();
 }
 
 double

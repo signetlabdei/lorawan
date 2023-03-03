@@ -34,7 +34,7 @@ namespace lorawan
 /**
  * This class can be used to install devices and gateways on a real
  * chirpstack network server using the REST API.
- * Requires libcurlpp and libcurl installed.
+ * Requires libcurl-dev installed.
  */
 class ChirpstackHelper
 {

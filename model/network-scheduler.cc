@@ -153,5 +153,15 @@ NetworkScheduler::OnReceiveWindowOpportunity(LoraDeviceAddress deviceAddress, in
         }
     }
 }
+
+void
+NetworkScheduler::DoDispose(void)
+{
+    NS_LOG_FUNCTION(this);
+    m_status = nullptr;
+    m_controller = nullptr;
+    Object::DoDispose();
+}
+
 } // namespace lorawan
 } // namespace ns3

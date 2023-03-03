@@ -324,8 +324,9 @@ void
 LoraRadioEnergyModel::DoDispose(void)
 {
     NS_LOG_FUNCTION(this);
-    m_source = NULL;
-    m_energyDepletionCallback.Nullify();
+    m_source = nullptr;
+    m_txCurrentModel = nullptr;
+    DeviceEnergyModel::DoDispose();
 }
 
 double

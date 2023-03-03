@@ -86,6 +86,9 @@ class GatewayStatus : public Object
     void SetNextTransmissionTime(Time nextTransmissionTime);
     // Time GetNextTransmissionTime (void);
 
+  protected:
+    void DoDispose() override;
+
   private:
     Address m_address; //!< The Address of the P2PNetDevice of this gateway
 

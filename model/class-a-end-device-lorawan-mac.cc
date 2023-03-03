@@ -576,7 +576,7 @@ ClassAEndDeviceLorawanMac::OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSe
 
     // Craft a RxParamSetupAns as response
     NS_LOG_INFO("Adding RxParamSetupAns reply");
-    m_macCommandList.push_back(CreateObject<RxParamSetupAns>(offsetOk, dataRateOk, channelOk));
+    m_macCommandList.push_back(Create<RxParamSetupAns>(offsetOk, dataRateOk, channelOk));
 }
 
 void
@@ -587,7 +587,17 @@ ClassAEndDeviceLorawanMac::OnRxTimingSetupReq(Time delay)
     m_receiveDelay1 = delay;
 
     NS_LOG_INFO("Adding RxTimingSetupAns reply");
-    m_macCommandList.push_back(CreateObject<RxTimingSetupAns>());
+    m_macCommandList.push_back(Create<RxTimingSetupAns>());
+}
+
+void
+ClassAEndDeviceLorawanMac::DoDispose()
+{
+    NS_LOG_FUNCTION(this);
+    m_closeFirstWindow.Cancel();
+    m_closeSecondWindow.Cancel();
+    m_secondReceiveWindow.Cancel();
+    EndDeviceLorawanMac::DoDispose();
 }
 
 } /* namespace lorawan */

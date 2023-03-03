@@ -76,6 +76,10 @@ class Forwarder : public Application
                                  uint16_t protocol,
                                  const Address& sender);
 
+  protected:
+    void DoDispose() override;
+
+  private:
     /**
      * Start the application
      */
@@ -86,7 +90,6 @@ class Forwarder : public Application
      */
     void StopApplication(void);
 
-  private:
     Ptr<LorawanMac> m_mac;                              //!< Pointer to the node's lorawan mac
     Ptr<PointToPointNetDevice> m_pointToPointNetDevice; //!< Pointer to the P2PNetDevice to the NS
 };

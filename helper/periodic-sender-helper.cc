@@ -56,7 +56,6 @@ PeriodicSenderHelper::PeriodicSenderHelper()
     m_intervalProb->SetAttribute("Max", DoubleValue(1));
 
     m_pktSize = 10;
-    m_pktSizeRV = 0;
 
     m_intervalGenerator = 0;
     m_sizeGenerator = 0;
@@ -64,6 +63,10 @@ PeriodicSenderHelper::PeriodicSenderHelper()
 
 PeriodicSenderHelper::~PeriodicSenderHelper()
 {
+    m_initialDelay = nullptr;
+    m_intervalProb = nullptr;
+    m_intervalGenerator = nullptr;
+    m_sizeGenerator = nullptr;
 }
 
 void
@@ -141,11 +144,6 @@ PeriodicSenderHelper::InstallPriv(Ptr<Node> node) const
     {
         app->SetPacketSize(m_sizeGenerator->GetInteger());
     }
-    // Different each transmission
-    if (m_pktSizeRV)
-    {
-        app->SetPacketSizeRandomVariable(m_pktSizeRV);
-    }
 
     app->SetNode(node);
     node->AddApplication(app);
@@ -157,12 +155,6 @@ void
 PeriodicSenderHelper::SetPeriod(Time period)
 {
     m_period = period;
-}
-
-void
-PeriodicSenderHelper::SetPacketSizeRandomVariable(Ptr<RandomVariableStream> rv)
-{
-    m_pktSizeRV = rv;
 }
 
 void

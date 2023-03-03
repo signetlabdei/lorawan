@@ -5,6 +5,7 @@
 #include "ns3/log.h"
 #include "ns3/lora-helper.h"
 #include "ns3/lora-interference-helper.h"
+#include "ns3/lora-tag.h"
 
 #include <csignal>
 #include <iomanip>
@@ -125,3 +126,30 @@ std::map<EndDeviceLoraPhy::State, std::string> stateMap = {
     {EndDeviceLoraPhy::State::TX, "TX"},
     {EndDeviceLoraPhy::State::STANDBY, "STANDBY"},
     {EndDeviceLoraPhy::State::RX, "RX"}};
+
+void
+OnStateChange(EndDeviceLoraPhy::State oldS, EndDeviceLoraPhy::State newS)
+{
+    NS_LOG_DEBUG("State change " << stateMap.at(oldS) << " -> " << stateMap.at(newS));
+}
+
+std::vector<int> packetsSent(6, 0);
+std::vector<int> packetsReceived(6, 0);
+
+void
+OnTransmissionCallback(Ptr<const Packet> packet, uint32_t systemId)
+{
+    NS_LOG_FUNCTION(packet << systemId);
+    LoraTag tag;
+    packet->PeekPacketTag(tag);
+    packetsSent.at(tag.GetSpreadingFactor() - 7)++;
+}
+
+void
+OnPacketReceptionCallback(Ptr<const Packet> packet, uint32_t systemId)
+{
+    NS_LOG_FUNCTION(packet << systemId);
+    LoraTag tag;
+    packet->PeekPacketTag(tag);
+    packetsReceived.at(tag.GetSpreadingFactor() - 7)++;
+}

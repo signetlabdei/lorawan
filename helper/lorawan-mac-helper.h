@@ -59,6 +59,7 @@ class LorawanMacHelper
      * them all to be able to call Install later.
      */
     LorawanMacHelper();
+    ~LorawanMacHelper();
 
     /**
      * Set the region in which the device is to operate.
@@ -87,7 +88,7 @@ class LorawanMacHelper
      * \param device the device within which this MAC will be created.
      * \returns a newly-created LorawanMac object.
      */
-    Ptr<LorawanMac> Create(Ptr<LoraNetDevice> device) const;
+    Ptr<LorawanMac> Install(Ptr<LoraNetDevice> device) const;
 
     /**
      * Set up the end device's data rates with the criteria from the default ADR algortithm

@@ -217,11 +217,13 @@ class EndDeviceLoraPhy : public LoraPhy
     void UnregisterListener(EndDeviceLoraPhyListener* listener);
 
   protected:
+    void DoDispose() override;
+
     // Implementation of LoraPhy's pure virtual functions
     virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event);
 
     /**
-     * Internal call when transmission finishes. 
+     * Internal call when transmission finishes.
      */
     void TxFinished(Ptr<Packet> packet);
 

@@ -61,6 +61,7 @@ GatewayLoraPhy::ReceptionPath::Free(void)
 {
     m_available = true;
     m_event = 0;
+    m_endReceiveEventId.Cancel();
     m_endReceiveEventId = EventId();
 }
 
@@ -289,6 +290,18 @@ GatewayLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event
             m_occupiedReceptionPaths--;
             return;
         }
+}
+
+void
+GatewayLoraPhy::DoDispose()
+{
+    NS_LOG_FUNCTION(this);
+    for (auto rp : m_receptionPaths)
+    {
+        rp->Free();
+    }
+    m_receptionPaths.clear();
+    LoraPhy::DoDispose();
 }
 
 // Uplink sensitivity (Source: SX1301 datasheet)

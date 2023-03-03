@@ -107,6 +107,9 @@ class NetworkServer : public Application
     Ptr<NetworkStatus> GetNetworkStatus(void);
 
   protected:
+    void DoInitialize() override;
+    void DoDispose() override;
+
     Ptr<NetworkStatus> m_status;
     Ptr<NetworkController> m_controller;
     Ptr<NetworkScheduler> m_scheduler;
