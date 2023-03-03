@@ -26,6 +26,7 @@
 #include "ns3/adr-component.h"
 #include "ns3/congestion-control-component.h"
 #include "ns3/double.h"
+#include "ns3/rl-component.h"
 #include "ns3/log.h"
 #include "ns3/network-controller-components.h"
 #include "ns3/point-to-point-channel.h"
@@ -42,7 +43,8 @@ NS_LOG_COMPONENT_DEFINE("NetworkServerHelper");
 
 NetworkServerHelper::NetworkServerHelper()
     : m_adrEnabled(false),
-      m_ccEnabled(false)
+      m_ccEnabled(false),
+      m_rlEnabled(false)
 {
     m_factory.SetTypeId("ns3::NetworkServer");
     SetAdr("ns3::AdrComponent");
@@ -151,6 +153,14 @@ NetworkServerHelper::EnableCongestionControl(bool enableCC)
 }
 
 void
+NetworkServerHelper::EnableRl(bool enableRl)
+{
+    NS_LOG_FUNCTION(this << enableRl);
+
+    m_rlEnabled = enableRl;
+}
+
+void
 NetworkServerHelper::AssignClusters(cluster_t clustersInfo)
 {
     int nClusters = clustersInfo.size();
@@ -229,6 +239,14 @@ NetworkServerHelper::InstallComponents(Ptr<NetworkServer> netServer)
         Ptr<CongestionControlComponent> ccc = CreateObject<CongestionControlComponent>();
         ccc->SetTargets(m_clusterTargets);
         netServer->AddComponent(ccc);
+    }
+
+    // Add inter process communication support
+    if (m_rlEnabled)
+    {
+        auto rlc = CreateObject<RlComponent>();
+        rlc->SetTargets(m_clusterTargets);
+        netServer->AddComponent(rlc);
     }
 }
 

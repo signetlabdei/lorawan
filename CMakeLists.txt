@@ -38,6 +38,8 @@ set(source_files
     model/lora-utils.cc
     model/adr-component.cc
     model/congestion-control-component.cc
+    model/rl-component.cc
+    model/ipc-handler.cc
     model/traffic-control-utils.cc
     model/hex-grid-position-allocator.cc
     model/range-position-allocator.cc
@@ -105,6 +107,8 @@ set(header_files
     model/lora-utils.h
     model/adr-component.h
     model/congestion-control-component.h
+    model/rl-component.h
+    model/ipc-handler.h
     model/traffic-control-utils.h
     model/hex-grid-position-allocator.h
     model/range-position-allocator.h
@@ -151,6 +155,9 @@ build_lib(
     ${libcsma}
     ${curl_LIBRARIES}
     ${ortools_LIBRARIES}
+    ${zmq_LIBRARIES}
+    # to be able to build examples
+    ${libinternet-apps}
   TEST_SOURCES
     test/utilities.cc
     test/lorawan-test-suite.cc

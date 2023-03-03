@@ -83,7 +83,13 @@ class NetworkServerHelper
     void EnableCongestionControl(bool enableCC);
 
     /**
-     * Assign cluster membership to devices and create interference domains.
+     * Enable (true) or disable (false) the reinforcement learning component
+     * in the Network Server created by this helper.
+     */
+    void EnableRl(bool enableRl);
+
+    /**
+     * Assign cluster membership to devices.
      */
     void AssignClusters(cluster_t clustersInfo);
 
@@ -103,6 +109,8 @@ class NetworkServerHelper
     bool m_adrEnabled;
 
     bool m_ccEnabled;
+
+    bool m_rlEnabled;
 
     ObjectFactory m_adrSupportFactory;
 
