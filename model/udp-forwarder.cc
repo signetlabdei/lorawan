@@ -34,6 +34,7 @@
 #include "ns3/timersync.h"
 #include "ns3/trace.h"
 #include "ns3/uinteger.h"
+#include "ns3/rng-seed-manager.h"
 
 #include <arpa/inet.h>
 #include <cstdio>
@@ -296,7 +297,7 @@ UdpForwarder::Configure(void)
 
     /* gateway unique identifier */
     char eui[17];
-    lgwm = GetNode()->GetId();
+    lgwm = (RngSeedManager::GetRun() << 48) + GetNode()->GetId();
     snprintf(eui, 17, "%016lx", lgwm);
     NS_LOG_INFO("gateway ID is configured to " << eui);
 
