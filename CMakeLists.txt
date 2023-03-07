@@ -146,6 +146,8 @@ build_lib(
     ${libtap-bridge}
     ${libcsma}
     ${curl_LIBRARIES}
+    # to enable examples when only building this module
+    # ${libinternet-apps}
   TEST_SOURCES
     test/utilities.cc
     test/lorawan-test-suite.cc
