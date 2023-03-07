@@ -46,8 +46,6 @@ namespace lorawan
  */
 class NetworkServerHelper
 {
-    using cluster_t = std::vector<std::pair<double, double>>;
-
   public:
     NetworkServerHelper();
 
@@ -113,8 +111,6 @@ class NetworkServerHelper
     bool m_rlEnabled;
 
     ObjectFactory m_adrSupportFactory;
-
-    std::vector<double> m_clusterTargets;
 };
 
 } // namespace lorawan
