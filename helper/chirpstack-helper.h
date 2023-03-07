@@ -63,7 +63,7 @@ class ChirpstackHelper
 
     ~ChirpstackHelper();
 
-    int InitConnection(const str address, uint16_t port);
+    int InitConnection(const str address, uint16_t port, const str token);
 
     void CloseConnection(int signal) const;
 
@@ -71,13 +71,11 @@ class ChirpstackHelper
 
     int Register(Ptr<Node> node) const;
 
-    void SetToken (str& token);
-    
-    void SetTenant (str& name);
+    void SetTenant(str& name);
 
-    void SetDeviceProfile (str& name);
+    void SetDeviceProfile(str& name);
 
-    void SetApplication (str& name);
+    void SetApplication(str& name);
 
   private:
     int DoConnect(void);
@@ -108,6 +106,7 @@ class ChirpstackHelper
     struct curl_slist* m_header = NULL;
 
     session_t m_session;
+    uint64_t m_run;
 
     static const struct coord_s m_center;
 };

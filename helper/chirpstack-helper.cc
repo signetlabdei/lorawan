@@ -25,6 +25,7 @@
 #include "ns3/log.h"
 #include "ns3/lora-net-device.h"
 #include "ns3/parson.h"
+#include "ns3/rng-seed-manager.h"
 
 namespace ns3
 {
@@ -36,6 +37,7 @@ NS_LOG_COMPONENT_DEFINE("ChirpstackHelper");
 const struct coord_s ChirpstackHelper::m_center = {48.866831, 2.356719, 42};
 
 ChirpstackHelper::ChirpstackHelper()
+    : m_run(1)
 {
     m_url = "http://localhost:8090/";
 
@@ -52,14 +54,16 @@ ChirpstackHelper::~ChirpstackHelper()
 }
 
 int
-ChirpstackHelper::InitConnection(const str address, uint16_t port)
+ChirpstackHelper::InitConnection(const str address, uint16_t port, const str token)
 {
     NS_LOG_FUNCTION(this << address << (unsigned)port);
 
     /* Setup base URL string with IP and port */
-
     m_url = "http://" + address + ":" + std::to_string(port);
     NS_LOG_INFO("Chirpstack REST API URL set to: " << m_url);
+
+    /* set API token */
+    m_token = token;
 
     /* Initialize HTTP header fields */
     curl_slist_free_all(m_header); /* free the header list if previously set */
@@ -67,6 +71,9 @@ ChirpstackHelper::InitConnection(const str address, uint16_t port)
     m_header = curl_slist_append(m_header, ("Authorization: Bearer " + m_token).c_str());
     m_header = curl_slist_append(m_header, "Accept: application/json");
     m_header = curl_slist_append(m_header, "Content-Type: application/json");
+
+    /* get run identifier */
+    m_run = RngSeedManager::GetRun();
 
     return DoConnect();
 }
@@ -106,12 +113,6 @@ ChirpstackHelper::Register(NodeContainer c) const
     }
 
     return EXIT_SUCCESS;
-}
-
-void
-ChirpstackHelper::SetToken(str& token)
-{
-    m_token = token;
 }
 
 void
@@ -158,7 +159,7 @@ ChirpstackHelper::NewTenant(const str& name)
                   "    \"maxDeviceCount\": 0,"
                   "    \"maxGatewayCount\": 0,"
                   "    \"name\": \"" +
-                  name +
+                  name + "-" + std::to_string((unsigned)m_run) +
                   "\","
                   "    \"privateGateways\": false"
                   "  }"
@@ -292,7 +293,7 @@ int
 ChirpstackHelper::NewDevice(Ptr<Node> node) const
 {
     char eui[17];
-    uint64_t id = node->GetId();
+    uint64_t id = (m_run << 48) + node->GetId();
     snprintf(eui, 17, "%016lx", id);
 
     str payload = "{"
@@ -359,7 +360,7 @@ int
 ChirpstackHelper::NewGateway(Ptr<Node> node) const
 {
     char eui[17];
-    uint64_t id = node->GetId();
+    uint64_t id = (m_run << 48) + node->GetId();
     snprintf(eui, 17, "%016lx", id);
 
     /* get reference coordinates */
