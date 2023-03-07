@@ -46,8 +46,6 @@ namespace lorawan
  */
 class NetworkServerHelper
 {
-    using cluster_t = std::vector<std::pair<double, double>>;
-
   public:
     NetworkServerHelper();
 
@@ -76,22 +74,6 @@ class NetworkServerHelper
      */
     void SetAdr(std::string type);
 
-    /**
-     * Enable (true) or disable (false) the congestion control component
-     * in the Network Server created by this helper.
-     */
-    void EnableCongestionControl(bool enableCC);
-
-    /**
-     * Assign cluster membership to devices and create interference domains.
-     */
-    void AssignClusters(cluster_t clustersInfo);
-
-    /**
-     * Assign one frequency to each cluster to create interference domains.
-     */
-    void AssignSingleFrequency(void);
-
   private:
     void InstallComponents(Ptr<NetworkServer> netServer);
     Ptr<Application> InstallPriv(Ptr<Node> node);
@@ -102,11 +84,7 @@ class NetworkServerHelper
 
     bool m_adrEnabled;
 
-    bool m_ccEnabled;
-
     ObjectFactory m_adrSupportFactory;
-
-    std::vector<double> m_clusterTargets;
 };
 
 } // namespace lorawan
