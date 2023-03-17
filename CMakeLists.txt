@@ -157,7 +157,7 @@ build_lib(
     ${ortools_LIBRARIES}
     ${zmq_LIBRARIES}
     # to be able to build examples
-    ${libinternet-apps}
+    #${libinternet-apps}
   TEST_SOURCES
     test/utilities.cc
     test/lorawan-test-suite.cc

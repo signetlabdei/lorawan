@@ -37,7 +37,7 @@ IpcHandler::IpcHandler()
     NS_LOG_INFO("Opening connection.");
     m_zqmContext = zmq_ctx_new();
     m_zqmSocket = zmq_socket(m_zqmContext, ZMQ_PAIR);
-    int rc = zmq_connect(m_zqmSocket, "ipc:///tmp/feeds/0.ipc");
+    int rc = zmq_connect(m_zqmSocket, "ipc:///tmp/feeds/loragym.ipc");
     NS_ASSERT_MSG(rc == 0, "zmq_connect error: " << zmq_strerror(zmq_errno()));
 }
 
