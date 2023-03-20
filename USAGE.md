@@ -23,7 +23,7 @@ this repository inside the `contrib` or `src` directory:
 
 ```bash
 git clone https://gitlab.com/non-det-alle/ns-3-dev
-git clone https://github.com/non-det-alle/lorawan ns-3-dev/contrib/lorawan
+git clone https://github.com/non-det-alle/elora ns-3-dev/contrib/lorawan
 ```
 
 Check out the chirpstack branch:
