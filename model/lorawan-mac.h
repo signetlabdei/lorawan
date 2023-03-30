@@ -48,12 +48,20 @@ class LoraPhy;
 class LorawanMac : public Object
 {
   public:
+    typedef std::array<std::array<uint8_t, 6>, 8> ReplyDataRateMatrix;
+
+    /**
+     * \param mac a pointer to the mac which is calling this callback
+     * \param packet the packet received
+     * \returns true if the callback could handle the packet successfully, false
+     *          otherwise.
+     */
+    typedef Callback<bool, Ptr<LorawanMac>, Ptr<const Packet>> ReceiveCallback;
+
     static TypeId GetTypeId(void);
 
     LorawanMac();
     virtual ~LorawanMac();
-
-    typedef std::array<std::array<uint8_t, 6>, 8> ReplyDataRateMatrix;
 
     /**
      * Send a packet.
@@ -61,6 +69,13 @@ class LorawanMac : public Object
      * \param packet The packet to send.
      */
     virtual void Send(Ptr<Packet> packet) = 0;
+
+    /**
+     * Perform actions after sending a packet.
+     *
+     * \param packet The packet that just finished transmission.
+     */
+    virtual void TxFinished(Ptr<const Packet> packet) = 0;
 
     /**
      * Receive a packet from the lower layer.
@@ -78,11 +93,34 @@ class LorawanMac : public Object
     virtual void FailedReception(Ptr<const Packet> packet) = 0;
 
     /**
-     * Perform actions after sending a packet.
+     * Set the number of PHY preamble symbols this MAC is set to use.
      *
-     * \param packet The packet that just finished transmission.
+     * \param nPreambleSymbols The number of preamble symbols to use (typically 8).
      */
-    virtual void TxFinished(Ptr<const Packet> packet) = 0;
+    void SetNPreambleSymbols(uint16_t nPreambleSymbols);
+
+    /**
+     * Get the number of PHY preamble symbols this MAC is set to use.
+     *
+     * \return The number of preamble symbols to use (typically 8).
+     */
+    uint16_t GetNPreambleSymbols(void);
+
+    /**
+     * Get the symbol time based on the datarate
+     * \param dr The datarate
+     * \return The symbol time
+     */
+    Time GetTSym(uint8_t dr);
+
+    /**
+     * \param cb callback to invoke whenever a packet has been received and must
+     *        be forwarded to the higher layers.
+     *
+     * Set the callback to be used to notify higher layers when a packet has been
+     * received.
+     */
+    virtual void SetReceiveCallback(ReceiveCallback cb);
 
     /**
      * Set the device this MAC layer is installed on.
@@ -201,73 +239,19 @@ class LorawanMac : public Object
      */
     void SetReplyDataRateMatrix(ReplyDataRateMatrix replyDataRateMatrix);
 
-    /**
-     * Set the number of PHY preamble symbols this MAC is set to use.
-     *
-     * \param nPreambleSymbols The number of preamble symbols to use (typically 8).
-     */
-    void SetNPreambleSymbols(int nPreambleSymbols);
-
-    /**
-     * Get the number of PHY preamble symbols this MAC is set to use.
-     *
-     * \return The number of preamble symbols to use (typically 8).
-     */
-    int GetNPreambleSymbols(void);
-
-    /**
-     * \param mac a pointer to the mac which is calling this callback
-     * \param packet the packet received
-     * \returns true if the callback could handle the packet successfully, false
-     *          otherwise.
-     */
-    typedef Callback<bool, Ptr<LorawanMac>, Ptr<const Packet>> ReceiveCallback;
-
-    /**
-     * \param cb callback to invoke whenever a packet has been received and must
-     *        be forwarded to the higher layers.
-     *
-     * Set the callback to be used to notify higher layers when a packet has been
-     * received.
-     */
-    virtual void SetReceiveCallback(ReceiveCallback cb);
-
   protected:
     void DoDispose() override;
 
-    /**
-     * The trace source that is fired when a packet cannot be sent because of duty
-     * cycle limitations.
-     *
-     * \see class CallBackTraceSource
-     */
-    TracedCallback<Ptr<const Packet>> m_cannotSendBecauseDutyCycle;
+    ReceiveCallback m_receiveCallback; ///<! Callback to forward to upper layers
 
     /**
-     * Trace source that is fired when a packet reaches the MAC layer.
+     * The tx parameters to use for transmitting.
      */
-    TracedCallback<Ptr<const Packet>> m_receivedPacket;
+    LoraPhyTxParameters m_txParams;
 
-    /**
-     * Trace source that is fired when a new APP layer packet arrives at the MAC
-     * layer.
-     */
-    TracedCallback<Ptr<const Packet>> m_sentNewPacket;
-
-    /**
-     * The PHY instance that sits under this MAC layer.
-     */
-    Ptr<LoraPhy> m_phy;
-
-    /**
-     * The device this MAC layer is installed on.
-     */
-    Ptr<NetDevice> m_device;
-
-    /**
-     * The LogicalChannelManager instance that is assigned to this MAC.
-     */
-    Ptr<LogicalChannelManager> m_channelManager;
+    Ptr<LoraPhy> m_phy;      //!< The PHY instance that sits under this MAC layer.
+    Ptr<NetDevice> m_device; //!< The device this MAC layer is installed on.
+    Ptr<LogicalChannelManager> m_channelManager; //!< The channel manager assigned to this MAC.
 
     /**
      * A vector holding the SF each Data Rate corresponds to.
@@ -286,11 +270,6 @@ class LorawanMac : public Object
     std::vector<uint32_t> m_maxMacPayloadForDataRate;
 
     /**
-     * The number of symbols to use in the PHY preamble.
-     */
-    int m_nPreambleSymbols;
-
-    /**
      * A vector holding the power that corresponds to a certain TxPower value.
      */
     std::vector<double> m_txDbmForTxPower;
@@ -301,7 +280,23 @@ class LorawanMac : public Object
      */
     ReplyDataRateMatrix m_replyDataRateMatrix;
 
-    ReceiveCallback m_receiveCallback; ///<! Callback to forward to upper layers
+    /**
+     * The trace source that is fired when a packet cannot be sent because of duty
+     * cycle limitations.
+     *
+     * \see class CallBackTraceSource
+     */
+    TracedCallback<Ptr<const Packet>> m_cannotSendBecauseDutyCycle;
+
+    /**
+     * Trace source that is fired when a new packet is sent by the MAC layer.
+     */
+    TracedCallback<Ptr<const Packet>> m_sentNewPacket;
+
+    /**
+     * Trace source that is fired when a packet reaches the MAC layer from PHY.
+     */
+    TracedCallback<Ptr<const Packet>> m_receivedPacket;
 };
 
 } // namespace lorawan

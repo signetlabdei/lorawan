@@ -40,21 +40,21 @@ class LoraChannel;
  * Structure to collect all parameters that are used to compute the duration of
  * a packet (excluding payload length).
  */
-struct LoraTxParameters
+struct LoraPhyTxParameters
 {
-    uint8_t sf = 7;                          //!< Spreading Factor
+    uint8_t sf = 12;                         //!< Spreading Factor
     bool headerDisabled = 0;                 //!< Whether to use implicit header mode
     uint8_t codingRate = 1;                  //!< Code rate (obtained as 4/(codingRate+4))
     double bandwidthHz = 125000;             //!< Bandwidth in Hz
-    uint32_t nPreamble = 8;                  //!< Number of preamble symbols
+    uint16_t nPreamble = 8;                  //!< Number of preamble symbols
     bool crcEnabled = 1;                     //!< Whether Cyclic Redundancy Check is enabled
     bool lowDataRateOptimizationEnabled = 0; //!< Whether Low Data Rate Optimization is enabled
 };
 
 /**
- * Allow logging of LoraTxParameters like with any other data type.
+ * Allow logging of LoraPhyTxParameters like with any other data type.
  */
-std::ostream& operator<<(std::ostream& os, const LoraTxParameters& params);
+std::ostream& operator<<(std::ostream& os, const LoraPhyTxParameters& params);
 
 /**
  * \ingroup lorawan
@@ -63,9 +63,9 @@ std::ostream& operator<<(std::ostream& os, const LoraTxParameters& params);
  *
  * This class features common callbacks and defines the interfaces that are used
  * to send and receive packets at the PHY layer. Furthermore, it features an
- * implementation of the GetOnAirTime function, used to compute the actual
+ * implementation of the GetTimeOnAir function, used to compute the actual
  * duration of a packet based on a series of parameters that are collected in
- * LoraTxParameters objects.
+ * LoraPhyTxParameters objects.
  */
 class LoraPhy : public Object
 {
@@ -88,7 +88,7 @@ class LoraPhy : public Object
      * \param txPowerDbm The power in dBm with which to transmit the packet.
      */
     virtual void Send(Ptr<Packet> packet,
-                      LoraTxParameters txParams,
+                      LoraPhyTxParameters txParams,
                       double frequency,
                       double txPowerDbm) = 0;
 
@@ -221,16 +221,17 @@ class LoraPhy : public Object
     /**
      * Compute the symbol time from SF and BW.
      *
-     * \param txParams The parameters for transmission
+     * \param sf The SF
+     * \param bw The BW
      * \return TSym, the time required to send a LoRa modulation symbol.
      */
-    static Time GetTSym(LoraTxParameters txParams);
+    static Time GetTSym(const LoraPhyTxParameters& txParams);
 
     /**
      * Compute the time that a packet with certain characteristics will take to be
      * transmitted.
      *
-     * Besides from the ones saved in LoraTxParameters, the packet's payload
+     * Besides from the ones saved in LoraPhyTxParameters, the packet's payload
      * (obtained through a GetSize () call to accout for the presence of Headers
      * and Trailers, too) also influences the packet transmit time.
      *
@@ -238,16 +239,17 @@ class LoraPhy : public Object
      * \param txParams The set of parameters that will be used for transmission.
      * \return The time necessary to transmit the packet.
      */
-    static Time GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams);
+    static Time GetTimeOnAir(Ptr<const Packet> packet, const LoraPhyTxParameters& txParams);
 
     /**
      * Compute the Signal to Noise Ratio (SNR) from the transmission power
      * measured at packet reception.
      *
      * \param transmissionPower The reception transmission power (dBm)
+     * \param bandwidth The bandwidth used to transmit (Hz)
      * \return The SNR value in dB.
      */
-    static double RxPowerToSNR(double transmissionPower);
+    static double RxPowerToSNR(double transmissionPower, double bandwidth = 125000);
 
   protected:
     void DoInitialize() override;
@@ -272,16 +274,13 @@ class LoraPhy : public Object
     Ptr<LoraChannel> m_channel;                 //!< The channel this PHY transmits on.
     Ptr<LoraInterferenceHelper> m_interference; //!< The InterferenceHelper associated to this PHY.
 
-    // Constants
-    static const int B = 125000; //! Bandwidth (Hz)
-    static const int NF = 6;     //! Noise Figure (dB)
-
     // Callbacks (communication with MAC layer)
     RxOkCallback m_rxOkCallback;             //! Callback to perform upon correct reception
     RxFailedCallback m_rxFailedCallback;     //! Callback to perform upon failed reception
     TxFinishedCallback m_txFinishedCallback; //! Callback to perform upon transmission end
 
     // Trace sources
+    uint32_t m_nodeId; //!< Node Id to correctly format context in traced callbacks
 
     /**
      * The trace source fired when a packet is sent.
@@ -341,8 +340,6 @@ class LoraPhy : public Object
      * \see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>> m_phySniffTxTrace;
-
-    uint32_t m_context; //!< Node Id to correctly format context in traced callbacks
 
   private:
     Ptr<MobilityModel> m_mobility; //!< The mobility model associated to this PHY.

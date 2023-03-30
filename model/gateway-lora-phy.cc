@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/gateway-lora-phy.h"
+#include "gateway-lora-phy.h"
 
 #include "ns3/lora-tag.h"
 #include "ns3/node.h"
@@ -105,7 +105,7 @@ GatewayLoraPhy::GetTypeId(void)
             .AddAttribute("numReceptionPaths",
                           "Set a certain number of parallel reception paths",
                           UintegerValue(8),
-                          MakeUintegerAccessor(&GatewayLoraPhy::SetReceptionPaths),
+                          MakeUintegerAccessor(&GatewayLoraPhy::InitReceptionPaths),
                           MakeUintegerChecker<uint8_t>(1))
             .AddTraceSource(
                 "NoReceptionBecauseTransmitting",
@@ -130,44 +130,12 @@ GatewayLoraPhy::GetTypeId(void)
 GatewayLoraPhy::GatewayLoraPhy()
     : m_isTransmitting(false)
 {
-    NS_LOG_FUNCTION_NOARGS();
+    NS_LOG_FUNCTION(this);
 }
 
 GatewayLoraPhy::~GatewayLoraPhy()
 {
-    NS_LOG_FUNCTION_NOARGS();
-}
-
-void
-GatewayLoraPhy::Send(Ptr<Packet> packet,
-                     LoraTxParameters txParams,
-                     double frequency,
-                     double txPowerDbm)
-{
-    NS_LOG_FUNCTION(this << packet << txParams << frequency << txPowerDbm);
-    // Get the time a packet with these parameters will take to be transmitted
-    Time duration = GetOnAirTime(packet, txParams);
-    NS_LOG_DEBUG("Duration of packet: " << duration << ", SF" << unsigned(txParams.sf));
-    // Interrupt all receive operations
-    for (auto& path : m_receptionPaths)
-        if (!path->IsAvailable()) // Reception path is occupied
-        {
-            // Fire the trace source for reception interrupted by transmission
-            m_noReceptionBecauseTransmitting(path->GetEvent()->GetPacket(), m_context);
-            // Cancel the scheduled EndReceive call
-            Simulator::Cancel(path->GetEndReceive());
-            // Free it and resets all parameters
-            path->Free();
-        }
-    // Send the downlink packet in the channel
-    m_channel->Send(this, packet, txPowerDbm, txParams.sf, duration, frequency);
-    Simulator::Schedule(duration, &GatewayLoraPhy::TxFinished, this);
-    m_isTransmitting = true;
-    // Fire the trace source
-    m_startSending(packet, m_context);
-    // Fire the sniffer trace source
-    if (!m_phySniffTxTrace.IsEmpty())
-        Simulator::Schedule(duration, &GatewayLoraPhy::m_phySniffTxTrace, this, packet);
+    NS_LOG_FUNCTION(this);
 }
 
 void
@@ -184,7 +152,7 @@ GatewayLoraPhy::StartReceive(Ptr<Packet> packet,
         NS_LOG_INFO("Dropping packet reception of packet with sf = "
                     << unsigned(sf) << " because we are in TX mode");
         // Fire the trace sources
-        m_noReceptionBecauseTransmitting(packet, m_context);
+        m_noReceptionBecauseTransmitting(packet, m_nodeId);
         return;
     }
     // Add the event to the LoraInterferenceHelper
@@ -202,7 +170,7 @@ GatewayLoraPhy::StartReceive(Ptr<Packet> packet,
                             << unsigned(sf) << " because under the sensitivity of " << sensitivity
                             << " dBm");
                 // Fire the trace sources
-                m_underSensitivity(packet, m_context);
+                m_underSensitivity(packet, m_nodeId);
             }
             else // We have sufficient sensitivity to start receiving
             {
@@ -226,14 +194,7 @@ GatewayLoraPhy::StartReceive(Ptr<Packet> packet,
                 << unsigned(sf) << " and frequency " << frequency
                 << "Hz because no suitable demodulator was found");
     // Fire the trace source
-    m_noMoreDemodulators(packet, m_context);
-}
-
-bool
-GatewayLoraPhy::IsTransmitting(void)
-{
-    NS_LOG_FUNCTION_NOARGS();
-    return m_isTransmitting;
+    m_noMoreDemodulators(packet, m_nodeId);
 }
 
 void
@@ -257,7 +218,7 @@ GatewayLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event
         tag.SetReceptionTime(Simulator::Now());
         packet->AddPacketTag(tag);
         // Fire the trace source
-        m_interferedPacket(packet, m_context);
+        m_interferedPacket(packet, m_nodeId);
     }
     else // Reception was correct
     {
@@ -268,16 +229,15 @@ GatewayLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event
         // quality and to fill the packet sniffing header.
         LoraTag tag;
         packet->RemovePacketTag(tag);
-        tag.SetReceivePower(event->GetRxPowerdBm());
-        tag.SetFrequency(event->GetFrequency());
-        tag.SetSnr(RxPowerToSNR(event->GetRxPowerdBm()));
         tag.SetReceptionTime(Simulator::Now());
+        tag.SetReceivePower(event->GetRxPowerdBm());
+        tag.SetSnr(RxPowerToSNR(event->GetRxPowerdBm()));
         packet->AddPacketTag(tag);
         // Forward the packet to the upper layer
         if (!m_rxOkCallback.IsNull())
             m_rxOkCallback(packet);
         // Fire the trace source
-        m_successfullyReceivedPacket(packet, m_context);
+        m_successfullyReceivedPacket(packet, m_nodeId);
         // Fire the sniffer trace source
         if (!m_phySniffRxTrace.IsEmpty())
             m_phySniffRxTrace(packet);
@@ -290,6 +250,77 @@ GatewayLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event
             m_occupiedReceptionPaths--;
             return;
         }
+}
+
+void
+GatewayLoraPhy::Send(Ptr<Packet> packet,
+                     LoraPhyTxParameters txParams,
+                     double frequency,
+                     double txPowerDbm)
+{
+    NS_LOG_FUNCTION(this << packet << txParams << frequency << txPowerDbm);
+
+    // Interrupt all receive operations
+    for (auto& path : m_receptionPaths)
+        if (!path->IsAvailable()) // Reception path is occupied
+        {
+            // Fire the trace source for reception interrupted by transmission
+            m_noReceptionBecauseTransmitting(path->GetEvent()->GetPacket(), m_nodeId);
+            // Cancel the scheduled EndReceive call
+            Simulator::Cancel(path->GetEndReceive());
+            // Free it and resets all parameters
+            path->Free();
+        }
+
+    // Tag packet with PHY layer tx info
+    LoraTag tag;
+    packet->RemovePacketTag(tag);
+    tag.SetTxParameters(txParams);
+    packet->AddPacketTag(tag);
+
+    // Get the time a packet with these parameters will take to be transmitted
+    Time duration = GetTimeOnAir(packet, txParams);
+    NS_LOG_DEBUG("Duration of packet: " << duration << ", SF" << unsigned(txParams.sf));
+
+    // Set state to transmistting
+    m_isTransmitting = true;
+    // Send the downlink packet in the channel
+    NS_LOG_INFO("Sending the packet in the channel");
+    m_channel->Send(this, packet, txPowerDbm, txParams.sf, duration, frequency);
+    // Fire the trace source
+    m_startSending(packet, m_nodeId);
+
+    // Schedule end of transmission
+    Simulator::Schedule(duration, &GatewayLoraPhy::TxFinished, this, packet);
+}
+
+void
+GatewayLoraPhy::TxFinished(Ptr<Packet> packet)
+{
+    NS_LOG_FUNCTION_NOARGS();
+    m_isTransmitting = false;
+    // Forward packet to the upper layer
+    if (!m_txFinishedCallback.IsNull())
+        m_txFinishedCallback(packet);
+    // Schedule the sniffer trace source
+    if (!m_phySniffTxTrace.IsEmpty())
+        m_phySniffTxTrace(packet);
+}
+
+bool
+GatewayLoraPhy::IsTransmitting(void)
+{
+    NS_LOG_FUNCTION_NOARGS();
+    return m_isTransmitting;
+}
+
+void
+GatewayLoraPhy::InitReceptionPaths(UintegerValue number)
+{
+    NS_LOG_FUNCTION(this << (unsigned)number.Get());
+    m_receptionPaths.clear();
+    for (uint32_t i = 0; i < number.Get(); ++i)
+        m_receptionPaths.push_back(Create<ReceptionPath>());
 }
 
 void
@@ -308,22 +339,6 @@ GatewayLoraPhy::DoDispose()
 // {SF7, SF8, SF9, SF10, SF11, SF12}
 // These sensitivities are for a bandwidth of 125000 Hz
 const double GatewayLoraPhy::sensitivity[6] = {-126.5, -129, -131.5, -134, -136.5, -139.5};
-
-void
-GatewayLoraPhy::TxFinished(void)
-{
-    NS_LOG_FUNCTION_NOARGS();
-    m_isTransmitting = false;
-}
-
-void
-GatewayLoraPhy::SetReceptionPaths(UintegerValue number)
-{
-    NS_LOG_FUNCTION(this << (unsigned)number.Get());
-    m_receptionPaths.clear();
-    for (uint32_t i = 0; i < number.Get(); ++i)
-        m_receptionPaths.push_back(Create<ReceptionPath>());
-}
 
 } // namespace lorawan
 } // namespace ns3

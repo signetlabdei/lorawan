@@ -27,11 +27,8 @@
 #ifndef CLASS_A_END_DEVICE_LORAWAN_MAC_H
 #define CLASS_A_END_DEVICE_LORAWAN_MAC_H
 
-#include "ns3/end-device-lorawan-mac.h" // EndDeviceLorawanMac
-#include "ns3/lora-frame-header.h"      // RxParamSetupReq
-#include "ns3/lorawan-mac.h"            // Packet
-// #include "ns3/random-variable-stream.h"
-#include "ns3/lora-device-address.h"
+#include "ns3/recv-window-manager.h"
+#include "ns3/end-device-lorawan-mac.h"
 
 // #include "ns3/traced-value.h"
 
@@ -45,26 +42,26 @@ namespace lorawan
  */
 class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
 {
+    enum RxOutcome
+    {
+        ACK,
+        RECV,
+        FAIL,
+        NONE
+    };
+
   public:
     static TypeId GetTypeId(void);
 
     ClassAEndDeviceLorawanMac();
     virtual ~ClassAEndDeviceLorawanMac();
 
-    /////////////////////
-    // Sending methods //
-    /////////////////////
-
     /**
-     * Add headers and send a packet with the sending function of the physical layer.
+     * Perform the actions that are required after a packet send.
      *
-     * \param packet the packet to send
+     * This function handles opening of the first receive window.
      */
-    virtual void SendToPhy(Ptr<Packet> packet);
-
-    //////////////////////////
-    //  Receiving methods   //
-    //////////////////////////
+    virtual void TxFinished(Ptr<const Packet> packet);
 
     /**
      * Receive a packet.
@@ -76,54 +73,27 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      */
     virtual void Receive(Ptr<const Packet> packet);
 
+    /**
+     * Signal reception failure.
+     *
+     * This method is typically registered as a callback in the underlying PHY
+     * layer so that it's called when a packet is going up the stack.
+     *
+     * \param packet the failed packet.
+     */
     virtual void FailedReception(Ptr<const Packet> packet);
 
     /**
-     * Perform the actions that are required after a packet send.
+     * Signal no reception during either reception window.
      *
-     * This function handles opening of the first receive window.
+     * This method is typically registered as a callback in the reception window
+     * manager that it's called when the second reception window ends.
      */
-    virtual void TxFinished(Ptr<const Packet> packet);
-
-    /**
-     * Perform operations needed to open the first receive window.
-     */
-    void OpenFirstReceiveWindow(void);
-
-    /**
-     * Perform operations needed to open the second receive window.
-     */
-    void OpenSecondReceiveWindow(void);
-
-    /**
-     * Perform operations needed to close the first receive window.
-     */
-    void CloseFirstReceiveWindow(void);
-
-    /**
-     * Perform operations needed to close the second receive window.
-     */
-    void CloseSecondReceiveWindow(void);
+    void NoReception(void);
 
     /////////////////////////
     // Getters and Setters //
     /////////////////////////
-
-    /**
-     * Find the minimum waiting time before the next possible transmission based
-     * on End Device's Class Type.
-     *
-     * \param waitingTime The minimum waiting time that has to be respected,
-     * irrespective of the class (e.g., because of duty cycle limitations).
-     */
-    virtual Time GetNextClassTransmissionDelay(Time waitingTime);
-
-    /**
-     * Get the Data Rate that will be used in the first receive window.
-     *
-     * \return The Data Rate
-     */
-    uint8_t GetFirstReceiveWindowDataRate(void);
 
     /**
      * Set the Data Rate to be used in the second receive window.
@@ -133,25 +103,41 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     void SetSecondReceiveWindowDataRate(uint8_t dataRate);
 
     /**
-     * Get the Data Rate that will be used in the second receive window.
-     *
-     * \return The Data Rate
-     */
-    uint8_t GetSecondReceiveWindowDataRate(void);
-
-    /**
      * Set the frequency that will be used for the second receive window.
      *
      * \param frequency the Frequency.
      */
     void SetSecondReceiveWindowFrequency(double frequency);
 
+  protected:
+    void DoInitialize() override;
+    void DoDispose() override;
+
+  private:
     /**
-     * Get the frequency that is used for the second receive window.
+     * Add headers and send a packet with the sending function of the physical layer.
      *
-     * @return The frequency, in Hz
+     * \param packet the packet to send
      */
-    double GetSecondReceiveWindowFrequency(void);
+    virtual void SendToPhy(Ptr<Packet> packet);
+
+    /**
+     * Find the minimum waiting time before the next possible transmission based
+     * on End Device's transmission/reception process.
+     */
+    virtual Time GetBusyTransmissionDelay();
+
+    /**
+     * Decide whether we can retransmit based on reception outcome.
+     *
+     * \param outcome Outcome of the reception.
+     */
+    void ManageRetransmissions(RxOutcome outcome);
+
+    /**
+     * Compute the time duration of a reception window based on its datarate.
+     */
+    Time GetReceptionWindowDuration(uint8_t datarate);
 
     /////////////////////////
     // MAC command methods //
@@ -159,74 +145,50 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
 
     /**
      * Perform the actions that need to be taken when receiving a RxParamSetupReq
-     * command based on the Device's Class Type.
+     * command.
      *
      * \param rxParamSetupReq The Parameter Setup Request, which contains:
      *                            - The offset to set.
      *                            - The data rate to use for the second receive window.
      *                            - The frequency to use for the second receive window.
      */
-    virtual void OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq);
+    void OnRxParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq);
 
     /**
      * Perform the actions that need to be taken when receiving a RxTimingSetupReq command.
      */
-    virtual void OnRxTimingSetupReq(Time delay);
-
-  protected:
-    void DoDispose() override;
-
-  private:
-    /**
-     * The interval between when a packet is done sending and when the first
-     * receive window is opened.
-     */
-    Time m_receiveDelay1;
+    void OnRxTimingSetupReq(Time delay);
 
     /**
-     * The interval between when a packet is done sending and when the second
-     * receive window is opened.
-     */
-    Time m_receiveDelay2;
-
-    /**
-     * The event of the closing the first receive window.
+     * The duration of a receive window in number of symbols. This should be
+     * converted to time based or the reception parameter used.
      *
-     * This Event will be canceled if there's a successful reception of a packet.
+     * The downlink preamble transmitted by the gateways contains 8 symbols.
+     * The receiver requires 5 symbols to detect the preamble and synchronize.
+     * Therefore there must be a 5 symbols overlap between the receive window
+     * and the transmitted preamble.
+     * (Ref: Recommended SX1272/76 Settings for EU868 LoRaWAN Network Operation )
      */
-    EventId m_closeFirstWindow;
-
-    /**
-     * The event of the closing the second receive window.
-     *
-     * This Event will be canceled if there's a successful reception of a packet.
-     */
-    EventId m_closeSecondWindow;
-
-    /**
-     * The event of the second receive window opening.
-     *
-     * This Event is used to cancel the second window in case the first one is
-     * successful.
-     */
-    EventId m_secondReceiveWindow;
-
-    /**
-     * The frequency to listen on for the second receive window.
-     */
-    double m_secondReceiveWindowFrequency;
-
-    /**
-     * The Data Rate to listen for during the second downlink transmission.
-     */
-    uint8_t m_secondReceiveWindowDataRate;
+    uint8_t m_receiveWindowDurationInSymbols;
 
     /**
      * The RX1DROffset parameter value
      */
     uint8_t m_rx1DrOffset;
 
+    /**
+     * Last channel used for tx
+     */
+    Ptr<LogicalChannel> m_lastTxCh;
+
+    /**
+     * Reception window process manager.
+     */
+    Ptr<RecvWindowManager> m_rwm;
+
 }; /* ClassAEndDeviceLorawanMac */
+
 } /* namespace lorawan */
 } /* namespace ns3 */
+
 #endif /* CLASS_A_END_DEVICE_LORAWAN_MAC_H */

@@ -44,31 +44,6 @@ namespace lorawan
  */
 class GatewayLoraPhy : public LoraPhy
 {
-  public:
-    static TypeId GetTypeId(void);
-
-    GatewayLoraPhy();
-    virtual ~GatewayLoraPhy();
-
-    virtual void StartReceive(Ptr<Packet> packet,
-                              double rxPowerDbm,
-                              uint8_t sf,
-                              Time duration,
-                              double frequency);
-
-    virtual void Send(Ptr<Packet> packet,
-                      LoraTxParameters txParams,
-                      double frequency,
-                      double txPowerDbm);
-
-    /**
-     * Used to check the gateway transmission state by the outside
-     */
-    bool IsTransmitting(void);
-
-  protected:
-    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event);
-
     /**
      * This class represents a configurable reception path.
      *
@@ -147,6 +122,43 @@ class GatewayLoraPhy : public LoraPhy
         EventId m_endReceiveEventId;
     };
 
+  public:
+    static TypeId GetTypeId(void);
+
+    GatewayLoraPhy();
+    virtual ~GatewayLoraPhy();
+
+    virtual void StartReceive(Ptr<Packet> packet,
+                              double rxPowerDbm,
+                              uint8_t sf,
+                              Time duration,
+                              double frequency);
+
+    virtual void Send(Ptr<Packet> packet,
+                      LoraPhyTxParameters txParams,
+                      double frequency,
+                      double txPowerDbm);
+
+    /**
+     * Used to check the gateway transmission state by the outside
+     */
+    bool IsTransmitting(void);
+
+  protected:
+    void DoDispose() override;
+
+    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event);
+
+    /**
+     * Used to schedule a change in the gateway transmission state
+     */
+    virtual void TxFinished(Ptr<Packet> packet);
+
+    /**
+     * Set a certain number of reception paths.
+     */
+    void InitReceptionPaths(UintegerValue number);
+
     /**
      * A vector containing the various parallel receivers that are managed by this
      * Gateway.
@@ -181,20 +193,6 @@ class GatewayLoraPhy : public LoraPhy
      * \see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_noReceptionBecauseTransmitting;
-
-  protected:
-    void DoDispose() override;
-
-  private:
-    /**
-     * Used to schedule a change in the gateway transmission state
-     */
-    void TxFinished(void);
-
-    /**
-     * Set a certain number of reception paths.
-     */
-    void SetReceptionPaths(UintegerValue number);
 };
 
 } // namespace lorawan

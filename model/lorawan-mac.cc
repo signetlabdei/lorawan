@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/lorawan-mac.h"
+#include "lorawan-mac.h"
 
 #include "ns3/log.h"
 
@@ -67,6 +67,33 @@ LorawanMac::LorawanMac()
 LorawanMac::~LorawanMac()
 {
     NS_LOG_FUNCTION(this);
+}
+
+void
+LorawanMac::SetNPreambleSymbols(uint16_t nPreambleSymbols)
+{
+    m_txParams.nPreamble = nPreambleSymbols;
+}
+
+uint16_t
+LorawanMac::GetNPreambleSymbols(void)
+{
+    return m_txParams.nPreamble;
+}
+
+Time
+LorawanMac::GetTSym(uint8_t dr)
+{
+    uint8_t sf = GetSfFromDataRate(dr);
+    double bandwidth = GetBandwidthFromDataRate(dr);
+    return LoraPhy::GetTSym({sf, 0, 0, bandwidth, 0, 0, 0});
+}
+
+void
+LorawanMac::SetReceiveCallback(ReceiveCallback cb)
+{
+    NS_LOG_FUNCTION_NOARGS();
+    m_receiveCallback = cb;
 }
 
 void
@@ -176,28 +203,9 @@ LorawanMac::SetTxDbmForTxPower(std::vector<double> txDbmForTxPower)
 }
 
 void
-LorawanMac::SetNPreambleSymbols(int nPreambleSymbols)
-{
-    m_nPreambleSymbols = nPreambleSymbols;
-}
-
-int
-LorawanMac::GetNPreambleSymbols(void)
-{
-    return m_nPreambleSymbols;
-}
-
-void
 LorawanMac::SetReplyDataRateMatrix(ReplyDataRateMatrix replyDataRateMatrix)
 {
     m_replyDataRateMatrix = replyDataRateMatrix;
-}
-
-void
-LorawanMac::SetReceiveCallback(ReceiveCallback cb)
-{
-    NS_LOG_FUNCTION_NOARGS();
-    m_receiveCallback = cb;
 }
 
 void
@@ -210,7 +218,7 @@ LorawanMac::DoDispose()
         m_channelManager->Dispose();
     }
     m_channelManager = nullptr;
-    
+
     m_phy = nullptr;
     m_device = nullptr;
     Object::DoDispose();

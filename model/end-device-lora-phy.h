@@ -26,6 +26,7 @@
 #ifndef END_DEVICE_LORA_PHY_H
 #define END_DEVICE_LORA_PHY_H
 
+#include "ns3/lora-device-address.h"
 #include "ns3/lora-phy.h"
 #include "ns3/mobility-model.h"
 #include "ns3/net-device.h"
@@ -89,7 +90,7 @@ class EndDeviceLoraPhyListener
 /**
  * Class representing a LoRa transceiver.
  *
- * This class inherits some functionality by LoraPhy, like the GetOnAirTime
+ * This class inherits some functionality by LoraPhy, like the GetTimeOnAir
  * function, and extends it to represent the behavior of a LoRa chip, like the
  * SX1272.
  *
@@ -149,7 +150,7 @@ class EndDeviceLoraPhy : public LoraPhy
 
     // Implementation of LoraPhy's pure virtual functions
     virtual void Send(Ptr<Packet> packet,
-                      LoraTxParameters txParams,
+                      LoraPhyTxParameters txParams,
                       double frequency,
                       double txPowerDbm);
 
@@ -181,7 +182,7 @@ class EndDeviceLoraPhy : public LoraPhy
      *
      * \param frequency The frequency [Hz] to listen to.
      */
-    void SetFrequency(double frequency);
+    void SetRxFrequency(double frequency);
 
     /**
      * Set the Spreading Factor this EndDevice will listen for.
@@ -191,7 +192,7 @@ class EndDeviceLoraPhy : public LoraPhy
      *
      * \param sf The spreading factor to listen for.
      */
-    void SetSpreadingFactor(uint8_t sf);
+    void SetRxSpreadingFactor(uint8_t sf);
 
     /**
      * Return the state this End Device is currently in.
@@ -216,11 +217,25 @@ class EndDeviceLoraPhy : public LoraPhy
      */
     void UnregisterListener(EndDeviceLoraPhyListener* listener);
 
+    /**
+     * Set the network address of this device.
+     *
+     * \param address The address to set.
+     */
+    void SetDeviceAddress(LoraDeviceAddress address);
+
   protected:
     void DoDispose() override;
 
     // Implementation of LoraPhy's pure virtual functions
     virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event);
+
+    /**
+     * Compute the shorter duration of packets being filtered
+     * early during reception for being uplink or for being
+     * destined to another device
+     */
+    Time GetFilteredDuration(Ptr<const Packet> packet, Time duration) const;
 
     /**
      * Internal call when transmission finishes.
@@ -237,14 +252,19 @@ class EndDeviceLoraPhy : public LoraPhy
      */
     void SwitchToTx(double txPowerDbm);
 
-    double m_frequency; //!< The frequency this device is listening on
-    uint8_t m_sf;       //!< The Spreading Factor this device is listening for
+    TracedValue<State> m_state; //!< The state this PHY is currently in.
+    uint8_t m_rxSf;             //!< The Spreading Factor this device is listening for
+    double m_rxFrequency;       //!< The frequency this device is listening on
+
+    /**
+     * The address of this device.
+     * Set by MAC layer.
+     */
+    LoraDeviceAddress m_address;
 
     static const double sensitivity[6]; //!< The sensitivity vector of this device to different SFs
 
     std::vector<EndDeviceLoraPhyListener*> m_listeners; //!< PHY listeners
-
-    TracedValue<State> m_state; //!< The state this PHY is currently in.
 
     /**
      * Trace source for when a packet is lost because it was using a SF different from

@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/lora-tag.h"
+#include "lora-tag.h"
 
 #include "ns3/tag.h"
 #include "ns3/uinteger.h"
@@ -47,12 +47,11 @@ LoraTag::GetInstanceTypeId(void) const
     return GetTypeId();
 }
 
-LoraTag::LoraTag(uint8_t sf, uint8_t destroyedBy)
-    : m_sf(sf),
-      m_destroyedBy(destroyedBy),
+LoraTag::LoraTag()
+    : m_frequency(0),
+      m_destroyedBy(0),
+      m_receptionTime(0),
       m_receivePower(0),
-      m_dataRate(0),
-      m_frequency(0),
       m_snr(0)
 {
 }
@@ -64,74 +63,96 @@ LoraTag::~LoraTag()
 uint32_t
 LoraTag::GetSerializedSize(void) const
 {
-    // Each datum about a SF is 1 byte + receivePower (the size of a double) +
-    // frequency (the size of a double) + SNR (the size of a double)
-    return 3 + 3 * sizeof(double);
+    return 4 + 1 + sizeof(double) + 1 + sizeof(int64_t) + sizeof(double) + sizeof(double);
 }
 
 void
 LoraTag::Serialize(TagBuffer i) const
 {
-    i.WriteU8(m_sf);
-    i.WriteU8(m_destroyedBy);
-    i.WriteDouble(m_receivePower);
+    // LoraPhyTxParameters (4 bytes total)
+    i.WriteU8(m_params.sf);
+    uint8_t p = 0;
+    // headerDisabled (1 bit)
+    p |= uint8_t(m_params.headerDisabled << 7 & 0b10000000);
+    // codingRate - 1 (2 bits)
+    p |= uint8_t((m_params.codingRate - 1) << 5 & 0b1100000);
+    // bandwidthHz / 125000 - 1 (2 bits)
+    p |= uint8_t(uint8_t(m_params.bandwidthHz / 125000 - 1) << 3 & 0b11000);
+    // crcEnabled (1 bit)
+    p |= uint8_t(m_params.crcEnabled << 2 & 0b100);
+    // lowDataRateOptimizationEnabled (1 bit)
+    p |= uint8_t(m_params.lowDataRateOptimizationEnabled << 1 & 0b10);
+    i.WriteU8(p);
+    i.WriteU16(m_params.nPreamble);
+
     i.WriteU8(m_dataRate);
     i.WriteDouble(m_frequency);
+    i.WriteU8(m_destroyedBy);
+
+    // Reception completed timestamp
+    int64_t t = m_receptionTime.GetNanoSeconds();
+    i.Write((const uint8_t*)&t, 8);
+
+    i.WriteDouble(m_receivePower);
     i.WriteDouble(m_snr);
 }
 
 void
 LoraTag::Deserialize(TagBuffer i)
 {
-    m_sf = i.ReadU8();
-    m_destroyedBy = i.ReadU8();
-    m_receivePower = i.ReadDouble();
+    // LoraPhyTxParameters
+    m_params.sf = i.ReadU8();
+    uint8_t p = i.ReadU8();
+    m_params.headerDisabled = bool((p >> 7) & 0b1);
+    m_params.codingRate = uint8_t((p >> 5) & 0b11) + 1;
+    m_params.bandwidthHz = (double((p >> 3) & 0b11) + 1) * 125000;
+    m_params.crcEnabled = bool((p >> 2) & 0b1);
+    m_params.lowDataRateOptimizationEnabled = bool((p >> 1) & 0b1);
+    m_params.nPreamble = i.ReadU16();
+
     m_dataRate = i.ReadU8();
     m_frequency = i.ReadDouble();
+    m_destroyedBy = i.ReadU8();
+
+    int64_t t;
+    i.Read((uint8_t*)&t, 8);
+    m_receptionTime = NanoSeconds(t);
+
+    m_receivePower = i.ReadDouble();
     m_snr = i.ReadDouble();
 }
 
 void
 LoraTag::Print(std::ostream& os) const
 {
-    os << m_sf << " " << m_destroyedBy << " " << m_receivePower << " " << m_dataRate;
+    os << "txParams: " << m_params << ", dataRate=" << (unsigned)m_dataRate
+       << ", frequency=" << m_frequency << ", destroyedBy=" << (unsigned)m_destroyedBy
+       << ", receptionTime=" << m_receptionTime << ", rxPower=" << m_receivePower
+       << ", snr=" << m_snr;
+}
+
+void
+LoraTag::SetTxParameters(LoraPhyTxParameters params)
+{
+    m_params = params;
+}
+
+LoraPhyTxParameters
+LoraTag::GetTxParameters() const
+{
+    return m_params;
+}
+
+void
+LoraTag::SetDataRate(uint8_t dataRate)
+{
+    m_dataRate = dataRate;
 }
 
 uint8_t
-LoraTag::GetSpreadingFactor() const
+LoraTag::GetDataRate() const
 {
-    return m_sf;
-}
-
-uint8_t
-LoraTag::GetDestroyedBy() const
-{
-    return m_destroyedBy;
-}
-
-double
-LoraTag::GetReceivePower() const
-{
-    return m_receivePower;
-}
-
-void
-LoraTag::SetDestroyedBy(uint8_t sf)
-{
-    m_destroyedBy = sf;
-}
-
-void
-LoraTag::SetSpreadingFactor(uint8_t sf)
-{
-    m_sf = sf;
-    m_dataRate = 12 - sf;
-}
-
-void
-LoraTag::SetReceivePower(double receivePower)
-{
-    m_receivePower = receivePower;
+    return m_dataRate;
 }
 
 void
@@ -141,28 +162,45 @@ LoraTag::SetFrequency(double frequency)
 }
 
 double
-LoraTag::GetFrequency(void)
+LoraTag::GetFrequency() const
 {
     return m_frequency;
 }
 
-uint8_t
-LoraTag::GetDataRate(void)
+void
+LoraTag::SetDestroyedBy(uint8_t sf)
 {
-    return m_dataRate;
+    m_destroyedBy = sf;
+}
+
+uint8_t
+LoraTag::GetDestroyedBy() const
+{
+    return m_destroyedBy;
 }
 
 void
-LoraTag::SetDataRate(uint8_t dataRate)
+LoraTag::SetReceptionTime(Time receptionTime)
 {
-    m_dataRate = dataRate;
-    m_sf = 12 - dataRate;
+    m_receptionTime = receptionTime;
+}
+
+Time
+LoraTag::GetReceptionTime() const
+{
+    return m_receptionTime;
+}
+
+void
+LoraTag::SetReceivePower(double receivePower)
+{
+    m_receivePower = receivePower;
 }
 
 double
-LoraTag::GetSnr(void)
+LoraTag::GetReceivePower() const
 {
-    return m_snr;
+    return m_receivePower;
 }
 
 void
@@ -171,16 +209,10 @@ LoraTag::SetSnr(double snr)
     m_snr = snr;
 }
 
-Time
-LoraTag::GetReceptionTime(void)
+double
+LoraTag::GetSnr() const
 {
-    return m_receptionTime;
-}
-
-void
-LoraTag::SetReceptionTime(Time receptionTime)
-{
-    m_receptionTime = receptionTime;
+    return m_snr;
 }
 
 } // namespace lorawan

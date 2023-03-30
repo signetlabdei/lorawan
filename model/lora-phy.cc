@@ -21,9 +21,11 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/lora-phy.h"
+#include "lora-phy.h"
 
 #include "ns3/node.h"
+
+#define NOISE_FIGURE 6 //! Noise Figure (dB)
 
 namespace ns3
 {
@@ -88,26 +90,27 @@ LoraPhy::GetTypeId(void)
 }
 
 LoraPhy::LoraPhy()
-    : m_context(0)
+    : m_nodeId(0)
 {
+    NS_LOG_FUNCTION(this);
+    m_interference = CreateObject<LoraInterferenceHelper>();
 }
 
 LoraPhy::~LoraPhy()
 {
+    NS_LOG_FUNCTION(this);
 }
 
 void
 LoraPhy::DoInitialize()
 {
     NS_LOG_FUNCTION(this);
-
     // This method ensures that the local mobility model pointer holds
     // a pointer to the Node's aggregated mobility model (if one exists)
     // in the case that the user has not directly called SetMobility()
     // on this WifiPhy during simulation setup.  If the mobility model
     // needs to be added or changed during simulation runtime, users must
     // call SetMobility() on this object.
-
     if (!m_mobility)
     {
         NS_ABORT_MSG_UNLESS(m_device && m_device->GetNode(),
@@ -122,7 +125,8 @@ LoraPhy::DoInitialize()
 
     // Get node id (if possible) to format context in tracing callbacks
     if (m_device && m_device->GetNode())
-        m_context = m_device->GetNode()->GetId();
+        m_nodeId = m_device->GetNode()->GetId();
+    Object::DoInitialize();
 }
 
 void
@@ -211,14 +215,14 @@ LoraPhy::SetTxFinishedCallback(TxFinishedCallback callback)
 }
 
 Time
-LoraPhy::GetTSym(LoraTxParameters txParams)
+LoraPhy::GetTSym(const LoraPhyTxParameters& txParams)
 {
     NS_LOG_FUNCTION(txParams);
     return Seconds(pow(2, int(txParams.sf)) / (txParams.bandwidthHz));
 }
 
 Time
-LoraPhy::GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams)
+LoraPhy::GetTimeOnAir(Ptr<const Packet> packet, const LoraPhyTxParameters& txParams)
 {
     NS_LOG_FUNCTION(packet << txParams);
 
@@ -226,11 +230,10 @@ LoraPhy::GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams)
     // [1] SX1272 LoRa modem designer's guide.
 
     // Compute the symbol duration
-    // Bandwidth is in Hz
-    double tSym = GetTSym(txParams).GetSeconds();
+    Time tSym = GetTSym(txParams);
 
     // Compute the preamble duration
-    double tPreamble = (double(txParams.nPreamble) + 4.25) * tSym;
+    Time tPreamble = (double(txParams.nPreamble) + 4.25) * tSym;
 
     // Payload size
     uint32_t pl = packet->GetSize(); // Size in bytes
@@ -250,7 +253,7 @@ LoraPhy::GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams)
         8 + std::max(std::ceil(num / den) * (txParams.codingRate + 4), double(0));
 
     // Time to transmit the payload
-    double tPayload = payloadSymbNb * tSym;
+    Time tPayload = payloadSymbNb * tSym;
 
     NS_LOG_DEBUG("Time computation: num = " << num << ", den = " << den << ", payloadSymbNb = "
                                             << payloadSymbNb << ", tSym = " << tSym);
@@ -259,19 +262,19 @@ LoraPhy::GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams)
     NS_LOG_DEBUG("Total time = " << tPreamble + tPayload);
 
     // Compute and return the total packet on-air time
-    return Seconds(tPreamble + tPayload);
+    return tPreamble + tPayload;
 }
 
 double
-LoraPhy::RxPowerToSNR(double transmissionPower)
+LoraPhy::RxPowerToSNR(double transmissionPower, double bandwidth)
 {
     NS_LOG_FUNCTION(transmissionPower);
     // The following conversion ignores interfering packets
-    return transmissionPower + 174 - 10 * log10(B) - NF;
+    return transmissionPower + 174 - 10 * log10(bandwidth) - NOISE_FIGURE;
 }
 
 std::ostream&
-operator<<(std::ostream& os, const LoraTxParameters& params)
+operator<<(std::ostream& os, const LoraPhyTxParameters& params)
 {
     os << "SF: " << unsigned(params.sf) << ", headerDisabled: " << params.headerDisabled
        << ", codingRate: " << unsigned(params.codingRate) << ", bandwidthHz: " << params.bandwidthHz

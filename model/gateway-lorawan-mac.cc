@@ -21,11 +21,10 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/gateway-lorawan-mac.h"
+#include "gateway-lorawan-mac.h"
 
 #include "ns3/log.h"
 #include "ns3/lora-frame-header.h"
-#include "ns3/lora-net-device.h"
 #include "ns3/lorawan-mac-header.h"
 
 namespace ns3
@@ -64,41 +63,39 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
 
     // Get DataRate to send this packet with
     LoraTag tag;
-    packet->RemovePacketTag(tag);
+    packet->PeekPacketTag(tag);
     uint8_t dataRate = tag.GetDataRate();
     double frequency = tag.GetFrequency();
-    NS_LOG_DEBUG("DR: " << unsigned(dataRate));
-    NS_LOG_DEBUG("SF: " << unsigned(GetSfFromDataRate(dataRate)));
-    NS_LOG_DEBUG("BW: " << GetBandwidthFromDataRate(dataRate));
-    NS_LOG_DEBUG("Freq: " << frequency << " Hz");
-    packet->AddPacketTag(tag);
 
-    LoraTxParameters params;
-    params.sf = GetSfFromDataRate(dataRate);
-    params.headerDisabled = false;
-    params.codingRate = 1;
-    params.bandwidthHz = GetBandwidthFromDataRate(dataRate);
-    params.nPreamble = 8;
-    params.crcEnabled = 1;
-    params.lowDataRateOptimizationEnabled =
-        LoraPhy::GetTSym(params) > MilliSeconds(16) ? true : false;
+    // Configure PHY tx params
+    m_txParams.sf = GetSfFromDataRate(dataRate);
+    m_txParams.bandwidthHz = GetBandwidthFromDataRate(dataRate);
+    m_txParams.lowDataRateOptimizationEnabled =
+        LoraPhy::GetTSym(m_txParams) > MilliSeconds(16) ? true : false;
+    NS_LOG_DEBUG("DR: " << unsigned(dataRate));
+    NS_LOG_DEBUG("SF: " << unsigned(m_txParams.sf));
+    NS_LOG_DEBUG("BW: " << m_txParams.bandwidthHz << " Hz");
+
+    // Find the transmission power for the desired frequency (always max possible)
+    double txPower = m_channelManager->GetTxPowerForChannel(Create<LogicalChannel>(frequency));
+    NS_LOG_DEBUG("Freq: " << frequency << " Hz");
 
     // Get the duration
-    Time duration = m_phy->GetOnAirTime(packet, params);
-
+    Time duration = m_phy->GetTimeOnAir(packet, m_txParams);
     NS_LOG_DEBUG("Duration: " << duration.GetSeconds());
-
-    // Find the channel with the desired frequency
-    double sendingPower =
-        m_channelManager->GetTxPowerForChannel(Create<LogicalChannel>(frequency));
-
     // Add the event to the channelHelper to keep track of duty cycle
     m_channelManager->AddEvent(duration, Create<LogicalChannel>(frequency));
 
     // Send the packet to the PHY layer to send it on the channel
-    m_phy->Send(packet, params, frequency, sendingPower);
-
+    m_phy->Send(packet, m_txParams, frequency, txPower);
+    // Fire trace source
     m_sentNewPacket(packet);
+}
+
+void
+GatewayLorawanMac::TxFinished(Ptr<const Packet> packet)
+{
+    NS_LOG_FUNCTION_NOARGS();
 }
 
 bool
@@ -116,10 +113,10 @@ GatewayLorawanMac::Receive(Ptr<const Packet> packet)
     Ptr<Packet> packetCopy = packet->Copy();
 
     // Only forward the packet if it's uplink
-    LorawanMacHeader macHdr;
-    packetCopy->PeekHeader(macHdr);
+    LorawanMacHeader mHdr;
+    packetCopy->PeekHeader(mHdr);
 
-    if (macHdr.IsUplink())
+    if (mHdr.IsUplink())
     {
         if (!m_receiveCallback.IsNull())
             m_receiveCallback(this, packetCopy);
@@ -138,12 +135,6 @@ void
 GatewayLorawanMac::FailedReception(Ptr<const Packet> packet)
 {
     NS_LOG_FUNCTION(this << packet);
-}
-
-void
-GatewayLorawanMac::TxFinished(Ptr<const Packet> packet)
-{
-    NS_LOG_FUNCTION_NOARGS();
 }
 
 Time
