@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/forwarder.h"
+#include "forwarder.h"
 
 #include "ns3/log.h"
 
@@ -46,10 +46,12 @@ Forwarder::GetTypeId(void)
 
 Forwarder::Forwarder()
 {
+    NS_LOG_FUNCTION(this);
 }
 
 Forwarder::~Forwarder()
 {
+    NS_LOG_FUNCTION(this);
 }
 
 void

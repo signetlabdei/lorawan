@@ -49,16 +49,19 @@ NetworkScheduler::GetTypeId(void)
 
 NetworkScheduler::NetworkScheduler()
 {
+    NS_LOG_FUNCTION(this);
 }
 
 NetworkScheduler::NetworkScheduler(Ptr<NetworkStatus> status, Ptr<NetworkController> controller)
     : m_status(status),
       m_controller(controller)
 {
+    NS_LOG_FUNCTION(this);
 }
 
 NetworkScheduler::~NetworkScheduler()
 {
+    NS_LOG_FUNCTION(this);
 }
 
 void

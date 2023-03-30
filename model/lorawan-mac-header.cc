@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/lorawan-mac-header.h"
+#include "lorawan-mac-header.h"
 
 #include "ns3/log.h"
 
@@ -73,8 +73,8 @@ LorawanMacHeader::Serialize(Buffer::Iterator start) const
     // The header we need to fill
     uint8_t header = 0;
 
-    // The MType
-    header |= m_mtype << 5;
+    // The FType
+    header |= m_ftype << 5;
 
     // Do nothing for the bits that are RFU
 
@@ -100,8 +100,8 @@ LorawanMacHeader::Deserialize(Buffer::Iterator start)
     m_major = byte & 0b11;
 
     // Move the three most significant bits to the least significant positions
-    // to get the MType
-    m_mtype = byte >> 5;
+    // to get the FType
+    m_ftype = byte >> 5;
 
     return 1; // the number of bytes consumed.
 }
@@ -109,24 +109,24 @@ LorawanMacHeader::Deserialize(Buffer::Iterator start)
 void
 LorawanMacHeader::Print(std::ostream& os) const
 {
-    os << "MessageType=" << unsigned(m_mtype) << std::endl;
+    os << "MessageType=" << unsigned(m_ftype) << std::endl;
     os << "Major=" << unsigned(m_major) << std::endl;
 }
 
 void
-LorawanMacHeader::SetMType(enum MType mtype)
+LorawanMacHeader::SetFType(enum FType ftype)
 {
-    NS_LOG_FUNCTION(this << mtype);
+    NS_LOG_FUNCTION(this << ftype);
 
-    m_mtype = mtype;
+    m_ftype = ftype;
 }
 
 uint8_t
-LorawanMacHeader::GetMType(void) const
+LorawanMacHeader::GetFType(void) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    return m_mtype;
+    return m_ftype;
 }
 
 void
@@ -152,8 +152,8 @@ LorawanMacHeader::IsUplink(void) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    return (m_mtype == JOIN_REQUEST) || (m_mtype == UNCONFIRMED_DATA_UP) ||
-           (m_mtype == CONFIRMED_DATA_UP);
+    return (m_ftype == JOIN_REQUEST) || (m_ftype == UNCONFIRMED_DATA_UP) ||
+           (m_ftype == CONFIRMED_DATA_UP);
 }
 
 bool
@@ -161,7 +161,7 @@ LorawanMacHeader::IsConfirmed(void) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    return (m_mtype == CONFIRMED_DATA_DOWN) || (m_mtype == CONFIRMED_DATA_UP);
+    return (m_ftype == CONFIRMED_DATA_DOWN) || (m_ftype == CONFIRMED_DATA_UP);
 }
 } // namespace lorawan
 } // namespace ns3

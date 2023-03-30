@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/lora-channel.h"
+#include "lora-channel.h"
 
 #include "ns3/end-device-lora-phy.h"
 #include "ns3/pointer.h"
@@ -63,12 +63,12 @@ LoraChannel::GetTypeId(void)
 
 LoraChannel::LoraChannel()
 {
-    NS_LOG_FUNCTION_NOARGS();
+    NS_LOG_FUNCTION(this);
 }
 
 LoraChannel::~LoraChannel()
 {
-    NS_LOG_FUNCTION_NOARGS();
+    NS_LOG_FUNCTION(this);
     m_phyListUp.clear();
     m_phyListDown.clear();
     m_delay = nullptr;

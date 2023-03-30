@@ -151,7 +151,7 @@ DownlinkPacketTest::SendPacket(Ptr<Node> endDevice, bool requestAck)
 {
     auto mac = DynamicCast<LoraNetDevice>(endDevice->GetDevice(0))->GetMac();
     if (requestAck)
-        DynamicCast<EndDeviceLorawanMac>(mac)->SetMType(LorawanMacHeader::CONFIRMED_DATA_UP);
+        DynamicCast<EndDeviceLorawanMac>(mac)->SetFType(LorawanMacHeader::CONFIRMED_DATA_UP);
     mac->Send(Create<Packet>(20));
 }
 
@@ -234,7 +234,7 @@ LinkCheckTest::SendPacket(Ptr<Node> endDevice, bool requestAck)
     auto macLayer = DynamicCast<EndDeviceLorawanMac>(
         DynamicCast<LoraNetDevice>(endDevice->GetDevice(0))->GetMac());
     if (requestAck)
-        macLayer->SetMType(LorawanMacHeader::CONFIRMED_DATA_UP);
+        macLayer->SetFType(LorawanMacHeader::CONFIRMED_DATA_UP);
     macLayer->AddMacCommand(Create<LinkCheckReq>());
     macLayer->Send(Create<Packet>(20));
 }

@@ -19,7 +19,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/building-penetration-loss.h"
+#include "building-penetration-loss.h"
 
 #include "ns3/double.h"
 #include "ns3/log.h"

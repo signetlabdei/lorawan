@@ -126,7 +126,7 @@ main(int argc, char* argv[])
     // Set message type (Default is unconfirmed)
     Ptr<LorawanMac> edMac1 = DynamicCast<LoraNetDevice>(endDevices.Get(1)->GetDevice(0))->GetMac();
     Ptr<ClassAEndDeviceLorawanMac> edLorawanMac1 = DynamicCast<ClassAEndDeviceLorawanMac>(edMac1);
-    edLorawanMac1->SetMType(LorawanMacHeader::CONFIRMED_DATA_UP);
+    edLorawanMac1->SetFType(LorawanMacHeader::CONFIRMED_DATA_UP);
 
     // Install applications in EDs
     OneShotSenderHelper oneShotHelper = OneShotSenderHelper();

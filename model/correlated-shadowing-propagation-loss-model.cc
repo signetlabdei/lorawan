@@ -19,7 +19,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/correlated-shadowing-propagation-loss-model.h"
+#include "correlated-shadowing-propagation-loss-model.h"
 
 #include "ns3/double.h"
 #include "ns3/log.h"

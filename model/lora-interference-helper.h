@@ -43,6 +43,8 @@ namespace lorawan
  */
 class LoraInterferenceHelper : public Object
 {
+    using sirMatrix_t = std::vector<std::vector<double>>;
+
   public:
     /**
      * A class representing a signal in time.
@@ -50,7 +52,7 @@ class LoraInterferenceHelper : public Object
      * Used in LoraInterferenceHelper to keep track of which signals overlap and
      * cause destructive interference.
      */
-    class Event : public SimpleRefCount<LoraInterferenceHelper::Event>
+    class Event : public SimpleRefCount<Event>
     {
       public:
         Event(Time duration,
@@ -132,7 +134,7 @@ class LoraInterferenceHelper : public Object
         double m_frequencyHz;
     };
 
-    enum CollisionMatrix
+    enum IsolationMatrix
     {
         CROCE,
         GOURSAUD,
@@ -143,6 +145,7 @@ class LoraInterferenceHelper : public Object
     static TypeId GetTypeId(void);
 
     LoraInterferenceHelper();
+    LoraInterferenceHelper(IsolationMatrix matrix);
     virtual ~LoraInterferenceHelper();
 
     /**
@@ -156,11 +159,11 @@ class LoraInterferenceHelper : public Object
      *
      * \return the newly created event
      */
-    Ptr<LoraInterferenceHelper::Event> Add(Time duration,
-                                           double rxPower,
-                                           uint8_t spreadingFactor,
-                                           Ptr<Packet> packet,
-                                           double frequency);
+    Ptr<Event> Add(Time duration,
+                   double rxPower,
+                   uint8_t spreadingFactor,
+                   Ptr<Packet> packet,
+                   double frequency);
 
     /**
      * Determine whether the event was destroyed by interference or not. This is
@@ -171,13 +174,13 @@ class LoraInterferenceHelper : public Object
      * \return The sf of the packets that caused the loss, or 0 if there was no
      * loss.
      */
-    uint8_t IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Event> event);
+    uint8_t IsDestroyedByInterference(Ptr<Event> event);
 
     /**
      * Get a list of the interferers currently registered at this
      * InterferenceHelper.
      */
-    std::list<Ptr<LoraInterferenceHelper::Event>> GetInterferers();
+    std::list<Ptr<Event>> GetInterferers();
 
     /**
      * Print the events that are saved in this helper in a human readable format.
@@ -192,8 +195,7 @@ class LoraInterferenceHelper : public Object
      *
      * \return The overlap time
      */
-    Time GetOverlapTime(Ptr<LoraInterferenceHelper::Event> event1,
-                        Ptr<LoraInterferenceHelper::Event> event2);
+    Time GetOverlapTime(Ptr<Event> event1, Ptr<Event> event2);
 
     /**
      * Delete all events in the LoraInterferenceHelper.
@@ -212,17 +214,17 @@ class LoraInterferenceHelper : public Object
     /**
      * Set the SIR collision matrix
      */
-    void SetCollisionMatrix(EnumValue matrix);
+    void SetIsolationMatrix(EnumValue matrix);
 
     /**
      * A list of the events this LoraInterferenceHelper is keeping track of.
      */
-    std::list<Ptr<LoraInterferenceHelper::Event>> m_events;
+    std::list<Ptr<Event>> m_events;
 
     /**
      * The SIR matrix used to determine if packets survive interference.
      */
-    std::vector<std::vector<double>> m_collisionSir;
+    sirMatrix_t m_isolationMatrix;
 
     /**
      * The threshold after which an event is considered old and removed from the
@@ -231,9 +233,9 @@ class LoraInterferenceHelper : public Object
     static const Time m_oldEventThreshold;
 
     /* Collision matrices */
-    static const std::vector<std::vector<double>> m_collisionSirAloha;
-    static const std::vector<std::vector<double>> m_collisionSirGoursaud;
-    static const std::vector<std::vector<double>> m_collisionSirCroce;
+    static const sirMatrix_t m_ALOHA;
+    static const sirMatrix_t m_GOURSAUD;
+    static const sirMatrix_t m_CROCE;
 };
 
 /**

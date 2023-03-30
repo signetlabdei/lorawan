@@ -22,7 +22,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/network-status.h"
+#include "network-status.h"
 
 #include "ns3/end-device-status.h"
 #include "ns3/gateway-status.h"
@@ -54,12 +54,12 @@ NetworkStatus::GetTypeId(void)
 
 NetworkStatus::NetworkStatus()
 {
-    NS_LOG_FUNCTION_NOARGS();
+    NS_LOG_FUNCTION(this);
 }
 
 NetworkStatus::~NetworkStatus()
 {
-    NS_LOG_FUNCTION_NOARGS();
+    NS_LOG_FUNCTION(this);
 }
 
 void
@@ -103,14 +103,14 @@ NetworkStatus::OnReceivedPacket(Ptr<const Packet> packet, const Address& gwAddre
     Ptr<Packet> myPacket = packet->Copy();
 
     // Extract the headers
-    LorawanMacHeader macHdr;
-    myPacket->RemoveHeader(macHdr);
-    LoraFrameHeader frameHdr;
-    frameHdr.SetAsUplink();
-    myPacket->RemoveHeader(frameHdr);
+    LorawanMacHeader mHdr;
+    myPacket->RemoveHeader(mHdr);
+    LoraFrameHeader fHdr;
+    fHdr.SetAsUplink();
+    myPacket->RemoveHeader(fHdr);
 
     // Update the correct EndDeviceStatus object
-    LoraDeviceAddress edAddr = frameHdr.GetAddress();
+    LoraDeviceAddress edAddr = fHdr.GetAddress();
     NS_LOG_DEBUG("Node address: " << edAddr);
     m_endDeviceStatuses.at(edAddr)->InsertReceivedPacket(packet, gwAddress);
 }
@@ -182,18 +182,18 @@ NetworkStatus::GetReplyForDevice(LoraDeviceAddress edAddress, int windowNumber)
 
     // Apply the appropriate tag
     LoraTag tag;
+    packet->RemovePacketTag(tag);
     switch (windowNumber)
     {
     case 1:
-        tag.SetDataRate(edStatus->GetMac()->GetFirstReceiveWindowDataRate());
+        tag.SetDataRate(edStatus->GetFirstReceiveWindowDataRate());
         tag.SetFrequency(edStatus->GetFirstReceiveWindowFrequency());
         break;
     case 2:
-        tag.SetDataRate(edStatus->GetMac()->GetSecondReceiveWindowDataRate());
+        tag.SetDataRate(edStatus->GetSecondReceiveWindowDataRate());
         tag.SetFrequency(edStatus->GetSecondReceiveWindowFrequency());
         break;
     }
-
     packet->AddPacketTag(tag);
     return packet;
 }
@@ -204,10 +204,11 @@ NetworkStatus::GetEndDeviceStatus(Ptr<const Packet> packet)
     NS_LOG_FUNCTION(this << packet);
 
     // Get the address
-    LorawanMacHeader mHdr;
-    LoraFrameHeader fHdr;
     Ptr<Packet> myPacket = packet->Copy();
+    LorawanMacHeader mHdr;
     myPacket->RemoveHeader(mHdr);
+    LoraFrameHeader fHdr;
+    fHdr.SetAsUplink();
     myPacket->RemoveHeader(fHdr);
     auto it = m_endDeviceStatuses.find(fHdr.GetAddress());
     if (it != m_endDeviceStatuses.end())

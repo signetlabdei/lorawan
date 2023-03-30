@@ -22,7 +22,7 @@ NS_LOG_COMPONENT_DEFINE("PcapExample");
 int nDevices = 1;
 int nGateways = 1;
 double radius = 6400; // Note that due to model updates, 7500 m is no longer the maximum distance
-double simulationTimeSeconds = 3600;
+double simulationTimeSeconds = 3600 * 2;
 
 int appPeriodSeconds = 60;
 
@@ -50,7 +50,7 @@ main(int argc, char* argv[])
      ***********/
 
     // Set the EDs to require Data Rate control from the NS
-    Config::SetDefault("ns3::EndDeviceLorawanMac::DRControl", BooleanValue(true));
+    Config::SetDefault("ns3::EndDeviceLorawanMac::ADRBit", BooleanValue(true));
 
     // Create the time value from the period
     Time appPeriod = Seconds(appPeriodSeconds);
@@ -189,8 +189,7 @@ main(int argc, char* argv[])
 
     // Create a forwarder for each gateway
     forHelper.Install(gateways);
-    forHelper.Install(endDevices);
-
+    
     ////////////////
     // Simulation //
     ////////////////

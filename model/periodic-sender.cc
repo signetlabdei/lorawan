@@ -46,12 +46,12 @@ PeriodicSender::GetTypeId(void)
 
 PeriodicSender::PeriodicSender()
 {
-    NS_LOG_FUNCTION_NOARGS();
+    NS_LOG_FUNCTION(this);
 }
 
 PeriodicSender::~PeriodicSender()
 {
-    NS_LOG_FUNCTION_NOARGS();
+    NS_LOG_FUNCTION(this);
 }
 
 void

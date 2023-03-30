@@ -61,7 +61,7 @@ main(int argc, char* argv[])
         cmd.AddValue("devices", "Number of end devices to include in the simulation", nDevices);
         cmd.AddValue("sir", "Signal to Interference Ratio matrix used for interference", sir);
         cmd.AddValue("initSF", "Whether to initialize the SFs", initializeSF);
-        cmd.AddValue("adr", "ns3::EndDeviceLorawanMac::DRControl");
+        cmd.AddValue("adr", "ns3::EndDeviceLorawanMac::ADRBit");
         cmd.AddValue("test", "Use test devices (5s period, 5B payload)", testDev);
         cmd.AddValue("file", "Whether to enable .pcap tracing on gateways", file);
         cmd.AddValue("log", "Whether to enable logs", log);
@@ -72,7 +72,7 @@ main(int argc, char* argv[])
     ///////////////// Real-time operation, necessary to interact with the outside world.
     GlobalValue::Bind("SimulatorImplementationType", StringValue("ns3::RealtimeSimulatorImpl"));
     GlobalValue::Bind("ChecksumEnabled", BooleanValue(true));
-    Config::SetDefault("ns3::EndDeviceLorawanMac::EnableCryptography", BooleanValue(true));
+    Config::SetDefault("ns3::EndDeviceLorawanMac::ADRBackoff", BooleanValue(true));
 
     /* Logging options */
     if (log)
@@ -203,7 +203,7 @@ main(int argc, char* argv[])
     {
         // Physiscal layer settings
         LoraPhyHelper phyHelper;
-        phyHelper.SetInterference("CollisionMatrix", EnumValue(sirMap.at(sir)));
+        phyHelper.SetInterference("IsolationMatrix", EnumValue(sirMap.at(sir)));
         phyHelper.SetChannel(channel);
 
         // Create a LoraDeviceAddressGenerator

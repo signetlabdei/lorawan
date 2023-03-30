@@ -46,18 +46,21 @@ OneShotSender::GetTypeId(void)
 
 OneShotSender::OneShotSender()
 {
+    NS_LOG_FUNCTION(this);
     SetInitialDelay(Seconds(0));
     SetPacketSize(10);
 }
 
 OneShotSender::OneShotSender(Time sendTime)
 {
+    NS_LOG_FUNCTION(this);
     SetInitialDelay(sendTime);
     SetPacketSize(10);
 }
 
 OneShotSender::~OneShotSender()
 {
+    NS_LOG_FUNCTION(this);
 }
 
 void

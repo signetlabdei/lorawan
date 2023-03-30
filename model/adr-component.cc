@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/adr-component.h"
+#include "adr-component.h"
 
 namespace ns3
 {
@@ -84,10 +84,12 @@ AdrComponent::GetTypeId(void)
 
 AdrComponent::AdrComponent()
 {
+    NS_LOG_FUNCTION(this);
 }
 
 AdrComponent::~AdrComponent()
 {
+    NS_LOG_FUNCTION(this);
 }
 
 void
@@ -108,9 +110,9 @@ AdrComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus>
 
     Ptr<Packet> myPacket = status->GetLastPacketReceivedFromDevice()->Copy();
     LorawanMacHeader mHdr;
+    myPacket->RemoveHeader(mHdr);
     LoraFrameHeader fHdr;
     fHdr.SetAsUplink();
-    myPacket->RemoveHeader(mHdr);
     myPacket->RemoveHeader(fHdr);
 
     // Execute the ADR algotithm only if the request bit is set
@@ -126,8 +128,8 @@ AdrComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus>
         {
             NS_LOG_DEBUG("New ADR request");
 
-            // Get the SF used by the device
-            uint8_t spreadingFactor = status->GetFirstReceiveWindowSpreadingFactor();
+            // Get the DR used by the device
+            uint8_t currDataRate = status->GetFirstReceiveWindowDataRate();
 
             // Get the device transmission power (dBm)
             uint8_t transmissionPower = status->GetMac()->GetTransmissionPower();
@@ -145,7 +147,7 @@ AdrComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus>
                 newTxPower = transmissionPower;
             }
 
-            if (newDataRate != SfToDr(spreadingFactor) || newTxPower != transmissionPower)
+            if (newDataRate != currDataRate || newTxPower != transmissionPower)
             {
                 // Create a list with mandatory channel indexes
                 int channels[] = {0, 1, 2};
@@ -163,7 +165,7 @@ AdrComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus>
                                                           enabledChannels,
                                                           rep);
                 status->m_reply.frameHeader.SetAsDownlink();
-                status->m_reply.macHeader.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+                status->m_reply.macHeader.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
 
                 status->m_reply.needsReply = true;
             }
@@ -207,12 +209,12 @@ AdrComponent::AdrImplementation(uint8_t* newDataRate,
     NS_LOG_DEBUG("m_SNR = " << m_SNR);
 
     // Get the SF used by the device
-    uint8_t spreadingFactor = status->GetFirstReceiveWindowSpreadingFactor();
+    uint8_t currDataRate = status->GetFirstReceiveWindowDataRate();
 
-    NS_LOG_DEBUG("SF = " << (unsigned)spreadingFactor);
+    NS_LOG_DEBUG("DR = " << (unsigned)currDataRate);
 
     // Get the device data rate and use it to get the SNR demodulation treshold
-    double req_SNR = treshold[SfToDr(spreadingFactor)];
+    double req_SNR = treshold[currDataRate];
 
     NS_LOG_DEBUG("Required SNR = " << req_SNR);
 
@@ -242,11 +244,11 @@ AdrComponent::AdrImplementation(uint8_t* newDataRate,
     // negative, so its decimal value is low) increase the transmission power
     //(note that the SF is not incremented as this particular algorithm
     // expects the node itself to raise its SF whenever necessary).
-    while (steps > 0 && spreadingFactor > min_spreadingFactor)
+    while (steps > 0 && currDataRate < max_dataRate)
     {
-        spreadingFactor--;
+        currDataRate++;
         steps--;
-        NS_LOG_DEBUG("Decreased SF by 1");
+        NS_LOG_DEBUG("Increased DR by 1");
     }
     while (steps > 0 && transmissionPower > min_transmissionPower)
     {
@@ -261,14 +263,8 @@ AdrComponent::AdrImplementation(uint8_t* newDataRate,
         NS_LOG_DEBUG("Increased Ptx by 2");
     }
 
-    *newDataRate = SfToDr(spreadingFactor);
+    *newDataRate = currDataRate;
     *newTxPower = transmissionPower;
-}
-
-uint8_t
-AdrComponent::SfToDr(uint8_t sf)
-{
-    return 12 - sf;
 }
 
 // Get the maximum received power (it considers the values in dB!)

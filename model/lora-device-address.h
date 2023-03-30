@@ -70,7 +70,7 @@ class NwkID
 class NwkAddr
 {
   public:
-    NwkAddr(uint32_t nwkId = 0);
+    NwkAddr(uint32_t nwkAddr = 0);
 
     /**
      * Set the NwkAddr, starting from a 32-bit representation of a 25-bit integer.

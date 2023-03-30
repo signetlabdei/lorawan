@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/lora-device-address.h"
+#include "lora-device-address.h"
 
 #include "ns3/log.h"
 
@@ -91,7 +91,7 @@ NwkAddr::Get(void) const
 
 LoraDeviceAddress::LoraDeviceAddress()
 {
-    NS_LOG_FUNCTION_NOARGS();
+    NS_LOG_FUNCTION(this);
 }
 
 LoraDeviceAddress::LoraDeviceAddress(uint32_t address)

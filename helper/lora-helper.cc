@@ -213,12 +213,12 @@ LoraHelper::DoPrintDeviceStatus(NodeContainer endDevices,
         // Add: #sent, #received, max-offered-traffic, duty-cycle
         uint8_t size = app->GetPacketSize();
         double interval = app->GetInterval().GetSeconds();
-        LoraTxParameters params;
+        LoraPhyTxParameters params;
         params.sf = 12 - dr;
         params.lowDataRateOptimizationEnabled =
             LoraPhy::GetTSym(params) > MilliSeconds(16) ? true : false;
         double maxot =
-            LoraPhy::GetOnAirTime(Create<Packet>(size + 13), params).GetSeconds() / interval;
+            LoraPhy::GetTimeOnAir(Create<Packet>(size + 13), params).GetSeconds() / interval;
         maxot = std::min(maxot, 0.01);
         
         double ot = mac->GetAggregatedDutyCycle();
@@ -395,12 +395,12 @@ LoraHelper::DoPrintSFStatus(NodeContainer endDevices, NodeContainer gateways, st
         // Max-offered-traffic, duty-cycle
         uint8_t size = app->GetPacketSize();
         double interval = app->GetInterval().GetSeconds();
-        LoraTxParameters params;
+        LoraPhyTxParameters params;
         params.sf = 12 - dr;
         params.lowDataRateOptimizationEnabled =
             LoraPhy::GetTSym(params) > MilliSeconds(16) ? true : false;
         double maxot =
-            LoraPhy::GetOnAirTime(Create<Packet>(size + 13), params).GetSeconds() / interval;
+            LoraPhy::GetTimeOnAir(Create<Packet>(size + 13), params).GetSeconds() / interval;
         maxot = std::min(maxot, 0.01);
         double ot = mac->GetAggregatedDutyCycle();
         ot = std::min(ot, maxot);

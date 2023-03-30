@@ -44,10 +44,12 @@ PoissonSender::GetTypeId(void)
 
 PoissonSender::PoissonSender()
 {
+    NS_LOG_FUNCTION(this);
 }
 
 PoissonSender::~PoissonSender()
 {
+    NS_LOG_FUNCTION(this);
 }
 
 void

@@ -18,10 +18,10 @@
 
 #include "lora-tx-current-model.h"
 
-#include "lora-utils.h"
-
 #include "ns3/double.h"
 #include "ns3/log.h"
+
+#include <cmath>
 
 namespace ns3
 {
@@ -132,7 +132,8 @@ double
 LinearLoraTxCurrentModel::CalcTxCurrent(double txPowerDbm) const
 {
     NS_LOG_FUNCTION(this << txPowerDbm);
-    return DbmToW(txPowerDbm) / (m_voltage * m_eta) + m_idleCurrent;
+    double txPowerW = pow(10.0, txPowerDbm / 10.0) / 1000.0;
+    return txPowerW / (m_voltage * m_eta) + m_idleCurrent;
 }
 
 NS_OBJECT_ENSURE_REGISTERED(ConstantLoraTxCurrentModel);

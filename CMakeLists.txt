@@ -9,6 +9,7 @@ set(source_files
     model/gateway-lorawan-mac.cc
     model/end-device-lorawan-mac.cc
     model/class-a-end-device-lorawan-mac.cc
+    model/recv-window-manager.cc
     model/gateway-lora-phy.cc
     model/end-device-lora-phy.cc
     model/sub-band.cc
@@ -35,7 +36,6 @@ set(source_files
     model/gateway-status.cc
     model/lora-radio-energy-model.cc
     model/lora-tx-current-model.cc
-    model/lora-utils.cc
     model/adr-component.cc
     model/hex-grid-position-allocator.cc
     model/range-position-allocator.cc
@@ -74,6 +74,7 @@ set(header_files
     model/gateway-lorawan-mac.h
     model/end-device-lorawan-mac.h
     model/class-a-end-device-lorawan-mac.h
+    model/recv-window-manager.h
     model/gateway-lora-phy.h
     model/end-device-lora-phy.h
     model/sub-band.h
@@ -100,7 +101,6 @@ set(header_files
     model/gateway-status.h
     model/lora-radio-energy-model.h
     model/lora-tx-current-model.h
-    model/lora-utils.h
     model/adr-component.h
     model/hex-grid-position-allocator.h
     model/range-position-allocator.h

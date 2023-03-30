@@ -67,8 +67,6 @@ class AdrComponent : public NetworkControllerComponent
   private:
     void AdrImplementation(uint8_t* newDataRate, uint8_t* newTxPower, Ptr<EndDeviceStatus> status);
 
-    uint8_t SfToDr(uint8_t sf);
-
     double GetMinTxFromGateways(EndDeviceStatus::GatewayList gwList);
 
     double GetMaxTxFromGateways(EndDeviceStatus::GatewayList gwList);
@@ -95,7 +93,7 @@ class AdrComponent : public NetworkControllerComponent
     enum CombiningMethod historyAveraging;
 
     // SF lower limit
-    const int min_spreadingFactor = 7;
+    const int max_dataRate = 5;
 
     // Minimum transmission power (dBm e.r.p) (Europe)
     const int min_transmissionPower = 0;

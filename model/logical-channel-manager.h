@@ -80,10 +80,10 @@ class LogicalChannelManager : public Object
     Time GetWaitingTime(const Ptr<LogicalChannel> channel);
 
     /**
-     * Register the transmission of a packet.
+     * Preemptively register the transmission of a packet.
      *
      * \param duration The duration of the transmission event.
-     * \param channel The channel the transmission was made on.
+     * \param channel The channel the transmission is made on.
      */
     void AddEvent(Time duration, Ptr<LogicalChannel> channel);
 
@@ -189,6 +189,7 @@ class LogicalChannelManager : public Object
     void DoDispose() override;
 
   private:
+
     /**
      * A list of the SubBands that are currently registered within this helper.
      */

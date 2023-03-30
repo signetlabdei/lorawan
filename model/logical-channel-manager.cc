@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/logical-channel-manager.h"
+#include "logical-channel-manager.h"
 
 #include "ns3/log.h"
 #include "ns3/simulator.h"
@@ -197,10 +197,11 @@ LogicalChannelManager::AddEvent(Time duration, Ptr<LogicalChannel> channel)
 
     double dutyCycle = subBand->GetDutyCycle();
     m_lastTxDuration = duration;
+    // Events need to be registered before starting tx!
     m_lastTxStart = Simulator::Now();
 
     // Computation of necessary waiting time on this sub-band
-    subBand->SetNextTransmissionTime(Simulator::Now() + m_lastTxDuration / dutyCycle);
+    subBand->SetNextTransmissionTime(Simulator::Now() + duration / dutyCycle);
 
     NS_LOG_DEBUG("Time on air: " << m_lastTxDuration.As(Time::MS));
     NS_LOG_DEBUG("Current time: " << Simulator::Now().As(Time::S));

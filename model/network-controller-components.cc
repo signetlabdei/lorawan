@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/network-controller-components.h"
+#include "network-controller-components.h"
 
 namespace ns3
 {
@@ -64,10 +64,12 @@ ConfirmedMessagesComponent::GetTypeId(void)
 
 ConfirmedMessagesComponent::ConfirmedMessagesComponent()
 {
+    NS_LOG_FUNCTION(this);
 }
 
 ConfirmedMessagesComponent::~ConfirmedMessagesComponent()
 {
+    NS_LOG_FUNCTION(this);
 }
 
 void
@@ -78,17 +80,17 @@ ConfirmedMessagesComponent::OnReceivedPacket(Ptr<const Packet> packet,
     NS_LOG_FUNCTION(this->GetTypeId() << packet << networkStatus);
 
     // Check whether the received packet requires an acknowledgment.
+    Ptr<Packet> myPacket = packet->Copy();
     LorawanMacHeader mHdr;
+    myPacket->RemoveHeader(mHdr);
     LoraFrameHeader fHdr;
     fHdr.SetAsUplink();
-    Ptr<Packet> myPacket = packet->Copy();
-    myPacket->RemoveHeader(mHdr);
     myPacket->RemoveHeader(fHdr);
 
     NS_LOG_INFO("Received packet Mac Header: " << mHdr);
     NS_LOG_INFO("Received packet Frame Header: " << fHdr);
 
-    if (mHdr.GetMType() == LorawanMacHeader::CONFIRMED_DATA_UP)
+    if (mHdr.GetFType() == LorawanMacHeader::CONFIRMED_DATA_UP)
     {
         NS_LOG_INFO("Packet requires confirmation");
 
@@ -96,7 +98,7 @@ ConfirmedMessagesComponent::OnReceivedPacket(Ptr<const Packet> packet,
         status->m_reply.frameHeader.SetAsDownlink();
         status->m_reply.frameHeader.SetAck(true);
         status->m_reply.frameHeader.SetAddress(fHdr.GetAddress());
-        status->m_reply.macHeader.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+        status->m_reply.macHeader.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
         status->m_reply.needsReply = true;
 
         // Note that the acknowledgment procedure dies here: "Acknowledgments
@@ -142,10 +144,12 @@ LinkCheckComponent::GetTypeId(void)
 
 LinkCheckComponent::LinkCheckComponent()
 {
+    NS_LOG_FUNCTION(this);
 }
 
 LinkCheckComponent::~LinkCheckComponent()
 {
+    NS_LOG_FUNCTION(this);
 }
 
 void
@@ -167,9 +171,9 @@ LinkCheckComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status,
 
     Ptr<Packet> myPacket = status->GetLastPacketReceivedFromDevice()->Copy();
     LorawanMacHeader mHdr;
+    myPacket->RemoveHeader(mHdr);
     LoraFrameHeader fHdr;
     fHdr.SetAsUplink();
-    myPacket->RemoveHeader(mHdr);
     myPacket->RemoveHeader(fHdr);
 
     Ptr<LinkCheckReq> command = fHdr.GetMacCommand<LinkCheckReq>();
@@ -187,7 +191,7 @@ LinkCheckComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status,
         replyCommand->SetGwCnt(gwCount);
         status->m_reply.frameHeader.SetAsDownlink();
         status->m_reply.frameHeader.AddCommand(replyCommand);
-        status->m_reply.macHeader.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+        status->m_reply.macHeader.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
     }
     else
     {

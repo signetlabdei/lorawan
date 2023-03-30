@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/mac-command.h"
+#include "mac-command.h"
 
 #include "ns3/log.h"
 
@@ -362,7 +362,7 @@ LinkAdrReq::GetRepetitions(void)
 {
     NS_LOG_FUNCTION(this);
 
-    return m_nbRep;
+    return (m_nbRep) ? m_nbRep : 1;
 }
 
 ////////////////

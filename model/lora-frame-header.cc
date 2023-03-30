@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/lora-frame-header.h"
+#include "lora-frame-header.h"
 
 #include "ns3/log.h"
 

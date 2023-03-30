@@ -132,24 +132,24 @@ UdpForwarder::ReceiveFromLora(Ptr<GatewayLorawanMac> mac, Ptr<const Packet> pack
     p.rf_chain = 0;
     p.modulation = MOD_LORA;
     p.bandwidth = BW_125KHZ;
-    switch (tag.GetSpreadingFactor())
+    switch (tag.GetDataRate())
     {
-    case 7:
+    case 5:
         p.datarate = DR_LORA_SF7;
         break;
-    case 8:
+    case 4:
         p.datarate = DR_LORA_SF8;
         break;
-    case 9:
+    case 3:
         p.datarate = DR_LORA_SF9;
         break;
-    case 10:
+    case 2:
         p.datarate = DR_LORA_SF10;
         break;
-    case 11:
+    case 1:
         p.datarate = DR_LORA_SF11;
         break;
-    case 12:
+    case 0:
         p.datarate = DR_LORA_SF12;
         break;
     default:
@@ -1750,25 +1750,25 @@ UdpForwarder::LgwSend(struct lgw_pkt_tx_s pkt_data)
     switch (pkt_data.datarate)
     {
     case DR_LORA_SF7:
-        tag.SetSpreadingFactor(7);
+        tag.SetDataRate(5);
         break;
     case DR_LORA_SF8:
-        tag.SetSpreadingFactor(8);
+        tag.SetDataRate(4);
         break;
     case DR_LORA_SF9:
-        tag.SetSpreadingFactor(9);
+        tag.SetDataRate(3);
         break;
     case DR_LORA_SF10:
-        tag.SetSpreadingFactor(10);
+        tag.SetDataRate(2);
         break;
     case DR_LORA_SF11:
-        tag.SetSpreadingFactor(11);
+        tag.SetDataRate(1);
         break;
     case DR_LORA_SF12:
-        tag.SetSpreadingFactor(12);
+        tag.SetDataRate(0);
         break;
     default:
-        tag.SetSpreadingFactor(12);
+        tag.SetDataRate(0);
         break;
     }
     tag.SetFrequency((double)pkt_data.freq_hz);

@@ -82,13 +82,6 @@ class LogicalChannel : public SimpleRefCount<LogicalChannel>
     double GetReplyFrequency(void) const;
 
     /**
-     * Set the frequency (Hz).
-     *
-     * \param frequency The center frequency this channel should be at.
-     */
-    // void SetFrequency (double frequency);
-
-    /**
      * Set the minimum Data Rate that is allowed on this channel.
      */
     void SetMinimumDataRate(uint8_t minDataRate);
@@ -111,7 +104,7 @@ class LogicalChannel : public SimpleRefCount<LogicalChannel>
     /**
      * Set this channel as enabled for uplink.
      */
-    void SetEnabledForUplink(void);
+    void EnableForUplink(void);
 
     /**
      * Set this channel as disabled for uplink.

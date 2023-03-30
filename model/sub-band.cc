@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/sub-band.h"
+#include "sub-band.h"
 
 #include "ns3/log.h"
 

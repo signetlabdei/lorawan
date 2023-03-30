@@ -50,6 +50,7 @@ OnPhySentPacket(Ptr<const Packet> packet, uint32_t index)
     LorawanMacHeader mHdr;
     packetCopy->RemoveHeader(mHdr);
     LoraFrameHeader fHdr;
+    fHdr.SetAsUplink();
     packetCopy->RemoveHeader(fHdr);
 
     NS_LOG_DEBUG("Sent a packet with Frame Counter " << fHdr.GetFCnt());
@@ -92,8 +93,8 @@ main(int argc, char* argv[])
 {
     CommandLine cmd;
     cmd.AddValue("simulationTime", "The time for which to simulate", simulationTime);
-    cmd.AddValue("MaxTransmissions", "ns3::EndDeviceLorawanMac::MaxTransmissions");
-    cmd.AddValue("MType", "ns3::EndDeviceLorawanMac::MType");
+    cmd.AddValue("NbTrans", "ns3::EndDeviceLorawanMac::NbTrans");
+    cmd.AddValue("FType", "ns3::EndDeviceLorawanMac::FType");
     cmd.Parse(argc, argv);
 
     // Set up logging

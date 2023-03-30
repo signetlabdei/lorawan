@@ -135,6 +135,7 @@ main(int argc, char* argv[])
      *  Install applications on the end devices  *
      *********************************************/
 
+    NS_LOG_INFO("Installing applications on end devices...");
     // OneShotSenderHelper oneShotSenderHelper;
     // oneShotSenderHelper.SetSendTime (Seconds (10));
 
@@ -149,6 +150,7 @@ main(int argc, char* argv[])
      * Install Energy Model *
      ************************/
 
+    NS_LOG_INFO("Installing energy model on end devices...");
     BasicEnergySourceHelper basicSourceHelper;
     LoraRadioEnergyModelHelper radioEnergyHelper;
 
@@ -176,6 +178,8 @@ main(int argc, char* argv[])
     /**************
      * Get output *
      **************/
+
+    NS_LOG_INFO("Preparing output file...");
     FileHelper fileHelper;
     fileHelper.ConfigureFile("battery-level", FileAggregator::SPACE_SEPARATED);
     fileHelper.WriteProbe("ns3::DoubleProbe", "/Names/EnergySource/RemainingEnergy", "Output");
@@ -184,7 +188,9 @@ main(int argc, char* argv[])
      *  Simulation  *
      ****************/
 
-    Simulator::Stop(Hours(24));
+    NS_LOG_INFO("Running...");
+
+    Simulator::Stop(Hours(1));
 
     Simulator::Run();
 

@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/lora-interference-helper.h"
+#include "lora-interference-helper.h"
 
 #include "ns3/simulator.h"
 
@@ -35,7 +35,7 @@ NS_LOG_COMPONENT_DEFINE("LoraInterferenceHelper");
 NS_OBJECT_ENSURE_REGISTERED(LoraInterferenceHelper);
 
 /***************************************
- *    LoraInterferenceHelper::Event    *
+ *    Event    *
  ***************************************/
 
 // Event Constructor
@@ -127,28 +127,36 @@ LoraInterferenceHelper::GetTypeId(void)
             .SetParent<Object>()
             .SetGroupName("lorawan")
             .AddConstructor<LoraInterferenceHelper>()
-            .AddAttribute("CollisionMatrix",
+            .AddAttribute("IsolationMatrix",
                           "Signal to Interference Ratio (SIR) matrix used to determine "
                           "if a packet is destroyed by interference on collision event",
-                          EnumValue(CollisionMatrix::CROCE),
-                          MakeEnumAccessor(&LoraInterferenceHelper::SetCollisionMatrix),
-                          MakeEnumChecker(CollisionMatrix::CROCE,
+                          EnumValue(IsolationMatrix::CROCE),
+                          MakeEnumAccessor(&LoraInterferenceHelper::SetIsolationMatrix),
+                          MakeEnumChecker(IsolationMatrix::CROCE,
                                           "CROCE",
-                                          CollisionMatrix::GOURSAUD,
+                                          IsolationMatrix::GOURSAUD,
                                           "GOURSAUD",
-                                          CollisionMatrix::ALOHA,
+                                          IsolationMatrix::ALOHA,
                                           "ALOHA"));
 
     return tid;
 }
 
 LoraInterferenceHelper::LoraInterferenceHelper()
-    : m_collisionSir(m_collisionSirCroce)
+    : m_isolationMatrix(CROCE)
 {
+    NS_LOG_FUNCTION(this);
+}
+
+LoraInterferenceHelper::LoraInterferenceHelper(IsolationMatrix matrix)
+{
+    NS_LOG_FUNCTION(this << matrix);
+    SetIsolationMatrix(EnumValue(matrix));
 }
 
 LoraInterferenceHelper::~LoraInterferenceHelper()
 {
+    NS_LOG_FUNCTION(this);
 }
 
 Ptr<LoraInterferenceHelper::Event>
@@ -161,11 +169,7 @@ LoraInterferenceHelper::Add(Time duration,
     NS_LOG_FUNCTION(this << duration.GetSeconds() << rxPower << unsigned(spreadingFactor) << packet
                          << frequency);
     // Create an event based on the parameters
-    auto event = Create<LoraInterferenceHelper::Event>(duration,
-                                                       rxPower,
-                                                       spreadingFactor,
-                                                       packet,
-                                                       frequency);
+    auto event = Create<Event>(duration, rxPower, spreadingFactor, packet, frequency);
     // Add the event to the list
     m_events.push_back(event);
     // Clean the event list
@@ -175,7 +179,7 @@ LoraInterferenceHelper::Add(Time duration,
 }
 
 uint8_t
-LoraInterferenceHelper::IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Event> event)
+LoraInterferenceHelper::IsDestroyedByInterference(Ptr<Event> event)
 {
     NS_LOG_FUNCTION(this << event);
     // We want to see the interference affecting this event: cycle through events
@@ -239,7 +243,7 @@ LoraInterferenceHelper::IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Ev
         NS_LOG_DEBUG("Signal power in W: " << signalPowerW);
         NS_LOG_DEBUG("Signal energy: " << signalEnergy);
         // Check whether the packet survives the interference of this SF
-        double sirIsolation = m_collisionSir[unsigned(sf) - 7][unsigned(currentSf) - 7];
+        double sirIsolation = m_isolationMatrix[unsigned(sf) - 7][unsigned(currentSf) - 7];
         NS_LOG_DEBUG("The needed isolation to survive is " << sirIsolation << " dB");
         double sir =
             10 * log10(signalEnergy / cumulativeInterferenceEnergy.at(unsigned(currentSf) - 7));
@@ -277,8 +281,7 @@ LoraInterferenceHelper::PrintEvents(std::ostream& stream)
 }
 
 Time
-LoraInterferenceHelper::GetOverlapTime(Ptr<LoraInterferenceHelper::Event> event1,
-                                       Ptr<LoraInterferenceHelper::Event> event2)
+LoraInterferenceHelper::GetOverlapTime(Ptr<Event> event1, Ptr<Event> event2)
 {
     NS_LOG_FUNCTION_NOARGS();
     Time s1 = event1->GetStartTime(); // Start times
@@ -314,7 +317,7 @@ void
 LoraInterferenceHelper::DoDispose()
 {
     NS_LOG_FUNCTION(this);
-    ClearAllEvents();
+    m_events.clear();
     Object::DoDispose();
 }
 
@@ -325,38 +328,38 @@ LoraInterferenceHelper::CleanOldEvents(void)
     // Cycle the events, and clean up if an event is old.
     Time now = Simulator::Now();
     Time threshold = m_oldEventThreshold;
-    auto isOld = [&now, &threshold](Ptr<LoraInterferenceHelper::Event> e) {
-        return e->GetEndTime() + threshold < now;
-    };
+    auto isOld = [&now, &threshold](Ptr<Event> e) { return e->GetEndTime() + threshold < now; };
     m_events.remove_if(isOld);
 }
 
 void
-LoraInterferenceHelper::SetCollisionMatrix(EnumValue matrix)
+LoraInterferenceHelper::SetIsolationMatrix(EnumValue matrix)
 {
     switch (matrix.Get())
     {
     case ALOHA:
         NS_LOG_DEBUG("Setting the ALOHA collision matrix");
-        m_collisionSir = LoraInterferenceHelper::m_collisionSirAloha;
+        m_isolationMatrix = LoraInterferenceHelper::m_ALOHA;
         break;
     case GOURSAUD:
         NS_LOG_DEBUG("Setting the GOURSAUD collision matrix");
-        m_collisionSir = LoraInterferenceHelper::m_collisionSirGoursaud;
+        m_isolationMatrix = LoraInterferenceHelper::m_GOURSAUD;
         break;
     case CROCE:
         NS_LOG_DEBUG("Setting the CROCE collision matrix");
-        m_collisionSir = LoraInterferenceHelper::m_collisionSirCroce;
+        m_isolationMatrix = LoraInterferenceHelper::m_CROCE;
         break;
     }
 }
 
 const Time LoraInterferenceHelper::m_oldEventThreshold = Seconds(2);
 
+using sirMatrix_t = std::vector<std::vector<double>>;
+
 // This collision matrix can be used for comparisons with the performance of Aloha
 // systems, where collisions imply the loss of both packets.
 double inf = std::numeric_limits<double>::max();
-const std::vector<std::vector<double>> LoraInterferenceHelper::m_collisionSirAloha = {
+const sirMatrix_t LoraInterferenceHelper::m_ALOHA = {
     //   7   8   9  10  11  12
     {inf, -inf, -inf, -inf, -inf, -inf}, // SF7
     {-inf, inf, -inf, -inf, -inf, -inf}, // SF8
@@ -370,7 +373,7 @@ const std::vector<std::vector<double>> LoraInterferenceHelper::m_collisionSirAlo
 // Values are inverted w.r.t. the paper since here we interpret this as an
 // _isolation_ matrix instead of a cochannel _rejection_ matrix like in
 // Goursaud's paper.
-const std::vector<std::vector<double>> LoraInterferenceHelper::m_collisionSirGoursaud = {
+const sirMatrix_t LoraInterferenceHelper::m_GOURSAUD = {
     // SF7  SF8  SF9  SF10 SF11 SF12
     {6, -16, -18, -19, -19, -20}, // SF7
     {-24, 6, -20, -22, -22, -22}, // SF8
@@ -381,7 +384,7 @@ const std::vector<std::vector<double>> LoraInterferenceHelper::m_collisionSirGou
 };
 
 // LoRa Collision Matrix (Croce)
-const std::vector<std::vector<double>> LoraInterferenceHelper::m_collisionSirCroce = {
+const sirMatrix_t LoraInterferenceHelper::m_CROCE = {
     // SF7  SF8  SF9  SF10 SF11 SF12
     {1, -8, -9, -9, -9, -9},      // SF7
     {-11, 1, -11, -12, -13, -13}, // SF8

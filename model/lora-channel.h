@@ -42,7 +42,7 @@ namespace lorawan
 {
 
 class LoraPhy;
-struct LoraTxParameters;
+struct LoraPhyTxParameters;
 
 /**
  * The class that delivers packets among PHY layers.

@@ -22,7 +22,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/end-device-status.h"
+#include "end-device-status.h"
 
 #include "ns3/command-line.h"
 #include "ns3/log.h"
@@ -59,12 +59,12 @@ EndDeviceStatus::EndDeviceStatus(LoraDeviceAddress endDeviceAddress,
       m_receivedPacketList(ReceivedPacketList()),
       m_mac(endDeviceMac)
 {
-    NS_LOG_FUNCTION(endDeviceAddress);
+    NS_LOG_FUNCTION(this << endDeviceAddress);
 }
 
 EndDeviceStatus::EndDeviceStatus()
 {
-    NS_LOG_FUNCTION_NOARGS();
+    NS_LOG_FUNCTION(this);
 
     // Initialize data structure
     m_reply = EndDeviceStatus::Reply();
@@ -73,7 +73,7 @@ EndDeviceStatus::EndDeviceStatus()
 
 EndDeviceStatus::~EndDeviceStatus()
 {
-    NS_LOG_FUNCTION_NOARGS();
+    NS_LOG_FUNCTION(this);
 }
 
 ///////////////
@@ -81,11 +81,11 @@ EndDeviceStatus::~EndDeviceStatus()
 ///////////////
 
 uint8_t
-EndDeviceStatus::GetFirstReceiveWindowSpreadingFactor()
+EndDeviceStatus::GetFirstReceiveWindowDataRate()
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    return m_firstReceiveWindowSpreadingFactor;
+    return m_firstReceiveWindowDataRate;
 }
 
 double
@@ -97,11 +97,11 @@ EndDeviceStatus::GetFirstReceiveWindowFrequency()
 }
 
 uint8_t
-EndDeviceStatus::GetSecondReceiveWindowOffset()
+EndDeviceStatus::GetSecondReceiveWindowDataRate()
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    return m_secondReceiveWindowOffset;
+    return m_secondReceiveWindowDataRate;
 }
 
 double
@@ -133,12 +133,12 @@ EndDeviceStatus::GetCompleteReplyPacket(void)
     m_reply.frameHeader.SetAddress(m_endDeviceAddress);
     Ptr<Packet> lastPacket = GetLastPacketReceivedFromDevice()->Copy();
     LorawanMacHeader mHdr;
+    lastPacket->RemoveHeader(mHdr);
     LoraFrameHeader fHdr;
     fHdr.SetAsUplink();
-    lastPacket->RemoveHeader(mHdr);
     lastPacket->RemoveHeader(fHdr);
     m_reply.frameHeader.SetFCnt(fHdr.GetFCnt());
-    m_reply.macHeader.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+    m_reply.macHeader.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
     replyPacket->AddHeader(m_reply.frameHeader);
     replyPacket->AddHeader(m_reply.macHeader);
     // 4 Bytes of MIC
@@ -193,10 +193,10 @@ EndDeviceStatus::GetReceivedPacketList()
 }
 
 void
-EndDeviceStatus::SetFirstReceiveWindowSpreadingFactor(uint8_t sf)
+EndDeviceStatus::SetFirstReceiveWindowDataRate(uint8_t dr)
 {
     NS_LOG_FUNCTION_NOARGS();
-    m_firstReceiveWindowSpreadingFactor = sf;
+    m_firstReceiveWindowDataRate = dr;
 }
 
 void
@@ -207,10 +207,10 @@ EndDeviceStatus::SetFirstReceiveWindowFrequency(double frequency)
 }
 
 void
-EndDeviceStatus::SetSecondReceiveWindowOffset(uint8_t offset)
+EndDeviceStatus::SetSecondReceiveWindowDataRate(uint8_t dr)
 {
     NS_LOG_FUNCTION_NOARGS();
-    m_secondReceiveWindowOffset = offset;
+    m_secondReceiveWindowDataRate = dr;
 }
 
 void
@@ -254,22 +254,22 @@ EndDeviceStatus::InsertReceivedPacket(Ptr<const Packet> receivedPacket, const Ad
     Ptr<Packet> myPacket = receivedPacket->Copy();
 
     // Extract the headers
-    LorawanMacHeader macHdr;
-    myPacket->RemoveHeader(macHdr);
+    LorawanMacHeader mHdr;
+    myPacket->RemoveHeader(mHdr);
 
-    LoraFrameHeader frameHdr;
-    frameHdr.SetAsUplink();
-    myPacket->RemoveHeader(frameHdr);
+    LoraFrameHeader fHdr;
+    fHdr.SetAsUplink();
+    myPacket->RemoveHeader(fHdr);
 
     // Update current parameters
     LoraTag tag;
     myPacket->RemovePacketTag(tag);
-    SetFirstReceiveWindowSpreadingFactor(tag.GetSpreadingFactor());
+    SetFirstReceiveWindowDataRate(tag.GetDataRate());
     SetFirstReceiveWindowFrequency(tag.GetFrequency());
 
     // Update Information on the received packet
     ReceivedPacketInfo info;
-    info.sf = tag.GetSpreadingFactor();
+    info.sf = tag.GetTxParameters().sf;
     info.frequency = tag.GetFrequency();
 
     double rcvPower = tag.GetReceivePower();
@@ -287,14 +287,14 @@ EndDeviceStatus::InsertReceivedPacket(Ptr<const Packet> receivedPacket, const Ad
         LorawanMacHeader currentMacHdr;
         packetCopy->RemoveHeader(currentMacHdr);
         LoraFrameHeader currentFrameHdr;
-        frameHdr.SetAsUplink();
+        fHdr.SetAsUplink();
         packetCopy->RemoveHeader(currentFrameHdr);
 
-        NS_LOG_DEBUG("Received packet's frame counter: " << unsigned(frameHdr.GetFCnt())
+        NS_LOG_DEBUG("Received packet's frame counter: " << unsigned(fHdr.GetFCnt())
                                                          << "\nCurrent packet's frame counter: "
                                                          << unsigned(currentFrameHdr.GetFCnt()));
 
-        if (frameHdr.GetFCnt() == currentFrameHdr.GetFCnt())
+        if (fHdr.GetFCnt() == currentFrameHdr.GetFCnt())
         {
             NS_LOG_INFO("Packet was already received by another gateway");
 

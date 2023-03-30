@@ -43,7 +43,7 @@ class LorawanMacHeader : public Header
      * The enum value corresponds to the value that will be written in the header
      * by the Serialize method.
      */
-    enum MType
+    enum FType
     {
         JOIN_REQUEST = 0,
         JOIN_ACCEPT = 1,
@@ -91,16 +91,16 @@ class LorawanMacHeader : public Header
     /**
      * Set the message type.
      *
-     * \param mtype The message type of this header.
+     * \param ftype The message type of this header.
      */
-    void SetMType(enum MType mtype);
+    void SetFType(enum FType ftype);
 
     /**
      * Get the message type from the header.
      *
      * \return The uint8_t corresponding to this header's message type.
      */
-    uint8_t GetMType(void) const;
+    uint8_t GetFType(void) const;
 
     /**
      * Set the major version of this header.
@@ -130,7 +130,7 @@ class LorawanMacHeader : public Header
     /**
      * The Message Type.
      */
-    uint8_t m_mtype;
+    uint8_t m_ftype;
 
     /**
      * The major version this header is using.

@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/lora-device-address-generator.h"
+#include "lora-device-address-generator.h"
 
 #include "ns3/log.h"
 

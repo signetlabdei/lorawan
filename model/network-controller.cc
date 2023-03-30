@@ -44,18 +44,18 @@ NetworkController::GetTypeId(void)
 
 NetworkController::NetworkController()
 {
-    NS_LOG_FUNCTION_NOARGS();
+    NS_LOG_FUNCTION(this);
 }
 
 NetworkController::NetworkController(Ptr<NetworkStatus> networkStatus)
     : m_status(networkStatus)
 {
-    NS_LOG_FUNCTION_NOARGS();
+    NS_LOG_FUNCTION(this);
 }
 
 NetworkController::~NetworkController()
 {
-    NS_LOG_FUNCTION_NOARGS();
+    NS_LOG_FUNCTION(this);
 }
 
 void

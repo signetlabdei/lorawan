@@ -65,8 +65,8 @@ main(int argc, char* argv[])
     cmd.AddValue("MultiplePacketsCombiningMethod",
                  "ns3::AdrComponent::MultiplePacketsCombiningMethod");
     cmd.AddValue("HistoryRange", "ns3::AdrComponent::HistoryRange");
-    cmd.AddValue("MType", "ns3::EndDeviceLorawanMac::MType");
-    cmd.AddValue("EDDRAdaptation", "ns3::EndDeviceLorawanMac::EnableEDDataRateAdaptation");
+    cmd.AddValue("FType", "ns3::EndDeviceLorawanMac::FType");
+    cmd.AddValue("ADRBackoff", "ns3::EndDeviceLorawanMac::ADRBackoff");
     cmd.AddValue("ChangeTransmissionPower", "ns3::AdrComponent::ChangeTransmissionPower");
     cmd.AddValue("AdrEnabled", "Whether to enable ADR", adrEnabled);
     cmd.AddValue("nDevices", "Number of devices to simulate", nDevices);
@@ -84,7 +84,7 @@ main(int argc, char* argv[])
     cmd.AddValue("initializeSF", "Whether to initialize the SFs", initializeSF);
     cmd.AddValue("MinSpeed", "Minimum speed for mobile devices", minSpeed);
     cmd.AddValue("MaxSpeed", "Maximum speed for mobile devices", maxSpeed);
-    cmd.AddValue("MaxTransmissions", "ns3::EndDeviceLorawanMac::MaxTransmissions");
+    cmd.AddValue("NbTrans", "ns3::EndDeviceLorawanMac::NbTrans");
     cmd.Parse(argc, argv);
 
     int gatewayRings = 2 + (std::sqrt(2) * sideLength) / (gatewayDistance);
@@ -112,7 +112,7 @@ main(int argc, char* argv[])
     LogComponentEnableAll(LOG_PREFIX_TIME);
 
     // Set the EDs to require Data Rate control from the NS
-    Config::SetDefault("ns3::EndDeviceLorawanMac::DRControl", BooleanValue(true));
+    Config::SetDefault("ns3::EndDeviceLorawanMac::ADRBit", BooleanValue(true));
 
     // Create a simple wireless channel
     ///////////////////////////////////

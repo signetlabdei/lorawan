@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/logical-channel.h"
+#include "logical-channel.h"
 
 #include "ns3/log.h"
 
@@ -108,7 +108,7 @@ LogicalChannel::GetMaximumDataRate(void)
 }
 
 void
-LogicalChannel::SetEnabledForUplink(void)
+LogicalChannel::EnableForUplink(void)
 {
     m_enabledForUplink = true;
 }

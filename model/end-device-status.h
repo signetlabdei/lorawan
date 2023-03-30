@@ -28,7 +28,6 @@
 #include "ns3/class-a-end-device-lorawan-mac.h"
 #include "ns3/lora-device-address.h"
 #include "ns3/lora-frame-header.h"
-#include "ns3/lora-net-device.h"
 #include "ns3/lorawan-mac-header.h"
 #include "ns3/object.h"
 #include "ns3/pointer.h"
@@ -191,11 +190,11 @@ class EndDeviceStatus : public Object
     virtual ~EndDeviceStatus();
 
     /**
-     * Get the spreading factor this device is using in the first receive window.
+     * Get the data rate this device is using in the first receive window.
      *
-     * \return An unsigned 8-bit integer containing the spreading factor.
+     * \return An unsigned 8-bit integer containing the data rate.
      */
-    uint8_t GetFirstReceiveWindowSpreadingFactor(void);
+    uint8_t GetFirstReceiveWindowDataRate(void);
 
     /**
      * Get the first window frequency of this device.
@@ -208,7 +207,7 @@ class EndDeviceStatus : public Object
      *
      * \return An unsigned 8-bit integer containing the spreading factor.
      */
-    uint8_t GetSecondReceiveWindowOffset(void);
+    uint8_t GetSecondReceiveWindowDataRate(void);
 
     /**
      * Return the second window frequency of this device.
@@ -224,9 +223,9 @@ class EndDeviceStatus : public Object
     const ReceivedPacketList& GetReceivedPacketList(void);
 
     /**
-     * Set the spreading factor this device is using in the first receive window.
+     * Set the data rate this device is using in the first receive window.
      */
-    void SetFirstReceiveWindowSpreadingFactor(uint8_t sf);
+    void SetFirstReceiveWindowDataRate(uint8_t dr);
 
     /**
      * Set the first window frequency of this device.
@@ -236,7 +235,7 @@ class EndDeviceStatus : public Object
     /**
      * Set the spreading factor this device is using in the first receive window.
      */
-    void SetSecondReceiveWindowOffset(uint8_t offset);
+    void SetSecondReceiveWindowDataRate(uint8_t dr);
 
     /**
      * Set the second window frequency of this device.
@@ -315,9 +314,9 @@ class EndDeviceStatus : public Object
 
   private:
     // Receive window data
-    uint8_t m_firstReceiveWindowSpreadingFactor = 0;
+    uint8_t m_firstReceiveWindowDataRate = 0;
     double m_firstReceiveWindowFrequency = 0;
-    uint8_t m_secondReceiveWindowOffset = 0;
+    uint8_t m_secondReceiveWindowDataRate = 0;
     double m_secondReceiveWindowFrequency = 869525000;
     EventId m_receiveWindowEvent;
 

@@ -116,7 +116,7 @@ main(int argc, char* argv[])
 
     // Create the LoraPhyHelper
     LoraPhyHelper phyHelper = LoraPhyHelper();
-    phyHelper.SetInterference("CollisionMatrix", EnumValue(sirMap.at(interferenceMatrix)));
+    phyHelper.SetInterference("IsolationMatrix", EnumValue(sirMap.at(interferenceMatrix)));
     phyHelper.SetChannel(channel);
 
     // Create the LorawanMacHelper
@@ -215,7 +215,7 @@ main(int argc, char* argv[])
     outputFile.open("durations.txt", std::ofstream::out | std::ofstream::trunc);
     for (uint8_t sf = 7; sf <= 12; sf++)
     {
-        LoraTxParameters txParams;
+        LoraPhyTxParameters txParams;
         txParams.sf = sf;
         txParams.headerDisabled = 0;
         txParams.codingRate = 1;
@@ -226,21 +226,21 @@ main(int argc, char* argv[])
             LoraPhy::GetTSym(txParams) > MilliSeconds(16) ? true : false;
         Ptr<Packet> pkt = Create<Packet>(packetSize);
 
-        LoraFrameHeader frameHdr = LoraFrameHeader();
-        frameHdr.SetAsUplink();
-        frameHdr.SetFPort(1);
-        frameHdr.SetAddress(LoraDeviceAddress());
-        frameHdr.SetAdr(0);
-        frameHdr.SetAdrAckReq(0);
-        frameHdr.SetFCnt(0);
-        pkt->AddHeader(frameHdr);
+        LoraFrameHeader fHdr = LoraFrameHeader();
+        fHdr.SetAsUplink();
+        fHdr.SetFPort(1);
+        fHdr.SetAddress(LoraDeviceAddress());
+        fHdr.SetAdr(0);
+        fHdr.SetAdrAckReq(0);
+        fHdr.SetFCnt(0);
+        pkt->AddHeader(fHdr);
 
-        LorawanMacHeader macHdr = LorawanMacHeader();
-        macHdr.SetMType(ns3::lorawan::LorawanMacHeader::UNCONFIRMED_DATA_UP);
-        macHdr.SetMajor(1);
-        pkt->AddHeader(macHdr);
+        LorawanMacHeader mHdr = LorawanMacHeader();
+        mHdr.SetFType(ns3::lorawan::LorawanMacHeader::UNCONFIRMED_DATA_UP);
+        mHdr.SetMajor(1);
+        pkt->AddHeader(mHdr);
 
-        outputFile << LoraPhy::GetOnAirTime(pkt, txParams).GetMicroSeconds() << " ";
+        outputFile << LoraPhy::GetTimeOnAir(pkt, txParams).GetMicroSeconds() << " ";
     }
     outputFile.close();
 
