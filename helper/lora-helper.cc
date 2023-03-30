@@ -195,7 +195,7 @@ LoraHelper::DoPrintDeviceStatus(NodeContainer endDevices,
         auto node = *j;
         auto position = node->GetObject<MobilityModel>();
         auto loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(0));
-        auto mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
+        auto mac = DynamicCast<BaseEndDeviceLorawanMac>(loraNetDevice->GetMac());
         auto app = DynamicCast<LoraApplication>(node->GetApplication(0));
 
         Vector pos = position->GetPosition();
@@ -381,7 +381,7 @@ LoraHelper::DoPrintSFStatus(NodeContainer endDevices, NodeContainer gateways, st
         // Obtain device information
         auto node = *j;
         auto loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(0));
-        auto mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
+        auto mac = DynamicCast<BaseEndDeviceLorawanMac>(loraNetDevice->GetMac());
         auto app = DynamicCast<LoraApplication>(node->GetApplication(0));
 
         int dr = int(mac->GetDataRate());

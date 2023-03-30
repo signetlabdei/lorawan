@@ -7,7 +7,7 @@
 #include "ns3/correlated-shadowing-propagation-loss-model.h"
 #include "ns3/double.h"
 #include "ns3/end-device-lora-phy.h"
-#include "ns3/end-device-lorawan-mac.h"
+#include "ns3/base-end-device-lorawan-mac.h"
 #include "ns3/forwarder-helper.h"
 #include "ns3/gateway-lora-phy.h"
 #include "ns3/gateway-lorawan-mac.h"
@@ -65,7 +65,7 @@ main(int argc, char* argv[])
     LogComponentEnable("AlohaThroughput", LOG_LEVEL_ALL);
 
     // Make all devices use SF7 (i.e., DR5)
-    // Config::SetDefault ("ns3::EndDeviceLorawanMac::DataRate", UintegerValue (5));
+    // Config::SetDefault ("ns3::BaseEndDeviceLorawanMac::DataRate", UintegerValue (5));
 
     /***********
      *  Setup  *

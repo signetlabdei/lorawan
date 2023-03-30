@@ -20,7 +20,7 @@
 
 #include "chirpstack-helper.h"
 
-#include "ns3/end-device-lorawan-mac.h"
+#include "ns3/base-end-device-lorawan-mac.h"
 #include "ns3/gateway-lorawan-mac.h"
 #include "ns3/log.h"
 #include "ns3/lora-net-device.h"
@@ -275,7 +275,7 @@ ChirpstackHelper::RegisterPriv(Ptr<Node> node) const
     for (int i = 0; i < (int)node->GetNDevices(); ++i)
         if (netdev = DynamicCast<LoraNetDevice>(node->GetDevice(i)); bool(netdev))
         {
-            if (bool(DynamicCast<EndDeviceLorawanMac>(netdev->GetMac())))
+            if (bool(DynamicCast<BaseEndDeviceLorawanMac>(netdev->GetMac())))
                 NewDevice(node);
             else if (bool(DynamicCast<GatewayLorawanMac>(netdev->GetMac())))
                 NewGateway(node);
@@ -324,7 +324,7 @@ ChirpstackHelper::NewDevice(Ptr<Node> node) const
 
     char devAddr[9];
     auto netdev = DynamicCast<LoraNetDevice>(node->GetDevice(0));
-    auto mac = DynamicCast<EndDeviceLorawanMac>(netdev->GetMac());
+    auto mac = DynamicCast<BaseEndDeviceLorawanMac>(netdev->GetMac());
     snprintf(devAddr, 9, "%08x", mac->GetDeviceAddress().Get());
 
     payload = "{"

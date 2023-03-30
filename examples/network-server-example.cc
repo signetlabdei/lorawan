@@ -51,7 +51,7 @@ main(int argc, char* argv[])
     // LogComponentEnable("LoraChannel", LOG_LEVEL_ALL);
     // LogComponentEnable("EndDeviceLoraPhy", LOG_LEVEL_ALL);
     // LogComponentEnable("LogicalChannelManager", LOG_LEVEL_ALL);
-    LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_ALL);
+    LogComponentEnable("BaseEndDeviceLorawanMac", LOG_LEVEL_ALL);
     LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
     // LogComponentEnable ("OneShotSender", LOG_LEVEL_ALL);
     // LogComponentEnable("PointToPointNetDevice", LOG_LEVEL_ALL);

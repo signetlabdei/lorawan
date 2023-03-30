@@ -348,7 +348,7 @@ LorawanMacHelper::SetSpreadingFactorsUp(NodeContainer endDevices,
         auto loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(0));
         NS_ASSERT(bool(loraNetDevice));
         auto position = node->GetObject<MobilityModel>();
-        auto mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
+        auto mac = DynamicCast<BaseEndDeviceLorawanMac>(loraNetDevice->GetMac());
         NS_ASSERT(bool(position) && bool(mac));
 
         // Try computing the distance from each gateway and find the best one

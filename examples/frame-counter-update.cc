@@ -93,8 +93,8 @@ main(int argc, char* argv[])
 {
     CommandLine cmd;
     cmd.AddValue("simulationTime", "The time for which to simulate", simulationTime);
-    cmd.AddValue("NbTrans", "ns3::EndDeviceLorawanMac::NbTrans");
-    cmd.AddValue("FType", "ns3::EndDeviceLorawanMac::FType");
+    cmd.AddValue("NbTrans", "ns3::BaseEndDeviceLorawanMac::NbTrans");
+    cmd.AddValue("FType", "ns3::BaseEndDeviceLorawanMac::FType");
     cmd.Parse(argc, argv);
 
     // Set up logging
@@ -185,7 +185,7 @@ main(int argc, char* argv[])
         auto node = *j;
         auto loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(0));
         auto phy = loraNetDevice->GetPhy();
-        auto mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
+        auto mac = DynamicCast<BaseEndDeviceLorawanMac>(loraNetDevice->GetMac());
         phy->TraceConnectWithoutContext("StartSending", MakeCallback(&OnPhySentPacket));
         mac->TraceConnectWithoutContext("RequiredTransmissions", MakeCallback(&OnMacPacketOutcome));
     }

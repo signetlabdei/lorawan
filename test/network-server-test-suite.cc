@@ -151,7 +151,7 @@ DownlinkPacketTest::SendPacket(Ptr<Node> endDevice, bool requestAck)
 {
     auto mac = DynamicCast<LoraNetDevice>(endDevice->GetDevice(0))->GetMac();
     if (requestAck)
-        DynamicCast<EndDeviceLorawanMac>(mac)->SetFType(LorawanMacHeader::CONFIRMED_DATA_UP);
+        DynamicCast<BaseEndDeviceLorawanMac>(mac)->SetFType(LorawanMacHeader::CONFIRMED_DATA_UP);
     mac->Send(Create<Packet>(20));
 }
 
@@ -171,7 +171,7 @@ DownlinkPacketTest::DoRun(void)
     Ptr<Node> nsNode = components.nsNode;
 
     // Connect the ED's trace source for received packets
-    DynamicCast<EndDeviceLorawanMac>(
+    DynamicCast<BaseEndDeviceLorawanMac>(
         DynamicCast<LoraNetDevice>(endDevices.Get(0)->GetDevice(0))->GetMac())
         ->TraceConnectWithoutContext(
             "RequiredTransmissions",
@@ -231,7 +231,7 @@ LinkCheckTest::LastKnownGatewayCount(int newValue, int oldValue)
 void
 LinkCheckTest::SendPacket(Ptr<Node> endDevice, bool requestAck)
 {
-    auto macLayer = DynamicCast<EndDeviceLorawanMac>(
+    auto macLayer = DynamicCast<BaseEndDeviceLorawanMac>(
         DynamicCast<LoraNetDevice>(endDevice->GetDevice(0))->GetMac());
     if (requestAck)
         macLayer->SetFType(LorawanMacHeader::CONFIRMED_DATA_UP);
@@ -255,7 +255,7 @@ LinkCheckTest::DoRun(void)
     Ptr<Node> nsNode = components.nsNode;
 
     // Connect the ED's trace source for Last known Gateway Count
-    DynamicCast<EndDeviceLorawanMac>(
+    DynamicCast<BaseEndDeviceLorawanMac>(
         DynamicCast<LoraNetDevice>(endDevices.Get(0)->GetDevice(0))->GetMac())
         ->TraceConnectWithoutContext("LastKnownGatewayCount",
                                      MakeCallback(&LinkCheckTest::LastKnownGatewayCount, this));
@@ -296,7 +296,7 @@ NetworkServerTestSuite::NetworkServerTestSuite()
     LogComponentEnable("NetworkControllerComponent", LOG_LEVEL_ALL);
     LogComponentEnable("LoraNetDevice", LOG_LEVEL_ALL);
     LogComponentEnable("GatewayLorawanMac", LOG_LEVEL_ALL);
-    LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_ALL);
+    LogComponentEnable("BaseEndDeviceLorawanMac", LOG_LEVEL_ALL);
     LogComponentEnable("EndDeviceLoraPhy", LOG_LEVEL_ALL);
     LogComponentEnable("EndDeviceStatus", LOG_LEVEL_ALL);
 
