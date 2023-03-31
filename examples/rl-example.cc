@@ -18,7 +18,7 @@
 #include "ns3/forwarder-helper.h"
 #include "ns3/hex-grid-position-allocator.h"
 #include "ns3/lora-channel.h"
-#include "ns3/lora-helper.h"
+#include "ns3/lorawan-helper.h"
 #include "ns3/lora-radio-energy-model-helper.h"
 #include "ns3/network-server-helper.h"
 #include "ns3/periodic-sender-helper.h"
@@ -190,7 +190,7 @@ main(int argc, char* argv[])
      *  Create Net Devices  *
      ************************/
 
-    LoraHelper loraHelper;
+    LorawanHelper loraHelper;
     LorawanMacHelper macHelper;
     NetDeviceContainer edNetDevices;
     {
