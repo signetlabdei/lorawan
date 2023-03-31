@@ -113,7 +113,7 @@ LoraPhy::DoInitialize()
     // call SetMobility() on this object.
     if (!m_mobility)
     {
-        NS_ABORT_MSG_UNLESS(m_device && m_device->GetNode(),
+        NS_ABORT_MSG_UNLESS(bool(m_device) && bool(m_device->GetNode()),
                             "Either install a MobilityModel on this object or ensure that this "
                             "object is part of a Node and NetDevice");
         m_mobility = m_device->GetNode()->GetObject<MobilityModel>();
