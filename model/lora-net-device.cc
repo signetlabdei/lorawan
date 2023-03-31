@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/lora-net-device.h"
+#include "lora-net-device.h"
 
 #include "ns3/abort.h"
 #include "ns3/log.h"

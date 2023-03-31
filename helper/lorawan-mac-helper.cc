@@ -352,7 +352,7 @@ LorawanMacHelper::SetSpreadingFactorsUp(NodeContainer endDevices,
         auto loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(0));
         NS_ASSERT(bool(loraNetDevice));
         auto position = node->GetObject<MobilityModel>();
-        auto mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
+        auto mac = DynamicCast<BaseEndDeviceLorawanMac>(loraNetDevice->GetMac());
         NS_ASSERT(bool(position) && bool(mac));
 
         // Try computing the distance from each gateway and find the best one
@@ -443,7 +443,7 @@ LorawanMacHelper::SetDutyCyclesWithCapacityModel(NodeContainer endDevices,
         auto loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(0));
         NS_ASSERT(bool(loraNetDevice));
         auto position = node->GetObject<MobilityModel>();
-        auto mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
+        auto mac = DynamicCast<BaseEndDeviceLorawanMac>(loraNetDevice->GetMac());
         auto app = DynamicCast<LoraApplication>(node->GetApplication(0));
         NS_ASSERT(bool(position) && bool(mac) && bool(app));
 
@@ -463,12 +463,12 @@ LorawanMacHelper::SetDutyCyclesWithCapacityModel(NodeContainer endDevices,
         }
 
         auto tmp = Create<Packet>(app->GetPacketSize() + 13);
-        LoraTxParameters params;
+        LoraPhyTxParameters params;
         params.sf = 12 - mac->GetDataRate();
         params.lowDataRateOptimizationEnabled =
             LoraPhy::GetTSym(params) > MilliSeconds(16) ? true : false;
 
-        double toa = LoraPhy::GetOnAirTime(tmp, params).GetSeconds();
+        double toa = LoraPhy::GetTimeOnAir(tmp, params).GetSeconds();
         double traffic = toa / app->GetInterval().GetSeconds();
         traffic = (traffic > 0.01) ? 0.01 : traffic;
 
@@ -491,7 +491,7 @@ LorawanMacHelper::SetDutyCyclesWithCapacityModel(NodeContainer endDevices,
                 for (const auto& id : out)
                 {
                     auto curr = NodeList::GetNode(id.first);
-                    auto mac = DynamicCast<EndDeviceLorawanMac>(
+                    auto mac = DynamicCast<BaseEndDeviceLorawanMac>(
                         DynamicCast<LoraNetDevice>(curr->GetDevice(0))->GetMac());
                     // Check if we need to turn off completely
                     if (id.second == 255)

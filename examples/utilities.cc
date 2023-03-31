@@ -90,7 +90,7 @@ ComputeArea(double range, int rings)
 /**
  * Possible interference matrices
  */
-const std::unordered_map<std::string, LoraInterferenceHelper::CollisionMatrix> sirMap = {
+const std::unordered_map<std::string, LoraInterferenceHelper::IsolationMatrix> sirMap = {
     {"CROCE", LoraInterferenceHelper::CROCE},
     {"GOURSAUD", LoraInterferenceHelper::GOURSAUD},
     {"ALOHA", LoraInterferenceHelper::ALOHA}};
@@ -186,7 +186,7 @@ OnTransmissionCallback(Ptr<const Packet> packet, uint32_t systemId)
     NS_LOG_FUNCTION(packet << systemId);
     LoraTag tag;
     packet->PeekPacketTag(tag);
-    packetsSent.at(tag.GetSpreadingFactor() - 7)++;
+    packetsSent.at(tag.GetDataRate())++;
 }
 
 void
@@ -195,5 +195,5 @@ OnPacketReceptionCallback(Ptr<const Packet> packet, uint32_t systemId)
     NS_LOG_FUNCTION(packet << systemId);
     LoraTag tag;
     packet->PeekPacketTag(tag);
-    packetsReceived.at(tag.GetSpreadingFactor() - 7)++;
+    packetsReceived.at(tag.GetDataRate())++;
 }

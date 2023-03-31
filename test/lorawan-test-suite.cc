@@ -50,7 +50,8 @@ InterferenceTest::DoRun(void)
 {
     NS_LOG_DEBUG("InterferenceTest");
 
-    LoraInterferenceHelper interferenceHelper;
+    // Test are designed around GOURSAUD signal-to-interference matrix
+    LoraInterferenceHelper interferenceHelper(LoraInterferenceHelper::GOURSAUD);
 
     double frequency = 868100000;
     double differentFrequency = 868300000;
@@ -297,58 +298,58 @@ HeaderTest::DoRun(void)
     //////////////////////////////////
     // Test the LorawanMacHeader class //
     //////////////////////////////////
-    LorawanMacHeader macHdr;
-    macHdr.SetMType(LorawanMacHeader::CONFIRMED_DATA_DOWN);
-    macHdr.SetMajor(1);
+    LorawanMacHeader mHdr;
+    mHdr.SetFType(LorawanMacHeader::CONFIRMED_DATA_DOWN);
+    mHdr.SetMajor(1);
 
     Buffer macBuf;
     macBuf.AddAtStart(100);
     Buffer::Iterator macSerialized = macBuf.Begin();
-    macHdr.Serialize(macSerialized);
+    mHdr.Serialize(macSerialized);
 
-    macHdr.Deserialize(macSerialized);
+    mHdr.Deserialize(macSerialized);
 
-    NS_TEST_EXPECT_MSG_EQ((macHdr.GetMType() == LorawanMacHeader::CONFIRMED_DATA_DOWN),
+    NS_TEST_EXPECT_MSG_EQ((mHdr.GetFType() == LorawanMacHeader::CONFIRMED_DATA_DOWN),
                           true,
-                          "MType changes in the serialization/deserialization process");
-    NS_TEST_EXPECT_MSG_EQ((macHdr.GetMajor() == 1),
+                          "FType changes in the serialization/deserialization process");
+    NS_TEST_EXPECT_MSG_EQ((mHdr.GetMajor() == 1),
                           true,
-                          "MType changes in the serialization/deserialization process");
+                          "FType changes in the serialization/deserialization process");
 
     ////////////////////////////////////
     // Test the LoraFrameHeader class //
     ////////////////////////////////////
-    LoraFrameHeader frameHdr;
-    frameHdr.SetAsDownlink();
-    frameHdr.SetAck(true);
-    frameHdr.SetAdr(false);
-    frameHdr.SetFCnt(1);
-    frameHdr.SetAddress(LoraDeviceAddress(56, 1864));
-    frameHdr.AddLinkCheckAns(10, 1);
+    LoraFrameHeader fHdr;
+    fHdr.SetAsDownlink();
+    fHdr.SetAck(true);
+    fHdr.SetAdr(false);
+    fHdr.SetFCnt(1);
+    fHdr.SetAddress(LoraDeviceAddress(56, 1864));
+    fHdr.AddLinkCheckAns(10, 1);
 
     // Serialization
     Buffer buf;
     buf.AddAtStart(100);
     Buffer::Iterator serialized = buf.Begin();
-    frameHdr.Serialize(serialized);
+    fHdr.Serialize(serialized);
 
     // Deserialization
-    frameHdr.Deserialize(serialized);
+    fHdr.Deserialize(serialized);
 
-    Ptr<LinkCheckAns> command = DynamicCast<LinkCheckAns>(*(frameHdr.GetCommands().begin()));
+    Ptr<LinkCheckAns> command = DynamicCast<LinkCheckAns>(*(fHdr.GetCommands().begin()));
     uint8_t margin = command->GetMargin();
     uint8_t gwCnt = command->GetGwCnt();
 
-    NS_TEST_EXPECT_MSG_EQ(frameHdr.GetAck(),
+    NS_TEST_EXPECT_MSG_EQ(fHdr.GetAck(),
                           true,
                           "Ack changes in the serialization/deserialization process");
-    NS_TEST_EXPECT_MSG_EQ(frameHdr.GetAdr(),
+    NS_TEST_EXPECT_MSG_EQ(fHdr.GetAdr(),
                           false,
                           "Adr changes in the serialization/deserialization process");
-    NS_TEST_EXPECT_MSG_EQ(frameHdr.GetFCnt(),
+    NS_TEST_EXPECT_MSG_EQ(fHdr.GetFCnt(),
                           1,
                           "FCnt changes in the serialization/deserialization process");
-    NS_TEST_EXPECT_MSG_EQ((frameHdr.GetAddress() == LoraDeviceAddress(56, 1864)),
+    NS_TEST_EXPECT_MSG_EQ((fHdr.GetAddress() == LoraDeviceAddress(56, 1864)),
                           true,
                           "Address changes in the serialization/deserialization process");
     NS_TEST_EXPECT_MSG_EQ(margin,
@@ -360,48 +361,38 @@ HeaderTest::DoRun(void)
     // Test a combination of the two above classes //
     /////////////////////////////////////////////////
     Ptr<Packet> pkt = Create<Packet>(10);
-    pkt->AddHeader(frameHdr);
-    pkt->AddHeader(macHdr);
+    pkt->AddHeader(fHdr);
+    pkt->AddHeader(mHdr);
 
     // Length = Payload + FrameHeader + MacHeader
     //        = 10 + (8+3) + 1 = 22
     NS_TEST_EXPECT_MSG_EQ((pkt->GetSize()), 22, "Wrong size of packet + headers");
 
-    LorawanMacHeader macHdr1;
+    LorawanMacHeader mHdr1;
 
-    pkt->RemoveHeader(macHdr1);
+    pkt->RemoveHeader(mHdr1);
 
     NS_TEST_EXPECT_MSG_EQ((pkt->GetSize()), 21, "Wrong size of packet + headers - macHeader");
 
-    LoraFrameHeader frameHdr1;
-    frameHdr1.SetAsDownlink();
+    LoraFrameHeader fHdr1;
+    fHdr1.SetAsDownlink();
 
-    pkt->RemoveHeader(frameHdr1);
-    Ptr<LinkCheckAns> linkCheckAns = DynamicCast<LinkCheckAns>(*(frameHdr1.GetCommands().begin()));
+    pkt->RemoveHeader(fHdr1);
+    Ptr<LinkCheckAns> linkCheckAns = DynamicCast<LinkCheckAns>(*(fHdr1.GetCommands().begin()));
 
     NS_TEST_EXPECT_MSG_EQ((pkt->GetSize()),
                           10,
                           "Wrong size of packet + headers - macHeader - frameHeader");
 
     // Verify contents of removed MAC header
-    NS_TEST_EXPECT_MSG_EQ(macHdr1.GetMType(),
-                          macHdr.GetMType(),
-                          "Removed header contents don't match");
-    NS_TEST_EXPECT_MSG_EQ(macHdr1.GetMajor(),
-                          macHdr.GetMajor(),
-                          "Removed header contents don't match");
+    NS_TEST_EXPECT_MSG_EQ(mHdr1.GetFType(), mHdr.GetFType(), "Removed header contents don't match");
+    NS_TEST_EXPECT_MSG_EQ(mHdr1.GetMajor(), mHdr.GetMajor(), "Removed header contents don't match");
 
     // Verify contents of removed frame header
-    NS_TEST_EXPECT_MSG_EQ(frameHdr1.GetAck(),
-                          frameHdr.GetAck(),
-                          "Removed header contents don't match");
-    NS_TEST_EXPECT_MSG_EQ(frameHdr1.GetAdr(),
-                          frameHdr.GetAdr(),
-                          "Removed header contents don't match");
-    NS_TEST_EXPECT_MSG_EQ(frameHdr1.GetFCnt(),
-                          frameHdr.GetFCnt(),
-                          "Removed header contents don't match");
-    NS_TEST_EXPECT_MSG_EQ((frameHdr1.GetAddress() == frameHdr.GetAddress()),
+    NS_TEST_EXPECT_MSG_EQ(fHdr1.GetAck(), fHdr.GetAck(), "Removed header contents don't match");
+    NS_TEST_EXPECT_MSG_EQ(fHdr1.GetAdr(), fHdr.GetAdr(), "Removed header contents don't match");
+    NS_TEST_EXPECT_MSG_EQ(fHdr1.GetFCnt(), fHdr.GetFCnt(), "Removed header contents don't match");
+    NS_TEST_EXPECT_MSG_EQ((fHdr1.GetAddress() == fHdr.GetAddress()),
                           true,
                           "Removed header contents don't match");
     NS_TEST_EXPECT_MSG_EQ(linkCheckAns->GetMargin(),
@@ -524,295 +515,295 @@ ReceivePathTest::DoRun(void)
 
     Reset();
 
-    // FIXME
-    // //////////////////////////////////////////////////////////////////////////////////
-    // // If no ReceptionPath is configured to listen on a frequency, no packet is received
-    // //////////////////////////////////////////////////////////////////////////////////
+    /*     FIXME
+        //////////////////////////////////////////////////////////////////////////////////
+        // If no ReceptionPath is configured to listen on a frequency, no packet is received
+        //////////////////////////////////////////////////////////////////////////////////
 
-    // Simulator::Schedule (Seconds (1), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (1), frequency4);
+        Simulator::Schedule (Seconds (1), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 7,
+                             Seconds (1), frequency4);
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+        Simulator::Stop (Hours (2));
+        Simulator::Run ();
+        Simulator::Destroy ();
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 1, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 1, "Unexpected value");
 
-    // Reset ();
+        Reset ();
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // // A ReceptionPath can receive a packet of any SF without any preconfiguration
-    // //////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////
+        // A ReceptionPath can receive a packet of any SF without any preconfiguration
+        //////////////////////////////////////////////////////////////////////////////
 
-    // Simulator::Schedule (Seconds (1), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (3), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 8,
-    //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (5), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 9,
-    //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (7), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 10,
-    //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (9), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 11,
-    //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (11), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14,
-    //                      12, Seconds (1), frequency1);
+        Simulator::Schedule (Seconds (1), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 7,
+                             Seconds (1), frequency1);
+        Simulator::Schedule (Seconds (3), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 8,
+                             Seconds (1), frequency1);
+        Simulator::Schedule (Seconds (5), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 9,
+                             Seconds (1), frequency1);
+        Simulator::Schedule (Seconds (7), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 10,
+                             Seconds (1), frequency1);
+        Simulator::Schedule (Seconds (9), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 11,
+                             Seconds (1), frequency1);
+        Simulator::Schedule (Seconds (11), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14,
+                             12, Seconds (1), frequency1);
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+        Simulator::Stop (Hours (2));
+        Simulator::Run ();
+        Simulator::Destroy ();
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 6, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 6, "Unexpected value");
 
-    // Reset ();
+        Reset ();
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Schedule two reception events at the first frequency, where there are two
-    // // reception paths listening. Each packet should be received correctly.
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (3), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 9,
-    //                      Seconds (4), frequency1);
+        ///////////////////////////////////////////////////////////////////////////
+        // Schedule two reception events at the first frequency, where there are two
+        // reception paths listening. Each packet should be received correctly.
+        ///////////////////////////////////////////////////////////////////////////
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 7,
+                             Seconds (4), frequency1);
+        Simulator::Schedule (Seconds (3), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 9,
+                             Seconds (4), frequency1);
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+        Simulator::Stop (Hours (2));
+        Simulator::Run ();
+        Simulator::Destroy ();
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 2, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 2, "Unexpected value");
 
-    // Reset ();
+        Reset ();
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Interference between packets on the same frequency and different ReceptionPaths
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (3), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
+        ///////////////////////////////////////////////////////////////////////////
+        // Interference between packets on the same frequency and different ReceptionPaths
+        ///////////////////////////////////////////////////////////////////////////
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 7,
+                             Seconds (4), frequency1);
+        Simulator::Schedule (Seconds (3), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 7,
+                             Seconds (4), frequency1);
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+        Simulator::Stop (Hours (2));
+        Simulator::Run ();
+        Simulator::Destroy ();
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 2, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 2, "Unexpected value");
 
-    // Reset ();
+        Reset ();
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Three receptions where only two receivePaths are available
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (3), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
+        ///////////////////////////////////////////////////////////////////////////
+        // Three receptions where only two receivePaths are available
+        ///////////////////////////////////////////////////////////////////////////
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 7,
+                             Seconds (4), frequency1);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 7,
+                             Seconds (4), frequency1);
+        Simulator::Schedule (Seconds (3), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 7,
+                             Seconds (4), frequency1);
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+        Simulator::Stop (Hours (2));
+        Simulator::Run ();
+        Simulator::Destroy ();
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 1, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 1, "Unexpected value");
 
-    // Reset ();
+        Reset ();
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Packets that are on different frequencys do not interfere
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency2);
+        ///////////////////////////////////////////////////////////////////////////
+        // Packets that are on different frequencys do not interfere
+        ///////////////////////////////////////////////////////////////////////////
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 7,
+                             Seconds (4), frequency1);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 7,
+                             Seconds (4), frequency2);
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+        Simulator::Stop (Hours (2));
+        Simulator::Run ();
+        Simulator::Destroy ();
 
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
 
-    // Reset ();
+        Reset ();
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Full capacity
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 8,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 9,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 10,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 11,
-    //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 12,
-    //                      Seconds (4), frequency3);
+        ///////////////////////////////////////////////////////////////////////////
+        // Full capacity
+        ///////////////////////////////////////////////////////////////////////////
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 7,
+                             Seconds (4), frequency1);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 8,
+                             Seconds (4), frequency1);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 9,
+                             Seconds (4), frequency2);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 10,
+                             Seconds (4), frequency2);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 11,
+                             Seconds (4), frequency3);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 12,
+                             Seconds (4), frequency3);
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+        Simulator::Stop (Hours (2));
+        Simulator::Run ();
+        Simulator::Destroy ();
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 6, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 6, "Unexpected value");
 
-    // Reset ();
+        Reset ();
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Full capacity + 1
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 8,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 9,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 10,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 11,
-    //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 12,
-    //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 10,
-    //                      Seconds (4), frequency3);
+        ///////////////////////////////////////////////////////////////////////////
+        // Full capacity + 1
+        ///////////////////////////////////////////////////////////////////////////
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 7,
+                             Seconds (4), frequency1);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 8,
+                             Seconds (4), frequency1);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 9,
+                             Seconds (4), frequency2);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 10,
+                             Seconds (4), frequency2);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 11,
+                             Seconds (4), frequency3);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 12,
+                             Seconds (4), frequency3);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 10,
+                             Seconds (4), frequency3);
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+        Simulator::Stop (Hours (2));
+        Simulator::Run ();
+        Simulator::Destroy ();
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 1, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 6, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 1, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 6, "Unexpected value");
 
-    // Reset ();
+        Reset ();
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Receive Paths are correctly freed
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 8,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 9,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 10,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 11,
-    //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 12,
-    //                      Seconds (4), frequency3);
+        ///////////////////////////////////////////////////////////////////////////
+        // Receive Paths are correctly freed
+        ///////////////////////////////////////////////////////////////////////////
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 7,
+                             Seconds (4), frequency1);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 8,
+                             Seconds (4), frequency1);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 9,
+                             Seconds (4), frequency2);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 10,
+                             Seconds (4), frequency2);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 11,
+                             Seconds (4), frequency3);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 12,
+                             Seconds (4), frequency3);
 
-    // Simulator::Schedule (Seconds (8), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (8), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 8,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (8), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 9,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (8), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 10,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (8), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 11,
-    //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (8), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 12,
-    //                      Seconds (4), frequency3);
+        Simulator::Schedule (Seconds (8), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 7,
+                             Seconds (4), frequency1);
+        Simulator::Schedule (Seconds (8), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 8,
+                             Seconds (4), frequency1);
+        Simulator::Schedule (Seconds (8), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 9,
+                             Seconds (4), frequency2);
+        Simulator::Schedule (Seconds (8), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 10,
+                             Seconds (4), frequency2);
+        Simulator::Schedule (Seconds (8), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 11,
+                             Seconds (4), frequency3);
+        Simulator::Schedule (Seconds (8), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 12,
+                             Seconds (4), frequency3);
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+        Simulator::Stop (Hours (2));
+        Simulator::Run ();
+        Simulator::Destroy ();
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 12, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 12, "Unexpected value");
 
-    // Reset ();
+        Reset ();
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Receive Paths stay occupied exactly for the necessary time
-    // // Occupy both ReceptionPaths centered at frequency1
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 8,
-    //                      Seconds (4), frequency1);
+        ///////////////////////////////////////////////////////////////////////////
+        // Receive Paths stay occupied exactly for the necessary time
+        // Occupy both ReceptionPaths centered at frequency1
+        ///////////////////////////////////////////////////////////////////////////
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 7,
+                             Seconds (4), frequency1);
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 8,
+                             Seconds (4), frequency1);
 
-    // // This packet will find no free ReceptionPaths
-    // Simulator::Schedule (Seconds (2 + 4) - NanoSeconds (1), &GatewayLoraPhy::StartReceive,
-    //                      gatewayPhy, packet, 14, 9, Seconds (4), frequency1);
+        // This packet will find no free ReceptionPaths
+        Simulator::Schedule (Seconds (2 + 4) - NanoSeconds (1), &GatewayLoraPhy::StartReceive,
+                             gatewayPhy, packet, 14, 9, Seconds (4), frequency1);
 
-    // // This packet will find a free ReceptionPath
-    // Simulator::Schedule (Seconds (2 + 4) + NanoSeconds (1), &GatewayLoraPhy::StartReceive,
-    //                      gatewayPhy, packet, 14, 10, Seconds (4), frequency1);
+        // This packet will find a free ReceptionPath
+        Simulator::Schedule (Seconds (2 + 4) + NanoSeconds (1), &GatewayLoraPhy::StartReceive,
+                             gatewayPhy, packet, 14, 10, Seconds (4), frequency1);
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+        Simulator::Stop (Hours (2));
+        Simulator::Run ();
+        Simulator::Destroy ();
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 1, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 3, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 1, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 3, "Unexpected value");
 
-    // Reset ();
+        Reset ();
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Only one ReceivePath locks on the incoming packet
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
+        ///////////////////////////////////////////////////////////////////////////
+        // Only one ReceivePath locks on the incoming packet
+        ///////////////////////////////////////////////////////////////////////////
+        Simulator::Schedule (Seconds (2), &GatewayLoraPhy::StartReceive, gatewayPhy, packet,
+        14, 7,
+                             Seconds (4), frequency1);
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+        Simulator::Stop (Hours (2));
+        Simulator::Run ();
+        Simulator::Destroy ();
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 1, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_maxOccupiedReceptionPaths, 1, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 1, "Unexpected value");
+        NS_TEST_EXPECT_MSG_EQ (m_maxOccupiedReceptionPaths, 1, "Unexpected value"); */
 }
 
 /**************************
@@ -914,7 +905,7 @@ LogicalChannelTest::DoRun(void)
     ///////////////////////////////////
 
     channelHelper->AddEvent(Seconds(2), channel1);
-    Time expectedTimeOff = Seconds(2 / 0.01 - 2);
+    Time expectedTimeOff = Seconds(2 / 0.01);
 
     // Waiting time is computed correctly
     NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitingTime(channel0),
@@ -980,7 +971,7 @@ TimeOnAirTest::DoRun(void)
 
     // Starting parameters
     packet = Create<Packet>(10);
-    LoraTxParameters txParams;
+    LoraPhyTxParameters txParams;
     txParams.sf = 7;
     txParams.headerDisabled = false;
     txParams.codingRate = 1;
@@ -989,63 +980,63 @@ TimeOnAirTest::DoRun(void)
     txParams.crcEnabled = 1;
     txParams.lowDataRateOptimizationEnabled = false;
 
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.041216, 0.0001, "Unexpected duration");
 
     txParams.sf = 8;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.072192, 0.0001, "Unexpected duration");
 
     txParams.headerDisabled = true;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.072192, 0.0001, "Unexpected duration");
 
     txParams.codingRate = 2;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.078336, 0.0001, "Unexpected duration");
 
     txParams.nPreamble = 10;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.082432, 0.0001, "Unexpected duration");
 
     txParams.lowDataRateOptimizationEnabled = true;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.082432, 0.0001, "Unexpected duration");
 
     txParams.sf = 10;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.280576, 0.0001, "Unexpected duration");
 
     txParams.bandwidthHz = 250000;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.14028, 0.0001, "Unexpected duration");
 
     txParams.bandwidthHz = 500000;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.070144, 0.0001, "Unexpected duration");
 
     txParams.headerDisabled = false;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.082432, 0.0001, "Unexpected duration");
 
     txParams.nPreamble = 8;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.078336, 0.0001, "Unexpected duration");
 
     txParams.sf = 12;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.264192, 0.0001, "Unexpected duration");
 
     packet = Create<Packet>(50);
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.657408, 0.0001, "Unexpected duration");
 
     txParams.bandwidthHz = 125000;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 2.629632, 0.0001, "Unexpected duration");
 
     txParams.codingRate = 1;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 2.301952, 0.0001, "Unexpected duration");
 }
 
@@ -1062,7 +1053,6 @@ class PhyConnectivityTest : public TestCase
     void ReceivedPacket(Ptr<const Packet> packet, uint32_t node);
     void UnderSensitivity(Ptr<const Packet> packet, uint32_t node);
     void Interference(Ptr<const Packet> packet, uint32_t node);
-    void NoMoreDemodulators(Ptr<const Packet> packet, uint32_t node);
     void WrongFrequency(Ptr<const Packet> packet, uint32_t node);
     void WrongSf(Ptr<const Packet> packet, uint32_t node);
     bool HaveSamePacketContents(Ptr<Packet> packet1, Ptr<Packet> packet2);
@@ -1072,13 +1062,13 @@ class PhyConnectivityTest : public TestCase
     Ptr<LoraChannel> channel;
     Ptr<EndDeviceLoraPhy> edPhy1;
     Ptr<EndDeviceLoraPhy> edPhy2;
-    Ptr<EndDeviceLoraPhy> edPhy3;
+    Ptr<GatewayLoraPhy> gwPhy1;
+    Ptr<GatewayLoraPhy> gwPhy2;
 
     Ptr<Packet> m_latestReceivedPacket;
     int m_receivedPacketCalls = 0;
     int m_underSensitivityCalls = 0;
     int m_interferenceCalls = 0;
-    int m_noMoreDemodulatorsCalls = 0;
     int m_wrongSfCalls = 0;
     int m_wrongFrequencyCalls = 0;
 };
@@ -1097,7 +1087,7 @@ PhyConnectivityTest::~PhyConnectivityTest()
 void
 PhyConnectivityTest::ReceivedPacket(Ptr<const Packet> packet, uint32_t node)
 {
-    NS_LOG_FUNCTION(packet << node);
+    NS_LOG_FUNCTION(packet << (unsigned)node);
 
     m_receivedPacketCalls++;
 
@@ -1107,7 +1097,7 @@ PhyConnectivityTest::ReceivedPacket(Ptr<const Packet> packet, uint32_t node)
 void
 PhyConnectivityTest::UnderSensitivity(Ptr<const Packet> packet, uint32_t node)
 {
-    NS_LOG_FUNCTION(packet << node);
+    NS_LOG_FUNCTION(packet << (unsigned)node);
 
     m_underSensitivityCalls++;
 }
@@ -1115,23 +1105,15 @@ PhyConnectivityTest::UnderSensitivity(Ptr<const Packet> packet, uint32_t node)
 void
 PhyConnectivityTest::Interference(Ptr<const Packet> packet, uint32_t node)
 {
-    NS_LOG_FUNCTION(packet << node);
+    NS_LOG_FUNCTION(packet << (unsigned)node);
 
     m_interferenceCalls++;
 }
 
 void
-PhyConnectivityTest::NoMoreDemodulators(Ptr<const Packet> packet, uint32_t node)
-{
-    NS_LOG_FUNCTION(packet << node);
-
-    m_noMoreDemodulatorsCalls++;
-}
-
-void
 PhyConnectivityTest::WrongSf(Ptr<const Packet> packet, uint32_t node)
 {
-    NS_LOG_FUNCTION(packet << node);
+    NS_LOG_FUNCTION(packet << (unsigned)node);
 
     m_wrongSfCalls++;
 }
@@ -1139,7 +1121,7 @@ PhyConnectivityTest::WrongSf(Ptr<const Packet> packet, uint32_t node)
 void
 PhyConnectivityTest::WrongFrequency(Ptr<const Packet> packet, uint32_t node)
 {
-    NS_LOG_FUNCTION(packet << node);
+    NS_LOG_FUNCTION(packet << (unsigned)node);
 
     m_wrongFrequencyCalls++;
 }
@@ -1147,6 +1129,8 @@ PhyConnectivityTest::WrongFrequency(Ptr<const Packet> packet, uint32_t node)
 bool
 PhyConnectivityTest::HaveSamePacketContents(Ptr<Packet> packet1, Ptr<Packet> packet2)
 {
+    NS_LOG_FUNCTION(packet1 << packet2);
+
     uint32_t size1 = packet1->GetSerializedSize();
     uint8_t buffer1[size1];
     packet1->Serialize(buffer1, size1);
@@ -1174,17 +1158,18 @@ PhyConnectivityTest::HaveSamePacketContents(Ptr<Packet> packet1, Ptr<Packet> pac
 void
 PhyConnectivityTest::Reset(void)
 {
+    m_latestReceivedPacket = 0;
     m_receivedPacketCalls = 0;
     m_underSensitivityCalls = 0;
     m_interferenceCalls = 0;
     m_wrongSfCalls = 0;
     m_wrongFrequencyCalls = 0;
 
-    Ptr<LogDistancePropagationLossModel> loss = CreateObject<LogDistancePropagationLossModel>();
+    auto loss = CreateObject<LogDistancePropagationLossModel>();
     loss->SetPathLossExponent(3.76);
     loss->SetReference(1, 7.7);
 
-    Ptr<PropagationDelayModel> delay = CreateObject<ConstantSpeedPropagationDelayModel>();
+    auto delay = CreateObject<ConstantSpeedPropagationDelayModel>();
 
     // Create the channel
     channel = CreateObject<LoraChannel>(loss, delay);
@@ -1192,89 +1177,79 @@ PhyConnectivityTest::Reset(void)
     // Connect PHYs
     edPhy1 = CreateObject<EndDeviceLoraPhy>();
     edPhy2 = CreateObject<EndDeviceLoraPhy>();
-    edPhy3 = CreateObject<EndDeviceLoraPhy>();
+    gwPhy1 = CreateObject<GatewayLoraPhy>();
+    gwPhy2 = CreateObject<GatewayLoraPhy>();
 
-    edPhy1->SetFrequency(868100000);
-    edPhy2->SetFrequency(868100000);
-    edPhy3->SetFrequency(868100000);
-
-    Ptr<ConstantPositionMobilityModel> mob1 = CreateObject<ConstantPositionMobilityModel>();
-    Ptr<ConstantPositionMobilityModel> mob2 = CreateObject<ConstantPositionMobilityModel>();
-    Ptr<ConstantPositionMobilityModel> mob3 = CreateObject<ConstantPositionMobilityModel>();
-
-    mob1->SetPosition(Vector(0.0, 0.0, 0.0));
-    mob2->SetPosition(Vector(10.0, 0.0, 0.0));
-    mob3->SetPosition(Vector(20.0, 0.0, 0.0));
-
+    /**
+     *       ed2
+     *
+     * gw1   ed1   gw2
+     */
+    auto mob1 = CreateObject<ConstantPositionMobilityModel>();
+    auto mob2 = CreateObject<ConstantPositionMobilityModel>();
+    auto mob3 = CreateObject<ConstantPositionMobilityModel>();
+    auto mob4 = CreateObject<ConstantPositionMobilityModel>();
+    mob1->SetPosition(Vector(0, 0, 0));
+    mob2->SetPosition(Vector(0, 10, 0));
+    mob3->SetPosition(Vector(-10, 0, 0));
+    mob4->SetPosition(Vector(10, 0, 0));
     edPhy1->SetMobility(mob1);
     edPhy2->SetMobility(mob2);
-    edPhy3->SetMobility(mob3);
-
-    edPhy1->SwitchToStandby();
-    edPhy2->SwitchToStandby();
-    edPhy3->SwitchToStandby();
-
-    channel->Add(edPhy1);
-    channel->Add(edPhy2);
-    channel->Add(edPhy3);
+    gwPhy1->SetMobility(mob3);
+    gwPhy2->SetMobility(mob4);
 
     edPhy1->SetChannel(channel);
     edPhy2->SetChannel(channel);
-    edPhy3->SetChannel(channel);
+    gwPhy1->SetChannel(channel);
+    gwPhy2->SetChannel(channel);
 
     // Listen for a specific SpreadingFactor
-    edPhy1->SetSpreadingFactor(12);
-    edPhy2->SetSpreadingFactor(12);
-    edPhy3->SetSpreadingFactor(12);
-
+    edPhy1->SetRxSpreadingFactor(12);
+    edPhy2->SetRxSpreadingFactor(12);
     // Listen on a specific frequency
-    edPhy1->SetFrequency(868100000);
-    edPhy2->SetFrequency(868100000);
-    edPhy3->SetFrequency(868100000);
+    edPhy1->SetRxFrequency(868100000);
+    edPhy2->SetRxFrequency(868100000);
 
+    edPhy1->SwitchToStandby();
+    edPhy2->SwitchToStandby();
+
+    // LoraPhy
     edPhy1->TraceConnectWithoutContext("ReceivedPacket",
                                        MakeCallback(&PhyConnectivityTest::ReceivedPacket, this));
     edPhy2->TraceConnectWithoutContext("ReceivedPacket",
                                        MakeCallback(&PhyConnectivityTest::ReceivedPacket, this));
-    edPhy3->TraceConnectWithoutContext("ReceivedPacket",
+    gwPhy1->TraceConnectWithoutContext("ReceivedPacket",
+                                       MakeCallback(&PhyConnectivityTest::ReceivedPacket, this));
+    gwPhy2->TraceConnectWithoutContext("ReceivedPacket",
                                        MakeCallback(&PhyConnectivityTest::ReceivedPacket, this));
 
     edPhy1->TraceConnectWithoutContext("LostPacketBecauseUnderSensitivity",
                                        MakeCallback(&PhyConnectivityTest::UnderSensitivity, this));
     edPhy2->TraceConnectWithoutContext("LostPacketBecauseUnderSensitivity",
                                        MakeCallback(&PhyConnectivityTest::UnderSensitivity, this));
-    edPhy3->TraceConnectWithoutContext("LostPacketBecauseUnderSensitivity",
+    gwPhy1->TraceConnectWithoutContext("LostPacketBecauseUnderSensitivity",
+                                       MakeCallback(&PhyConnectivityTest::UnderSensitivity, this));
+    gwPhy2->TraceConnectWithoutContext("LostPacketBecauseUnderSensitivity",
                                        MakeCallback(&PhyConnectivityTest::UnderSensitivity, this));
 
     edPhy1->TraceConnectWithoutContext("LostPacketBecauseInterference",
                                        MakeCallback(&PhyConnectivityTest::Interference, this));
     edPhy2->TraceConnectWithoutContext("LostPacketBecauseInterference",
                                        MakeCallback(&PhyConnectivityTest::Interference, this));
-    edPhy3->TraceConnectWithoutContext("LostPacketBecauseInterference",
+    gwPhy1->TraceConnectWithoutContext("LostPacketBecauseInterference",
+                                       MakeCallback(&PhyConnectivityTest::Interference, this));
+    gwPhy2->TraceConnectWithoutContext("LostPacketBecauseInterference",
                                        MakeCallback(&PhyConnectivityTest::Interference, this));
 
-    edPhy1->TraceConnectWithoutContext(
-        "LostPacketBecauseNoMoreReceivers",
-        MakeCallback(&PhyConnectivityTest::NoMoreDemodulators, this));
-    edPhy2->TraceConnectWithoutContext(
-        "LostPacketBecauseNoMoreReceivers",
-        MakeCallback(&PhyConnectivityTest::NoMoreDemodulators, this));
-    edPhy3->TraceConnectWithoutContext(
-        "LostPacketBecauseNoMoreReceivers",
-        MakeCallback(&PhyConnectivityTest::NoMoreDemodulators, this));
-
+    // End device only
     edPhy1->TraceConnectWithoutContext("LostPacketBecauseWrongFrequency",
                                        MakeCallback(&PhyConnectivityTest::WrongFrequency, this));
     edPhy2->TraceConnectWithoutContext("LostPacketBecauseWrongFrequency",
-                                       MakeCallback(&PhyConnectivityTest::WrongFrequency, this));
-    edPhy3->TraceConnectWithoutContext("LostPacketBecauseWrongFrequency",
                                        MakeCallback(&PhyConnectivityTest::WrongFrequency, this));
 
     edPhy1->TraceConnectWithoutContext("LostPacketBecauseWrongSpreadingFactor",
                                        MakeCallback(&PhyConnectivityTest::WrongSf, this));
     edPhy2->TraceConnectWithoutContext("LostPacketBecauseWrongSpreadingFactor",
-                                       MakeCallback(&PhyConnectivityTest::WrongSf, this));
-    edPhy3->TraceConnectWithoutContext("LostPacketBecauseWrongSpreadingFactor",
                                        MakeCallback(&PhyConnectivityTest::WrongSf, this));
 }
 
@@ -1288,13 +1263,15 @@ PhyConnectivityTest::DoRun(void)
     // Setup
     ////////
 
-    Reset();
-
-    LoraTxParameters txParams;
-    txParams.sf = 12;
-
+    LoraPhyTxParameters txParams;
+    // The following packet is used to test both uplink & downlink connectivity
     uint8_t buffer[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     Ptr<Packet> packet = Create<Packet>(buffer, 10);
+    LoraFrameHeader fHdr;
+    packet->AddHeader(fHdr); // Default address is accepred by devices
+    LorawanMacHeader mHdr;
+    mHdr.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+    packet->AddHeader(mHdr); // Currently, gateways don't care about UL/DL
 
     // Testing
     //////////
@@ -1302,28 +1279,10 @@ PhyConnectivityTest::DoRun(void)
     // Basic packet delivery test
     /////////////////////////////
 
-    Simulator::Schedule(Seconds(2),
-                        &EndDeviceLoraPhy::Send,
-                        edPhy1,
-                        packet,
-                        txParams,
-                        868100000,
-                        14);
-
-    Simulator::Stop(Hours(2));
-    Simulator::Run();
-    Simulator::Destroy();
-
-    NS_TEST_EXPECT_MSG_EQ(
-        m_receivedPacketCalls,
-        2,
-        "Channel skipped some PHYs when delivering a packet"); // All PHYs except the sender
+    // Both gateways receive packet
 
     Reset();
-
-    // Sleeping PHYs do not receive the packet
-
-    edPhy2->SwitchToSleep();
+    txParams.sf = 12;
 
     Simulator::Schedule(Seconds(2),
                         &EndDeviceLoraPhy::Send,
@@ -1335,21 +1294,35 @@ PhyConnectivityTest::DoRun(void)
 
     Simulator::Stop(Hours(2));
     Simulator::Run();
+
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacketCalls,
+                          2,
+                          "Channel skipped some GW PHYs when delivering a packet"); // All GW PHYs
+
     Simulator::Destroy();
+
+    // Sleeping PHYs do not receive downlink packet
+
+    Reset();
+    edPhy2->SwitchToSleep();
+    Simulator::Schedule(Seconds(2), &GatewayLoraPhy::Send, gwPhy1, packet, txParams, 868100000, 14);
+
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
 
     NS_TEST_EXPECT_MSG_EQ(
         m_receivedPacketCalls,
         1,
-        "Packet was received by a PHY in SLEEP mode"); // All PHYs in Standby except the sender
+        "Packet was received by a ED PHY in SLEEP mode"); // All ED PHYs in Standby except one
 
-    Reset();
+    Simulator::Destroy();
 
     // Packet that arrives under sensitivity is received correctly if SF increases
 
+    Reset();
     txParams.sf = 7;
-    edPhy2->SetSpreadingFactor(7);
-    DynamicCast<ConstantPositionMobilityModel>(edPhy2->GetMobility())
-        ->SetPosition(Vector(2990, 0, 0));
+    DynamicCast<ConstantPositionMobilityModel>(gwPhy2->GetMobility())
+        ->SetPosition(Vector(3410, 0, 0));
 
     Simulator::Schedule(Seconds(2),
                         &EndDeviceLoraPhy::Send,
@@ -1361,20 +1334,21 @@ PhyConnectivityTest::DoRun(void)
 
     Simulator::Stop(Hours(2));
     Simulator::Run();
-    Simulator::Destroy();
 
     NS_TEST_EXPECT_MSG_EQ(
         m_underSensitivityCalls,
         1,
         "Packet that should have been lost because of low receive power was recevied");
 
-    Reset();
+    Simulator::Destroy();
 
     // Try again using a packet with higher SF
+
+    Reset();
     txParams.sf = 8;
-    edPhy2->SetSpreadingFactor(8);
-    DynamicCast<ConstantPositionMobilityModel>(edPhy2->GetMobility())
-        ->SetPosition(Vector(2990, 0, 0));
+    edPhy2->SetRxSpreadingFactor(8);
+    DynamicCast<ConstantPositionMobilityModel>(gwPhy2->GetMobility())
+        ->SetPosition(Vector(3410, 0, 0));
 
     Simulator::Schedule(Seconds(2),
                         &EndDeviceLoraPhy::Send,
@@ -1386,17 +1360,20 @@ PhyConnectivityTest::DoRun(void)
 
     Simulator::Stop(Hours(2));
     Simulator::Run();
-    Simulator::Destroy();
 
     NS_TEST_EXPECT_MSG_EQ(m_underSensitivityCalls,
                           0,
                           "Packets that should have arrived above sensitivity were under it");
 
-    Reset();
+    Simulator::Destroy();
 
     // Packets can be destroyed by interference
 
+    Reset();
     txParams.sf = 12;
+    DynamicCast<ConstantPositionMobilityModel>(edPhy2->GetMobility())
+        ->SetPosition(Vector(19.5, 0, 0));
+
     Simulator::Schedule(Seconds(2),
                         &EndDeviceLoraPhy::Send,
                         edPhy1,
@@ -1406,7 +1383,7 @@ PhyConnectivityTest::DoRun(void)
                         14);
     Simulator::Schedule(Seconds(2),
                         &EndDeviceLoraPhy::Send,
-                        edPhy3,
+                        edPhy2,
                         packet,
                         txParams,
                         868100000,
@@ -1414,59 +1391,50 @@ PhyConnectivityTest::DoRun(void)
 
     Simulator::Stop(Hours(2));
     Simulator::Run();
-    Simulator::Destroy();
 
+    // gwPhy1: both packets are lost because similar power
+    // gwPhy2: able to capture the packet sent by closest device, lose other
     NS_TEST_EXPECT_MSG_EQ(m_interferenceCalls,
-                          1,
+                          3,
                           "Packets that should be destroyed by interference weren't");
 
-    Reset();
+    Simulator::Destroy();
 
     // Packets can be lost because the PHY is not listening on the right frequency
 
-    Simulator::Schedule(Seconds(2),
-                        &EndDeviceLoraPhy::Send,
-                        edPhy1,
-                        packet,
-                        txParams,
-                        868300000,
-                        14);
+    Reset();
+    Simulator::Schedule(Seconds(2), &GatewayLoraPhy::Send, gwPhy1, packet, txParams, 868300000, 14);
 
     Simulator::Stop(Hours(2));
     Simulator::Run();
-    Simulator::Destroy();
 
     NS_TEST_EXPECT_MSG_EQ(m_wrongFrequencyCalls,
                           2,
                           "Packets were received even though PHY was on a different frequency");
 
-    Reset();
+    Simulator::Destroy();
 
     // Packets can be lost because the PHY is not listening for the right SF
 
+    Reset();
     txParams.sf = 8; // Send with 8, listening for 12
-    Simulator::Schedule(Seconds(2),
-                        &EndDeviceLoraPhy::Send,
-                        edPhy1,
-                        packet,
-                        txParams,
-                        868100000,
-                        14);
+    Simulator::Schedule(Seconds(2), &GatewayLoraPhy::Send, gwPhy1, packet, txParams, 868100000, 14);
 
     Simulator::Stop(Hours(2));
     Simulator::Run();
-    Simulator::Destroy();
 
     NS_TEST_EXPECT_MSG_EQ(m_wrongSfCalls,
                           2,
                           "Packets were received even though PHY was listening for a different SF");
 
-    Reset();
+    Simulator::Destroy();
 
     // Sending of packets
     /////////////////////
 
-    // The very same packet arrives at the other PHY
+    // The very same packet arrives to the receiving PHYs
+
+    Reset();
     Simulator::Schedule(Seconds(2),
                         &EndDeviceLoraPhy::Send,
                         edPhy1,
@@ -1477,19 +1445,19 @@ PhyConnectivityTest::DoRun(void)
 
     Simulator::Stop(Hours(2));
     Simulator::Run();
-    Simulator::Destroy();
 
     NS_TEST_EXPECT_MSG_EQ(HaveSamePacketContents(packet, m_latestReceivedPacket),
                           true,
                           "Packet changed contents when going through the channel");
 
-    Reset();
+    Simulator::Destroy();
 
     // Correct state transitions
     ////////////////////////////
 
-    // PHY switches to STANDBY after TX and RX
+    // PHY switches to STANDBY after TX
 
+    Reset();
     Simulator::Schedule(Seconds(2),
                         &EndDeviceLoraPhy::Send,
                         edPhy1,
@@ -1500,7 +1468,6 @@ PhyConnectivityTest::DoRun(void)
 
     Simulator::Stop(Hours(2));
     Simulator::Run();
-    Simulator::Destroy();
 
     NS_TEST_EXPECT_MSG_EQ(edPhy1->GetState(),
                           EndDeviceLoraPhy::STANDBY,
@@ -1508,6 +1475,25 @@ PhyConnectivityTest::DoRun(void)
     NS_TEST_EXPECT_MSG_EQ(edPhy2->GetState(),
                           EndDeviceLoraPhy::STANDBY,
                           "State didn't switch to STANDBY as expected");
+
+    Simulator::Destroy();
+
+    // PHY switches to STANDBY after RX
+
+    Reset();
+    Simulator::Schedule(Seconds(2), &GatewayLoraPhy::Send, gwPhy1, packet, txParams, 868100000, 14);
+
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+
+    NS_TEST_EXPECT_MSG_EQ(edPhy1->GetState(),
+                          EndDeviceLoraPhy::STANDBY,
+                          "State didn't switch to STANDBY as expected");
+    NS_TEST_EXPECT_MSG_EQ(edPhy2->GetState(),
+                          EndDeviceLoraPhy::STANDBY,
+                          "State didn't switch to STANDBY as expected");
+
+    Simulator::Destroy();
 }
 
 /*****************

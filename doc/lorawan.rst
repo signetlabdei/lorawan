@@ -103,7 +103,7 @@ To represent these two models, the module features two generic ``LoraPhy`` and
 model the peculiarities of the two wireless network devices: the End Device (ED)
 and the Gateway (GW). So, the PHY layers can be modeled by use of
 ``EndDeviceLoraPhy`` and ``GatewayLoraPhy`` classes, while objects of class
-``EndDeviceLorawanMac``, ``ClassAEndDeviceLorawanMac``, and ``GatewayLorawanMac`` 
+``BaseEndDeviceLorawanMac``, ``ClassAEndDeviceLorawanMac``, and ``GatewayLorawanMac`` 
 are used to represent the MAC layer. A ``NetworkServer`` application can also be
 installed on a node that will then administer the wireless network through the
 GW's forwarding application, ``Forwarder``, which leverages the gateway's LoRa
@@ -453,13 +453,13 @@ following trace sources are exposed:
   - ``OccupiedReceptionPaths`` is used to keep track of the number of occupied
     reception paths out of the 8 that are available at the gateway;
 
-- In ``LorawanMac`` (both ``EndDeviceLorawanMac`` and ``GatewayLorawanMac``):
+- In ``LorawanMac`` (both ``BaseEndDeviceLorawanMac`` and ``GatewayLorawanMac``):
 
   - ``CannotSendBecauseDutyCycle`` is used to keep track of the number of when a
     packet coming from the application layer cannot be sent on any of the
     available channels because of duty cycle limitations;
 
-- In ``EndDeviceLorawanMac``:
+- In ``BaseEndDeviceLorawanMac``:
 
   - ``DataRate`` keeps track of the data rate that is employed by the device;
   - ``LastKnownLinkMargin`` keeps track of the last link margin of this device's

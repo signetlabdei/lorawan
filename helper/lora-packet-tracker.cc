@@ -514,13 +514,13 @@ LoraPacketTracker::PrintSimulationStatistics(Time startTime)
         bool noPaths = false;
         bool busyGw = false;
 
-        LoraTxParameters params;
+        LoraPhyTxParameters params;
         LoraTag tag;
         pd.first->Copy()->RemovePacketTag(tag);
-        params.sf = tag.GetSpreadingFactor();
+        params.sf = tag.GetTxParameters().sf;
         params.lowDataRateOptimizationEnabled =
             LoraPhy::GetTSym(params) > MilliSeconds(16) ? true : false;
-        totOffTraff += LoraPhy::GetOnAirTime(pd.first->Copy(), params).GetSeconds();
+        totOffTraff += LoraPhy::GetTimeOnAir(pd.first->Copy(), params).GetSeconds();
 
         total++;
         totBytesSent += pd.first->GetSize();

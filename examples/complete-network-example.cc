@@ -70,7 +70,7 @@ main(int argc, char* argv[])
     // LogComponentEnable("GatewayLoraPhy", LOG_LEVEL_ALL);
     // LogComponentEnable("LoraInterferenceHelper", LOG_LEVEL_ALL);
     // LogComponentEnable("LorawanMac", LOG_LEVEL_ALL);
-    // LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_ALL);
+    // LogComponentEnable("BaseEndDeviceLorawanMac", LOG_LEVEL_ALL);
     // LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
     // LogComponentEnable("GatewayLorawanMac", LOG_LEVEL_ALL);
     // LogComponentEnable("LogicalChannelManager", LOG_LEVEL_ALL);

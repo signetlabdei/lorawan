@@ -126,7 +126,7 @@ main(int argc, char* argv[])
 
     /* Apply global configurations */
     {
-        Config::SetDefault("ns3::EndDeviceLorawanMac::DRControl",
+        Config::SetDefault("ns3::BaseEndDeviceLorawanMac::ADRBit",
                            BooleanValue(adrEnabled)); //!< ADR bit
         Config::SetDefault("ns3::AdrComponent::SNRDeviceMargin",
                            DoubleValue(10 * log10(-1 / log(0.98))));
@@ -148,7 +148,7 @@ main(int argc, char* argv[])
         //!> Requirement: build ns3 with debug option
         LogComponentEnable("CongestionControlComponent", LOG_LEVEL_INFO);
         LogComponentEnable("TrafficControlUtils", LOG_LEVEL_DEBUG);
-        LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_WARN);
+        LogComponentEnable("BaseEndDeviceLorawanMac", LOG_LEVEL_WARN);
         // LogComponentEnable ("UrbanTrafficHelper", LOG_LEVEL_DEBUG);
         LogComponentEnableAll(LOG_PREFIX_FUNC);
         LogComponentEnableAll(LOG_PREFIX_NODE);
@@ -262,7 +262,7 @@ main(int argc, char* argv[])
 
         // Physiscal layer settings
         LoraPhyHelper phyHelper;
-        phyHelper.SetInterference("CollisionMatrix", EnumValue(sirMap.at(sir)));
+        phyHelper.SetInterference("IsolationMatrix", EnumValue(sirMap.at(sir)));
         phyHelper.SetChannel(channel);
 
         // Create the LoraNetDevices of the gateways

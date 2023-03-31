@@ -33,6 +33,7 @@
 #include "ns3/simulator.h"
 #include "ns3/string.h"
 #include "ns3/trace-source-accessor.h"
+#include "ns3/lora-net-device.h"
 
 namespace ns3
 {
@@ -175,7 +176,7 @@ NetworkServerHelper::AssignClusters(cluster_t clustersInfo)
             currCluster++;
         auto loraNetDevice = DynamicCast<LoraNetDevice>((*i)->GetDevice(0));
         NS_ASSERT(bool(loraNetDevice));
-        auto mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
+        auto mac = DynamicCast<BaseEndDeviceLorawanMac>(loraNetDevice->GetMac());
         NS_ASSERT(bool(mac));
         mac->SetCluster(currCluster);
         totWeight += devWeight;
@@ -199,14 +200,14 @@ NetworkServerHelper::AssignSingleFrequency()
     {
         auto loraNetDevice = DynamicCast<LoraNetDevice>((*i)->GetDevice(0));
         NS_ASSERT(bool(loraNetDevice));
-        auto mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
+        auto mac = DynamicCast<BaseEndDeviceLorawanMac>(loraNetDevice->GetMac());
         NS_ASSERT(bool(mac));
         // Assign one frequency to each cluster
         int chid = 0;
         for (auto& ch : mac->GetLogicalChannelManager()->GetChannelList())
         {
             if (chid == mac->GetCluster())
-                ch->SetEnabledForUplink();
+                ch->EnableForUplink();
             else
                 ch->DisableForUplink();
             chid++;

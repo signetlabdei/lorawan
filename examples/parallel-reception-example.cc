@@ -6,7 +6,7 @@
 #include "ns3/command-line.h"
 #include "ns3/constant-position-mobility-model.h"
 #include "ns3/end-device-lora-phy.h"
-#include "ns3/end-device-lorawan-mac.h"
+#include "ns3/base-end-device-lorawan-mac.h"
 #include "ns3/gateway-lora-phy.h"
 #include "ns3/gateway-lorawan-mac.h"
 #include "ns3/log.h"
@@ -37,7 +37,7 @@ main(int argc, char* argv[])
     LogComponentEnable("GatewayLoraPhy", LOG_LEVEL_ALL);
     // LogComponentEnable ("LoraInterferenceHelper", LOG_LEVEL_ALL);
     // LogComponentEnable ("LorawanMac", LOG_LEVEL_ALL);
-    // LogComponentEnable ("EndDeviceLorawanMac", LOG_LEVEL_ALL);
+    // LogComponentEnable ("BaseEndDeviceLorawanMac", LOG_LEVEL_ALL);
     // LogComponentEnable ("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
     LogComponentEnable("GatewayLorawanMac", LOG_LEVEL_ALL);
     // LogComponentEnable ("LogicalChannelManager", LOG_LEVEL_ALL);
@@ -138,7 +138,7 @@ main(int argc, char* argv[])
      ******************/
     for (uint32_t i = 0; i < endDevices.GetN(); i++)
     {
-        DynamicCast<EndDeviceLorawanMac>(
+        DynamicCast<BaseEndDeviceLorawanMac>(
             DynamicCast<LoraNetDevice>(endDevices.Get(i)->GetDevice(0))->GetMac())
             ->SetDataRate(5 - i);
     }

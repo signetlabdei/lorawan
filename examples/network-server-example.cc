@@ -51,7 +51,7 @@ main(int argc, char* argv[])
     // LogComponentEnable("LoraChannel", LOG_LEVEL_ALL);
     // LogComponentEnable("EndDeviceLoraPhy", LOG_LEVEL_ALL);
     // LogComponentEnable("LogicalChannelManager", LOG_LEVEL_ALL);
-    LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_ALL);
+    LogComponentEnable("BaseEndDeviceLorawanMac", LOG_LEVEL_ALL);
     LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
     // LogComponentEnable ("OneShotSender", LOG_LEVEL_ALL);
     // LogComponentEnable("PointToPointNetDevice", LOG_LEVEL_ALL);
@@ -126,7 +126,7 @@ main(int argc, char* argv[])
     // Set message type (Default is unconfirmed)
     Ptr<LorawanMac> edMac1 = DynamicCast<LoraNetDevice>(endDevices.Get(1)->GetDevice(0))->GetMac();
     Ptr<ClassAEndDeviceLorawanMac> edLorawanMac1 = DynamicCast<ClassAEndDeviceLorawanMac>(edMac1);
-    edLorawanMac1->SetMType(LorawanMacHeader::CONFIRMED_DATA_UP);
+    edLorawanMac1->SetFType(LorawanMacHeader::CONFIRMED_DATA_UP);
 
     // Install applications in EDs
     OneShotSenderHelper oneShotHelper = OneShotSenderHelper();

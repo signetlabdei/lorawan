@@ -93,7 +93,7 @@ main(int argc, char* argv[])
 
     /* Apply global configurations */
     {
-        Config::SetDefault("ns3::EndDeviceLorawanMac::DRControl",
+        Config::SetDefault("ns3::BaseEndDeviceLorawanMac::DRControl",
                            BooleanValue(adrEnabled)); //!< ADR bit
         Config::SetDefault("ns3::RlComponent::StartTime", TimeValue(Hours(2)));
         Config::SetDefault("ns3::RlComponent::EndTime", TimeValue(Hours(periods)));
@@ -105,7 +105,7 @@ main(int argc, char* argv[])
         //!> Requirement: build ns3 with debug option
         LogComponentEnable("IpcHandler", LOG_LEVEL_INFO);
         //LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_INFO);
-        //LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_INFO);
+        //LogComponentEnable("BaseEndDeviceLorawanMac", LOG_LEVEL_INFO);
         // LogComponentEnable ("UrbanTrafficHelper", LOG_LEVEL_DEBUG);
         LogComponentEnableAll(LOG_PREFIX_FUNC);
         LogComponentEnableAll(LOG_PREFIX_NODE);

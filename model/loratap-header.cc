@@ -17,7 +17,7 @@
  * Author: Alessandro Aimi <alleaimi95@gmail.com>
  */
 
-#include "ns3/loratap-header.h"
+#include "loratap-header.h"
 
 #include "ns3/log.h"
 
@@ -146,9 +146,10 @@ LoratapHeader::Fill(LoraTag& tag)
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    m_frequency = unsigned(int(tag.GetFrequency() * 1000000));
-    m_bandwidth = 1; // 1 * 125kHz
-    m_sf = tag.GetSpreadingFactor();
+    m_frequency = unsigned(int(tag.GetFrequency()));
+    auto p = tag.GetTxParameters();
+    m_bandwidth = uint8_t(p.bandwidthHz / 125000); // n * 125kHz
+    m_sf = p.sf;
     int snr = tag.GetSnr() + 0.5 - (tag.GetSnr() < 0); //.5 to approximate to nearest int
     int rssi = tag.GetReceivePower() + 0.5 - (tag.GetReceivePower() < 0);
     m_packet_rssi = rssi + 139;
