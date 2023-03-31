@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/one-shot-sender-helper.h"
+#include "one-shot-sender-helper.h"
 
 #include "ns3/double.h"
 #include "ns3/log.h"

@@ -394,7 +394,7 @@ Helpers
 The ``lorawan`` module features helpers to configure the PHY and MAC layers on a
 large number of devices. The two layers are split in two different classes,
 ``LorawanMacHelper`` and ``LoraPhyHelper``, which can be leveraged by a
-``LoraHelper`` object to fully configure a LoRa device (both for EDs and for
+``LorawanHelper`` object to fully configure a LoRa device (both for EDs and for
 GWs). Since the helpers are general purpose (i.e., they can be used both for ED
 and GW configuration), it is necessary to specify the device type via the
 ``SetDeviceType`` method before the ``Install`` method can be called.

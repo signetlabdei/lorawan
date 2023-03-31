@@ -871,10 +871,9 @@ void
 BaseEndDeviceLorawanMac::DoInitialize()
 {
     NS_LOG_FUNCTION(this);
-    if (auto phy = DynamicCast<EndDeviceLoraPhy>(m_phy); phy != nullptr)
-    {
-        phy->SetDeviceAddress(m_address);
-    }
+    auto phy = DynamicCast<EndDeviceLoraPhy>(m_phy);
+    NS_ABORT_MSG_UNLESS(phy != 0, "This object requires an EndDeviceLoraPhy installed to work");
+    phy->SetDeviceAddress(m_address);
     LorawanMac::DoInitialize();
 }
 

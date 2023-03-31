@@ -102,10 +102,10 @@ GatewayLoraPhy::GetTypeId(void)
             .SetParent<LoraPhy>()
             .SetGroupName("lorawan")
             .AddConstructor<GatewayLoraPhy>()
-            .AddAttribute("numReceptionPaths",
+            .AddAttribute("NbRecvPaths",
                           "Set a certain number of parallel reception paths",
                           UintegerValue(8),
-                          MakeUintegerAccessor(&GatewayLoraPhy::InitReceptionPaths),
+                          MakeUintegerAccessor(&GatewayLoraPhy::SetReceptionPaths),
                           MakeUintegerChecker<uint8_t>(1))
             .AddTraceSource(
                 "NoReceptionBecauseTransmitting",
@@ -131,6 +131,7 @@ GatewayLoraPhy::GatewayLoraPhy()
     : m_isTransmitting(false)
 {
     NS_LOG_FUNCTION(this);
+    SetReceptionPaths(8);
 }
 
 GatewayLoraPhy::~GatewayLoraPhy()
@@ -315,11 +316,11 @@ GatewayLoraPhy::IsTransmitting(void)
 }
 
 void
-GatewayLoraPhy::InitReceptionPaths(UintegerValue number)
+GatewayLoraPhy::SetReceptionPaths(uint8_t number)
 {
-    NS_LOG_FUNCTION(this << (unsigned)number.Get());
+    NS_LOG_FUNCTION(this << (unsigned)number);
     m_receptionPaths.clear();
-    for (uint32_t i = 0; i < number.Get(); ++i)
+    for (uint32_t i = 0; i < number; ++i)
         m_receptionPaths.push_back(Create<ReceptionPath>());
 }
 

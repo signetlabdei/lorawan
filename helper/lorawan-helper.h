@@ -21,8 +21,8 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#ifndef LORA_HELPER_H
-#define LORA_HELPER_H
+#ifndef LORAWAN_HELPER_H
+#define LORAWAN_HELPER_H
 
 #include "ns3/lora-net-device.h"
 #include "ns3/lora-packet-tracker.h"
@@ -46,7 +46,7 @@ namespace lorawan
  * This class can help create a large set of similar LoraNetDevice objects and
  * configure a large set of their attributes during creation.
  */
-class LoraHelper : public PcapHelperForDevice
+class LorawanHelper : public PcapHelperForDevice
 {
   public:
     enum TraceLevel
@@ -58,8 +58,8 @@ class LoraHelper : public PcapHelperForDevice
         NET
     };
 
-    LoraHelper();
-    virtual ~LoraHelper();
+    LorawanHelper();
+    virtual ~LorawanHelper();
 
     /**
      * Install LoraNetDevices on a list of nodes
@@ -175,4 +175,4 @@ class LoraHelper : public PcapHelperForDevice
 } // namespace lorawan
 
 } // namespace ns3
-#endif /* LORA_HELPER_H */
+#endif /* LORAWAN_HELPER_H */

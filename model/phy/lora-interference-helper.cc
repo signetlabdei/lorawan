@@ -131,7 +131,7 @@ LoraInterferenceHelper::GetTypeId(void)
                           "Signal to Interference Ratio (SIR) matrix used to determine "
                           "if a packet is destroyed by interference on collision event",
                           EnumValue(IsolationMatrix::CROCE),
-                          MakeEnumAccessor(&LoraInterferenceHelper::SetIsolationMatrix),
+                          MakeEnumAccessor(&LoraInterferenceHelper::SetIsolationMatrixAttribute),
                           MakeEnumChecker(IsolationMatrix::CROCE,
                                           "CROCE",
                                           IsolationMatrix::GOURSAUD,
@@ -146,12 +146,6 @@ LoraInterferenceHelper::LoraInterferenceHelper()
     : m_isolationMatrix(CROCE)
 {
     NS_LOG_FUNCTION(this);
-}
-
-LoraInterferenceHelper::LoraInterferenceHelper(IsolationMatrix matrix)
-{
-    NS_LOG_FUNCTION(this << matrix);
-    SetIsolationMatrix(EnumValue(matrix));
 }
 
 LoraInterferenceHelper::~LoraInterferenceHelper()
@@ -333,9 +327,9 @@ LoraInterferenceHelper::CleanOldEvents(void)
 }
 
 void
-LoraInterferenceHelper::SetIsolationMatrix(EnumValue matrix)
+LoraInterferenceHelper::SetIsolationMatrix(IsolationMatrix matrix)
 {
-    switch (matrix.Get())
+    switch (matrix)
     {
     case ALOHA:
         NS_LOG_DEBUG("Setting the ALOHA collision matrix");
@@ -350,6 +344,12 @@ LoraInterferenceHelper::SetIsolationMatrix(EnumValue matrix)
         m_isolationMatrix = LoraInterferenceHelper::m_CROCE;
         break;
     }
+}
+
+void
+LoraInterferenceHelper::SetIsolationMatrixAttribute(EnumValue matrix)
+{
+    SetIsolationMatrix((IsolationMatrix)matrix.Get());
 }
 
 const Time LoraInterferenceHelper::m_oldEventThreshold = Seconds(2);

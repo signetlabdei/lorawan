@@ -18,7 +18,7 @@
  *                         <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/urban-traffic-helper.h"
+#include "urban-traffic-helper.h"
 
 #include "ns3/double.h"
 #include "ns3/log.h"

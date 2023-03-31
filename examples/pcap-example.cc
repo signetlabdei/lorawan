@@ -7,7 +7,7 @@
 #include "ns3/core-module.h"
 #include "ns3/propagation-loss-model.h"
 #include "ns3/mobility-helper.h"
-#include "ns3/lora-helper.h"
+#include "ns3/lorawan-helper.h"
 #include "ns3/network-server-helper.h"
 #include "ns3/forwarder-helper.h"
 #include "ns3/periodic-sender-helper.h"
@@ -91,8 +91,8 @@ main(int argc, char* argv[])
     // Create the LorawanMacHelper
     LorawanMacHelper macHelper = LorawanMacHelper();
 
-    // Create the LoraHelper
-    LoraHelper helper = LoraHelper();
+    // Create the LorawanHelper
+    LorawanHelper helper = LorawanHelper();
 
     // Create the NetworkServerHelper
     NetworkServerHelper nsHelper = NetworkServerHelper();

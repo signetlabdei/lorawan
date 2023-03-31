@@ -20,7 +20,7 @@
 #define TEST_UTILITIES_H
 
 #include "ns3/forwarder-helper.h"
-#include "ns3/lora-helper.h"
+#include "ns3/lorawan-helper.h"
 #include "ns3/mobility-helper.h"
 #include "ns3/network-server-helper.h"
 #include "ns3/position-allocator.h"

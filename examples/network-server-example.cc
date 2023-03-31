@@ -11,7 +11,7 @@
 #include "ns3/log.h"
 #include "ns3/lora-channel.h"
 #include "ns3/lora-device-address-generator.h"
-#include "ns3/lora-helper.h"
+#include "ns3/lorawan-helper.h"
 #include "ns3/lora-phy-helper.h"
 #include "ns3/lorawan-mac-helper.h"
 #include "ns3/mobility-helper.h"
@@ -100,8 +100,8 @@ main(int argc, char* argv[])
     // Create the LorawanMacHelper
     LorawanMacHelper macHelper = LorawanMacHelper();
 
-    // Create the LoraHelper
-    LoraHelper helper = LoraHelper();
+    // Create the LorawanHelper
+    LorawanHelper helper = LorawanHelper();
 
     // Create EDs
     /////////////

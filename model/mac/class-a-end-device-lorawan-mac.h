@@ -169,7 +169,7 @@ class ClassAEndDeviceLorawanMac : public BaseEndDeviceLorawanMac
      * and the transmitted preamble.
      * (Ref: Recommended SX1272/76 Settings for EU868 LoRaWAN Network Operation )
      */
-    uint8_t m_receiveWindowDurationInSymbols;
+    uint16_t m_recvWinSymb;
 
     /**
      * The RX1DROffset parameter value

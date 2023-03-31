@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/network-server-helper.h"
+#include "network-server-helper.h"
 
 #include "ns3/adr-component.h"
 #include "ns3/double.h"
