@@ -3,7 +3,7 @@
  */
 
 #include "ns3/log.h"
-#include "ns3/lora-helper.h"
+#include "ns3/lorawan-helper.h"
 #include "ns3/lora-interference-helper.h"
 #include "ns3/lora-tag.h"
 
@@ -132,14 +132,14 @@ OnInterrupt(sighandler_t action)
 /**
  * Granularities of the tracing system
  */
-const std::unordered_map<std::string, LoraHelper::TraceLevel> traceLevelMap = {
-    {"PKT", LoraHelper::PKT},
-    {"DEV", LoraHelper::DEV},
-    {"SF", LoraHelper::SF},
-    {"GW", LoraHelper::GW},
-    {"NET", LoraHelper::NET}};
+const std::unordered_map<std::string, LorawanHelper::TraceLevel> traceLevelMap = {
+    {"PKT", LorawanHelper::PKT},
+    {"DEV", LorawanHelper::DEV},
+    {"SF", LorawanHelper::SF},
+    {"GW", LorawanHelper::GW},
+    {"NET", LorawanHelper::NET}};
 
-std::vector<LoraHelper::TraceLevel>
+std::vector<LorawanHelper::TraceLevel>
 ParseTraceLevels(std::string s)
 {
     std::regex rx("PKT|DEV|SF|GW|NET|\\{((PKT|DEV|SF|GW|NET),)*(PKT|DEV|SF|GW|NET)\\}");
@@ -152,7 +152,7 @@ ParseTraceLevels(std::string s)
     s.erase(std::remove(s.begin(), s.end(), '{'), s.end());
     s.erase(std::remove(s.begin(), s.end(), '}'), s.end());
 
-    std::vector<LoraHelper::TraceLevel> out;
+    std::vector<LorawanHelper::TraceLevel> out;
 
     std::stringstream ss(s);
     while (ss.good())

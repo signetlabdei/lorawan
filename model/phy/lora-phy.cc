@@ -108,7 +108,7 @@ LoraPhy::DoInitialize()
     // This method ensures that the local mobility model pointer holds
     // a pointer to the Node's aggregated mobility model (if one exists)
     // in the case that the user has not directly called SetMobility()
-    // on this WifiPhy during simulation setup.  If the mobility model
+    // on this LoraPhy during simulation setup.  If the mobility model
     // needs to be added or changed during simulation runtime, users must
     // call SetMobility() on this object.
     if (!m_mobility)

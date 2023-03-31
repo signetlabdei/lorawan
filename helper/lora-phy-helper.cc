@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/lora-phy-helper.h"
+#include "lora-phy-helper.h"
 
 namespace ns3
 {

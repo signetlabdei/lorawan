@@ -145,7 +145,6 @@ class LoraInterferenceHelper : public Object
     static TypeId GetTypeId(void);
 
     LoraInterferenceHelper();
-    LoraInterferenceHelper(IsolationMatrix matrix);
     virtual ~LoraInterferenceHelper();
 
     /**
@@ -202,6 +201,11 @@ class LoraInterferenceHelper : public Object
      */
     void ClearAllEvents(void);
 
+    /**
+     * Set the SIR collision matrix
+     */
+    void SetIsolationMatrix(IsolationMatrix matrix);
+
   protected:
     void DoDispose() override;
 
@@ -212,9 +216,9 @@ class LoraInterferenceHelper : public Object
     void CleanOldEvents(void);
 
     /**
-     * Set the SIR collision matrix
+     * Set the SIR collision matrix attribute
      */
-    void SetIsolationMatrix(EnumValue matrix);
+    void SetIsolationMatrixAttribute(EnumValue matrix);
 
     /**
      * A list of the events this LoraInterferenceHelper is keeping track of.

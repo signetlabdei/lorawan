@@ -187,13 +187,6 @@ NetworkServer::GetNetworkStatus(void)
 }
 
 void
-NetworkServer::DoInitialize(void)
-{
-    NS_LOG_FUNCTION(this);
-    Application::DoInitialize();
-}
-
-void
 NetworkServer::DoDispose(void)
 {
     NS_LOG_FUNCTION(this);

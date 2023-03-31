@@ -17,7 +17,7 @@
 #include "ns3/gateway-lora-phy.h"
 #include "ns3/gateway-lorawan-mac.h"
 #include "ns3/log.h"
-#include "ns3/lora-helper.h"
+#include "ns3/lorawan-helper.h"
 #include "ns3/mobility-helper.h"
 #include "ns3/network-server-helper.h"
 #include "ns3/node-container.h"
@@ -75,7 +75,7 @@ main(int argc, char* argv[])
     // LogComponentEnable("GatewayLorawanMac", LOG_LEVEL_ALL);
     // LogComponentEnable("LogicalChannelManager", LOG_LEVEL_ALL);
     // LogComponentEnable("LogicalChannel", LOG_LEVEL_ALL);
-    // LogComponentEnable("LoraHelper", LOG_LEVEL_ALL);
+    // LogComponentEnable("LorawanHelper", LOG_LEVEL_ALL);
     // LogComponentEnable("LoraPhyHelper", LOG_LEVEL_ALL);
     // LogComponentEnable("LorawanMacHelper", LOG_LEVEL_ALL);
     // LogComponentEnable("PeriodicSenderHelper", LOG_LEVEL_ALL);
@@ -144,8 +144,8 @@ main(int argc, char* argv[])
     // Create the LorawanMacHelper
     LorawanMacHelper macHelper = LorawanMacHelper();
 
-    // Create the LoraHelper
-    LoraHelper helper = LoraHelper();
+    // Create the LorawanHelper
+    LorawanHelper helper = LorawanHelper();
     helper.EnablePacketTracking(); // Output filename
     // helper.EnableSimulationTimePrinting ();
 

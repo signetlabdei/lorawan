@@ -18,7 +18,7 @@
 #include "ns3/gateway-lora-phy.h"
 #include "ns3/gateway-lorawan-mac.h"
 #include "ns3/log.h"
-#include "ns3/lora-helper.h"
+#include "ns3/lorawan-helper.h"
 #include "ns3/lorawan-mac-header.h"
 #include "ns3/mobility-helper.h"
 #include "ns3/network-server-helper.h"
@@ -137,8 +137,8 @@ main(int argc, char* argv[])
     // Create the LorawanMacHelper
     LorawanMacHelper macHelper = LorawanMacHelper();
 
-    // Create the LoraHelper
-    LoraHelper helper = LoraHelper();
+    // Create the LorawanHelper
+    LorawanHelper helper = LorawanHelper();
     helper.EnablePacketTracking(); // Output filename
 
     // Create the NetworkServerHelper

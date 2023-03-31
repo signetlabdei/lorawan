@@ -49,7 +49,7 @@ set(source_files
     helper/forwarder-helper.cc
     helper/lorawan-mac-helper.cc
     helper/urban-traffic-helper.cc
-    helper/lora-helper.cc
+    helper/lorawan-helper.cc
     helper/network-server-helper.cc
     helper/one-shot-sender-helper.cc
     helper/chirpstack-helper.cc
@@ -118,7 +118,7 @@ set(header_files
     helper/forwarder-helper.h
     helper/lorawan-mac-helper.h
     helper/urban-traffic-helper.h
-    helper/lora-helper.h
+    helper/lorawan-helper.h
     helper/network-server-helper.h
     helper/one-shot-sender-helper.h
     helper/chirpstack-helper.h

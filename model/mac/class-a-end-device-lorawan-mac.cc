@@ -43,16 +43,21 @@ NS_OBJECT_ENSURE_REGISTERED(ClassAEndDeviceLorawanMac);
 TypeId
 ClassAEndDeviceLorawanMac::GetTypeId(void)
 {
-    static TypeId tid = TypeId("ns3::ClassAEndDeviceLorawanMac")
-                            .SetParent<BaseEndDeviceLorawanMac>()
-                            .SetGroupName("lorawan")
-                            .AddConstructor<ClassAEndDeviceLorawanMac>();
+    static TypeId tid =
+        TypeId("ns3::ClassAEndDeviceLorawanMac")
+            .SetParent<BaseEndDeviceLorawanMac>()
+            .SetGroupName("lorawan")
+            .AddConstructor<ClassAEndDeviceLorawanMac>()
+            .AddAttribute("RecvWinSymb",
+                          "The duration of a receive window in number of symbols.",
+                          UintegerValue(8),
+                          MakeUintegerAccessor(&ClassAEndDeviceLorawanMac::m_recvWinSymb),
+                          MakeUintegerChecker<uint16_t>(4, 1023));
     return tid;
 }
 
 ClassAEndDeviceLorawanMac::ClassAEndDeviceLorawanMac()
-    : // NOT LoraWAN default
-      m_receiveWindowDurationInSymbols(16),
+    : m_recvWinSymb(8),
       // LoRaWAN default
       m_rx1DrOffset(0),
       m_lastTxCh(nullptr)
@@ -146,7 +151,7 @@ ClassAEndDeviceLorawanMac::GetBusyTransmissionDelay()
 Time
 ClassAEndDeviceLorawanMac::GetReceptionWindowDuration(uint8_t datarate)
 {
-    return m_receiveWindowDurationInSymbols * GetTSym(datarate);
+    return m_recvWinSymb * GetTSym(datarate);
 }
 
 //////////////////////////
@@ -329,7 +334,9 @@ void
 ClassAEndDeviceLorawanMac::DoInitialize()
 {
     NS_LOG_FUNCTION(this);
-    m_rwm->SetPhy(DynamicCast<EndDeviceLoraPhy>(m_phy));
+    auto phy = DynamicCast<EndDeviceLoraPhy>(m_phy);
+    NS_ABORT_MSG_UNLESS(phy != 0, "This object requires an EndDeviceLoraPhy installed to work");
+    m_rwm->SetPhy(phy);
     BaseEndDeviceLorawanMac::DoInitialize();
 }
 

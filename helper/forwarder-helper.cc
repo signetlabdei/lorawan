@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/forwarder-helper.h"
+#include "forwarder-helper.h"
 
 #include "ns3/double.h"
 #include "ns3/forwarder.h"

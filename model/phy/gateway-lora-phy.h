@@ -144,6 +144,11 @@ class GatewayLoraPhy : public LoraPhy
      */
     bool IsTransmitting(void);
 
+    /**
+     * Set a certain number of reception paths.
+     */
+    void SetReceptionPaths(uint8_t number);
+
   protected:
     void DoDispose() override;
 
@@ -153,11 +158,6 @@ class GatewayLoraPhy : public LoraPhy
      * Used to schedule a change in the gateway transmission state
      */
     virtual void TxFinished(Ptr<Packet> packet);
-
-    /**
-     * Set a certain number of reception paths.
-     */
-    void InitReceptionPaths(UintegerValue number);
 
     /**
      * A vector containing the various parallel receivers that are managed by this

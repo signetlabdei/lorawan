@@ -21,7 +21,7 @@
  *                              <alessandro.aimi@cnam.fr>
  */
 
-#include "ns3/lora-helper.h"
+#include "lorawan-helper.h"
 
 #include "ns3/class-a-end-device-lorawan-mac.h"
 #include "ns3/energy-source-container.h"
@@ -36,9 +36,9 @@ namespace ns3
 namespace lorawan
 {
 
-NS_LOG_COMPONENT_DEFINE("LoraHelper");
+NS_LOG_COMPONENT_DEFINE("LorawanHelper");
 
-LoraHelper::LoraHelper()
+LorawanHelper::LorawanHelper()
     : m_lastPhyPerformanceUpdate(Seconds(0)),
       m_lastGlobalPerformanceUpdate(Seconds(0)),
       m_lastDeviceStatusUpdate(Seconds(0)),
@@ -46,13 +46,13 @@ LoraHelper::LoraHelper()
 {
 }
 
-LoraHelper::~LoraHelper()
+LorawanHelper::~LorawanHelper()
 {
     delete m_packetTracker;
 }
 
 NetDeviceContainer
-LoraHelper::Install(const LoraPhyHelper& phyHelper,
+LorawanHelper::Install(const LoraPhyHelper& phyHelper,
                     const LorawanMacHelper& macHelper,
                     NodeContainer c) const
 {
@@ -61,7 +61,6 @@ LoraHelper::Install(const LoraPhyHelper& phyHelper,
     {
         Ptr<Node> node = *i;
         Ptr<LoraNetDevice> device = CreateObject<LoraNetDevice>();
-        node->AddDevice(device);
         Ptr<LoraPhy> phy = phyHelper.Install(device);
         Ptr<LorawanMac> mac = macHelper.Install(device);
         if (m_packetTracker)
@@ -101,6 +100,7 @@ LoraHelper::Install(const LoraPhyHelper& phyHelper,
                     MakeCallback(&LoraPacketTracker::MacGwReceptionCallback, m_packetTracker));
             }
         }
+        node->AddDevice(device);
         devices.Add(device);
         NS_LOG_DEBUG("node=" << node << ", mob=" << node->GetObject<MobilityModel>());
     }
@@ -108,13 +108,13 @@ LoraHelper::Install(const LoraPhyHelper& phyHelper,
 }
 
 NetDeviceContainer
-LoraHelper::Install(const LoraPhyHelper& phy, const LorawanMacHelper& mac, Ptr<Node> node) const
+LorawanHelper::Install(const LoraPhyHelper& phy, const LorawanMacHelper& mac, Ptr<Node> node) const
 {
     return Install(phy, mac, NodeContainer(node));
 }
 
 void
-LoraHelper::EnablePacketTracking()
+LorawanHelper::EnablePacketTracking()
 {
     NS_LOG_FUNCTION(this);
 
@@ -123,7 +123,7 @@ LoraHelper::EnablePacketTracking()
 }
 
 LoraPacketTracker&
-LoraHelper::GetPacketTracker(void)
+LorawanHelper::GetPacketTracker(void)
 {
     NS_LOG_FUNCTION(this);
 
@@ -131,25 +131,25 @@ LoraHelper::GetPacketTracker(void)
 }
 
 void
-LoraHelper::EnableSimulationTimePrinting(Time interval)
+LorawanHelper::EnableSimulationTimePrinting(Time interval)
 {
     m_oldtime = std::time(0);
-    Simulator::Schedule(Seconds(0), &LoraHelper::DoPrintSimulationTime, this, interval);
+    Simulator::Schedule(Seconds(0), &LorawanHelper::DoPrintSimulationTime, this, interval);
 }
 
 void
-LoraHelper::DoPrintSimulationTime(Time interval)
+LorawanHelper::DoPrintSimulationTime(Time interval)
 {
     // NS_LOG_INFO ("Time: " << Simulator::Now().GetHours());
     std::cout << "Simulated time: " << Simulator::Now().GetHours() << " hours, ";
     std::cout << "Real time from last call: " << std::time(0) - m_oldtime << " seconds"
               << std::endl;
     m_oldtime = std::time(0);
-    Simulator::Schedule(interval, &LoraHelper::DoPrintSimulationTime, this, interval);
+    Simulator::Schedule(interval, &LorawanHelper::DoPrintSimulationTime, this, interval);
 }
 
 void
-LoraHelper::EnablePeriodicDeviceStatusPrinting(NodeContainer endDevices,
+LorawanHelper::EnablePeriodicDeviceStatusPrinting(NodeContainer endDevices,
                                                NodeContainer gateways,
                                                std::string filename,
                                                Time interval)
@@ -160,7 +160,7 @@ LoraHelper::EnablePeriodicDeviceStatusPrinting(NodeContainer endDevices,
 
     // Schedule periodic printing
     Simulator::Schedule(interval,
-                        &LoraHelper::EnablePeriodicDeviceStatusPrinting,
+                        &LorawanHelper::EnablePeriodicDeviceStatusPrinting,
                         this,
                         endDevices,
                         gateways,
@@ -169,7 +169,7 @@ LoraHelper::EnablePeriodicDeviceStatusPrinting(NodeContainer endDevices,
 }
 
 void
-LoraHelper::DoPrintDeviceStatus(NodeContainer endDevices,
+LorawanHelper::DoPrintDeviceStatus(NodeContainer endDevices,
                                 NodeContainer gateways,
                                 std::string filename)
 {
@@ -220,7 +220,7 @@ LoraHelper::DoPrintDeviceStatus(NodeContainer endDevices,
         double maxot =
             LoraPhy::GetTimeOnAir(Create<Packet>(size + 13), params).GetSeconds() / interval;
         maxot = std::min(maxot, 0.01);
-        
+
         double ot = mac->GetAggregatedDutyCycle();
         ot = std::min(ot, maxot);
 
@@ -234,7 +234,7 @@ LoraHelper::DoPrintDeviceStatus(NodeContainer endDevices,
 }
 
 void
-LoraHelper::EnablePeriodicGwsPerformancePrinting(NodeContainer gateways,
+LorawanHelper::EnablePeriodicGwsPerformancePrinting(NodeContainer gateways,
                                                  std::string filename,
                                                  Time interval)
 {
@@ -243,7 +243,7 @@ LoraHelper::EnablePeriodicGwsPerformancePrinting(NodeContainer gateways,
     DoPrintGwsPerformance(gateways, filename);
 
     Simulator::Schedule(interval,
-                        &LoraHelper::EnablePeriodicGwsPerformancePrinting,
+                        &LorawanHelper::EnablePeriodicGwsPerformancePrinting,
                         this,
                         gateways,
                         filename,
@@ -251,7 +251,7 @@ LoraHelper::EnablePeriodicGwsPerformancePrinting(NodeContainer gateways,
 }
 
 void
-LoraHelper::DoPrintGwsPerformance(NodeContainer gateways, std::string filename)
+LorawanHelper::DoPrintGwsPerformance(NodeContainer gateways, std::string filename)
 {
     NS_LOG_FUNCTION(this);
 
@@ -283,21 +283,21 @@ LoraHelper::DoPrintGwsPerformance(NodeContainer gateways, std::string filename)
 }
 
 void
-LoraHelper::EnablePeriodicGlobalPerformancePrinting(std::string filename, Time interval)
+LorawanHelper::EnablePeriodicGlobalPerformancePrinting(std::string filename, Time interval)
 {
     NS_LOG_FUNCTION(this << filename << interval);
 
     DoPrintGlobalPerformance(filename);
 
     Simulator::Schedule(interval,
-                        &LoraHelper::EnablePeriodicGlobalPerformancePrinting,
+                        &LorawanHelper::EnablePeriodicGlobalPerformancePrinting,
                         this,
                         filename,
                         interval);
 }
 
 void
-LoraHelper::DoPrintGlobalPerformance(std::string filename)
+LorawanHelper::DoPrintGlobalPerformance(std::string filename)
 {
     NS_LOG_FUNCTION(this);
 
@@ -325,7 +325,7 @@ LoraHelper::DoPrintGlobalPerformance(std::string filename)
 }
 
 void
-LoraHelper::EnablePeriodicSFStatusPrinting(NodeContainer endDevices,
+LorawanHelper::EnablePeriodicSFStatusPrinting(NodeContainer endDevices,
                                            NodeContainer gateways,
                                            std::string filename,
                                            Time interval)
@@ -336,7 +336,7 @@ LoraHelper::EnablePeriodicSFStatusPrinting(NodeContainer endDevices,
 
     // Schedule periodic printing
     Simulator::Schedule(interval,
-                        &LoraHelper::EnablePeriodicSFStatusPrinting,
+                        &LorawanHelper::EnablePeriodicSFStatusPrinting,
                         this,
                         endDevices,
                         gateways,
@@ -345,7 +345,7 @@ LoraHelper::EnablePeriodicSFStatusPrinting(NodeContainer endDevices,
 }
 
 void
-LoraHelper::DoPrintSFStatus(NodeContainer endDevices, NodeContainer gateways, std::string filename)
+LorawanHelper::DoPrintSFStatus(NodeContainer endDevices, NodeContainer gateways, std::string filename)
 {
     const char* c = filename.c_str();
     std::ofstream outputFile;
@@ -428,7 +428,7 @@ LoraHelper::DoPrintSFStatus(NodeContainer endDevices, NodeContainer gateways, st
 }
 
 void
-LoraHelper::EnablePrinting(NodeContainer endDevices,
+LorawanHelper::EnablePrinting(NodeContainer endDevices,
                            NodeContainer gateways,
                            std::vector<enum TraceLevel> levels,
                            Time samplePeriod)
@@ -464,7 +464,7 @@ LoraHelper::EnablePrinting(NodeContainer endDevices,
 }
 
 void
-LoraHelper::EnablePcapInternal(std::string prefix,
+LorawanHelper::EnablePcapInternal(std::string prefix,
                                Ptr<NetDevice> nd,
                                bool promiscuous,
                                bool explicitFilename)
@@ -479,7 +479,7 @@ LoraHelper::EnablePcapInternal(std::string prefix,
     Ptr<LoraNetDevice> device = DynamicCast<LoraNetDevice>(nd);
     if (bool(device) == 0)
     {
-        NS_LOG_INFO("LoraHelper::EnablePcapInternal(): Device "
+        NS_LOG_INFO("LorawanHelper::EnablePcapInternal(): Device "
                     << device << " not of type ns3::LoraNetDevice");
         return;
     }
@@ -502,13 +502,13 @@ LoraHelper::EnablePcapInternal(std::string prefix,
 
     auto file = pcapHelper.CreateFile(filename, std::ios::out, PcapHelper::DLT_LORATAP);
     phy->TraceConnectWithoutContext("SnifferRx",
-                                    MakeBoundCallback(&LoraHelper::PcapSniffRxEvent, file));
+                                    MakeBoundCallback(&LorawanHelper::PcapSniffRxEvent, file));
     phy->TraceConnectWithoutContext("SnifferTx",
-                                    MakeBoundCallback(&LoraHelper::PcapSniffTxEvent, file));
+                                    MakeBoundCallback(&LorawanHelper::PcapSniffTxEvent, file));
 }
 
 void
-LoraHelper::PcapSniffRxEvent(Ptr<PcapFileWrapper> file, Ptr<const Packet> packet)
+LorawanHelper::PcapSniffRxEvent(Ptr<PcapFileWrapper> file, Ptr<const Packet> packet)
 {
     Ptr<Packet> p = packet->Copy();
     LoraTag tag;
@@ -520,7 +520,7 @@ LoraHelper::PcapSniffRxEvent(Ptr<PcapFileWrapper> file, Ptr<const Packet> packet
 }
 
 void
-LoraHelper::PcapSniffTxEvent(Ptr<PcapFileWrapper> file, Ptr<const Packet> packet)
+LorawanHelper::PcapSniffTxEvent(Ptr<PcapFileWrapper> file, Ptr<const Packet> packet)
 {
     Ptr<Packet> p = packet->Copy();
     LoraTag tag;

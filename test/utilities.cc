@@ -28,8 +28,8 @@ CreateEndDevices(int nDevices, MobilityHelper mobility, Ptr<LoraChannel> channel
     // Create the LorawanMacHelper
     LorawanMacHelper macHelper = LorawanMacHelper();
 
-    // Create the LoraHelper
-    LoraHelper helper = LoraHelper();
+    // Create the LorawanHelper
+    LorawanHelper helper = LorawanHelper();
 
     // Create a set of nodes
     NodeContainer endDevices;
@@ -56,8 +56,8 @@ CreateGateways(int nGateways, MobilityHelper mobility, Ptr<LoraChannel> channel)
     // Create the LorawanMacHelper
     LorawanMacHelper macHelper = LorawanMacHelper();
 
-    // Create the LoraHelper
-    LoraHelper helper = LoraHelper();
+    // Create the LorawanHelper
+    LorawanHelper helper = LorawanHelper();
 
     // Create the gateways
     NodeContainer gateways;

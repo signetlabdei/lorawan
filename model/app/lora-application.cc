@@ -116,14 +116,21 @@ void
 LoraApplication::DoInitialize()
 {
     NS_LOG_FUNCTION(this);
-    // Make sure we have a MAC layer
+    // Install a MAC layer if it was not done manually beforehand
     if (bool(m_mac) == 0)
     {
-        NS_ASSERT(m_node->GetNDevices() == 1);
-        // Assumes there's only one device, force it to be an end device
-        auto loraNetDevice = DynamicCast<LoraNetDevice>(m_node->GetDevice(0));
-        m_mac = DynamicCast<BaseEndDeviceLorawanMac>(loraNetDevice->GetMac());
-        NS_ASSERT(bool(m_mac) != 0);
+        // Require exactly one LoraNetDevice installed on this node
+        Ptr<LoraNetDevice> netDev = 0;
+        uint32_t i = 0;
+        for (; i < m_node->GetNDevices() && bool(netDev) == 0; ++i)
+            netDev = DynamicCast<LoraNetDevice>(m_node->GetDevice(i));
+        NS_ABORT_MSG_UNLESS(bool(netDev) != 0, "One LoraNetDevice must be installed on this node");
+        for (; i < m_node->GetNDevices(); ++i)
+            NS_ABORT_MSG_IF(bool(DynamicCast<LoraNetDevice>(m_node->GetDevice(i))) != 0,
+                            "No more than one LoraNetDevice must be installed on this node");
+        m_mac = DynamicCast<BaseEndDeviceLorawanMac>(netDev->GetMac());
+        NS_ABORT_MSG_UNLESS(bool(m_mac) != 0,
+                            "A child of BaseEndDeviceLorawanMac must be installed on this node");
     }
     Application::DoInitialize();
 }

@@ -14,7 +14,7 @@
 #include "ns3/log.h"
 #include "ns3/lora-device-address.h"
 #include "ns3/lora-frame-header.h"
-#include "ns3/lora-helper.h"
+#include "ns3/lorawan-helper.h"
 #include "ns3/lora-net-device.h"
 #include "ns3/lora-phy.h"
 #include "ns3/lorawan-mac-header.h"
@@ -123,8 +123,8 @@ main(int argc, char* argv[])
     LorawanMacHelper macHelper = LorawanMacHelper();
     macHelper.SetRegion(LorawanMacHelper::ALOHA);
 
-    // Create the LoraHelper
-    LoraHelper helper = LoraHelper();
+    // Create the LorawanHelper
+    LorawanHelper helper = LorawanHelper();
     helper.EnablePacketTracking(); // Output filename
 
     // Create the NetworkServerHelper
