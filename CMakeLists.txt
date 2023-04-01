@@ -127,7 +127,7 @@ build_lib(
     ${libbuildings}
     ${libenergy}
     ${libcsma}
-    TEST_SOURCES
+  TEST_SOURCES
     test/utilities.cc
     test/lorawan-test-suite.cc
     test/network-status-test-suite.cc
