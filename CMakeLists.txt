@@ -1,68 +1,56 @@
 # Tip: use 'find . -follow -type f -name *.cc' to help complete this
 
 set(source_files
-    model/app/server/network-controller-components.cc
-    model/app/server/adr-component.cc
+    model/app/server/network-server.cc
+    model/app/server/network-scheduler.cc
+    model/app/server/network-status.cc
+    model/app/server/gateway-status.cc
     model/app/server/end-device-status.cc
     model/app/server/network-controller.cc
-    model/app/server/network-status.cc
-    model/app/server/network-scheduler.cc
-    model/app/server/gateway-status.cc
-    model/app/server/network-server.cc
-    model/app/server/congestion-control-component.cc
-    model/app/server/traffic-control-utils.cc
-    model/app/server/rl-component.cc
-    model/app/server/ipc-handler.cc
+    model/app/server/network-controller-components.cc
+    model/app/server/adr-component.cc
+    model/app/forwarder.cc
     model/app/lora-application.cc
     model/app/one-shot-sender.cc
     model/app/periodic-sender.cc
-    model/app/udp-forwarder.cc
-    model/app/forwarder.cc
     model/app/poisson-sender.cc
-    model/mac/class-a-end-device-lorawan-mac.cc
-    model/mac/lora-device-address.cc
-    model/mac/gateway-lorawan-mac.cc
-    model/mac/sub-band.cc
-    model/mac/logical-channel.cc
-    model/mac/mac-command.cc
-    model/mac/base-end-device-lorawan-mac.cc
-    model/mac/lorawan-mac-header.cc
     model/mac/lorawan-mac.cc
-    model/mac/logical-channel-manager.cc
+    model/mac/gateway-lorawan-mac.cc
+    model/mac/base-end-device-lorawan-mac.cc
+    model/mac/class-a-end-device-lorawan-mac.cc
     model/mac/recv-window-manager.cc
-    model/mac/lora-frame-header.cc
+    model/mac/lora-device-address.cc
     model/mac/lora-device-address-generator.cc
+    model/mac/logical-channel-manager.cc
+    model/mac/logical-channel.cc
+    model/mac/sub-band.cc
+    model/mac/lorawan-mac-header.cc
+    model/mac/lora-frame-header.cc
+    model/mac/mac-command.cc
+    model/phy/lora-phy.cc
+    model/phy/gateway-lora-phy.cc
     model/phy/end-device-lora-phy.cc
     model/phy/lora-channel.cc
     model/phy/lora-interference-helper.cc
-    model/phy/lora-phy.cc
-    model/phy/gateway-lora-phy.cc
     model/phy/lora-radio-energy-model.cc
     model/phy/lora-tx-current-model.cc
+    model/lora-net-device.cc
+    model/lora-tag.cc
     model/loratap-header.cc
     model/hex-grid-position-allocator.cc
     model/range-position-allocator.cc
     model/correlated-shadowing-propagation-loss-model.cc
-    model/lora-net-device.cc
-    model/lora-tag.cc
     model/building-penetration-loss.cc
-    helper/forwarder-helper.cc
-    helper/lorawan-mac-helper.cc
-    helper/urban-traffic-helper.cc
     helper/lorawan-helper.cc
-    helper/network-server-helper.cc
-    helper/one-shot-sender-helper.cc
-    helper/chirpstack-helper.cc
-    helper/periodic-sender-helper.cc
     helper/lora-packet-tracker.cc
-    helper/lora-radio-energy-model-helper.cc
-    helper/udp-forwarder-helper.cc
+    helper/lorawan-mac-helper.cc
     helper/lora-phy-helper.cc
-    third_party/packet_forwarder/base64.cc
-    third_party/packet_forwarder/jitqueue.cc
-    third_party/packet_forwarder/parson.cc
-    third_party/packet_forwarder/timersync.cc
-    third_party/lora_gateway/loragw_hal.cc
+    helper/lora-radio-energy-model-helper.cc
+    helper/network-server-helper.cc
+    helper/forwarder-helper.cc
+    helper/periodic-sender-helper.cc
+    helper/one-shot-sender-helper.cc
+    helper/urban-traffic-helper.cc
     third_party/loramac-node/LoRaMacCrypto.cc
     third_party/loramac-node/aes.cc
     third_party/loramac-node/utilities.cc
@@ -70,69 +58,56 @@ set(source_files
 )
 
 set(header_files
-    model/app/server/network-controller-components.h
-    model/app/server/adr-component.h
+    model/app/server/network-server.h
+    model/app/server/network-scheduler.h
+    model/app/server/network-status.h
+    model/app/server/gateway-status.h
     model/app/server/end-device-status.h
     model/app/server/network-controller.h
-    model/app/server/network-status.h
-    model/app/server/network-scheduler.h
-    model/app/server/gateway-status.h
-    model/app/server/network-server.h
-    model/app/server/congestion-control-component.h
-    model/app/server/traffic-control-utils.h
-    model/app/server/rl-component.h
-    model/app/server/ipc-handler.h
+    model/app/server/network-controller-components.h
+    model/app/server/adr-component.h
+    model/app/forwarder.h
     model/app/lora-application.h
     model/app/one-shot-sender.h
     model/app/periodic-sender.h
-    model/app/udp-forwarder.h
-    model/app/forwarder.h
     model/app/poisson-sender.h
-    model/mac/class-a-end-device-lorawan-mac.h
-    model/mac/lora-device-address.h
-    model/mac/gateway-lorawan-mac.h
-    model/mac/sub-band.h
-    model/mac/logical-channel.h
-    model/mac/mac-command.h
-    model/mac/base-end-device-lorawan-mac.h
-    model/mac/lorawan-mac-header.h
     model/mac/lorawan-mac.h
-    model/mac/logical-channel-manager.h
+    model/mac/gateway-lorawan-mac.h
+    model/mac/base-end-device-lorawan-mac.h
+    model/mac/class-a-end-device-lorawan-mac.h
     model/mac/recv-window-manager.h
-    model/mac/lora-frame-header.h
+    model/mac/lora-device-address.h
     model/mac/lora-device-address-generator.h
+    model/mac/logical-channel-manager.h
+    model/mac/logical-channel.h
+    model/mac/sub-band.h
+    model/mac/lorawan-mac-header.h
+    model/mac/lora-frame-header.h
+    model/mac/mac-command.h
+    model/phy/lora-phy.h
+    model/phy/gateway-lora-phy.h
     model/phy/end-device-lora-phy.h
     model/phy/lora-channel.h
     model/phy/lora-interference-helper.h
-    model/phy/lora-phy.h
-    model/phy/gateway-lora-phy.h
     model/phy/lora-radio-energy-model.h
     model/phy/lora-tx-current-model.h
+    model/lora-net-device.h
+    model/lora-tag.h
     model/loratap-header.h
     model/hex-grid-position-allocator.h
     model/range-position-allocator.h
     model/correlated-shadowing-propagation-loss-model.h
-    model/lora-net-device.h
-    model/lora-tag.h
     model/building-penetration-loss.h
-    helper/forwarder-helper.h
-    helper/lorawan-mac-helper.h
-    helper/urban-traffic-helper.h
     helper/lorawan-helper.h
-    helper/network-server-helper.h
-    helper/one-shot-sender-helper.h
-    helper/chirpstack-helper.h
-    helper/periodic-sender-helper.h
     helper/lora-packet-tracker.h
-    helper/lora-radio-energy-model-helper.h
-    helper/udp-forwarder-helper.h
+    helper/lorawan-mac-helper.h
     helper/lora-phy-helper.h
-    third_party/packet_forwarder/base64.h
-    third_party/packet_forwarder/jitqueue.h
-    third_party/packet_forwarder/parson.h
-    third_party/packet_forwarder/trace.h
-    third_party/packet_forwarder/timersync.h
-    third_party/lora_gateway/loragw_hal.h
+    helper/lora-radio-energy-model-helper.h
+    helper/network-server-helper.h
+    helper/forwarder-helper.h
+    helper/periodic-sender-helper.h
+    helper/one-shot-sender-helper.h
+    helper/urban-traffic-helper.h
     third_party/loramac-node/LoRaMacCrypto.h
     third_party/loramac-node/se-identity.h
     third_party/loramac-node/aes.h
@@ -145,21 +120,14 @@ build_lib(
   SOURCE_FILES ${source_files}
   HEADER_FILES ${header_files}
   LIBRARIES_TO_LINK
-    ${libnetwork}
-    ${libpropagation}
-    ${libenergy}
     ${libpoint-to-point}
-    ${libbuildings}
-    ${libmobility}
+    ${libinternet-apps}
     ${libapplications}
-    ${libtap-bridge}
+    ${libpropagation}
+    ${libbuildings}
+    ${libenergy}
     ${libcsma}
-    ${curl_LIBRARIES}
-    ${ortools_LIBRARIES}
-    ${zmq_LIBRARIES}
-    # to enable examples when only building this module
-    #${libinternet-apps}
-  TEST_SOURCES
+    TEST_SOURCES
     test/utilities.cc
     test/lorawan-test-suite.cc
     test/network-status-test-suite.cc

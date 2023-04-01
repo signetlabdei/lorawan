@@ -32,7 +32,6 @@
 #include "ns3/object.h"
 #include "ns3/pointer.h"
 
-#include <boost/circular_buffer.hpp>
 #include <iostream>
 
 namespace ns3
@@ -172,13 +171,12 @@ class EndDeviceStatus : public Object
     struct ReceivedPacketInfo
     {
         // Members
-        GatewayList gwList;           //!< List of gateways that received this packet.
+        GatewayList gwList; //!< List of gateways that received this packet.
         uint8_t sf;
         double frequency;
     };
 
-    typedef boost::circular_buffer<std::pair<Ptr<const Packet>, ReceivedPacketInfo>>
-        ReceivedPacketList;
+    typedef std::list<std::pair<Ptr<const Packet>, ReceivedPacketInfo>> ReceivedPacketList;
 
     /*******************************************/
     /* Proper EndDeviceStatus class definition */

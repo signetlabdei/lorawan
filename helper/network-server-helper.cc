@@ -24,16 +24,14 @@
 #include "network-server-helper.h"
 
 #include "ns3/adr-component.h"
-#include "ns3/congestion-control-component.h"
 #include "ns3/double.h"
-#include "ns3/rl-component.h"
 #include "ns3/log.h"
+#include "ns3/lora-net-device.h"
 #include "ns3/network-controller-components.h"
 #include "ns3/point-to-point-channel.h"
 #include "ns3/simulator.h"
 #include "ns3/string.h"
 #include "ns3/trace-source-accessor.h"
-#include "ns3/lora-net-device.h"
 
 namespace ns3
 {
@@ -43,13 +41,10 @@ namespace lorawan
 NS_LOG_COMPONENT_DEFINE("NetworkServerHelper");
 
 NetworkServerHelper::NetworkServerHelper()
-    : m_adrEnabled(false),
-      m_ccEnabled(false),
-      m_rlEnabled(false)
+    : m_adrEnabled(false)
 {
     m_factory.SetTypeId("ns3::NetworkServer");
     SetAdr("ns3::AdrComponent");
-    m_clusterTargets = {0.95};
 }
 
 NetworkServerHelper::~NetworkServerHelper()
@@ -146,76 +141,6 @@ NetworkServerHelper::SetAdr(std::string type)
 }
 
 void
-NetworkServerHelper::EnableCongestionControl(bool enableCC)
-{
-    NS_LOG_FUNCTION(this << enableCC);
-
-    m_ccEnabled = enableCC;
-}
-
-void
-NetworkServerHelper::EnableRl(bool enableRl)
-{
-    NS_LOG_FUNCTION(this << enableRl);
-
-    m_rlEnabled = enableRl;
-}
-
-void
-NetworkServerHelper::AssignClusters(cluster_t clustersInfo)
-{
-    int nClusters = clustersInfo.size();
-    NS_ASSERT_MSG(nClusters <= 3, "For the moment only up to 3 clusters are supported.");
-    NS_ASSERT_MSG(m_endDevices.GetN() > 0, "Devices must be set before assigning clusters.");
-    double devWeight = double(100.0) / m_endDevices.GetN();
-    uint8_t currCluster = 0;
-    double totWeight = 0;
-    for (auto i = m_endDevices.Begin(); i != m_endDevices.End(); ++i)
-    {
-        if (clustersInfo[currCluster].first == 0.0)
-            currCluster++;
-        auto loraNetDevice = DynamicCast<LoraNetDevice>((*i)->GetDevice(0));
-        NS_ASSERT(bool(loraNetDevice));
-        auto mac = DynamicCast<BaseEndDeviceLorawanMac>(loraNetDevice->GetMac());
-        NS_ASSERT(bool(mac));
-        mac->SetCluster(currCluster);
-        totWeight += devWeight;
-        if (currCluster < nClusters - 1 and
-            totWeight >= clustersInfo[currCluster].first - devWeight / 2)
-        {
-            currCluster++;
-            totWeight = 0;
-        }
-    }
-    m_clusterTargets.clear();
-    for (const auto& cluster : clustersInfo)
-        m_clusterTargets.push_back(cluster.second);
-}
-
-void
-NetworkServerHelper::AssignSingleFrequency()
-{
-    NS_ASSERT_MSG(m_endDevices.GetN() > 0, "Devices must be set before assigning frequencies.");
-    for (auto i = m_endDevices.Begin(); i != m_endDevices.End(); ++i)
-    {
-        auto loraNetDevice = DynamicCast<LoraNetDevice>((*i)->GetDevice(0));
-        NS_ASSERT(bool(loraNetDevice));
-        auto mac = DynamicCast<BaseEndDeviceLorawanMac>(loraNetDevice->GetMac());
-        NS_ASSERT(bool(mac));
-        // Assign one frequency to each cluster
-        int chid = 0;
-        for (auto& ch : mac->GetLogicalChannelManager()->GetChannelList())
-        {
-            if (chid == mac->GetCluster())
-                ch->EnableForUplink();
-            else
-                ch->DisableForUplink();
-            chid++;
-        }
-    }
-}
-
-void
 NetworkServerHelper::InstallComponents(Ptr<NetworkServer> netServer)
 {
     NS_LOG_FUNCTION(this << netServer);
@@ -232,22 +157,6 @@ NetworkServerHelper::InstallComponents(Ptr<NetworkServer> netServer)
     if (m_adrEnabled)
     {
         netServer->AddComponent(m_adrSupportFactory.Create<NetworkControllerComponent>());
-    }
-
-    // Add congestion control support
-    if (m_ccEnabled)
-    {
-        Ptr<CongestionControlComponent> ccc = CreateObject<CongestionControlComponent>();
-        ccc->SetTargets(m_clusterTargets);
-        netServer->AddComponent(ccc);
-    }
-
-    // Add inter process communication support
-    if (m_rlEnabled)
-    {
-        auto rlc = CreateObject<RlComponent>();
-        rlc->SetTargets(m_clusterTargets);
-        netServer->AddComponent(rlc);
     }
 }
 

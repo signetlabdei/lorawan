@@ -53,8 +53,8 @@ LorawanHelper::~LorawanHelper()
 
 NetDeviceContainer
 LorawanHelper::Install(const LoraPhyHelper& phyHelper,
-                    const LorawanMacHelper& macHelper,
-                    NodeContainer c) const
+                       const LorawanMacHelper& macHelper,
+                       NodeContainer c) const
 {
     NetDeviceContainer devices;
     for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i)
@@ -150,9 +150,9 @@ LorawanHelper::DoPrintSimulationTime(Time interval)
 
 void
 LorawanHelper::EnablePeriodicDeviceStatusPrinting(NodeContainer endDevices,
-                                               NodeContainer gateways,
-                                               std::string filename,
-                                               Time interval)
+                                                  NodeContainer gateways,
+                                                  std::string filename,
+                                                  Time interval)
 {
     NS_LOG_FUNCTION(this);
 
@@ -170,8 +170,8 @@ LorawanHelper::EnablePeriodicDeviceStatusPrinting(NodeContainer endDevices,
 
 void
 LorawanHelper::DoPrintDeviceStatus(NodeContainer endDevices,
-                                NodeContainer gateways,
-                                std::string filename)
+                                   NodeContainer gateways,
+                                   std::string filename)
 {
     const char* c = filename.c_str();
     std::ofstream outputFile;
@@ -227,7 +227,7 @@ LorawanHelper::DoPrintDeviceStatus(NodeContainer endDevices,
         outputFile << currentTime.GetSeconds() << " " << node->GetId() << " " << pos.x << " "
                    << pos.y << " " << pos.z << " " << gwdist << " " << dr << " "
                    << unsigned(txPower) << " " << count.sent << " " << count.received << " "
-                   << maxot << " " << ot << " " << unsigned(mac->GetCluster()) << std::endl;
+                   << maxot << " " << ot << std::endl;
     }
     m_lastDeviceStatusUpdate = Simulator::Now();
     outputFile.close();
@@ -235,8 +235,8 @@ LorawanHelper::DoPrintDeviceStatus(NodeContainer endDevices,
 
 void
 LorawanHelper::EnablePeriodicGwsPerformancePrinting(NodeContainer gateways,
-                                                 std::string filename,
-                                                 Time interval)
+                                                    std::string filename,
+                                                    Time interval)
 {
     NS_LOG_FUNCTION(this);
 
@@ -326,9 +326,9 @@ LorawanHelper::DoPrintGlobalPerformance(std::string filename)
 
 void
 LorawanHelper::EnablePeriodicSFStatusPrinting(NodeContainer endDevices,
-                                           NodeContainer gateways,
-                                           std::string filename,
-                                           Time interval)
+                                              NodeContainer gateways,
+                                              std::string filename,
+                                              Time interval)
 {
     NS_LOG_FUNCTION(this);
 
@@ -345,7 +345,9 @@ LorawanHelper::EnablePeriodicSFStatusPrinting(NodeContainer endDevices,
 }
 
 void
-LorawanHelper::DoPrintSFStatus(NodeContainer endDevices, NodeContainer gateways, std::string filename)
+LorawanHelper::DoPrintSFStatus(NodeContainer endDevices,
+                               NodeContainer gateways,
+                               std::string filename)
 {
     const char* c = filename.c_str();
     std::ofstream outputFile;
@@ -374,8 +376,7 @@ LorawanHelper::DoPrintSFStatus(NodeContainer endDevices, NodeContainer gateways,
     };
 
     using sfMap_t = std::map<int, sfStatus_t>;
-    using clusterMap_t = std::map<int, sfMap_t>;
-    clusterMap_t clusmap;
+    sfMap_t sfmap;
 
     for (NodeContainer::Iterator j = endDevices.Begin(); j != endDevices.End(); ++j)
     {
@@ -386,7 +387,7 @@ LorawanHelper::DoPrintSFStatus(NodeContainer endDevices, NodeContainer gateways,
         auto app = DynamicCast<LoraApplication>(node->GetApplication(0));
 
         int dr = int(mac->GetDataRate());
-        sfStatus_t& sfstat = clusmap[mac->GetCluster()][dr];
+        sfStatus_t& sfstat = sfmap[dr];
 
         // Sent, received
         devCount_t& count = devPktCount[node->GetId()];
@@ -417,11 +418,10 @@ LorawanHelper::DoPrintSFStatus(NodeContainer endDevices, NodeContainer gateways,
         }
     }
 
-    for (const auto& cl : clusmap)
-        for (const auto& sf : cl.second)
-            outputFile << currentTime.GetSeconds() << " " << cl.first << " " << sf.first << " "
-                       << sf.second.sent << " " << sf.second.received << " " << sf.second.totMaxOT
-                       << " " << sf.second.totAggDC << " " << sf.second.totEnergy << std::endl;
+    for (const auto& sf : sfmap)
+        outputFile << currentTime.GetSeconds() << " " << sf.first << " " << sf.second.sent << " "
+                   << sf.second.received << " " << sf.second.totMaxOT << " " << sf.second.totAggDC
+                   << " " << sf.second.totEnergy << std::endl;
 
     m_lastSFStatusUpdate = Simulator::Now();
     outputFile.close();
@@ -429,9 +429,9 @@ LorawanHelper::DoPrintSFStatus(NodeContainer endDevices, NodeContainer gateways,
 
 void
 LorawanHelper::EnablePrinting(NodeContainer endDevices,
-                           NodeContainer gateways,
-                           std::vector<enum TraceLevel> levels,
-                           Time samplePeriod)
+                              NodeContainer gateways,
+                              std::vector<enum TraceLevel> levels,
+                              Time samplePeriod)
 {
     std::vector<bool> active(5, false);
     for (auto l : levels)
@@ -465,9 +465,9 @@ LorawanHelper::EnablePrinting(NodeContainer endDevices,
 
 void
 LorawanHelper::EnablePcapInternal(std::string prefix,
-                               Ptr<NetDevice> nd,
-                               bool promiscuous,
-                               bool explicitFilename)
+                                  Ptr<NetDevice> nd,
+                                  bool promiscuous,
+                                  bool explicitFilename)
 {
     NS_LOG_FUNCTION(this << prefix << nd << promiscuous << explicitFilename);
 

@@ -24,10 +24,8 @@
 #include "lorawan-mac-helper.h"
 
 #include "ns3/class-a-end-device-lorawan-mac.h"
-#include "ns3/congestion-control-component.h"
 #include "ns3/lora-application.h"
 #include "ns3/node-list.h"
-#include "ns3/traffic-control-utils.h"
 
 namespace ns3
 {
@@ -416,96 +414,6 @@ LorawanMacHelper::SetSpreadingFactorsUp(NodeContainer endDevices,
 
     return sfQuantity;
 } //  end function
-
-void
-LorawanMacHelper::SetDutyCyclesWithCapacityModel(NodeContainer endDevices,
-                                                 NodeContainer gateways,
-                                                 Ptr<LoraChannel> channel,
-                                                 cluster_t targets,
-                                                 int beta)
-{
-    using datarate_t = std::vector<std::pair<uint32_t, double>>;
-    using gateway_t = std::vector<std::vector<datarate_t>>;
-    using output_t = std::unordered_map<uint32_t, uint8_t>;
-
-    const int N_SF = 6;
-    const int N_CL = targets.size();
-    std::vector<int> N_CH(N_CL, 0);
-
-    // Partition devices & retrieve their offered traffic and channels
-    std::map<uint32_t, gateway_t> gwgroups;
-    for (auto currGw = gateways.Begin(); currGw != gateways.End(); ++currGw)
-        gwgroups[(*currGw)->GetId()] = gateway_t(N_CL, std::vector<datarate_t>(N_SF));
-
-    for (auto j = endDevices.Begin(); j != endDevices.End(); ++j)
-    {
-        auto node = *j;
-        auto loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(0));
-        NS_ASSERT(bool(loraNetDevice));
-        auto position = node->GetObject<MobilityModel>();
-        auto mac = DynamicCast<BaseEndDeviceLorawanMac>(loraNetDevice->GetMac());
-        auto app = DynamicCast<LoraApplication>(node->GetApplication(0));
-        NS_ASSERT(bool(position) && bool(mac) && bool(app));
-
-        // Try computing the distance from each gateway and find the best one
-        auto bestGateway = gateways.Get(0);
-        // Assume devices transmit at 14 dBm erp
-        double highestRxPower =
-            channel->GetRxPower(14, position, bestGateway->GetObject<MobilityModel>());
-        for (auto currentGw = gateways.Begin() + 1; currentGw != gateways.End(); ++currentGw)
-        {
-            // Compute the power received from the current gateway
-            auto curr = *currentGw;
-            auto currPosition = curr->GetObject<MobilityModel>();
-            double currentRxPower = channel->GetRxPower(14, position, currPosition); // dBm
-            if (currentRxPower > highestRxPower)
-                bestGateway = curr;
-        }
-
-        auto tmp = Create<Packet>(app->GetPacketSize() + 13);
-        LoraPhyTxParameters params;
-        params.sf = 12 - mac->GetDataRate();
-        params.lowDataRateOptimizationEnabled =
-            LoraPhy::GetTSym(params) > MilliSeconds(16) ? true : false;
-
-        double toa = LoraPhy::GetTimeOnAir(tmp, params).GetSeconds();
-        double traffic = toa / app->GetInterval().GetSeconds();
-        traffic = (traffic > 0.01) ? 0.01 : traffic;
-
-        gwgroups[bestGateway->GetId()][mac->GetCluster()][mac->GetDataRate()].push_back(
-            {node->GetId(), traffic});
-
-        if (auto& nCh = N_CH[mac->GetCluster()]; !nCh)
-            nCh = mac->GetLogicalChannelManager()->GetEnabledChannelList().size();
-    }
-
-    // Optimize duty cycle
-    for (const auto& gw : gwgroups)
-        for (int cl = 0; cl < N_CL; ++cl)
-            for (const auto& dr : gw.second[cl])
-            {
-                double limit = CongestionControlComponent::CapacityForPDRModel(targets[cl].second) *
-                               N_CH[cl] * beta;
-                output_t out;
-                TrafficControlUtils::OptimizeDutyCycleMaxMin(dr, limit, out);
-                for (const auto& id : out)
-                {
-                    auto curr = NodeList::GetNode(id.first);
-                    auto mac = DynamicCast<BaseEndDeviceLorawanMac>(
-                        DynamicCast<LoraNetDevice>(curr->GetDevice(0))->GetMac());
-                    // Check if we need to turn off completely
-                    if (id.second == 255)
-                    {
-                        NS_LOG_DEBUG("Device " + std::to_string(curr->GetId()) + " disabled.");
-                        mac->SetAggregatedDutyCycle(0);
-                    }
-                    else if (id.second == 0)
-                        mac->SetAggregatedDutyCycle(1);
-                    else
-                        mac->SetAggregatedDutyCycle(1 / std::pow(2, double(id.second)));
-                }
-            }
-}
 
 } // namespace lorawan
 } // namespace ns3

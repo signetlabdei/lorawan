@@ -16,50 +16,6 @@ using namespace ns3;
 using namespace lorawan;
 
 /**
- * Clusters info (% devices, PDR required)
- */
-using cluster_t = std::vector<std::pair<double, double>>;
-
-/**
- * Parse clusters' info from string
- */
-cluster_t
-ParseClusterInfo(std::string s)
-{
-    std::regex rx("\\{\\{[0-9]+(\\.[0-9]+)?,0*(1(\\.0+)?|0|\\.[0-9]+)\\}"
-                  "(,\\{[0-9]+(\\.[0-9]+)?,0*(1(\\.0+)?|0|\\.[0-9]+)\\})*\\}");
-    NS_ASSERT_MSG(std::regex_match(s, rx),
-                  "Cluster vector " << s
-                                    << " ill formatted. "
-                                       "Syntax (no spaces): {{double > 0,double [0,1]},...}");
-
-    s.erase(std::remove(s.begin(), s.end(), '{'), s.end());
-    s.erase(std::remove(s.begin(), s.end(), '}'), s.end());
-
-    cluster_t clusterInfo;
-    double share = 0;
-    double pdr = 0;
-
-    std::string d = ",";
-    size_t pos = 0;
-    double tot = 0;
-    while ((pos = s.find(d)) != std::string::npos)
-    {
-        share = std::stod(s.substr(0, pos));
-        s.erase(0, pos + d.length());
-        tot += share;
-
-        pos = s.find(d);
-        pdr = std::stod(s.substr(0, pos));
-        s.erase(0, pos + d.length());
-
-        clusterInfo.push_back({share, pdr});
-    }
-    NS_ASSERT_MSG(tot == 100.0, "Total share among clusters must be 100%.");
-    return clusterInfo;
-}
-
-/**
  * \brief Computes total deployment area
  *
  * Computes total deployment area in range of gateways placed with

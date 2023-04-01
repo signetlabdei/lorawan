@@ -69,27 +69,3 @@ build_lib_example(
     ${libcore}
     ${liblorawan}
 )
-
-build_lib_example(
-  NAME chirpstack-example
-  SOURCE_FILES chirpstack-example.cc
-  LIBRARIES_TO_LINK
-    ${libcore}
-    ${liblorawan}
-)
-
-build_lib_example(
-  NAME congestion-example
-  SOURCE_FILES congestion-example.cc
-  LIBRARIES_TO_LINK
-    ${libcore}
-    ${liblorawan}
-)
-
-build_lib_example(
-  NAME rl-example
-  SOURCE_FILES rl-example.cc
-  LIBRARIES_TO_LINK
-    ${libcore}
-    ${liblorawan}
-)

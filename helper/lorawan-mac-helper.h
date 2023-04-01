@@ -36,8 +36,6 @@ namespace lorawan
 
 class LorawanMacHelper
 {
-    using cluster_t = std::vector<std::pair<double, double>>;
-
   public:
     /**
      * Define the operational region.
@@ -98,12 +96,6 @@ class LorawanMacHelper
     static std::vector<int> SetSpreadingFactorsUp(NodeContainer endDevices,
                                                   NodeContainer gateways,
                                                   Ptr<LoraChannel> channel);
-    
-    static void SetDutyCyclesWithCapacityModel(NodeContainer endDevices,
-                                               NodeContainer gateways,
-                                               Ptr<LoraChannel> channel,
-                                               cluster_t targets,
-                                               int beta = 1);
 
   private:
     /**
