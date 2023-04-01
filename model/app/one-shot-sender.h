@@ -54,7 +54,6 @@ class OneShotSender : public LoraApplication
      * Start the application by scheduling the first SendPacket event.
      */
     void StartApplication(void);
-
 };
 
 } // namespace lorawan

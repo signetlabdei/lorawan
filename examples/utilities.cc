@@ -3,9 +3,9 @@
  */
 
 #include "ns3/log.h"
-#include "ns3/lorawan-helper.h"
 #include "ns3/lora-interference-helper.h"
 #include "ns3/lora-tag.h"
+#include "ns3/lorawan-helper.h"
 
 #include <csignal>
 #include <iomanip>

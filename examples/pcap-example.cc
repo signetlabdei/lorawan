@@ -5,13 +5,13 @@
  */
 
 #include "ns3/core-module.h"
-#include "ns3/propagation-loss-model.h"
-#include "ns3/mobility-helper.h"
-#include "ns3/lorawan-helper.h"
-#include "ns3/network-server-helper.h"
 #include "ns3/forwarder-helper.h"
+#include "ns3/lorawan-helper.h"
+#include "ns3/mobility-helper.h"
+#include "ns3/network-server-helper.h"
 #include "ns3/periodic-sender-helper.h"
 #include "ns3/point-to-point-helper.h"
+#include "ns3/propagation-loss-model.h"
 
 using namespace ns3;
 using namespace lorawan;
@@ -189,7 +189,7 @@ main(int argc, char* argv[])
 
     // Create a forwarder for each gateway
     forHelper.Install(gateways);
-    
+
     ////////////////
     // Simulation //
     ////////////////

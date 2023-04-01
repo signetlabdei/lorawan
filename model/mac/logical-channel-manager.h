@@ -184,12 +184,11 @@ class LogicalChannelManager : public Object
      * \param chIndex The index of the channel to disable.
      */
     void DisableChannel(uint8_t chIndex);
-  
+
   protected:
     void DoDispose() override;
 
   private:
-
     /**
      * A list of the SubBands that are currently registered within this helper.
      */

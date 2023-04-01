@@ -3,10 +3,10 @@
  * packet to the gateway.
  */
 
+#include "ns3/base-end-device-lorawan-mac.h"
 #include "ns3/command-line.h"
 #include "ns3/constant-position-mobility-model.h"
 #include "ns3/end-device-lora-phy.h"
-#include "ns3/base-end-device-lorawan-mac.h"
 #include "ns3/gateway-lora-phy.h"
 #include "ns3/gateway-lorawan-mac.h"
 #include "ns3/log.h"

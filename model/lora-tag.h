@@ -162,12 +162,12 @@ class LoraTag : public Tag
 
   private:
     LoraPhyTxParameters m_params; //!< The PHY transmission parameters of this packet
-    uint8_t m_dataRate;        //!< The data rate of this packet
-    double m_frequency;        //!< The frequency of this packet
-    uint8_t m_destroyedBy;     //!< The Spreading Factor that destroyed the packet.
-    Time m_receptionTime;      //!< The time at which reception was completed for this packet
-    double m_receivePower;     //!< The reception power of this packet.
-    double m_snr;              //!< The SNR of this packet during demodulation
+    uint8_t m_dataRate;           //!< The data rate of this packet
+    double m_frequency;           //!< The frequency of this packet
+    uint8_t m_destroyedBy;        //!< The Spreading Factor that destroyed the packet.
+    Time m_receptionTime;         //!< The time at which reception was completed for this packet
+    double m_receivePower;        //!< The reception power of this packet.
+    double m_snr;                 //!< The SNR of this packet during demodulation
 };
 } // namespace lorawan
 } // namespace ns3

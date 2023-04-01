@@ -1803,8 +1803,8 @@ class LorawanTestSuite : public TestSuite
 LorawanTestSuite::LorawanTestSuite()
     : TestSuite("lorawan", UNIT)
 {
-    //LogComponentEnable("LorawanTestSuite", LOG_LEVEL_DEBUG);
-    // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
+    // LogComponentEnable("LorawanTestSuite", LOG_LEVEL_DEBUG);
+    //  TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
     AddTestCase(new InterferenceTest, TestCase::QUICK);
     AddTestCase(new AddressTest, TestCase::QUICK);
     AddTestCase(new HeaderTest, TestCase::QUICK);

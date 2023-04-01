@@ -335,7 +335,8 @@ ClassAEndDeviceLorawanMac::DoInitialize()
 {
     NS_LOG_FUNCTION(this);
     auto phy = DynamicCast<EndDeviceLoraPhy>(m_phy);
-    NS_ABORT_MSG_UNLESS(bool(phy) != 0, "This object requires an EndDeviceLoraPhy installed to work");
+    NS_ABORT_MSG_UNLESS(bool(phy) != 0,
+                        "This object requires an EndDeviceLoraPhy installed to work");
     m_rwm->SetPhy(phy);
     BaseEndDeviceLorawanMac::DoInitialize();
 }

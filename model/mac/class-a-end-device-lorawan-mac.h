@@ -27,8 +27,8 @@
 #ifndef CLASS_A_END_DEVICE_LORAWAN_MAC_H
 #define CLASS_A_END_DEVICE_LORAWAN_MAC_H
 
-#include "ns3/recv-window-manager.h"
 #include "ns3/base-end-device-lorawan-mac.h"
+#include "ns3/recv-window-manager.h"
 
 // #include "ns3/traced-value.h"
 
