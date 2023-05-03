@@ -374,9 +374,6 @@ MAC layer details
 Some details that are not crucial for the evaluation of the system performance
 of a network still need to be implemented. These include:
 
-- Frame counters, both at the End Devices and at the Network Server's
-  DeviceStatus
-- Proper setting of ADR flags (no ADR mechanism is implemented still)
 - Join procedure management (both at the NS and at the EDs)
 
 Usage
