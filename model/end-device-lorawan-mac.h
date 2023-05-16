@@ -31,6 +31,7 @@
 #include "ns3/random-variable-stream.h"
 #include "ns3/lora-device-address.h"
 #include "ns3/traced-value.h"
+#include "ns3/network-server.h"
 
 namespace ns3 {
 namespace lorawan {
@@ -223,10 +224,6 @@ public:
    */
   void ApplyNecessaryOptions (LorawanMICTrailer& micTrlr);
   
-  void ApplyNecessaryOptions (LorawanMICTrailer& micTrlr, bool isuplink, bool isLorawan_1_1, bool isAck, uint16_t fcnt, 
-                                                    uint32_t devaddr, uint32_t xFCntDwn, uint32_t FCntUp, uint8_t msgLen, uint8_t *msg, uint8_t SNwkSIntKey[16], 
-                                                    uint8_t FNwkSIntKey[16], uint8_t txch);
-  
   /**
    * Set the message type to send when the Send method is called.
    */
@@ -340,6 +337,8 @@ public:
    * packet.
    */
   void AddMacCommand (Ptr<MacCommand> macCommand);
+  
+  void SetNwkServer(Ptr<NetworkServer> nwkServer);
 
 protected:
   /**
@@ -429,6 +428,10 @@ protected:
    * the channel list.
    */
   Ptr<UniformRandomVariable> m_uniformRV;
+  
+  Ptr<NetworkServer> m_networkServer;
+  
+  uint32_t m_joinNonce; /*  should be 3 bytes long   */
 
   /////////////////
   //  Callbacks  //

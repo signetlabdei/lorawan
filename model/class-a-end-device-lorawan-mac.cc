@@ -150,7 +150,7 @@ ClassAEndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
   // Remove the Mac Header to get some information
   LorawanMacHeader mHdr;
   packetCopy->RemoveHeader (mHdr);
-
+      
   NS_LOG_DEBUG ("Mac Header: " << mHdr);
 
   // Only keep analyzing the packet if it's downlink
@@ -176,7 +176,26 @@ ClassAEndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
           // THIS WILL BE GetReceiveWindow()
           Simulator::Cancel (m_secondReceiveWindow);
 
-
+            if (mHdr.GetMType() == JOIN_ACCEPT)
+            {
+                uint8_t temp[3];
+                uint32_t newJoinNonce = 0;
+                packetCopy->CopyData(temp, 3);  /*  get the new joinNonce value */
+                
+                for (i = 0;i < 3;i++)
+                {
+                    newJoinNonce <<= 8;
+                    newJoinNonce |= temp[i];
+                }
+                
+                if (newJoinNonce > m_joinNonce)
+                {
+                    /*  update is value is greater  */
+                    m_joinNonce = newJoinNonce;
+                }
+                
+            }
+          
           // Parse the MAC commands
           ParseCommands (fHdr);
 

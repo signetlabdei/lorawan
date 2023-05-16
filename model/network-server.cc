@@ -145,6 +145,8 @@ NetworkServer::AddNode (Ptr<Node> node)
   Ptr<ClassAEndDeviceLorawanMac> edLorawanMac =
     loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
 
+  edLorawanMac->SetNwkServer(this);
+    
   // Update the NetworkStatus about the existence of this node
   m_status->AddNode (edLorawanMac);
 }
@@ -185,6 +187,19 @@ Ptr<NetworkStatus>
 NetworkServer::GetNetworkStatus (void)
 {
   return m_status;
+}
+
+bool 
+NetworkServer::IsVersion1(void) const
+{
+    return m_isVersion1;
+}
+
+void
+NetworkServer::SetIsVersion1(bool isVersion1)
+{
+    m_isVersion1 = isVersion1;
+    return;
 }
 
 }
