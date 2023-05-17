@@ -431,8 +431,20 @@ protected:
   
   Ptr<NetworkServer> m_networkServer;
   
-  uint32_t m_joinNonce; /*  should be 3 bytes long   */
-
+  uint32_t m_joinNonce; /*  join accept count - should be 3 bytes long   */
+  
+  uint16_t m_devNonce;  /*  join request count  */
+  
+   /**
+    * The RX1DROffset parameter value
+    */
+  uint8_t m_rx1DrOffset;
+  
+  /**
+   * The Data Rate to listen for during the second downlink transmission.
+   */
+  uint8_t m_secondReceiveWindowDataRate;
+  
   /////////////////
   //  Callbacks  //
   /////////////////

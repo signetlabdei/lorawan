@@ -203,15 +203,6 @@ private:
    */
   double m_secondReceiveWindowFrequency;
 
-  /**
-   * The Data Rate to listen for during the second downlink transmission.
-   */
-  uint8_t m_secondReceiveWindowDataRate;
-
-  /**
-   * The RX1DROffset parameter value
-   */
-  uint8_t m_rx1DrOffset;
 
 }; /* ClassAEndDeviceLorawanMac */
 } /* namespace lorawan */

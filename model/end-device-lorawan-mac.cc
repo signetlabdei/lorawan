@@ -127,7 +127,8 @@ EndDeviceLorawanMac::EndDeviceLorawanMac ()
       m_aggregatedDutyCycle (1),
       m_mType (LorawanMacHeader::CONFIRMED_DATA_UP),
       m_currentFCnt (0),
-      m_joinNonce (0)
+      m_joinNonce (0),
+      m_devNonce (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -537,7 +538,10 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMacHeader& macHeader)
 //      *   Network ID              =>  m_address.GetNwkID()
 //      *   Network Addresss        =>  m_address.GetNwkID()
 //      *   Network Server Version  =>  m_networkServer->IsVersion1()
-//      *   JoinNonce               => m_joinNonce
+//      *   JoinNonce               =>  m_joinNonce
+//      *   RX1DROffset             =>  m_rx1DROffset
+//      *   RX2DataRate             =>  m_secondReceiveWindowDataRate
+//      *   DevNonce                =>  m_devNonce
 //      */
 //     
 //     micTrlr.GenerateB0UL (B0, m_address.GetNwkAddr(), FCntUp, msgLen);

@@ -90,6 +90,15 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
       m_dataRate = m_dataRate - 1;
     }
 
+  Ptr<Packet> packetCopy = packetToSend->Copy();
+  LorawanMacHeader mHdr;
+  packetCopy->RemoveHeader(mHdr);
+  
+  if (mHdr.GetMType() == JOIN_REQUEST)
+  {
+    m_devNonce++;
+  }
+    
   // Craft LoraTxParameters object
   LoraTxParameters params;
   params.sf = GetSfFromDataRate (m_dataRate);
