@@ -340,6 +340,12 @@ public:
   
   void SetNwkServer(Ptr<NetworkServer> nwkServer);
 
+  void SetNwkKey(uint8_t nwkKey[16]);
+  void GetNwkKey(uint8_t nwkKey[16]) const;
+  
+  void SetJoinEUI(uint8_t joinEUI[16]);
+  void GetJoinEUI(uint8_t joinEUI[16]) const;
+  
 protected:
   /**
    * Structure representing the parameters that will be used in the
@@ -517,6 +523,9 @@ private:
   LorawanMacHeader::MType m_mType;
 
   uint16_t m_currentFCnt;
+  
+  uint8_t m_nwkKey[16];
+  uint8_t m_joinEUI[16];
 };
 
 

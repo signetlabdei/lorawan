@@ -127,8 +127,8 @@ EndDeviceLorawanMac::EndDeviceLorawanMac ()
       m_aggregatedDutyCycle (1),
       m_mType (LorawanMacHeader::CONFIRMED_DATA_UP),
       m_currentFCnt (0),
-      m_joinNonce (0),
-      m_devNonce (0)
+      m_joinNonce (1),
+      m_devNonce (1)
 {
   NS_LOG_FUNCTION (this);
 
@@ -320,7 +320,7 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           packet->AddHeader (macHdr);
           
           micTrlr = LorawanMICTrailer ();
-            //ApplyNecessaryOptions (micTrlr);
+          ApplyNecessaryOptions (micTrlr);
           packet->AddTrailer (micTrlr);
           
           m_retxParams.retxLeft = m_retxParams.retxLeft - 1;           // decreasing the number of retransmissions
@@ -542,6 +542,12 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMacHeader& macHeader)
 //      *   RX1DROffset             =>  m_rx1DROffset
 //      *   RX2DataRate             =>  m_secondReceiveWindowDataRate
 //      *   DevNonce                =>  m_devNonce
+//      *   NwkKey                  =>  m_nwkKey
+//      *   JoinEUI                 =>  m_joinEUI
+//      *   FCntUp                  =>  m_currentFCnt
+//      *   TxDR                    =>  m_dataRate
+//      *   TxCh                    =>
+//      *   ConfFCnt                =>  0x0000
 //      */
 //     
 //     micTrlr.GenerateB0UL (B0, m_address.GetNwkAddr(), FCntUp, msgLen);
@@ -1008,5 +1014,58 @@ EndDeviceLorawanMac::GetTransmissionPower (void)
 {
   return m_txPower;
 }
+
+void 
+EndDeviceLorawanMac::SetNwkKey(uint8_t nwkKey[16])
+{
+    unsigned int i;
+    
+    for (i = 0;i < 16;i++)
+    {
+        m_nwkKey[i] = nwkKey[i];
+    }
+    
+    return;
+}
+
+void
+EndDeviceLorawanMac::GetNwkKey(uint8_t nwkKey[16]) const
+{
+    unsigned int i;
+    
+    for (i = 0;i < 16;i++)
+    {
+        nwkKey[i] = m_nwkKey[i];
+    }
+    
+    return;
+}
+
+void 
+EndDeviceLorawanMac::SetJoinEUI(uint8_t joinEUI[16])
+{
+    unsigned int i;
+    
+    for (i = 0;i < 16;i++)
+    {
+        m_joinEUI[i] = joinEUI[i];
+    }
+    
+    return;
+}
+
+void
+EndDeviceLorawanMac::GetJoinEUI(uint8_t joinEUI[16]) const
+{
+    unsigned int i;
+    
+    for (i = 0;i < 16;i++)
+    {
+        joinEUI[i] = m_joinEUI[i];
+    }
+    
+    return;
+}
+
 }
 }

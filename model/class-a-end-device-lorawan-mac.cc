@@ -94,10 +94,10 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
   LorawanMacHeader mHdr;
   packetCopy->RemoveHeader(mHdr);
   
-  if (mHdr.GetMType() == JOIN_REQUEST)
-  {
-    m_devNonce++;
-  }
+//   if (mHdr.GetMType() == JOIN_REQUEST)
+//   {
+//     m_devNonce++;
+//   }
     
   // Craft LoraTxParameters object
   LoraTxParameters params;
@@ -185,25 +185,25 @@ ClassAEndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
           // THIS WILL BE GetReceiveWindow()
           Simulator::Cancel (m_secondReceiveWindow);
 
-            if (mHdr.GetMType() == JOIN_ACCEPT)
-            {
-                uint8_t temp[3];
-                uint32_t newJoinNonce = 0;
-                packetCopy->CopyData(temp, 3);  /*  get the new joinNonce value */
-                
-                for (i = 0;i < 3;i++)
-                {
-                    newJoinNonce <<= 8;
-                    newJoinNonce |= temp[i];
-                }
-                
-                if (newJoinNonce > m_joinNonce)
-                {
-                    /*  update is value is greater  */
-                    m_joinNonce = newJoinNonce;
-                }
-                
-            }
+//             if (mHdr.GetMType() == JOIN_ACCEPT)
+//             {
+//                 uint8_t temp[3];
+//                 uint32_t newJoinNonce = 0;
+//                 packetCopy->CopyData(temp, 3);  /*  get the new joinNonce value */
+//                 
+//                 for (i = 0;i < 3;i++)
+//                 {
+//                     newJoinNonce <<= 8;
+//                     newJoinNonce |= temp[i];
+//                 }
+//                 
+//                 if (newJoinNonce > m_joinNonce)
+//                 {
+//                     /*  update is value is greater  */
+//                     m_joinNonce = newJoinNonce;
+//                 }
+//                 
+//             }
           
           // Parse the MAC commands
           ParseCommands (fHdr);
