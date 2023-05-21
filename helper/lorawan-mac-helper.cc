@@ -32,6 +32,10 @@ NS_LOG_COMPONENT_DEFINE ("LorawanMacHelper");
 
 LorawanMacHelper::LorawanMacHelper () : m_region (LorawanMacHelper::EU)
 {
+    m_CurNwkKey = {   0, 0, 0, 0,
+                    0, 0, 0, 0, 
+                    0, 0, 0, 0,
+                    0, 0, 0, 0};
 }
 
 void
@@ -106,6 +110,9 @@ LorawanMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
             break;
           }
         }
+        
+        mac->SetNwkKey(m_CurNwkKey);
+        GenerateNwkKey();
     }
   else
     {
@@ -667,6 +674,29 @@ LorawanMacHelper::SetSpreadingFactorsGivenDistribution (NodeContainer endDevices
   return sfQuantity;
 
 } //  end function
+
+void
+LorawanMacHelper::GenerateNwkKey(void)
+{
+    /*  just increment from the last one    */
+    int i;
+    
+    for (i = 15;i >= 0;i--)
+    {
+        if (m_CurNwkKey[i] == 255)
+        {
+            /*  carry over to next byte */
+            m_CurNwkKey[i] = 0;
+        }
+        else
+        {
+            m_CurNwkKey[i]++;
+            break;
+        }
+    }
+    
+    return;
+}
 
 } // namespace lorawan
 } // namespace ns3

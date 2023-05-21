@@ -166,10 +166,14 @@ private:
    */
   void ApplyCommonAlohaConfigurations (Ptr<LorawanMac> lorawanMac) const;
 
+  virtual void GenerateNwkKey(void);
+  
   ObjectFactory m_mac;
   Ptr<LoraDeviceAddressGenerator> m_addrGen; //!< Pointer to the address generator to use
   enum DeviceType m_deviceType; //!< The kind of device to install
   enum Regions m_region; //!< The region in which the device will operate
+  
+  uint8_t m_CurNwkKey[16];
 };
 
 } // namespace lorawan
