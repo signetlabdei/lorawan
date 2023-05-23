@@ -239,9 +239,11 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       ApplyNecessaryOptions (macHdr);
       packet->AddHeader (macHdr);
       
+      m_txCh = GetChannelForTx();
+      
       //Add MIC trailer
       LorawanMICTrailer micTrlr;
-        //ApplyNecessaryOptions (micTrlr);
+      ApplyNecessaryOptions (micTrlr);
       packet->AddTrailer (micTrlr);
       
       // Reset MAC command list
@@ -275,7 +277,7 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
 
           NS_LOG_INFO ("Added MAC header of size " << macHdr.GetSerializedSize () <<
                        " bytes.");
-
+          
           // Sent a new packet
           NS_LOG_DEBUG ("Copied packet: " << m_retxParams.packet);
           m_sentNewPacket (m_retxParams.packet);
@@ -314,6 +316,8 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           NS_LOG_INFO ("Added frame header of size " << frameHdr.GetSerializedSize () <<
                        " bytes.");
 
+          m_txCh = GetChannelForTx();
+          
           // Add the Lorawan Mac header to the packet
           macHdr = LorawanMacHeader ();
           ApplyNecessaryOptions (macHdr);
@@ -546,7 +550,7 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMacHeader& macHeader)
 //      *   JoinEUI                 =>  m_joinEUI
 //      *   FCntUp                  =>  m_currentFCnt
 //      *   TxDR                    =>  m_dataRate
-//      *   TxCh                    =>
+//      *   TxCh                    =>  m_txChIndex (check (m_txCh == 0))
 //      *   ConfFCnt                =>  0x0000
 //      */
 //     
@@ -632,7 +636,7 @@ EndDeviceLorawanMac::GetNextTransmissionDelay (void)
   return waitingTime;
 }
 
-Ptr<LogicalLoraChannel>
+uint8_t
 EndDeviceLorawanMac::GetChannelForTx (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
@@ -644,7 +648,9 @@ EndDeviceLorawanMac::GetChannelForTx (void)
 
   // Try every channel
   std::vector<Ptr<LogicalLoraChannel> >::iterator it;
-  for (it = logicalChannels.begin (); it != logicalChannels.end (); ++it)
+  unsigned int i;
+  
+  for (it = logicalChannels.begin (), i = 0; it != logicalChannels.end (); ++it, i++)
     {
       // Pointer to the current channel
       Ptr<LogicalLoraChannel> logicalChannel = *it;
@@ -661,7 +667,8 @@ EndDeviceLorawanMac::GetChannelForTx (void)
       // Send immediately if we can
       if (waitingTime == Seconds (0))
         {
-          return *it;
+          m_txCh = *it;
+          return i;
         }
       else
         {
@@ -669,7 +676,9 @@ EndDeviceLorawanMac::GetChannelForTx (void)
                         "the current channel because of duty cycle limitations.");
         }
     }
-  return 0;                 // In this case, no suitable channel was found
+    
+  m_txCh =  0;                 // In this case, no suitable channel was found
+  return 0;
 }
 
 
@@ -1042,11 +1051,11 @@ EndDeviceLorawanMac::GetNwkKey(uint8_t nwkKey[16]) const
 }
 
 void 
-EndDeviceLorawanMac::SetJoinEUI(uint8_t joinEUI[16])
+EndDeviceLorawanMac::SetJoinEUI(uint8_t joinEUI[8])
 {
     unsigned int i;
     
-    for (i = 0;i < 16;i++)
+    for (i = 0;i < 8;i++)
     {
         m_joinEUI[i] = joinEUI[i];
     }
@@ -1055,16 +1064,51 @@ EndDeviceLorawanMac::SetJoinEUI(uint8_t joinEUI[16])
 }
 
 void
-EndDeviceLorawanMac::GetJoinEUI(uint8_t joinEUI[16]) const
+EndDeviceLorawanMac::GetJoinEUI(uint8_t joinEUI[8]) const
 {
     unsigned int i;
     
-    for (i = 0;i < 16;i++)
+    for (i = 0;i < 8;i++)
     {
         joinEUI[i] = m_joinEUI[i];
     }
     
     return;
+}
+
+void
+EndDeviceLorawanMac::SetJoinNonce(uint32_t joinNonce)
+{
+    /*  three bytes long and should be at least one to be in the network    */
+    if (joinNonce > 0 && joinNonce < 0x01000000)
+    {
+        m_joinNonce = joinNonce;
+    }
+    
+    return;
+}
+
+uint32_t
+EndDeviceLorawanMac::GetJoinNonce(void) const
+{
+    return m_joinNonce;
+}
+
+void
+EndDeviceLorawanMac::SetDevNonce(uint16_t devNonce)
+{
+    if (devNonce > 0)
+    {
+        m_devNonce = devNonce;
+    }
+    
+    return;
+}
+
+uint16_t
+EndDeviceLorawanMac::GetDevNonce(void) const
+{
+    return m_devNonce;
 }
 
 }

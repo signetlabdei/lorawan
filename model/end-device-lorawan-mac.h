@@ -340,11 +340,17 @@ public:
   
   void SetNwkServer(Ptr<NetworkServer> nwkServer);
 
+  void SetJoinNonce(uint32_t joinNonce);
+  uint32_t GetJoinNonce(void) const;
+  
+  void SetDevNonce(uint16_t devNonce);
+  uint16_t GetDevNonce(void) const;
+  
   void SetNwkKey(uint8_t nwkKey[16]);
   void GetNwkKey(uint8_t nwkKey[16]) const;
   
-  void SetJoinEUI(uint8_t joinEUI[16]);
-  void GetJoinEUI(uint8_t joinEUI[16]) const;
+  void SetJoinEUI(uint8_t joinEUI[8]);
+  void GetJoinEUI(uint8_t joinEUI[8]) const;
   
 protected:
   /**
@@ -405,7 +411,7 @@ protected:
    * ones that are available in the ED's LogicalLoraChannel, based on their duty
    * cycle limitations.
    */
-  Ptr<LogicalLoraChannel> GetChannelForTx (void);
+  uint8_t GetChannelForTx (void);
 
   /**
    * The duration of a receive window in number of symbols. This should be
@@ -450,6 +456,10 @@ protected:
    * The Data Rate to listen for during the second downlink transmission.
    */
   uint8_t m_secondReceiveWindowDataRate;
+  
+  Ptr<LogicalLoraChannel> m_txCh;
+  
+  uint8_t m_txChIndex;
   
   /////////////////
   //  Callbacks  //
@@ -525,7 +535,7 @@ private:
   uint16_t m_currentFCnt;
   
   uint8_t m_nwkKey[16];
-  uint8_t m_joinEUI[16];
+  uint8_t m_joinEUI[8];
 };
 
 

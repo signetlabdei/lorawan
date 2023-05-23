@@ -32,9 +32,12 @@ NS_LOG_COMPONENT_DEFINE ("LorawanMacHelper");
 
 LorawanMacHelper::LorawanMacHelper () : m_region (LorawanMacHelper::EU)
 {
-    m_CurNwkKey = {   0, 0, 0, 0,
+    m_CurNwkKey = { 0, 0, 0, 0,
                     0, 0, 0, 0, 
                     0, 0, 0, 0,
+                    0, 0, 0, 0};
+    
+    m_CurJoinEUI = {0, 0, 0, 0
                     0, 0, 0, 0};
 }
 
@@ -113,6 +116,8 @@ LorawanMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
         
         mac->SetNwkKey(m_CurNwkKey);
         GenerateNwkKey();
+        mac->SetJoinEUI(m_CurJoinEUI);
+        GenerateJoinEUI();
     }
   else
     {
@@ -691,6 +696,29 @@ LorawanMacHelper::GenerateNwkKey(void)
         else
         {
             m_CurNwkKey[i]++;
+            break;
+        }
+    }
+    
+    return;
+}
+
+void
+LorawanMacHelper::GenerateJoinEUI(void)
+{
+    /*  just increment from the last one    */
+    int i;
+    
+    for (i = 7;i >= 0;i--)
+    {
+        if (m_CurJoinEUI[i] == 255)
+        {
+            /*  carry over to next byte */
+            m_CurJoinEUI[i] = 0;
+        }
+        else
+        {
+            m_CurJoinEUI[i]++;
             break;
         }
     }
