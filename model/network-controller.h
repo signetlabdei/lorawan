@@ -25,6 +25,7 @@
 #include "ns3/packet.h"
 #include "ns3/network-status.h"
 #include "ns3/network-controller-components.h"
+#include "ns3/end-device-status.h"
 
 namespace ns3 {
 namespace lorawan {

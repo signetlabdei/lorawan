@@ -222,7 +222,7 @@ public:
   /**
    * Add the necessary options and to the LorawanMICTrailer.
    */
-  void ApplyNecessaryOptions (LorawanMICTrailer& micTrlr);
+  void ApplyNecessaryOptions (LorawanMICTrailer& micTrlr, uint8_t *msg, uint8_t len);
   
   /**
    * Set the message type to send when the Send method is called.
@@ -347,10 +347,10 @@ public:
   uint16_t GetDevNonce(void) const;
   
   void SetNwkKey(uint8_t nwkKey[16]);
-  void GetNwkKey(uint8_t nwkKey[16]) const;
+  void GetNwkKey(uint8_t nwkKey[16]);
   
   void SetJoinEUI(uint8_t joinEUI[8]);
-  void GetJoinEUI(uint8_t joinEUI[8]) const;
+  void GetJoinEUI(uint8_t joinEUI[8]);
   
 protected:
   /**
@@ -443,10 +443,6 @@ protected:
   
   Ptr<NetworkServer> m_networkServer;
   
-  uint32_t m_joinNonce; /*  join accept count - should be 3 bytes long   */
-  
-  uint16_t m_devNonce;  /*  join request count  */
-  
    /**
     * The RX1DROffset parameter value
     */
@@ -533,6 +529,10 @@ private:
   LorawanMacHeader::MType m_mType;
 
   uint16_t m_currentFCnt;
+  
+  uint32_t m_joinNonce; /*  join accept count - should be 3 bytes long   */
+  
+  uint16_t m_devNonce;  /*  join request count  */
   
   uint8_t m_nwkKey[16];
   uint8_t m_joinEUI[8];

@@ -19,7 +19,6 @@ private:
     void padding_128 (uint8_t *in, uint8_t out[16], unsigned int length);
     
     /*  AES-128 funcs taken from NIST publication   */
-    void aes128 (uint8_t K[16], uint8_t M[16], uint8_t O[16]);
     void aes128_subbytes (uint8_t state[4][4], const uint8_t sbox[16][16]);
     void aes128_shiftrows (uint8_t state[4][4]);
     void aes128_mixcolumns (uint8_t state[4][4]);
@@ -42,11 +41,13 @@ public:
     virtual uint32_t Deserialize (Buffer::Iterator end);
     virtual void Print (std::ostream &os) const;
     
+    void aes128 (uint8_t K[16], uint8_t M[16], uint8_t O[16]);
+    
     uint32_t GetMIC (void) const;
     void SetMIC (uint32_t newMIC);
     uint32_t CalcMIC (uint8_t msgLen, uint8_t *msg, uint8_t B0[16], uint8_t xNwkSIntKey[16]);    /*  Bx and xNwkSIntKey need to be 16 bytes (128 bits) each, uint128_t is not guranteed to be supported */
     uint32_t CalcMIC_1_1_UL(uint8_t msgLen, uint8_t *msg, uint8_t B0[16], uint8_t B1[16], uint8_t SNwkSIntKey[16], uint8_t FNwkSIntKey[16]);    /*  special case for UL for 1.1 LoRaWAN network servers */
-    bool VerifyMIC (uint8_t msgLen, uint8_t *msg,uint8_t B0[16], uint8_t xNwkSIntKey[16]);
+    bool VerifyMIC (uint8_t msgLen, uint8_t *msg, uint8_t B0[16], uint8_t xNwkSIntKey[16]);
     bool VerifyMIC_1_1_UL (uint8_t msgLen, uint8_t *msg, uint8_t B0[16], uint8_t B1[16], uint8_t SNwkSIntKey[16], uint8_t FNwkSIntKey[16]);
     
     /*  for making B0 and B1   */

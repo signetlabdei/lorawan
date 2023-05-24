@@ -216,6 +216,11 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       m_currentFCnt++;
       NS_LOG_DEBUG ("APP packet: " << packet << ".");
 
+      /*    for MIC calculation later   */
+      uint8_t msglen = packet->GetSize();
+      std::vector<uint8_t> msg(msglen);
+      packet->CopyData(msg.data(), msglen);
+      
       // Add the Lora Frame Header to the packet
       LoraFrameHeader frameHdr;
       ApplyNecessaryOptions (frameHdr);
@@ -243,7 +248,7 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       
       //Add MIC trailer
       LorawanMICTrailer micTrlr;
-      ApplyNecessaryOptions (micTrlr);
+      ApplyNecessaryOptions (micTrlr, msg, msglen);
       packet->AddTrailer (micTrlr);
       
       // Reset MAC command list
@@ -307,6 +312,10 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           packet->RemoveHeader(macHdr);
           packet->RemoveHeader(frameHdr);
           
+          /*    for MIC calculation later   */
+          uint8_t msglen = packet->GetSize();
+          std::vector<uint8_t> msg(msglen);
+          packet->CopyData(msg.data(), msglen);
           
           // Add the Lora Frame Header to the packet
           frameHdr = LoraFrameHeader ();
@@ -324,7 +333,7 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           packet->AddHeader (macHdr);
           
           micTrlr = LorawanMICTrailer ();
-          ApplyNecessaryOptions (micTrlr);
+          ApplyNecessaryOptions (micTrlr, msg, msglen);
           packet->AddTrailer (micTrlr);
           
           m_retxParams.retxLeft = m_retxParams.retxLeft - 1;           // decreasing the number of retransmissions
@@ -519,63 +528,94 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMacHeader& macHeader)
   macHeader.SetMajor (1);
 }
 
-// void
-// EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMICTrailer& micTrlr)
-// {
-//     uint8_t B0[16];
-//     uint8_t B1[16];
-//     uint16_t ConfFCnt;
-//     uint32_t mic_temp;
-//     
-//     NS_LOG_FUNCTION_NOARGS ();
-//     
-//     if (isLorawan_1_1 && isAck)
-//     {
-//         ConfFCnt = fcnt;    /*  only value is of uint16_t so modding by 2^16 does nothing? maybe misunderstanding smth  */
-//     }
-//     else
-//     {
-//         ConfFCnt = 0x0000;
-//     }
-//     
-//     /*
-//      *   Network ID              =>  m_address.GetNwkID()
-//      *   Network Addresss        =>  m_address.GetNwkID()
-//      *   Network Server Version  =>  m_networkServer->IsVersion1()
-//      *   JoinNonce               =>  m_joinNonce
-//      *   RX1DROffset             =>  m_rx1DROffset
-//      *   RX2DataRate             =>  m_secondReceiveWindowDataRate
-//      *   DevNonce                =>  m_devNonce
-//      *   NwkKey                  =>  m_nwkKey
-//      *   JoinEUI                 =>  m_joinEUI
-//      *   FCntUp                  =>  m_currentFCnt
-//      *   TxDR                    =>  m_dataRate
-//      *   TxCh                    =>  m_txChIndex (check (m_txCh == 0))
-//      *   ConfFCnt                =>  0x0000
-//      */
-//     
-//     micTrlr.GenerateB0UL (B0, m_address.GetNwkAddr(), FCntUp, msgLen);
-//         
-//     if (isLorawan_1_1)
-//     {
-//         micTrlr.GenerateB1UL (B1, ConfFCnt, m_dataRate, txch, m_address.GetNwkAddr(), FCntUp, msgLen);
-//         mic_temp = micTrlr.CalcMIC_1_1_UL (msgLen, msg, B0 ,B1, SNwkSIntKey, FNwkSIntKey);
-//         micTrlr.SetMIC (mic_temp);
-//     }
-//     else
-//     {
-//         mic_temp = micTrlr.CalcMIC (msgLen, msg, B0, FNwkSIntKey);
-//         micTrlr.SetMIC (mic_temp);
-//     }
-// 
-// }
-
-/*  placeholder func until all parameters are better organized for MIC calc     */
-void EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMICTrailer& micTrlr)
+void
+EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMICTrailer& micTrlr, uint8_t *msg, uint8_t len)
 {
+    uint8_t B0[16];
+    uint8_t B1[16];
+    uint8_t FNwkSIntKey[16];
+    uint8_t SNwkSIntKey[16];
+    
+    
+    uint16_t ConfFCnt;
+    uint32_t mic_temp;
+    
     NS_LOG_FUNCTION_NOARGS ();
     
-    micTrlr.SetMIC (0x00000000);
+    /*
+     *   Network ID              =>  m_address.GetNwkID().Get()
+     *   DevAddr                 =>  m_address.GetNwkAddr().Get()
+     *   Network Server Version  =>  m_networkServer->IsVersion1()
+     *   JoinNonce               =>  m_joinNonce
+     *   RX1DROffset             =>  m_rx1DROffset
+     *   RX2DataRate             =>  m_secondReceiveWindowDataRate
+     *   DevNonce                =>  m_devNonce
+     *   NwkKey                  =>  m_nwkKey
+     *   JoinEUI                 =>  m_joinEUI
+     *   FCntUp                  =>  m_currentFCnt
+     *   TxDR                    =>  m_dataRate
+     *   TxCh                    =>  m_txChIndex (check (m_txCh == 0))
+     *   ConfFCnt                =>  0x0000
+     */
+    
+    if (m_networkServer->IsVersion1())
+    {
+        /*  temp <= 0x01 | JoinNonce(3) | NetID(1) | DevNonce(2) | 0x000000000000000000    */
+        uint8_t temp[16] = {
+            0x01, (uint8_t)((GetJoinNonce() & 0x00FF0000) >> 16), 
+            (uint8_t)((GetJoinNonce() & 0x0000FF00) >> 8), (uint8_t)(GetJoinNonce() & 0x000000FF),
+            m_address.GetNwkID.Get(), (uint8_t)((GetDevNonce() & 0xFF00) >> 8),
+            (uint8_t)(GetDevNonce() & 0x00FF), 0x00, 
+            0x00, 0x00, 
+            0x00, 0x00, 
+            0x00, 0x00, 
+            0x00, 0x00
+        };
+        
+        micTrlr.aes128(m_nwkKey, temp, FNwkSIntKey);
+        micTrlr.GenerateB0UL(B0, m_address.GetNwkAddr().Get(), (uint32_t)m_currentFCnt, len);
+        mic_temp = micTrlr.CalcMIC(len, msg, B0, FNwkSIntKey);
+    }
+    else    /*  v1.1 or later   */
+    {
+        /*  tempf <= 0x01 | JoinNonce(3) | JoinEUI(8) | DevNonce(2) | 0x0000    */
+        uint8_t tempf[16] = {
+            0x01, (uint8_t)((GetJoinNonce() & 0x00FF0000) >> 16), 
+            (uint8_t)((GetJoinNonce() & 0x0000FF00) >> 8), (uint8_t)(GetJoinNonce() & 0x000000FF),
+            m_joinEUI[7], m_joinEUI[6],
+            m_joinEUI[5], m_joinEUI[4],
+            m_joinEUI[3], m_joinEUI[2],
+            m_joinEUI[1], m_joinEUI[0],
+            (uint8_t)((GetDevNonce() & 0xFF00) >> 8), (uint8_t)(GetDevNonce() & 0x00FF)
+            0x00, 0x00
+        };
+        
+        /*  temps <= 0x03 | JoinNonce(3) | JoinEUI(8) | DevNonce(2) | 0x0000    */
+        uint8_t temps[16] = {
+            0x03, (uint8_t)((GetJoinNonce() & 0x00FF0000) >> 16), 
+            (uint8_t)((GetJoinNonce() & 0x0000FF00) >> 8), (uint8_t)(GetJoinNonce() & 0x000000FF),
+            m_joinEUI[7], m_joinEUI[6],
+            m_joinEUI[5], m_joinEUI[4],
+            m_joinEUI[3], m_joinEUI[2],
+            m_joinEUI[1], m_joinEUI[0],
+            (uint8_t)((GetDevNonce() & 0xFF00) >> 8), (uint8_t)(GetDevNonce() & 0x00FF)
+            0x00, 0x00
+        };
+        
+        micTrlr.aes128(m_nwkKey, tempf, FNwkSIntKey);
+        micTrlr.GenerateB0UL(B0, m_address.GetNwkAddr().Get(), (uint32_t)m_currentFCnt, len);
+        
+        
+        micTrlr.aes128(m_nwkKey, temps, SNwkSIntKey);
+        micTrlr.GenerateB1UL(B1, 0x0000, m_dataRate, m_txChIndex, m_address.GetNwkAddr().Get(),
+                             (uint32_t)m_currentFCnt, len);
+     
+        mic_temp = micTrlr.CalcMIC_1_1_UL(len, msg, B0, B1, SNwkSIntKey, FNwkSIntKey);
+    }
+    
+    micTrlr.SetMIC(mic_temp);
+    
+    return;
 }
 
 void
@@ -1038,7 +1078,7 @@ EndDeviceLorawanMac::SetNwkKey(uint8_t nwkKey[16])
 }
 
 void
-EndDeviceLorawanMac::GetNwkKey(uint8_t nwkKey[16]) const
+EndDeviceLorawanMac::GetNwkKey(uint8_t nwkKey[16])
 {
     unsigned int i;
     
@@ -1064,7 +1104,7 @@ EndDeviceLorawanMac::SetJoinEUI(uint8_t joinEUI[8])
 }
 
 void
-EndDeviceLorawanMac::GetJoinEUI(uint8_t joinEUI[8]) const
+EndDeviceLorawanMac::GetJoinEUI(uint8_t joinEUI[8])
 {
     unsigned int i;
     

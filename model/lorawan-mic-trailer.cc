@@ -221,6 +221,8 @@ LorawanMICTrailer::aes128 (uint8_t K[16], uint8_t M[16], uint8_t O[16])
         {0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16}
     };
     
+    aes128_keyexpansion(K, w, sbox);
+    
     /*  move input into state matrix    */
     for (i = 0;i < 4;i++)
     {
