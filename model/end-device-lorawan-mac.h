@@ -31,11 +31,10 @@
 #include "ns3/random-variable-stream.h"
 #include "ns3/lora-device-address.h"
 #include "ns3/traced-value.h"
-#include "ns3/network-server.h"
 
 namespace ns3 {
 namespace lorawan {
-
+    
 /**
  * Class representing the MAC layer of a LoRaWAN device.
  */
@@ -338,19 +337,22 @@ public:
    */
   void AddMacCommand (Ptr<MacCommand> macCommand);
   
-  void SetNwkServer(Ptr<NetworkServer> nwkServer);
+  //void SetNwkServer(Ptr<NetworkServer> nwkServer);
 
   void SetJoinNonce(uint32_t joinNonce);
-  uint32_t GetJoinNonce(void) const;
+  uint32_t GetJoinNonce(void);
   
   void SetDevNonce(uint16_t devNonce);
-  uint16_t GetDevNonce(void) const;
+  uint16_t GetDevNonce(void);
   
   void SetNwkKey(uint8_t nwkKey[16]);
   void GetNwkKey(uint8_t nwkKey[16]);
   
   void SetJoinEUI(uint8_t joinEUI[8]);
   void GetJoinEUI(uint8_t joinEUI[8]);
+  
+  bool IsVersion1(void) const;
+  void SetIsVersion1(bool isVersion1);
   
 protected:
   /**
@@ -441,8 +443,6 @@ protected:
    */
   Ptr<UniformRandomVariable> m_uniformRV;
   
-  Ptr<NetworkServer> m_networkServer;
-  
    /**
     * The RX1DROffset parameter value
     */
@@ -530,12 +530,16 @@ private:
 
   uint16_t m_currentFCnt;
   
-  uint32_t m_joinNonce; /*  join accept count - should be 3 bytes long   */
+  /*  join accept count - should be 3 bytes long   */
+  uint32_t m_joinNonce; 
   
-  uint16_t m_devNonce;  /*  join request count  */
+  /*  join request count  */
+  uint16_t m_devNonce;
   
   uint8_t m_nwkKey[16];
   uint8_t m_joinEUI[8];
+  
+  bool m_isVersion1;  /*  whether or not the network server version is v1.0 or not    */
 };
 
 

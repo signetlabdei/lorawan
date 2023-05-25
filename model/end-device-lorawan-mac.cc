@@ -126,9 +126,7 @@ EndDeviceLorawanMac::EndDeviceLorawanMac ()
       m_lastKnownGatewayCount (0),
       m_aggregatedDutyCycle (1),
       m_mType (LorawanMacHeader::CONFIRMED_DATA_UP),
-      m_currentFCnt (0),
-      m_joinNonce (1),
-      m_devNonce (1)
+      m_currentFCnt (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -143,6 +141,11 @@ EndDeviceLorawanMac::EndDeviceLorawanMac ()
   // Initialize structure for retransmission parameters
   m_retxParams = EndDeviceLorawanMac::LoraRetxParameters ();
   m_retxParams.retxLeft = m_maxNumbTx;
+  
+  m_joinNonce = 1;
+  m_devNonce = 1;
+  m_rx1DrOffset = 0;
+  m_isVersion1 = false;
 }
 
 EndDeviceLorawanMac::~EndDeviceLorawanMac ()
@@ -170,11 +173,11 @@ EndDeviceLorawanMac::Send (Ptr<Packet> packet)
     }
 
   // Pick a channel on which to transmit the packet
-  Ptr<LogicalLoraChannel> txChannel = GetChannelForTx ();
+  m_txChIndex = GetChannelForTx();
 
-  if (!(txChannel && m_retxParams.retxLeft > 0))
+  if (!(m_txCh && m_retxParams.retxLeft > 0))
     {
-      if (!txChannel)
+      if (!m_txCh)
         {
           m_cannotSendBecauseDutyCycle (packet);
         }
@@ -187,7 +190,7 @@ EndDeviceLorawanMac::Send (Ptr<Packet> packet)
   // the transmitting channel is available and we have not run out the maximum number of retransmissions
     {
       // Make sure we can transmit at the current power on this channel
-      NS_ASSERT_MSG (m_txPower <= m_channelHelper.GetTxPowerForChannel (txChannel),
+      NS_ASSERT_MSG (m_txPower <= m_channelHelper.GetTxPowerForChannel (m_txCh),
                      " The selected power is too hight to be supported by this channel.");
       DoSend (packet);
     }
@@ -244,11 +247,9 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       ApplyNecessaryOptions (macHdr);
       packet->AddHeader (macHdr);
       
-      m_txCh = GetChannelForTx();
-      
       //Add MIC trailer
       LorawanMICTrailer micTrlr;
-      ApplyNecessaryOptions (micTrlr, msg, msglen);
+      ApplyNecessaryOptions (micTrlr, msg.data(), msglen);
       packet->AddTrailer (micTrlr);
       
       // Reset MAC command list
@@ -324,8 +325,6 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
 
           NS_LOG_INFO ("Added frame header of size " << frameHdr.GetSerializedSize () <<
                        " bytes.");
-
-          m_txCh = GetChannelForTx();
           
           // Add the Lorawan Mac header to the packet
           macHdr = LorawanMacHeader ();
@@ -333,7 +332,7 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           packet->AddHeader (macHdr);
           
           micTrlr = LorawanMICTrailer ();
-          ApplyNecessaryOptions (micTrlr, msg, msglen);
+          ApplyNecessaryOptions (micTrlr, msg.data(), msglen);
           packet->AddTrailer (micTrlr);
           
           m_retxParams.retxLeft = m_retxParams.retxLeft - 1;           // decreasing the number of retransmissions
@@ -535,16 +534,13 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMICTrailer& micTrlr, uint8_t 
     uint8_t B1[16];
     uint8_t FNwkSIntKey[16];
     uint8_t SNwkSIntKey[16];
-    
-    
-    uint16_t ConfFCnt;
     uint32_t mic_temp;
     
     NS_LOG_FUNCTION_NOARGS ();
     
     /*
-     *   Network ID              =>  m_address.GetNwkID().Get()
-     *   DevAddr                 =>  m_address.GetNwkAddr().Get()
+     *   Network ID              =>  m_address.GetNwkID()
+     *   DevAddr                 =>  m_address.GetNwkAddr()
      *   Network Server Version  =>  m_networkServer->IsVersion1()
      *   JoinNonce               =>  m_joinNonce
      *   RX1DROffset             =>  m_rx1DROffset
@@ -558,13 +554,13 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMICTrailer& micTrlr, uint8_t 
      *   ConfFCnt                =>  0x0000
      */
     
-    if (m_networkServer->IsVersion1())
+    if (IsVersion1())
     {
         /*  temp <= 0x01 | JoinNonce(3) | NetID(1) | DevNonce(2) | 0x000000000000000000    */
         uint8_t temp[16] = {
             0x01, (uint8_t)((GetJoinNonce() & 0x00FF0000) >> 16), 
             (uint8_t)((GetJoinNonce() & 0x0000FF00) >> 8), (uint8_t)(GetJoinNonce() & 0x000000FF),
-            m_address.GetNwkID.Get(), (uint8_t)((GetDevNonce() & 0xFF00) >> 8),
+            m_address.GetNwkID(), (uint8_t)((GetDevNonce() & 0xFF00) >> 8),
             (uint8_t)(GetDevNonce() & 0x00FF), 0x00, 
             0x00, 0x00, 
             0x00, 0x00, 
@@ -573,7 +569,7 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMICTrailer& micTrlr, uint8_t 
         };
         
         micTrlr.aes128(m_nwkKey, temp, FNwkSIntKey);
-        micTrlr.GenerateB0UL(B0, m_address.GetNwkAddr().Get(), (uint32_t)m_currentFCnt, len);
+        micTrlr.GenerateB0UL(B0, m_address.GetNwkAddr(), (uint32_t)m_currentFCnt, len);
         mic_temp = micTrlr.CalcMIC(len, msg, B0, FNwkSIntKey);
     }
     else    /*  v1.1 or later   */
@@ -586,7 +582,7 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMICTrailer& micTrlr, uint8_t 
             m_joinEUI[5], m_joinEUI[4],
             m_joinEUI[3], m_joinEUI[2],
             m_joinEUI[1], m_joinEUI[0],
-            (uint8_t)((GetDevNonce() & 0xFF00) >> 8), (uint8_t)(GetDevNonce() & 0x00FF)
+            (uint8_t)((GetDevNonce() & 0xFF00) >> 8), (uint8_t)(GetDevNonce() & 0x00FF),
             0x00, 0x00
         };
         
@@ -598,16 +594,16 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMICTrailer& micTrlr, uint8_t 
             m_joinEUI[5], m_joinEUI[4],
             m_joinEUI[3], m_joinEUI[2],
             m_joinEUI[1], m_joinEUI[0],
-            (uint8_t)((GetDevNonce() & 0xFF00) >> 8), (uint8_t)(GetDevNonce() & 0x00FF)
+            (uint8_t)((GetDevNonce() & 0xFF00) >> 8), (uint8_t)(GetDevNonce() & 0x00FF),
             0x00, 0x00
         };
         
         micTrlr.aes128(m_nwkKey, tempf, FNwkSIntKey);
-        micTrlr.GenerateB0UL(B0, m_address.GetNwkAddr().Get(), (uint32_t)m_currentFCnt, len);
+        micTrlr.GenerateB0UL(B0, m_address.GetNwkAddr(), (uint32_t)m_currentFCnt, len);
         
         
         micTrlr.aes128(m_nwkKey, temps, SNwkSIntKey);
-        micTrlr.GenerateB1UL(B1, 0x0000, m_dataRate, m_txChIndex, m_address.GetNwkAddr().Get(),
+        micTrlr.GenerateB1UL(B1, 0x0000, m_dataRate, m_txChIndex, m_address.GetNwkAddr(),
                              (uint32_t)m_currentFCnt, len);
      
         mic_temp = micTrlr.CalcMIC_1_1_UL(len, msg, B0, B1, SNwkSIntKey, FNwkSIntKey);
@@ -1042,7 +1038,7 @@ EndDeviceLorawanMac::GetAggregatedDutyCycle (void)
   return m_aggregatedDutyCycle;
 }
 
-void
+void 
 EndDeviceLorawanMac::AddMacCommand (Ptr<MacCommand> macCommand)
 {
   NS_LOG_FUNCTION (this << macCommand);
@@ -1050,15 +1046,7 @@ EndDeviceLorawanMac::AddMacCommand (Ptr<MacCommand> macCommand)
   m_macCommandList.push_back (macCommand);
 }
 
-void 
-EndDeviceLorawanMac::SetNwkServer(Ptr<NetworkServer> nwkServer);
-{
-    m_networkServer = nwkServer;
-    
-    return;
-}
-
-uint8_t
+uint8_t 
 EndDeviceLorawanMac::GetTransmissionPower (void)
 {
   return m_txPower;
@@ -1077,7 +1065,7 @@ EndDeviceLorawanMac::SetNwkKey(uint8_t nwkKey[16])
     return;
 }
 
-void
+void 
 EndDeviceLorawanMac::GetNwkKey(uint8_t nwkKey[16])
 {
     unsigned int i;
@@ -1103,7 +1091,7 @@ EndDeviceLorawanMac::SetJoinEUI(uint8_t joinEUI[8])
     return;
 }
 
-void
+void 
 EndDeviceLorawanMac::GetJoinEUI(uint8_t joinEUI[8])
 {
     unsigned int i;
@@ -1116,7 +1104,7 @@ EndDeviceLorawanMac::GetJoinEUI(uint8_t joinEUI[8])
     return;
 }
 
-void
+void 
 EndDeviceLorawanMac::SetJoinNonce(uint32_t joinNonce)
 {
     /*  three bytes long and should be at least one to be in the network    */
@@ -1128,13 +1116,13 @@ EndDeviceLorawanMac::SetJoinNonce(uint32_t joinNonce)
     return;
 }
 
-uint32_t
-EndDeviceLorawanMac::GetJoinNonce(void) const
+uint32_t 
+EndDeviceLorawanMac::GetJoinNonce(void)
 {
     return m_joinNonce;
 }
 
-void
+void 
 EndDeviceLorawanMac::SetDevNonce(uint16_t devNonce)
 {
     if (devNonce > 0)
@@ -1145,10 +1133,23 @@ EndDeviceLorawanMac::SetDevNonce(uint16_t devNonce)
     return;
 }
 
-uint16_t
-EndDeviceLorawanMac::GetDevNonce(void) const
+uint16_t 
+EndDeviceLorawanMac::GetDevNonce(void)
 {
     return m_devNonce;
+}
+
+bool 
+EndDeviceLorawanMac::IsVersion1(void) const
+{
+    return m_isVersion1;
+}
+
+void
+EndDeviceLorawanMac::SetIsVersion1(bool isVersion1)
+{
+    m_isVersion1 = isVersion1;
+    return;
 }
 
 }

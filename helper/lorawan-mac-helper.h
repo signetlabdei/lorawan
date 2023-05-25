@@ -96,7 +96,7 @@ public:
    * \param device the device within which this MAC will be created.
    * \returns a newly-created LorawanMac object.
    */
-  Ptr<LorawanMac> Create (Ptr<Node> node, Ptr<NetDevice> device) const;
+  Ptr<LorawanMac> Create (Ptr<Node> node, Ptr<NetDevice> device);
 
   /**
    * Set up the end device's data rates
@@ -116,7 +116,7 @@ public:
   static std::vector<int> SetSpreadingFactorsGivenDistribution (NodeContainer endDevices,
                                                                 NodeContainer gateways,
                                                                 std::vector<double> distribution);
-
+  
 private:
   /**
    * Perform region-specific configurations for the 868 MHz EU band.
@@ -165,17 +165,17 @@ private:
    * ClassAEndDeviceLorawanMac classes.
    */
   void ApplyCommonAlohaConfigurations (Ptr<LorawanMac> lorawanMac) const;
-
-  virtual void GenerateNwkKey(void);
-  virtual void GenerateJoinEUI(void);
   
   ObjectFactory m_mac;
   Ptr<LoraDeviceAddressGenerator> m_addrGen; //!< Pointer to the address generator to use
   enum DeviceType m_deviceType; //!< The kind of device to install
   enum Regions m_region; //!< The region in which the device will operate
   
+  void GenerateNwkKey(void);
+  void GenerateJoinEUI(void);
+  
   uint8_t m_CurNwkKey[16];
-  uint8_t m_CurJoinEUI[8]
+  uint8_t m_CurJoinEUI[8];
 };
 
 } // namespace lorawan

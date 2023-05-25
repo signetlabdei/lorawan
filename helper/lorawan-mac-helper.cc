@@ -32,13 +32,15 @@ NS_LOG_COMPONENT_DEFINE ("LorawanMacHelper");
 
 LorawanMacHelper::LorawanMacHelper () : m_region (LorawanMacHelper::EU)
 {
-    m_CurNwkKey = { 0, 0, 0, 0,
-                    0, 0, 0, 0, 
-                    0, 0, 0, 0,
-                    0, 0, 0, 0};
+    for (unsigned int i = 0;i < 16;i++)
+    {
+        m_CurNwkKey[i] = 0;
+    }
     
-    m_CurJoinEUI = {0, 0, 0, 0
-                    0, 0, 0, 0};
+    for (unsigned int i = 0;i < 8;i++)
+    {
+        m_CurJoinEUI[i] = 0;
+    }
 }
 
 void
@@ -78,7 +80,7 @@ LorawanMacHelper::SetRegion (enum LorawanMacHelper::Regions region)
 }
 
 Ptr<LorawanMac>
-LorawanMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
+LorawanMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device)
 {
   Ptr<LorawanMac> mac = m_mac.Create<LorawanMac> ();
   mac->SetDevice (device);
@@ -114,9 +116,9 @@ LorawanMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
           }
         }
         
-        mac->SetNwkKey(m_CurNwkKey);
+        edMac->SetNwkKey(m_CurNwkKey);
         GenerateNwkKey();
-        mac->SetJoinEUI(m_CurJoinEUI);
+        edMac->SetJoinEUI(m_CurJoinEUI);
         GenerateJoinEUI();
     }
   else
@@ -680,7 +682,7 @@ LorawanMacHelper::SetSpreadingFactorsGivenDistribution (NodeContainer endDevices
 
 } //  end function
 
-void
+void 
 LorawanMacHelper::GenerateNwkKey(void)
 {
     /*  just increment from the last one    */
@@ -703,7 +705,7 @@ LorawanMacHelper::GenerateNwkKey(void)
     return;
 }
 
-void
+void 
 LorawanMacHelper::GenerateJoinEUI(void)
 {
     /*  just increment from the last one    */

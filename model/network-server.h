@@ -38,7 +38,7 @@
 
 namespace ns3 {
 namespace lorawan {
-
+    
 /**
  * The NetworkServer is an application standing on top of a node equipped with
  * links that connect it with the gateways.
@@ -98,16 +98,11 @@ public:
                 const Address &address);
 
   Ptr<NetworkStatus> GetNetworkStatus (void);
-  
-  bool IsVersion1(void) const;
-  void SetIsVersion1(bool isVersion1);
 
 protected:
   Ptr<NetworkStatus> m_status;
   Ptr<NetworkController> m_controller;
   Ptr<NetworkScheduler> m_scheduler;
-  
-  bool m_isVersion1;  /*  whether or not the network server version is v1.0 or not    */
 
   TracedCallback<Ptr<const Packet>> m_receivedPacket;
 };
