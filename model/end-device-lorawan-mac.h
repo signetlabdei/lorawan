@@ -336,22 +336,75 @@ public:
    * packet.
    */
   void AddMacCommand (Ptr<MacCommand> macCommand);
-  
-  //void SetNwkServer(Ptr<NetworkServer> nwkServer);
 
+  /**
+   *    Sets the JoinNonce value stored on this end device
+   *
+   *    \param  joinNonce   the new JoinNonce value being set
+   */
   void SetJoinNonce(uint32_t joinNonce);
-  uint32_t GetJoinNonce(void);
   
+  /**
+   *    Gets the JoinNonce value stored on this end device
+   * 
+   *    \return the currently stored JoinNonce value
+   */
+  uint32_t GetJoinNonce(void) const;
+  
+  /**
+   *    Sets the DevNonce value stored in this end device
+   * 
+   *    \param  devNonce    the new DevNonce value being set
+   */
   void SetDevNonce(uint16_t devNonce);
-  uint16_t GetDevNonce(void);
+
+  /**
+   *    Gets the DevNonce value stored in this device
+   * 
+   *    \return     the currently stored devNonce value
+   */
+  uint16_t GetDevNonce(void) const;
   
+  /**
+   *    Sets the NwkKey stored on this end device
+   * 
+   *    \param  nwkKey the new 128-bit network key 
+   */
   void SetNwkKey(uint8_t nwkKey[16]);
-  void GetNwkKey(uint8_t nwkKey[16]);
   
+  /**
+   *    Gets the NwkKey stored on this device
+   * 
+   *    \param  nwkKey    container to copy the currently stored NwkKey in this device to
+   */
+  void GetNwkKey(uint8_t nwkKey[16]) const;
+  
+  /**
+   *    Sets the JoinEUI stored on this end device
+   * 
+   *    \param  joinEUI the new JoinEUI to be used by this device
+   */
   void SetJoinEUI(uint8_t joinEUI[8]);
-  void GetJoinEUI(uint8_t joinEUI[8]);
   
+  /**
+   *    Gets the JoinEUI stored in this end device
+   * 
+   *    \param  joinEUI container to JOinEUI stored on this device to
+   */
+  void GetJoinEUI(uint8_t joinEUI[8]) const;
+  
+  /**
+   *    Whether the version the LoRaWAN network this device is apart of is v1.0 or not
+   * 
+   *    \return     true if v1.0, false if not
+   */
   bool IsVersion1(void) const;
+  
+  /**
+   *    Set whether the LoRaWAN version of the network is v1.0 or not
+   *
+   *    \param  isVersion1  whether the version of the network is v1.0 or not 
+   */
   void SetIsVersion1(bool isVersion1);
   
 protected:
@@ -442,16 +495,6 @@ protected:
    * the channel list.
    */
   Ptr<UniformRandomVariable> m_uniformRV;
-  
-   /**
-    * The RX1DROffset parameter value
-    */
-  uint8_t m_rx1DrOffset;
-  
-  /**
-   * The Data Rate to listen for during the second downlink transmission.
-   */
-  uint8_t m_secondReceiveWindowDataRate;
   
   Ptr<LogicalLoraChannel> m_txCh;
   

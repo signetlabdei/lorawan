@@ -144,7 +144,6 @@ EndDeviceLorawanMac::EndDeviceLorawanMac ()
   
   m_joinNonce = 1;
   m_devNonce = 1;
-  m_rx1DrOffset = 0;
   m_isVersion1 = false;
 }
 
@@ -537,22 +536,6 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMICTrailer& micTrlr, uint8_t 
     uint32_t mic_temp;
     
     NS_LOG_FUNCTION_NOARGS ();
-    
-    /*
-     *   Network ID              =>  m_address.GetNwkID()
-     *   DevAddr                 =>  m_address.GetNwkAddr()
-     *   Network Server Version  =>  m_networkServer->IsVersion1()
-     *   JoinNonce               =>  m_joinNonce
-     *   RX1DROffset             =>  m_rx1DROffset
-     *   RX2DataRate             =>  m_secondReceiveWindowDataRate
-     *   DevNonce                =>  m_devNonce
-     *   NwkKey                  =>  m_nwkKey
-     *   JoinEUI                 =>  m_joinEUI
-     *   FCntUp                  =>  m_currentFCnt
-     *   TxDR                    =>  m_dataRate
-     *   TxCh                    =>  m_txChIndex (check (m_txCh == 0))
-     *   ConfFCnt                =>  0x0000
-     */
     
     if (IsVersion1())
     {
@@ -1066,7 +1049,7 @@ EndDeviceLorawanMac::SetNwkKey(uint8_t nwkKey[16])
 }
 
 void 
-EndDeviceLorawanMac::GetNwkKey(uint8_t nwkKey[16])
+EndDeviceLorawanMac::GetNwkKey(uint8_t nwkKey[16]) const
 {
     unsigned int i;
     
@@ -1092,7 +1075,7 @@ EndDeviceLorawanMac::SetJoinEUI(uint8_t joinEUI[8])
 }
 
 void 
-EndDeviceLorawanMac::GetJoinEUI(uint8_t joinEUI[8])
+EndDeviceLorawanMac::GetJoinEUI(uint8_t joinEUI[8]) const
 {
     unsigned int i;
     
@@ -1117,7 +1100,7 @@ EndDeviceLorawanMac::SetJoinNonce(uint32_t joinNonce)
 }
 
 uint32_t 
-EndDeviceLorawanMac::GetJoinNonce(void)
+EndDeviceLorawanMac::GetJoinNonce(void) const
 {
     return m_joinNonce;
 }
@@ -1134,7 +1117,7 @@ EndDeviceLorawanMac::SetDevNonce(uint16_t devNonce)
 }
 
 uint16_t 
-EndDeviceLorawanMac::GetDevNonce(void)
+EndDeviceLorawanMac::GetDevNonce(void) const
 {
     return m_devNonce;
 }

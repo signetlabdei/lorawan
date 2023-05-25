@@ -49,7 +49,8 @@ ClassAEndDeviceLorawanMac::ClassAEndDeviceLorawanMac () :
   // LoraWAN default
   m_receiveDelay1 (Seconds (1)),
   // LoraWAN default
-  m_receiveDelay2 (Seconds (2))
+  m_receiveDelay2 (Seconds (2)),
+  m_rx1DrOffset (0)
 {
   NS_LOG_FUNCTION (this);
 
