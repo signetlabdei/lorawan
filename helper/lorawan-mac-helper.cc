@@ -32,6 +32,15 @@ NS_LOG_COMPONENT_DEFINE ("LorawanMacHelper");
 
 LorawanMacHelper::LorawanMacHelper () : m_region (LorawanMacHelper::EU)
 {
+    for (unsigned int i = 0;i < 16;i++)
+    {
+        m_CurNwkKey[i] = 0;
+    }
+    
+    for (unsigned int i = 0;i < 8;i++)
+    {
+        m_CurJoinEUI[i] = 0;
+    }
 }
 
 void
@@ -71,7 +80,7 @@ LorawanMacHelper::SetRegion (enum LorawanMacHelper::Regions region)
 }
 
 Ptr<LorawanMac>
-LorawanMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
+LorawanMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device)
 {
   Ptr<LorawanMac> mac = m_mac.Create<LorawanMac> ();
   mac->SetDevice (device);
@@ -106,6 +115,11 @@ LorawanMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
             break;
           }
         }
+        
+        edMac->SetNwkKey(m_CurNwkKey);
+        GenerateNwkKey();
+        edMac->SetJoinEUI(m_CurJoinEUI);
+        GenerateJoinEUI();
     }
   else
     {
@@ -667,6 +681,52 @@ LorawanMacHelper::SetSpreadingFactorsGivenDistribution (NodeContainer endDevices
   return sfQuantity;
 
 } //  end function
+
+void 
+LorawanMacHelper::GenerateNwkKey(void)
+{
+    /*  just increment from the last one    */
+    int i;
+    
+    for (i = 15;i >= 0;i--)
+    {
+        if (m_CurNwkKey[i] == 255)
+        {
+            /*  carry over to next byte */
+            m_CurNwkKey[i] = 0;
+        }
+        else
+        {
+            m_CurNwkKey[i]++;
+            break;
+        }
+    }
+    
+    return;
+}
+
+void 
+LorawanMacHelper::GenerateJoinEUI(void)
+{
+    /*  just increment from the last one    */
+    int i;
+    
+    for (i = 7;i >= 0;i--)
+    {
+        if (m_CurJoinEUI[i] == 255)
+        {
+            /*  carry over to next byte */
+            m_CurJoinEUI[i] = 0;
+        }
+        else
+        {
+            m_CurJoinEUI[i]++;
+            break;
+        }
+    }
+    
+    return;
+}
 
 } // namespace lorawan
 } // namespace ns3

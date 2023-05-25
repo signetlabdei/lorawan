@@ -32,7 +32,7 @@
 
 namespace ns3 {
 namespace lorawan {
-
+    
 /**
  * This class represents the knowledge about the state of the network that is
  * available at the Network Server. It is essentially a collection of two maps:

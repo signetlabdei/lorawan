@@ -27,13 +27,14 @@
 #include "ns3/lorawan-mac.h"
 #include "ns3/lorawan-mac-header.h"
 #include "ns3/lora-frame-header.h"
+#include "ns3/lorawan-mic-trailer.h"
 #include "ns3/random-variable-stream.h"
 #include "ns3/lora-device-address.h"
 #include "ns3/traced-value.h"
 
 namespace ns3 {
 namespace lorawan {
-
+    
 /**
  * Class representing the MAC layer of a LoRaWAN device.
  */
@@ -218,6 +219,11 @@ public:
   void ApplyNecessaryOptions (LorawanMacHeader &macHeader);
 
   /**
+   * Add the necessary options and to the LorawanMICTrailer.
+   */
+  void ApplyNecessaryOptions (LorawanMICTrailer& micTrlr, uint8_t *msg, uint8_t len);
+  
+  /**
    * Set the message type to send when the Send method is called.
    */
   void SetMType (LorawanMacHeader::MType mType);
@@ -331,6 +337,76 @@ public:
    */
   void AddMacCommand (Ptr<MacCommand> macCommand);
 
+  /**
+   *    Sets the JoinNonce value stored on this end device
+   *
+   *    \param  joinNonce   the new JoinNonce value being set
+   */
+  void SetJoinNonce(uint32_t joinNonce);
+  
+  /**
+   *    Gets the JoinNonce value stored on this end device
+   * 
+   *    \return the currently stored JoinNonce value
+   */
+  uint32_t GetJoinNonce(void) const;
+  
+  /**
+   *    Sets the DevNonce value stored in this end device
+   * 
+   *    \param  devNonce    the new DevNonce value being set
+   */
+  void SetDevNonce(uint16_t devNonce);
+
+  /**
+   *    Gets the DevNonce value stored in this device
+   * 
+   *    \return     the currently stored devNonce value
+   */
+  uint16_t GetDevNonce(void) const;
+  
+  /**
+   *    Sets the NwkKey stored on this end device
+   * 
+   *    \param  nwkKey the new 128-bit network key 
+   */
+  void SetNwkKey(uint8_t nwkKey[16]);
+  
+  /**
+   *    Gets the NwkKey stored on this device
+   * 
+   *    \param  nwkKey    container to copy the currently stored NwkKey in this device to
+   */
+  void GetNwkKey(uint8_t nwkKey[16]) const;
+  
+  /**
+   *    Sets the JoinEUI stored on this end device
+   * 
+   *    \param  joinEUI the new JoinEUI to be used by this device
+   */
+  void SetJoinEUI(uint8_t joinEUI[8]);
+  
+  /**
+   *    Gets the JoinEUI stored in this end device
+   * 
+   *    \param  joinEUI container to JOinEUI stored on this device to
+   */
+  void GetJoinEUI(uint8_t joinEUI[8]) const;
+  
+  /**
+   *    Whether the version the LoRaWAN network this device is apart of is v1.0 or not
+   * 
+   *    \return     true if v1.0, false if not
+   */
+  bool IsVersion1(void) const;
+  
+  /**
+   *    Set whether the LoRaWAN version of the network is v1.0 or not
+   *
+   *    \param  isVersion1  whether the version of the network is v1.0 or not 
+   */
+  void SetIsVersion1(bool isVersion1);
+  
 protected:
   /**
    * Structure representing the parameters that will be used in the
@@ -390,7 +466,7 @@ protected:
    * ones that are available in the ED's LogicalLoraChannel, based on their duty
    * cycle limitations.
    */
-  Ptr<LogicalLoraChannel> GetChannelForTx (void);
+  uint8_t GetChannelForTx (void);
 
   /**
    * The duration of a receive window in number of symbols. This should be
@@ -419,7 +495,11 @@ protected:
    * the channel list.
    */
   Ptr<UniformRandomVariable> m_uniformRV;
-
+  
+  Ptr<LogicalLoraChannel> m_txCh;
+  
+  uint8_t m_txChIndex;
+  
   /////////////////
   //  Callbacks  //
   /////////////////
@@ -492,6 +572,17 @@ private:
   LorawanMacHeader::MType m_mType;
 
   uint16_t m_currentFCnt;
+  
+  /*  join accept count - should be 3 bytes long   */
+  uint32_t m_joinNonce; 
+  
+  /*  join request count  */
+  uint16_t m_devNonce;
+  
+  uint8_t m_nwkKey[16];
+  uint8_t m_joinEUI[8];
+  
+  bool m_isVersion1;  /*  whether or not the network server version is v1.0 or not    */
 };
 
 

@@ -56,9 +56,9 @@ public:
    * \returns a device container which contains all the devices created by this
    * method.
    */
-  virtual NetDeviceContainer Install (const LoraPhyHelper &phyHelper,
-                                      const LorawanMacHelper &macHelper,
-                                      NodeContainer c) const;
+  virtual NetDeviceContainer Install (LoraPhyHelper &phyHelper,
+                                      LorawanMacHelper &macHelper,
+                                      NodeContainer c);
 
   /**
    * Install LoraNetDevice on a single node
@@ -69,9 +69,9 @@ public:
    * \returns a device container which contains all the devices created by this
    * method.
    */
-  virtual NetDeviceContainer Install (const LoraPhyHelper &phyHelper,
-                                      const LorawanMacHelper &macHelper,
-                                      Ptr<Node> node) const;
+  virtual NetDeviceContainer Install (LoraPhyHelper &phyHelper,
+                                      LorawanMacHelper &macHelper,
+                                      Ptr<Node> node);
 
   /**
    * Enable tracking of packets via trace sources.

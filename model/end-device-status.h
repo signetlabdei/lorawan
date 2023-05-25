@@ -28,12 +28,11 @@
 #include "ns3/class-a-end-device-lorawan-mac.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/pointer.h"
-#include "ns3/lora-frame-header.h"
 #include <iostream>
 
 namespace ns3 {
 namespace lorawan {
-
+    
 /**
  * This class represents the Network Server's knowledge about an End Device in
  * the LoRaWAN network it is administering.

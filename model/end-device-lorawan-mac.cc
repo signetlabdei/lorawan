@@ -141,6 +141,10 @@ EndDeviceLorawanMac::EndDeviceLorawanMac ()
   // Initialize structure for retransmission parameters
   m_retxParams = EndDeviceLorawanMac::LoraRetxParameters ();
   m_retxParams.retxLeft = m_maxNumbTx;
+  
+  m_joinNonce = 1;
+  m_devNonce = 1;
+  m_isVersion1 = false;
 }
 
 EndDeviceLorawanMac::~EndDeviceLorawanMac ()
@@ -168,11 +172,11 @@ EndDeviceLorawanMac::Send (Ptr<Packet> packet)
     }
 
   // Pick a channel on which to transmit the packet
-  Ptr<LogicalLoraChannel> txChannel = GetChannelForTx ();
+  m_txChIndex = GetChannelForTx();
 
-  if (!(txChannel && m_retxParams.retxLeft > 0))
+  if (!(m_txCh && m_retxParams.retxLeft > 0))
     {
-      if (!txChannel)
+      if (!m_txCh)
         {
           m_cannotSendBecauseDutyCycle (packet);
         }
@@ -185,7 +189,7 @@ EndDeviceLorawanMac::Send (Ptr<Packet> packet)
   // the transmitting channel is available and we have not run out the maximum number of retransmissions
     {
       // Make sure we can transmit at the current power on this channel
-      NS_ASSERT_MSG (m_txPower <= m_channelHelper.GetTxPowerForChannel (txChannel),
+      NS_ASSERT_MSG (m_txPower <= m_channelHelper.GetTxPowerForChannel (m_txCh),
                      " The selected power is too hight to be supported by this channel.");
       DoSend (packet);
     }
@@ -214,6 +218,11 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       m_currentFCnt++;
       NS_LOG_DEBUG ("APP packet: " << packet << ".");
 
+      /*    for MIC calculation later   */
+      uint8_t msglen = packet->GetSize();
+      std::vector<uint8_t> msg(msglen);
+      packet->CopyData(msg.data(), msglen);
+      
       // Add the Lora Frame Header to the packet
       LoraFrameHeader frameHdr;
       ApplyNecessaryOptions (frameHdr);
@@ -236,10 +245,15 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       LorawanMacHeader macHdr;
       ApplyNecessaryOptions (macHdr);
       packet->AddHeader (macHdr);
-
+      
+      //Add MIC trailer
+      LorawanMICTrailer micTrlr;
+      ApplyNecessaryOptions (micTrlr, msg.data(), msglen);
+      packet->AddTrailer (micTrlr);
+      
       // Reset MAC command list
       m_macCommandList.clear ();
-
+      
       if (m_retxParams.waitingAck)
         {
           // Call the callback to notify about the failure
@@ -249,6 +263,8 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
                         unsigned(txs) << " transmissions out of a maximum of " << unsigned(m_maxNumbTx) << ".");
         }
 
+    
+        
       // Reset retransmission parameters
       resetRetransmissionParameters ();
 
@@ -266,7 +282,7 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
 
           NS_LOG_INFO ("Added MAC header of size " << macHdr.GetSerializedSize () <<
                        " bytes.");
-
+          
           // Sent a new packet
           NS_LOG_DEBUG ("Copied packet: " << m_retxParams.packet);
           m_sentNewPacket (m_retxParams.packet);
@@ -291,9 +307,16 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           // Remove the headers
           LorawanMacHeader macHdr;
           LoraFrameHeader frameHdr;
+          LorawanMICTrailer micTrlr;
+          packet->RemoveTrailer (micTrlr);
           packet->RemoveHeader(macHdr);
           packet->RemoveHeader(frameHdr);
-
+          
+          /*    for MIC calculation later   */
+          uint8_t msglen = packet->GetSize();
+          std::vector<uint8_t> msg(msglen);
+          packet->CopyData(msg.data(), msglen);
+          
           // Add the Lora Frame Header to the packet
           frameHdr = LoraFrameHeader ();
           ApplyNecessaryOptions (frameHdr);
@@ -301,11 +324,16 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
 
           NS_LOG_INFO ("Added frame header of size " << frameHdr.GetSerializedSize () <<
                        " bytes.");
-
+          
           // Add the Lorawan Mac header to the packet
           macHdr = LorawanMacHeader ();
           ApplyNecessaryOptions (macHdr);
           packet->AddHeader (macHdr);
+          
+          micTrlr = LorawanMICTrailer ();
+          ApplyNecessaryOptions (micTrlr, msg.data(), msglen);
+          packet->AddTrailer (micTrlr);
+          
           m_retxParams.retxLeft = m_retxParams.retxLeft - 1;           // decreasing the number of retransmissions
           NS_LOG_DEBUG ("Retransmitting an old packet.");
 
@@ -499,6 +527,77 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMacHeader& macHeader)
 }
 
 void
+EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMICTrailer& micTrlr, uint8_t *msg, uint8_t len)
+{
+    uint8_t B0[16];
+    uint8_t B1[16];
+    uint8_t FNwkSIntKey[16];
+    uint8_t SNwkSIntKey[16];
+    uint32_t mic_temp;
+    
+    NS_LOG_FUNCTION_NOARGS ();
+    
+    if (IsVersion1())
+    {
+        /*  temp <= 0x01 | JoinNonce(3) | NetID(1) | DevNonce(2) | 0x000000000000000000    */
+        uint8_t temp[16] = {
+            0x01, (uint8_t)((GetJoinNonce() & 0x00FF0000) >> 16), 
+            (uint8_t)((GetJoinNonce() & 0x0000FF00) >> 8), (uint8_t)(GetJoinNonce() & 0x000000FF),
+            m_address.GetNwkID(), (uint8_t)((GetDevNonce() & 0xFF00) >> 8),
+            (uint8_t)(GetDevNonce() & 0x00FF), 0x00, 
+            0x00, 0x00, 
+            0x00, 0x00, 
+            0x00, 0x00, 
+            0x00, 0x00
+        };
+        
+        micTrlr.aes128(m_nwkKey, temp, FNwkSIntKey);
+        micTrlr.GenerateB0UL(B0, m_address.GetNwkAddr(), (uint32_t)m_currentFCnt, len);
+        mic_temp = micTrlr.CalcMIC(len, msg, B0, FNwkSIntKey);
+    }
+    else    /*  v1.1 or later   */
+    {
+        /*  tempf <= 0x01 | JoinNonce(3) | JoinEUI(8) | DevNonce(2) | 0x0000    */
+        uint8_t tempf[16] = {
+            0x01, (uint8_t)((GetJoinNonce() & 0x00FF0000) >> 16), 
+            (uint8_t)((GetJoinNonce() & 0x0000FF00) >> 8), (uint8_t)(GetJoinNonce() & 0x000000FF),
+            m_joinEUI[7], m_joinEUI[6],
+            m_joinEUI[5], m_joinEUI[4],
+            m_joinEUI[3], m_joinEUI[2],
+            m_joinEUI[1], m_joinEUI[0],
+            (uint8_t)((GetDevNonce() & 0xFF00) >> 8), (uint8_t)(GetDevNonce() & 0x00FF),
+            0x00, 0x00
+        };
+        
+        /*  temps <= 0x03 | JoinNonce(3) | JoinEUI(8) | DevNonce(2) | 0x0000    */
+        uint8_t temps[16] = {
+            0x03, (uint8_t)((GetJoinNonce() & 0x00FF0000) >> 16), 
+            (uint8_t)((GetJoinNonce() & 0x0000FF00) >> 8), (uint8_t)(GetJoinNonce() & 0x000000FF),
+            m_joinEUI[7], m_joinEUI[6],
+            m_joinEUI[5], m_joinEUI[4],
+            m_joinEUI[3], m_joinEUI[2],
+            m_joinEUI[1], m_joinEUI[0],
+            (uint8_t)((GetDevNonce() & 0xFF00) >> 8), (uint8_t)(GetDevNonce() & 0x00FF),
+            0x00, 0x00
+        };
+        
+        micTrlr.aes128(m_nwkKey, tempf, FNwkSIntKey);
+        micTrlr.GenerateB0UL(B0, m_address.GetNwkAddr(), (uint32_t)m_currentFCnt, len);
+        
+        
+        micTrlr.aes128(m_nwkKey, temps, SNwkSIntKey);
+        micTrlr.GenerateB1UL(B1, 0x0000, m_dataRate, m_txChIndex, m_address.GetNwkAddr(),
+                             (uint32_t)m_currentFCnt, len);
+     
+        mic_temp = micTrlr.CalcMIC_1_1_UL(len, msg, B0, B1, SNwkSIntKey, FNwkSIntKey);
+    }
+    
+    micTrlr.SetMIC(mic_temp);
+    
+    return;
+}
+
+void
 EndDeviceLorawanMac::SetMType (LorawanMacHeader::MType mType)
 {
   m_mType = mType;
@@ -556,7 +655,7 @@ EndDeviceLorawanMac::GetNextTransmissionDelay (void)
   return waitingTime;
 }
 
-Ptr<LogicalLoraChannel>
+uint8_t
 EndDeviceLorawanMac::GetChannelForTx (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
@@ -568,7 +667,9 @@ EndDeviceLorawanMac::GetChannelForTx (void)
 
   // Try every channel
   std::vector<Ptr<LogicalLoraChannel> >::iterator it;
-  for (it = logicalChannels.begin (); it != logicalChannels.end (); ++it)
+  unsigned int i;
+  
+  for (it = logicalChannels.begin (), i = 0; it != logicalChannels.end (); ++it, i++)
     {
       // Pointer to the current channel
       Ptr<LogicalLoraChannel> logicalChannel = *it;
@@ -585,7 +686,8 @@ EndDeviceLorawanMac::GetChannelForTx (void)
       // Send immediately if we can
       if (waitingTime == Seconds (0))
         {
-          return *it;
+          m_txCh = *it;
+          return i;
         }
       else
         {
@@ -593,7 +695,9 @@ EndDeviceLorawanMac::GetChannelForTx (void)
                         "the current channel because of duty cycle limitations.");
         }
     }
-  return 0;                 // In this case, no suitable channel was found
+    
+  m_txCh =  0;                 // In this case, no suitable channel was found
+  return 0;
 }
 
 
@@ -917,7 +1021,7 @@ EndDeviceLorawanMac::GetAggregatedDutyCycle (void)
   return m_aggregatedDutyCycle;
 }
 
-void
+void 
 EndDeviceLorawanMac::AddMacCommand (Ptr<MacCommand> macCommand)
 {
   NS_LOG_FUNCTION (this << macCommand);
@@ -925,10 +1029,111 @@ EndDeviceLorawanMac::AddMacCommand (Ptr<MacCommand> macCommand)
   m_macCommandList.push_back (macCommand);
 }
 
-uint8_t
+uint8_t 
 EndDeviceLorawanMac::GetTransmissionPower (void)
 {
   return m_txPower;
 }
+
+void 
+EndDeviceLorawanMac::SetNwkKey(uint8_t nwkKey[16])
+{
+    unsigned int i;
+    
+    for (i = 0;i < 16;i++)
+    {
+        m_nwkKey[i] = nwkKey[i];
+    }
+    
+    return;
+}
+
+void 
+EndDeviceLorawanMac::GetNwkKey(uint8_t nwkKey[16]) const
+{
+    unsigned int i;
+    
+    for (i = 0;i < 16;i++)
+    {
+        nwkKey[i] = m_nwkKey[i];
+    }
+    
+    return;
+}
+
+void 
+EndDeviceLorawanMac::SetJoinEUI(uint8_t joinEUI[8])
+{
+    unsigned int i;
+    
+    for (i = 0;i < 8;i++)
+    {
+        m_joinEUI[i] = joinEUI[i];
+    }
+    
+    return;
+}
+
+void 
+EndDeviceLorawanMac::GetJoinEUI(uint8_t joinEUI[8]) const
+{
+    unsigned int i;
+    
+    for (i = 0;i < 8;i++)
+    {
+        joinEUI[i] = m_joinEUI[i];
+    }
+    
+    return;
+}
+
+void 
+EndDeviceLorawanMac::SetJoinNonce(uint32_t joinNonce)
+{
+    /*  three bytes long and should be at least one to be in the network    */
+    if (joinNonce > 0 && joinNonce < 0x01000000)
+    {
+        m_joinNonce = joinNonce;
+    }
+    
+    return;
+}
+
+uint32_t 
+EndDeviceLorawanMac::GetJoinNonce(void) const
+{
+    return m_joinNonce;
+}
+
+void 
+EndDeviceLorawanMac::SetDevNonce(uint16_t devNonce)
+{
+    if (devNonce > 0)
+    {
+        m_devNonce = devNonce;
+    }
+    
+    return;
+}
+
+uint16_t 
+EndDeviceLorawanMac::GetDevNonce(void) const
+{
+    return m_devNonce;
+}
+
+bool 
+EndDeviceLorawanMac::IsVersion1(void) const
+{
+    return m_isVersion1;
+}
+
+void
+EndDeviceLorawanMac::SetIsVersion1(bool isVersion1)
+{
+    m_isVersion1 = isVersion1;
+    return;
+}
+
 }
 }

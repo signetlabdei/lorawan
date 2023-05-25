@@ -90,6 +90,15 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
       m_dataRate = m_dataRate - 1;
     }
 
+  Ptr<Packet> packetCopy = packetToSend->Copy();
+  LorawanMacHeader mHdr;
+  packetCopy->RemoveHeader(mHdr);
+  
+//   if (mHdr.GetMType() == JOIN_REQUEST)
+//   {
+//     m_devNonce++;
+//   }
+    
   // Craft LoraTxParameters object
   LoraTxParameters params;
   params.sf = GetSfFromDataRate (m_dataRate);
@@ -102,7 +111,7 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
 
   // Wake up PHY layer and directly send the packet
 
-  Ptr<LogicalLoraChannel> txChannel = GetChannelForTx ();
+  Ptr<LogicalLoraChannel> txChannel = m_txCh;
 
   NS_LOG_DEBUG ("PacketToSend: " << packetToSend);
   m_phy->Send (packetToSend, params, txChannel->GetFrequency (), m_txPower);
@@ -150,7 +159,7 @@ ClassAEndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
   // Remove the Mac Header to get some information
   LorawanMacHeader mHdr;
   packetCopy->RemoveHeader (mHdr);
-
+      
   NS_LOG_DEBUG ("Mac Header: " << mHdr);
 
   // Only keep analyzing the packet if it's downlink
@@ -176,7 +185,26 @@ ClassAEndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
           // THIS WILL BE GetReceiveWindow()
           Simulator::Cancel (m_secondReceiveWindow);
 
-
+//             if (mHdr.GetMType() == JOIN_ACCEPT)
+//             {
+//                 uint8_t temp[3];
+//                 uint32_t newJoinNonce = 0;
+//                 packetCopy->CopyData(temp, 3);  /*  get the new joinNonce value */
+//                 
+//                 for (i = 0;i < 3;i++)
+//                 {
+//                     newJoinNonce <<= 8;
+//                     newJoinNonce |= temp[i];
+//                 }
+//                 
+//                 if (newJoinNonce > m_joinNonce)
+//                 {
+//                     /*  update is value is greater  */
+//                     m_joinNonce = newJoinNonce;
+//                 }
+//                 
+//             }
+          
           // Parse the MAC commands
           ParseCommands (fHdr);
 

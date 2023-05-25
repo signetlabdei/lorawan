@@ -145,6 +145,8 @@ NetworkServer::AddNode (Ptr<Node> node)
   Ptr<ClassAEndDeviceLorawanMac> edLorawanMac =
     loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
 
+  //edLorawanMac->SetNwkServer(this);
+    
   // Update the NetworkStatus about the existence of this node
   m_status->AddNode (edLorawanMac);
 }
