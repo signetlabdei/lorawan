@@ -35,8 +35,6 @@
 
 #include <algorithm>
 
-#define HISTORY 100
-
 namespace ns3
 {
 namespace lorawan
@@ -58,7 +56,7 @@ EndDeviceStatus::EndDeviceStatus(LoraDeviceAddress endDeviceAddress,
                                  Ptr<ClassAEndDeviceLorawanMac> endDeviceMac)
     : m_reply(EndDeviceStatus::Reply()),
       m_endDeviceAddress(endDeviceAddress),
-      m_receivedPacketList(ReceivedPacketList(HISTORY)),
+      m_receivedPacketList(ReceivedPacketList()),
       m_mac(endDeviceMac)
 {
     NS_LOG_FUNCTION(this << endDeviceAddress);
@@ -70,7 +68,7 @@ EndDeviceStatus::EndDeviceStatus()
 
     // Initialize data structure
     m_reply = EndDeviceStatus::Reply();
-    m_receivedPacketList = ReceivedPacketList(HISTORY);
+    m_receivedPacketList = ReceivedPacketList();
 }
 
 EndDeviceStatus::~EndDeviceStatus()
