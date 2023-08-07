@@ -57,7 +57,7 @@ BaseEndDeviceLorawanMac::GetTypeId(void)
                           MakeBooleanChecker())
             .AddAttribute("NbTrans",
                           "Default number of transmissions for each packet",
-                          IntegerValue(8),
+                          IntegerValue(1),
                           MakeIntegerAccessor(&BaseEndDeviceLorawanMac::m_nbTrans),
                           MakeIntegerChecker<uint8_t>())
             .AddAttribute("ADRBackoff",
