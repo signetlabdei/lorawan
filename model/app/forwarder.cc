@@ -69,7 +69,7 @@ Forwarder::SetGatewayLorawanMac(Ptr<GatewayLorawanMac> mac)
 }
 
 bool
-Forwarder::ReceiveFromLora(Ptr<GatewayLorawanMac> mac, Ptr<const Packet> packet)
+Forwarder::ReceiveFromLora(Ptr<LorawanMac> mac, Ptr<const Packet> packet)
 {
     NS_LOG_FUNCTION(this << packet);
     Ptr<Packet> packetCopy = packet->Copy();

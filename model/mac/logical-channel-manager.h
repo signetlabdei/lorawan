@@ -33,6 +33,7 @@
 #include <iterator>
 #include <list>
 #include <vector>
+#include <map>
 
 namespace ns3
 {

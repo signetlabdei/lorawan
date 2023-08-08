@@ -62,11 +62,11 @@ class Forwarder : public Application
     void SetPointToPointNetDevice(Ptr<PointToPointNetDevice> pointToPointNetDevice);
 
     /**
-     * Receive a packet from the GatewayLorawanMac.
+     * Receive a packet from the Lorawan Mac layer.
      *
      * \param packet The packet we received.
      */
-    bool ReceiveFromLora(Ptr<GatewayLorawanMac> mac, Ptr<const Packet> packet);
+    bool ReceiveFromLora(Ptr<LorawanMac> mac, Ptr<const Packet> packet);
 
     /**
      * Receive a packet from the PointToPointNetDevice
