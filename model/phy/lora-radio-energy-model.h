@@ -43,7 +43,7 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
     typedef Callback<void, double> UpdateTxCurrentCallback;
 
     LoraRadioEnergyModelPhyListener();
-    virtual ~LoraRadioEnergyModelPhyListener();
+    ~LoraRadioEnergyModelPhyListener() override;
 
     /**
      * \brief Sets the change state callback. Used by helper class.
@@ -66,7 +66,7 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
      *
      * Defined in ns3::LoraEndDevicePhyListener
      */
-    void NotifyRxStart(void);
+    void NotifyRxStart(void) override;
 
     /**
      * \brief Switches the LoraRadioEnergyModel to TX state and switches back to
@@ -77,23 +77,23 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
      *
      * Defined in ns3::LoraEndDevicePhyListener
      */
-    void NotifyTxStart(double txPowerDbm);
+    void NotifyTxStart(double txPowerDbm) override;
 
     /**
      * Defined in ns3::LoraEndDevicePhyListener
      */
-    void NotifySleep(void);
+    void NotifySleep(void) override;
 
     /**
      * Defined in ns3::LoraEndDevicePhyListener
      */
-    void NotifyStandby(void);
+    void NotifyStandby(void) override;
 
   private:
     /**
      * A helper function that makes scheduling m_changeStateCallback possible.
      */
-    void SwitchToStandby(void);
+    void SwitchToStandby();
 
     /**
      * Change state callback used to notify the LoraRadioEnergyModel of a state
@@ -145,9 +145,9 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
      * \brief Get the type ID.
      * \return the object TypeId
      */
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
     LoraRadioEnergyModel();
-    virtual ~LoraRadioEnergyModel();
+    ~LoraRadioEnergyModel() override;
 
     /**
      * \brief Sets pointer to EnergySouce installed on node.
@@ -156,14 +156,14 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
      *
      * Implements DeviceEnergyModel::SetEnergySource.
      */
-    void SetEnergySource(Ptr<EnergySource> source);
+    void SetEnergySource(Ptr<EnergySource> source) override;
 
     /**
      * \returns Total energy consumption of the wifi device.
      *
      * Implements DeviceEnergyModel::GetTotalEnergyConsumption.
      */
-    double GetTotalEnergyConsumption(void) const;
+    double GetTotalEnergyConsumption(void) const override;
 
     // Setter & getters for state power consumption.
     /**
@@ -171,7 +171,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
      *
      * \returns idle current of the lora device.
      */
-    double GetStandbyCurrentA(void) const;
+    double GetStandbyCurrentA() const;
     /**
      * \brief Sets idle current.
      *
@@ -183,7 +183,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
      *
      * \returns transmit current of the lora device.
      */
-    double GetTxCurrentA(void) const;
+    double GetTxCurrentA() const;
     /**
      * \brief Sets transmit current.
      *
@@ -195,7 +195,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
      *
      * \returns receive current of the lora device.
      */
-    double GetRxCurrentA(void) const;
+    double GetRxCurrentA() const;
     /**
      * \brief Sets receive current.
      *
@@ -207,7 +207,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
      *
      * \returns sleep current of the lora device.
      */
-    double GetSleepCurrentA(void) const;
+    double GetSleepCurrentA() const;
     /**
      * \brief Sets sleep current.
      *
@@ -218,7 +218,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
     /**
      * \returns Current state.
      */
-    EndDeviceLoraPhy::State GetCurrentState(void) const;
+    EndDeviceLoraPhy::State GetCurrentState() const;
 
     /**
      * \param callback Callback function.
@@ -256,43 +256,43 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
      *
      * Implements DeviceEnergyModel::ChangeState.
      */
-    void ChangeState(int newState);
+    void ChangeState(int newState) override;
 
     /**
      * \brief Handles energy depletion.
      *
      * Implements DeviceEnergyModel::HandleEnergyDepletion
      */
-    void HandleEnergyDepletion(void);
+    void HandleEnergyDepletion(void) override;
 
     /**
      * \brief Handles energy recharged.
      *
      * Implements DeviceEnergyModel::HandleEnergyChanged
      */
-    void HandleEnergyChanged(void);
+    void HandleEnergyChanged(void) override;
 
     /**
      * \brief Handles energy recharged.
      *
      * Implements DeviceEnergyModel::HandleEnergyRecharged
      */
-    void HandleEnergyRecharged(void);
+    void HandleEnergyRecharged(void) override;
 
     /**
      * \returns Pointer to the PHY listener.
      */
-    LoraRadioEnergyModelPhyListener* GetPhyListener(void);
+    LoraRadioEnergyModelPhyListener* GetPhyListener();
 
   private:
-    void DoDispose(void);
+    void DoDispose(void) override;
 
     /**
      * \returns Current draw of device, at current state.
      *
      * Implements DeviceEnergyModel::GetCurrentA.
      */
-    double DoGetCurrentA(void) const;
+    double DoGetCurrentA(void) const override;
 
     /**
      * \param state New state the radio device is currently in.

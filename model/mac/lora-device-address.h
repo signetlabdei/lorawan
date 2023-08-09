@@ -57,7 +57,7 @@ class NwkID
      *
      * \return The Network Id.
      */
-    uint8_t Get(void) const;
+    uint8_t Get() const;
 
   private:
     uint8_t m_nwkId; //!< 8-bit integer representation of the network id
@@ -88,7 +88,7 @@ class NwkAddr
      *
      * \return The Network Address.
      */
-    uint32_t Get(void) const;
+    uint32_t Get() const;
 
   private:
     uint32_t m_nwkAddr; //!< 8-bit integer representation of the network id
@@ -150,7 +150,7 @@ class LoraDeviceAddress
     /**
      * Get the address in 32-bit integer form.
      */
-    uint32_t Get(void) const;
+    uint32_t Get() const;
 
     /**
      * Get the NwkID of this device.
@@ -160,7 +160,7 @@ class LoraDeviceAddress
      *
      * \return An 8-bit representation of the Network Id of this Device Address.
      */
-    uint8_t GetNwkID(void);
+    uint8_t GetNwkID();
 
     /**
      * Set the NwkID of this device.
@@ -180,7 +180,7 @@ class LoraDeviceAddress
      *
      * \return A 32-bit representation of the Network Address of this Device Address.
      */
-    uint32_t GetNwkAddr(void);
+    uint32_t GetNwkAddr();
 
     /**
      * Set the NwkAddr of this device.
@@ -197,7 +197,7 @@ class LoraDeviceAddress
      *
      * \return The string containing the network address.
      */
-    std::string Print(void) const;
+    std::string Print() const;
 
     bool operator==(const LoraDeviceAddress& other) const;
     bool operator!=(const LoraDeviceAddress& other) const;
@@ -208,8 +208,8 @@ class LoraDeviceAddress
     /**
      * Convert this instance of LoraDeviceAddress to an Address
      */
-    Address ConvertTo(void) const;
-    static uint8_t GetType(void);
+    Address ConvertTo() const;
+    static uint8_t GetType();
     NwkID m_nwkId;     //!< The network Id of this address
     NwkAddr m_nwkAddr; //!< The network address of this address
 };

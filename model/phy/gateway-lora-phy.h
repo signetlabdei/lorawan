@@ -66,7 +66,7 @@ class GatewayLoraPhy : public LoraPhy
          *
          * \return True if its current state is free, false if it's currently locked.
          */
-        bool IsAvailable(void);
+        bool IsAvailable();
 
         /**
          * Set this reception path as available.
@@ -74,7 +74,7 @@ class GatewayLoraPhy : public LoraPhy
          * This function sets the m_available variable as true, and deletes the
          * LoraInterferenceHelper Event this ReceivePath was previously locked on.
          */
-        void Free(void);
+        void Free();
 
         /**
          * Set this reception path as not available and lock it on the
@@ -90,13 +90,13 @@ class GatewayLoraPhy : public LoraPhy
          * \returns 0 if no event is currently being received, a pointer to
          * the event otherwise.
          */
-        Ptr<LoraInterferenceHelper::Event> GetEvent(void);
+        Ptr<LoraInterferenceHelper::Event> GetEvent();
 
         /**
          * Get the EventId of the EndReceive call associated to this ReceptionPath's
          * packet.
          */
-        EventId GetEndReceive(void);
+        EventId GetEndReceive();
 
         /**
          * Set the EventId of the EndReceive call associated to this ReceptionPath's
@@ -123,26 +123,26 @@ class GatewayLoraPhy : public LoraPhy
     };
 
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     GatewayLoraPhy();
-    virtual ~GatewayLoraPhy();
+    ~GatewayLoraPhy() override;
 
-    virtual void StartReceive(Ptr<Packet> packet,
-                              double rxPowerDbm,
-                              uint8_t sf,
-                              Time duration,
-                              double frequency);
+    void StartReceive(Ptr<Packet> packet,
+                      double rxPowerDbm,
+                      uint8_t sf,
+                      Time duration,
+                      double frequency) override;
 
-    virtual void Send(Ptr<Packet> packet,
-                      LoraPhyTxParameters txParams,
-                      double frequency,
-                      double txPowerDbm);
+    void Send(Ptr<Packet> packet,
+              LoraPhyTxParameters txParams,
+              double frequency,
+              double txPowerDbm) override;
 
     /**
      * Used to check the gateway transmission state by the outside
      */
-    bool IsTransmitting(void);
+    bool IsTransmitting() override;
 
     /**
      * Set a certain number of reception paths.
@@ -152,7 +152,7 @@ class GatewayLoraPhy : public LoraPhy
   protected:
     void DoDispose() override;
 
-    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event);
+    void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) override;
 
     /**
      * Used to schedule a change in the gateway transmission state

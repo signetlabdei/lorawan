@@ -43,9 +43,9 @@ class Forwarder : public Application
 {
   public:
     Forwarder();
-    ~Forwarder();
+    ~Forwarder() override;
 
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     /**
      * Sets the mac to use to communicate with the EDs.
@@ -83,12 +83,12 @@ class Forwarder : public Application
     /**
      * Start the application
      */
-    void StartApplication(void);
+    void StartApplication() override;
 
     /**
      * Stop the application
      */
-    void StopApplication(void);
+    void StopApplication() override;
 
     Ptr<LorawanMac> m_mac;                              //!< Pointer to the node's lorawan mac
     Ptr<PointToPointNetDevice> m_pointToPointNetDevice; //!< Pointer to the P2PNetDevice to the NS

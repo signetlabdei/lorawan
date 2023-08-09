@@ -54,14 +54,14 @@ class LorawanMacHeader : public Header
         PROPRIETARY = 7
     };
 
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     LorawanMacHeader();
-    ~LorawanMacHeader();
+    ~LorawanMacHeader() override;
 
     // Pure virtual methods from Header that need to be implemented by this class
-    virtual TypeId GetInstanceTypeId(void) const;
-    virtual uint32_t GetSerializedSize(void) const;
+    TypeId GetInstanceTypeId() const override;
+    uint32_t GetSerializedSize() const override;
 
     /**
      * Serialize the header.
@@ -71,7 +71,7 @@ class LorawanMacHeader : public Header
      * \param start A pointer to the buffer that will be filled with the
      * serialization.
      */
-    virtual void Serialize(Buffer::Iterator start) const;
+    void Serialize(Buffer::Iterator start) const override;
 
     /**
      * Deserialize the header.
@@ -79,14 +79,14 @@ class LorawanMacHeader : public Header
      * \param start A pointer to the buffer we need to deserialize.
      * \return The number of consumed bytes.
      */
-    virtual uint32_t Deserialize(Buffer::Iterator start);
+    uint32_t Deserialize(Buffer::Iterator start) override;
 
     /**
      * Print the header in a human readable format.
      *
      * \param os The std::ostream on which to print the header.
      */
-    virtual void Print(std::ostream& os) const;
+    void Print(std::ostream& os) const override;
 
     /**
      * Set the message type.
@@ -100,7 +100,7 @@ class LorawanMacHeader : public Header
      *
      * \return The uint8_t corresponding to this header's message type.
      */
-    uint8_t GetFType(void) const;
+    uint8_t GetFType() const;
 
     /**
      * Set the major version of this header.
@@ -114,7 +114,7 @@ class LorawanMacHeader : public Header
      *
      * \return The uint8_t corresponding to this header's major version.
      */
-    uint8_t GetMajor(void) const;
+    uint8_t GetMajor() const;
 
     /**
      * Check whether this header is for an uplink message
@@ -122,9 +122,9 @@ class LorawanMacHeader : public Header
      * \return True if the message is meant to be sent from an ED to a GW, false
      * otherwise.
      */
-    bool IsUplink(void) const;
+    bool IsUplink() const;
 
-    bool IsConfirmed(void) const;
+    bool IsConfirmed() const;
 
   private:
     /**

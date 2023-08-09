@@ -33,7 +33,7 @@ NS_LOG_COMPONENT_DEFINE("LoraTxCurrentModel");
 NS_OBJECT_ENSURE_REGISTERED(LoraTxCurrentModel);
 
 TypeId
-LoraTxCurrentModel::GetTypeId(void)
+LoraTxCurrentModel::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::LoraTxCurrentModel").SetParent<Object>().SetGroupName("Lora");
     return tid;
@@ -51,7 +51,7 @@ LoraTxCurrentModel::~LoraTxCurrentModel()
 NS_OBJECT_ENSURE_REGISTERED(LinearLoraTxCurrentModel);
 
 TypeId
-LinearLoraTxCurrentModel::GetTypeId(void)
+LinearLoraTxCurrentModel::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::LinearLoraTxCurrentModel")
@@ -111,19 +111,19 @@ LinearLoraTxCurrentModel::SetStandbyCurrent(double idleCurrent)
 }
 
 double
-LinearLoraTxCurrentModel::GetEta(void) const
+LinearLoraTxCurrentModel::GetEta() const
 {
     return m_eta;
 }
 
 double
-LinearLoraTxCurrentModel::GetVoltage(void) const
+LinearLoraTxCurrentModel::GetVoltage() const
 {
     return m_voltage;
 }
 
 double
-LinearLoraTxCurrentModel::GetStandbyCurrent(void) const
+LinearLoraTxCurrentModel::GetStandbyCurrent() const
 {
     return m_idleCurrent;
 }
@@ -139,7 +139,7 @@ LinearLoraTxCurrentModel::CalcTxCurrent(double txPowerDbm) const
 NS_OBJECT_ENSURE_REGISTERED(ConstantLoraTxCurrentModel);
 
 TypeId
-ConstantLoraTxCurrentModel::GetTypeId(void)
+ConstantLoraTxCurrentModel::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::ConstantLoraTxCurrentModel")
@@ -173,7 +173,7 @@ ConstantLoraTxCurrentModel::SetTxCurrent(double txCurrent)
 }
 
 double
-ConstantLoraTxCurrentModel::GetTxCurrent(void) const
+ConstantLoraTxCurrentModel::GetTxCurrent() const
 {
     return m_txCurrent;
 }

@@ -35,25 +35,25 @@ namespace lorawan
 class GatewayLorawanMac : public LorawanMac
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     GatewayLorawanMac();
-    virtual ~GatewayLorawanMac();
+    ~GatewayLorawanMac() override;
 
     // Implementation of the LorawanMac interface
-    virtual void Send(Ptr<Packet> packet);
+    void Send(Ptr<Packet> packet) override;
 
     // Implementation of the LorawanMac interface
-    virtual void Receive(Ptr<const Packet> packet);
+    void Receive(Ptr<const Packet> packet) override;
 
     // Implementation of the LorawanMac interface
-    virtual void FailedReception(Ptr<const Packet> packet);
+    void FailedReception(Ptr<const Packet> packet) override;
 
     // Implementation of the LorawanMac interface
-    virtual void TxFinished(Ptr<const Packet> packet);
+    void TxFinished(Ptr<const Packet> packet) override;
 
     // Check whether the physiscal layer is currently transmitting
-    bool IsTransmitting(void);
+    bool IsTransmitting();
 
     /**
      * Return the next time at which we will be able to transmit.

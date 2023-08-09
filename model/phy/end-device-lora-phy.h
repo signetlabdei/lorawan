@@ -79,12 +79,12 @@ class EndDeviceLoraPhyListener
     /**
      * Notify listeners that we went to sleep
      */
-    virtual void NotifySleep(void) = 0;
+    virtual void NotifySleep() = 0;
 
     /**
      * Notify listeners that we woke up
      */
-    virtual void NotifyStandby(void) = 0;
+    virtual void NotifyStandby() = 0;
 };
 
 /**
@@ -142,37 +142,37 @@ class EndDeviceLoraPhy : public LoraPhy
         RX
     };
 
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     // Constructor and destructor
     EndDeviceLoraPhy();
-    virtual ~EndDeviceLoraPhy();
+    ~EndDeviceLoraPhy() override;
 
     // Implementation of LoraPhy's pure virtual functions
-    virtual void Send(Ptr<Packet> packet,
-                      LoraPhyTxParameters txParams,
-                      double frequency,
-                      double txPowerDbm);
+    void Send(Ptr<Packet> packet,
+              LoraPhyTxParameters txParams,
+              double frequency,
+              double txPowerDbm) override;
 
     // Implementation of LoraPhy's pure virtual functions
-    virtual void StartReceive(Ptr<Packet> packet,
-                              double rxPowerDbm,
-                              uint8_t sf,
-                              Time duration,
-                              double frequency);
+    void StartReceive(Ptr<Packet> packet,
+                      double rxPowerDbm,
+                      uint8_t sf,
+                      Time duration,
+                      double frequency) override;
 
     // Implementation of LoraPhy's pure virtual functions
-    virtual bool IsTransmitting(void);
+    bool IsTransmitting() override;
 
     /**
      * Switch to the STANDBY state.
      */
-    void SwitchToStandby(void);
+    void SwitchToStandby();
 
     /**
      * Switch to the SLEEP state.
      */
-    void SwitchToSleep(void);
+    void SwitchToSleep();
 
     /**
      * Set the frequency this EndDevice will listen on.
@@ -199,7 +199,7 @@ class EndDeviceLoraPhy : public LoraPhy
      *
      * \return The state this EndDeviceLoraPhy is currently in.
      */
-    EndDeviceLoraPhy::State GetState(void);
+    EndDeviceLoraPhy::State GetState();
 
     /**
      * Add the input listener to the list of objects to be notified of PHY-level
@@ -228,7 +228,7 @@ class EndDeviceLoraPhy : public LoraPhy
     void DoDispose() override;
 
     // Implementation of LoraPhy's pure virtual functions
-    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event);
+    void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) override;
 
     /**
      * Compute the shorter duration of packets being filtered

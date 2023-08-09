@@ -34,14 +34,14 @@ namespace ns3
 class HexGridPositionAllocator : public PositionAllocator
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     HexGridPositionAllocator();
-    ~HexGridPositionAllocator();
+    ~HexGridPositionAllocator() override;
 
-    virtual Vector GetNext(void) const;
+    Vector GetNext() const override;
 
-    virtual int64_t AssignStreams(int64_t stream);
+    int64_t AssignStreams(int64_t stream) override;
 
     void SetDistance(double distance);
 
@@ -64,9 +64,9 @@ class HexGridPositionAllocator : public PositionAllocator
      * With this information we build 2 vectors, one radial
      * and the other fase-shifted counter-clockwise by 120 deg.
      */
-    Vector ObtainCurrentPosition(void) const;
+    Vector ObtainCurrentPosition() const;
 
-    void ResetCoordinates(void);
+    void ResetCoordinates();
 
     /**
      * The distance between two adjacent nodes

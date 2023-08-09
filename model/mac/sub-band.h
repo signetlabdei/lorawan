@@ -61,7 +61,7 @@ class SubBand : public SimpleRefCount<SubBand>
      *
      * \return The lowest frequency of the SubBand.
      */
-    double GetFirstFrequency(void);
+    double GetFirstFrequency();
 
     /**
      * Get the last frequency of the subband.
@@ -76,7 +76,7 @@ class SubBand : public SimpleRefCount<SubBand>
      * \return The duty cycle (as a fraction) that needs to be enforced on this
      * SubBand.
      */
-    double GetDutyCycle(void);
+    double GetDutyCycle();
 
     /**
      * Update the next transmission time.
@@ -96,7 +96,7 @@ class SubBand : public SimpleRefCount<SubBand>
      * \return The next time at which transmission in this SubBand will be
      * allowed.
      */
-    Time GetNextTransmissionTime(void);
+    Time GetNextTransmissionTime();
 
     /**
      * Return whether or not a frequency belongs to this SubBand.
@@ -128,7 +128,7 @@ class SubBand : public SimpleRefCount<SubBand>
      *
      * \return The maximum transmission power, in dBm.
      */
-    double GetMaxTxPowerDbm(void);
+    double GetMaxTxPowerDbm();
 
   private:
     double m_firstFrequency;     //!< Starting frequency of the subband, in Hz

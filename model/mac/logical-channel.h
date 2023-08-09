@@ -65,7 +65,7 @@ class LogicalChannel : public SimpleRefCount<LogicalChannel>
      *
      * \return The center frequency of this channel.
      */
-    double GetFrequency(void) const;
+    double GetFrequency() const;
 
     /**
      * Set the reply frequency (Hz).
@@ -79,7 +79,7 @@ class LogicalChannel : public SimpleRefCount<LogicalChannel>
      *
      * \return The center frequency of replies of this channel.
      */
-    double GetReplyFrequency(void) const;
+    double GetReplyFrequency() const;
 
     /**
      * Set the minimum Data Rate that is allowed on this channel.
@@ -94,27 +94,27 @@ class LogicalChannel : public SimpleRefCount<LogicalChannel>
     /**
      * Get the minimum Data Rate that is allowed on this channel.
      */
-    uint8_t GetMinimumDataRate(void);
+    uint8_t GetMinimumDataRate();
 
     /**
      * Get the maximum Data Rate that is allowed on this channel.
      */
-    uint8_t GetMaximumDataRate(void);
+    uint8_t GetMaximumDataRate();
 
     /**
      * Set this channel as enabled for uplink.
      */
-    void EnableForUplink(void);
+    void EnableForUplink();
 
     /**
      * Set this channel as disabled for uplink.
      */
-    void DisableForUplink(void);
+    void DisableForUplink();
 
     /**
      * Test whether this channel is marked as enabled for uplink.
      */
-    bool IsEnabledForUplink(void);
+    bool IsEnabledForUplink();
 
   private:
     /**

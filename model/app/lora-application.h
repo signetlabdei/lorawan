@@ -36,9 +36,9 @@ class LoraApplication : public Application
      * \brief Get the type ID.
      * \return the object TypeId
      */
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
     LoraApplication();
-    virtual ~LoraApplication();
+    ~LoraApplication() override;
 
     /**
      * Set the sending interval
@@ -50,7 +50,7 @@ class LoraApplication : public Application
      * Get the sending inteval
      * \returns the interval between two packet sends
      */
-    Time GetInterval(void) const;
+    Time GetInterval() const;
 
     /**
      * Set the initial delay of this application
@@ -65,12 +65,12 @@ class LoraApplication : public Application
     /**
      * Get packet size
      */
-    uint8_t GetPacketSize(void) const;
+    uint8_t GetPacketSize() const;
 
     /**
      * True if the application is currently running
      */
-    bool IsRunning(void);
+    bool IsRunning();
 
   protected:
     void DoInitialize() override;
@@ -79,17 +79,17 @@ class LoraApplication : public Application
     /**
      * Start the application by scheduling the first SendPacket event
      */
-    virtual void StartApplication(void);
+    void StartApplication() override;
 
     /**
      * Stop the application
      */
-    virtual void StopApplication(void);
+    void StopApplication() override;
 
     /**
      * Send a packet using the LoraNetDevice's Send method
      */
-    virtual void SendPacket(void);
+    virtual void SendPacket();
 
     /**
      * The average interval between to consecutive send events

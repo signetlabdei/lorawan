@@ -40,8 +40,8 @@ namespace lorawan
 class LoraTag : public Tag
 {
   public:
-    static TypeId GetTypeId(void);
-    virtual TypeId GetInstanceTypeId(void) const;
+    static TypeId GetTypeId();
+    TypeId GetInstanceTypeId() const override;
 
     /**
      * Create a LoraTag with a given spreading factor and collision.
@@ -51,12 +51,12 @@ class LoraTag : public Tag
      */
     LoraTag();
 
-    virtual ~LoraTag();
+    ~LoraTag() override;
 
-    virtual uint32_t GetSerializedSize() const;
-    virtual void Serialize(TagBuffer i) const;
-    virtual void Deserialize(TagBuffer i);
-    virtual void Print(std::ostream& os) const;
+    uint32_t GetSerializedSize() const override;
+    void Serialize(TagBuffer i) const override;
+    void Deserialize(TagBuffer i) override;
+    void Print(std::ostream& os) const override;
 
     /**
      * Set the tx parameters for this packet.
@@ -70,7 +70,7 @@ class LoraTag : public Tag
      *
      * \return The tx parameters of this packet.
      */
-    LoraPhyTxParameters GetTxParameters(void) const;
+    LoraPhyTxParameters GetTxParameters() const;
 
     /**
      * Set the data rate of the packet.
@@ -86,7 +86,7 @@ class LoraTag : public Tag
     /**
      * Get the data rate of the packet.
      */
-    uint8_t GetDataRate(void) const;
+    uint8_t GetDataRate() const;
 
     /**
      * Set the frequency of the packet.
@@ -102,7 +102,7 @@ class LoraTag : public Tag
     /**
      * Get the frequency of the packet.
      */
-    double GetFrequency(void) const;
+    double GetFrequency() const;
 
     /**
      * Set which Spreading Factor this packet was destroyed by.
@@ -130,7 +130,7 @@ class LoraTag : public Tag
      *
      * \return The timestamp at demodulation end of this packet.
      */
-    Time GetReceptionTime(void) const;
+    Time GetReceptionTime() const;
 
     /**
      * Set the power this packet was received with.
@@ -158,7 +158,7 @@ class LoraTag : public Tag
      *
      * \return The SNR measured during demodulation of this packet.
      */
-    double GetSnr(void) const;
+    double GetSnr() const;
 
   private:
     LoraPhyTxParameters m_params; //!< The PHY transmission parameters of this packet

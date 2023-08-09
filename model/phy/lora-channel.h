@@ -57,15 +57,15 @@ class LoraChannel : public Channel
 {
   public:
     // TypeId
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     // Constructor and destructor
     LoraChannel();
-    virtual ~LoraChannel();
+    ~LoraChannel() override;
 
     // Inherited from Channel.
-    virtual std::size_t GetNDevices(void) const;
-    virtual Ptr<NetDevice> GetDevice(std::size_t i) const;
+    std::size_t GetNDevices() const override;
+    Ptr<NetDevice> GetDevice(std::size_t i) const override;
 
     /**
      * Construct a LoraChannel with a loss and delay model.

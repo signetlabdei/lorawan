@@ -54,20 +54,20 @@ namespace lorawan
 class NetworkServer : public Application
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     NetworkServer();
-    virtual ~NetworkServer();
+    ~NetworkServer() override;
 
     /**
      * Start the NS application.
      */
-    void StartApplication(void);
+    void StartApplication() override;
 
     /**
      * Stop the NS application.
      */
-    void StopApplication(void);
+    void StopApplication() override;
 
     /**
      * Inform the NetworkServer that these nodes are connected to the network.
@@ -104,7 +104,7 @@ class NetworkServer : public Application
                  uint16_t protocol,
                  const Address& address);
 
-    Ptr<NetworkStatus> GetNetworkStatus(void);
+    Ptr<NetworkStatus> GetNetworkStatus();
 
   protected:
     void DoDispose() override;

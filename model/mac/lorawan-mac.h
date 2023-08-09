@@ -58,10 +58,10 @@ class LorawanMac : public Object
      */
     typedef Callback<bool, Ptr<LorawanMac>, Ptr<const Packet>> ReceiveCallback;
 
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     LorawanMac();
-    virtual ~LorawanMac();
+    ~LorawanMac() override;
 
     /**
      * Send a packet.
@@ -104,7 +104,7 @@ class LorawanMac : public Object
      *
      * \return The number of preamble symbols to use (typically 8).
      */
-    uint16_t GetNPreambleSymbols(void);
+    uint16_t GetNPreambleSymbols();
 
     /**
      * Get the symbol time based on the datarate
@@ -134,7 +134,7 @@ class LorawanMac : public Object
      *
      * \return The NetDevice this MAC layer will refer to.
      */
-    Ptr<NetDevice> GetDevice(void);
+    Ptr<NetDevice> GetDevice();
 
     /**
      * Set the underlying PHY layer
@@ -148,14 +148,14 @@ class LorawanMac : public Object
      *
      * \return The PHY layer that this MAC is connected to.
      */
-    Ptr<LoraPhy> GetPhy(void);
+    Ptr<LoraPhy> GetPhy();
 
     /**
      * Get the logical lora channel helper associated with this MAC.
      *
      * \return The instance of LogicalChannelManager that this MAC is using.
      */
-    Ptr<LogicalChannelManager> GetLogicalChannelManager(void);
+    Ptr<LogicalChannelManager> GetLogicalChannelManager();
 
     /**
      * Set the LogicalChannelManager this MAC instance will use.

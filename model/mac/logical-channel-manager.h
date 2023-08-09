@@ -32,8 +32,8 @@
 
 #include <iterator>
 #include <list>
-#include <vector>
 #include <map>
+#include <vector>
 
 namespace ns3
 {
@@ -52,10 +52,10 @@ namespace lorawan
 class LogicalChannelManager : public Object
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     LogicalChannelManager();
-    virtual ~LogicalChannelManager();
+    ~LogicalChannelManager() override;
 
     /**
      * Get the time it is necessary to wait before transmitting again, according
@@ -93,7 +93,7 @@ class LogicalChannelManager : public Object
      *
      * \return A list of the managed channels.
      */
-    std::vector<Ptr<LogicalChannel>> GetChannelList(void);
+    std::vector<Ptr<LogicalChannel>> GetChannelList();
 
     /**
      * Get the list of LogicalChannels currently registered on this helper
@@ -101,7 +101,7 @@ class LogicalChannelManager : public Object
      *
      * \return A list of the managed channels enabled for Uplink transmission.
      */
-    std::vector<Ptr<LogicalChannel>> GetEnabledChannelList(void);
+    std::vector<Ptr<LogicalChannel>> GetEnabledChannelList();
 
     /**
      *  Get a pointer to the LogicalChannel at a certain index.

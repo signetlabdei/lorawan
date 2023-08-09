@@ -59,7 +59,7 @@ class LorawanHelper : public PcapHelperForDevice
     };
 
     LorawanHelper();
-    virtual ~LorawanHelper();
+    ~LorawanHelper() override;
 
     /**
      * Install LoraNetDevices on a list of nodes
@@ -93,7 +93,7 @@ class LorawanHelper : public PcapHelperForDevice
      * This method automatically connects to trace sources to computes relevant
      * metrics.
      */
-    void EnablePacketTracking(void);
+    void EnablePacketTracking();
 
     /**
      * Periodically prints the simulation time to the standard output.
@@ -143,9 +143,9 @@ class LorawanHelper : public PcapHelperForDevice
                         std::vector<enum TraceLevel> levels,
                         Time samplePeriod);
 
-    LoraPacketTracker& GetPacketTracker(void);
+    LoraPacketTracker& GetPacketTracker();
 
-    LoraPacketTracker* m_packetTracker = 0;
+    LoraPacketTracker* m_packetTracker = nullptr;
 
     time_t m_oldtime;
 
@@ -161,10 +161,10 @@ class LorawanHelper : public PcapHelperForDevice
      */
     void DoPrintSimulationTime(Time interval);
 
-    virtual void EnablePcapInternal(std::string prefix,
-                                    Ptr<NetDevice> nd,
-                                    bool promiscuous,
-                                    bool explicitFilename);
+    void EnablePcapInternal(std::string prefix,
+                            Ptr<NetDevice> nd,
+                            bool promiscuous,
+                            bool explicitFilename) override;
 
     Time m_lastPhyPerformanceUpdate;
     Time m_lastGlobalPerformanceUpdate;

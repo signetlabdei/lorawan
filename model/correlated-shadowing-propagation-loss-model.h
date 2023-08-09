@@ -111,13 +111,13 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
         static const double m_kInv[4][4];
     };
 
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     /**
      * Constructor.
      */
     CorrelatedShadowingPropagationLossModel();
-    virtual ~CorrelatedShadowingPropagationLossModel();
+    ~CorrelatedShadowingPropagationLossModel() override;
 
     /**
      * Set the correlation distance for newly created ShadowingMap instances
@@ -127,14 +127,14 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
     /**
      * Get the correlation distance that is currently being used.
      */
-    double GetCorrelationDistance(void);
+    double GetCorrelationDistance();
 
   private:
-    virtual double DoCalcRxPower(double txPowerDbm,
-                                 Ptr<MobilityModel> a,
-                                 Ptr<MobilityModel> b) const;
+    double DoCalcRxPower(double txPowerDbm,
+                         Ptr<MobilityModel> a,
+                         Ptr<MobilityModel> b) const override;
 
-    virtual int64_t DoAssignStreams(int64_t stream);
+    int64_t DoAssignStreams(int64_t stream) override;
 
     double m_correlationDistance; //!< The correlation distance for the ShadowingMap
 

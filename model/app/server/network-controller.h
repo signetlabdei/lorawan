@@ -45,11 +45,11 @@ class NetworkControllerComponent;
 class NetworkController : public Object
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     NetworkController();
     NetworkController(Ptr<NetworkStatus> networkStatus);
-    virtual ~NetworkController();
+    ~NetworkController() override;
 
     /**
      * Add a new NetworkControllerComponent

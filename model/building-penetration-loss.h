@@ -40,36 +40,36 @@ namespace lorawan
 class BuildingPenetrationLoss : public PropagationLossModel
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     BuildingPenetrationLoss();
 
-    ~BuildingPenetrationLoss();
+    ~BuildingPenetrationLoss() override;
 
   private:
     /**
      * Perform the computation of the received power according to the current
      * model.
      */
-    virtual double DoCalcRxPower(double txPowerDbm,
-                                 Ptr<MobilityModel> a,
-                                 Ptr<MobilityModel> b) const;
+    double DoCalcRxPower(double txPowerDbm,
+                         Ptr<MobilityModel> a,
+                         Ptr<MobilityModel> b) const override;
 
-    virtual int64_t DoAssignStreams(int64_t stream);
+    int64_t DoAssignStreams(int64_t stream) override;
 
     /**
      * Generate a random p value.
      * The distribution of the returned value is as specified in TR 45.820.
      * \returns A value in the 0-3 range.
      */
-    int GetPValue(void) const;
+    int GetPValue() const;
 
     /**
      * Get a value to compute the wall loss.
      * The distribution of the returned value is as specified in TR 45.820.
      * \returns A value in the 0-2 range.
      */
-    int GetWallLossValue(void) const;
+    int GetWallLossValue() const;
 
     /**
      * Compute the wall loss associated to this mobility model

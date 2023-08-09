@@ -222,8 +222,7 @@ main(int argc, char* argv[])
         txParams.bandwidthHz = 125000;
         txParams.nPreamble = 8;
         txParams.crcEnabled = 1;
-        txParams.lowDataRateOptimizationEnabled =
-            LoraPhy::GetTSym(txParams) > MilliSeconds(16) ? true : false;
+        txParams.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(txParams) > MilliSeconds(16);
         Ptr<Packet> pkt = Create<Packet>(packetSize);
 
         LoraFrameHeader fHdr = LoraFrameHeader();
@@ -257,7 +256,9 @@ main(int argc, char* argv[])
     p2p.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
     p2p.SetChannelAttribute("Delay", StringValue("2ms"));
     for (auto gw = gateways.Begin(); gw != gateways.End(); ++gw)
+    {
         p2p.Install(networkServer.Get(0), *gw);
+    }
 
     // Create a NS for the network
     nsHelper.SetEndDevices(endDevices);
@@ -282,7 +283,7 @@ main(int argc, char* argv[])
             ->TraceConnectWithoutContext("StartSending", MakeCallback(OnTransmissionCallback));
     }
 
-    macHelper.SetSpreadingFactorsUp(endDevices, gateways, channel);
+    LorawanMacHelper::SetSpreadingFactorsUp(endDevices, gateways, channel);
 
     ////////////////
     // Simulation //

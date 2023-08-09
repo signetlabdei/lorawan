@@ -50,11 +50,11 @@ class NetworkStatus;
 class NetworkControllerComponent : public Object
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     // Constructor and destructor
     NetworkControllerComponent();
-    virtual ~NetworkControllerComponent();
+    ~NetworkControllerComponent() override;
 
     // Virtual methods whose implementation is left to child classes
     /**
@@ -87,11 +87,11 @@ class NetworkControllerComponent : public Object
 class ConfirmedMessagesComponent : public NetworkControllerComponent
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     // Constructor and destructor
     ConfirmedMessagesComponent();
-    virtual ~ConfirmedMessagesComponent();
+    ~ConfirmedMessagesComponent() override;
 
     /**
      * This method checks whether the received packet requires an acknowledgment
@@ -102,11 +102,11 @@ class ConfirmedMessagesComponent : public NetworkControllerComponent
      */
     void OnReceivedPacket(Ptr<const Packet> packet,
                           Ptr<EndDeviceStatus> status,
-                          Ptr<NetworkStatus> networkStatus);
+                          Ptr<NetworkStatus> networkStatus) override;
 
-    void BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus);
+    void BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus) override;
 
-    void OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus);
+    void OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus) override;
 };
 
 ///////////////////////////////////
@@ -116,11 +116,11 @@ class ConfirmedMessagesComponent : public NetworkControllerComponent
 class LinkCheckComponent : public NetworkControllerComponent
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     // Constructor and destructor
     LinkCheckComponent();
-    virtual ~LinkCheckComponent();
+    ~LinkCheckComponent() override;
 
     /**
      * This method checks whether the received packet requires an acknowledgment
@@ -131,11 +131,11 @@ class LinkCheckComponent : public NetworkControllerComponent
      */
     void OnReceivedPacket(Ptr<const Packet> packet,
                           Ptr<EndDeviceStatus> status,
-                          Ptr<NetworkStatus> networkStatus);
+                          Ptr<NetworkStatus> networkStatus) override;
 
-    void BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus);
+    void BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus) override;
 
-    void OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus);
+    void OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus) override;
 
   private:
     void UpdateLinkCheckAns(Ptr<const Packet> packet, Ptr<EndDeviceStatus> status);

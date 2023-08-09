@@ -129,7 +129,7 @@ main(int argc, char* argv[])
     macHelper.SetType("ns3::GatewayLorawanMac");
     helper.Install(phyHelper, macHelper, gateways);
 
-    macHelper.SetSpreadingFactorsUp(endDevices, gateways, channel);
+    LorawanMacHelper::SetSpreadingFactorsUp(endDevices, gateways, channel);
 
     /*********************************************
      *  Install applications on the end devices  *

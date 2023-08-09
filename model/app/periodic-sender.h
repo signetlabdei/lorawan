@@ -35,20 +35,20 @@ class PeriodicSender : public LoraApplication
 {
   public:
     PeriodicSender();
-    ~PeriodicSender();
+    ~PeriodicSender() override;
 
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
   private:
     /**
      * Start the application by scheduling the first SendPacket event
      */
-    void StartApplication(void);
+    void StartApplication() override;
 
     /**
      * Send a packet using the LoraNetDevice's Send method
      */
-    void SendPacket(void);
+    void SendPacket() override;
 };
 
 } // namespace lorawan

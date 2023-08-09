@@ -226,7 +226,7 @@ main(int argc, char* argv[])
     double deltaY = 17;
     int gridWidth = 2 * radius / (xLength + deltaX);
     int gridHeight = 2 * radius / (yLength + deltaY);
-    if (realisticChannelModel == false)
+    if (!realisticChannelModel)
     {
         gridWidth = 0;
         gridHeight = 0;
@@ -274,7 +274,7 @@ main(int argc, char* argv[])
      *  Set up the end device's spreading factor  *
      **********************************************/
 
-    macHelper.SetSpreadingFactorsUp(endDevices, gateways, channel);
+    LorawanMacHelper::SetSpreadingFactorsUp(endDevices, gateways, channel);
 
     NS_LOG_DEBUG("Completed configuration");
 
@@ -309,7 +309,9 @@ main(int argc, char* argv[])
     p2p.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
     p2p.SetChannelAttribute("Delay", StringValue("2ms"));
     for (auto gw = gateways.Begin(); gw != gateways.End(); ++gw)
+    {
         p2p.Install(networkServer.Get(0), *gw);
+    }
 
     // Create a NS for the network
     nsHelper.SetEndDevices(endDevices);

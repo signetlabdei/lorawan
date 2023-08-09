@@ -54,10 +54,10 @@ class RecvWindowManager : public Object
 
     typedef Callback<void> NoRecvCallback;
 
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     RecvWindowManager();
-    virtual ~RecvWindowManager();
+    ~RecvWindowManager() override;
 
     /* Start the reception windows scheduling process */
     void Start();

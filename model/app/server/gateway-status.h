@@ -37,11 +37,11 @@ namespace lorawan
 class GatewayStatus : public Object
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     GatewayStatus();
     GatewayStatus(Address address, Ptr<NetDevice> netDevice, Ptr<GatewayLorawanMac> gwMac);
-    virtual ~GatewayStatus();
+    ~GatewayStatus() override;
 
     /**
      * Get this gateway's P2P link address.
@@ -66,7 +66,7 @@ class GatewayStatus : public Object
     /**
      * Get a pointer to this gateway's MAC instance.
      */
-    Ptr<GatewayLorawanMac> GetGatewayMac(void);
+    Ptr<GatewayLorawanMac> GetGatewayMac();
 
     /**
      * Set a pointer to this gateway's MAC instance.

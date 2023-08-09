@@ -51,17 +51,17 @@ class ClassAEndDeviceLorawanMac : public BaseEndDeviceLorawanMac
     };
 
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     ClassAEndDeviceLorawanMac();
-    virtual ~ClassAEndDeviceLorawanMac();
+    ~ClassAEndDeviceLorawanMac() override;
 
     /**
      * Perform the actions that are required after a packet send.
      *
      * This function handles opening of the first receive window.
      */
-    virtual void TxFinished(Ptr<const Packet> packet);
+    void TxFinished(Ptr<const Packet> packet) override;
 
     /**
      * Receive a packet.
@@ -71,7 +71,7 @@ class ClassAEndDeviceLorawanMac : public BaseEndDeviceLorawanMac
      *
      * \param packet the received packet.
      */
-    virtual void Receive(Ptr<const Packet> packet);
+    void Receive(Ptr<const Packet> packet) override;
 
     /**
      * Signal reception failure.
@@ -81,7 +81,7 @@ class ClassAEndDeviceLorawanMac : public BaseEndDeviceLorawanMac
      *
      * \param packet the failed packet.
      */
-    virtual void FailedReception(Ptr<const Packet> packet);
+    void FailedReception(Ptr<const Packet> packet) override;
 
     /**
      * Signal no reception during either reception window.
@@ -89,7 +89,7 @@ class ClassAEndDeviceLorawanMac : public BaseEndDeviceLorawanMac
      * This method is typically registered as a callback in the reception window
      * manager that it's called when the second reception window ends.
      */
-    void NoReception(void);
+    void NoReception();
 
     /////////////////////////
     // Getters and Setters //
@@ -119,13 +119,13 @@ class ClassAEndDeviceLorawanMac : public BaseEndDeviceLorawanMac
      *
      * \param packet the packet to send
      */
-    virtual void SendToPhy(Ptr<Packet> packet);
+    void SendToPhy(Ptr<Packet> packet) override;
 
     /**
      * Find the minimum waiting time before the next possible transmission based
      * on End Device's transmission/reception process.
      */
-    virtual Time GetBusyTransmissionDelay();
+    Time GetBusyTransmissionDelay() override;
 
     /**
      * Decide whether we can retransmit based on reception outcome.
@@ -152,12 +152,12 @@ class ClassAEndDeviceLorawanMac : public BaseEndDeviceLorawanMac
      *                            - The data rate to use for the second receive window.
      *                            - The frequency to use for the second receive window.
      */
-    void OnRxParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq);
+    void OnRxParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq) override;
 
     /**
      * Perform the actions that need to be taken when receiving a RxTimingSetupReq command.
      */
-    void OnRxTimingSetupReq(Time delay);
+    void OnRxTimingSetupReq(Time delay) override;
 
     /**
      * The duration of a receive window in number of symbols. This should be

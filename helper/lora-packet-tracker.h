@@ -189,7 +189,7 @@ class LoraPacketTracker
     void EnableOldPacketsCleanup(Time oldPacketThreshold = Hours(12));
 
   private:
-    void CleanupOldPackets(void);
+    void CleanupOldPackets();
 
     PhyPacketData m_packetTracker;
     MacPacketData m_macPacketTracker;

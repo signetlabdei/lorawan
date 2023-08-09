@@ -37,7 +37,7 @@ NS_LOG_COMPONENT_DEFINE("AdrComponent");
 NS_OBJECT_ENSURE_REGISTERED(AdrComponent);
 
 TypeId
-AdrComponent::GetTypeId(void)
+AdrComponent::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::AdrComponent")

@@ -52,17 +52,17 @@ class BaseEndDeviceLorawanMac : public LorawanMac
     struct LorawanMacTxContext
     {
         Time firstAttempt;
-        Ptr<Packet> packet = 0;
+        Ptr<Packet> packet = nullptr;
         uint8_t nbTxLeft;
         bool waitingAck = false;
         bool busy = false;
     };
 
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     BaseEndDeviceLorawanMac();
-    virtual ~BaseEndDeviceLorawanMac();
+    ~BaseEndDeviceLorawanMac() override;
 
     /**
      * Send a packet.
@@ -71,14 +71,14 @@ class BaseEndDeviceLorawanMac : public LorawanMac
      *
      * \param packet the packet to send
      */
-    virtual void Send(Ptr<Packet> packet);
+    void Send(Ptr<Packet> packet) override;
 
     /**
      * Perform the actions that are required after a packet send.
      *
      * This function handles opening of the first receive window.
      */
-    virtual void TxFinished(Ptr<const Packet> packet) = 0;
+    void TxFinished(Ptr<const Packet> packet) override = 0;
 
     /**
      * Receive a packet.
@@ -88,7 +88,7 @@ class BaseEndDeviceLorawanMac : public LorawanMac
      *
      * \param packet the received packet.
      */
-    virtual void Receive(Ptr<const Packet> packet) = 0;
+    void Receive(Ptr<const Packet> packet) override = 0;
 
     /**
      * Signal reception failure.
@@ -98,7 +98,7 @@ class BaseEndDeviceLorawanMac : public LorawanMac
      *
      * \param packet the failed packet.
      */
-    virtual void FailedReception(Ptr<const Packet> packet) = 0;
+    void FailedReception(Ptr<const Packet> packet) override = 0;
 
     /**
      * Add a MAC command to the list of those that will be sent out in the next
@@ -122,7 +122,7 @@ class BaseEndDeviceLorawanMac : public LorawanMac
      *
      * \return This device's address.
      */
-    LoraDeviceAddress GetDeviceAddress(void);
+    LoraDeviceAddress GetDeviceAddress();
 
     /**
      * Set the message type to send when the Send method is called.
@@ -132,7 +132,7 @@ class BaseEndDeviceLorawanMac : public LorawanMac
     /**
      * Get the message type to send when the Send method is called.
      */
-    LorawanMacHeader::FType GetFType(void);
+    LorawanMacHeader::FType GetFType();
 
     /**
      * Set the data rate this end device will use when transmitting. For End
@@ -148,7 +148,7 @@ class BaseEndDeviceLorawanMac : public LorawanMac
      *
      * \return The data rate this device uses when transmitting.
      */
-    uint8_t GetDataRate(void);
+    uint8_t GetDataRate();
 
     /**
      * Set the transmission power this end device will use when transmitting.
@@ -164,7 +164,7 @@ class BaseEndDeviceLorawanMac : public LorawanMac
      *
      * \return The transmission power this device uses when transmitting.
      */
-    uint8_t GetTransmissionPower(void);
+    uint8_t GetTransmissionPower();
 
     /**
      * Get the aggregated duty cycle.
@@ -172,7 +172,7 @@ class BaseEndDeviceLorawanMac : public LorawanMac
      * \return A time instance containing the aggregated duty cycle in fractional
      * form.
      */
-    double GetAggregatedDutyCycle(void);
+    double GetAggregatedDutyCycle();
 
     /**
      * Set the aggregated duty cycle.
@@ -192,7 +192,7 @@ class BaseEndDeviceLorawanMac : public LorawanMac
     /**
      * Set the maximum number of transmissions allowed.
      */
-    uint8_t GetNumberOfTransmissions(void);
+    uint8_t GetNumberOfTransmissions();
 
     /**
      * Enable data rate adaptation in the retransmitting procedure.
@@ -204,7 +204,7 @@ class BaseEndDeviceLorawanMac : public LorawanMac
     /**
      * Get if data rate adaptation is enabled or not.
      */
-    bool GetADRBackoff(void);
+    bool GetADRBackoff();
 
   protected:
     void DoInitialize() override;
@@ -227,7 +227,7 @@ class BaseEndDeviceLorawanMac : public LorawanMac
      * ones that are available in the ED's LogicalChannel, based on their duty
      * cycle limitations.
      */
-    Ptr<LogicalChannel> GetChannelForTx(void);
+    Ptr<LogicalChannel> GetChannelForTx();
 
     ///////////////////////////
     // Protected MAC Actions //
@@ -332,7 +332,7 @@ class BaseEndDeviceLorawanMac : public LorawanMac
     /**
      * Find the minimum waiting time before the next possible transmission.
      */
-    Time GetNextTransmissionDelay(void);
+    Time GetNextTransmissionDelay();
 
     /**
      * Find the minimum waiting time before the next possible transmission based
@@ -341,7 +341,7 @@ class BaseEndDeviceLorawanMac : public LorawanMac
     virtual Time GetBusyTransmissionDelay() = 0;
 
     /* Check if we need to backoff parameters after long radio silence */
-    void ExecuteADRBackoff(void);
+    void ExecuteADRBackoff();
 
     /**
      * Randomly shuffle a Ptr<LogicalChannel> vector.
@@ -422,7 +422,7 @@ class BaseEndDeviceLorawanMac : public LorawanMac
     /**
      * Perform the actions that need to be taken when receiving a DevStatusReq command.
      */
-    void OnDevStatusReq(void);
+    void OnDevStatusReq();
 
     /**
      * Perform the actions that need to be taken when receiving a NewChannelReq command.

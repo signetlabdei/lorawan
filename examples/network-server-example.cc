@@ -78,7 +78,8 @@ main(int argc, char* argv[])
     //////////
 
     // End Device mobility
-    MobilityHelper mobilityEd, mobilityGw;
+    MobilityHelper mobilityEd;
+    MobilityHelper mobilityGw;
     Ptr<ListPositionAllocator> positionAllocEd = CreateObject<ListPositionAllocator>();
     positionAllocEd->Add(Vector(6000.0, 0.0, 0.0));
     positionAllocEd->Add(Vector(0.0, 100.0, 0.0));
@@ -167,7 +168,9 @@ main(int argc, char* argv[])
     p2p.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
     p2p.SetChannelAttribute("Delay", StringValue("2ms"));
     for (auto gw = gateways.Begin(); gw != gateways.End(); ++gw)
+    {
         p2p.Install(networkServers.Get(0), *gw);
+    }
 
     // Install the NetworkServer application on the network server
     NetworkServerHelper networkServerHelper;

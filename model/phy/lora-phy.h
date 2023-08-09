@@ -71,13 +71,13 @@ class LoraPhy : public Object
 {
   public:
     // TypeId
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     /**
      * Constructor and destructor
      */
     LoraPhy();
-    virtual ~LoraPhy();
+    ~LoraPhy() override;
 
     /**
      * Instruct the PHY to send a packet according to some parameters.
@@ -116,7 +116,7 @@ class LoraPhy : public Object
      * \returns true if the device is currently transmitting a packet, false
      * otherwise.
      */
-    virtual bool IsTransmitting(void) = 0;
+    virtual bool IsTransmitting() = 0;
 
     /**
      * Type definition for a callback for when a packet is correctly received.
@@ -188,7 +188,7 @@ class LoraPhy : public Object
      *
      * \return The LoraChannel instance this PHY transmits on.
      */
-    Ptr<LoraChannel> GetChannel(void) const;
+    Ptr<LoraChannel> GetChannel() const;
 
     /**
      * Get the mobility model associated to this PHY.
@@ -209,7 +209,7 @@ class LoraPhy : public Object
      *
      * \return The NetDevice associated to this PHY.
      */
-    Ptr<NetDevice> GetDevice(void) const;
+    Ptr<NetDevice> GetDevice() const;
 
     /**
      * Set the NetDevice that owns this PHY.
