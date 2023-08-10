@@ -35,7 +35,7 @@ NS_LOG_COMPONENT_DEFINE("OneShotSender");
 NS_OBJECT_ENSURE_REGISTERED(OneShotSender);
 
 TypeId
-OneShotSender::GetTypeId(void)
+OneShotSender::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::OneShotSender")
                             .SetParent<LoraApplication>()
@@ -71,7 +71,7 @@ OneShotSender::SetSendTime(Time sendTime)
 }
 
 void
-OneShotSender::SendPacket(void)
+OneShotSender::SendPacket()
 {
     NS_LOG_FUNCTION(this);
 
@@ -81,7 +81,7 @@ OneShotSender::SendPacket(void)
 }
 
 void
-OneShotSender::StartApplication(void)
+OneShotSender::StartApplication()
 {
     NS_LOG_FUNCTION(this);
     // Schedule the next SendPacket event

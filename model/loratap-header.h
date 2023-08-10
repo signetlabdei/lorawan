@@ -36,18 +36,18 @@ class LoratapHeader : public Header
 {
   public:
     LoratapHeader();
-    ~LoratapHeader();
+    ~LoratapHeader() override;
 
     // Methods inherited from Header
-    static TypeId GetTypeId(void);
-    virtual TypeId GetInstanceTypeId(void) const;
+    static TypeId GetTypeId();
+    TypeId GetInstanceTypeId() const override;
 
     /**
      * Return the size required for serialization of this header
      *
      * \return The serialized size in bytes
      */
-    virtual uint32_t GetSerializedSize(void) const;
+    uint32_t GetSerializedSize() const override;
 
     /**
      * Serialize the header.
@@ -57,7 +57,7 @@ class LoratapHeader : public Header
      * \param start A pointer to the buffer that will be filled with the
      * serialization.
      */
-    virtual void Serialize(Buffer::Iterator start) const;
+    void Serialize(Buffer::Iterator start) const override;
 
     /**
      * Deserialize the contents of the buffer into a LoratapHeader object.
@@ -65,14 +65,14 @@ class LoratapHeader : public Header
      * \param start A pointer to the buffer we need to deserialize.
      * \return The number of consumed bytes.
      */
-    virtual uint32_t Deserialize(Buffer::Iterator start);
+    uint32_t Deserialize(Buffer::Iterator start) override;
 
     /**
      * Print the header in a human-readable format.
      *
      * \param os The std::ostream on which to print the header.
      */
-    virtual void Print(std::ostream& os) const;
+    void Print(std::ostream& os) const override;
 
     /**
      * Fill the header with info from LoraTag

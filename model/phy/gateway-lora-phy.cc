@@ -41,26 +41,26 @@ NS_OBJECT_ENSURE_REGISTERED(GatewayLoraPhy);
  **************************************/
 GatewayLoraPhy::ReceptionPath::ReceptionPath()
     : m_available(1),
-      m_event(0),
+      m_event(nullptr),
       m_endReceiveEventId(EventId())
 {
 }
 
-GatewayLoraPhy::ReceptionPath::~ReceptionPath(void)
+GatewayLoraPhy::ReceptionPath::~ReceptionPath()
 {
 }
 
 bool
-GatewayLoraPhy::ReceptionPath::IsAvailable(void)
+GatewayLoraPhy::ReceptionPath::IsAvailable() const
 {
     return m_available;
 }
 
 void
-GatewayLoraPhy::ReceptionPath::Free(void)
+GatewayLoraPhy::ReceptionPath::Free()
 {
     m_available = true;
-    m_event = 0;
+    m_event = nullptr;
     m_endReceiveEventId.Cancel();
     m_endReceiveEventId = EventId();
 }
@@ -73,13 +73,13 @@ GatewayLoraPhy::ReceptionPath::LockOnEvent(Ptr<LoraInterferenceHelper::Event> ev
 }
 
 Ptr<LoraInterferenceHelper::Event>
-GatewayLoraPhy::ReceptionPath::GetEvent(void)
+GatewayLoraPhy::ReceptionPath::GetEvent()
 {
     return m_event;
 }
 
 EventId
-GatewayLoraPhy::ReceptionPath::GetEndReceive(void)
+GatewayLoraPhy::ReceptionPath::GetEndReceive()
 {
     return m_endReceiveEventId;
 }
@@ -95,7 +95,7 @@ GatewayLoraPhy::ReceptionPath::SetEndReceive(EventId endReceiveEventId)
  ***********************************************************************/
 
 TypeId
-GatewayLoraPhy::GetTypeId(void)
+GatewayLoraPhy::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::GatewayLoraPhy")
@@ -160,6 +160,7 @@ GatewayLoraPhy::StartReceive(Ptr<Packet> packet,
     auto event = m_interference->Add(duration, rxPowerDbm, sf, packet, frequency);
     // Cycle over the receive paths to check availability to receive the packet
     for (auto& path : m_receptionPaths)
+    {
         if (path->IsAvailable()) // If the receive path is available we have a candidate
         {
             // See whether the reception power is above or below the sensitivity
@@ -190,6 +191,7 @@ GatewayLoraPhy::StartReceive(Ptr<Packet> packet,
             }
             return;
         }
+    }
     // If we get to this point, there are no demodulators we can use
     NS_LOG_INFO("Dropping packet reception of packet with sf = "
                 << unsigned(sf) << " and frequency " << frequency
@@ -236,21 +238,27 @@ GatewayLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event
         packet->AddPacketTag(tag);
         // Forward the packet to the upper layer
         if (!m_rxOkCallback.IsNull())
+        {
             m_rxOkCallback(packet);
+        }
         // Fire the trace source
         m_successfullyReceivedPacket(packet, m_nodeId);
         // Fire the sniffer trace source
         if (!m_phySniffRxTrace.IsEmpty())
+        {
             m_phySniffRxTrace(packet);
+        }
     }
     // Search for the demodulator that was locked on this event to free it.
     for (auto& path : m_receptionPaths)
+    {
         if (path->GetEvent() == event)
         {
             path->Free();
             m_occupiedReceptionPaths--;
             return;
         }
+    }
 }
 
 void
@@ -302,14 +310,18 @@ GatewayLoraPhy::TxFinished(Ptr<Packet> packet)
     m_isTransmitting = false;
     // Forward packet to the upper layer
     if (!m_txFinishedCallback.IsNull())
+    {
         m_txFinishedCallback(packet);
+    }
     // Schedule the sniffer trace source
     if (!m_phySniffTxTrace.IsEmpty())
+    {
         m_phySniffTxTrace(packet);
+    }
 }
 
 bool
-GatewayLoraPhy::IsTransmitting(void)
+GatewayLoraPhy::IsTransmitting()
 {
     NS_LOG_FUNCTION_NOARGS();
     return m_isTransmitting;
@@ -321,7 +333,9 @@ GatewayLoraPhy::SetReceptionPaths(uint8_t number)
     NS_LOG_FUNCTION(this << (unsigned)number);
     m_receptionPaths.clear();
     for (uint32_t i = 0; i < number; ++i)
+    {
         m_receptionPaths.push_back(Create<ReceptionPath>());
+    }
 }
 
 void

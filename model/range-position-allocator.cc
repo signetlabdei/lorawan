@@ -36,7 +36,7 @@ NS_LOG_COMPONENT_DEFINE("RangePositionAllocator");
 NS_OBJECT_ENSURE_REGISTERED(RangePositionAllocator);
 
 TypeId
-RangePositionAllocator::GetTypeId(void)
+RangePositionAllocator::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::RangePositionAllocator")
                             .SetParent<PositionAllocator>()
@@ -124,7 +124,9 @@ void
 RangePositionAllocator::SetNodes(NodeContainer nodes)
 {
     for (NodeContainer::Iterator i = nodes.Begin(); i != nodes.End(); ++i)
+    {
         m_nodes.push_back(*i);
+    }
 }
 
 bool
@@ -149,9 +151,11 @@ RangePositionAllocator::OutOfRange(double x, double y, double z) const
 }
 
 Vector
-RangePositionAllocator::GetNext(void) const
+RangePositionAllocator::GetNext() const
 {
-    double x, y, z;
+    double x;
+    double y;
+    double z;
 
     z = (bool(m_zrv) == 0) ? m_z : m_zrv->GetValue();
     do

@@ -33,7 +33,7 @@ NS_LOG_COMPONENT_DEFINE("PoissonSender");
 NS_OBJECT_ENSURE_REGISTERED(PoissonSender);
 
 TypeId
-PoissonSender::GetTypeId(void)
+PoissonSender::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::PoissonSender")
                             .SetParent<LoraApplication>()
@@ -71,7 +71,7 @@ PoissonSender::DoDispose()
 }
 
 void
-PoissonSender::StartApplication(void)
+PoissonSender::StartApplication()
 {
     NS_LOG_FUNCTION(this);
     // Schedule the next SendPacket event
@@ -83,7 +83,7 @@ PoissonSender::StartApplication(void)
 }
 
 void
-PoissonSender::SendPacket(void)
+PoissonSender::SendPacket()
 {
     NS_LOG_FUNCTION(this);
 

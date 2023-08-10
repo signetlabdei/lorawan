@@ -194,12 +194,12 @@ class EndDeviceStatus : public Object
      *
      * \return An unsigned 8-bit integer containing the data rate.
      */
-    uint8_t GetFirstReceiveWindowDataRate();
+    uint8_t GetFirstReceiveWindowDataRate() const;
 
     /**
      * Get the first window frequency of this device.
      */
-    double GetFirstReceiveWindowFrequency();
+    double GetFirstReceiveWindowFrequency() const;
 
     /**
      * Get the offset of spreading factor this device is using in the second
@@ -207,20 +207,20 @@ class EndDeviceStatus : public Object
      *
      * \return An unsigned 8-bit integer containing the spreading factor.
      */
-    uint8_t GetSecondReceiveWindowDataRate();
+    uint8_t GetSecondReceiveWindowDataRate() const;
 
     /**
      * Return the second window frequency of this device.
      *
      */
-    double GetSecondReceiveWindowFrequency();
+    double GetSecondReceiveWindowFrequency() const;
 
     /**
      * Get the received packet list.
      *
      * \return The received packet list.
      */
-    const ReceivedPacketList& GetReceivedPacketList();
+    const ReceivedPacketList& GetReceivedPacketList() const;
 
     /**
      * Set the data rate this device is using in the first receive window.

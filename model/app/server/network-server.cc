@@ -46,7 +46,7 @@ NS_LOG_COMPONENT_DEFINE("NetworkServer");
 NS_OBJECT_ENSURE_REGISTERED(NetworkServer);
 
 TypeId
-NetworkServer::GetTypeId(void)
+NetworkServer::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::NetworkServer")
@@ -75,13 +75,13 @@ NetworkServer::~NetworkServer()
 }
 
 void
-NetworkServer::StartApplication(void)
+NetworkServer::StartApplication()
 {
     NS_LOG_FUNCTION_NOARGS();
 }
 
 void
-NetworkServer::StopApplication(void)
+NetworkServer::StopApplication()
 {
     NS_LOG_FUNCTION_NOARGS();
 }
@@ -103,11 +103,13 @@ NetworkServer::AddGateway(Ptr<Node> gateway, Ptr<NetDevice> netDevice)
     // Get the gateway's LoRa MAC layer
     Ptr<GatewayLorawanMac> gwMac = 0;
     for (uint32_t i = 0; i < gateway->GetNDevices(); i++)
+    {
         if (auto loraDev = DynamicCast<LoraNetDevice>(gateway->GetDevice(i)); bool(loraDev) != 0)
         {
             gwMac = DynamicCast<GatewayLorawanMac>(loraDev->GetMac());
             break;
         }
+    }
     NS_ASSERT(bool(gwMac));
     // Get the Address
     Address gatewayAddress = p2pNetDevice->GetAddress();
@@ -136,11 +138,13 @@ NetworkServer::AddNode(Ptr<Node> node)
     // Get the ClassAEndDeviceLorawanMac
     Ptr<ClassAEndDeviceLorawanMac> edMac = 0;
     for (uint32_t i = 0; i < node->GetNDevices(); i++)
+    {
         if (auto loraDev = DynamicCast<LoraNetDevice>(node->GetDevice(i)); bool(loraDev) != 0)
         {
             edMac = DynamicCast<ClassAEndDeviceLorawanMac>(loraDev->GetMac());
             break;
         }
+    }
     NS_ASSERT(bool(edMac));
     // Update the NetworkStatus about the existence of this node
     m_status->AddNode(edMac);
@@ -181,13 +185,13 @@ NetworkServer::AddComponent(Ptr<NetworkControllerComponent> component)
 }
 
 Ptr<NetworkStatus>
-NetworkServer::GetNetworkStatus(void)
+NetworkServer::GetNetworkStatus()
 {
     return m_status;
 }
 
 void
-NetworkServer::DoDispose(void)
+NetworkServer::DoDispose()
 {
     NS_LOG_FUNCTION(this);
     if (m_status)

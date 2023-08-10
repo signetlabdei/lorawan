@@ -586,35 +586,51 @@ LoraPacketTracker::EnableOldPacketsCleanup(Time oldPacketThreshold)
 }
 
 void
-LoraPacketTracker::CleanupOldPackets(void)
+LoraPacketTracker::CleanupOldPackets()
 {
     if (m_oldPacketThreshold.IsZero())
+    {
         return;
+    }
     if (Simulator::Now() < m_lastPacketCleanup + m_oldPacketThreshold)
+    {
         return;
+    }
 
     for (auto it = m_packetTracker.cbegin(); it != m_packetTracker.cend();)
     {
         if ((*it).second.sendTime < Simulator::Now() - m_oldPacketThreshold)
+        {
             it = m_packetTracker.erase(it);
+        }
         else
+        {
             ++it;
+        }
     }
 
     for (auto it = m_macPacketTracker.cbegin(); it != m_macPacketTracker.cend();)
     {
         if ((*it).second.sendTime < Simulator::Now() - m_oldPacketThreshold)
+        {
             it = m_macPacketTracker.erase(it);
+        }
         else
+        {
             ++it;
+        }
     }
 
     for (auto it = m_reTransmissionTracker.cbegin(); it != m_reTransmissionTracker.cend();)
     {
         if ((*it).second.firstAttempt < Simulator::Now() - m_oldPacketThreshold)
+        {
             it = m_reTransmissionTracker.erase(it);
+        }
         else
+        {
             ++it;
+        }
     }
 
     m_lastPacketCleanup = Simulator::Now();

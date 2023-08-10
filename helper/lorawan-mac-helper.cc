@@ -384,22 +384,34 @@ LorawanMacHelper::SetSpreadingFactorsUp(NodeContainer endDevices,
 
         uint8_t datarate = 0; // SF12 by default
         if (snrMargin > snrThresholds[0])
+        {
             datarate = 5; // SF7
+        }
         else if (snrMargin > snrThresholds[1])
+        {
             datarate = 4; // SF8
+        }
         else if (snrMargin > snrThresholds[2])
+        {
             datarate = 3; // SF9
+        }
         else if (snrMargin > snrThresholds[3])
+        {
             datarate = 2; // SF10
+        }
         else if (snrMargin > snrThresholds[4])
+        {
             datarate = 1; // SF11
+        }
 
         mac->SetDataRate(datarate);
         sfQuantity[datarate]++;
 
         // Minimize power
         if (datarate != 6)
+        {
             continue;
+        }
         for (int j = 14; j >= 0; j -= 2)
         {
             snrMargin =

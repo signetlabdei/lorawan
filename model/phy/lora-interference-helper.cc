@@ -60,43 +60,43 @@ LoraInterferenceHelper::Event::~Event()
 
 // Getters
 Time
-LoraInterferenceHelper::Event::GetStartTime(void) const
+LoraInterferenceHelper::Event::GetStartTime() const
 {
     return m_startTime;
 }
 
 Time
-LoraInterferenceHelper::Event::GetEndTime(void) const
+LoraInterferenceHelper::Event::GetEndTime() const
 {
     return m_endTime;
 }
 
 Time
-LoraInterferenceHelper::Event::GetDuration(void) const
+LoraInterferenceHelper::Event::GetDuration() const
 {
     return m_endTime - m_startTime;
 }
 
 double
-LoraInterferenceHelper::Event::GetRxPowerdBm(void) const
+LoraInterferenceHelper::Event::GetRxPowerdBm() const
 {
     return m_rxPowerdBm;
 }
 
 uint8_t
-LoraInterferenceHelper::Event::GetSpreadingFactor(void) const
+LoraInterferenceHelper::Event::GetSpreadingFactor() const
 {
     return m_sf;
 }
 
 Ptr<Packet>
-LoraInterferenceHelper::Event::GetPacket(void) const
+LoraInterferenceHelper::Event::GetPacket() const
 {
     return m_packet;
 }
 
 double
-LoraInterferenceHelper::Event::GetFrequency(void) const
+LoraInterferenceHelper::Event::GetFrequency() const
 {
     return m_frequencyHz;
 }
@@ -120,7 +120,7 @@ operator<<(std::ostream& os, const LoraInterferenceHelper::Event& event)
  ****************************/
 
 TypeId
-LoraInterferenceHelper::GetTypeId(void)
+LoraInterferenceHelper::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::LoraInterferenceHelper")
@@ -168,7 +168,9 @@ LoraInterferenceHelper::Add(Time duration,
     m_events.push_back(event);
     // Clean the event list
     if (m_events.size() > 100)
+    {
         CleanOldEvents();
+    }
     return event;
 }
 
@@ -188,7 +190,6 @@ LoraInterferenceHelper::IsDestroyedByInterference(Ptr<Event> event)
     Time now = Simulator::Now();
     Time duration = event->GetDuration();
     Time packetStartTime = now - duration;
-    Time packetEndTime = now;
     // Energy for interferers of various SFs
     std::vector<double> cumulativeInterferenceEnergy(6, 0);
     // Cycle over the events
@@ -270,8 +271,10 @@ LoraInterferenceHelper::PrintEvents(std::ostream& stream)
 {
     NS_LOG_FUNCTION_NOARGS();
     stream << "Currently registered events:" << std::endl;
-    for (auto e : m_events)
+    for (const auto& e : m_events)
+    {
         stream << e << std::endl;
+    }
 }
 
 Time
@@ -282,26 +285,36 @@ LoraInterferenceHelper::GetOverlapTime(Ptr<Event> event1, Ptr<Event> event2)
     Time s2 = event2->GetStartTime();
     Time e1 = event1->GetEndTime(); // End times
     Time e2 = event2->GetEndTime();
-    if (e1 <= s2 || e2 <= s1) // Non-overlapping events
+    if (e1 <= s2 || e2 <= s1)
+    { // Non-overlapping events
         return Seconds(0);
+    }
     else if (s1 < s2) // Overlapping: event1 starts before event2
     {
-        if (e2 < e1)        // event2 is temporally contained in event1
+        if (e2 < e1)
+        {                   // event2 is temporally contained in event1
             return e2 - s2; // return duration of event2
+        }
         else
+        {
             return e1 - s2; // return time between start of event2 and end of event1
+        }
     }
     else // Overlapping: event2 starts before event1 (or s1 = s2)
     {
-        if (e1 < e2)        // event1 is temporally contained in event2
+        if (e1 < e2)
+        {                   // event1 is temporally contained in event2
             return e1 - s1; // return duration of event1
+        }
         else
+        {
             return e2 - s1; // return time between start of event1 and end of event2
+        }
     }
 }
 
 void
-LoraInterferenceHelper::ClearAllEvents(void)
+LoraInterferenceHelper::ClearAllEvents()
 {
     NS_LOG_FUNCTION_NOARGS();
     m_events.clear();
@@ -316,7 +329,7 @@ LoraInterferenceHelper::DoDispose()
 }
 
 void
-LoraInterferenceHelper::CleanOldEvents(void)
+LoraInterferenceHelper::CleanOldEvents()
 {
     NS_LOG_FUNCTION(this);
     // Cycle the events, and clean up if an event is old.

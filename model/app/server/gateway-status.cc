@@ -34,7 +34,7 @@ namespace lorawan
 NS_LOG_COMPONENT_DEFINE("GatewayStatus");
 
 TypeId
-GatewayStatus::GetTypeId(void)
+GatewayStatus::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::GatewayStatus")
                             .SetParent<Object>()
@@ -93,7 +93,7 @@ GatewayStatus::SetNetDevice(Ptr<NetDevice> netDevice)
 }
 
 Ptr<GatewayLorawanMac>
-GatewayStatus::GetGatewayMac(void)
+GatewayStatus::GetGatewayMac()
 {
     return m_gatewayMac;
 }
@@ -137,7 +137,7 @@ GatewayStatus::SetNextTransmissionTime(Time nextTransmissionTime)
 }
 
 void
-GatewayStatus::DoDispose(void)
+GatewayStatus::DoDispose()
 {
     NS_LOG_FUNCTION(this);
     m_netDevice = nullptr;

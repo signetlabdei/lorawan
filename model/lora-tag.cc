@@ -34,7 +34,7 @@ namespace lorawan
 NS_OBJECT_ENSURE_REGISTERED(LoraTag);
 
 TypeId
-LoraTag::GetTypeId(void)
+LoraTag::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::LoraTag").SetParent<Tag>().SetGroupName("lorawan").AddConstructor<LoraTag>();
@@ -42,7 +42,7 @@ LoraTag::GetTypeId(void)
 }
 
 TypeId
-LoraTag::GetInstanceTypeId(void) const
+LoraTag::GetInstanceTypeId() const
 {
     return GetTypeId();
 }
@@ -61,7 +61,7 @@ LoraTag::~LoraTag()
 }
 
 uint32_t
-LoraTag::GetSerializedSize(void) const
+LoraTag::GetSerializedSize() const
 {
     return 4 + 1 + sizeof(double) + 1 + sizeof(int64_t) + sizeof(double) + sizeof(double);
 }

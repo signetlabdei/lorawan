@@ -30,7 +30,7 @@ NS_LOG_COMPONENT_DEFINE("HexGridPositionAllocator");
 NS_OBJECT_ENSURE_REGISTERED(HexGridPositionAllocator);
 
 TypeId
-HexGridPositionAllocator::GetTypeId(void)
+HexGridPositionAllocator::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::HexGridPositionAllocator")
@@ -63,7 +63,7 @@ HexGridPositionAllocator::~HexGridPositionAllocator()
 }
 
 Vector
-HexGridPositionAllocator::GetNext(void) const
+HexGridPositionAllocator::GetNext() const
 {
     Vector position = ObtainCurrentPosition();
     // Shift coordinates to point next position
@@ -134,7 +134,7 @@ HexGridPositionAllocator::ObtainCurrentPosition() const
 }
 
 void
-HexGridPositionAllocator::ResetCoordinates(void)
+HexGridPositionAllocator::ResetCoordinates()
 {
     // Special initialization to manage the first assignment
     m_ring = 0;

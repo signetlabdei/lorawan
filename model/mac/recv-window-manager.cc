@@ -33,7 +33,7 @@ NS_LOG_COMPONENT_DEFINE("RecvWindowManager");
 NS_OBJECT_ENSURE_REGISTERED(RecvWindowManager);
 
 TypeId
-RecvWindowManager::GetTypeId(void)
+RecvWindowManager::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::RecvWindowManager")
                             .SetParent<Object>()
@@ -44,7 +44,7 @@ RecvWindowManager::GetTypeId(void)
 
 RecvWindowManager::RecvWindowManager()
     : m_win({{Seconds(1), 12, Seconds(0), 868100000}, {Seconds(2), 12, Seconds(0), 869525000}}),
-      m_phy(0)
+      m_phy(nullptr)
 {
     NS_LOG_FUNCTION(this);
 }
@@ -71,7 +71,9 @@ RecvWindowManager::ForceSleep()
     NS_LOG_FUNCTION(this);
     m_closing.Cancel();
     if (m_phy->GetState() == EndDeviceLoraPhy::STANDBY)
+    {
         m_phy->SwitchToSleep();
+    }
 }
 
 void
@@ -178,7 +180,9 @@ RecvWindowManager::CloseWin(WinId id)
         // No reception, turn PHY layer to sleep
         m_phy->SwitchToSleep();
         if (id == SECOND && !m_noRecvCallback.IsNull())
+        {
             m_noRecvCallback();
+        }
     }
 }
 

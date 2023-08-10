@@ -35,9 +35,9 @@ namespace ns3
 class RangePositionAllocator : public PositionAllocator
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
     RangePositionAllocator();
-    ~RangePositionAllocator();
+    ~RangePositionAllocator() override;
 
     /**
      * \param rho the value of the radius of the allocation disc
@@ -74,8 +74,8 @@ class RangePositionAllocator : public PositionAllocator
      */
     void SetNodes(NodeContainer nodes);
 
-    virtual Vector GetNext(void) const;
-    virtual int64_t AssignStreams(int64_t stream);
+    Vector GetNext() const override;
+    int64_t AssignStreams(int64_t stream) override;
 
   private:
     bool OutOfRange(double x, double y, double z) const;

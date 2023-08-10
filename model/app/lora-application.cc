@@ -33,7 +33,7 @@ NS_LOG_COMPONENT_DEFINE("LoraApplication");
 NS_OBJECT_ENSURE_REGISTERED(LoraApplication);
 
 TypeId
-LoraApplication::GetTypeId(void)
+LoraApplication::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::LoraApplication")
@@ -78,7 +78,7 @@ LoraApplication::SetInterval(Time interval)
 }
 
 Time
-LoraApplication::GetInterval(void) const
+LoraApplication::GetInterval() const
 {
     NS_LOG_FUNCTION(this);
     return m_avgInterval;
@@ -99,14 +99,14 @@ LoraApplication::SetPacketSize(uint8_t size)
 }
 
 uint8_t
-LoraApplication::GetPacketSize(void) const
+LoraApplication::GetPacketSize() const
 {
     NS_LOG_FUNCTION(this);
     return m_basePktSize;
 }
 
 bool
-LoraApplication::IsRunning(void)
+LoraApplication::IsRunning()
 {
     NS_LOG_FUNCTION(this);
     return m_sendEvent.IsRunning();
@@ -146,20 +146,20 @@ LoraApplication::DoDispose()
 // Protected methods
 // StartApp, StopApp and Send will likely be overridden by lora application subclasses
 void
-LoraApplication::StartApplication(void)
+LoraApplication::StartApplication()
 { // Provide null functionality in case subclass is not interested
     NS_LOG_FUNCTION(this);
 }
 
 void
-LoraApplication::StopApplication(void)
+LoraApplication::StopApplication()
 {
     NS_LOG_FUNCTION_NOARGS();
     m_sendEvent.Cancel();
 }
 
 void
-LoraApplication::SendPacket(void)
+LoraApplication::SendPacket()
 { // Provide null functionality in case subclass is not interested
     NS_LOG_FUNCTION(this);
 }

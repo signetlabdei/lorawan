@@ -35,7 +35,7 @@ NS_LOG_COMPONENT_DEFINE("PeriodicSender");
 NS_OBJECT_ENSURE_REGISTERED(PeriodicSender);
 
 TypeId
-PeriodicSender::GetTypeId(void)
+PeriodicSender::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::PeriodicSender")
                             .SetParent<LoraApplication>()
@@ -55,7 +55,7 @@ PeriodicSender::~PeriodicSender()
 }
 
 void
-PeriodicSender::StartApplication(void)
+PeriodicSender::StartApplication()
 {
     NS_LOG_FUNCTION(this);
     // Schedule the next SendPacket event
@@ -67,7 +67,7 @@ PeriodicSender::StartApplication(void)
 }
 
 void
-PeriodicSender::SendPacket(void)
+PeriodicSender::SendPacket()
 {
     NS_LOG_FUNCTION(this);
     // Create and send a new packet

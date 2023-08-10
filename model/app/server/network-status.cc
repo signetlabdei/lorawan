@@ -43,7 +43,7 @@ NS_LOG_COMPONENT_DEFINE("NetworkStatus");
 NS_OBJECT_ENSURE_REGISTERED(NetworkStatus);
 
 TypeId
-NetworkStatus::GetTypeId(void)
+NetworkStatus::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::NetworkStatus")
                             .SetParent<Object>()
@@ -240,7 +240,7 @@ NetworkStatus::GetEndDeviceStatus(LoraDeviceAddress address)
 }
 
 int
-NetworkStatus::CountEndDevices(void)
+NetworkStatus::CountEndDevices()
 {
     NS_LOG_FUNCTION(this);
 
@@ -248,7 +248,7 @@ NetworkStatus::CountEndDevices(void)
 }
 
 void
-NetworkStatus::DoDispose(void)
+NetworkStatus::DoDispose()
 {
     NS_LOG_FUNCTION(this);
     for (auto dev : m_endDeviceStatuses)

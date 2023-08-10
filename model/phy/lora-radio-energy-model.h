@@ -66,7 +66,7 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
      *
      * Defined in ns3::LoraEndDevicePhyListener
      */
-    void NotifyRxStart(void) override;
+    void NotifyRxStart() override;
 
     /**
      * \brief Switches the LoraRadioEnergyModel to TX state and switches back to
@@ -82,12 +82,12 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
     /**
      * Defined in ns3::LoraEndDevicePhyListener
      */
-    void NotifySleep(void) override;
+    void NotifySleep() override;
 
     /**
      * Defined in ns3::LoraEndDevicePhyListener
      */
-    void NotifyStandby(void) override;
+    void NotifyStandby() override;
 
   private:
     /**
@@ -163,7 +163,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
      *
      * Implements DeviceEnergyModel::GetTotalEnergyConsumption.
      */
-    double GetTotalEnergyConsumption(void) const override;
+    double GetTotalEnergyConsumption() const override;
 
     // Setter & getters for state power consumption.
     /**
@@ -263,21 +263,21 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
      *
      * Implements DeviceEnergyModel::HandleEnergyDepletion
      */
-    void HandleEnergyDepletion(void) override;
+    void HandleEnergyDepletion() override;
 
     /**
      * \brief Handles energy recharged.
      *
      * Implements DeviceEnergyModel::HandleEnergyChanged
      */
-    void HandleEnergyChanged(void) override;
+    void HandleEnergyChanged() override;
 
     /**
      * \brief Handles energy recharged.
      *
      * Implements DeviceEnergyModel::HandleEnergyRecharged
      */
-    void HandleEnergyRecharged(void) override;
+    void HandleEnergyRecharged() override;
 
     /**
      * \returns Pointer to the PHY listener.
@@ -285,14 +285,14 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
     LoraRadioEnergyModelPhyListener* GetPhyListener();
 
   private:
-    void DoDispose(void) override;
+    void DoDispose() override;
 
     /**
      * \returns Current draw of device, at current state.
      *
      * Implements DeviceEnergyModel::GetCurrentA.
      */
-    double DoGetCurrentA(void) const override;
+    double DoGetCurrentA() const override;
 
     /**
      * \param state New state the radio device is currently in.

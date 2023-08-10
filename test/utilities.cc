@@ -6,7 +6,7 @@ namespace lorawan
 {
 
 Ptr<LoraChannel>
-CreateChannel(void)
+CreateChannel()
 {
     // Create the lora channel object
     Ptr<LogDistancePropagationLossModel> loss = CreateObject<LogDistancePropagationLossModel>();
@@ -84,7 +84,9 @@ CreateNetworkServer(NodeContainer endDevices, NodeContainer gateways)
     p2p.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
     p2p.SetChannelAttribute("Delay", StringValue("2ms"));
     for (auto gw = gateways.Begin(); gw != gateways.End(); ++gw)
+    {
         p2p.Install(nsNode, *gw);
+    }
 
     // Install server application
     NetworkServerHelper networkServerHelper = NetworkServerHelper();
@@ -120,7 +122,7 @@ InitializeNetwork(int nDevices, int nGateways)
 
     NodeContainer gateways = CreateGateways(nGateways, mobility, channel);
 
-    LorawanMacHelper().SetSpreadingFactorsUp(endDevices, gateways, channel);
+    LorawanMacHelper::SetSpreadingFactorsUp(endDevices, gateways, channel);
 
     Ptr<Node> nsNode = CreateNetworkServer(endDevices, gateways);
 

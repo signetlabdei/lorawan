@@ -192,7 +192,7 @@ class BaseEndDeviceLorawanMac : public LorawanMac
     /**
      * Set the maximum number of transmissions allowed.
      */
-    uint8_t GetNumberOfTransmissions();
+    uint8_t GetNumberOfTransmissions() const;
 
     /**
      * Enable data rate adaptation in the retransmitting procedure.
@@ -204,7 +204,7 @@ class BaseEndDeviceLorawanMac : public LorawanMac
     /**
      * Get if data rate adaptation is enabled or not.
      */
-    bool GetADRBackoff();
+    bool GetADRBackoff() const;
 
   protected:
     void DoInitialize() override;

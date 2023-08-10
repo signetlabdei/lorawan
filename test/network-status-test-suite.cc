@@ -34,10 +34,10 @@ class EndDeviceStatusTest : public TestCase
 {
   public:
     EndDeviceStatusTest();
-    virtual ~EndDeviceStatusTest();
+    ~EndDeviceStatusTest() override;
 
   private:
-    virtual void DoRun(void);
+    void DoRun() override;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -54,7 +54,7 @@ EndDeviceStatusTest::~EndDeviceStatusTest()
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-EndDeviceStatusTest::DoRun(void)
+EndDeviceStatusTest::DoRun()
 {
     NS_LOG_DEBUG("EndDeviceStatusTest");
 
@@ -70,10 +70,10 @@ class NetworkStatusTest : public TestCase
 {
   public:
     NetworkStatusTest();
-    virtual ~NetworkStatusTest();
+    ~NetworkStatusTest() override;
 
   private:
-    virtual void DoRun(void);
+    void DoRun() override;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -90,7 +90,7 @@ NetworkStatusTest::~NetworkStatusTest()
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-NetworkStatusTest::DoRun(void)
+NetworkStatusTest::DoRun()
 {
     NS_LOG_DEBUG("NetworkStatusTest");
 

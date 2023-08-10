@@ -66,7 +66,7 @@ class GatewayLoraPhy : public LoraPhy
          *
          * \return True if its current state is free, false if it's currently locked.
          */
-        bool IsAvailable();
+        bool IsAvailable() const;
 
         /**
          * Set this reception path as available.

@@ -61,7 +61,7 @@ class SubBand : public SimpleRefCount<SubBand>
      *
      * \return The lowest frequency of the SubBand.
      */
-    double GetFirstFrequency();
+    double GetFirstFrequency() const;
 
     /**
      * Get the last frequency of the subband.
@@ -76,7 +76,7 @@ class SubBand : public SimpleRefCount<SubBand>
      * \return The duty cycle (as a fraction) that needs to be enforced on this
      * SubBand.
      */
-    double GetDutyCycle();
+    double GetDutyCycle() const;
 
     /**
      * Update the next transmission time.
@@ -105,7 +105,7 @@ class SubBand : public SimpleRefCount<SubBand>
      * \return True if the frequency is between firstFrequency and lastFrequency,
      * false otherwise.
      */
-    bool BelongsToSubBand(double frequency);
+    bool BelongsToSubBand(double frequency) const;
 
     /**
      * Return whether or not a channel belongs to this SubBand.
@@ -114,7 +114,7 @@ class SubBand : public SimpleRefCount<SubBand>
      * \return True if the channel's center frequency is between firstFrequency
      * and lastFrequency, false otherwise.
      */
-    bool BelongsToSubBand(Ptr<LogicalChannel> channel);
+    bool BelongsToSubBand(Ptr<LogicalChannel> channel) const;
 
     /**
      * Set the maximum transmission power that is allowed on this SubBand.
@@ -128,7 +128,7 @@ class SubBand : public SimpleRefCount<SubBand>
      *
      * \return The maximum transmission power, in dBm.
      */
-    double GetMaxTxPowerDbm();
+    double GetMaxTxPowerDbm() const;
 
   private:
     double m_firstFrequency;     //!< Starting frequency of the subband, in Hz

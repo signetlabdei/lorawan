@@ -37,7 +37,7 @@ NS_LOG_COMPONENT_DEFINE("GatewayLorawanMac");
 NS_OBJECT_ENSURE_REGISTERED(GatewayLorawanMac);
 
 TypeId
-GatewayLorawanMac::GetTypeId(void)
+GatewayLorawanMac::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::GatewayLorawanMac")
                             .SetParent<LorawanMac>()
@@ -70,8 +70,7 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
     // Configure PHY tx params
     m_txParams.sf = GetSfFromDataRate(dataRate);
     m_txParams.bandwidthHz = GetBandwidthFromDataRate(dataRate);
-    m_txParams.lowDataRateOptimizationEnabled =
-        LoraPhy::GetTSym(m_txParams) > MilliSeconds(16) ? true : false;
+    m_txParams.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(m_txParams) > MilliSeconds(16);
     NS_LOG_DEBUG("DR: " << unsigned(dataRate));
     NS_LOG_DEBUG("SF: " << unsigned(m_txParams.sf));
     NS_LOG_DEBUG("BW: " << m_txParams.bandwidthHz << " Hz");
@@ -99,7 +98,7 @@ GatewayLorawanMac::TxFinished(Ptr<const Packet> packet)
 }
 
 bool
-GatewayLorawanMac::IsTransmitting(void)
+GatewayLorawanMac::IsTransmitting()
 {
     return m_phy->IsTransmitting();
 }
@@ -119,7 +118,9 @@ GatewayLorawanMac::Receive(Ptr<const Packet> packet)
     if (mHdr.IsUplink())
     {
         if (!m_receiveCallback.IsNull())
+        {
             m_receiveCallback(this, packetCopy);
+        }
 
         NS_LOG_DEBUG("Received packet: " << packet);
 

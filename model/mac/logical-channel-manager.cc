@@ -36,7 +36,7 @@ NS_LOG_COMPONENT_DEFINE("LogicalChannelManager");
 NS_OBJECT_ENSURE_REGISTERED(LogicalChannelManager);
 
 TypeId
-LogicalChannelManager::GetTypeId(void)
+LogicalChannelManager::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::LogicalChannelManager")
                             .SetParent<Object>()
@@ -58,26 +58,32 @@ LogicalChannelManager::~LogicalChannelManager()
 }
 
 std::vector<Ptr<LogicalChannel>>
-LogicalChannelManager::GetChannelList(void)
+LogicalChannelManager::GetChannelList()
 {
     NS_LOG_FUNCTION(this);
 
     std::vector<Ptr<LogicalChannel>> vector;
     for (auto& llc : m_channelList)
+    {
         vector.push_back(llc.second);
+    }
 
     return vector;
 }
 
 std::vector<Ptr<LogicalChannel>>
-LogicalChannelManager::GetEnabledChannelList(void)
+LogicalChannelManager::GetEnabledChannelList()
 {
     NS_LOG_FUNCTION(this);
 
     std::vector<Ptr<LogicalChannel>> vector;
     for (auto& llc : m_channelList)
+    {
         if (llc.second->IsEnabledForUplink())
+        {
             vector.push_back(llc.second);
+        }
+    }
 
     return vector;
 }

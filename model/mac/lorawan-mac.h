@@ -104,7 +104,7 @@ class LorawanMac : public Object
      *
      * \return The number of preamble symbols to use (typically 8).
      */
-    uint16_t GetNPreambleSymbols();
+    uint16_t GetNPreambleSymbols() const;
 
     /**
      * Get the symbol time based on the datarate

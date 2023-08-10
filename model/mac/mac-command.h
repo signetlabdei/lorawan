@@ -447,14 +447,14 @@ class DevStatusAns : public MacCommand
      *
      * \return The battery level.
      */
-    uint8_t GetBattery();
+    uint8_t GetBattery() const;
 
     /**
      * Get the demodulation margin contained in this MAC command.
      *
      * \return The margin.
      */
-    uint8_t GetMargin();
+    uint8_t GetMargin() const;
 
   private:
     uint8_t m_battery;
@@ -483,10 +483,10 @@ class NewChannelReq : public MacCommand
     uint8_t Deserialize(Buffer::Iterator& start) override;
     void Print(std::ostream& os) const override;
 
-    uint8_t GetChannelIndex();
-    double GetFrequency();
-    uint8_t GetMinDataRate();
-    uint8_t GetMaxDataRate();
+    uint8_t GetChannelIndex() const;
+    double GetFrequency() const;
+    uint8_t GetMinDataRate() const;
+    uint8_t GetMaxDataRate() const;
 
   private:
     uint8_t m_chIndex;
@@ -619,8 +619,8 @@ class DlChannelReq : public MacCommand
     uint8_t Deserialize(Buffer::Iterator& start) override;
     void Print(std::ostream& os) const override;
 
-    uint8_t GetChannelIndex();
-    double GetFrequency();
+    uint8_t GetChannelIndex() const;
+    double GetFrequency() const;
 
   private:
     uint8_t m_chIndex;

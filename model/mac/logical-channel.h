@@ -94,12 +94,12 @@ class LogicalChannel : public SimpleRefCount<LogicalChannel>
     /**
      * Get the minimum Data Rate that is allowed on this channel.
      */
-    uint8_t GetMinimumDataRate();
+    uint8_t GetMinimumDataRate() const;
 
     /**
      * Get the maximum Data Rate that is allowed on this channel.
      */
-    uint8_t GetMaximumDataRate();
+    uint8_t GetMaximumDataRate() const;
 
     /**
      * Set this channel as enabled for uplink.
@@ -114,7 +114,7 @@ class LogicalChannel : public SimpleRefCount<LogicalChannel>
     /**
      * Test whether this channel is marked as enabled for uplink.
      */
-    bool IsEnabledForUplink();
+    bool IsEnabledForUplink() const;
 
   private:
     /**

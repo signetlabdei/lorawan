@@ -37,7 +37,7 @@ NS_LOG_COMPONENT_DEFINE("LoraChannel");
 NS_OBJECT_ENSURE_REGISTERED(LoraChannel);
 
 TypeId
-LoraChannel::GetTypeId(void)
+LoraChannel::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::LoraChannel")
@@ -98,11 +98,13 @@ LoraChannel::Remove(Ptr<LoraPhy> phy)
     auto& phyList = (DynamicCast<EndDeviceLoraPhy>(phy)) ? m_phyListDown : m_phyListUp;
     auto i = find(phyList.begin(), phyList.end(), phy);
     if (i != phyList.end())
+    {
         phyList.erase(i);
+    }
 }
 
 std::size_t
-LoraChannel::GetNDevices(void) const
+LoraChannel::GetNDevices() const
 {
     NS_LOG_FUNCTION_NOARGS();
     return m_phyListUp.size() + m_phyListDown.size();

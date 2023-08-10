@@ -66,7 +66,7 @@ LogicalChannel::LogicalChannel(double frequency, uint8_t minDataRate, uint8_t ma
 }
 
 double
-LogicalChannel::GetFrequency(void) const
+LogicalChannel::GetFrequency() const
 {
     return m_frequency;
 }
@@ -78,7 +78,7 @@ LogicalChannel::SetReplyFrequency(double replyFrequency)
 }
 
 double
-LogicalChannel::GetReplyFrequency(void) const
+LogicalChannel::GetReplyFrequency() const
 {
     return m_replyFrequency;
 }
@@ -96,31 +96,31 @@ LogicalChannel::SetMaximumDataRate(uint8_t maxDataRate)
 }
 
 uint8_t
-LogicalChannel::GetMinimumDataRate(void)
+LogicalChannel::GetMinimumDataRate() const
 {
     return m_minDataRate;
 }
 
 uint8_t
-LogicalChannel::GetMaximumDataRate(void)
+LogicalChannel::GetMaximumDataRate() const
 {
     return m_maxDataRate;
 }
 
 void
-LogicalChannel::EnableForUplink(void)
+LogicalChannel::EnableForUplink()
 {
     m_enabledForUplink = true;
 }
 
 void
-LogicalChannel::DisableForUplink(void)
+LogicalChannel::DisableForUplink()
 {
     m_enabledForUplink = false;
 }
 
 bool
-LogicalChannel::IsEnabledForUplink(void)
+LogicalChannel::IsEnabledForUplink() const
 {
     return m_enabledForUplink;
 }

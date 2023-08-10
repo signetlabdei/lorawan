@@ -41,7 +41,7 @@ NS_LOG_COMPONENT_DEFINE("ClassAEndDeviceLorawanMac");
 NS_OBJECT_ENSURE_REGISTERED(ClassAEndDeviceLorawanMac);
 
 TypeId
-ClassAEndDeviceLorawanMac::GetTypeId(void)
+ClassAEndDeviceLorawanMac::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::ClassAEndDeviceLorawanMac")
@@ -84,8 +84,7 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packet)
     // Configure PHY tx params
     m_txParams.sf = GetSfFromDataRate(m_dataRate);
     m_txParams.bandwidthHz = GetBandwidthFromDataRate(m_dataRate);
-    m_txParams.lowDataRateOptimizationEnabled =
-        LoraPhy::GetTSym(m_txParams) > MilliSeconds(16) ? true : false;
+    m_txParams.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(m_txParams) > MilliSeconds(16);
     NS_LOG_DEBUG("DR: " << unsigned(m_dataRate));
     NS_LOG_DEBUG("SF: " << unsigned(m_txParams.sf));
     NS_LOG_DEBUG("BW: " << m_txParams.bandwidthHz << " Hz");
@@ -190,7 +189,9 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
     ApplyMACCommands(fHdr, packetCopy);
 
     if (!m_receiveCallback.IsNull())
+    {
         m_receiveCallback(this, packetCopy);
+    }
     // Call the trace source
     m_receivedPacket(packet);
 
@@ -234,11 +235,17 @@ ClassAEndDeviceLorawanMac::ManageRetransmissions(RxOutcome outcome)
     if ((!recv || (needAck && !gotAck)) && canReTx)
     {
         if (outcome == RECV)
+        {
             NS_LOG_DEBUG("Received packet without ACK: rescheduling transmission.");
+        }
         else if (outcome == FAIL)
+        {
             NS_LOG_DEBUG("Reception failed: rescheduling transmission.");
+        }
         else if (outcome == NONE)
+        {
             NS_LOG_DEBUG("No reception initiated by PHY: rescheduling transmission.");
+        }
         NS_LOG_INFO("We have " << unsigned(m_txContext.nbTxLeft) << " retransmissions left.");
         postponeTransmission(Seconds(RETRANSMIT_TIMEOUT), m_txContext.packet);
         return;

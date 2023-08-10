@@ -54,7 +54,7 @@ LoraFrameHeader::~LoraFrameHeader()
 }
 
 TypeId
-LoraFrameHeader::GetTypeId(void)
+LoraFrameHeader::GetTypeId()
 {
     static TypeId tid =
         TypeId("LoraFrameHeader").SetParent<Header>().AddConstructor<LoraFrameHeader>();
@@ -62,13 +62,13 @@ LoraFrameHeader::GetTypeId(void)
 }
 
 TypeId
-LoraFrameHeader::GetInstanceTypeId(void) const
+LoraFrameHeader::GetInstanceTypeId() const
 {
     return GetTypeId();
 }
 
 uint32_t
-LoraFrameHeader::GetSerializedSize(void) const
+LoraFrameHeader::GetSerializedSize() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -113,7 +113,9 @@ LoraFrameHeader::Serialize(Buffer::Iterator start) const
 
     // FPort
     if (m_fPort > -1 && !m_frmpCmdsLen)
+    {
         start.WriteU8((uint8_t)m_fPort);
+    }
 
     NS_LOG_DEBUG("Serializing the following data: ");
     NS_LOG_DEBUG("Address: " << m_address.Print());
@@ -124,7 +126,9 @@ LoraFrameHeader::Serialize(Buffer::Iterator start) const
     NS_LOG_DEBUG("fOptsLen: " << unsigned(m_fOptsLen));
     NS_LOG_DEBUG("fCnt: " << unsigned(m_fCnt));
     if (m_fPort > -1)
+    {
         NS_LOG_DEBUG("fPort: " << m_fPort);
+    }
 }
 
 uint32_t
@@ -328,7 +332,9 @@ LoraFrameHeader::Deserialize(Buffer::Iterator start)
     }
 
     if (m_fPort > -1)
+    {
         NS_LOG_DEBUG("fPort: " << m_fPort);
+    }
 
     return 7 + m_fOptsLen + (m_fPort > -1 && !m_frmpCmdsLen) +
            m_frmpCmdsLen; // the number of bytes consumed.
@@ -354,13 +360,15 @@ LoraFrameHeader::Print(std::ostream& os) const
     }
 
     if (m_fPort > -1)
+    {
         os << "FPort=" << m_fPort;
+    }
 
     os << std::endl;
 }
 
 void
-LoraFrameHeader::SetAsUplink(void)
+LoraFrameHeader::SetAsUplink()
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -368,7 +376,7 @@ LoraFrameHeader::SetAsUplink(void)
 }
 
 void
-LoraFrameHeader::SetAsDownlink(void)
+LoraFrameHeader::SetAsDownlink()
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -382,7 +390,7 @@ LoraFrameHeader::SetFPort(int fPort)
 }
 
 int
-LoraFrameHeader::GetFPort(void) const
+LoraFrameHeader::GetFPort() const
 {
     return m_fPort;
 }
@@ -394,7 +402,7 @@ LoraFrameHeader::SetAddress(LoraDeviceAddress address)
 }
 
 LoraDeviceAddress
-LoraFrameHeader::GetAddress(void) const
+LoraFrameHeader::GetAddress() const
 {
     return m_address;
 }
@@ -407,7 +415,7 @@ LoraFrameHeader::SetAdr(bool adr)
 }
 
 bool
-LoraFrameHeader::GetAdr(void) const
+LoraFrameHeader::GetAdr() const
 {
     return m_adr;
 }
@@ -419,7 +427,7 @@ LoraFrameHeader::SetAdrAckReq(bool adrAckReq)
 }
 
 bool
-LoraFrameHeader::GetAdrAckReq(void) const
+LoraFrameHeader::GetAdrAckReq() const
 {
     return m_adrAckReq;
 }
@@ -432,7 +440,7 @@ LoraFrameHeader::SetAck(bool ack)
 }
 
 bool
-LoraFrameHeader::GetAck(void) const
+LoraFrameHeader::GetAck() const
 {
     return m_ack;
 }
@@ -444,13 +452,13 @@ LoraFrameHeader::SetFPending(bool fPending)
 }
 
 bool
-LoraFrameHeader::GetFPending(void) const
+LoraFrameHeader::GetFPending() const
 {
     return m_fPending;
 }
 
 uint8_t
-LoraFrameHeader::GetFOptsLen(void) const
+LoraFrameHeader::GetFOptsLen() const
 {
     // Sum the serialized lenght of all commands in the list
     uint8_t fOptsLen = 0;
@@ -469,7 +477,7 @@ LoraFrameHeader::SetFCnt(uint16_t fCnt)
 }
 
 uint16_t
-LoraFrameHeader::GetFCnt(void) const
+LoraFrameHeader::GetFCnt() const
 {
     return m_fCnt;
 }
@@ -481,7 +489,7 @@ LoraFrameHeader::SetFRMPaylodCmdsLen(uint16_t frmpCmdsLen)
 }
 
 void
-LoraFrameHeader::AddLinkCheckReq(void)
+LoraFrameHeader::AddLinkCheckReq()
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -554,7 +562,7 @@ LoraFrameHeader::AddDutyCycleReq(uint8_t dutyCycle)
 }
 
 void
-LoraFrameHeader::AddDutyCycleAns(void)
+LoraFrameHeader::AddDutyCycleAns()
 {
     NS_LOG_FUNCTION(this);
 
@@ -581,7 +589,7 @@ LoraFrameHeader::AddRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, do
 }
 
 void
-LoraFrameHeader::AddRxParamSetupAns(void)
+LoraFrameHeader::AddRxParamSetupAns()
 {
     NS_LOG_FUNCTION(this);
 
@@ -593,7 +601,7 @@ LoraFrameHeader::AddRxParamSetupAns(void)
 }
 
 void
-LoraFrameHeader::AddDevStatusReq(void)
+LoraFrameHeader::AddDevStatusReq()
 {
     NS_LOG_FUNCTION(this);
 
@@ -621,7 +629,7 @@ LoraFrameHeader::AddNewChannelReq(uint8_t chIndex,
 }
 
 std::list<Ptr<MacCommand>>
-LoraFrameHeader::GetCommands(void)
+LoraFrameHeader::GetCommands()
 {
     NS_LOG_FUNCTION_NOARGS();
 

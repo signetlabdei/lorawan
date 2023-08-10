@@ -35,7 +35,7 @@ NS_LOG_COMPONENT_DEFINE("LorawanMac");
 NS_OBJECT_ENSURE_REGISTERED(LorawanMac);
 
 TypeId
-LorawanMac::GetTypeId(void)
+LorawanMac::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::LorawanMac")
@@ -76,7 +76,7 @@ LorawanMac::SetNPreambleSymbols(uint16_t nPreambleSymbols)
 }
 
 uint16_t
-LorawanMac::GetNPreambleSymbols(void)
+LorawanMac::GetNPreambleSymbols() const
 {
     return m_txParams.nPreamble;
 }
@@ -103,13 +103,13 @@ LorawanMac::SetDevice(Ptr<NetDevice> device)
 }
 
 Ptr<NetDevice>
-LorawanMac::GetDevice(void)
+LorawanMac::GetDevice()
 {
     return m_device;
 }
 
 Ptr<LoraPhy>
-LorawanMac::GetPhy(void)
+LorawanMac::GetPhy()
 {
     return m_phy;
 }
@@ -126,7 +126,7 @@ LorawanMac::SetPhy(Ptr<LoraPhy> phy)
 }
 
 Ptr<LogicalChannelManager>
-LorawanMac::GetLogicalChannelManager(void)
+LorawanMac::GetLogicalChannelManager()
 {
     return m_channelManager;
 }

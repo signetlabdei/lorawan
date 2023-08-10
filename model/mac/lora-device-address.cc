@@ -55,7 +55,7 @@ NwkID::Set(uint8_t nwkId)
 }
 
 uint8_t
-NwkID::Get(void) const
+NwkID::Get() const
 {
     return m_nwkId;
 }
@@ -81,7 +81,7 @@ NwkAddr::Set(uint32_t nwkAddr)
 }
 
 uint32_t
-NwkAddr::Get(void) const
+NwkAddr::Get() const
 {
     return m_nwkAddr;
 }
@@ -149,7 +149,7 @@ LoraDeviceAddress::Deserialize(const uint8_t buf[4])
 }
 
 Address
-LoraDeviceAddress::ConvertTo(void) const
+LoraDeviceAddress::ConvertTo() const
 {
     NS_LOG_FUNCTION(this);
 
@@ -174,7 +174,7 @@ LoraDeviceAddress::ConvertFrom(const Address& address)
 }
 
 uint8_t
-LoraDeviceAddress::GetType(void)
+LoraDeviceAddress::GetType()
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -183,7 +183,7 @@ LoraDeviceAddress::GetType(void)
 }
 
 uint32_t
-LoraDeviceAddress::Get(void) const
+LoraDeviceAddress::Get() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -205,7 +205,7 @@ LoraDeviceAddress::Set(uint32_t address)
 }
 
 uint8_t
-LoraDeviceAddress::GetNwkID(void)
+LoraDeviceAddress::GetNwkID()
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -213,7 +213,7 @@ LoraDeviceAddress::GetNwkID(void)
 }
 
 uint32_t
-LoraDeviceAddress::GetNwkAddr(void)
+LoraDeviceAddress::GetNwkAddr()
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -237,7 +237,7 @@ LoraDeviceAddress::SetNwkAddr(uint32_t nwkAddr)
 }
 
 std::string
-LoraDeviceAddress::Print(void) const
+LoraDeviceAddress::Print() const
 {
     NS_LOG_FUNCTION_NOARGS();
 

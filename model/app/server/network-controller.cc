@@ -33,7 +33,7 @@ NS_LOG_COMPONENT_DEFINE("NetworkController");
 NS_OBJECT_ENSURE_REGISTERED(NetworkController);
 
 TypeId
-NetworkController::GetTypeId(void)
+NetworkController::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::NetworkController")
                             .SetParent<Object>()

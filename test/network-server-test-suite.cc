@@ -36,13 +36,13 @@ class UplinkPacketTest : public TestCase
 {
   public:
     UplinkPacketTest();
-    virtual ~UplinkPacketTest();
+    ~UplinkPacketTest() override;
 
     void ReceivedPacket(Ptr<const Packet> packet);
     void SendPacket(Ptr<Node> endDevice);
 
   private:
-    virtual void DoRun(void);
+    void DoRun() override;
     bool m_receivedPacket = false;
 };
 
@@ -75,7 +75,7 @@ UplinkPacketTest::SendPacket(Ptr<Node> endDevice)
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-UplinkPacketTest::DoRun(void)
+UplinkPacketTest::DoRun()
 {
     NS_LOG_DEBUG("UplinkPacketTest");
 
@@ -111,7 +111,7 @@ class DownlinkPacketTest : public TestCase
 {
   public:
     DownlinkPacketTest();
-    virtual ~DownlinkPacketTest();
+    ~DownlinkPacketTest() override;
 
     void ReceivedPacketAtEndDevice(uint8_t requiredTransmissions,
                                    bool success,
@@ -120,7 +120,7 @@ class DownlinkPacketTest : public TestCase
     void SendPacket(Ptr<Node> endDevice, bool requestAck);
 
   private:
-    virtual void DoRun(void);
+    void DoRun() override;
     bool m_receivedPacketAtEd = false;
 };
 
@@ -151,14 +151,16 @@ DownlinkPacketTest::SendPacket(Ptr<Node> endDevice, bool requestAck)
 {
     auto mac = DynamicCast<LoraNetDevice>(endDevice->GetDevice(0))->GetMac();
     if (requestAck)
+    {
         DynamicCast<BaseEndDeviceLorawanMac>(mac)->SetFType(LorawanMacHeader::CONFIRMED_DATA_UP);
+    }
     mac->Send(Create<Packet>(20));
 }
 
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-DownlinkPacketTest::DoRun(void)
+DownlinkPacketTest::DoRun()
 {
     NS_LOG_DEBUG("DownlinkPacketTest");
 
@@ -195,14 +197,14 @@ class LinkCheckTest : public TestCase
 {
   public:
     LinkCheckTest();
-    virtual ~LinkCheckTest();
+    ~LinkCheckTest() override;
 
     void LastKnownGatewayCount(int newValue, int oldValue);
 
     void SendPacket(Ptr<Node> endDevice, bool requestAck);
 
   private:
-    virtual void DoRun(void);
+    void DoRun() override;
     bool m_receivedPacketAtEd = false;
     int m_numberOfGatewaysThatReceivedPacket = 0;
 };
@@ -234,7 +236,9 @@ LinkCheckTest::SendPacket(Ptr<Node> endDevice, bool requestAck)
     auto macLayer = DynamicCast<BaseEndDeviceLorawanMac>(
         DynamicCast<LoraNetDevice>(endDevice->GetDevice(0))->GetMac());
     if (requestAck)
+    {
         macLayer->SetFType(LorawanMacHeader::CONFIRMED_DATA_UP);
+    }
     macLayer->AddMacCommand(Create<LinkCheckReq>());
     macLayer->Send(Create<Packet>(20));
 }
@@ -242,7 +246,7 @@ LinkCheckTest::SendPacket(Ptr<Node> endDevice, bool requestAck)
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-LinkCheckTest::DoRun(void)
+LinkCheckTest::DoRun()
 {
     NS_LOG_DEBUG("LinkCheckTest");
 

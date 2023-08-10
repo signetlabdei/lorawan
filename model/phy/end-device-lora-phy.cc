@@ -49,7 +49,7 @@ EndDeviceLoraPhyListener::~EndDeviceLoraPhyListener()
 }
 
 TypeId
-EndDeviceLoraPhy::GetTypeId(void)
+EndDeviceLoraPhy::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::EndDeviceLoraPhy")
@@ -138,10 +138,14 @@ EndDeviceLoraPhy::TxFinished(Ptr<Packet> packet)
     SwitchToStandby();
     // Forward packet to the upper layer
     if (!m_txFinishedCallback.IsNull())
+    {
         m_txFinishedCallback(packet);
+    }
     // Schedule the sniffer trace source
     if (!m_phySniffTxTrace.IsEmpty())
+    {
         m_phySniffTxTrace(packet);
+    }
 }
 
 void
@@ -289,7 +293,9 @@ EndDeviceLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Eve
         // If there is one, perform the callback to inform the upper layer of the
         // failed reception attempt
         if (!m_rxFailedCallback.IsNull())
+        {
             m_rxFailedCallback(packet);
+        }
         // Possibly a trace source callback could be added here
         return;
     }
@@ -309,7 +315,9 @@ EndDeviceLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Eve
         // If there is one, perform the callback to inform the upper layer of the
         // lost packet
         if (!m_rxFailedCallback.IsNull())
+        {
             m_rxFailedCallback(packet);
+        }
         // Fire the trace source
         m_interferedPacket(packet, m_nodeId);
         return;
@@ -326,16 +334,20 @@ EndDeviceLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Eve
     packet->AddPacketTag(tag);
     // If there is one, perform the callback to inform the upper layer
     if (!m_rxOkCallback.IsNull())
+    {
         m_rxOkCallback(packet);
+    }
     // Fire the trace source
     m_successfullyReceivedPacket(packet, m_nodeId);
     // Fire the sniffer trace source
     if (!m_phySniffRxTrace.IsEmpty())
+    {
         m_phySniffRxTrace(packet);
+    }
 }
 
 void
-EndDeviceLoraPhy::SwitchToStandby(void)
+EndDeviceLoraPhy::SwitchToStandby()
 {
     NS_LOG_FUNCTION_NOARGS();
     m_state = STANDBY;
@@ -345,7 +357,7 @@ EndDeviceLoraPhy::SwitchToStandby(void)
 }
 
 void
-EndDeviceLoraPhy::SwitchToSleep(void)
+EndDeviceLoraPhy::SwitchToSleep()
 {
     NS_LOG_FUNCTION_NOARGS();
     NS_ASSERT(m_state == STANDBY);
@@ -356,7 +368,7 @@ EndDeviceLoraPhy::SwitchToSleep(void)
 }
 
 void
-EndDeviceLoraPhy::SwitchToRx(void)
+EndDeviceLoraPhy::SwitchToRx()
 {
     NS_LOG_FUNCTION_NOARGS();
     NS_ASSERT(m_state == STANDBY);
@@ -378,14 +390,14 @@ EndDeviceLoraPhy::SwitchToTx(double txPowerDbm)
 }
 
 EndDeviceLoraPhy::State
-EndDeviceLoraPhy::GetState(void)
+EndDeviceLoraPhy::GetState()
 {
     NS_LOG_FUNCTION_NOARGS();
     return m_state;
 }
 
 bool
-EndDeviceLoraPhy::IsTransmitting(void)
+EndDeviceLoraPhy::IsTransmitting()
 {
     NS_LOG_FUNCTION_NOARGS();
     return m_state == TX;
@@ -424,7 +436,9 @@ EndDeviceLoraPhy::UnregisterListener(EndDeviceLoraPhyListener* listener)
     NS_LOG_FUNCTION(this << listener);
     auto i = find(m_listeners.begin(), m_listeners.end(), listener);
     if (i != m_listeners.end())
+    {
         m_listeners.erase(i);
+    }
 }
 
 void

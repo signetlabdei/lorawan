@@ -36,7 +36,7 @@ NS_LOG_COMPONENT_DEFINE("CorrelatedShadowingPropagationLossModel");
 NS_OBJECT_ENSURE_REGISTERED(CorrelatedShadowingPropagationLossModel);
 
 TypeId
-CorrelatedShadowingPropagationLossModel::GetTypeId(void)
+CorrelatedShadowingPropagationLossModel::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::CorrelatedShwodingPropagationLossModel")

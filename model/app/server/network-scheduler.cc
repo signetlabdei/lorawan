@@ -33,7 +33,7 @@ NS_LOG_COMPONENT_DEFINE("NetworkScheduler");
 NS_OBJECT_ENSURE_REGISTERED(NetworkScheduler);
 
 TypeId
-NetworkScheduler::GetTypeId(void)
+NetworkScheduler::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::NetworkScheduler")

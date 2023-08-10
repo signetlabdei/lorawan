@@ -39,7 +39,7 @@ NS_LOG_COMPONENT_DEFINE("BaseEndDeviceLorawanMac");
 NS_OBJECT_ENSURE_REGISTERED(BaseEndDeviceLorawanMac);
 
 TypeId
-BaseEndDeviceLorawanMac::GetTypeId(void)
+BaseEndDeviceLorawanMac::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::BaseEndDeviceLorawanMac")
@@ -174,7 +174,7 @@ BaseEndDeviceLorawanMac::Send(Ptr<Packet> packet)
 }
 
 Time
-BaseEndDeviceLorawanMac::GetNextTransmissionDelay(void)
+BaseEndDeviceLorawanMac::GetNextTransmissionDelay()
 {
     NS_LOG_FUNCTION(this);
 
@@ -287,7 +287,9 @@ BaseEndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
         // Increase frame counter
         m_fCnt++;
         if (m_ADRACKCnt < MAX_ADR_ACK_CNT) // overflow prevention
+        {
             m_ADRACKCnt++;
+        }
         // Fire trace source
         m_sentNewPacket(packet);
     }
@@ -310,7 +312,9 @@ BaseEndDeviceLorawanMac::ExecuteADRBackoff()
     else if (m_ADRACKCnt > ADR_ACK_LIMIT && !((m_ADRACKCnt - ADR_ACK_LIMIT) % ADR_ACK_DELAY))
     {
         if (m_dataRate)
+        {
             m_dataRate--; // Decrease data rate
+        }
         else
         {
             // Enable default channels and set nbTrans to 1
@@ -323,7 +327,7 @@ BaseEndDeviceLorawanMac::ExecuteADRBackoff()
 }
 
 Ptr<LogicalChannel>
-BaseEndDeviceLorawanMac::GetChannelForTx(void)
+BaseEndDeviceLorawanMac::GetChannelForTx()
 {
     NS_LOG_FUNCTION(this);
 
@@ -343,7 +347,7 @@ BaseEndDeviceLorawanMac::GetChannelForTx(void)
             NS_LOG_DEBUG("Packet cannot be immediately transmitted on "
                          << "the current channel because of duty cycle limitations.");
     }
-    return 0; // In this case, no suitable channel was found
+    return nullptr; // In this case, no suitable channel was found
 }
 
 std::vector<Ptr<LogicalChannel>>
@@ -401,7 +405,9 @@ BaseEndDeviceLorawanMac::FillHeader(LoraFrameHeader& fHdr)
         fHdr.AddCommand(command);
         // Keep sending them or not on next uplink (by specifications)
         if (type == MacCommandType::DL_CHANNEL_ANS || type == MacCommandType::RX_TIMING_SETUP_ANS)
+        {
             tmpCmdList.push_back(command);
+        }
     }
 
     // Reset MAC command list
@@ -559,7 +565,9 @@ BaseEndDeviceLorawanMac::AppendCmdsFromFRMPayload(LoraFrameHeader& fHdr, Ptr<con
         char str[341];
         str[size - 1] = 0;
         for (uint32_t j = 0; j < size; j++)
+        {
             sprintf(&str[2 * j], "%02X", cmds[j]);
+        }
         NS_LOG_INFO("Encrypted payload: " << std::hex << str << std::dec);
 
         int result = m_crypto->PayloadEncrypt(cmds,
@@ -570,7 +578,9 @@ BaseEndDeviceLorawanMac::AppendCmdsFromFRMPayload(LoraFrameHeader& fHdr, Ptr<con
                                               fHdr.GetFCnt());
 
         for (uint32_t j = 0; j < size; j++)
+        {
             sprintf(&str[2 * j], "%02X", cmds[j]);
+        }
         NS_LOG_INFO("Decryption result: " << result << ", payload: " << std::hex << str
                                           << std::dec);
     }
@@ -725,7 +735,7 @@ BaseEndDeviceLorawanMac::OnDutyCycleReq(double dutyCycle)
 }
 
 void
-BaseEndDeviceLorawanMac::OnDevStatusReq(void)
+BaseEndDeviceLorawanMac::OnDevStatusReq()
 {
     NS_LOG_FUNCTION(this);
 
@@ -772,7 +782,9 @@ BaseEndDeviceLorawanMac::OnDlChannelReq(uint8_t chIndex, double frequency)
     bool channelFrequencyOk = bool(m_channelManager->GetSubBandFromFrequency(frequency));
 
     if (uplinkFrequencyExists && channelFrequencyOk)
+    {
         m_channelManager->SetReplyFrequency(chIndex, frequency);
+    }
 
     NS_LOG_INFO("Adding DlChannelAns reply");
     m_fOpts.push_back(Create<DlChannelAns>(uplinkFrequencyExists, channelFrequencyOk));
@@ -789,7 +801,7 @@ BaseEndDeviceLorawanMac::SetDeviceAddress(LoraDeviceAddress address)
 }
 
 LoraDeviceAddress
-BaseEndDeviceLorawanMac::GetDeviceAddress(void)
+BaseEndDeviceLorawanMac::GetDeviceAddress()
 {
     return m_address;
 }
@@ -802,7 +814,7 @@ BaseEndDeviceLorawanMac::SetFType(LorawanMacHeader::FType fType)
 }
 
 LorawanMacHeader::FType
-BaseEndDeviceLorawanMac::GetFType(void)
+BaseEndDeviceLorawanMac::GetFType()
 {
     return m_fType;
 }
@@ -814,13 +826,13 @@ BaseEndDeviceLorawanMac::SetDataRate(uint8_t dataRate)
 }
 
 uint8_t
-BaseEndDeviceLorawanMac::GetDataRate(void)
+BaseEndDeviceLorawanMac::GetDataRate()
 {
     return m_dataRate;
 }
 
 uint8_t
-BaseEndDeviceLorawanMac::GetTransmissionPower(void)
+BaseEndDeviceLorawanMac::GetTransmissionPower()
 {
     return m_txPower;
 }
@@ -832,7 +844,7 @@ BaseEndDeviceLorawanMac::SetTransmissionPower(uint8_t txPower)
 }
 
 double
-BaseEndDeviceLorawanMac::GetAggregatedDutyCycle(void)
+BaseEndDeviceLorawanMac::GetAggregatedDutyCycle()
 {
     return m_aggregatedDutyCycle;
 }
@@ -850,7 +862,7 @@ BaseEndDeviceLorawanMac::SetNumberOfTransmissions(uint8_t nbTrans)
 }
 
 uint8_t
-BaseEndDeviceLorawanMac::GetNumberOfTransmissions(void)
+BaseEndDeviceLorawanMac::GetNumberOfTransmissions() const
 {
     return m_nbTrans;
 }
@@ -862,7 +874,7 @@ BaseEndDeviceLorawanMac::SetADRBackoff(bool backoff)
 }
 
 bool
-BaseEndDeviceLorawanMac::GetADRBackoff(void)
+BaseEndDeviceLorawanMac::GetADRBackoff() const
 {
     return m_enableADRBackoff;
 }

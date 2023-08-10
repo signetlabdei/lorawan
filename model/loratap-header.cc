@@ -51,20 +51,20 @@ LoratapHeader::~LoratapHeader()
 }
 
 TypeId
-LoratapHeader::GetTypeId(void)
+LoratapHeader::GetTypeId()
 {
     static TypeId tid = TypeId("LoratapHeader").SetParent<Header>().AddConstructor<LoratapHeader>();
     return tid;
 }
 
 TypeId
-LoratapHeader::GetInstanceTypeId(void) const
+LoratapHeader::GetInstanceTypeId() const
 {
     return GetTypeId();
 }
 
 uint32_t
-LoratapHeader::GetSerializedSize(void) const
+LoratapHeader::GetSerializedSize() const
 {
     NS_LOG_FUNCTION_NOARGS();
 

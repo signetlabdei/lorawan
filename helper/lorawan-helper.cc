@@ -123,7 +123,7 @@ LorawanHelper::EnablePacketTracking()
 }
 
 LoraPacketTracker&
-LorawanHelper::GetPacketTracker(void)
+LorawanHelper::GetPacketTracker()
 {
     NS_LOG_FUNCTION(this);
 
@@ -133,7 +133,7 @@ LorawanHelper::GetPacketTracker(void)
 void
 LorawanHelper::EnableSimulationTimePrinting(Time interval)
 {
-    m_oldtime = std::time(0);
+    m_oldtime = std::time(nullptr);
     Simulator::Schedule(Seconds(0), &LorawanHelper::DoPrintSimulationTime, this, interval);
 }
 
@@ -144,7 +144,7 @@ LorawanHelper::DoPrintSimulationTime(Time interval)
     std::cout << "Simulated time: " << Simulator::Now().GetHours() << " hours, ";
     std::cout << "Real time from last call: " << std::time(0) - m_oldtime << " seconds"
               << std::endl;
-    m_oldtime = std::time(0);
+    m_oldtime = std::time(nullptr);
     Simulator::Schedule(interval, &LorawanHelper::DoPrintSimulationTime, this, interval);
 }
 
@@ -414,7 +414,9 @@ LorawanHelper::DoPrintSFStatus(NodeContainer endDevices,
         {
             auto demc = esc->Get(0)->FindDeviceEnergyModels("ns3::LoraRadioEnergyModel");
             if (demc.GetN())
+            {
                 sfstat.totEnergy += demc.Get(0)->GetTotalEnergyConsumption();
+            }
         }
     }
 
