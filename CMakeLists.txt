@@ -51,10 +51,10 @@ set(source_files
     helper/periodic-sender-helper.cc
     helper/one-shot-sender-helper.cc
     helper/urban-traffic-helper.cc
-    third_party/loramac-node/LoRaMacCrypto.cc
-    third_party/loramac-node/aes.cc
-    third_party/loramac-node/utilities.cc
-    third_party/loramac-node/cmac.cc
+    third-party/loramac-node/LoRaMacCrypto.cc
+    third-party/loramac-node/aes.cc
+    third-party/loramac-node/utilities.cc
+    third-party/loramac-node/cmac.cc
 )
 
 set(header_files
@@ -108,11 +108,11 @@ set(header_files
     helper/periodic-sender-helper.h
     helper/one-shot-sender-helper.h
     helper/urban-traffic-helper.h
-    third_party/loramac-node/LoRaMacCrypto.h
-    third_party/loramac-node/se-identity.h
-    third_party/loramac-node/aes.h
-    third_party/loramac-node/utilities.h
-    third_party/loramac-node/cmac.h
+    third-party/loramac-node/LoRaMacCrypto.h
+    third-party/loramac-node/se-identity.h
+    third-party/loramac-node/aes.h
+    third-party/loramac-node/utilities.h
+    third-party/loramac-node/cmac.h
 )
 
 build_lib(
