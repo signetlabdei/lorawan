@@ -94,7 +94,7 @@ NetworkController::BeforeSendingReply(Ptr<EndDeviceStatus> endDeviceStatus)
 }
 
 void
-NetworkController::DoDispose(void)
+NetworkController::DoDispose()
 {
     NS_LOG_FUNCTION(this);
     for (auto c : m_components)

@@ -151,7 +151,7 @@ EndDeviceStatus::GetCompleteReplyPacket()
 }
 
 bool
-EndDeviceStatus::NeedsReply()
+EndDeviceStatus::NeedsReply() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -159,14 +159,14 @@ EndDeviceStatus::NeedsReply()
 }
 
 LorawanMacHeader
-EndDeviceStatus::GetReplyMacHeader()
+EndDeviceStatus::GetReplyMacHeader() const
 {
     NS_LOG_FUNCTION_NOARGS();
     return m_reply.macHeader;
 }
 
 LoraFrameHeader
-EndDeviceStatus::GetReplyFrameHeader()
+EndDeviceStatus::GetReplyFrameHeader() const
 {
     NS_LOG_FUNCTION_NOARGS();
     return m_reply.frameHeader;
@@ -321,8 +321,7 @@ EndDeviceStatus::InsertReceivedPacket(Ptr<const Packet> receivedPacket, const Ad
         gwInfo.rxPower = rcvPower;
         gwInfo.gwAddress = gwAddress;
         info.gwList.insert(std::pair<Address, PacketInfoPerGw>(gwAddress, gwInfo));
-        m_receivedPacketList.push_back(
-            std::pair<Ptr<const Packet>, ReceivedPacketInfo>(receivedPacket, info));
+        m_receivedPacketList.emplace_back(receivedPacket, info);
     }
     NS_LOG_DEBUG(*this);
 }
@@ -353,7 +352,7 @@ EndDeviceStatus::GetLastPacketReceivedFromDevice()
     }
     else
     {
-        return 0;
+        return nullptr;
     }
 }
 

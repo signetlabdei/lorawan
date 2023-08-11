@@ -117,7 +117,7 @@ class EndDeviceStatus : public Object
      *
      * \return A boolean value signaling if the end device needs a reply.
      */
-    bool NeedsReply();
+    bool NeedsReply() const;
 
     /**
      * Get the reply packet.
@@ -131,14 +131,14 @@ class EndDeviceStatus : public Object
      *
      * \return The packet reply mac header.
      */
-    LorawanMacHeader GetReplyMacHeader();
+    LorawanMacHeader GetReplyMacHeader() const;
 
     /**
      * Get the reply packet frame header.
      *
      * \return The packet reply frame header.
      */
-    LoraFrameHeader GetReplyFrameHeader();
+    LoraFrameHeader GetReplyFrameHeader() const;
 
     /**
      * Get the data of the reply packet.

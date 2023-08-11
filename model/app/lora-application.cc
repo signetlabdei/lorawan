@@ -123,11 +123,15 @@ LoraApplication::DoInitialize()
         Ptr<LoraNetDevice> netDev = 0;
         uint32_t i = 0;
         for (; i < m_node->GetNDevices() && bool(netDev) == 0; ++i)
+        {
             netDev = DynamicCast<LoraNetDevice>(m_node->GetDevice(i));
+        }
         NS_ABORT_MSG_UNLESS(bool(netDev) != 0, "One LoraNetDevice must be installed on this node");
         for (; i < m_node->GetNDevices(); ++i)
+        {
             NS_ABORT_MSG_IF(bool(DynamicCast<LoraNetDevice>(m_node->GetDevice(i))) != 0,
                             "No more than one LoraNetDevice must be installed on this node");
+        }
         m_mac = DynamicCast<BaseEndDeviceLorawanMac>(netDev->GetMac());
         NS_ABORT_MSG_UNLESS(bool(m_mac) != 0,
                             "A child of BaseEndDeviceLorawanMac must be installed on this node");

@@ -93,15 +93,17 @@ NetworkServer::AddGateway(Ptr<Node> gateway, Ptr<NetDevice> netDevice)
     // Get the PointToPointNetDevice
     Ptr<PointToPointNetDevice> p2pNetDevice = 0;
     for (uint32_t i = 0; i < gateway->GetNDevices(); i++)
+    {
         if (p2pNetDevice = DynamicCast<PointToPointNetDevice>(gateway->GetDevice(i));
             bool(p2pNetDevice) != 0)
         {
             // We found a p2pNetDevice on the gateway
             break;
         }
+    }
     NS_ASSERT(bool(p2pNetDevice));
     // Get the gateway's LoRa MAC layer
-    Ptr<GatewayLorawanMac> gwMac = 0;
+    Ptr<GatewayLorawanMac> gwMac = nullptr;
     for (uint32_t i = 0; i < gateway->GetNDevices(); i++)
     {
         if (auto loraDev = DynamicCast<LoraNetDevice>(gateway->GetDevice(i)); bool(loraDev) != 0)
@@ -136,7 +138,7 @@ NetworkServer::AddNode(Ptr<Node> node)
 {
     NS_LOG_FUNCTION(this << node);
     // Get the ClassAEndDeviceLorawanMac
-    Ptr<ClassAEndDeviceLorawanMac> edMac = 0;
+    Ptr<ClassAEndDeviceLorawanMac> edMac = nullptr;
     for (uint32_t i = 0; i < node->GetNDevices(); i++)
     {
         if (auto loraDev = DynamicCast<LoraNetDevice>(node->GetDevice(i)); bool(loraDev) != 0)

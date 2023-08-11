@@ -93,7 +93,7 @@ LogicalChannelManager::GetChannel(uint8_t chIndex)
 {
     NS_LOG_FUNCTION(this);
 
-    return (m_channelList.count(chIndex)) ? m_channelList.at(chIndex) : 0;
+    return (m_channelList.count(chIndex)) ? m_channelList.at(chIndex) : nullptr;
 }
 
 Ptr<SubBand>

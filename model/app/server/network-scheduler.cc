@@ -158,7 +158,7 @@ NetworkScheduler::OnReceiveWindowOpportunity(LoraDeviceAddress deviceAddress, in
 }
 
 void
-NetworkScheduler::DoDispose(void)
+NetworkScheduler::DoDispose()
 {
     NS_LOG_FUNCTION(this);
     m_status = nullptr;

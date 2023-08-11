@@ -31,7 +31,9 @@ double
 ComputeArea(double range, int rings)
 {
     if (rings == 1)
+    {
         return pow(range / 1000, 2) * M_PI;
+    }
 
     double radius = range * std::cos(M_PI / 6);
     int ngateways = 3 * rings * rings - 3 * rings + 1;
@@ -63,7 +65,9 @@ PrintConfigSetup(int nDevs, double range, int rings, std::vector<int>& devPerSF)
     ss << "Area: " << area << " km^2, Density: " << nDevs / area << " devs/km^2\n";
     ss << "\n|- SF distribution:    ";
     for (int j = (int)devPerSF.size() - 1; j >= 0; --j)
+    {
         ss << "SF" << 12 - j << ":" << devPerSF[j] << ", ";
+    }
     ss << "\n";
     ss << "\nAll configurations terminated. Starting simulation...\n\n"
        << "--------------------------------------------------------------------------------\n";

@@ -32,9 +32,9 @@ class PoissonSender : public LoraApplication
 {
   public:
     PoissonSender();
-    ~PoissonSender();
+    ~PoissonSender() override;
 
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
   protected:
     void DoInitialize() override;
@@ -44,12 +44,12 @@ class PoissonSender : public LoraApplication
     /**
      * Start the application by scheduling the first SendPacket event
      */
-    void StartApplication(void);
+    void StartApplication() override;
 
     /**
      * Send a packet using the LoraNetDevice's Send method
      */
-    void SendPacket(void);
+    void SendPacket() override;
 
     Ptr<ExponentialRandomVariable> m_interval; //!< Random variable modeling packet inter-send time
 };
