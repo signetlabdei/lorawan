@@ -110,7 +110,9 @@ LoraPacketTracker::MacGwReceptionCallback(Ptr<const Packet> packet)
             (*it).second.receptionTimes.insert(
                 std::pair<int, Time>(Simulator::GetContext(), Simulator::Now()));
             if (Simulator::Now() < (*it).second.receivedTime)
+            {
                 (*it).second.receivedTime = Simulator::Now();
+            }
         }
         else
         {
@@ -297,6 +299,7 @@ LoraPacketTracker::CountPhyPacketsAllGws(Time startTime, Time stopTime, GwsPhyPk
 {
     output.clear();
     for (const auto& ppd : m_packetTracker)
+    {
         if (ppd.second.sendTime >= startTime && ppd.second.sendTime <= stopTime)
         {
             NS_LOG_DEBUG("Dealing with packet " << ppd.second.packet);
@@ -333,6 +336,7 @@ LoraPacketTracker::CountPhyPacketsAllGws(Time startTime, Time stopTime, GwsPhyPk
                 }
             }
         }
+    }
 }
 
 void
@@ -345,7 +349,9 @@ LoraPacketTracker::PrintPhyPacketsAllGws(Time startTime, Time stopTime, GwsPhyPk
     {
         std::string out("");
         for (int i = 0; i < 5; ++i)
+        {
             out += std::to_string(gw.second.v[i]) + " ";
+        }
         out += std::to_string(gw.second.v[5]);
         output[gw.first].s = out;
     }
@@ -359,6 +365,7 @@ LoraPacketTracker::PrintPhyPacketsGlobally(Time startTime, Time stopTime)
     std::vector<int> count(6, 0);
 
     for (const auto& ppd : m_packetTracker)
+    {
         if (ppd.second.sendTime >= startTime && ppd.second.sendTime <= stopTime)
         {
             count[0]++;
@@ -374,27 +381,46 @@ LoraPacketTracker::PrintPhyPacketsGlobally(Time startTime, Time stopTime)
                     break;
                 }
                 else if (!interfered and out.second == INTERFERED)
+                {
                     interfered = true;
+                }
                 else if (!noPaths and out.second == NO_MORE_RECEIVERS)
+                {
                     noPaths = true;
+                }
                 else if (!busyGw and out.second == LOST_BECAUSE_TX)
+                {
                     busyGw = true;
+                }
             }
             if (received)
+            {
                 count[1]++;
+            }
             else if (interfered)
+            {
                 count[2]++;
+            }
             else if (noPaths)
+            {
                 count[3]++;
+            }
             else if (busyGw)
+            {
                 count[4]++;
+            }
             else
+            {
                 count[5]++;
+            }
         }
+    }
 
     std::string output("");
     for (int i = 0; i < 5; ++i)
+    {
         output += std::to_string(count[i]) + " ";
+    }
     output += std::to_string(count[5]);
     return output;
 }
@@ -411,7 +437,7 @@ LoraPacketTracker::CountMacPacketsGlobally(Time startTime, Time stopTime)
         if ((*it).second.sendTime >= startTime && (*it).second.sendTime <= stopTime)
         {
             sent++;
-            if ((*it).second.receptionTimes.size())
+            if (!(*it).second.receptionTimes.empty())
             {
                 received++;
             }
@@ -459,7 +485,7 @@ LoraPacketTracker::PrintDevicePackets(Time startTime, Time stopTime, uint32_t de
             (*it).second.senderId == devId)
         {
             sent++;
-            if ((*it).second.receptionTimes.size())
+            if (!(*it).second.receptionTimes.empty())
             {
                 received++;
             }
@@ -476,12 +502,14 @@ LoraPacketTracker::CountAllDevicesPackets(Time startTime, Time stopTime, DevPktC
 
     out.clear();
     for (const auto& mpd : m_macPacketTracker)
+    {
         if (mpd.second.sendTime >= startTime && mpd.second.sendTime <= stopTime)
         {
             out[mpd.second.senderId].sent++;
             if (mpd.second.receptionTimes.size())
                 out[mpd.second.senderId].received++;
         }
+    }
 }
 
 std::string
@@ -507,7 +535,9 @@ LoraPacketTracker::PrintSimulationStatistics(Time startTime)
     for (const auto& pd : m_packetTracker)
     {
         if (pd.second.sendTime < startTime - Seconds(5))
+        {
             continue;
+        }
 
         bool received = false;
         bool interfered = false;
@@ -518,8 +548,7 @@ LoraPacketTracker::PrintSimulationStatistics(Time startTime)
         LoraTag tag;
         pd.first->Copy()->RemovePacketTag(tag);
         params.sf = tag.GetTxParameters().sf;
-        params.lowDataRateOptimizationEnabled =
-            LoraPhy::GetTSym(params) > MilliSeconds(16) ? true : false;
+        params.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(params) > MilliSeconds(16);
         totOffTraff += LoraPhy::GetTimeOnAir(pd.first->Copy(), params).GetSeconds();
 
         total++;
@@ -535,22 +564,38 @@ LoraPacketTracker::PrintSimulationStatistics(Time startTime)
                 break;
             }
             else if (!interfered and out.second == INTERFERED)
+            {
                 interfered = true;
+            }
             else if (!noPaths and out.second == NO_MORE_RECEIVERS)
+            {
                 noPaths = true;
+            }
             else if (!busyGw and out.second == LOST_BECAUSE_TX)
+            {
                 busyGw = true;
+            }
         }
         if (received)
+        {
             totReceived++;
+        }
         else if (interfered)
+        {
             totInterfered++;
+        }
         else if (noPaths)
+        {
             totNoMorePaths++;
+        }
         else if (busyGw)
+        {
             totBusyGw++;
+        }
         else
+        {
             totUnderSens++;
+        }
     }
 
     std::stringstream ss;
@@ -563,7 +608,9 @@ LoraPacketTracker::PrintSimulationStatistics(Time startTime)
 
     ss << "\nPDR: ";
     for (int dr = 5; dr >= 0; --dr)
+    {
         ss << "SF" << 12 - dr << " " << receivedSF[dr] / sentSF[dr] * 100 << "%, ";
+    }
     ss << "\n";
 
     double totTime = (Simulator::Now() - startTime).GetSeconds();

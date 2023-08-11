@@ -57,8 +57,8 @@ PeriodicSenderHelper::PeriodicSenderHelper()
 
     m_pktSize = 10;
 
-    m_intervalGenerator = 0;
-    m_sizeGenerator = 0;
+    m_intervalGenerator = nullptr;
+    m_sizeGenerator = nullptr;
 }
 
 PeriodicSenderHelper::~PeriodicSenderHelper()

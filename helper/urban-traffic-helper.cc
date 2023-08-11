@@ -262,15 +262,19 @@ UrbanTrafficHelper::InstallPriv(Ptr<Node> node) const
     }
 
     if (poisson)
+    {
         app = CreateObjectWithAttributes<PoissonSender>("Interval",
                                                         TimeValue(interval),
                                                         "PacketSize",
                                                         UintegerValue(pktSize));
+    }
     else
+    {
         app = CreateObjectWithAttributes<PeriodicSender>("Interval",
                                                          TimeValue(interval),
                                                          "PacketSize",
                                                          UintegerValue(pktSize));
+    }
 
     NS_LOG_DEBUG("Created: " << type << " (" << interval.GetSeconds() << "s, " << (unsigned)pktSize
                              << "B, " << ((poisson) ? "poisson)" : "uniform)"));

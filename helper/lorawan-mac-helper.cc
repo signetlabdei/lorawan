@@ -152,7 +152,9 @@ LorawanMacHelper::ConfigureForAlohaRegion(Ptr<LorawanMac> mac) const
         /////////////
 
         if (m_addrGen)
+        {
             edMac->SetDeviceAddress(m_addrGen->NextAddress());
+        }
     }
 }
 
@@ -253,7 +255,9 @@ LorawanMacHelper::ConfigureForEuRegion(Ptr<LorawanMac> mac) const
         /////////////
 
         if (m_addrGen)
+        {
             edMac->SetDeviceAddress(m_addrGen->NextAddress());
+        }
     }
 }
 
@@ -332,7 +336,9 @@ LorawanMacHelper::ConfigureForSingleChannelRegion(Ptr<LorawanMac> mac) const
         /////////////
 
         if (m_addrGen)
+        {
             edMac->SetDeviceAddress(m_addrGen->NextAddress());
+        }
     }
 }
 

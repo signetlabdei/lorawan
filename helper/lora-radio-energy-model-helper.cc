@@ -85,17 +85,17 @@ LoraRadioEnergyModelHelper::SetTxCurrentModel(std::string name,
 Ptr<DeviceEnergyModel>
 LoraRadioEnergyModelHelper::DoInstall(Ptr<NetDevice> device, Ptr<EnergySource> source) const
 {
-    NS_ASSERT(device != NULL);
-    NS_ASSERT(source != NULL);
+    NS_ASSERT(device != nullptr);
+    NS_ASSERT(source != nullptr);
     // check if device is LoraNetDevice
     std::string deviceName = device->GetInstanceTypeId().GetName();
-    if (deviceName.compare("ns3::LoraNetDevice") != 0)
+    if (deviceName != "ns3::LoraNetDevice")
     {
         NS_FATAL_ERROR("NetDevice type is not LoraNetDevice!");
     }
     Ptr<Node> node = device->GetNode();
     Ptr<LoraRadioEnergyModel> model = DynamicCast<LoraRadioEnergyModel>(m_radioEnergy.Create());
-    NS_ASSERT(model != NULL);
+    NS_ASSERT(model != nullptr);
     // set energy source pointer
     model->SetEnergySource(source);
 

@@ -142,7 +142,7 @@ LorawanHelper::DoPrintSimulationTime(Time interval)
 {
     // NS_LOG_INFO ("Time: " << Simulator::Now().GetHours());
     std::cout << "Simulated time: " << Simulator::Now().GetHours() << " hours, ";
-    std::cout << "Real time from last call: " << std::time(0) - m_oldtime << " seconds"
+    std::cout << "Real time from last call: " << std::time(nullptr) - m_oldtime << " seconds"
               << std::endl;
     m_oldtime = std::time(nullptr);
     Simulator::Schedule(interval, &LorawanHelper::DoPrintSimulationTime, this, interval);
@@ -202,7 +202,9 @@ LorawanHelper::DoPrintDeviceStatus(NodeContainer endDevices,
 
         double gwdist = std::numeric_limits<double>::max();
         for (auto gw = gateways.Begin(); gw != gateways.End(); ++gw)
+        {
             gwdist = std::min(gwdist, (*gw)->GetObject<MobilityModel>()->GetDistanceFrom(position));
+        }
 
         int dr = int(mac->GetDataRate());
 
@@ -215,8 +217,7 @@ LorawanHelper::DoPrintDeviceStatus(NodeContainer endDevices,
         double interval = app->GetInterval().GetSeconds();
         LoraPhyTxParameters params;
         params.sf = 12 - dr;
-        params.lowDataRateOptimizationEnabled =
-            LoraPhy::GetTSym(params) > MilliSeconds(16) ? true : false;
+        params.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(params) > MilliSeconds(16);
         double maxot =
             LoraPhy::GetTimeOnAir(Create<Packet>(size + 13), params).GetSeconds() / interval;
         maxot = std::min(maxot, 0.01);
@@ -399,8 +400,7 @@ LorawanHelper::DoPrintSFStatus(NodeContainer endDevices,
         double interval = app->GetInterval().GetSeconds();
         LoraPhyTxParameters params;
         params.sf = 12 - dr;
-        params.lowDataRateOptimizationEnabled =
-            LoraPhy::GetTSym(params) > MilliSeconds(16) ? true : false;
+        params.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(params) > MilliSeconds(16);
         double maxot =
             LoraPhy::GetTimeOnAir(Create<Packet>(size + 13), params).GetSeconds() / interval;
         maxot = std::min(maxot, 0.01);
