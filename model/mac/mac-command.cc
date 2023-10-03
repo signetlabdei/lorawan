@@ -1056,7 +1056,7 @@ RxTimingSetupAns::RxTimingSetupAns()
 {
     NS_LOG_FUNCTION(this);
 
-    m_commandType = DEV_STATUS_REQ;
+    m_commandType = RX_TIMING_SETUP_ANS;
     m_serializedSize = 1;
 }
 
@@ -1096,7 +1096,7 @@ TxParamSetupReq::TxParamSetupReq()
 {
     NS_LOG_FUNCTION(this);
 
-    m_commandType = DEV_STATUS_REQ;
+    m_commandType = TX_PARAM_SETUP_REQ;
     m_serializedSize = 2;
 }
 
@@ -1107,6 +1107,7 @@ TxParamSetupReq::Serialize(Buffer::Iterator& start) const
 
     // Write the CID
     start.WriteU8(GetCIDFromMacCommand(m_commandType));
+    //! TODO: implement fields
 }
 
 uint8_t
@@ -1116,6 +1117,7 @@ TxParamSetupReq::Deserialize(Buffer::Iterator& start)
 
     // Consume the CID
     start.ReadU8();
+    //! TODO: implement fields
 
     return m_serializedSize;
 }
@@ -1136,7 +1138,7 @@ TxParamSetupAns::TxParamSetupAns()
 {
     NS_LOG_FUNCTION(this);
 
-    m_commandType = DEV_STATUS_REQ;
+    m_commandType = TX_PARAM_SETUP_ANS;
     m_serializedSize = 1;
 }
 

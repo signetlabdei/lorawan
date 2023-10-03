@@ -572,6 +572,7 @@ class RxTimingSetupAns : public MacCommand
 /**
  * Implementation of the TxParamSetupReq LoRaWAN MAC command.
  */
+//! TODO: implement (not mandatory in the EU)
 class TxParamSetupReq : public MacCommand
 {
   public:
