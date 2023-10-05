@@ -163,7 +163,7 @@ BaseEndDeviceLorawanMac::Send(Ptr<Packet> packet)
     if (Time nextTxDelay = GetNextTransmissionDelay(); nextTxDelay > Seconds(0))
     {
         m_cannotSendBecauseDutyCycle(packet);
-        postponeTransmission(nextTxDelay, packet);
+        PostponeTransmission(nextTxDelay, packet);
         NS_LOG_DEBUG("Attempting to send, but device is busy or duty cycle won't allow it. "
                      "Scheduling a tx in "
                      << nextTxDelay.As(Time::S) << ".");
@@ -198,7 +198,7 @@ BaseEndDeviceLorawanMac::GetNextTransmissionDelay()
 }
 
 void
-BaseEndDeviceLorawanMac::postponeTransmission(Time nextTxDelay, Ptr<Packet> packet)
+BaseEndDeviceLorawanMac::PostponeTransmission(Time nextTxDelay, Ptr<Packet> packet)
 {
     NS_LOG_FUNCTION(this << nextTxDelay << packet);
 

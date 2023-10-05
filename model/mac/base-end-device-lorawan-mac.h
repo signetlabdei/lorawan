@@ -220,7 +220,7 @@ class BaseEndDeviceLorawanMac : public LorawanMac
      *
      * \param nextTxDelay Delay at which the transmission will be performed.
      */
-    virtual void postponeTransmission(Time nextTxDelay, Ptr<Packet>);
+    virtual void PostponeTransmission(Time nextTxDelay, Ptr<Packet>);
 
     /**
      * Find a suitable channel for transmission. The channel is chosen among the

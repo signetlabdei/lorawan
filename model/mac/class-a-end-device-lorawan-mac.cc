@@ -247,7 +247,7 @@ ClassAEndDeviceLorawanMac::ManageRetransmissions(RxOutcome outcome)
             NS_LOG_DEBUG("No reception initiated by PHY: rescheduling transmission.");
         }
         NS_LOG_INFO("We have " << unsigned(m_txContext.nbTxLeft) << " retransmissions left.");
-        postponeTransmission(Seconds(RETRANSMIT_TIMEOUT), m_txContext.packet);
+        PostponeTransmission(Seconds(RETRANSMIT_TIMEOUT), m_txContext.packet);
         return;
     }
 
