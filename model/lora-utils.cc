@@ -14,36 +14,39 @@
  */
 
 #include "lora-utils.h"
+
 #include <cmath>
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
 double
-DbToRatio (double dB)
+DbToRatio(double dB)
 {
-  double ratio = std::pow (10.0, dB / 10.0);
-  return ratio;
-}
-
-double
-DbmToW (double dBm)
-{
-  double mW = std::pow (10.0, dBm / 10.0);
-  return mW / 1000.0;
+    double ratio = std::pow(10.0, dB / 10.0);
+    return ratio;
 }
 
 double
-WToDbm (double w)
+DbmToW(double dBm)
 {
-  return 10.0 * std::log10 (w * 1000.0);
+    double mW = std::pow(10.0, dBm / 10.0);
+    return mW / 1000.0;
 }
 
 double
-RatioToDb (double ratio)
+WToDbm(double w)
 {
-  return 10.0 * std::log10 (ratio);
+    return 10.0 * std::log10(w * 1000.0);
 }
 
+double
+RatioToDb(double ratio)
+{
+    return 10.0 * std::log10(ratio);
 }
-} //namespace ns3
+
+} // namespace lorawan
+} // namespace ns3

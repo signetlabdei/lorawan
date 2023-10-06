@@ -20,74 +20,74 @@
 
 #include "network-controller.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
-NS_LOG_COMPONENT_DEFINE ("NetworkController");
+NS_LOG_COMPONENT_DEFINE("NetworkController");
 
-NS_OBJECT_ENSURE_REGISTERED (NetworkController);
+NS_OBJECT_ENSURE_REGISTERED(NetworkController);
 
 TypeId
-NetworkController::GetTypeId (void)
+NetworkController::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::NetworkController")
-    .AddConstructor<NetworkController> ()
-    .SetGroupName ("lorawan");
-  return tid;
+    static TypeId tid = TypeId("ns3::NetworkController")
+                            .AddConstructor<NetworkController>()
+                            .SetGroupName("lorawan");
+    return tid;
 }
 
-NetworkController::NetworkController ()
+NetworkController::NetworkController()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 }
 
-NetworkController::NetworkController (Ptr<NetworkStatus> networkStatus) :
-  m_status (networkStatus)
+NetworkController::NetworkController(Ptr<NetworkStatus> networkStatus)
+    : m_status(networkStatus)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 }
 
-NetworkController::~NetworkController ()
+NetworkController::~NetworkController()
 {
-  NS_LOG_FUNCTION_NOARGS ();
-}
-
-void
-NetworkController::Install (Ptr<NetworkControllerComponent> component)
-{
-  NS_LOG_FUNCTION (this);
-  m_components.push_back (component);
+    NS_LOG_FUNCTION_NOARGS();
 }
 
 void
-NetworkController::OnNewPacket (Ptr<Packet const> packet)
+NetworkController::Install(Ptr<NetworkControllerComponent> component)
 {
-  NS_LOG_FUNCTION (this << packet);
+    NS_LOG_FUNCTION(this);
+    m_components.push_back(component);
+}
 
-  // NOTE As a future optimization, we can allow components to register their
-  // callbacks and only be called in case a certain MAC command is contained.
-  // For now, we call all components.
+void
+NetworkController::OnNewPacket(Ptr<const Packet> packet)
+{
+    NS_LOG_FUNCTION(this << packet);
 
-  // Inform each component about the new packet
-  for (auto it = m_components.begin (); it != m_components.end (); ++it)
+    // NOTE As a future optimization, we can allow components to register their
+    // callbacks and only be called in case a certain MAC command is contained.
+    // For now, we call all components.
+
+    // Inform each component about the new packet
+    for (auto it = m_components.begin(); it != m_components.end(); ++it)
     {
-      (*it)->OnReceivedPacket (packet,
-                               m_status->GetEndDeviceStatus (packet),
-                               m_status);
+        (*it)->OnReceivedPacket(packet, m_status->GetEndDeviceStatus(packet), m_status);
     }
 }
 
 void
-NetworkController::BeforeSendingReply (Ptr<EndDeviceStatus> endDeviceStatus)
+NetworkController::BeforeSendingReply(Ptr<EndDeviceStatus> endDeviceStatus)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  // Inform each component about the imminent reply
-  for (auto it = m_components.begin (); it != m_components.end (); ++it)
+    // Inform each component about the imminent reply
+    for (auto it = m_components.begin(); it != m_components.end(); ++it)
     {
-      (*it)->BeforeSendingReply (endDeviceStatus, m_status);
+        (*it)->BeforeSendingReply(endDeviceStatus, m_status);
     }
 }
 
-}
-}
+} // namespace lorawan
+} // namespace ns3

@@ -19,75 +19,80 @@
  */
 
 #include "ns3/gateway-lora-phy.h"
+
 #include "ns3/log-macros-enabled.h"
+#include "ns3/log.h"
 #include "ns3/lora-tag.h"
 #include "ns3/simulator.h"
-#include "ns3/log.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
-NS_LOG_COMPONENT_DEFINE ("GatewayLoraPhy");
+NS_LOG_COMPONENT_DEFINE("GatewayLoraPhy");
 
-NS_OBJECT_ENSURE_REGISTERED (GatewayLoraPhy);
+NS_OBJECT_ENSURE_REGISTERED(GatewayLoraPhy);
 
 /**************************************
  *    ReceptionPath implementation    *
  **************************************/
-GatewayLoraPhy::ReceptionPath::ReceptionPath ()
-    : m_available (1), m_event (0), m_endReceiveEventId (EventId ())
+GatewayLoraPhy::ReceptionPath::ReceptionPath()
+    : m_available(1),
+      m_event(0),
+      m_endReceiveEventId(EventId())
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 }
 
-GatewayLoraPhy::ReceptionPath::~ReceptionPath (void)
+GatewayLoraPhy::ReceptionPath::~ReceptionPath(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 }
 
 bool
-GatewayLoraPhy::ReceptionPath::IsAvailable (void)
+GatewayLoraPhy::ReceptionPath::IsAvailable(void)
 {
-  return m_available;
+    return m_available;
 }
 
 void
-GatewayLoraPhy::ReceptionPath::Free (void)
+GatewayLoraPhy::ReceptionPath::Free(void)
 {
-  m_available = true;
-  m_event = 0;
-  m_endReceiveEventId = EventId ();
+    m_available = true;
+    m_event = 0;
+    m_endReceiveEventId = EventId();
 }
 
 void
-GatewayLoraPhy::ReceptionPath::LockOnEvent (Ptr<LoraInterferenceHelper::Event> event)
+GatewayLoraPhy::ReceptionPath::LockOnEvent(Ptr<LoraInterferenceHelper::Event> event)
 {
-  m_available = false;
-  m_event = event;
+    m_available = false;
+    m_event = event;
 }
 
 void
-GatewayLoraPhy::ReceptionPath::SetEvent (Ptr<LoraInterferenceHelper::Event> event)
+GatewayLoraPhy::ReceptionPath::SetEvent(Ptr<LoraInterferenceHelper::Event> event)
 {
-  m_event = event;
+    m_event = event;
 }
 
 Ptr<LoraInterferenceHelper::Event>
-GatewayLoraPhy::ReceptionPath::GetEvent (void)
+GatewayLoraPhy::ReceptionPath::GetEvent(void)
 {
-  return m_event;
+    return m_event;
 }
 
 EventId
-GatewayLoraPhy::ReceptionPath::GetEndReceive (void)
+GatewayLoraPhy::ReceptionPath::GetEndReceive(void)
 {
-  return m_endReceiveEventId;
+    return m_endReceiveEventId;
 }
 
 void
-GatewayLoraPhy::ReceptionPath::SetEndReceive (EventId endReceiveEventId)
+GatewayLoraPhy::ReceptionPath::SetEndReceive(EventId endReceiveEventId)
 {
-  m_endReceiveEventId = endReceiveEventId;
+    m_endReceiveEventId = endReceiveEventId;
 }
 
 /***********************************************************************
@@ -95,39 +100,41 @@ GatewayLoraPhy::ReceptionPath::SetEndReceive (EventId endReceiveEventId)
  ***********************************************************************/
 
 TypeId
-GatewayLoraPhy::GetTypeId (void)
+GatewayLoraPhy::GetTypeId(void)
 {
-  static TypeId tid =
-      TypeId ("ns3::GatewayLoraPhy")
-          .SetParent<LoraPhy> ()
-          .SetGroupName ("lorawan")
-          .AddTraceSource (
-              "NoReceptionBecauseTransmitting",
-              "Trace source indicating a packet "
-              "could not be correctly received because"
-              "the GW is in transmission mode",
-              MakeTraceSourceAccessor (&GatewayLoraPhy::m_noReceptionBecauseTransmitting),
-              "ns3::Packet::TracedCallback")
-          .AddTraceSource ("LostPacketBecauseNoMoreReceivers",
-                           "Trace source indicating a packet "
-                           "could not be correctly received because"
-                           "there are no more demodulators available",
-                           MakeTraceSourceAccessor (&GatewayLoraPhy::m_noMoreDemodulators),
-                           "ns3::Packet::TracedCallback")
-          .AddTraceSource ("OccupiedReceptionPaths", "Number of currently occupied reception paths",
-                           MakeTraceSourceAccessor (&GatewayLoraPhy::m_occupiedReceptionPaths),
-                           "ns3::TracedValueCallback::Int");
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::GatewayLoraPhy")
+            .SetParent<LoraPhy>()
+            .SetGroupName("lorawan")
+            .AddTraceSource(
+                "NoReceptionBecauseTransmitting",
+                "Trace source indicating a packet "
+                "could not be correctly received because"
+                "the GW is in transmission mode",
+                MakeTraceSourceAccessor(&GatewayLoraPhy::m_noReceptionBecauseTransmitting),
+                "ns3::Packet::TracedCallback")
+            .AddTraceSource("LostPacketBecauseNoMoreReceivers",
+                            "Trace source indicating a packet "
+                            "could not be correctly received because"
+                            "there are no more demodulators available",
+                            MakeTraceSourceAccessor(&GatewayLoraPhy::m_noMoreDemodulators),
+                            "ns3::Packet::TracedCallback")
+            .AddTraceSource("OccupiedReceptionPaths",
+                            "Number of currently occupied reception paths",
+                            MakeTraceSourceAccessor(&GatewayLoraPhy::m_occupiedReceptionPaths),
+                            "ns3::TracedValueCallback::Int");
+    return tid;
 }
 
-GatewayLoraPhy::GatewayLoraPhy () : m_isTransmitting (false)
+GatewayLoraPhy::GatewayLoraPhy()
+    : m_isTransmitting(false)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 }
 
-GatewayLoraPhy::~GatewayLoraPhy ()
+GatewayLoraPhy::~GatewayLoraPhy()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 }
 
 // Uplink sensitivity (Source: SX1301 datasheet)
@@ -135,57 +142,57 @@ GatewayLoraPhy::~GatewayLoraPhy ()
 const double GatewayLoraPhy::sensitivity[6] = {-130.0, -132.5, -135.0, -137.5, -140.0, -142.5};
 
 void
-GatewayLoraPhy::AddReceptionPath ()
+GatewayLoraPhy::AddReceptionPath()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  m_receptionPaths.push_back (Create<GatewayLoraPhy::ReceptionPath> ());
+    m_receptionPaths.push_back(Create<GatewayLoraPhy::ReceptionPath>());
 }
 
 void
-GatewayLoraPhy::ResetReceptionPaths (void)
+GatewayLoraPhy::ResetReceptionPaths(void)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_receptionPaths.clear ();
+    m_receptionPaths.clear();
 }
 
 void
-GatewayLoraPhy::TxFinished (Ptr<Packet> packet)
+GatewayLoraPhy::TxFinished(Ptr<Packet> packet)
 {
-  m_isTransmitting = false;
+    m_isTransmitting = false;
 }
 
 bool
-GatewayLoraPhy::IsTransmitting (void)
+GatewayLoraPhy::IsTransmitting(void)
 {
-  return m_isTransmitting;
+    return m_isTransmitting;
 }
 
 void
-GatewayLoraPhy::AddFrequency (double frequencyMHz)
+GatewayLoraPhy::AddFrequency(double frequencyMHz)
 {
-  NS_LOG_FUNCTION (this << frequencyMHz);
+    NS_LOG_FUNCTION(this << frequencyMHz);
 
-  m_frequencies.push_back (frequencyMHz);
+    m_frequencies.push_back(frequencyMHz);
 
-  NS_ASSERT (m_frequencies.size () <= 8);
+    NS_ASSERT(m_frequencies.size() <= 8);
 }
 
 bool
-GatewayLoraPhy::IsOnFrequency (double frequencyMHz)
+GatewayLoraPhy::IsOnFrequency(double frequencyMHz)
 {
-  NS_LOG_FUNCTION (this << frequencyMHz);
+    NS_LOG_FUNCTION(this << frequencyMHz);
 
-  // Look into our list of frequencies
-  for (auto &f : m_frequencies)
+    // Look into our list of frequencies
+    for (auto& f : m_frequencies)
     {
-      if (f == frequencyMHz)
+        if (f == frequencyMHz)
         {
-          return true;
+            return true;
         }
     }
-  return false;
+    return false;
 }
 } // namespace lorawan
 } // namespace ns3

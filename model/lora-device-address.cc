@@ -19,252 +19,261 @@
  */
 
 #include "ns3/lora-device-address.h"
+
 #include "ns3/log.h"
+
 #include <bitset>
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
-NS_LOG_COMPONENT_DEFINE ("LoraDeviceAddress");
+NS_LOG_COMPONENT_DEFINE("LoraDeviceAddress");
 
 // NwkID
 ////////
 
-NwkID::NwkID (uint8_t nwkId) : m_nwkId (nwkId)
+NwkID::NwkID(uint8_t nwkId)
+    : m_nwkId(nwkId)
 {
 }
 
 void
-NwkID::Set (uint8_t nwkId)
+NwkID::Set(uint8_t nwkId)
 {
-  // Check whether the MSB is set
-  if (nwkId >> 7)
+    // Check whether the MSB is set
+    if (nwkId >> 7)
     {
-      NS_LOG_WARN ("Attempting to set too big a network ID. Will only consider the 7 least significant bits.");
+        NS_LOG_WARN("Attempting to set too big a network ID. Will only consider the 7 least "
+                    "significant bits.");
     }
-  m_nwkId = nwkId & 0x7F;     // 0x7f = ob01111111
+    m_nwkId = nwkId & 0x7F; // 0x7f = ob01111111
 }
 
 uint8_t
-NwkID::Get (void) const
+NwkID::Get(void) const
 {
-  return m_nwkId;
+    return m_nwkId;
 }
 
 // NwkAddr
 //////////
 
-NwkAddr::NwkAddr (uint32_t nwkAddr) : m_nwkAddr (nwkAddr)
+NwkAddr::NwkAddr(uint32_t nwkAddr)
+    : m_nwkAddr(nwkAddr)
 {
 }
 
 void
-NwkAddr::Set (uint32_t nwkAddr)
+NwkAddr::Set(uint32_t nwkAddr)
 {
-  // Check whether the most significant bits are set
-  if (nwkAddr >> 25)
+    // Check whether the most significant bits are set
+    if (nwkAddr >> 25)
     {
-      NS_LOG_WARN ("Attempting to set too big a network address. Will only consider the 25 least significant bits.");
+        NS_LOG_WARN("Attempting to set too big a network address. Will only consider the 25 least "
+                    "significant bits.");
     }
-  m_nwkAddr = nwkAddr & 0x1FFFFFF;
+    m_nwkAddr = nwkAddr & 0x1FFFFFF;
 }
 
 uint32_t
-NwkAddr::Get (void) const
+NwkAddr::Get(void) const
 {
-  return m_nwkAddr;
+    return m_nwkAddr;
 }
 
 // LoraDeviceAddress
 ////////////////////
 
-LoraDeviceAddress::LoraDeviceAddress ()
+LoraDeviceAddress::LoraDeviceAddress()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 }
 
-LoraDeviceAddress::LoraDeviceAddress (uint32_t address)
+LoraDeviceAddress::LoraDeviceAddress(uint32_t address)
 {
-  NS_LOG_FUNCTION (this << address);
+    NS_LOG_FUNCTION(this << address);
 
-  Set (address);
+    Set(address);
 }
 
-LoraDeviceAddress::LoraDeviceAddress (uint8_t nwkId, uint32_t nwkAddr)
+LoraDeviceAddress::LoraDeviceAddress(uint8_t nwkId, uint32_t nwkAddr)
 {
-  NS_LOG_FUNCTION (this << unsigned(nwkId) << nwkAddr);
+    NS_LOG_FUNCTION(this << unsigned(nwkId) << nwkAddr);
 
-  m_nwkId.Set (nwkId);
-  m_nwkAddr.Set (nwkAddr);
+    m_nwkId.Set(nwkId);
+    m_nwkAddr.Set(nwkAddr);
 }
 
-LoraDeviceAddress::LoraDeviceAddress (NwkID nwkId, NwkAddr nwkAddr)
+LoraDeviceAddress::LoraDeviceAddress(NwkID nwkId, NwkAddr nwkAddr)
 {
-  NS_LOG_FUNCTION (this << unsigned(nwkId.Get ()) << nwkAddr.Get ());
+    NS_LOG_FUNCTION(this << unsigned(nwkId.Get()) << nwkAddr.Get());
 
-  m_nwkId = nwkId;
-  m_nwkAddr = nwkAddr;
+    m_nwkId = nwkId;
+    m_nwkAddr = nwkAddr;
 }
 
 void
-LoraDeviceAddress::Serialize (uint8_t buf[4]) const
+LoraDeviceAddress::Serialize(uint8_t buf[4]) const
 {
-  NS_LOG_FUNCTION (this << &buf);
+    NS_LOG_FUNCTION(this << &buf);
 
-  uint32_t address = Get ();
+    uint32_t address = Get();
 
-  buf[0] = (address >> 24) & 0xff;
-  buf[1] = (address >> 16) & 0xff;
-  buf[2] = (address >> 8) & 0xff;
-  buf[3] = (address >> 0) & 0xff;
+    buf[0] = (address >> 24) & 0xff;
+    buf[1] = (address >> 16) & 0xff;
+    buf[2] = (address >> 8) & 0xff;
+    buf[3] = (address >> 0) & 0xff;
 }
 
 LoraDeviceAddress
-LoraDeviceAddress::Deserialize (const uint8_t buf[4])
+LoraDeviceAddress::Deserialize(const uint8_t buf[4])
 {
-  NS_LOG_FUNCTION (&buf);
+    NS_LOG_FUNCTION(&buf);
 
-  // Craft the address from the buffer
-  uint32_t address = 0;
-  address |= buf[0];
-  address <<= 8;
-  address |= buf[1];
-  address <<= 8;
-  address |= buf[2];
-  address <<= 8;
-  address |= buf[3];
+    // Craft the address from the buffer
+    uint32_t address = 0;
+    address |= buf[0];
+    address <<= 8;
+    address |= buf[1];
+    address <<= 8;
+    address |= buf[2];
+    address <<= 8;
+    address |= buf[3];
 
-  return LoraDeviceAddress (address);
+    return LoraDeviceAddress(address);
 }
 
 Address
-LoraDeviceAddress::ConvertTo (void) const
+LoraDeviceAddress::ConvertTo(void) const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  uint8_t addressBuffer[4];
-  Serialize (addressBuffer);
-  return Address (GetType (), addressBuffer, 4);
+    uint8_t addressBuffer[4];
+    Serialize(addressBuffer);
+    return Address(GetType(), addressBuffer, 4);
 }
 
 LoraDeviceAddress
-LoraDeviceAddress::ConvertFrom (const Address &address)
+LoraDeviceAddress::ConvertFrom(const Address& address)
 {
-  // Create the new, empty address
-  LoraDeviceAddress ad;
-  uint8_t addressBuffer[4];
+    // Create the new, empty address
+    LoraDeviceAddress ad;
+    uint8_t addressBuffer[4];
 
-  // Check that the address we want to convert is compatible with a
-  // LoraDeviceAddress
-  NS_ASSERT (address.CheckCompatible (GetType (), 4));
-  address.CopyTo (addressBuffer);
-  ad = Deserialize (addressBuffer);
-  return ad;
+    // Check that the address we want to convert is compatible with a
+    // LoraDeviceAddress
+    NS_ASSERT(address.CheckCompatible(GetType(), 4));
+    address.CopyTo(addressBuffer);
+    ad = Deserialize(addressBuffer);
+    return ad;
 }
 
 uint8_t
-LoraDeviceAddress::GetType (void)
+LoraDeviceAddress::GetType(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  static uint8_t type = Address::Register ();
-  return type;
+    static uint8_t type = Address::Register();
+    return type;
 }
 
 uint32_t
-LoraDeviceAddress::Get (void) const
+LoraDeviceAddress::Get(void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  uint32_t address = 0;
-  uint32_t nwkId = uint32_t (m_nwkId.Get () << 25);
-  address |= (m_nwkAddr.Get () | nwkId);
-  NS_LOG_DEBUG ("m_nwkId + m_nwkAddr = " << std::bitset<32> (address));
+    uint32_t address = 0;
+    uint32_t nwkId = uint32_t(m_nwkId.Get() << 25);
+    address |= (m_nwkAddr.Get() | nwkId);
+    NS_LOG_DEBUG("m_nwkId + m_nwkAddr = " << std::bitset<32>(address));
 
-  return address;
+    return address;
 }
 
 void
-LoraDeviceAddress::Set (uint32_t address)
+LoraDeviceAddress::Set(uint32_t address)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  m_nwkId.Set (address >> 25);     // Only leave the 7 most significant bits
-  m_nwkAddr.Set (address & 0x1FFFFFF);     // Only consider the 25 least significant bits
+    m_nwkId.Set(address >> 25);         // Only leave the 7 most significant bits
+    m_nwkAddr.Set(address & 0x1FFFFFF); // Only consider the 25 least significant bits
 }
 
 uint8_t
-LoraDeviceAddress::GetNwkID (void)
+LoraDeviceAddress::GetNwkID(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  return m_nwkId.Get ();
+    return m_nwkId.Get();
 }
 
 uint32_t
-LoraDeviceAddress::GetNwkAddr (void)
+LoraDeviceAddress::GetNwkAddr(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  return m_nwkAddr.Get ();
+    return m_nwkAddr.Get();
 }
 
 void
-LoraDeviceAddress::SetNwkID (uint8_t nwkId)
+LoraDeviceAddress::SetNwkID(uint8_t nwkId)
 {
-  NS_LOG_FUNCTION (this << unsigned(nwkId));
+    NS_LOG_FUNCTION(this << unsigned(nwkId));
 
-  m_nwkId.Set (nwkId);
+    m_nwkId.Set(nwkId);
 }
 
 void
-LoraDeviceAddress::SetNwkAddr (uint32_t nwkAddr)
+LoraDeviceAddress::SetNwkAddr(uint32_t nwkAddr)
 {
-  NS_LOG_FUNCTION (this << nwkAddr);
+    NS_LOG_FUNCTION(this << nwkAddr);
 
-  m_nwkAddr.Set (nwkAddr);
+    m_nwkAddr.Set(nwkAddr);
 }
 
 std::string
-LoraDeviceAddress::Print (void) const
+LoraDeviceAddress::Print(void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  std::string result;
-  result += std::bitset<7> (m_nwkId.Get ()).to_string ();
-  result += "|";
-  result += std::bitset<25> (m_nwkAddr.Get ()).to_string ();
-  return result;
-}
-
-bool LoraDeviceAddress::operator==
-  (const LoraDeviceAddress &other) const
-{
-  return this->Get () == other.Get ();
+    std::string result;
+    result += std::bitset<7>(m_nwkId.Get()).to_string();
+    result += "|";
+    result += std::bitset<25>(m_nwkAddr.Get()).to_string();
+    return result;
 }
 
-bool LoraDeviceAddress::operator!=
-  (const LoraDeviceAddress &other) const
+bool
+LoraDeviceAddress::operator==(const LoraDeviceAddress& other) const
 {
-  return this->Get () != other.Get ();
+    return this->Get() == other.Get();
 }
 
-bool LoraDeviceAddress::operator<
-  (const LoraDeviceAddress &other) const
+bool
+LoraDeviceAddress::operator!=(const LoraDeviceAddress& other) const
 {
-  return this->Get () < other.Get ();
+    return this->Get() != other.Get();
 }
 
-bool LoraDeviceAddress::operator>
-  (const LoraDeviceAddress &other) const
+bool
+LoraDeviceAddress::operator<(const LoraDeviceAddress& other) const
 {
-  return !(this->Get () < other.Get ());
+    return this->Get() < other.Get();
 }
 
-std::ostream& operator<< (std::ostream& os, const LoraDeviceAddress &address)
+bool
+LoraDeviceAddress::operator>(const LoraDeviceAddress& other) const
 {
-  os << address.Print ();
-  return os;
+    return !(this->Get() < other.Get());
 }
+
+std::ostream&
+operator<<(std::ostream& os, const LoraDeviceAddress& address)
+{
+    os << address.Print();
+    return os;
 }
-}
+} // namespace lorawan
+} // namespace ns3

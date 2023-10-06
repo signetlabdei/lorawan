@@ -21,18 +21,20 @@
 #ifndef LORA_HELPER_H
 #define LORA_HELPER_H
 
-#include "ns3/lora-phy-helper.h"
-#include "ns3/lorawan-mac-helper.h"
-#include "ns3/node-container.h"
-#include "ns3/net-device-container.h"
-#include "ns3/net-device.h"
 #include "ns3/lora-net-device.h"
 #include "ns3/lora-packet-tracker.h"
+#include "ns3/lora-phy-helper.h"
+#include "ns3/lorawan-mac-helper.h"
+#include "ns3/net-device-container.h"
+#include "ns3/net-device.h"
+#include "ns3/node-container.h"
 
 #include <ctime>
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
 /**
  * Helps to create LoraNetDevice objects
@@ -42,99 +44,99 @@ namespace lorawan {
  */
 class LoraHelper
 {
-public:
-  virtual ~LoraHelper ();
+  public:
+    virtual ~LoraHelper();
 
-  LoraHelper ();
+    LoraHelper();
 
-  /**
-   * Install LoraNetDevices on a list of nodes
-   *
-   * \param phy the PHY helper to create PHY objects
-   * \param mac the MAC helper to create MAC objects
-   * \param c the set of nodes on which a lora device must be created
-   * \returns a device container which contains all the devices created by this
-   * method.
-   */
-  virtual NetDeviceContainer Install (const LoraPhyHelper &phyHelper,
-                                      const LorawanMacHelper &macHelper,
-                                      NodeContainer c) const;
+    /**
+     * Install LoraNetDevices on a list of nodes
+     *
+     * \param phy the PHY helper to create PHY objects
+     * \param mac the MAC helper to create MAC objects
+     * \param c the set of nodes on which a lora device must be created
+     * \returns a device container which contains all the devices created by this
+     * method.
+     */
+    virtual NetDeviceContainer Install(const LoraPhyHelper& phyHelper,
+                                       const LorawanMacHelper& macHelper,
+                                       NodeContainer c) const;
 
-  /**
-   * Install LoraNetDevice on a single node
-   *
-   * \param phy the PHY helper to create PHY objects
-   * \param mac the MAC helper to create MAC objects
-   * \param node the node on which a lora device must be created
-   * \returns a device container which contains all the devices created by this
-   * method.
-   */
-  virtual NetDeviceContainer Install (const LoraPhyHelper &phyHelper,
-                                      const LorawanMacHelper &macHelper,
-                                      Ptr<Node> node) const;
+    /**
+     * Install LoraNetDevice on a single node
+     *
+     * \param phy the PHY helper to create PHY objects
+     * \param mac the MAC helper to create MAC objects
+     * \param node the node on which a lora device must be created
+     * \returns a device container which contains all the devices created by this
+     * method.
+     */
+    virtual NetDeviceContainer Install(const LoraPhyHelper& phyHelper,
+                                       const LorawanMacHelper& macHelper,
+                                       Ptr<Node> node) const;
 
-  /**
-   * Enable tracking of packets via trace sources.
-   *
-   * This method automatically connects to trace sources to computes relevant
-   * metrics.
-   */
-  void EnablePacketTracking (void);
+    /**
+     * Enable tracking of packets via trace sources.
+     *
+     * This method automatically connects to trace sources to computes relevant
+     * metrics.
+     */
+    void EnablePacketTracking(void);
 
-  /**
-   * Periodically prints the simulation time to the standard output.
-   */
-  void EnableSimulationTimePrinting (Time interval);
+    /**
+     * Periodically prints the simulation time to the standard output.
+     */
+    void EnableSimulationTimePrinting(Time interval);
 
-  /**
-   * Periodically prints the status of devices in the network to a file.
-   */
-  void EnablePeriodicDeviceStatusPrinting (NodeContainer endDevices,
-                                           NodeContainer gateways,
-                                           std::string filename,
-                                           Time interval);
+    /**
+     * Periodically prints the status of devices in the network to a file.
+     */
+    void EnablePeriodicDeviceStatusPrinting(NodeContainer endDevices,
+                                            NodeContainer gateways,
+                                            std::string filename,
+                                            Time interval);
 
-  /**
-   * Periodically prints PHY-level performance at every gateway in the container.
-   */
-  void EnablePeriodicPhyPerformancePrinting (NodeContainer gateways,
-                                             std::string filename,
-                                             Time interval);
+    /**
+     * Periodically prints PHY-level performance at every gateway in the container.
+     */
+    void EnablePeriodicPhyPerformancePrinting(NodeContainer gateways,
+                                              std::string filename,
+                                              Time interval);
 
-  void DoPrintPhyPerformance (NodeContainer gateways, std::string filename);
+    void DoPrintPhyPerformance(NodeContainer gateways, std::string filename);
 
-  /**
-   * Periodically prints global performance.
-   */
-  void EnablePeriodicGlobalPerformancePrinting (std::string filename,
-                                                Time interval);
+    /**
+     * Periodically prints global performance.
+     */
+    void EnablePeriodicGlobalPerformancePrinting(std::string filename, Time interval);
 
-  void DoPrintGlobalPerformance (std::string filename);
+    void DoPrintGlobalPerformance(std::string filename);
 
-  LoraPacketTracker& GetPacketTracker (void);
+    LoraPacketTracker& GetPacketTracker(void);
 
-  LoraPacketTracker* m_packetTracker = 0;
+    LoraPacketTracker* m_packetTracker = 0;
 
-  time_t m_oldtime;
+    time_t m_oldtime;
 
-  /**
-   * Print a summary of the status of all devices in the network.
-   */
-  void DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateways,
-                            std::string filename);
+    /**
+     * Print a summary of the status of all devices in the network.
+     */
+    void DoPrintDeviceStatus(NodeContainer endDevices,
+                             NodeContainer gateways,
+                             std::string filename);
 
-private:
-  /**
-   * Actually print the simulation time and re-schedule execution of this
-   * function.
-   */
-  void DoPrintSimulationTime (Time interval);
+  private:
+    /**
+     * Actually print the simulation time and re-schedule execution of this
+     * function.
+     */
+    void DoPrintSimulationTime(Time interval);
 
-  Time m_lastPhyPerformanceUpdate;
-  Time m_lastGlobalPerformanceUpdate;
+    Time m_lastPhyPerformanceUpdate;
+    Time m_lastGlobalPerformanceUpdate;
 };
 
-} //namespace ns3
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* LORA_HELPER_H */
