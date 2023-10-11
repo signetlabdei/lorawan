@@ -79,7 +79,7 @@ ForwarderHelper::InstallPriv (Ptr<Node> node) const
   for (uint32_t i = 0; i < node->GetNDevices (); i++)
     {
       Ptr<NetDevice> currentNetDevice = node->GetDevice (i);
-      if (currentNetDevice->GetObject<LoraNetDevice> () != 0)
+      if (currentNetDevice->GetObject<LoraNetDevice>())
         {
           Ptr<LoraNetDevice> loraNetDevice =
             currentNetDevice->GetObject<LoraNetDevice> ();
@@ -87,7 +87,7 @@ ForwarderHelper::InstallPriv (Ptr<Node> node) const
           loraNetDevice->SetReceiveCallback (MakeCallback
                                                (&Forwarder::ReceiveFromLora, app));
         }
-      else if (currentNetDevice->GetObject<PointToPointNetDevice> () != 0)
+      else if (currentNetDevice->GetObject<PointToPointNetDevice> ())
         {
           Ptr<PointToPointNetDevice> pointToPointNetDevice =
             currentNetDevice->GetObject<PointToPointNetDevice> ();

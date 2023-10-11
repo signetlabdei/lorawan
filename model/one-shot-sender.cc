@@ -83,13 +83,13 @@ OneShotSender::StartApplication (void)
   NS_LOG_FUNCTION (this);
 
   // Make sure we have a MAC layer
-  if (m_mac == 0)
+  if (!m_mac)
     {
       // Assumes there's only one device
       Ptr<LoraNetDevice> loraNetDevice = m_node->GetDevice (0)->GetObject<LoraNetDevice> ();
 
       m_mac = loraNetDevice->GetMac ();
-      NS_ASSERT (m_mac != 0);
+      NS_ASSERT (m_mac);
     }
 
   // Schedule the next SendPacket event

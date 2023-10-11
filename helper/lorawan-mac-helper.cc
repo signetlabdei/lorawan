@@ -77,7 +77,7 @@ LorawanMacHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
   mac->SetDevice (device);
 
   // If we are operating on an end device, add an address to it
-  if (m_deviceType == ED_A && m_addrGen != 0)
+  if (m_deviceType == ED_A && m_addrGen)
     {
       mac->GetObject<ClassAEndDeviceLorawanMac> ()->SetDeviceAddress (m_addrGen->NextAddress ());
     }
@@ -461,13 +461,13 @@ LorawanMacHelper::SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer
     {
       Ptr<Node> object = *j;
       Ptr<MobilityModel> position = object->GetObject<MobilityModel> ();
-      NS_ASSERT (position != 0);
+      NS_ASSERT (position);
       Ptr<NetDevice> netDevice = object->GetDevice (0);
       Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
-      NS_ASSERT (loraNetDevice != 0);
+      NS_ASSERT (loraNetDevice);
       Ptr<ClassAEndDeviceLorawanMac> mac =
           loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
-      NS_ASSERT (mac != 0);
+      NS_ASSERT (mac);
 
       // Try computing the distance from each gateway and find the best one
       Ptr<Node> bestGateway = gateways.Get (0);
@@ -620,13 +620,13 @@ LorawanMacHelper::SetSpreadingFactorsGivenDistribution (NodeContainer endDevices
     {
       Ptr<Node> object = *j;
       Ptr<MobilityModel> position = object->GetObject<MobilityModel> ();
-      NS_ASSERT (position != 0);
+      NS_ASSERT (position);
       Ptr<NetDevice> netDevice = object->GetDevice (0);
       Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
-      NS_ASSERT (loraNetDevice != 0);
+      NS_ASSERT (loraNetDevice);
       Ptr<ClassAEndDeviceLorawanMac> mac =
           loraNetDevice->GetMac ()->GetObject<ClassAEndDeviceLorawanMac> ();
-      NS_ASSERT (mac != 0);
+      NS_ASSERT (mac);
 
       double prob = uniformRV->GetValue (0, 1);
 
