@@ -13,7 +13,7 @@
 using namespace ns3;
 using namespace lorawan;
 
-NS_LOG_COMPONENT_DEFINE ("NetworkSchedulerTestSuite");
+NS_LOG_COMPONENT_DEFINE("NetworkSchedulerTestSuite");
 
 /////////////////////////////
 // NetworkStatus testing //
@@ -21,35 +21,34 @@ NS_LOG_COMPONENT_DEFINE ("NetworkSchedulerTestSuite");
 
 class NetworkSchedulerTest : public TestCase
 {
-public:
-  NetworkSchedulerTest ();
-  virtual ~NetworkSchedulerTest ();
+  public:
+    NetworkSchedulerTest();
+    virtual ~NetworkSchedulerTest();
 
-private:
-  virtual void DoRun (void);
+  private:
+    virtual void DoRun(void);
 };
 
 // Add some help text to this case to describe what it is intended to test
-NetworkSchedulerTest::NetworkSchedulerTest ()
-  : TestCase ("Verify correct behavior of the NetworkScheduler object")
+NetworkSchedulerTest::NetworkSchedulerTest()
+    : TestCase("Verify correct behavior of the NetworkScheduler object")
 {
 }
 
 // Reminder that the test case should clean up after itself
-NetworkSchedulerTest::~NetworkSchedulerTest ()
+NetworkSchedulerTest::~NetworkSchedulerTest()
 {
 }
-
 
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-NetworkSchedulerTest::DoRun (void)
+NetworkSchedulerTest::DoRun(void)
 {
-  NS_LOG_DEBUG ("NetworkSchedulerTest");
+    NS_LOG_DEBUG("NetworkSchedulerTest");
 
-  // If a packet is received at the network server, a reply event should be
-  // scheduled to happen 1 second after the reception.
+    // If a packet is received at the network server, a reply event should be
+    // scheduled to happen 1 second after the reception.
 }
 
 /**************
@@ -62,16 +61,16 @@ NetworkSchedulerTest::DoRun (void)
 
 class NetworkSchedulerTestSuite : public TestSuite
 {
-public:
-  NetworkSchedulerTestSuite ();
+  public:
+    NetworkSchedulerTestSuite();
 };
 
-NetworkSchedulerTestSuite::NetworkSchedulerTestSuite ()
-  : TestSuite ("network-scheduler", UNIT)
+NetworkSchedulerTestSuite::NetworkSchedulerTestSuite()
+    : TestSuite("network-scheduler", UNIT)
 {
-  LogComponentEnable ("NetworkSchedulerTestSuite", LOG_LEVEL_DEBUG);
-  // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
-  AddTestCase (new NetworkSchedulerTest, TestCase::QUICK);
+    LogComponentEnable("NetworkSchedulerTestSuite", LOG_LEVEL_DEBUG);
+    // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
+    AddTestCase(new NetworkSchedulerTest, TestCase::QUICK);
 }
 
 // Do not forget to allocate an instance of this TestSuite

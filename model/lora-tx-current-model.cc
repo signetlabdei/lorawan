@@ -14,169 +14,172 @@
  */
 
 #include "lora-tx-current-model.h"
-#include "ns3/log.h"
-#include "ns3/double.h"
+
 #include "lora-utils.h"
 
-namespace ns3 {
-namespace lorawan {
+#include "ns3/double.h"
+#include "ns3/log.h"
 
-NS_LOG_COMPONENT_DEFINE ("LoraTxCurrentModel");
+namespace ns3
+{
+namespace lorawan
+{
 
-NS_OBJECT_ENSURE_REGISTERED (LoraTxCurrentModel);
+NS_LOG_COMPONENT_DEFINE("LoraTxCurrentModel");
+
+NS_OBJECT_ENSURE_REGISTERED(LoraTxCurrentModel);
 
 TypeId
-LoraTxCurrentModel::GetTypeId (void)
+LoraTxCurrentModel::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::LoraTxCurrentModel")
-    .SetParent<Object> ()
-    .SetGroupName ("Lora")
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::LoraTxCurrentModel").SetParent<Object>().SetGroupName("Lora");
+    return tid;
 }
 
-LoraTxCurrentModel::LoraTxCurrentModel ()
+LoraTxCurrentModel::LoraTxCurrentModel()
 {
 }
 
-LoraTxCurrentModel::~LoraTxCurrentModel ()
+LoraTxCurrentModel::~LoraTxCurrentModel()
 {
 }
 
 // Similarly to the wifi case
-NS_OBJECT_ENSURE_REGISTERED (LinearLoraTxCurrentModel);
+NS_OBJECT_ENSURE_REGISTERED(LinearLoraTxCurrentModel);
 
 TypeId
-LinearLoraTxCurrentModel::GetTypeId (void)
+LinearLoraTxCurrentModel::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::LinearLoraTxCurrentModel")
-    .SetParent<LoraTxCurrentModel> ()
-    .SetGroupName ("Lora")
-    .AddConstructor<LinearLoraTxCurrentModel> ()
-    .AddAttribute ("Eta", "The efficiency of the power amplifier.",
-                   DoubleValue (0.10),
-                   MakeDoubleAccessor (&LinearLoraTxCurrentModel::SetEta,
-                                       &LinearLoraTxCurrentModel::GetEta),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("Voltage", "The supply voltage (in Volts).",
-                   DoubleValue (3.3),
-                   MakeDoubleAccessor (&LinearLoraTxCurrentModel::SetVoltage,
-                                       &LinearLoraTxCurrentModel::GetVoltage),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("StandbyCurrent", "The current in the STANDBY state (in Watts).",
-                   DoubleValue (0.0014),      // idle mode = 1.4mA
-                   MakeDoubleAccessor (&LinearLoraTxCurrentModel::SetStandbyCurrent,
-                                       &LinearLoraTxCurrentModel::GetStandbyCurrent),
-                   MakeDoubleChecker<double> ())
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::LinearLoraTxCurrentModel")
+            .SetParent<LoraTxCurrentModel>()
+            .SetGroupName("Lora")
+            .AddConstructor<LinearLoraTxCurrentModel>()
+            .AddAttribute("Eta",
+                          "The efficiency of the power amplifier.",
+                          DoubleValue(0.10),
+                          MakeDoubleAccessor(&LinearLoraTxCurrentModel::SetEta,
+                                             &LinearLoraTxCurrentModel::GetEta),
+                          MakeDoubleChecker<double>())
+            .AddAttribute("Voltage",
+                          "The supply voltage (in Volts).",
+                          DoubleValue(3.3),
+                          MakeDoubleAccessor(&LinearLoraTxCurrentModel::SetVoltage,
+                                             &LinearLoraTxCurrentModel::GetVoltage),
+                          MakeDoubleChecker<double>())
+            .AddAttribute("StandbyCurrent",
+                          "The current in the STANDBY state (in Watts).",
+                          DoubleValue(0.0014), // idle mode = 1.4mA
+                          MakeDoubleAccessor(&LinearLoraTxCurrentModel::SetStandbyCurrent,
+                                             &LinearLoraTxCurrentModel::GetStandbyCurrent),
+                          MakeDoubleChecker<double>());
+    return tid;
 }
 
-LinearLoraTxCurrentModel::LinearLoraTxCurrentModel ()
+LinearLoraTxCurrentModel::LinearLoraTxCurrentModel()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-LinearLoraTxCurrentModel::~LinearLoraTxCurrentModel ()
+LinearLoraTxCurrentModel::~LinearLoraTxCurrentModel()
 {
-  NS_LOG_FUNCTION (this);
-}
-
-void
-LinearLoraTxCurrentModel::SetEta (double eta)
-{
-  NS_LOG_FUNCTION (this << eta);
-  m_eta = eta;
+    NS_LOG_FUNCTION(this);
 }
 
 void
-LinearLoraTxCurrentModel::SetVoltage (double voltage)
+LinearLoraTxCurrentModel::SetEta(double eta)
 {
-  NS_LOG_FUNCTION (this << voltage);
-  m_voltage = voltage;
+    NS_LOG_FUNCTION(this << eta);
+    m_eta = eta;
 }
 
 void
-LinearLoraTxCurrentModel::SetStandbyCurrent (double idleCurrent)
+LinearLoraTxCurrentModel::SetVoltage(double voltage)
 {
-  NS_LOG_FUNCTION (this << idleCurrent);
-  m_idleCurrent = idleCurrent;
+    NS_LOG_FUNCTION(this << voltage);
+    m_voltage = voltage;
+}
+
+void
+LinearLoraTxCurrentModel::SetStandbyCurrent(double idleCurrent)
+{
+    NS_LOG_FUNCTION(this << idleCurrent);
+    m_idleCurrent = idleCurrent;
 }
 
 double
-LinearLoraTxCurrentModel::GetEta (void) const
+LinearLoraTxCurrentModel::GetEta(void) const
 {
-  return m_eta;
+    return m_eta;
 }
 
 double
-LinearLoraTxCurrentModel::GetVoltage (void) const
+LinearLoraTxCurrentModel::GetVoltage(void) const
 {
-  return m_voltage;
+    return m_voltage;
 }
 
 double
-LinearLoraTxCurrentModel::GetStandbyCurrent (void) const
+LinearLoraTxCurrentModel::GetStandbyCurrent(void) const
 {
-  return m_idleCurrent;
+    return m_idleCurrent;
 }
 
 double
-LinearLoraTxCurrentModel::CalcTxCurrent (double txPowerDbm) const
+LinearLoraTxCurrentModel::CalcTxCurrent(double txPowerDbm) const
 {
-  NS_LOG_FUNCTION (this << txPowerDbm);
-  return DbmToW (txPowerDbm) / (m_voltage * m_eta) + m_idleCurrent;
+    NS_LOG_FUNCTION(this << txPowerDbm);
+    return DbmToW(txPowerDbm) / (m_voltage * m_eta) + m_idleCurrent;
 }
 
-
-NS_OBJECT_ENSURE_REGISTERED (ConstantLoraTxCurrentModel);
+NS_OBJECT_ENSURE_REGISTERED(ConstantLoraTxCurrentModel);
 
 TypeId
-ConstantLoraTxCurrentModel::GetTypeId (void)
+ConstantLoraTxCurrentModel::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::ConstantLoraTxCurrentModel")
-    .SetParent<LoraTxCurrentModel> ()
-    .SetGroupName ("Lora")
-    .AddConstructor<ConstantLoraTxCurrentModel> ()
-    .AddAttribute ("TxCurrent",
-                   "The radio Tx current in Ampere.",
-                   DoubleValue (0.028),        // transmit at 0dBm = 28mA
-                   MakeDoubleAccessor (&ConstantLoraTxCurrentModel::SetTxCurrent,
-                                       &ConstantLoraTxCurrentModel::GetTxCurrent),
-                   MakeDoubleChecker<double> ())
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::ConstantLoraTxCurrentModel")
+            .SetParent<LoraTxCurrentModel>()
+            .SetGroupName("Lora")
+            .AddConstructor<ConstantLoraTxCurrentModel>()
+            .AddAttribute("TxCurrent",
+                          "The radio Tx current in Ampere.",
+                          DoubleValue(0.028), // transmit at 0dBm = 28mA
+                          MakeDoubleAccessor(&ConstantLoraTxCurrentModel::SetTxCurrent,
+                                             &ConstantLoraTxCurrentModel::GetTxCurrent),
+                          MakeDoubleChecker<double>());
+    return tid;
 }
 
-ConstantLoraTxCurrentModel::ConstantLoraTxCurrentModel ()
+ConstantLoraTxCurrentModel::ConstantLoraTxCurrentModel()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-ConstantLoraTxCurrentModel::~ConstantLoraTxCurrentModel ()
+ConstantLoraTxCurrentModel::~ConstantLoraTxCurrentModel()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 void
-ConstantLoraTxCurrentModel::SetTxCurrent (double txCurrent)
+ConstantLoraTxCurrentModel::SetTxCurrent(double txCurrent)
 {
-  NS_LOG_FUNCTION (this << txCurrent);
-  m_txCurrent = txCurrent;
+    NS_LOG_FUNCTION(this << txCurrent);
+    m_txCurrent = txCurrent;
 }
 
 double
-ConstantLoraTxCurrentModel::GetTxCurrent (void) const
+ConstantLoraTxCurrentModel::GetTxCurrent(void) const
 {
-  return m_txCurrent;
+    return m_txCurrent;
 }
 
 double
-ConstantLoraTxCurrentModel::CalcTxCurrent (double txPowerDbm) const
+ConstantLoraTxCurrentModel::CalcTxCurrent(double txPowerDbm) const
 {
-  NS_LOG_FUNCTION (this << txPowerDbm);
-  return m_txCurrent;
+    NS_LOG_FUNCTION(this << txPowerDbm);
+    return m_txCurrent;
 }
 
-}
+} // namespace lorawan
 } // namespace ns3

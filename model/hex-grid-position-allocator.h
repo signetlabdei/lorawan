@@ -20,34 +20,36 @@
 #define HEX_GRID_POSITION_ALLOCATOR_H
 
 #include "ns3/position-allocator.h"
+
 #include <cmath>
 
-namespace ns3 {
+namespace ns3
+{
 
-  class HexGridPositionAllocator : public PositionAllocator
-  {
+class HexGridPositionAllocator : public PositionAllocator
+{
   public:
-    HexGridPositionAllocator ();
-    HexGridPositionAllocator (double radius);
+    HexGridPositionAllocator();
+    HexGridPositionAllocator(double radius);
 
-    ~HexGridPositionAllocator ();
+    ~HexGridPositionAllocator();
 
-    virtual Vector GetNext (void) const;
+    virtual Vector GetNext(void) const;
 
-    virtual int64_t AssignStreams (int64_t stream);
+    virtual int64_t AssignStreams(int64_t stream);
 
-    static TypeId GetTypeId (void);
+    static TypeId GetTypeId(void);
 
-    double GetRadius (void);
+    double GetRadius(void);
 
-    void SetRadius (double radius);
+    void SetRadius(double radius);
 
   private:
     /**
      * This method adds to the given list of positions an outer ring of positions
      * \param position the list of position around which to create the other positions
      */
-    std::vector<Vector> AddRing (std::vector<Vector> positions);
+    std::vector<Vector> AddRing(std::vector<Vector> positions);
 
     /**
      * The list of current positions
@@ -66,7 +68,7 @@ namespace ns3 {
     double m_radius;
 
     const static double pi; //!< Pi
-  };
+};
 
 } // namespace ns3
 
