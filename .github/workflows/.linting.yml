@@ -1,0 +1,50 @@
+# ns-3 CI/CD script with jobs of the code-linting stage
+#
+# Contains jobs to perform lint checking.
+
+on: workflow_call
+
+jobs:
+  # Clang-tidy
+  clang-tidy-16:
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:rolling
+    timeout-minutes: 180
+    env:
+      CLANG_TIDY_OUTPUT: clang-tidy-output.log
+    steps:
+      # The following step is required in all jobs that use this repo's actions
+      - name: "Retrieve actions from repository"
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions
+      - name: "Install dependencies and checkout repo in ns-3"
+        uses: ./.github/actions/install-linting
+      - name: "Configure ns-3 CMake"
+        run: >
+          ./ns3 configure -d debug
+          --enable-examples --enable-tests --enable-asserts
+          --enable-modules "lorawan;applications"
+          --enable-clang-tidy
+      # Use a trick (git diff on empty tag) to only run clang-tidy on the lorawan module
+      - name: "Running clang-tidy"
+        shell: bash
+        run: >
+          git -C src/lorawan/ tag empty $(git hash-object -t tree /dev/null) &&
+          git -C src/lorawan/ diff -U0 empty 
+          --src-prefix=a/src/lorawan/ --dst-prefix=b/src/lorawan/ |
+          clang-tidy-diff-16.py -path cmake-cache/ -p1 -quiet -use-color
+          -iregex "src\/lorawan\/.+\.(cpp|cc|cxx|c|h|hpp)"
+          1> $CLANG_TIDY_OUTPUT
+          2> /dev/null
+      - name: "Check job results"
+        run: |
+          (! egrep -A 3 "error:|warning:|note:" $CLANG_TIDY_OUTPUT)
+          echo "No clang-tidy errors found"
+      - if: failure()
+        name: "Upload clang-tidy-output.log"
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: ${{ env.CLANG_TIDY_OUTPUT }}
+          path: ${{ env.CLANG_TIDY_OUTPUT }}

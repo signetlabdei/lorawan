@@ -1,0 +1,28 @@
+# Note: this action requires an archlinux container and access to the repos's actions!
+# (see .doc.yml)
+name: "install-doc"
+description: "Installs required archlinux packages and checks-out the repo in ns-3"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Install required system packages"
+      shell: bash
+      run: >
+        pacman-key --init && pacman -Syu --noconfirm
+        base-devel ninja cmake python ccache gsl gtk3 boost openssh
+        graphviz imagemagick texlive-basic texlive-bin texlive-binextra texlive-latexextra
+        texlive-fontutils texlive-fontsrecommended python-sphinx 
+        wget &&
+        pacman --noconfirm -U https://archive.archlinux.org/packages/d/dia/dia-0.97.3-9-x86_64.pkg.tar.zst &&
+        pacman --noconfirm -U https://archive.archlinux.org/packages/d/doxygen/doxygen-1.9.6-1-x86_64.pkg.tar.zst &&
+        mv /etc/ImageMagick-7/policy.xml /etc/ImageMagick-7/policy.xml.bak
+    - name: "Checkout this repository as ns-3 module"
+      uses: ./.github/actions/checkout-in-ns3
+    - name: "Add lorawan module to docs"
+      shell: bash
+      working-directory: doc/models
+      run: |
+        sed -i '/lr-wpan\/doc\/lr-wpan.rst/a\\t\$(SRC)\/lorawan\/doc\/lorawan.rst \\' Makefile
+        sed -i '/lr-wpan\/doc\/lr-wpan-arch.dia/i\\t\$(SRC)\/lorawan\/doc\/figures\/LoRaWANTopology.pdf \\' Makefile
+        sed -i '/lr-wpan/i\   lorawan' source/index.rst

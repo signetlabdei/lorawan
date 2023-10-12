@@ -1,0 +1,21 @@
+# Note: this action requires an ubuntu container and access to the repos's actions!
+# (see analysis.yml)
+name: "install-analysis"
+description: "Installs required ubuntu packages and checks-out the repo in ns-3"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Install required system packages"
+      shell: bash
+      run: >
+        sudo apt update && DEBIAN_FRONTEND=noninteractive sudo apt install -y
+        apt-utils
+        git gcc g++ cmake python3 make ninja-build
+        tcpdump libgsl-dev libxml2-dev
+        curl unzip tar
+        ccache
+        lcov
+        wget
+    - name: "Checkout this repository as ns-3 module"
+      uses: ./.github/actions/checkout-in-ns3
