@@ -99,7 +99,7 @@ LoraNetDevice::CompleteConfig (void)
   NS_LOG_FUNCTION_NOARGS ();
 
   // Verify we have all the necessary pieces
-  if (m_mac == 0 || m_phy == 0 || m_node == 0 || m_configComplete)
+  if (!m_mac || !m_phy || !m_node || m_configComplete)
     {
       return;
     }
@@ -114,7 +114,7 @@ LoraNetDevice::Send (Ptr<Packet> packet)
   NS_LOG_FUNCTION (this << packet);
 
   // Send the packet to the MAC layer, if it exists
-  NS_ASSERT (m_mac != 0);
+  NS_ASSERT (m_mac);
   m_mac->Send (packet);
 }
 
@@ -195,7 +195,7 @@ LoraNetDevice::IsLinkUp (void) const
 {
   NS_LOG_FUNCTION (this);
 
-  return m_phy != 0;
+  return m_phy != nullptr;
 }
 
 void
