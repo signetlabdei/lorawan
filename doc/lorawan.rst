@@ -103,7 +103,7 @@ To represent these two models, the module features two generic ``LoraPhy`` and
 model the peculiarities of the two wireless network devices: the End Device (ED)
 and the Gateway (GW). So, the PHY layers can be modeled by use of
 ``EndDeviceLoraPhy`` and ``GatewayLoraPhy`` classes, while objects of class
-``EndDeviceLorawanMac``, ``ClassAEndDeviceLorawanMac``, and ``GatewayLorawanMac`` 
+``EndDeviceLorawanMac``, ``ClassAEndDeviceLorawanMac``, and ``GatewayLorawanMac``
 are used to represent the MAC layer. A ``NetworkServer`` application can also be
 installed on a node that will then administer the wireless network through the
 GW's forwarding application, ``Forwarder``, which leverages the gateway's LoRa
@@ -187,12 +187,12 @@ and forwarded to the MAC layer.
 
    \begin{matrix}
     & \scriptstyle{\rm SF7 } & \scriptstyle{\rm SF8 }& \scriptstyle{\rm SF9 }& \scriptstyle{\rm SF10} & \scriptstyle{\rm SF11} & \scriptstyle{\rm SF12}\\
-   \scriptstyle{\rm SF7 }& 6	&-16	&-18	&-19	&-19	&-20\\
-   \scriptstyle{\rm SF8 }& -24	&6	&-20	&-22	&-22	&-22\\
-   \scriptstyle{\rm SF9 }& -27	&-27	&6	&-23	&-25	&-25\\
-   \scriptstyle{\rm SF10} & -30	&-30	&-30	&6	&-26	&-28\\
-   \scriptstyle{\rm SF11} & -33	&-33	&-33	&-33	&6	&-29\\
-   \scriptstyle{\rm SF12} & -36	&-36	&-36	&-36	&-36	&6\\
+   \scriptstyle{\rm SF7 }& 6    &-16    &-18    &-19    &-19    &-20\\
+   \scriptstyle{\rm SF8 }& -24  &6  &-20    &-22    &-22    &-22\\
+   \scriptstyle{\rm SF9 }& -27  &-27    &6  &-23    &-25    &-25\\
+   \scriptstyle{\rm SF10} & -30 &-30    &-30    &6  &-26    &-28\\
+   \scriptstyle{\rm SF11} & -33 &-33    &-33    &-33    &6  &-29\\
+   \scriptstyle{\rm SF12} & -36 &-36    &-36    &-36    &-36    &6\\
    \end{matrix}
 
 A full description of the link layer model can also be found in

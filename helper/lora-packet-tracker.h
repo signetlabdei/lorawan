@@ -21,149 +21,149 @@
 #ifndef LORA_PACKET_TRACKER_H
 #define LORA_PACKET_TRACKER_H
 
-#include "ns3/packet.h"
 #include "ns3/nstime.h"
+#include "ns3/packet.h"
 
 #include <map>
 #include <string>
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
 enum PhyPacketOutcome
 {
-  RECEIVED,
-  INTERFERED,
-  NO_MORE_RECEIVERS,
-  UNDER_SENSITIVITY,
-  LOST_BECAUSE_TX,
-  UNSET
+    RECEIVED,
+    INTERFERED,
+    NO_MORE_RECEIVERS,
+    UNDER_SENSITIVITY,
+    LOST_BECAUSE_TX,
+    UNSET
 };
 
 struct PacketStatus
 {
-  Ptr<Packet const> packet;
-  uint32_t senderId;
-  Time sendTime;
-  std::map<int, enum PhyPacketOutcome> outcomes;
+    Ptr<const Packet> packet;
+    uint32_t senderId;
+    Time sendTime;
+    std::map<int, enum PhyPacketOutcome> outcomes;
 };
 
 struct MacPacketStatus
 {
-  Ptr<Packet const> packet;
-  uint32_t senderId;
-  Time sendTime;
-  Time receivedTime;
-  std::map<int, Time> receptionTimes;
+    Ptr<const Packet> packet;
+    uint32_t senderId;
+    Time sendTime;
+    Time receivedTime;
+    std::map<int, Time> receptionTimes;
 };
 
 struct RetransmissionStatus
 {
-  Time firstAttempt;
-  Time finishTime;
-  uint8_t reTxAttempts;
-  bool successful;
+    Time firstAttempt;
+    Time finishTime;
+    uint8_t reTxAttempts;
+    bool successful;
 };
 
-typedef std::map<Ptr<Packet const>, MacPacketStatus> MacPacketData;
-typedef std::map<Ptr<Packet const>, PacketStatus> PhyPacketData;
-typedef std::map<Ptr<Packet const>, RetransmissionStatus> RetransmissionData;
-
+typedef std::map<Ptr<const Packet>, MacPacketStatus> MacPacketData;
+typedef std::map<Ptr<const Packet>, PacketStatus> PhyPacketData;
+typedef std::map<Ptr<const Packet>, RetransmissionStatus> RetransmissionData;
 
 class LoraPacketTracker
 {
-public:
-  LoraPacketTracker ();
-  ~LoraPacketTracker ();
+  public:
+    LoraPacketTracker();
+    ~LoraPacketTracker();
 
-  /////////////////////////
-  // PHY layer callbacks //
-  /////////////////////////
-  // Packet transmission callback
-  void TransmissionCallback (Ptr<Packet const> packet, uint32_t systemId);
-  // Packet outcome traces
-  void PacketReceptionCallback (Ptr<Packet const> packet, uint32_t systemId);
-  void InterferenceCallback (Ptr<Packet const> packet, uint32_t systemId);
-  void NoMoreReceiversCallback (Ptr<Packet const> packet, uint32_t systemId);
-  void UnderSensitivityCallback (Ptr<Packet const> packet, uint32_t systemId);
-  void LostBecauseTxCallback (Ptr<Packet const> packet, uint32_t systemId);
+    /////////////////////////
+    // PHY layer callbacks //
+    /////////////////////////
+    // Packet transmission callback
+    void TransmissionCallback(Ptr<const Packet> packet, uint32_t systemId);
+    // Packet outcome traces
+    void PacketReceptionCallback(Ptr<const Packet> packet, uint32_t systemId);
+    void InterferenceCallback(Ptr<const Packet> packet, uint32_t systemId);
+    void NoMoreReceiversCallback(Ptr<const Packet> packet, uint32_t systemId);
+    void UnderSensitivityCallback(Ptr<const Packet> packet, uint32_t systemId);
+    void LostBecauseTxCallback(Ptr<const Packet> packet, uint32_t systemId);
 
-  /////////////////////////
-  // MAC layer callbacks //
-  /////////////////////////
-  // Packet transmission at an EndDevice
-  void MacTransmissionCallback (Ptr<Packet const> packet);
-  void RequiredTransmissionsCallback (uint8_t reqTx, bool success,
-                                      Time firstAttempt, Ptr<Packet> packet);
-  // Packet reception at the Gateway
-  void MacGwReceptionCallback (Ptr<Packet const> packet);
+    /////////////////////////
+    // MAC layer callbacks //
+    /////////////////////////
+    // Packet transmission at an EndDevice
+    void MacTransmissionCallback(Ptr<const Packet> packet);
+    void RequiredTransmissionsCallback(uint8_t reqTx,
+                                       bool success,
+                                       Time firstAttempt,
+                                       Ptr<Packet> packet);
+    // Packet reception at the Gateway
+    void MacGwReceptionCallback(Ptr<const Packet> packet);
 
-  ///////////////////////////////
-  // Packet counting functions //
-  ///////////////////////////////
-  bool IsUplink (Ptr<Packet const> packet);
+    ///////////////////////////////
+    // Packet counting functions //
+    ///////////////////////////////
+    bool IsUplink(Ptr<const Packet> packet);
 
-  // void CountRetransmissions (Time transient, Time simulationTime, MacPacketData
-  //                            macPacketTracker, RetransmissionData reTransmissionTracker,
-  //                            PhyPacketData packetTracker);
+    // void CountRetransmissions (Time transient, Time simulationTime, MacPacketData
+    //                            macPacketTracker, RetransmissionData reTransmissionTracker,
+    //                            PhyPacketData packetTracker);
 
-  /**
-   * Count packets to evaluate the performance at PHY level of a specific
-   * gateway.
-   */
-  std::vector<int> CountPhyPacketsPerGw (Time startTime, Time stopTime,
-                                         int systemId);
-  /**
-   * Count packets to evaluate the performance at PHY level of a specific
-   * gateway.
-   */
-  std::string PrintPhyPacketsPerGw (Time startTime, Time stopTime,
-                                    int systemId);
-  /**
-   * Count packets to evaluate the performance at MAC level of a specific
-   * gateway.
-   */
-  std::string CountMacPacketsPerGw (Time startTime, Time stopTime,
-                                    int systemId);
+    /**
+     * Count packets to evaluate the performance at PHY level of a specific
+     * gateway.
+     */
+    std::vector<int> CountPhyPacketsPerGw(Time startTime, Time stopTime, int systemId);
+    /**
+     * Count packets to evaluate the performance at PHY level of a specific
+     * gateway.
+     */
+    std::string PrintPhyPacketsPerGw(Time startTime, Time stopTime, int systemId);
+    /**
+     * Count packets to evaluate the performance at MAC level of a specific
+     * gateway.
+     */
+    std::string CountMacPacketsPerGw(Time startTime, Time stopTime, int systemId);
 
-  /**
-   * Count packets to evaluate the performance at MAC level of a specific
-   * gateway.
-   */
-  std::string PrintMacPacketsPerGw (Time startTime, Time stopTime,
-                                    int systemId);
+    /**
+     * Count packets to evaluate the performance at MAC level of a specific
+     * gateway.
+     */
+    std::string PrintMacPacketsPerGw(Time startTime, Time stopTime, int systemId);
 
-  /**
-   * Count the number of retransmissions that were needed to correctly deliver a
-   * packet and receive the corresponding acknowledgment.
-   */
-  std::string CountRetransmissions (Time startTime, Time stopTime);
+    /**
+     * Count the number of retransmissions that were needed to correctly deliver a
+     * packet and receive the corresponding acknowledgment.
+     */
+    std::string CountRetransmissions(Time startTime, Time stopTime);
 
-  /**
-   * Count packets to evaluate the global performance at MAC level of the whole
-   * network. In this case, a MAC layer packet is labeled as successful if it
-   * was successful at at least one of the available gateways.
-   *
-   * This returns a string containing the number of sent packets and the number
-   * of packets that were received by at least one gateway.
-   */
-  std::string CountMacPacketsGlobally (Time startTime, Time stopTime);
+    /**
+     * Count packets to evaluate the global performance at MAC level of the whole
+     * network. In this case, a MAC layer packet is labeled as successful if it
+     * was successful at at least one of the available gateways.
+     *
+     * This returns a string containing the number of sent packets and the number
+     * of packets that were received by at least one gateway.
+     */
+    std::string CountMacPacketsGlobally(Time startTime, Time stopTime);
 
-  /**
-   * Count packets to evaluate the global performance at MAC level of the whole
-   * network. In this case, a MAC layer packet is labeled as successful if it
-   * was successful at at least one of the available gateways, and if
-   * the corresponding acknowledgment was correctly delivered at the device.
-   *
-   * This returns a string containing the number of sent packets and the number
-   * of packets that generated a successful acknowledgment.
-   */
-  std::string CountMacPacketsGloballyCpsr (Time startTime, Time stopTime);
-private:
-  PhyPacketData m_packetTracker;
-  MacPacketData m_macPacketTracker;
-  RetransmissionData m_reTransmissionTracker;
+    /**
+     * Count packets to evaluate the global performance at MAC level of the whole
+     * network. In this case, a MAC layer packet is labeled as successful if it
+     * was successful at at least one of the available gateways, and if
+     * the corresponding acknowledgment was correctly delivered at the device.
+     *
+     * This returns a string containing the number of sent packets and the number
+     * of packets that generated a successful acknowledgment.
+     */
+    std::string CountMacPacketsGloballyCpsr(Time startTime, Time stopTime);
+
+  private:
+    PhyPacketData m_packetTracker;
+    MacPacketData m_macPacketTracker;
+    RetransmissionData m_reTransmissionTracker;
 };
-}
-}
+} // namespace lorawan
+} // namespace ns3
 #endif

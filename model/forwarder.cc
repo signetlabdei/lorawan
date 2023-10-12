@@ -18,97 +18,100 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#include "ns3/forwarder.h"
+#include "forwarder.h"
+
 #include "ns3/log.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
-NS_LOG_COMPONENT_DEFINE ("Forwarder");
+NS_LOG_COMPONENT_DEFINE("Forwarder");
 
-NS_OBJECT_ENSURE_REGISTERED (Forwarder);
+NS_OBJECT_ENSURE_REGISTERED(Forwarder);
 
 TypeId
-Forwarder::GetTypeId (void)
+Forwarder::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::Forwarder")
-    .SetParent<Application> ()
-    .AddConstructor<Forwarder> ()
-    .SetGroupName ("lorawan");
-  return tid;
+    static TypeId tid = TypeId("ns3::Forwarder")
+                            .SetParent<Application>()
+                            .AddConstructor<Forwarder>()
+                            .SetGroupName("lorawan");
+    return tid;
 }
 
-Forwarder::Forwarder ()
+Forwarder::Forwarder()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 }
 
-Forwarder::~Forwarder ()
+Forwarder::~Forwarder()
 {
-  NS_LOG_FUNCTION_NOARGS ();
-}
-
-void
-Forwarder::SetPointToPointNetDevice (Ptr<PointToPointNetDevice>
-                                     pointToPointNetDevice)
-{
-  NS_LOG_FUNCTION (this << pointToPointNetDevice);
-
-  m_pointToPointNetDevice = pointToPointNetDevice;
+    NS_LOG_FUNCTION_NOARGS();
 }
 
 void
-Forwarder::SetLoraNetDevice (Ptr<LoraNetDevice> loraNetDevice)
+Forwarder::SetPointToPointNetDevice(Ptr<PointToPointNetDevice> pointToPointNetDevice)
 {
-  NS_LOG_FUNCTION (this << loraNetDevice);
+    NS_LOG_FUNCTION(this << pointToPointNetDevice);
 
-  m_loraNetDevice = loraNetDevice;
+    m_pointToPointNetDevice = pointToPointNetDevice;
+}
+
+void
+Forwarder::SetLoraNetDevice(Ptr<LoraNetDevice> loraNetDevice)
+{
+    NS_LOG_FUNCTION(this << loraNetDevice);
+
+    m_loraNetDevice = loraNetDevice;
 }
 
 bool
-Forwarder::ReceiveFromLora (Ptr<NetDevice> loraNetDevice, Ptr<const Packet>
-                            packet, uint16_t protocol, const Address& sender)
+Forwarder::ReceiveFromLora(Ptr<NetDevice> loraNetDevice,
+                           Ptr<const Packet> packet,
+                           uint16_t protocol,
+                           const Address& sender)
 {
-  NS_LOG_FUNCTION (this << packet << protocol << sender);
+    NS_LOG_FUNCTION(this << packet << protocol << sender);
 
-  Ptr<Packet> packetCopy = packet->Copy ();
+    Ptr<Packet> packetCopy = packet->Copy();
 
-  m_pointToPointNetDevice->Send (packetCopy,
-                                 m_pointToPointNetDevice->GetBroadcast (),
-                                 0x800);
+    m_pointToPointNetDevice->Send(packetCopy, m_pointToPointNetDevice->GetBroadcast(), 0x800);
 
-  return true;
+    return true;
 }
 
 bool
-Forwarder::ReceiveFromPointToPoint (Ptr<NetDevice> pointToPointNetDevice,
-                                    Ptr<const Packet> packet, uint16_t protocol,
-                                    const Address& sender)
+Forwarder::ReceiveFromPointToPoint(Ptr<NetDevice> pointToPointNetDevice,
+                                   Ptr<const Packet> packet,
+                                   uint16_t protocol,
+                                   const Address& sender)
 {
-  NS_LOG_FUNCTION (this << packet << protocol << sender);
+    NS_LOG_FUNCTION(this << packet << protocol << sender);
 
-  Ptr<Packet> packetCopy = packet->Copy ();
+    Ptr<Packet> packetCopy = packet->Copy();
 
-  m_loraNetDevice->Send (packetCopy);
+    m_loraNetDevice->Send(packetCopy);
 
-  return true;
+    return true;
 }
 
 void
-Forwarder::StartApplication (void)
+Forwarder::StartApplication(void)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  // TODO Make sure we are connected to both needed devices
+    // TODO Make sure we are connected to both needed devices
 }
 
 void
-Forwarder::StopApplication (void)
+Forwarder::StopApplication(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  // TODO Get rid of callbacks
+    // TODO Get rid of callbacks
 }
 
-}
-}
+} // namespace lorawan
+} // namespace ns3

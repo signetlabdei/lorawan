@@ -23,16 +23,19 @@
 #ifndef END_DEVICE_LORA_PHY_H
 #define END_DEVICE_LORA_PHY_H
 
+#include "lora-phy.h"
+
+#include "ns3/mobility-model.h"
+#include "ns3/net-device.h"
+#include "ns3/node.h"
+#include "ns3/nstime.h"
 #include "ns3/object.h"
 #include "ns3/traced-value.h"
-#include "ns3/net-device.h"
-#include "ns3/nstime.h"
-#include "ns3/mobility-model.h"
-#include "ns3/node.h"
-#include "ns3/lora-phy.h"
 
-namespace ns3 {
-namespace lorawan {
+namespace ns3
+{
+namespace lorawan
+{
 
 class LoraChannel;
 
@@ -41,44 +44,44 @@ class LoraChannel;
  */
 class EndDeviceLoraPhyListener
 {
-public:
-  virtual ~EndDeviceLoraPhyListener ();
+  public:
+    virtual ~EndDeviceLoraPhyListener();
 
-  /**
-   * We have received the first bit of a packet. We decided
-   * that we could synchronize on this packet. It does not mean
-   * we will be able to successfully receive completely the
-   * whole packet. It means that we will report a BUSY status until
-   * one of the following happens:
-   *   - NotifyRxEndOk
-   *   - NotifyRxEndError
-   *   - NotifyTxStart
-   *
-   * \param duration the expected duration of the packet reception.
-   */
-  virtual void NotifyRxStart () = 0;
+    /**
+     * We have received the first bit of a packet. We decided
+     * that we could synchronize on this packet. It does not mean
+     * we will be able to successfully receive completely the
+     * whole packet. It means that we will report a BUSY status until
+     * one of the following happens:
+     *   - NotifyRxEndOk
+     *   - NotifyRxEndError
+     *   - NotifyTxStart
+     *
+     * \param duration the expected duration of the packet reception.
+     */
+    virtual void NotifyRxStart() = 0;
 
-  /**
-   * We are about to send the first bit of the packet.
-   * We do not send any event to notify the end of
-   * transmission. Listeners should assume that the
-   * channel implicitely reverts to the idle state
-   * unless they have received a cca busy report.
-   *
-   * \param duration the expected transmission duration.
-   * \param txPowerDbm the nominal tx power in dBm
-   */
-  virtual void NotifyTxStart (double txPowerDbm) = 0;
+    /**
+     * We are about to send the first bit of the packet.
+     * We do not send any event to notify the end of
+     * transmission. Listeners should assume that the
+     * channel implicitely reverts to the idle state
+     * unless they have received a cca busy report.
+     *
+     * \param duration the expected transmission duration.
+     * \param txPowerDbm the nominal tx power in dBm
+     */
+    virtual void NotifyTxStart(double txPowerDbm) = 0;
 
-  /**
-   * Notify listeners that we went to sleep
-   */
-  virtual void NotifySleep (void) = 0;
+    /**
+     * Notify listeners that we went to sleep
+     */
+    virtual void NotifySleep(void) = 0;
 
-  /**
-   * Notify listeners that we woke up
-   */
-  virtual void NotifyStandby (void) = 0;
+    /**
+     * Notify listeners that we woke up
+     */
+    virtual void NotifyStandby(void) = 0;
 };
 
 /**
@@ -103,175 +106,179 @@ public:
  */
 class EndDeviceLoraPhy : public LoraPhy
 {
-public:
-  /**
-   * An enumeration of the possible states of an EndDeviceLoraPhy.
-   * It makes sense to define a state for End Devices since there's only one
-   * demodulator which can either send, receive, stay idle or go in a deep
-   * sleep state.
-   */
-  enum State
-  {
+  public:
     /**
-     * The PHY layer is sleeping.
-     * During sleep, the device is not listening for incoming messages.
+     * An enumeration of the possible states of an EndDeviceLoraPhy.
+     * It makes sense to define a state for End Devices since there's only one
+     * demodulator which can either send, receive, stay idle or go in a deep
+     * sleep state.
      */
-    SLEEP,
+    enum State
+    {
+        /**
+         * The PHY layer is sleeping.
+         * During sleep, the device is not listening for incoming messages.
+         */
+        SLEEP,
+
+        /**
+         * The PHY layer is in STANDBY.
+         * When the PHY is in this state, it's listening to the channel, and
+         * it's also ready to transmit data passed to it by the MAC layer.
+         */
+        STANDBY,
+
+        /**
+         * The PHY layer is sending a packet.
+         * During transmission, the device cannot receive any packet or send
+         * any additional packet.
+         */
+        TX,
+
+        /**
+         * The PHY layer is receiving a packet.
+         * While the device is locked on an incoming packet, transmission is
+         * not possible.
+         */
+        RX
+    };
+
+    static TypeId GetTypeId(void);
+
+    // Constructor and destructor
+    EndDeviceLoraPhy();
+    virtual ~EndDeviceLoraPhy();
+
+    // Implementation of LoraPhy's pure virtual functions
+    virtual void StartReceive(Ptr<Packet> packet,
+                              double rxPowerDbm,
+                              uint8_t sf,
+                              Time duration,
+                              double frequencyMHz) = 0;
+
+    // Implementation of LoraPhy's pure virtual functions
+    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) = 0;
+
+    // Implementation of LoraPhy's pure virtual functions
+    virtual void Send(Ptr<Packet> packet,
+                      LoraTxParameters txParams,
+                      double frequencyMHz,
+                      double txPowerDbm) = 0;
+
+    // Implementation of LoraPhy's pure virtual functions
+    virtual bool IsOnFrequency(double frequencyMHz);
+
+    // Implementation of LoraPhy's pure virtual functions
+    virtual bool IsTransmitting(void);
 
     /**
-     * The PHY layer is in STANDBY.
-     * When the PHY is in this state, it's listening to the channel, and
-     * it's also ready to transmit data passed to it by the MAC layer.
+     * Set the frequency this EndDevice will listen on.
+     *
+     * Should a packet be transmitted on a frequency different than that the
+     * EndDeviceLoraPhy is listening on, the packet will be discarded.
+     *
+     * \param The frequency [MHz] to listen to.
      */
-    STANDBY,
+    void SetFrequency(double frequencyMHz);
 
     /**
-     * The PHY layer is sending a packet.
-     * During transmission, the device cannot receive any packet or send
-     * any additional packet.
+     * Set the Spreading Factor this EndDevice will listen for.
+     *
+     * The EndDeviceLoraPhy object will not be able to lock on transmissions that
+     * use a different SF than the one it's listening for.
+     *
+     * \param sf The spreading factor to listen for.
      */
-    TX,
+    void SetSpreadingFactor(uint8_t sf);
 
     /**
-     * The PHY layer is receiving a packet.
-     * While the device is locked on an incoming packet, transmission is
-     * not possible.
+     * Get the Spreading Factor this EndDevice is listening for.
+     *
+     * \return The Spreading Factor we are listening for.
      */
-    RX
-  };
+    uint8_t GetSpreadingFactor(void);
 
-  static TypeId GetTypeId (void);
+    /**
+     * Return the state this End Device is currently in.
+     *
+     * \return The state this EndDeviceLoraPhy is currently in.
+     */
+    EndDeviceLoraPhy::State GetState(void);
 
-  // Constructor and destructor
-  EndDeviceLoraPhy ();
-  virtual ~EndDeviceLoraPhy ();
+    /**
+     * Switch to the STANDBY state.
+     */
+    void SwitchToStandby(void);
 
-  // Implementation of LoraPhy's pure virtual functions
-  virtual void StartReceive (Ptr<Packet> packet, double rxPowerDbm,
-                             uint8_t sf, Time duration, double frequencyMHz) = 0;
+    /**
+     * Switch to the SLEEP state.
+     */
+    void SwitchToSleep(void);
 
-  // Implementation of LoraPhy's pure virtual functions
-  virtual void EndReceive (Ptr<Packet> packet,
-                           Ptr<LoraInterferenceHelper::Event> event) = 0;
+    /**
+     * Add the input listener to the list of objects to be notified of PHY-level
+     * events.
+     *
+     * \param listener the new listener
+     */
+    void RegisterListener(EndDeviceLoraPhyListener* listener);
 
-  // Implementation of LoraPhy's pure virtual functions
-  virtual void Send (Ptr<Packet> packet, LoraTxParameters txParams,
-                     double frequencyMHz, double txPowerDbm) = 0;
+    /**
+     * Remove the input listener from the list of objects to be notified of
+     * PHY-level events.
+     *
+     * \param listener the listener to be unregistered
+     */
+    void UnregisterListener(EndDeviceLoraPhyListener* listener);
 
-  // Implementation of LoraPhy's pure virtual functions
-  virtual bool IsOnFrequency (double frequencyMHz);
+    static const double sensitivity[6]; //!< The sensitivity vector of this device to different SFs
 
-  // Implementation of LoraPhy's pure virtual functions
-  virtual bool IsTransmitting (void);
+  protected:
+    /**
+     * Switch to the RX state
+     */
+    void SwitchToRx();
 
-  /**
-   * Set the frequency this EndDevice will listen on.
-   *
-   * Should a packet be transmitted on a frequency different than that the
-   * EndDeviceLoraPhy is listening on, the packet will be discarded.
-   *
-   * \param The frequency [MHz] to listen to.
-   */
-  void SetFrequency (double frequencyMHz);
+    /**
+     * Switch to the TX state
+     */
+    void SwitchToTx(double txPowerDbm);
 
-  /**
-   * Set the Spreading Factor this EndDevice will listen for.
-   *
-   * The EndDeviceLoraPhy object will not be able to lock on transmissions that
-   * use a different SF than the one it's listening for.
-   *
-   * \param sf The spreading factor to listen for.
-   */
-  void SetSpreadingFactor (uint8_t sf);
+    /**
+     * Trace source for when a packet is lost because it was using a SF different from
+     * the one this EndDeviceLoraPhy was configured to listen for.
+     */
+    TracedCallback<Ptr<const Packet>, uint32_t> m_wrongSf;
 
-  /**
-   * Get the Spreading Factor this EndDevice is listening for.
-   *
-   * \return The Spreading Factor we are listening for.
-   */
-  uint8_t GetSpreadingFactor (void);
+    /**
+     * Trace source for when a packet is lost because it was transmitted on a
+     * frequency different from the one this EndDeviceLoraPhy was configured to
+     * listen on.
+     */
+    TracedCallback<Ptr<const Packet>, uint32_t> m_wrongFrequency;
 
-  /**
-   * Return the state this End Device is currently in.
-   *
-   * \return The state this EndDeviceLoraPhy is currently in.
-   */
-  EndDeviceLoraPhy::State GetState (void);
+    TracedValue<State> m_state; //!< The state this PHY is currently in.
 
-  /**
-   * Switch to the STANDBY state.
-   */
-  void SwitchToStandby (void);
+    // static const double sensitivity[6]; //!< The sensitivity vector of this device to different
+    // SFs
 
-  /**
-   * Switch to the SLEEP state.
-   */
-  void SwitchToSleep (void);
+    double m_frequency; //!< The frequency this device is listening on
 
-  /**
-   * Add the input listener to the list of objects to be notified of PHY-level
-   * events.
-   *
-   * \param listener the new listener
-   */
-  void RegisterListener (EndDeviceLoraPhyListener *listener);
+    uint8_t m_sf; //!< The Spreading Factor this device is listening for
 
-  /**
-   * Remove the input listener from the list of objects to be notified of
-   * PHY-level events.
-   *
-   * \param listener the listener to be unregistered
-   */
-  void UnregisterListener (EndDeviceLoraPhyListener *listener);
+    /**
+     * typedef for a list of EndDeviceLoraPhyListener
+     */
+    typedef std::vector<EndDeviceLoraPhyListener*> Listeners;
+    /**
+     * typedef for a list of EndDeviceLoraPhyListener iterator
+     */
+    typedef std::vector<EndDeviceLoraPhyListener*>::iterator ListenersI;
 
-  static const double sensitivity[6]; //!< The sensitivity vector of this device to different SFs
-
-
-protected:
-  /**
-   * Switch to the RX state
-   */
-  void SwitchToRx ();
-
-  /**
-   * Switch to the TX state
-   */
-  void SwitchToTx (double txPowerDbm);
-
-  /**
-   * Trace source for when a packet is lost because it was using a SF different from
-   * the one this EndDeviceLoraPhy was configured to listen for.
-   */
-  TracedCallback<Ptr<const Packet>, uint32_t> m_wrongSf;
-
-  /**
-   * Trace source for when a packet is lost because it was transmitted on a
-   * frequency different from the one this EndDeviceLoraPhy was configured to
-   * listen on.
-   */
-  TracedCallback<Ptr<const Packet>, uint32_t> m_wrongFrequency;
-
-  TracedValue<State> m_state; //!< The state this PHY is currently in.
-
-  // static const double sensitivity[6]; //!< The sensitivity vector of this device to different SFs
-
-  double m_frequency; //!< The frequency this device is listening on
-
-  uint8_t m_sf; //!< The Spreading Factor this device is listening for
-
-  /**
-   * typedef for a list of EndDeviceLoraPhyListener
-   */
-  typedef std::vector<EndDeviceLoraPhyListener *> Listeners;
-  /**
-   * typedef for a list of EndDeviceLoraPhyListener iterator
-   */
-  typedef std::vector<EndDeviceLoraPhyListener *>::iterator ListenersI;
-
-  Listeners m_listeners; //!< PHY listeners
+    Listeners m_listeners; //!< PHY listeners
 };
 
-} /* namespace ns3 */
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* END_DEVICE_LORA_PHY_H */

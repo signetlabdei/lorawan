@@ -21,61 +21,64 @@
 #ifndef ONE_SHOT_SENDER_H
 #define ONE_SHOT_SENDER_H
 
-#include "ns3/application.h"
-#include "ns3/nstime.h"
-#include "ns3/lorawan-mac.h"
-#include "ns3/attribute.h"
+#include "lorawan-mac.h"
 
-namespace ns3 {
-namespace lorawan {
+#include "ns3/application.h"
+#include "ns3/attribute.h"
+#include "ns3/nstime.h"
+
+namespace ns3
+{
+namespace lorawan
+{
 
 class OneShotSender : public Application
 {
-public:
-  OneShotSender ();
-  OneShotSender (Time sendTime);
-  ~OneShotSender ();
+  public:
+    OneShotSender();
+    OneShotSender(Time sendTime);
+    ~OneShotSender();
 
-  static TypeId GetTypeId (void);
+    static TypeId GetTypeId(void);
 
-  /**
-   * Send a packet using the LoraNetDevice's Send method.
-   */
-  void SendPacket (void);
+    /**
+     * Send a packet using the LoraNetDevice's Send method.
+     */
+    void SendPacket(void);
 
-  /**
-   * Set the time at which this app will send a packet.
-   */
-  void SetSendTime (Time sendTime);
+    /**
+     * Set the time at which this app will send a packet.
+     */
+    void SetSendTime(Time sendTime);
 
-  /**
-   * Start the application by scheduling the first SendPacket event.
-   */
-  void StartApplication (void);
+    /**
+     * Start the application by scheduling the first SendPacket event.
+     */
+    void StartApplication(void);
 
-  /**
-   * Stop the application.
-   */
-  void StopApplication (void);
+    /**
+     * Stop the application.
+     */
+    void StopApplication(void);
 
-private:
-  /**
-   * The time at which to send the packet.
-   */
-  Time m_sendTime;
+  private:
+    /**
+     * The time at which to send the packet.
+     */
+    Time m_sendTime;
 
-  /**
-   * The sending event.
-   */
-  EventId m_sendEvent;
+    /**
+     * The sending event.
+     */
+    EventId m_sendEvent;
 
-  /**
-   * The MAC layer of this node.
-   */
-  Ptr<LorawanMac> m_mac;
+    /**
+     * The MAC layer of this node.
+     */
+    Ptr<LorawanMac> m_mac;
 };
 
-} //namespace ns3
+} // namespace lorawan
 
-}
+} // namespace ns3
 #endif /* ONE_SHOT_APPLICATION */
