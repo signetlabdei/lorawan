@@ -90,7 +90,7 @@ ChangeEndDevicePosition(Ptr<Node> endDevice, bool inRange)
 int
 main(int argc, char* argv[])
 {
-    CommandLine cmd;
+    CommandLine cmd(__FILE__);
     cmd.AddValue("simulationTime", "The time for which to simulate", simulationTime);
     cmd.AddValue("MaxTransmissions", "ns3::EndDeviceLorawanMac::MaxTransmissions");
     cmd.AddValue("MType", "ns3::EndDeviceLorawanMac::MType");

@@ -33,7 +33,7 @@ main(int argc, char* argv[])
 {
     bool verbose = false;
 
-    CommandLine cmd;
+    CommandLine cmd(__FILE__);
     cmd.AddValue("verbose", "Whether to print output or not", verbose);
     cmd.Parse(argc, argv);
 

@@ -52,7 +52,7 @@ bool print = true;
 int
 main(int argc, char* argv[])
 {
-    CommandLine cmd;
+    CommandLine cmd(__FILE__);
     cmd.AddValue("nDevices", "Number of end devices to include in the simulation", nDevices);
     cmd.AddValue("radius", "The radius of the area to simulate", radius);
     cmd.AddValue("simulationTime", "The time for which to simulate", simulationTime);
