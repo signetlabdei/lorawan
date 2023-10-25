@@ -45,13 +45,13 @@ class LoraChannel;
  */
 struct LoraTxParameters
 {
-    uint8_t sf = 7;                          //!< Spreading Factor
-    bool headerDisabled = 0;                 //!< Whether to use implicit header mode
-    uint8_t codingRate = 1;                  //!< Code rate (obtained as 4/(codingRate+4))
-    double bandwidthHz = 125000;             //!< Bandwidth in Hz
-    uint32_t nPreamble = 8;                  //!< Number of preamble symbols
-    bool crcEnabled = 1;                     //!< Whether Cyclic Redundancy Check is enabled
-    bool lowDataRateOptimizationEnabled = 0; //!< Whether Low Data Rate Optimization is enabled
+    uint8_t sf = 7;                              //!< Spreading Factor
+    bool headerDisabled = false;                 //!< Whether to use implicit header mode
+    uint8_t codingRate = 1;                      //!< Code rate (obtained as 4/(codingRate+4))
+    double bandwidthHz = 125000;                 //!< Bandwidth in Hz
+    uint32_t nPreamble = 8;                      //!< Number of preamble symbols
+    bool crcEnabled = true;                      //!< Whether Cyclic Redundancy Check is enabled
+    bool lowDataRateOptimizationEnabled = false; //!< Whether Low Data Rate Optimization is enabled
 };
 
 /**
@@ -74,13 +74,13 @@ class LoraPhy : public Object
 {
   public:
     // TypeId
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     /**
      * Constructor and destructor
      */
     LoraPhy();
-    virtual ~LoraPhy();
+    ~LoraPhy() override;
 
     /**
      * Type definition for a callback for when a packet is correctly received.
@@ -157,7 +157,7 @@ class LoraPhy : public Object
      * \returns true if the device is currently transmitting a packet, false
      * otherwise.
      */
-    virtual bool IsTransmitting(void) = 0;
+    virtual bool IsTransmitting() = 0;
 
     /**
      * Whether this device is listening on the specified frequency or not.
@@ -221,14 +221,14 @@ class LoraPhy : public Object
      *
      * \return The LoraChannel instance this PHY transmits on.
      */
-    Ptr<LoraChannel> GetChannel(void) const;
+    Ptr<LoraChannel> GetChannel() const;
 
     /**
      * Get the NetDevice associated to this PHY.
      *
      * \return The NetDevice associated to this PHY.
      */
-    Ptr<NetDevice> GetDevice(void) const;
+    Ptr<NetDevice> GetDevice() const;
 
     /**
      * Set the NetDevice that owns this PHY.

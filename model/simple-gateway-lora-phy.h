@@ -44,23 +44,23 @@ class LoraChannel;
 class SimpleGatewayLoraPhy : public GatewayLoraPhy
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     SimpleGatewayLoraPhy();
-    virtual ~SimpleGatewayLoraPhy();
+    ~SimpleGatewayLoraPhy() override;
 
-    virtual void StartReceive(Ptr<Packet> packet,
-                              double rxPowerDbm,
-                              uint8_t sf,
-                              Time duration,
-                              double frequencyMHz);
+    void StartReceive(Ptr<Packet> packet,
+                      double rxPowerDbm,
+                      uint8_t sf,
+                      Time duration,
+                      double frequencyMHz) override;
 
-    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event);
+    void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) override;
 
-    virtual void Send(Ptr<Packet> packet,
-                      LoraTxParameters txParams,
-                      double frequencyMHz,
-                      double txPowerDbm);
+    void Send(Ptr<Packet> packet,
+              LoraTxParameters txParams,
+              double frequencyMHz,
+              double txPowerDbm) override;
 
   private:
 };

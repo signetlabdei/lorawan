@@ -32,10 +32,10 @@ namespace lorawan
 class LoraTxCurrentModel : public Object
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     LoraTxCurrentModel();
-    virtual ~LoraTxCurrentModel();
+    ~LoraTxCurrentModel() override;
 
     /**
      * Get the current for transmission at this power.
@@ -53,10 +53,10 @@ class LoraTxCurrentModel : public Object
 class LinearLoraTxCurrentModel : public LoraTxCurrentModel
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     LinearLoraTxCurrentModel();
-    virtual ~LinearLoraTxCurrentModel();
+    ~LinearLoraTxCurrentModel() override;
 
     /**
      * \param eta (dimension-less)
@@ -82,19 +82,19 @@ class LinearLoraTxCurrentModel : public LoraTxCurrentModel
     /**
      * \return the power amplifier efficiency.
      */
-    double GetEta(void) const;
+    double GetEta() const;
 
     /**
      * \return the supply voltage.
      */
-    double GetVoltage(void) const;
+    double GetVoltage() const;
 
     /**
      * \return the current in the STANDBY state.
      */
-    double GetStandbyCurrent(void) const;
+    double GetStandbyCurrent() const;
 
-    double CalcTxCurrent(double txPowerDbm) const;
+    double CalcTxCurrent(double txPowerDbm) const override;
 
   private:
     double m_eta;         //!< ETA
@@ -109,10 +109,10 @@ class ConstantLoraTxCurrentModel : public LoraTxCurrentModel
      * \brief Get the type ID.
      * \return the object TypeId
      */
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     ConstantLoraTxCurrentModel();
-    virtual ~ConstantLoraTxCurrentModel();
+    ~ConstantLoraTxCurrentModel() override;
 
     /**
      * \param txCurrent (Ampere)
@@ -124,9 +124,9 @@ class ConstantLoraTxCurrentModel : public LoraTxCurrentModel
     /**
      * \return the current in the TX state.
      */
-    double GetTxCurrent(void) const;
+    double GetTxCurrent() const;
 
-    double CalcTxCurrent(double txPowerDbm) const;
+    double CalcTxCurrent(double txPowerDbm) const override;
 
   private:
     double m_txCurrent;

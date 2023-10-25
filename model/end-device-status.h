@@ -115,35 +115,35 @@ class EndDeviceStatus : public Object
      *
      * \return A boolean value signaling if the end device needs a reply.
      */
-    bool NeedsReply(void);
+    bool NeedsReply() const;
 
     /**
      * Get the reply packet.
      *
      * \return A pointer to the packet reply (data + headers).
      */
-    Ptr<Packet> GetCompleteReplyPacket(void);
+    Ptr<Packet> GetCompleteReplyPacket();
 
     /**
      * Get the reply packet mac header.
      *
      * \return The packet reply mac header.
      */
-    LorawanMacHeader GetReplyMacHeader(void);
+    LorawanMacHeader GetReplyMacHeader() const;
 
     /**
      * Get the reply packet frame header.
      *
      * \return The packet reply frame header.
      */
-    LoraFrameHeader GetReplyFrameHeader(void);
+    LoraFrameHeader GetReplyFrameHeader() const;
 
     /**
      * Get the data of the reply packet.
      *
      * \return A pointer to the packet reply.
      */
-    Ptr<Packet> GetReplyPayload(void);
+    Ptr<Packet> GetReplyPayload();
 
     /***********************************/
     /* Received packet list management */
@@ -169,8 +169,8 @@ class EndDeviceStatus : public Object
     struct ReceivedPacketInfo
     {
         // Members
-        Ptr<const Packet> packet = 0; //!< The received packet
-        GatewayList gwList;           //!< List of gateways that received this packet.
+        Ptr<const Packet> packet = nullptr; //!< The received packet
+        GatewayList gwList;                 //!< List of gateways that received this packet.
         uint8_t sf;
         double frequency;
     };
@@ -181,24 +181,24 @@ class EndDeviceStatus : public Object
     /* Proper EndDeviceStatus class definition */
     /*******************************************/
 
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     EndDeviceStatus();
     EndDeviceStatus(LoraDeviceAddress endDeviceAddress,
                     Ptr<ClassAEndDeviceLorawanMac> endDeviceMac);
-    virtual ~EndDeviceStatus();
+    ~EndDeviceStatus() override;
 
     /**
      * Get the spreading factor this device is using in the first receive window.
      *
      * \return An unsigned 8-bit integer containing the spreading factor.
      */
-    uint8_t GetFirstReceiveWindowSpreadingFactor(void);
+    uint8_t GetFirstReceiveWindowSpreadingFactor() const;
 
     /**
      * Get the first window frequency of this device.
      */
-    double GetFirstReceiveWindowFrequency(void);
+    double GetFirstReceiveWindowFrequency() const;
 
     /**
      * Get the offset of spreading factor this device is using in the second
@@ -206,20 +206,20 @@ class EndDeviceStatus : public Object
      *
      * \return An unsigned 8-bit integer containing the spreading factor.
      */
-    uint8_t GetSecondReceiveWindowOffset(void);
+    uint8_t GetSecondReceiveWindowOffset() const;
 
     /**
      * Return the second window frequency of this device.
      *
      */
-    double GetSecondReceiveWindowFrequency(void);
+    double GetSecondReceiveWindowFrequency() const;
 
     /**
      * Get the received packet list.
      *
      * \return The received packet list.
      */
-    ReceivedPacketList GetReceivedPacketList(void);
+    ReceivedPacketList GetReceivedPacketList() const;
 
     /**
      * Set the spreading factor this device is using in the first receive window.
@@ -256,7 +256,7 @@ class EndDeviceStatus : public Object
      */
     void SetReplyPayload(Ptr<Packet> replyPayload);
 
-    Ptr<ClassAEndDeviceLorawanMac> GetMac(void);
+    Ptr<ClassAEndDeviceLorawanMac> GetMac();
 
     //////////////////////
     //  Other methods  //
@@ -270,18 +270,18 @@ class EndDeviceStatus : public Object
     /**
      * Return the last packet that was received from this device.
      */
-    Ptr<const Packet> GetLastPacketReceivedFromDevice(void);
+    Ptr<const Packet> GetLastPacketReceivedFromDevice();
 
     /**
      * Return the information about the last packet that was received from the
      * device.
      */
-    EndDeviceStatus::ReceivedPacketInfo GetLastReceivedPacketInfo(void);
+    EndDeviceStatus::ReceivedPacketInfo GetLastReceivedPacketInfo();
 
     /**
      * Initialize reply.
      */
-    void InitializeReply(void);
+    void InitializeReply();
 
     /**
      * Add MAC command to the list.
@@ -300,12 +300,12 @@ class EndDeviceStatus : public Object
 
     void SetReceiveWindowOpportunity(EventId event);
 
-    void RemoveReceiveWindowOpportunity(void);
+    void RemoveReceiveWindowOpportunity();
 
     /**
      * Return an ordered list of the best gateways.
      */
-    std::map<double, Address> GetPowerGatewayMap(void);
+    std::map<double, Address> GetPowerGatewayMap();
 
     struct Reply m_reply; //<! Next reply intended for this device
 

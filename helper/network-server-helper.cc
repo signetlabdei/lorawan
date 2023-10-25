@@ -74,7 +74,7 @@ ApplicationContainer
 NetworkServerHelper::Install(NodeContainer c)
 {
     ApplicationContainer apps;
-    for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i)
+    for (auto i = c.Begin(); i != c.End(); ++i)
     {
         apps.Add(InstallPriv(*i));
     }
@@ -93,7 +93,7 @@ NetworkServerHelper::InstallPriv(Ptr<Node> node)
     node->AddApplication(app);
 
     // Cycle on each gateway
-    for (NodeContainer::Iterator i = m_gateways.Begin(); i != m_gateways.End(); i++)
+    for (auto i = m_gateways.Begin(); i != m_gateways.End(); i++)
     {
         // Add the connections with the gateway
         // Create a PointToPoint link between gateway and NS

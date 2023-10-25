@@ -167,7 +167,7 @@ main(int argc, char* argv[])
     mobility.Install(endDevices);
 
     // Make it so that nodes are at a certain height > 0
-    for (NodeContainer::Iterator j = endDevices.Begin(); j != endDevices.End(); ++j)
+    for (auto j = endDevices.Begin(); j != endDevices.End(); ++j)
     {
         Ptr<MobilityModel> mobility = (*j)->GetObject<MobilityModel>();
         Vector position = mobility->GetPosition();
@@ -190,7 +190,7 @@ main(int argc, char* argv[])
     // Now end devices are connected to the channel
 
     // Connect trace sources
-    for (NodeContainer::Iterator j = endDevices.Begin(); j != endDevices.End(); ++j)
+    for (auto j = endDevices.Begin(); j != endDevices.End(); ++j)
     {
         Ptr<Node> node = *j;
         Ptr<LoraNetDevice> loraNetDevice = node->GetDevice(0)->GetObject<LoraNetDevice>();
@@ -226,7 +226,7 @@ main(int argc, char* argv[])
     double deltaY = 17;
     int gridWidth = 2 * radius / (xLength + deltaX);
     int gridHeight = 2 * radius / (yLength + deltaY);
-    if (realisticChannelModel == false)
+    if (!realisticChannelModel)
     {
         gridWidth = 0;
         gridHeight = 0;
@@ -274,7 +274,7 @@ main(int argc, char* argv[])
      *  Set up the end device's spreading factor  *
      **********************************************/
 
-    macHelper.SetSpreadingFactorsUp(endDevices, gateways, channel);
+    LorawanMacHelper::SetSpreadingFactorsUp(endDevices, gateways, channel);
 
     NS_LOG_DEBUG("Completed configuration");
 

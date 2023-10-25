@@ -46,27 +46,27 @@ class AdrComponent : public NetworkControllerComponent
     };
 
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     // Constructor
     AdrComponent();
     // Destructor
-    virtual ~AdrComponent();
+    ~AdrComponent() override;
 
     void OnReceivedPacket(Ptr<const Packet> packet,
                           Ptr<EndDeviceStatus> status,
-                          Ptr<NetworkStatus> networkStatus);
+                          Ptr<NetworkStatus> networkStatus) override;
 
-    void BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus);
+    void BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus) override;
 
-    void OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus);
+    void OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus) override;
 
   private:
     void AdrImplementation(uint8_t* newDataRate, uint8_t* newTxPower, Ptr<EndDeviceStatus> status);
 
     uint8_t SfToDr(uint8_t sf);
 
-    double RxPowerToSNR(double transmissionPower);
+    double RxPowerToSNR(double transmissionPower) const;
 
     double GetMinTxFromGateways(EndDeviceStatus::GatewayList gwList);
 

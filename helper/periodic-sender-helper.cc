@@ -49,7 +49,7 @@ PeriodicSenderHelper::PeriodicSenderHelper()
     m_intervalProb->SetAttribute("Max", DoubleValue(1));
 
     m_pktSize = 10;
-    m_pktSizeRV = 0;
+    m_pktSizeRV = nullptr;
 }
 
 PeriodicSenderHelper::~PeriodicSenderHelper()
@@ -72,7 +72,7 @@ ApplicationContainer
 PeriodicSenderHelper::Install(NodeContainer c) const
 {
     ApplicationContainer apps;
-    for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i)
+    for (auto i = c.Begin(); i != c.End(); ++i)
     {
         apps.Add(InstallPriv(*i));
     }

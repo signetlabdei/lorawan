@@ -40,7 +40,7 @@ namespace lorawan
 NS_LOG_COMPONENT_DEFINE("EndDeviceStatus");
 
 TypeId
-EndDeviceStatus::GetTypeId(void)
+EndDeviceStatus::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::EndDeviceStatus")
                             .SetParent<Object>()
@@ -78,7 +78,7 @@ EndDeviceStatus::~EndDeviceStatus()
 ///////////////
 
 uint8_t
-EndDeviceStatus::GetFirstReceiveWindowSpreadingFactor()
+EndDeviceStatus::GetFirstReceiveWindowSpreadingFactor() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -86,7 +86,7 @@ EndDeviceStatus::GetFirstReceiveWindowSpreadingFactor()
 }
 
 double
-EndDeviceStatus::GetFirstReceiveWindowFrequency()
+EndDeviceStatus::GetFirstReceiveWindowFrequency() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -94,7 +94,7 @@ EndDeviceStatus::GetFirstReceiveWindowFrequency()
 }
 
 uint8_t
-EndDeviceStatus::GetSecondReceiveWindowOffset()
+EndDeviceStatus::GetSecondReceiveWindowOffset() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -102,14 +102,14 @@ EndDeviceStatus::GetSecondReceiveWindowOffset()
 }
 
 double
-EndDeviceStatus::GetSecondReceiveWindowFrequency()
+EndDeviceStatus::GetSecondReceiveWindowFrequency() const
 {
     NS_LOG_FUNCTION_NOARGS();
     return m_secondReceiveWindowFrequency;
 }
 
 Ptr<Packet>
-EndDeviceStatus::GetCompleteReplyPacket(void)
+EndDeviceStatus::GetCompleteReplyPacket()
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -146,7 +146,7 @@ EndDeviceStatus::GetCompleteReplyPacket(void)
 }
 
 bool
-EndDeviceStatus::NeedsReply(void)
+EndDeviceStatus::NeedsReply() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -154,34 +154,34 @@ EndDeviceStatus::NeedsReply(void)
 }
 
 LorawanMacHeader
-EndDeviceStatus::GetReplyMacHeader()
+EndDeviceStatus::GetReplyMacHeader() const
 {
     NS_LOG_FUNCTION_NOARGS();
     return m_reply.macHeader;
 }
 
 LoraFrameHeader
-EndDeviceStatus::GetReplyFrameHeader()
+EndDeviceStatus::GetReplyFrameHeader() const
 {
     NS_LOG_FUNCTION_NOARGS();
     return m_reply.frameHeader;
 }
 
 Ptr<Packet>
-EndDeviceStatus::GetReplyPayload(void)
+EndDeviceStatus::GetReplyPayload()
 {
     NS_LOG_FUNCTION_NOARGS();
     return m_reply.payload->Copy();
 }
 
 Ptr<ClassAEndDeviceLorawanMac>
-EndDeviceStatus::GetMac(void)
+EndDeviceStatus::GetMac()
 {
     return m_mac;
 }
 
 EndDeviceStatus::ReceivedPacketList
-EndDeviceStatus::GetReceivedPacketList()
+EndDeviceStatus::GetReceivedPacketList() const
 {
     NS_LOG_FUNCTION_NOARGS();
     return m_receivedPacketList;
@@ -317,14 +317,13 @@ EndDeviceStatus::InsertReceivedPacket(Ptr<const Packet> receivedPacket, const Ad
         gwInfo.rxPower = rcvPower;
         gwInfo.gwAddress = gwAddress;
         info.gwList.insert(std::pair<Address, PacketInfoPerGw>(gwAddress, gwInfo));
-        m_receivedPacketList.push_back(
-            std::pair<Ptr<const Packet>, ReceivedPacketInfo>(receivedPacket, info));
+        m_receivedPacketList.emplace_back(receivedPacket, info);
     }
     NS_LOG_DEBUG(*this);
 }
 
 EndDeviceStatus::ReceivedPacketInfo
-EndDeviceStatus::GetLastReceivedPacketInfo(void)
+EndDeviceStatus::GetLastReceivedPacketInfo()
 {
     NS_LOG_FUNCTION_NOARGS();
     auto it = m_receivedPacketList.rbegin();
@@ -339,7 +338,7 @@ EndDeviceStatus::GetLastReceivedPacketInfo(void)
 }
 
 Ptr<const Packet>
-EndDeviceStatus::GetLastPacketReceivedFromDevice(void)
+EndDeviceStatus::GetLastPacketReceivedFromDevice()
 {
     NS_LOG_FUNCTION_NOARGS();
     auto it = m_receivedPacketList.rbegin();
@@ -349,7 +348,7 @@ EndDeviceStatus::GetLastPacketReceivedFromDevice(void)
     }
     else
     {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -380,13 +379,13 @@ EndDeviceStatus::SetReceiveWindowOpportunity(EventId event)
 }
 
 void
-EndDeviceStatus::RemoveReceiveWindowOpportunity(void)
+EndDeviceStatus::RemoveReceiveWindowOpportunity()
 {
     Simulator::Cancel(m_receiveWindowEvent);
 }
 
 std::map<double, Address>
-EndDeviceStatus::GetPowerGatewayMap(void)
+EndDeviceStatus::GetPowerGatewayMap()
 {
     // Create a map of the gateways
     // Key: received power
@@ -417,8 +416,7 @@ operator<<(std::ostream& os, const EndDeviceStatus& status)
         EndDeviceStatus::GatewayList gatewayList = info.gwList;
         Ptr<const Packet> pkt = (*j).first;
         os << pkt << " " << gatewayList.size() << std::endl;
-        for (EndDeviceStatus::GatewayList::iterator k = gatewayList.begin(); k != gatewayList.end();
-             k++)
+        for (auto k = gatewayList.begin(); k != gatewayList.end(); k++)
         {
             EndDeviceStatus::PacketInfoPerGw infoPerGw = (*k).second;
             os << "  " << infoPerGw.gwAddress << " " << infoPerGw.rxPower << std::endl;

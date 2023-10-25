@@ -31,15 +31,15 @@ class HexGridPositionAllocator : public PositionAllocator
     HexGridPositionAllocator();
     HexGridPositionAllocator(double radius);
 
-    ~HexGridPositionAllocator();
+    ~HexGridPositionAllocator() override;
 
-    virtual Vector GetNext(void) const;
+    Vector GetNext() const override;
 
-    virtual int64_t AssignStreams(int64_t stream);
+    int64_t AssignStreams(int64_t stream) override;
 
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
-    double GetRadius(void);
+    double GetRadius() const;
 
     void SetRadius(double radius);
 

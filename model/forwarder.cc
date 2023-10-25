@@ -31,7 +31,7 @@ NS_LOG_COMPONENT_DEFINE("Forwarder");
 NS_OBJECT_ENSURE_REGISTERED(Forwarder);
 
 TypeId
-Forwarder::GetTypeId(void)
+Forwarder::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::Forwarder")
                             .SetParent<Application>()
@@ -97,7 +97,7 @@ Forwarder::ReceiveFromPointToPoint(Ptr<NetDevice> pointToPointNetDevice,
 }
 
 void
-Forwarder::StartApplication(void)
+Forwarder::StartApplication()
 {
     NS_LOG_FUNCTION(this);
 
@@ -105,7 +105,7 @@ Forwarder::StartApplication(void)
 }
 
 void
-Forwarder::StopApplication(void)
+Forwarder::StopApplication()
 {
     NS_LOG_FUNCTION_NOARGS();
 

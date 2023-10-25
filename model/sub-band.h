@@ -39,7 +39,7 @@ class LogicalLoraChannel;
 class SubBand : public Object
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     SubBand();
 
@@ -53,21 +53,21 @@ class SubBand : public Object
      */
     SubBand(double firstFrequency, double lastFrequency, double dutyCycle, double maxTxPowerDbm);
 
-    virtual ~SubBand();
+    ~SubBand() override;
 
     /**
      * Get the lowest frequency of the SubBand.
      *
      * \return The lowest frequency of the SubBand.
      */
-    double GetFirstFrequency(void);
+    double GetFirstFrequency() const;
 
     /**
      * Get the last frequency of the subband.
      *
      * \return The lowest frequency of the SubBand.
      */
-    // double GetLastFrequency (void);
+    // double GetLastFrequency ();
 
     /**
      * Get the duty cycle of the subband.
@@ -75,7 +75,7 @@ class SubBand : public Object
      * \return The duty cycle (as a fraction) that needs to be enforced on this
      * SubBand.
      */
-    double GetDutyCycle(void);
+    double GetDutyCycle() const;
 
     /**
      * Update the next transmission time.
@@ -95,7 +95,7 @@ class SubBand : public Object
      * \return The next time at which transmission in this SubBand will be
      * allowed.
      */
-    Time GetNextTransmissionTime(void);
+    Time GetNextTransmissionTime();
 
     /**
      * Return whether or not a frequency belongs to this SubBand.
@@ -104,7 +104,7 @@ class SubBand : public Object
      * \return True if the frequency is between firstFrequency and lastFrequency,
      * false otherwise.
      */
-    bool BelongsToSubBand(double frequency);
+    bool BelongsToSubBand(double frequency) const;
 
     /**
      * Return whether or not a channel belongs to this SubBand.
@@ -113,7 +113,7 @@ class SubBand : public Object
      * \return True if the channel's center frequency is between firstFrequency
      * and lastFrequency, false otherwise.
      */
-    bool BelongsToSubBand(Ptr<LogicalLoraChannel> channel);
+    bool BelongsToSubBand(Ptr<LogicalLoraChannel> channel) const;
 
     /**
      * Set the maximum transmission power that is allowed on this SubBand.
@@ -127,7 +127,7 @@ class SubBand : public Object
      *
      * \return The maximum transmission power, in dBm.
      */
-    double GetMaxTxPowerDbm(void);
+    double GetMaxTxPowerDbm() const;
 
   private:
     double m_firstFrequency;     //!< Starting frequency of the subband, in MHz

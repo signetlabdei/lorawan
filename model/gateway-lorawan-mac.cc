@@ -35,7 +35,7 @@ NS_LOG_COMPONENT_DEFINE("GatewayLorawanMac");
 NS_OBJECT_ENSURE_REGISTERED(GatewayLorawanMac);
 
 TypeId
-GatewayLorawanMac::GetTypeId(void)
+GatewayLorawanMac::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::GatewayLorawanMac")
                             .SetParent<LorawanMac>()
@@ -84,9 +84,8 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
     params.codingRate = 1;
     params.bandwidthHz = GetBandwidthFromDataRate(dataRate);
     params.nPreamble = 8;
-    params.crcEnabled = 1;
-    params.lowDataRateOptimizationEnabled =
-        LoraPhy::GetTSym(params) > MilliSeconds(16) ? true : false;
+    params.crcEnabled = true;
+    params.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(params) > MilliSeconds(16);
 
     // Get the duration
     Time duration = m_phy->GetOnAirTime(packet, params);
@@ -107,7 +106,7 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
 }
 
 bool
-GatewayLorawanMac::IsTransmitting(void)
+GatewayLorawanMac::IsTransmitting()
 {
     return m_phy->IsTransmitting();
 }

@@ -78,7 +78,8 @@ main(int argc, char* argv[])
     //////////
 
     // End Device mobility
-    MobilityHelper mobilityEd, mobilityGw;
+    MobilityHelper mobilityEd;
+    MobilityHelper mobilityGw;
     Ptr<ListPositionAllocator> positionAllocEd = CreateObject<ListPositionAllocator>();
     positionAllocEd->Add(Vector(6000.0, 0.0, 0.0));
     positionAllocEd->Add(Vector(0.0, 100.0, 0.0));
@@ -153,7 +154,7 @@ main(int argc, char* argv[])
     helper.Install(phyHelper, macHelper, gateways);
 
     // Set spreading factors up
-    macHelper.SetSpreadingFactorsUp(endDevices, gateways, channel);
+    LorawanMacHelper::SetSpreadingFactorsUp(endDevices, gateways, channel);
 
     ////////////
     // Create NS

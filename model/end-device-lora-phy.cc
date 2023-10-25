@@ -44,7 +44,7 @@ EndDeviceLoraPhyListener::~EndDeviceLoraPhyListener()
 }
 
 TypeId
-EndDeviceLoraPhy::GetTypeId(void)
+EndDeviceLoraPhy::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::EndDeviceLoraPhy")
@@ -94,13 +94,13 @@ EndDeviceLoraPhy::SetSpreadingFactor(uint8_t sf)
 }
 
 uint8_t
-EndDeviceLoraPhy::GetSpreadingFactor(void)
+EndDeviceLoraPhy::GetSpreadingFactor() const
 {
     return m_sf;
 }
 
 bool
-EndDeviceLoraPhy::IsTransmitting(void)
+EndDeviceLoraPhy::IsTransmitting()
 {
     return m_state == TX;
 }
@@ -118,21 +118,21 @@ EndDeviceLoraPhy::SetFrequency(double frequencyMHz)
 }
 
 void
-EndDeviceLoraPhy::SwitchToStandby(void)
+EndDeviceLoraPhy::SwitchToStandby()
 {
     NS_LOG_FUNCTION_NOARGS();
 
     m_state = STANDBY;
 
     // Notify listeners of the state change
-    for (Listeners::const_iterator i = m_listeners.begin(); i != m_listeners.end(); i++)
+    for (auto i = m_listeners.begin(); i != m_listeners.end(); i++)
     {
         (*i)->NotifyStandby();
     }
 }
 
 void
-EndDeviceLoraPhy::SwitchToRx(void)
+EndDeviceLoraPhy::SwitchToRx()
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -141,7 +141,7 @@ EndDeviceLoraPhy::SwitchToRx(void)
     m_state = RX;
 
     // Notify listeners of the state change
-    for (Listeners::const_iterator i = m_listeners.begin(); i != m_listeners.end(); i++)
+    for (auto i = m_listeners.begin(); i != m_listeners.end(); i++)
     {
         (*i)->NotifyRxStart();
     }
@@ -157,14 +157,14 @@ EndDeviceLoraPhy::SwitchToTx(double txPowerDbm)
     m_state = TX;
 
     // Notify listeners of the state change
-    for (Listeners::const_iterator i = m_listeners.begin(); i != m_listeners.end(); i++)
+    for (auto i = m_listeners.begin(); i != m_listeners.end(); i++)
     {
         (*i)->NotifyTxStart(txPowerDbm);
     }
 }
 
 void
-EndDeviceLoraPhy::SwitchToSleep(void)
+EndDeviceLoraPhy::SwitchToSleep()
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -173,14 +173,14 @@ EndDeviceLoraPhy::SwitchToSleep(void)
     m_state = SLEEP;
 
     // Notify listeners of the state change
-    for (Listeners::const_iterator i = m_listeners.begin(); i != m_listeners.end(); i++)
+    for (auto i = m_listeners.begin(); i != m_listeners.end(); i++)
     {
         (*i)->NotifySleep();
     }
 }
 
 EndDeviceLoraPhy::State
-EndDeviceLoraPhy::GetState(void)
+EndDeviceLoraPhy::GetState()
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -196,7 +196,7 @@ EndDeviceLoraPhy::RegisterListener(EndDeviceLoraPhyListener* listener)
 void
 EndDeviceLoraPhy::UnregisterListener(EndDeviceLoraPhyListener* listener)
 {
-    ListenersI i = find(m_listeners.begin(), m_listeners.end(), listener);
+    auto i = find(m_listeners.begin(), m_listeners.end(), listener);
     if (i != m_listeners.end())
     {
         m_listeners.erase(i);

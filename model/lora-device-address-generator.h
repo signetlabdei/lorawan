@@ -35,7 +35,7 @@ namespace lorawan
 class LoraDeviceAddressGenerator : public Object
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     /**
      * Initialise the base NwkID and the first NwkAddr to be used by the
@@ -56,7 +56,7 @@ class LoraDeviceAddressGenerator : public Object
      *
      * \return the LoraDeviceAddress address of the next network
      */
-    LoraDeviceAddress NextNetwork(void);
+    LoraDeviceAddress NextNetwork();
 
     /**
      * Allocate the next LoraDeviceAddress.
@@ -68,7 +68,7 @@ class LoraDeviceAddressGenerator : public Object
      *
      * \return the LoraDeviceAddress address
      */
-    LoraDeviceAddress NextAddress(void);
+    LoraDeviceAddress NextAddress();
 
     /**
      * Get the LoraDeviceAddress that will be allocated upon a call to
@@ -79,7 +79,7 @@ class LoraDeviceAddressGenerator : public Object
      *
      * \return the LoraDeviceAddress
      */
-    LoraDeviceAddress GetNextAddress(void);
+    LoraDeviceAddress GetNextAddress();
 
   private:
     NwkID m_currentNwkId;     //!< The current Network Id value

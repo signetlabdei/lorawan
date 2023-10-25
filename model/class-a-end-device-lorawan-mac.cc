@@ -40,7 +40,7 @@ NS_LOG_COMPONENT_DEFINE("ClassAEndDeviceLorawanMac");
 NS_OBJECT_ENSURE_REGISTERED(ClassAEndDeviceLorawanMac);
 
 TypeId
-ClassAEndDeviceLorawanMac::GetTypeId(void)
+ClassAEndDeviceLorawanMac::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::ClassAEndDeviceLorawanMac")
                             .SetParent<EndDeviceLorawanMac>()
@@ -100,9 +100,8 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
     params.codingRate = m_codingRate;
     params.bandwidthHz = GetBandwidthFromDataRate(m_dataRate);
     params.nPreamble = m_nPreambleSymbols;
-    params.crcEnabled = 1;
-    params.lowDataRateOptimizationEnabled =
-        LoraPhy::GetTSym(params) > MilliSeconds(16) ? true : false;
+    params.crcEnabled = true;
+    params.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(params) > MilliSeconds(16);
 
     // Wake up PHY layer and directly send the packet
 
@@ -298,7 +297,7 @@ ClassAEndDeviceLorawanMac::TxFinished(Ptr<const Packet> packet)
 }
 
 void
-ClassAEndDeviceLorawanMac::OpenFirstReceiveWindow(void)
+ClassAEndDeviceLorawanMac::OpenFirstReceiveWindow()
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -318,7 +317,7 @@ ClassAEndDeviceLorawanMac::OpenFirstReceiveWindow(void)
 }
 
 void
-ClassAEndDeviceLorawanMac::CloseFirstReceiveWindow(void)
+ClassAEndDeviceLorawanMac::CloseFirstReceiveWindow()
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -349,7 +348,7 @@ ClassAEndDeviceLorawanMac::CloseFirstReceiveWindow(void)
 }
 
 void
-ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow(void)
+ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow()
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -386,7 +385,7 @@ ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow(void)
 }
 
 void
-ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow(void)
+ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -503,7 +502,7 @@ ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitingTime)
 }
 
 uint8_t
-ClassAEndDeviceLorawanMac::GetFirstReceiveWindowDataRate(void)
+ClassAEndDeviceLorawanMac::GetFirstReceiveWindowDataRate()
 {
     return m_replyDataRateMatrix.at(m_dataRate).at(m_rx1DrOffset);
 }
@@ -515,7 +514,7 @@ ClassAEndDeviceLorawanMac::SetSecondReceiveWindowDataRate(uint8_t dataRate)
 }
 
 uint8_t
-ClassAEndDeviceLorawanMac::GetSecondReceiveWindowDataRate(void)
+ClassAEndDeviceLorawanMac::GetSecondReceiveWindowDataRate() const
 {
     return m_secondReceiveWindowDataRate;
 }
@@ -527,7 +526,7 @@ ClassAEndDeviceLorawanMac::SetSecondReceiveWindowFrequency(double frequencyMHz)
 }
 
 double
-ClassAEndDeviceLorawanMac::GetSecondReceiveWindowFrequency(void)
+ClassAEndDeviceLorawanMac::GetSecondReceiveWindowFrequency() const
 {
     return m_secondReceiveWindowFrequency;
 }
@@ -569,7 +568,7 @@ ClassAEndDeviceLorawanMac::OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSe
 
     // Craft a RxParamSetupAns as response
     NS_LOG_INFO("Adding RxParamSetupAns reply");
-    m_macCommandList.push_back(CreateObject<RxParamSetupAns>(offsetOk, dataRateOk, true));
+    m_macCommandList.emplace_back(CreateObject<RxParamSetupAns>(offsetOk, dataRateOk, true));
 }
 
 } /* namespace lorawan */

@@ -138,7 +138,8 @@ main(int argc, char* argv[])
     //////////
 
     // End Device mobility
-    MobilityHelper mobilityEd, mobilityGw;
+    MobilityHelper mobilityEd;
+    MobilityHelper mobilityGw;
     mobilityEd.SetPositionAllocator(
         "ns3::RandomRectanglePositionAllocator",
         "X",
@@ -242,7 +243,7 @@ main(int argc, char* argv[])
     // Do not set spreading factors up: we will wait for the NS to do this
     if (initializeSF)
     {
-        macHelper.SetSpreadingFactorsUp(endDevices, gateways, channel);
+        LorawanMacHelper::SetSpreadingFactorsUp(endDevices, gateways, channel);
     }
 
     ////////////

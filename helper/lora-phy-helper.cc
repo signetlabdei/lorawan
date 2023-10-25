@@ -58,7 +58,7 @@ LoraPhyHelper::SetDeviceType(enum DeviceType dt)
 }
 
 TypeId
-LoraPhyHelper::GetDeviceType(void) const
+LoraPhyHelper::GetDeviceType() const
 {
     NS_LOG_FUNCTION(this);
     return m_phy.GetTypeId();

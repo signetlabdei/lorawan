@@ -32,7 +32,7 @@ NS_LOG_COMPONENT_DEFINE("LogicalLoraChannelHelper");
 NS_OBJECT_ENSURE_REGISTERED(LogicalLoraChannelHelper);
 
 TypeId
-LogicalLoraChannelHelper::GetTypeId(void)
+LogicalLoraChannelHelper::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::LogicalLoraChannelHelper").SetParent<Object>().SetGroupName("lorawan");
@@ -52,7 +52,7 @@ LogicalLoraChannelHelper::~LogicalLoraChannelHelper()
 }
 
 std::vector<Ptr<LogicalLoraChannel>>
-LogicalLoraChannelHelper::GetChannelList(void)
+LogicalLoraChannelHelper::GetChannelList()
 {
     NS_LOG_FUNCTION(this);
 
@@ -65,7 +65,7 @@ LogicalLoraChannelHelper::GetChannelList(void)
 }
 
 std::vector<Ptr<LogicalLoraChannel>>
-LogicalLoraChannelHelper::GetEnabledChannelList(void)
+LogicalLoraChannelHelper::GetEnabledChannelList()
 {
     NS_LOG_FUNCTION(this);
 
@@ -111,7 +111,7 @@ LogicalLoraChannelHelper::GetSubBandFromFrequency(double frequency)
     NS_LOG_ERROR("Requested frequency: " << frequency);
     NS_ABORT_MSG("Warning: frequency is outside any known SubBand.");
 
-    return 0; // If no SubBand is found, return 0
+    return nullptr; // If no SubBand is found, return 0
 }
 
 void
@@ -184,7 +184,7 @@ LogicalLoraChannelHelper::RemoveChannel(Ptr<LogicalLoraChannel> logicalChannel)
 }
 
 Time
-LogicalLoraChannelHelper::GetAggregatedWaitingTime(void)
+LogicalLoraChannelHelper::GetAggregatedWaitingTime()
 {
     // Aggregate waiting time
     Time aggregatedWaitingTime = m_nextAggregatedTransmissionTime - Simulator::Now();

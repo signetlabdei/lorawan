@@ -70,7 +70,7 @@ class LoraPhyHelper
      */
     void SetDeviceType(enum DeviceType dt);
 
-    TypeId GetDeviceType(void) const;
+    TypeId GetDeviceType() const;
 
     /**
      * Set an attribute of the underlying PHY object.

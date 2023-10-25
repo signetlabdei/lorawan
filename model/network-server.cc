@@ -42,7 +42,7 @@ NS_LOG_COMPONENT_DEFINE("NetworkServer");
 NS_OBJECT_ENSURE_REGISTERED(NetworkServer);
 
 TypeId
-NetworkServer::GetTypeId(void)
+NetworkServer::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::NetworkServer")
@@ -71,13 +71,13 @@ NetworkServer::~NetworkServer()
 }
 
 void
-NetworkServer::StartApplication(void)
+NetworkServer::StartApplication()
 {
     NS_LOG_FUNCTION_NOARGS();
 }
 
 void
-NetworkServer::StopApplication(void)
+NetworkServer::StopApplication()
 {
     NS_LOG_FUNCTION_NOARGS();
 }
@@ -186,7 +186,7 @@ NetworkServer::AddComponent(Ptr<NetworkControllerComponent> component)
 }
 
 Ptr<NetworkStatus>
-NetworkServer::GetNetworkStatus(void)
+NetworkServer::GetNetworkStatus()
 {
     return m_status;
 }

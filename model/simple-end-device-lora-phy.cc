@@ -36,7 +36,7 @@ NS_LOG_COMPONENT_DEFINE("SimpleEndDeviceLoraPhy");
 NS_OBJECT_ENSURE_REGISTERED(SimpleEndDeviceLoraPhy);
 
 TypeId
-SimpleEndDeviceLoraPhy::GetTypeId(void)
+SimpleEndDeviceLoraPhy::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::SimpleEndDeviceLoraPhy")
                             .SetParent<EndDeviceLoraPhy>()

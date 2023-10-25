@@ -28,7 +28,7 @@ NS_LOG_COMPONENT_DEFINE("HexGridPositionAllocator");
 NS_OBJECT_ENSURE_REGISTERED(HexGridPositionAllocator);
 
 TypeId
-HexGridPositionAllocator::GetTypeId(void)
+HexGridPositionAllocator::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::HexGridPositionAllocator")
                             .SetParent<PositionAllocator>()
@@ -49,7 +49,7 @@ HexGridPositionAllocator::HexGridPositionAllocator()
     NS_LOG_FUNCTION_NOARGS();
 
     // Create the first position
-    m_positions.push_back(Vector(0.0, 0.0, 0.0));
+    m_positions.emplace_back(0.0, 0.0, 0.0);
 
     // Add rings
     for (int i = 0; i < 20; i++)
@@ -67,7 +67,7 @@ HexGridPositionAllocator::HexGridPositionAllocator(double radius)
     NS_LOG_FUNCTION_NOARGS();
 
     // Create the first position
-    m_positions.push_back(Vector(0.0, 0.0, 0.0));
+    m_positions.emplace_back(0.0, 0.0, 0.0);
 
     // Add a couple rings
     // Add rings
@@ -88,7 +88,7 @@ HexGridPositionAllocator::~HexGridPositionAllocator()
 const double HexGridPositionAllocator::pi = std::acos(-1);
 
 double
-HexGridPositionAllocator::GetRadius(void)
+HexGridPositionAllocator::GetRadius() const
 {
     return m_radius;
 }
@@ -100,7 +100,7 @@ HexGridPositionAllocator::SetRadius(double radius)
 }
 
 Vector
-HexGridPositionAllocator::GetNext(void) const
+HexGridPositionAllocator::GetNext() const
 {
     // TODO: Check that there is a next element
     Vector position = *m_next;
@@ -123,7 +123,7 @@ HexGridPositionAllocator::AddRing(std::vector<Vector> positions)
     std::vector<Vector> copy = positions;
 
     // Iterate on the given vector
-    for (std::vector<Vector>::iterator it = positions.begin(); it != positions.end(); it++)
+    for (auto it = positions.begin(); it != positions.end(); it++)
     {
         // Get the current position
         Vector currentPosition = *it;
@@ -141,7 +141,7 @@ HexGridPositionAllocator::AddRing(std::vector<Vector> positions)
 
             // If the newly created position is not already in the copy, add it
             bool found = false;
-            for (std::vector<Vector>::iterator it = copy.begin(); it != copy.end(); it++)
+            for (auto it = copy.begin(); it != copy.end(); it++)
             {
                 // If the vector is already in the vector
                 // 1 is an EPSILON used to determine whether two floats are equal
@@ -151,7 +151,7 @@ HexGridPositionAllocator::AddRing(std::vector<Vector> positions)
                     break;
                 }
             }
-            if (found == false)
+            if (!found)
             {
                 NS_LOG_DEBUG("Adding position " << newPosition);
                 copy.push_back(newPosition);

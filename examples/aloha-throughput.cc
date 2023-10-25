@@ -173,7 +173,7 @@ main(int argc, char* argv[])
     mobility.Install(endDevices);
 
     // Make it so that nodes are at a certain height > 0
-    for (NodeContainer::Iterator j = endDevices.Begin(); j != endDevices.End(); ++j)
+    for (auto j = endDevices.Begin(); j != endDevices.End(); ++j)
     {
         Ptr<MobilityModel> mobility = (*j)->GetObject<MobilityModel>();
         Vector position = mobility->GetPosition();
@@ -196,7 +196,7 @@ main(int argc, char* argv[])
     // Now end devices are connected to the channel
 
     // Connect trace sources
-    for (NodeContainer::Iterator j = endDevices.Begin(); j != endDevices.End(); ++j)
+    for (auto j = endDevices.Begin(); j != endDevices.End(); ++j)
     {
         Ptr<Node> node = *j;
         Ptr<LoraNetDevice> loraNetDevice = node->GetDevice(0)->GetObject<LoraNetDevice>();
@@ -245,26 +245,25 @@ main(int argc, char* argv[])
     {
         LoraTxParameters txParams;
         txParams.sf = sf;
-        txParams.headerDisabled = 0;
+        txParams.headerDisabled = false;
         txParams.codingRate = 1;
         txParams.bandwidthHz = 125000;
         txParams.nPreamble = 8;
-        txParams.crcEnabled = 1;
-        txParams.lowDataRateOptimizationEnabled =
-            LoraPhy::GetTSym(txParams) > MilliSeconds(16) ? true : false;
+        txParams.crcEnabled = true;
+        txParams.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(txParams) > MilliSeconds(16);
         Ptr<Packet> pkt = Create<Packet>(packetSize);
 
         LoraFrameHeader frameHdr = LoraFrameHeader();
         frameHdr.SetAsUplink();
         frameHdr.SetFPort(1);
         frameHdr.SetAddress(LoraDeviceAddress());
-        frameHdr.SetAdr(0);
-        frameHdr.SetAdrAckReq(0);
+        frameHdr.SetAdr(false);
+        frameHdr.SetAdrAckReq(false);
         frameHdr.SetFCnt(0);
         pkt->AddHeader(frameHdr);
 
         LorawanMacHeader macHdr = LorawanMacHeader();
-        macHdr.SetMType(ns3::lorawan::LorawanMacHeader::UNCONFIRMED_DATA_UP);
+        macHdr.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_UP);
         macHdr.SetMajor(1);
         pkt->AddHeader(macHdr);
 
@@ -289,7 +288,7 @@ main(int argc, char* argv[])
     forHelper.Install(gateways);
 
     // Install trace sources
-    for (NodeContainer::Iterator node = gateways.Begin(); node != gateways.End(); node++)
+    for (auto node = gateways.Begin(); node != gateways.End(); node++)
     {
         (*node)->GetDevice(0)->GetObject<LoraNetDevice>()->GetPhy()->TraceConnectWithoutContext(
             "ReceivedPacket",
@@ -297,14 +296,14 @@ main(int argc, char* argv[])
     }
 
     // Install trace sources
-    for (NodeContainer::Iterator node = endDevices.Begin(); node != endDevices.End(); node++)
+    for (auto node = endDevices.Begin(); node != endDevices.End(); node++)
     {
         (*node)->GetDevice(0)->GetObject<LoraNetDevice>()->GetPhy()->TraceConnectWithoutContext(
             "StartSending",
             MakeCallback(OnTransmissionCallback));
     }
 
-    macHelper.SetSpreadingFactorsUp(endDevices, gateways, channel);
+    LorawanMacHelper::SetSpreadingFactorsUp(endDevices, gateways, channel);
 
     ////////////////
     // Simulation //

@@ -38,29 +38,29 @@ NS_OBJECT_ENSURE_REGISTERED(GatewayLoraPhy);
  *    ReceptionPath implementation    *
  **************************************/
 GatewayLoraPhy::ReceptionPath::ReceptionPath()
-    : m_available(1),
-      m_event(0),
+    : m_available(true),
+      m_event(nullptr),
       m_endReceiveEventId(EventId())
 {
     NS_LOG_FUNCTION_NOARGS();
 }
 
-GatewayLoraPhy::ReceptionPath::~ReceptionPath(void)
+GatewayLoraPhy::ReceptionPath::~ReceptionPath()
 {
     NS_LOG_FUNCTION_NOARGS();
 }
 
 bool
-GatewayLoraPhy::ReceptionPath::IsAvailable(void)
+GatewayLoraPhy::ReceptionPath::IsAvailable() const
 {
     return m_available;
 }
 
 void
-GatewayLoraPhy::ReceptionPath::Free(void)
+GatewayLoraPhy::ReceptionPath::Free()
 {
     m_available = true;
-    m_event = 0;
+    m_event = nullptr;
     m_endReceiveEventId = EventId();
 }
 
@@ -78,13 +78,13 @@ GatewayLoraPhy::ReceptionPath::SetEvent(Ptr<LoraInterferenceHelper::Event> event
 }
 
 Ptr<LoraInterferenceHelper::Event>
-GatewayLoraPhy::ReceptionPath::GetEvent(void)
+GatewayLoraPhy::ReceptionPath::GetEvent()
 {
     return m_event;
 }
 
 EventId
-GatewayLoraPhy::ReceptionPath::GetEndReceive(void)
+GatewayLoraPhy::ReceptionPath::GetEndReceive()
 {
     return m_endReceiveEventId;
 }
@@ -100,7 +100,7 @@ GatewayLoraPhy::ReceptionPath::SetEndReceive(EventId endReceiveEventId)
  ***********************************************************************/
 
 TypeId
-GatewayLoraPhy::GetTypeId(void)
+GatewayLoraPhy::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::GatewayLoraPhy")
@@ -150,7 +150,7 @@ GatewayLoraPhy::AddReceptionPath()
 }
 
 void
-GatewayLoraPhy::ResetReceptionPaths(void)
+GatewayLoraPhy::ResetReceptionPaths()
 {
     NS_LOG_FUNCTION(this);
 
@@ -164,7 +164,7 @@ GatewayLoraPhy::TxFinished(Ptr<Packet> packet)
 }
 
 bool
-GatewayLoraPhy::IsTransmitting(void)
+GatewayLoraPhy::IsTransmitting()
 {
     return m_isTransmitting;
 }

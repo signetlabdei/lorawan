@@ -41,11 +41,11 @@ class NetworkController; // Forward declaration
 class NetworkScheduler : public Object
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     NetworkScheduler();
     NetworkScheduler(Ptr<NetworkStatus> status, Ptr<NetworkController> controller);
-    virtual ~NetworkScheduler();
+    ~NetworkScheduler() override;
 
     /**
      * Method called by NetworkServer to inform the Scheduler of a newly arrived

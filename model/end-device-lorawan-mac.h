@@ -42,10 +42,10 @@ namespace lorawan
 class EndDeviceLorawanMac : public LorawanMac
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     EndDeviceLorawanMac();
-    virtual ~EndDeviceLorawanMac();
+    ~EndDeviceLorawanMac() override;
 
     /////////////////////
     // Sending methods //
@@ -58,7 +58,7 @@ class EndDeviceLorawanMac : public LorawanMac
      *
      * \param packet the packet to send
      */
-    virtual void Send(Ptr<Packet> packet);
+    void Send(Ptr<Packet> packet) override;
 
     /**
      * Checking if we are performing the transmission of a new packet or a retransmission, and call
@@ -95,16 +95,16 @@ class EndDeviceLorawanMac : public LorawanMac
      *
      * \param packet the received packet.
      */
-    virtual void Receive(Ptr<const Packet> packet);
+    void Receive(Ptr<const Packet> packet) override;
 
-    virtual void FailedReception(Ptr<const Packet> packet);
+    void FailedReception(Ptr<const Packet> packet) override;
 
     /**
      * Perform the actions that are required after a packet send.
      *
      * This function handles opening of the first receive window.
      */
-    virtual void TxFinished(Ptr<const Packet> packet);
+    void TxFinished(Ptr<const Packet> packet) override;
 
     /////////////////////////
     // Getters and Setters //
@@ -125,7 +125,7 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Get if data rate adaptation is enabled or not.
      */
-    bool GetDataRateAdaptation(void);
+    bool GetDataRateAdaptation() const;
 
     /**
      * Set the maximum number of transmissions allowed.
@@ -137,7 +137,7 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Set the maximum number of transmissions allowed.
      */
-    uint8_t GetMaxNumberOfTransmissions(void);
+    uint8_t GetMaxNumberOfTransmissions();
 
     /**
      * Set the data rate this end device will use when transmitting. For End
@@ -153,14 +153,14 @@ class EndDeviceLorawanMac : public LorawanMac
      *
      * \return The data rate this device uses when transmitting.
      */
-    uint8_t GetDataRate(void);
+    uint8_t GetDataRate();
 
     /**
      * Get the transmission power this end device is set to use.
      *
      * \return The transmission power this device uses when transmitting.
      */
-    virtual uint8_t GetTransmissionPower(void);
+    virtual uint8_t GetTransmissionPower();
 
     /**
      * Set the network address of this device.
@@ -174,7 +174,7 @@ class EndDeviceLorawanMac : public LorawanMac
      *
      * \return This device's address.
      */
-    LoraDeviceAddress GetDeviceAddress(void);
+    LoraDeviceAddress GetDeviceAddress();
 
     /**
      * Set a value for the RX1DROffset parameter.
@@ -192,7 +192,7 @@ class EndDeviceLorawanMac : public LorawanMac
      *
      * \return The value of the RX1DROffset parameter.
      */
-    // uint8_t GetRx1DrOffset (void);
+    // uint8_t GetRx1DrOffset ();
 
     /**
      * Get the aggregated duty cycle.
@@ -200,7 +200,7 @@ class EndDeviceLorawanMac : public LorawanMac
      * \return A time instance containing the aggregated duty cycle in fractional
      * form.
      */
-    double GetAggregatedDutyCycle(void);
+    double GetAggregatedDutyCycle();
 
     /////////////////////////
     // MAC command methods //
@@ -228,7 +228,7 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Get the message type to send when the Send method is called.
      */
-    LorawanMacHeader::MType GetMType(void);
+    LorawanMacHeader::MType GetMType();
 
     /**
      * Parse and take action on the commands contained on this FrameHeader.
@@ -282,7 +282,7 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Perform the actions that need to be taken when receiving a DevStatusReq command.
      */
-    void OnDevStatusReq(void);
+    void OnDevStatusReq();
 
     /**
      * Perform the actions that need to be taken when receiving a NewChannelReq command.
@@ -350,7 +350,7 @@ class EndDeviceLorawanMac : public LorawanMac
     struct LoraRetxParameters
     {
         Time firstAttempt;
-        Ptr<Packet> packet = 0;
+        Ptr<Packet> packet = nullptr;
         bool waitingAck = false;
         uint8_t retxLeft;
     };
@@ -401,7 +401,7 @@ class EndDeviceLorawanMac : public LorawanMac
      * ones that are available in the ED's LogicalLoraChannel, based on their duty
      * cycle limitations.
      */
-    Ptr<LogicalLoraChannel> GetChannelForTx(void);
+    Ptr<LogicalLoraChannel> GetChannelForTx();
 
     /**
      * The duration of a receive window in number of symbols. This should be
@@ -453,7 +453,7 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Find the minimum waiting time before the next possible transmission.
      */
-    Time GetNextTransmissionDelay(void);
+    Time GetNextTransmissionDelay();
 
     /**
      * Whether this device's data rate should be controlled by the NS.

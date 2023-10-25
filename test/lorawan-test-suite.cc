@@ -24,10 +24,10 @@ class InterferenceTest : public TestCase
 {
   public:
     InterferenceTest();
-    virtual ~InterferenceTest();
+    ~InterferenceTest() override;
 
   private:
-    virtual void DoRun(void);
+    void DoRun() override;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -44,7 +44,7 @@ InterferenceTest::~InterferenceTest()
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-InterferenceTest::DoRun(void)
+InterferenceTest::DoRun()
 {
     NS_LOG_DEBUG("InterferenceTest");
 
@@ -57,29 +57,29 @@ InterferenceTest::DoRun(void)
     Ptr<LoraInterferenceHelper::Event> event1;
 
     // Test overlap duration
-    event = interferenceHelper.Add(Seconds(2), 14, 7, 0, frequency);
-    event1 = interferenceHelper.Add(Seconds(1), 14, 12, 0, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
+    event1 = interferenceHelper.Add(Seconds(1), 14, 12, nullptr, frequency);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.GetOverlapTime(event, event1),
                           Seconds(1),
                           "Overlap computation didn't give the expected result");
     interferenceHelper.ClearAllEvents();
 
-    event = interferenceHelper.Add(Seconds(2), 14, 7, 0, frequency);
-    event1 = interferenceHelper.Add(Seconds(1.5), 14, 12, 0, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
+    event1 = interferenceHelper.Add(Seconds(1.5), 14, 12, nullptr, frequency);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.GetOverlapTime(event, event1),
                           Seconds(1.5),
                           "Overlap computation didn't give the expected result");
     interferenceHelper.ClearAllEvents();
 
-    event = interferenceHelper.Add(Seconds(2), 14, 7, 0, frequency);
-    event1 = interferenceHelper.Add(Seconds(3), 14, 12, 0, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
+    event1 = interferenceHelper.Add(Seconds(3), 14, 12, nullptr, frequency);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.GetOverlapTime(event, event1),
                           Seconds(2),
                           "Overlap computation didn't give the expected result");
     interferenceHelper.ClearAllEvents();
 
-    event = interferenceHelper.Add(Seconds(2), 14, 7, 0, frequency);
-    event1 = interferenceHelper.Add(Seconds(2), 14, 12, 0, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
+    event1 = interferenceHelper.Add(Seconds(2), 14, 12, nullptr, frequency);
     // Because of some strange behavior, this test would get stuck if we used the same syntax of the
     // previous ones. This works instead.
     bool retval = interferenceHelper.GetOverlapTime(event, event1) == Seconds(2);
@@ -87,32 +87,32 @@ InterferenceTest::DoRun(void)
     interferenceHelper.ClearAllEvents();
 
     // Perfect overlap, packet survives
-    event = interferenceHelper.Add(Seconds(2), 14, 7, 0, frequency);
-    interferenceHelper.Add(Seconds(2), 14, 12, 0, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
+    interferenceHelper.Add(Seconds(2), 14, 12, nullptr, frequency);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
     interferenceHelper.ClearAllEvents();
 
     // Perfect overlap, packet survives
-    event = interferenceHelper.Add(Seconds(2), 14, 7, 0, frequency);
-    interferenceHelper.Add(Seconds(2), 14 - 7, 7, 0, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
+    interferenceHelper.Add(Seconds(2), 14 - 7, 7, nullptr, frequency);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
     interferenceHelper.ClearAllEvents();
 
     // Perfect overlap, packet destroyed
-    event = interferenceHelper.Add(Seconds(2), 14, 7, 0, frequency);
-    interferenceHelper.Add(Seconds(2), 14 - 6, 7, 0, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
+    interferenceHelper.Add(Seconds(2), 14 - 6, 7, nullptr, frequency);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           7,
                           "Packet was not destroyed by interference as expected");
     interferenceHelper.ClearAllEvents();
 
     // Partial overlap, packet survives
-    event = interferenceHelper.Add(Seconds(2), 14, 7, 0, frequency);
-    interferenceHelper.Add(Seconds(1), 14 - 6, 7, 0, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
+    interferenceHelper.Add(Seconds(1), 14 - 6, 7, nullptr, frequency);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
@@ -121,8 +121,8 @@ InterferenceTest::DoRun(void)
     // Different frequencys
     // Packet would be destroyed if they were on the same frequency, but survives
     // since they are on different frequencies
-    event = interferenceHelper.Add(Seconds(2), 14, 7, 0, frequency);
-    interferenceHelper.Add(Seconds(2), 14, 7, 0, differentFrequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
+    interferenceHelper.Add(Seconds(2), 14, 7, nullptr, differentFrequency);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
@@ -131,8 +131,8 @@ InterferenceTest::DoRun(void)
     // Different SFs
     // Packet would be destroyed if they both were SF7, but survives thanks to SF
     // orthogonality
-    event = interferenceHelper.Add(Seconds(2), 14, 7, 0, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, 0, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
@@ -140,16 +140,16 @@ InterferenceTest::DoRun(void)
 
     // SF imperfect orthogonality
     // Different SFs are orthogonal only up to a point
-    event = interferenceHelper.Add(Seconds(2), 14, 7, 0, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 17, 8, 0, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
+    interferenceHelper.Add(Seconds(2), 14 + 17, 8, nullptr, frequency);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           8,
                           "Packet was not destroyed by interference as expected");
     interferenceHelper.ClearAllEvents();
 
     // If a more 'distant' SF is used, isolation gets better
-    event = interferenceHelper.Add(Seconds(2), 14, 7, 0, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 17, 10, 0, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
+    interferenceHelper.Add(Seconds(2), 14 + 17, 10, nullptr, frequency);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet was destroyed by interference while it should have survived");
@@ -157,10 +157,10 @@ InterferenceTest::DoRun(void)
 
     // Cumulative interference
     // Same-SF interference is cumulative
-    event = interferenceHelper.Add(Seconds(2), 14, 7, 0, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, 0, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, 0, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, 0, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           8,
                           "Packet was not destroyed by interference as expected");
@@ -168,10 +168,10 @@ InterferenceTest::DoRun(void)
 
     // Cumulative interference
     // Interference is not cumulative between different SFs
-    event = interferenceHelper.Add(Seconds(2), 14, 7, 0, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, 0, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 9, 0, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 10, 0, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 9, nullptr, frequency);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 10, nullptr, frequency);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
@@ -186,10 +186,10 @@ class AddressTest : public TestCase
 {
   public:
     AddressTest();
-    virtual ~AddressTest();
+    ~AddressTest() override;
 
   private:
-    virtual void DoRun(void);
+    void DoRun() override;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -206,7 +206,7 @@ AddressTest::~AddressTest()
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-AddressTest::DoRun(void)
+AddressTest::DoRun()
 {
     NS_LOG_DEBUG("AddressTest");
 
@@ -268,10 +268,10 @@ class HeaderTest : public TestCase
 {
   public:
     HeaderTest();
-    virtual ~HeaderTest();
+    ~HeaderTest() override;
 
   private:
-    virtual void DoRun(void);
+    void DoRun() override;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -288,7 +288,7 @@ HeaderTest::~HeaderTest()
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-HeaderTest::DoRun(void)
+HeaderTest::DoRun()
 {
     NS_LOG_DEBUG("HeaderTest");
 
@@ -419,11 +419,11 @@ class ReceivePathTest : public TestCase
 {
   public:
     ReceivePathTest();
-    virtual ~ReceivePathTest();
+    ~ReceivePathTest() override;
 
   private:
-    virtual void DoRun(void);
-    void Reset(void);
+    void DoRun() override;
+    void Reset();
     void OccupiedReceptionPaths(int oldValue, int newValue);
     void NoMoreDemodulators(Ptr<const Packet> packet, uint32_t node);
     void Interference(Ptr<const Packet> packet, uint32_t node);
@@ -448,7 +448,7 @@ ReceivePathTest::~ReceivePathTest()
 }
 
 void
-ReceivePathTest::Reset(void)
+ReceivePathTest::Reset()
 {
     // FIXME
     // m_noMoreDemodulatorsCalls = 0;
@@ -515,7 +515,7 @@ ReceivePathTest::ReceivedPacket(Ptr<const Packet> packet, uint32_t node)
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-ReceivePathTest::DoRun(void)
+ReceivePathTest::DoRun()
 {
     NS_LOG_DEBUG("ReceivePathTest");
 
@@ -822,10 +822,10 @@ class LogicalLoraChannelTest : public TestCase
 {
   public:
     LogicalLoraChannelTest();
-    virtual ~LogicalLoraChannelTest();
+    ~LogicalLoraChannelTest() override;
 
   private:
-    virtual void DoRun(void);
+    void DoRun() override;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -842,7 +842,7 @@ LogicalLoraChannelTest::~LogicalLoraChannelTest()
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-LogicalLoraChannelTest::DoRun(void)
+LogicalLoraChannelTest::DoRun()
 {
     NS_LOG_DEBUG("LogicalLoraChannelTest");
 
@@ -945,10 +945,10 @@ class TimeOnAirTest : public TestCase
 {
   public:
     TimeOnAirTest();
-    virtual ~TimeOnAirTest();
+    ~TimeOnAirTest() override;
 
   private:
-    virtual void DoRun(void);
+    void DoRun() override;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -966,7 +966,7 @@ TimeOnAirTest::~TimeOnAirTest()
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-TimeOnAirTest::DoRun(void)
+TimeOnAirTest::DoRun()
 {
     NS_LOG_DEBUG("TimeOnAirTest");
 
@@ -985,7 +985,7 @@ TimeOnAirTest::DoRun(void)
     txParams.codingRate = 1;
     txParams.bandwidthHz = 125000;
     txParams.nPreamble = 8;
-    txParams.crcEnabled = 1;
+    txParams.crcEnabled = true;
     txParams.lowDataRateOptimizationEnabled = false;
 
     duration = LoraPhy::GetOnAirTime(packet, txParams);
@@ -1056,7 +1056,7 @@ class PhyConnectivityTest : public TestCase
 {
   public:
     PhyConnectivityTest();
-    virtual ~PhyConnectivityTest();
+    ~PhyConnectivityTest() override;
     void Reset();
     void ReceivedPacket(Ptr<const Packet> packet, uint32_t node);
     void UnderSensitivity(Ptr<const Packet> packet, uint32_t node);
@@ -1067,7 +1067,7 @@ class PhyConnectivityTest : public TestCase
     bool HaveSamePacketContents(Ptr<Packet> packet1, Ptr<Packet> packet2);
 
   private:
-    virtual void DoRun(void);
+    void DoRun() override;
     Ptr<LoraChannel> channel;
     Ptr<SimpleEndDeviceLoraPhy> edPhy1;
     Ptr<SimpleEndDeviceLoraPhy> edPhy2;
@@ -1171,7 +1171,7 @@ PhyConnectivityTest::HaveSamePacketContents(Ptr<Packet> packet1, Ptr<Packet> pac
 }
 
 void
-PhyConnectivityTest::Reset(void)
+PhyConnectivityTest::Reset()
 {
     m_receivedPacketCalls = 0;
     m_underSensitivityCalls = 0;
@@ -1280,7 +1280,7 @@ PhyConnectivityTest::Reset(void)
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-PhyConnectivityTest::DoRun(void)
+PhyConnectivityTest::DoRun()
 {
     NS_LOG_DEBUG("PhyConnectivityTest");
 
@@ -1517,10 +1517,10 @@ class LorawanMacTest : public TestCase
 {
   public:
     LorawanMacTest();
-    virtual ~LorawanMacTest();
+    ~LorawanMacTest() override;
 
   private:
-    virtual void DoRun(void);
+    void DoRun() override;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -1537,7 +1537,7 @@ LorawanMacTest::~LorawanMacTest()
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-LorawanMacTest::DoRun(void)
+LorawanMacTest::DoRun()
 {
     NS_LOG_DEBUG("LorawanMacTest");
 }

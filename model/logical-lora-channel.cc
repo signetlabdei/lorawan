@@ -31,7 +31,7 @@ NS_LOG_COMPONENT_DEFINE("LogicalLoraChannel");
 NS_OBJECT_ENSURE_REGISTERED(LogicalLoraChannel);
 
 TypeId
-LogicalLoraChannel::GetTypeId(void)
+LogicalLoraChannel::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::LogicalLoraChannel").SetParent<Object>().SetGroupName("lorawan");
@@ -69,7 +69,7 @@ LogicalLoraChannel::LogicalLoraChannel(double frequency, uint8_t minDataRate, ui
 }
 
 double
-LogicalLoraChannel::GetFrequency(void) const
+LogicalLoraChannel::GetFrequency() const
 {
     return m_frequency;
 }
@@ -87,31 +87,31 @@ LogicalLoraChannel::SetMaximumDataRate(uint8_t maxDataRate)
 }
 
 uint8_t
-LogicalLoraChannel::GetMinimumDataRate(void)
+LogicalLoraChannel::GetMinimumDataRate() const
 {
     return m_minDataRate;
 }
 
 uint8_t
-LogicalLoraChannel::GetMaximumDataRate(void)
+LogicalLoraChannel::GetMaximumDataRate() const
 {
     return m_maxDataRate;
 }
 
 void
-LogicalLoraChannel::SetEnabledForUplink(void)
+LogicalLoraChannel::SetEnabledForUplink()
 {
     m_enabledForUplink = true;
 }
 
 void
-LogicalLoraChannel::DisableForUplink(void)
+LogicalLoraChannel::DisableForUplink()
 {
     m_enabledForUplink = false;
 }
 
 bool
-LogicalLoraChannel::IsEnabledForUplink(void)
+LogicalLoraChannel::IsEnabledForUplink() const
 {
     return m_enabledForUplink;
 }

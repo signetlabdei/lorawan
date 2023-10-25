@@ -46,10 +46,10 @@ namespace lorawan
 class NetworkStatus : public Object
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     NetworkStatus();
-    virtual ~NetworkStatus();
+    ~NetworkStatus() override;
 
     /**
      * Add a device to the ones that are tracked by this NetworkStatus object.
@@ -113,7 +113,7 @@ class NetworkStatus : public Object
     /**
      * Return the number of end devices currently managed by the server.
      */
-    int CountEndDevices(void);
+    int CountEndDevices();
 
   public:
     std::map<LoraDeviceAddress, Ptr<EndDeviceStatus>> m_endDeviceStatuses;

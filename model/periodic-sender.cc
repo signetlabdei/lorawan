@@ -36,7 +36,7 @@ NS_LOG_COMPONENT_DEFINE("PeriodicSender");
 NS_OBJECT_ENSURE_REGISTERED(PeriodicSender);
 
 TypeId
-PeriodicSender::GetTypeId(void)
+PeriodicSender::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::PeriodicSender")
                             .SetParent<Application>()
@@ -60,7 +60,7 @@ PeriodicSender::PeriodicSender()
     : m_interval(Seconds(10)),
       m_initialDelay(Seconds(1)),
       m_basePktSize(10),
-      m_pktSizeRV(0)
+      m_pktSizeRV(nullptr)
 
 {
     NS_LOG_FUNCTION_NOARGS();
@@ -79,7 +79,7 @@ PeriodicSender::SetInterval(Time interval)
 }
 
 Time
-PeriodicSender::GetInterval(void) const
+PeriodicSender::GetInterval() const
 {
     NS_LOG_FUNCTION(this);
     return m_interval;
@@ -105,7 +105,7 @@ PeriodicSender::SetPacketSize(uint8_t size)
 }
 
 void
-PeriodicSender::SendPacket(void)
+PeriodicSender::SendPacket()
 {
     NS_LOG_FUNCTION(this);
 
@@ -129,7 +129,7 @@ PeriodicSender::SendPacket(void)
 }
 
 void
-PeriodicSender::StartApplication(void)
+PeriodicSender::StartApplication()
 {
     NS_LOG_FUNCTION(this);
 
@@ -152,7 +152,7 @@ PeriodicSender::StartApplication(void)
 }
 
 void
-PeriodicSender::StopApplication(void)
+PeriodicSender::StopApplication()
 {
     NS_LOG_FUNCTION_NOARGS();
     Simulator::Cancel(m_sendEvent);

@@ -34,7 +34,7 @@ NS_LOG_COMPONENT_DEFINE("LoraPhy");
 NS_OBJECT_ENSURE_REGISTERED(LoraPhy);
 
 TypeId
-LoraPhy::GetTypeId(void)
+LoraPhy::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::LoraPhy")
@@ -85,7 +85,7 @@ LoraPhy::~LoraPhy()
 }
 
 Ptr<NetDevice>
-LoraPhy::GetDevice(void) const
+LoraPhy::GetDevice() const
 {
     return m_device;
 }
@@ -99,7 +99,7 @@ LoraPhy::SetDevice(Ptr<NetDevice> device)
 }
 
 Ptr<LoraChannel>
-LoraPhy::GetChannel(void) const
+LoraPhy::GetChannel() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -107,7 +107,7 @@ LoraPhy::GetChannel(void) const
 }
 
 Ptr<MobilityModel>
-LoraPhy::GetMobility(void)
+LoraPhy::GetMobility()
 {
     NS_LOG_FUNCTION_NOARGS();
 
