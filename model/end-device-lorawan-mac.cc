@@ -186,7 +186,7 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
     {
         // Make sure we can transmit at the current power on this channel
         NS_ASSERT_MSG(m_txPower <= m_channelHelper.GetTxPowerForChannel(txChannel),
-                      " The selected power is too hight to be supported by this channel.");
+                      " The selected power is too high to be supported by this channel.");
         DoSend(packet);
     }
 }

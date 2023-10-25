@@ -41,12 +41,12 @@ class PeriodicSender : public Application
 
     /**
      * Set the sending interval
-     * \param interval the interval between two packet sendings
+     * \param interval the interval between two packet send instances
      */
     void SetInterval(Time interval);
 
     /**
-     * Get the sending inteval
+     * Get the sending interval
      * \returns the interval between two packet sends
      */
     Time GetInterval(void) const;

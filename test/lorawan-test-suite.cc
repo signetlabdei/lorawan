@@ -1365,7 +1365,7 @@ PhyConnectivityTest::DoRun(void)
     NS_TEST_EXPECT_MSG_EQ(
         m_underSensitivityCalls,
         1,
-        "Packet that should have been lost because of low receive power was recevied");
+        "Packet that should have been lost because of low receive power was received");
 
     Reset();
 

@@ -138,7 +138,7 @@ class LoraDeviceAddress
      *
      * Note that nwkId is 7 bits long, and this function expects the 7 least
      * significant bits to contain the nwkId. Similarly for the nwkAddr, the 25
-     * least signficant bits of the uint32 are those that are expected to
+     * least significant bits of the uint32 are those that are expected to
      * contain the nwkAddr.
      */
     void Set(uint8_t nwkId, uint32_t nwkAddr);

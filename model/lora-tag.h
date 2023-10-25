@@ -100,7 +100,7 @@ class LoraTag : public Tag
      * This value works in two ways:
      * - It is used by the GW to signal to the NS the frequency of the uplink
          packet
-     * - It is used by the NS to signal to the GW the freqeuncy of a downlink
+     * - It is used by the NS to signal to the GW the frequency of a downlink
          packet
      */
     void SetFrequency(double frequency);

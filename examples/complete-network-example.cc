@@ -59,7 +59,7 @@ main(int argc, char* argv[])
     cmd.AddValue("appPeriod",
                  "The period in seconds to be used by periodically transmitting applications",
                  appPeriodSeconds);
-    cmd.AddValue("print", "Whether or not to print various informations", print);
+    cmd.AddValue("print", "Whether or not to print various information", print);
     cmd.Parse(argc, argv);
 
     // Set up logging
@@ -201,7 +201,7 @@ main(int argc, char* argv[])
      *  Create Gateways  *
      *********************/
 
-    // Create the gateway nodes (allocate them uniformely on the disc)
+    // Create the gateway nodes (allocate them uniformly on the disc)
     NodeContainer gateways;
     gateways.Create(nGateways);
 

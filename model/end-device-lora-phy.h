@@ -64,7 +64,7 @@ class EndDeviceLoraPhyListener
      * We are about to send the first bit of the packet.
      * We do not send any event to notify the end of
      * transmission. Listeners should assume that the
-     * channel implicitely reverts to the idle state
+     * channel implicitly reverts to the idle state
      * unless they have received a cca busy report.
      *
      * \param duration the expected transmission duration.

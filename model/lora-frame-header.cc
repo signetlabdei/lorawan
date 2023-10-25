@@ -420,7 +420,7 @@ LoraFrameHeader::GetFPending(void) const
 uint8_t
 LoraFrameHeader::GetFOptsLen(void) const
 {
-    // Sum the serialized lenght of all commands in the list
+    // Sum the serialized length of all commands in the list
     uint8_t fOptsLen = 0;
     std::list<Ptr<MacCommand>>::const_iterator it;
     for (it = m_macCommands.begin(); it != m_macCommands.end(); it++)

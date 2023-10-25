@@ -104,7 +104,7 @@ AdrComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus>
     myPacket->RemoveHeader(mHdr);
     myPacket->RemoveHeader(fHdr);
 
-    // Execute the ADR algotithm only if the request bit is set
+    // Execute the ADR algorithm only if the request bit is set
     if (fHdr.GetAdr())
     {
         if (int(status->GetReceivedPacketList().size()) < historyRange)
@@ -202,8 +202,8 @@ AdrComponent::AdrImplementation(uint8_t* newDataRate,
 
     NS_LOG_DEBUG("SF = " << (unsigned)spreadingFactor);
 
-    // Get the device data rate and use it to get the SNR demodulation treshold
-    double req_SNR = treshold[SfToDr(spreadingFactor)];
+    // Get the device data rate and use it to get the SNR demodulation threshold
+    double req_SNR = threshold[SfToDr(spreadingFactor)];
 
     NS_LOG_DEBUG("Required SNR = " << req_SNR);
 
