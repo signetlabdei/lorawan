@@ -135,7 +135,7 @@ PeriodicSender::StartApplication(void)
     NS_LOG_FUNCTION(this);
 
     // Make sure we have a MAC layer
-    if (m_mac)
+    if (!m_mac)
     {
         // Assumes there's only one device
         Ptr<LoraNetDevice> loraNetDevice = m_node->GetDevice(0)->GetObject<LoraNetDevice>();
