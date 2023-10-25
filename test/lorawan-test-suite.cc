@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 // Include headers of classes to test
 #include "ns3/constant-position-mobility-model.h"
