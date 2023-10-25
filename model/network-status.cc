@@ -42,8 +42,10 @@ NS_OBJECT_ENSURE_REGISTERED(NetworkStatus);
 TypeId
 NetworkStatus::GetTypeId(void)
 {
-    static TypeId tid =
-        TypeId("ns3::NetworkStatus").AddConstructor<NetworkStatus>().SetGroupName("lorawan");
+    static TypeId tid = TypeId("ns3::NetworkStatus")
+                            .SetParent<Object>()
+                            .AddConstructor<NetworkStatus>()
+                            .SetGroupName("lorawan");
     return tid;
 }
 

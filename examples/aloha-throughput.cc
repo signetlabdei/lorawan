@@ -70,7 +70,7 @@ main(int argc, char* argv[])
 {
     std::string interferenceMatrix = "aloha";
 
-    CommandLine cmd;
+    CommandLine cmd(__FILE__);
     cmd.AddValue("nDevices", "Number of end devices to include in the simulation", nDevices);
     cmd.AddValue("simulationTime", "Simulation Time", simulationTime);
     cmd.AddValue("interferenceMatrix",

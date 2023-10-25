@@ -59,7 +59,7 @@ main(int argc, char* argv[])
     double maxSpeed = 16;
     std::string adrType = "ns3::AdrComponent";
 
-    CommandLine cmd;
+    CommandLine cmd(__FILE__);
     cmd.AddValue("verbose", "Whether to print output or not", verbose);
     cmd.AddValue("MultipleGwCombiningMethod", "ns3::AdrComponent::MultipleGwCombiningMethod");
     cmd.AddValue("MultiplePacketsCombiningMethod",
