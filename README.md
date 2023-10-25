@@ -45,8 +45,8 @@ modules_enabled = ['lorawan']
 To compile, move to the `ns-3` folder, configure and then build ns-3:
 
 ```bash
-./waf configure --enable-tests --enable-examples
-./waf build
+./ns3 configure --enable-tests --enable-examples
+./ns3 build
 ```
 
 Finally, make sure tests run smoothly with:
