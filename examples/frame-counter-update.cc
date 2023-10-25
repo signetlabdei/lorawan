@@ -190,7 +190,7 @@ main(int argc, char* argv[])
         mac->TraceConnectWithoutContext("RequiredTransmissions", MakeCallback(&OnMacPacketOutcome));
     }
 
-    // Create the gateway nodes (allocate them uniformely on the disc)
+    // Create the gateway nodes (allocate them uniformly on the disc)
     NodeContainer gateways;
     gateways.Create(nGateways);
 

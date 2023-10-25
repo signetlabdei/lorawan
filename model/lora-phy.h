@@ -251,7 +251,7 @@ class LoraPhy : public Object
      * transmitted.
      *
      * Besides from the ones saved in LoraTxParameters, the packet's payload
-     * (obtained through a GetSize () call to accout for the presence of Headers
+     * (obtained through a GetSize () call to account for the presence of Headers
      * and Trailers, too) also influences the packet transmit time.
      *
      * \param packet The packet that needs to be transmitted.

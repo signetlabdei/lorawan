@@ -465,7 +465,7 @@ ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitingTime)
     NS_LOG_FUNCTION_NOARGS();
 
     // This is a new packet from APP; it can not be sent until the end of the
-    // second receive window (if the second recieve window has not closed yet)
+    // second receive window (if the second receive window has not closed yet)
     if (!m_retxParams.waitingAck)
     {
         if (!m_closeFirstWindow.IsExpired() || !m_closeSecondWindow.IsExpired() ||

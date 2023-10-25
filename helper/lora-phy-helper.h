@@ -82,7 +82,7 @@ class LoraPhyHelper
     void Set(std::string name, const AttributeValue& v);
 
     /**
-     * Crate a LoraPhy and connect it to a device on a node.
+     * Create a LoraPhy and connect it to a device on a node.
      *
      * \param node the node on which we wish to create a wifi PHY.
      * \param device the device within which this PHY will be created.
