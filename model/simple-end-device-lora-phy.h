@@ -43,27 +43,27 @@ class LoraChannel;
 class SimpleEndDeviceLoraPhy : public EndDeviceLoraPhy
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     // Constructor and destructor
     SimpleEndDeviceLoraPhy();
-    virtual ~SimpleEndDeviceLoraPhy();
+    ~SimpleEndDeviceLoraPhy() override;
 
     // Implementation of EndDeviceLoraPhy's pure virtual functions
-    virtual void StartReceive(Ptr<Packet> packet,
-                              double rxPowerDbm,
-                              uint8_t sf,
-                              Time duration,
-                              double frequencyMHz);
+    void StartReceive(Ptr<Packet> packet,
+                      double rxPowerDbm,
+                      uint8_t sf,
+                      Time duration,
+                      double frequencyMHz) override;
 
     // Implementation of LoraPhy's pure virtual functions
-    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event);
+    void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) override;
 
     // Implementation of LoraPhy's pure virtual functions
-    virtual void Send(Ptr<Packet> packet,
-                      LoraTxParameters txParams,
-                      double frequencyMHz,
-                      double txPowerDbm);
+    void Send(Ptr<Packet> packet,
+              LoraTxParameters txParams,
+              double frequencyMHz,
+              double txPowerDbm) override;
 
   private:
 };

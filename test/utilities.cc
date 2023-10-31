@@ -6,7 +6,7 @@ namespace lorawan
 {
 
 Ptr<LoraChannel>
-CreateChannel(void)
+CreateChannel()
 {
     // Create the lora channel object
     Ptr<LogDistancePropagationLossModel> loss = CreateObject<LogDistancePropagationLossModel>();
@@ -112,7 +112,7 @@ InitializeNetwork(int nDevices, int nGateways)
 
     NodeContainer gateways = CreateGateways(nGateways, mobility, channel);
 
-    LorawanMacHelper().SetSpreadingFactorsUp(endDevices, gateways, channel);
+    LorawanMacHelper::SetSpreadingFactorsUp(endDevices, gateways, channel);
 
     Ptr<Node> nsNode = CreateNetworkServer(endDevices, gateways);
 

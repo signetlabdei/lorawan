@@ -38,7 +38,7 @@ struct NetworkComponents
     Ptr<Node> nsNode;
 };
 
-Ptr<LoraChannel> CreateChannel(void);
+Ptr<LoraChannel> CreateChannel();
 
 NodeContainer CreateEndDevices(int nDevices, MobilityHelper mobility, Ptr<LoraChannel> channel);
 

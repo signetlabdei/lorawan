@@ -34,8 +34,8 @@ namespace lorawan
 class LoraTag : public Tag
 {
   public:
-    static TypeId GetTypeId(void);
-    virtual TypeId GetInstanceTypeId(void) const;
+    static TypeId GetTypeId();
+    TypeId GetInstanceTypeId() const override;
 
     /**
      * Create a LoraTag with a given spreading factor and collision.
@@ -45,12 +45,12 @@ class LoraTag : public Tag
      */
     LoraTag(uint8_t sf = 0, uint8_t destroyedBy = 0);
 
-    virtual ~LoraTag();
+    ~LoraTag() override;
 
-    virtual void Serialize(TagBuffer i) const;
-    virtual void Deserialize(TagBuffer i);
-    virtual uint32_t GetSerializedSize() const;
-    virtual void Print(std::ostream& os) const;
+    void Serialize(TagBuffer i) const override;
+    void Deserialize(TagBuffer i) override;
+    uint32_t GetSerializedSize() const override;
+    void Print(std::ostream& os) const override;
 
     /**
      * Read which Spreading Factor this packet was transmitted with.
@@ -108,14 +108,14 @@ class LoraTag : public Tag
     /**
      * Get the frequency of the packet.
      */
-    double GetFrequency(void);
+    double GetFrequency() const;
 
     /**
      * Get the data rate for this packet.
      *
      * \return The data rate that needs to be employed for this packet.
      */
-    uint8_t GetDataRate(void);
+    uint8_t GetDataRate() const;
 
     /**
      * Set the data rate for this packet.

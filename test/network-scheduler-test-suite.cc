@@ -22,10 +22,10 @@ class NetworkSchedulerTest : public TestCase
 {
   public:
     NetworkSchedulerTest();
-    virtual ~NetworkSchedulerTest();
+    ~NetworkSchedulerTest() override;
 
   private:
-    virtual void DoRun(void);
+    void DoRun() override;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -42,7 +42,7 @@ NetworkSchedulerTest::~NetworkSchedulerTest()
 // This method is the pure virtual method from class TestCase that every
 // TestCase must implement
 void
-NetworkSchedulerTest::DoRun(void)
+NetworkSchedulerTest::DoRun()
 {
     NS_LOG_DEBUG("NetworkSchedulerTest");
 

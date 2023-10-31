@@ -38,7 +38,7 @@ NS_OBJECT_ENSURE_REGISTERED(SimpleGatewayLoraPhy);
  ***********************************************************************/
 
 TypeId
-SimpleGatewayLoraPhy::GetTypeId(void)
+SimpleGatewayLoraPhy::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::SimpleGatewayLoraPhy")
                             .SetParent<GatewayLoraPhy>()

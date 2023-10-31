@@ -31,7 +31,7 @@ NS_LOG_COMPONENT_DEFINE("SubBand");
 NS_OBJECT_ENSURE_REGISTERED(SubBand);
 
 TypeId
-SubBand::GetTypeId(void)
+SubBand::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::SubBand").SetParent<Object>().SetGroupName("lorawan");
     return tid;
@@ -61,25 +61,25 @@ SubBand::~SubBand()
 }
 
 double
-SubBand::GetFirstFrequency(void)
+SubBand::GetFirstFrequency() const
 {
     return m_firstFrequency;
 }
 
 double
-SubBand::GetDutyCycle(void)
+SubBand::GetDutyCycle() const
 {
     return m_dutyCycle;
 }
 
 bool
-SubBand::BelongsToSubBand(double frequency)
+SubBand::BelongsToSubBand(double frequency) const
 {
     return (frequency > m_firstFrequency) && (frequency < m_lastFrequency);
 }
 
 bool
-SubBand::BelongsToSubBand(Ptr<LogicalLoraChannel> logicalChannel)
+SubBand::BelongsToSubBand(Ptr<LogicalLoraChannel> logicalChannel) const
 {
     double frequency = logicalChannel->GetFrequency();
     return BelongsToSubBand(frequency);
@@ -92,7 +92,7 @@ SubBand::SetNextTransmissionTime(Time nextTime)
 }
 
 Time
-SubBand::GetNextTransmissionTime(void)
+SubBand::GetNextTransmissionTime()
 {
     return m_nextTransmissionTime;
 }
@@ -104,7 +104,7 @@ SubBand::SetMaxTxPowerDbm(double maxTxPowerDbm)
 }
 
 double
-SubBand::GetMaxTxPowerDbm(void)
+SubBand::GetMaxTxPowerDbm() const
 {
     return m_maxTxPowerDbm;
 }

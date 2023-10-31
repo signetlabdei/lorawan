@@ -33,7 +33,7 @@ NS_LOG_COMPONENT_DEFINE("BuildingPenetrationLoss");
 NS_OBJECT_ENSURE_REGISTERED(BuildingPenetrationLoss);
 
 TypeId
-BuildingPenetrationLoss::GetTypeId(void)
+BuildingPenetrationLoss::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::BuildingPenetrationLoss")
                             .SetParent<PropagationLossModel>()
@@ -136,7 +136,7 @@ BuildingPenetrationLoss::DoAssignStreams(int64_t stream)
 }
 
 int
-BuildingPenetrationLoss::GetPValue(void) const
+BuildingPenetrationLoss::GetPValue() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -163,7 +163,7 @@ BuildingPenetrationLoss::GetPValue(void) const
 }
 
 int
-BuildingPenetrationLoss::GetWallLossValue(void) const
+BuildingPenetrationLoss::GetWallLossValue() const
 {
     NS_LOG_FUNCTION_NOARGS();
 

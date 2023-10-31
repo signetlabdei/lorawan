@@ -461,7 +461,7 @@ LorawanMacHelper::SetSpreadingFactorsUp(NodeContainer endDevices,
     NS_LOG_FUNCTION_NOARGS();
 
     std::vector<int> sfQuantity(7, 0);
-    for (NodeContainer::Iterator j = endDevices.Begin(); j != endDevices.End(); ++j)
+    for (auto j = endDevices.Begin(); j != endDevices.End(); ++j)
     {
         Ptr<Node> object = *j;
         Ptr<MobilityModel> position = object->GetObject<MobilityModel>();
@@ -480,8 +480,7 @@ LorawanMacHelper::SetSpreadingFactorsUp(NodeContainer endDevices,
         // Assume devices transmit at 14 dBm
         double highestRxPower = channel->GetRxPower(14, position, bestGatewayPosition);
 
-        for (NodeContainer::Iterator currentGw = gateways.Begin() + 1; currentGw != gateways.End();
-             ++currentGw)
+        for (auto currentGw = gateways.Begin() + 1; currentGw != gateways.End(); ++currentGw)
         {
             // Compute the power received from the current gateway
             Ptr<Node> curr = *currentGw;
@@ -620,7 +619,7 @@ LorawanMacHelper::SetSpreadingFactorsGivenDistribution(NodeContainer endDevices,
                                              << cumdistr[2] << " " << cumdistr[3] << " "
                                              << cumdistr[4] << " " << cumdistr[5]);
 
-    for (NodeContainer::Iterator j = endDevices.Begin(); j != endDevices.End(); ++j)
+    for (auto j = endDevices.Begin(); j != endDevices.End(); ++j)
     {
         Ptr<Node> object = *j;
         Ptr<MobilityModel> position = object->GetObject<MobilityModel>();

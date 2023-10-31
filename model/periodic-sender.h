@@ -35,9 +35,9 @@ class PeriodicSender : public Application
 {
   public:
     PeriodicSender();
-    ~PeriodicSender();
+    ~PeriodicSender() override;
 
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     /**
      * Set the sending interval
@@ -49,7 +49,7 @@ class PeriodicSender : public Application
      * Get the sending interval
      * \returns the interval between two packet sends
      */
-    Time GetInterval(void) const;
+    Time GetInterval() const;
 
     /**
      * Set the initial delay of this application
@@ -69,17 +69,17 @@ class PeriodicSender : public Application
     /**
      * Send a packet using the LoraNetDevice's Send method
      */
-    void SendPacket(void);
+    void SendPacket();
 
     /**
      * Start the application by scheduling the first SendPacket event
      */
-    void StartApplication(void);
+    void StartApplication() override;
 
     /**
      * Stop the application
      */
-    void StopApplication(void);
+    void StopApplication() override;
 
   private:
     /**

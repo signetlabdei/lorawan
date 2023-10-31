@@ -42,10 +42,10 @@ namespace lorawan
 class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     ClassAEndDeviceLorawanMac();
-    virtual ~ClassAEndDeviceLorawanMac();
+    ~ClassAEndDeviceLorawanMac() override;
 
     /////////////////////
     // Sending methods //
@@ -56,7 +56,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      *
      * \param packet the packet to send
      */
-    virtual void SendToPhy(Ptr<Packet> packet);
+    void SendToPhy(Ptr<Packet> packet) override;
 
     //////////////////////////
     //  Receiving methods   //
@@ -70,36 +70,36 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      *
      * \param packet the received packet.
      */
-    virtual void Receive(Ptr<const Packet> packet);
+    void Receive(Ptr<const Packet> packet) override;
 
-    virtual void FailedReception(Ptr<const Packet> packet);
+    void FailedReception(Ptr<const Packet> packet) override;
 
     /**
      * Perform the actions that are required after a packet send.
      *
      * This function handles opening of the first receive window.
      */
-    virtual void TxFinished(Ptr<const Packet> packet);
+    void TxFinished(Ptr<const Packet> packet) override;
 
     /**
      * Perform operations needed to open the first receive window.
      */
-    void OpenFirstReceiveWindow(void);
+    void OpenFirstReceiveWindow();
 
     /**
      * Perform operations needed to open the second receive window.
      */
-    void OpenSecondReceiveWindow(void);
+    void OpenSecondReceiveWindow();
 
     /**
      * Perform operations needed to close the first receive window.
      */
-    void CloseFirstReceiveWindow(void);
+    void CloseFirstReceiveWindow();
 
     /**
      * Perform operations needed to close the second receive window.
      */
-    void CloseSecondReceiveWindow(void);
+    void CloseSecondReceiveWindow();
 
     /////////////////////////
     // Getters and Setters //
@@ -112,14 +112,14 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      * \param waitingTime The minimum waiting time that has to be respected,
      * irrespective of the class (e.g., because of duty cycle limitations).
      */
-    virtual Time GetNextClassTransmissionDelay(Time waitingTime);
+    Time GetNextClassTransmissionDelay(Time waitingTime) override;
 
     /**
      * Get the Data Rate that will be used in the first receive window.
      *
      * \return The Data Rate
      */
-    uint8_t GetFirstReceiveWindowDataRate(void);
+    uint8_t GetFirstReceiveWindowDataRate();
 
     /**
      * Set the Data Rate to be used in the second receive window.
@@ -133,7 +133,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      *
      * \return The Data Rate
      */
-    uint8_t GetSecondReceiveWindowDataRate(void);
+    uint8_t GetSecondReceiveWindowDataRate() const;
 
     /**
      * Set the frequency that will be used for the second receive window.
@@ -147,7 +147,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      *
      * @return The frequency, in MHz
      */
-    double GetSecondReceiveWindowFrequency(void);
+    double GetSecondReceiveWindowFrequency() const;
 
     /////////////////////////
     // MAC command methods //
@@ -162,7 +162,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      *                            - The data rate to use for the second receive window.
      *                            - The frequency to use for the second receive window.
      */
-    virtual void OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq);
+    void OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq) override;
 
   private:
     /**

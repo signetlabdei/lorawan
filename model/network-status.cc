@@ -40,7 +40,7 @@ NS_LOG_COMPONENT_DEFINE("NetworkStatus");
 NS_OBJECT_ENSURE_REGISTERED(NetworkStatus);
 
 TypeId
-NetworkStatus::GetTypeId(void)
+NetworkStatus::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::NetworkStatus")
                             .SetParent<Object>()
@@ -218,7 +218,7 @@ NetworkStatus::GetEndDeviceStatus(Ptr<const Packet> packet)
     else
     {
         NS_LOG_ERROR("EndDeviceStatus not found");
-        return 0;
+        return nullptr;
     }
 }
 
@@ -235,12 +235,12 @@ NetworkStatus::GetEndDeviceStatus(LoraDeviceAddress address)
     else
     {
         NS_LOG_ERROR("EndDeviceStatus not found");
-        return 0;
+        return nullptr;
     }
 }
 
 int
-NetworkStatus::CountEndDevices(void)
+NetworkStatus::CountEndDevices()
 {
     NS_LOG_FUNCTION(this);
 

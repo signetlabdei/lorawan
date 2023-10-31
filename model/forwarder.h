@@ -40,9 +40,9 @@ class Forwarder : public Application
 {
   public:
     Forwarder();
-    ~Forwarder();
+    ~Forwarder() override;
 
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     /**
      * Sets the device to use to communicate with the EDs.
@@ -83,12 +83,12 @@ class Forwarder : public Application
     /**
      * Start the application
      */
-    void StartApplication(void);
+    void StartApplication() override;
 
     /**
      * Stop the application
      */
-    void StopApplication(void);
+    void StopApplication() override;
 
   private:
     Ptr<LoraNetDevice> m_loraNetDevice; //!< Pointer to the node's LoraNetDevice

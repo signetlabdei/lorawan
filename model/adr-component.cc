@@ -33,7 +33,7 @@ NS_LOG_COMPONENT_DEFINE("AdrComponent");
 NS_OBJECT_ENSURE_REGISTERED(AdrComponent);
 
 TypeId
-AdrComponent::GetTypeId(void)
+AdrComponent::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::AdrComponent")
@@ -283,7 +283,7 @@ AdrComponent::SfToDr(uint8_t sf)
 }
 
 double
-AdrComponent::RxPowerToSNR(double transmissionPower)
+AdrComponent::RxPowerToSNR(double transmissionPower) const
 {
     // The following conversion ignores interfering packets
     return transmissionPower + 174 - 10 * log10(B) - NF;
@@ -293,7 +293,7 @@ AdrComponent::RxPowerToSNR(double transmissionPower)
 double
 AdrComponent::GetMinTxFromGateways(EndDeviceStatus::GatewayList gwList)
 {
-    EndDeviceStatus::GatewayList::iterator it = gwList.begin();
+    auto it = gwList.begin();
     double min = it->second.rxPower;
 
     for (; it != gwList.end(); it++)
@@ -311,7 +311,7 @@ AdrComponent::GetMinTxFromGateways(EndDeviceStatus::GatewayList gwList)
 double
 AdrComponent::GetMaxTxFromGateways(EndDeviceStatus::GatewayList gwList)
 {
-    EndDeviceStatus::GatewayList::iterator it = gwList.begin();
+    auto it = gwList.begin();
     double max = it->second.rxPower;
 
     for (; it != gwList.end(); it++)
@@ -331,7 +331,7 @@ AdrComponent::GetAverageTxFromGateways(EndDeviceStatus::GatewayList gwList)
 {
     double sum = 0;
 
-    for (EndDeviceStatus::GatewayList::iterator it = gwList.begin(); it != gwList.end(); it++)
+    for (auto it = gwList.begin(); it != gwList.end(); it++)
     {
         NS_LOG_DEBUG("Gateway at " << it->first << " has TP " << it->second.rxPower);
         sum += it->second.rxPower;

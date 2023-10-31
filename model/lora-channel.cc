@@ -40,7 +40,7 @@ NS_LOG_COMPONENT_DEFINE("LoraChannel");
 NS_OBJECT_ENSURE_REGISTERED(LoraChannel);
 
 TypeId
-LoraChannel::GetTypeId(void)
+LoraChannel::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::LoraChannel")
@@ -98,7 +98,7 @@ LoraChannel::Remove(Ptr<LoraPhy> phy)
 }
 
 std::size_t
-LoraChannel::GetNDevices(void) const
+LoraChannel::GetNDevices() const
 {
     return m_phyList.size();
 }

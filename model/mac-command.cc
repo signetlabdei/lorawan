@@ -34,7 +34,7 @@ NS_LOG_COMPONENT_DEFINE("MacCommand");
 NS_OBJECT_ENSURE_REGISTERED(MacCommand);
 
 TypeId
-MacCommand::GetTypeId(void)
+MacCommand::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::MacCommand").SetParent<Object>().SetGroupName("lorawan");
     return tid;
@@ -51,7 +51,7 @@ MacCommand::~MacCommand()
 }
 
 enum MacCommandType
-MacCommand::GetCommandType(void) const
+MacCommand::GetCommandType() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -59,7 +59,7 @@ MacCommand::GetCommandType(void) const
 }
 
 uint8_t
-MacCommand::GetSerializedSize(void) const
+MacCommand::GetSerializedSize() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -230,7 +230,7 @@ LinkCheckAns::SetMargin(uint8_t margin)
 }
 
 uint8_t
-LinkCheckAns::GetMargin(void) const
+LinkCheckAns::GetMargin() const
 {
     NS_LOG_FUNCTION(this);
 
@@ -246,7 +246,7 @@ LinkCheckAns::SetGwCnt(uint8_t gwCnt)
 }
 
 uint8_t
-LinkCheckAns::GetGwCnt(void) const
+LinkCheckAns::GetGwCnt() const
 {
     NS_LOG_FUNCTION(this);
 
@@ -254,7 +254,7 @@ LinkCheckAns::GetGwCnt(void) const
 }
 
 void
-LinkCheckAns::IncrementGwCnt(void)
+LinkCheckAns::IncrementGwCnt()
 {
     NS_LOG_FUNCTION(this);
 
@@ -334,7 +334,7 @@ LinkAdrReq::Print(std::ostream& os) const
 }
 
 uint8_t
-LinkAdrReq::GetDataRate(void)
+LinkAdrReq::GetDataRate()
 {
     NS_LOG_FUNCTION(this);
 
@@ -342,7 +342,7 @@ LinkAdrReq::GetDataRate(void)
 }
 
 uint8_t
-LinkAdrReq::GetTxPower(void)
+LinkAdrReq::GetTxPower()
 {
     NS_LOG_FUNCTION(this);
 
@@ -350,7 +350,7 @@ LinkAdrReq::GetTxPower(void)
 }
 
 std::list<int>
-LinkAdrReq::GetEnabledChannelsList(void)
+LinkAdrReq::GetEnabledChannelsList()
 {
     NS_LOG_FUNCTION(this);
 
@@ -368,7 +368,7 @@ LinkAdrReq::GetEnabledChannelsList(void)
 }
 
 int
-LinkAdrReq::GetRepetitions(void)
+LinkAdrReq::GetRepetitions()
 {
     NS_LOG_FUNCTION(this);
 
@@ -490,7 +490,7 @@ DutyCycleReq::Print(std::ostream& os) const
 }
 
 double
-DutyCycleReq::GetMaximumAllowedDutyCycle(void) const
+DutyCycleReq::GetMaximumAllowedDutyCycle() const
 {
     NS_LOG_FUNCTION(this);
 
@@ -590,7 +590,7 @@ RxParamSetupReq::Serialize(Buffer::Iterator& start) const
     start.WriteU8(GetCIDFromMacCommand(m_commandType));
     // Data serialization
     start.WriteU8((m_rx1DrOffset & 0b111) << 4 | (m_rx2DataRate & 0b1111));
-    uint32_t encodedFrequency = uint32_t(m_frequency / 100);
+    uint32_t encodedFrequency = m_frequency / 100;
     NS_LOG_DEBUG(unsigned(encodedFrequency));
     NS_LOG_DEBUG(std::bitset<32>(encodedFrequency));
     start.WriteU8((encodedFrequency & 0xff0000) >> 16); // Most significant byte
@@ -631,7 +631,7 @@ RxParamSetupReq::Print(std::ostream& os) const
 }
 
 uint8_t
-RxParamSetupReq::GetRx1DrOffset(void)
+RxParamSetupReq::GetRx1DrOffset()
 {
     NS_LOG_FUNCTION(this);
 
@@ -639,7 +639,7 @@ RxParamSetupReq::GetRx1DrOffset(void)
 }
 
 uint8_t
-RxParamSetupReq::GetRx2DataRate(void)
+RxParamSetupReq::GetRx2DataRate()
 {
     NS_LOG_FUNCTION(this);
 
@@ -647,7 +647,7 @@ RxParamSetupReq::GetRx2DataRate(void)
 }
 
 double
-RxParamSetupReq::GetFrequency(void)
+RxParamSetupReq::GetFrequency()
 {
     NS_LOG_FUNCTION(this);
 
@@ -814,7 +814,7 @@ DevStatusAns::Print(std::ostream& os) const
 }
 
 uint8_t
-DevStatusAns::GetBattery(void)
+DevStatusAns::GetBattery() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -822,7 +822,7 @@ DevStatusAns::GetBattery(void)
 }
 
 uint8_t
-DevStatusAns::GetMargin(void)
+DevStatusAns::GetMargin() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -865,7 +865,7 @@ NewChannelReq::Serialize(Buffer::Iterator& start) const
     start.WriteU8(GetCIDFromMacCommand(m_commandType));
 
     start.WriteU8(m_chIndex);
-    uint32_t encodedFrequency = uint32_t(m_frequency / 100);
+    uint32_t encodedFrequency = m_frequency / 100;
     start.WriteU8((encodedFrequency & 0xff0000) >> 16);
     start.WriteU8((encodedFrequency & 0xff00) >> 8);
     start.WriteU8(encodedFrequency & 0xff);
@@ -901,7 +901,7 @@ NewChannelReq::Print(std::ostream& os) const
 }
 
 uint8_t
-NewChannelReq::GetChannelIndex(void)
+NewChannelReq::GetChannelIndex() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -909,7 +909,7 @@ NewChannelReq::GetChannelIndex(void)
 }
 
 double
-NewChannelReq::GetFrequency(void)
+NewChannelReq::GetFrequency() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -917,7 +917,7 @@ NewChannelReq::GetFrequency(void)
 }
 
 uint8_t
-NewChannelReq::GetMinDataRate(void)
+NewChannelReq::GetMinDataRate() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -925,7 +925,7 @@ NewChannelReq::GetMinDataRate(void)
 }
 
 uint8_t
-NewChannelReq::GetMaxDataRate(void)
+NewChannelReq::GetMaxDataRate() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -1044,7 +1044,7 @@ RxTimingSetupReq::Print(std::ostream& os) const
 }
 
 Time
-RxTimingSetupReq::GetDelay(void)
+RxTimingSetupReq::GetDelay()
 {
     NS_LOG_FUNCTION(this);
 

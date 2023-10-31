@@ -48,10 +48,10 @@ namespace lorawan
 class LogicalLoraChannelHelper : public Object
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     LogicalLoraChannelHelper();
-    virtual ~LogicalLoraChannelHelper();
+    ~LogicalLoraChannelHelper() override;
 
     /**
      * Get the time it is necessary to wait before transmitting again, according
@@ -59,7 +59,7 @@ class LogicalLoraChannelHelper : public Object
      *
      * \return The aggregate waiting time.
      */
-    Time GetAggregatedWaitingTime(void);
+    Time GetAggregatedWaitingTime();
 
     /**
      * Get the time it is necessary to wait for before transmitting on a given
@@ -88,7 +88,7 @@ class LogicalLoraChannelHelper : public Object
      *
      * \return A list of the managed channels.
      */
-    std::vector<Ptr<LogicalLoraChannel>> GetChannelList(void);
+    std::vector<Ptr<LogicalLoraChannel>> GetChannelList();
 
     /**
      * Get the list of LogicalLoraChannels currently registered on this helper
@@ -96,7 +96,7 @@ class LogicalLoraChannelHelper : public Object
      *
      * \return A list of the managed channels enabled for Uplink transmission.
      */
-    std::vector<Ptr<LogicalLoraChannel>> GetEnabledChannelList(void);
+    std::vector<Ptr<LogicalLoraChannel>> GetEnabledChannelList();
 
     /**
      * Add a new channel to the list.

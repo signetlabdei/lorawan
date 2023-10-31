@@ -45,7 +45,7 @@ class LoraRadioEnergyModelHelper : public DeviceEnergyModelHelper
     /**
      * Destroy a RadioEnergy Helper
      */
-    ~LoraRadioEnergyModelHelper();
+    ~LoraRadioEnergyModelHelper() override;
 
     /**
      * \param name the name of the attribute to set
@@ -53,7 +53,7 @@ class LoraRadioEnergyModelHelper : public DeviceEnergyModelHelper
      *
      * Sets an attribute of the underlying PHY object.
      */
-    void Set(std::string name, const AttributeValue& v);
+    void Set(std::string name, const AttributeValue& v) override;
 
     /**
      * \param name the name of the model to set
@@ -102,7 +102,8 @@ class LoraRadioEnergyModelHelper : public DeviceEnergyModelHelper
      *
      * Implements DeviceEnergyModel::Install.
      */
-    virtual Ptr<DeviceEnergyModel> DoInstall(Ptr<NetDevice> device, Ptr<EnergySource> source) const;
+    Ptr<DeviceEnergyModel> DoInstall(Ptr<NetDevice> device,
+                                     Ptr<EnergySource> source) const override;
 
   private:
     ObjectFactory m_radioEnergy;    ///< radio energy

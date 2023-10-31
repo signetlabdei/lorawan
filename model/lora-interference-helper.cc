@@ -59,43 +59,43 @@ LoraInterferenceHelper::Event::~Event()
 
 // Getters
 Time
-LoraInterferenceHelper::Event::GetStartTime(void) const
+LoraInterferenceHelper::Event::GetStartTime() const
 {
     return m_startTime;
 }
 
 Time
-LoraInterferenceHelper::Event::GetEndTime(void) const
+LoraInterferenceHelper::Event::GetEndTime() const
 {
     return m_endTime;
 }
 
 Time
-LoraInterferenceHelper::Event::GetDuration(void) const
+LoraInterferenceHelper::Event::GetDuration() const
 {
     return m_endTime - m_startTime;
 }
 
 double
-LoraInterferenceHelper::Event::GetRxPowerdBm(void) const
+LoraInterferenceHelper::Event::GetRxPowerdBm() const
 {
     return m_rxPowerdBm;
 }
 
 uint8_t
-LoraInterferenceHelper::Event::GetSpreadingFactor(void) const
+LoraInterferenceHelper::Event::GetSpreadingFactor() const
 {
     return m_sf;
 }
 
 Ptr<Packet>
-LoraInterferenceHelper::Event::GetPacket(void) const
+LoraInterferenceHelper::Event::GetPacket() const
 {
     return m_packet;
 }
 
 double
-LoraInterferenceHelper::Event::GetFrequency(void) const
+LoraInterferenceHelper::Event::GetFrequency() const
 {
     return m_frequencyMHz;
 }
@@ -168,7 +168,7 @@ LoraInterferenceHelper::SetCollisionMatrix(
 }
 
 TypeId
-LoraInterferenceHelper::GetTypeId(void)
+LoraInterferenceHelper::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::LoraInterferenceHelper").SetParent<Object>().SetGroupName("lorawan");
@@ -222,7 +222,7 @@ LoraInterferenceHelper::Add(Time duration,
 }
 
 void
-LoraInterferenceHelper::CleanOldEvents(void)
+LoraInterferenceHelper::CleanOldEvents()
 {
     NS_LOG_FUNCTION(this);
 
@@ -280,7 +280,6 @@ LoraInterferenceHelper::IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Ev
     Time now = Simulator::Now();
     Time duration = event->GetDuration();
     Time packetStartTime = now - duration;
-    Time packetEndTime = now;
 
     // Get the list of interfering events
     std::list<Ptr<LoraInterferenceHelper::Event>>::iterator it;
@@ -335,7 +334,7 @@ LoraInterferenceHelper::IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Ev
     }
 
     // For each SF, check if there was destructive interference
-    for (uint8_t currentSf = uint8_t(7); currentSf <= uint8_t(12); currentSf++)
+    for (auto currentSf = uint8_t(7); currentSf <= uint8_t(12); currentSf++)
     {
         NS_LOG_DEBUG("Cumulative Interference Energy: "
                      << cumulativeInterferenceEnergy.at(unsigned(currentSf) - 7));
@@ -374,7 +373,7 @@ LoraInterferenceHelper::IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Ev
 }
 
 void
-LoraInterferenceHelper::ClearAllEvents(void)
+LoraInterferenceHelper::ClearAllEvents()
 {
     NS_LOG_FUNCTION_NOARGS();
 

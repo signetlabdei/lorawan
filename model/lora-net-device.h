@@ -46,11 +46,11 @@ class LorawanMac;
 class LoraNetDevice : public NetDevice
 {
   public:
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
     // Constructor and destructor
     LoraNetDevice();
-    virtual ~LoraNetDevice();
+    ~LoraNetDevice() override;
 
     /**
      * Set which LorawanMac instance is linked to this device.
@@ -71,14 +71,14 @@ class LoraNetDevice : public NetDevice
      *
      * \return the mac we are currently using.
      */
-    Ptr<LorawanMac> GetMac(void) const;
+    Ptr<LorawanMac> GetMac() const;
 
     /**
      * Get the LoraPhy instance that is linked to this NetDevice.
      *
      * \return the phy we are currently using.
      */
-    Ptr<LoraPhy> GetPhy(void) const;
+    Ptr<LoraPhy> GetPhy() const;
 
     /**
      * Send a packet through the LoRaWAN stack.
@@ -91,7 +91,7 @@ class LoraNetDevice : public NetDevice
      * This function is implemented to achieve compliance with the NetDevice
      * interface. Note that the dest and protocolNumber args are ignored.
      */
-    bool Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
+    bool Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber) override;
 
     /**
      * Callback the Mac layer calls whenever a packet arrives and needs to be
@@ -103,33 +103,33 @@ class LoraNetDevice : public NetDevice
 
     // From class NetDevice. Some of these have little meaning for a LoRaWAN
     // network device (since, for instance, IP is not used in the standard)
-    virtual void SetReceiveCallback(NetDevice::ReceiveCallback cb);
-    virtual Ptr<Channel> GetChannel(void) const;
-    virtual void SetNode(Ptr<Node> node);
-    virtual Ptr<Node> GetNode(void) const;
+    void SetReceiveCallback(NetDevice::ReceiveCallback cb) override;
+    Ptr<Channel> GetChannel() const override;
+    void SetNode(Ptr<Node> node) override;
+    Ptr<Node> GetNode() const override;
 
-    virtual void SetIfIndex(const uint32_t index);
-    virtual uint32_t GetIfIndex(void) const;
-    virtual void SetAddress(Address address);
-    virtual Address GetAddress(void) const;
-    virtual bool SetMtu(const uint16_t mtu);
-    virtual uint16_t GetMtu(void) const;
-    virtual bool IsLinkUp(void) const;
-    virtual void AddLinkChangeCallback(Callback<void> callback);
-    virtual bool IsBroadcast(void) const;
-    virtual Address GetBroadcast(void) const;
-    virtual bool IsMulticast(void) const;
-    virtual Address GetMulticast(Ipv4Address multicastGroup) const;
-    virtual Address GetMulticast(Ipv6Address addr) const;
-    virtual bool IsBridge(void) const;
-    virtual bool IsPointToPoint(void) const;
-    virtual bool SendFrom(Ptr<Packet> packet,
-                          const Address& source,
-                          const Address& dest,
-                          uint16_t protocolNumber);
-    virtual bool NeedsArp(void) const;
-    virtual void SetPromiscReceiveCallback(PromiscReceiveCallback cb);
-    virtual bool SupportsSendFrom(void) const;
+    void SetIfIndex(const uint32_t index) override;
+    uint32_t GetIfIndex() const override;
+    void SetAddress(Address address) override;
+    Address GetAddress() const override;
+    bool SetMtu(const uint16_t mtu) override;
+    uint16_t GetMtu() const override;
+    bool IsLinkUp() const override;
+    void AddLinkChangeCallback(Callback<void> callback) override;
+    bool IsBroadcast() const override;
+    Address GetBroadcast() const override;
+    bool IsMulticast() const override;
+    Address GetMulticast(Ipv4Address multicastGroup) const override;
+    Address GetMulticast(Ipv6Address addr) const override;
+    bool IsBridge() const override;
+    bool IsPointToPoint() const override;
+    bool SendFrom(Ptr<Packet> packet,
+                  const Address& source,
+                  const Address& dest,
+                  uint16_t protocolNumber) override;
+    bool NeedsArp() const override;
+    void SetPromiscReceiveCallback(PromiscReceiveCallback cb) override;
+    bool SupportsSendFrom() const override;
 
   protected:
     /**
@@ -146,13 +146,13 @@ class LoraNetDevice : public NetDevice
     /**
      * Return the LoraChannel this device is connected to.
      */
-    Ptr<LoraChannel> DoGetChannel(void) const;
+    Ptr<LoraChannel> DoGetChannel() const;
 
     /**
      * Complete the configuration of this LoRa device by connecting all lower
      * components (PHY, MAC, Channel) together.
      */
-    void CompleteConfig(void);
+    void CompleteConfig();
 
     // Member variables
     Ptr<Node> m_node;      //!< The Node this NetDevice is connected to.

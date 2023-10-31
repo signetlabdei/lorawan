@@ -30,7 +30,7 @@ namespace lorawan
 NS_OBJECT_ENSURE_REGISTERED(LoraTag);
 
 TypeId
-LoraTag::GetTypeId(void)
+LoraTag::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::LoraTag").SetParent<Tag>().SetGroupName("lorawan").AddConstructor<LoraTag>();
@@ -38,7 +38,7 @@ LoraTag::GetTypeId(void)
 }
 
 TypeId
-LoraTag::GetInstanceTypeId(void) const
+LoraTag::GetInstanceTypeId() const
 {
     return GetTypeId();
 }
@@ -57,7 +57,7 @@ LoraTag::~LoraTag()
 }
 
 uint32_t
-LoraTag::GetSerializedSize(void) const
+LoraTag::GetSerializedSize() const
 {
     // Each datum about a SF is 1 byte + receivePower (the size of a double) +
     // frequency (the size of a double)
@@ -133,13 +133,13 @@ LoraTag::SetFrequency(double frequency)
 }
 
 double
-LoraTag::GetFrequency(void)
+LoraTag::GetFrequency() const
 {
     return m_frequency;
 }
 
 uint8_t
-LoraTag::GetDataRate(void)
+LoraTag::GetDataRate() const
 {
     return m_dataRate;
 }
