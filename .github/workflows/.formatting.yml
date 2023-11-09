@@ -1,0 +1,68 @@
+# ns-3 CI/CD script with the pre-build stage
+#
+# Contains jobs to check the ns-3 code formatting and spell-checking.
+
+on: workflow_call
+
+jobs:
+  # Clang-format
+  check-style-clang-format:
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:rolling
+    strategy:
+      matrix:
+        version: [14, 15, 16]
+    timeout-minutes: 60
+    steps:
+      # The following step is required in all jobs that use this repo's actions
+      - name: "Retrieve actions from repository"
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions
+      - name: "Install required system packages"
+        run: >
+          apt update && DEBIAN_FRONTEND=noninteractive apt install -y 
+          python3
+          clang-format-${{ matrix.version }}
+          wget
+      - name: "Checkout this repository as ns-3 module"
+        uses: ./.github/actions/checkout-in-ns3
+      - name: "Check code style"
+        run: python3 utils/check-style-clang-format.py --verbose src/lorawan
+
+  # Emacs line
+  emacs-line:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - run: >
+          if ( egrep -rn --include="*.h" --include="*.cc" --include="*.c" --include="*.py" --include="*.rst" "c-file-style:|py-indent-offset:" ) ; then
+          echo "Found Emacs lines on the above C/C++, Python and RST files" ;
+          exit 1 ;
+          else
+          echo "No Emacs lines found on C/C++, Python and RST files" ;
+          exit 0 ;
+          fi
+
+  # Spell checking
+  spell-check:
+    runs-on: ubuntu-latest
+    container:
+      image: python:latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install codespell
+      # Get commit messages
+      - run: >
+          if (git remote | grep -qw upstream) ; then
+          git remote remove upstream ;
+          fi
+      - run: git config --global --add safe.directory $GITHUB_WORKSPACE
+      # develop here is meant to be the "default branch"
+      - run: git remote add -t develop --no-tags -f upstream https://github.com/signetlabdei/lorawan.git
+      - run: git log --pretty=%B HEAD...upstream/develop ^upstream/develop > git_messages.txt
+      # Check source code and commit messages
+      - run: codespell -f -C0 --skip="./experiments" ./

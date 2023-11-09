@@ -1,0 +1,24 @@
+# Note: this action requires an archlinux container, specific inputs and access to the repos's actions!
+# (see .base-per-commit.yml)
+name: "install-per-commit"
+description: "Installs required archlinux packages and checks-out the repo in ns-3"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Install required system packages"
+      shell: bash
+      run: >
+        pacman-key --init && pacman -Syu --noconfirm
+        base-devel gcc clang cmake ninja ccache
+        boost gsl gtk3
+        openssh
+        python
+        wget
+    - name: "Checkout this repository as ns-3 module"
+      uses: ./.github/actions/checkout-in-ns3
+    - name: "Format a string id for the build conf. of this job"
+      shell: bash
+      run: |
+        EXTRA_ID=`echo $EXTRA_OPTIONS | sed 's/--/-/g' | sed 's/ //g'`
+        echo "BUILD_ID=per-commit-$COMPILER-$MODE$EXTRA_ID" >> $GITHUB_ENV

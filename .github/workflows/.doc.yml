@@ -1,0 +1,61 @@
+# Base ns-3 CI job template for per-commit jobs involving building and testing
+
+on: workflow_call
+
+jobs:
+  doxygen:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux
+    timeout-minutes: 120
+    continue-on-error: true
+    steps:
+      # The following step is required in all jobs that use this repo's actions
+      - name: "Retrieve actions from repository"
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions
+      - name: "Install dependencies and checkout repo in ns-3"
+        uses: ./.github/actions/install-doc
+      - name: "Build ns-3"
+        env:
+          BUILD_ID: per-commit-g++-debug
+          COMPILER: g++
+          MODE: debug
+        uses: ./.github/actions/build
+        with:
+          save-ccache: "false"
+          store-artifacts: "false"
+      - name: "Build ns-3 assemble-introspected-command-line"
+        run: ./ns3 build assemble-introspected-command-line
+      - name: "Check documentation coverage and formatting"
+        run: |
+          doc/doxygen.warnings.report.sh -i -m lorawan
+          python3 utils/check-style-clang-format.py --no-formatting --no-tabs doc/introspected-doxygen.h
+          python3 utils/check-style-clang-format.py --no-formatting --no-tabs doc/introspected-command-line.h
+          ./ns3 clean
+      - name: "Upload doxygen warnings as artifact"
+        if: always()
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: doxygen.warnings.log
+          path: doc/doxygen.warnings.log
+
+  models:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux
+    timeout-minutes: 120
+    steps:
+      # The following step is required in all jobs that use this repo's actions
+      - name: "Retrieve actions from repository"
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions
+      - name: "Install dependencies and checkout repo in ns-3"
+        uses: ./.github/actions/install-doc
+      - name: "Make html and latexpdf"
+        working-directory: doc/models
+        run: |
+          make html
+          make latexpdf
