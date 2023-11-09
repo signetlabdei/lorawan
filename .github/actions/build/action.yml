@@ -1,0 +1,44 @@
+name: "build"
+description: "Defines the central steps in building ns-3"
+
+inputs:
+  save-ccache:
+    description: "Whether to update build ccache after building"
+    default: "true"
+  store-artifacts:
+    description: "Whether to upload build artifacts after building"
+    default: "true"
+
+runs:
+  using: "composite"
+  steps:
+    # Pre-configuration steps
+    - if: env.MODE != 'optimized' && ( ! contains(env.EXTRA_OPTIONS, '--disable-precompiled-headers') )
+      name: "Restore build cache of this job"
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ${{ env.BUILD_ID }}
+        save: ${{ inputs.save-ccache }}
+    # Configuration steps
+    - name: "Configure ns-3 CMake"
+      shell: bash
+      run: >
+        CXX=$COMPILER ./ns3 configure -d $MODE -GNinja 
+        --enable-examples --enable-tests --enable-asserts --enable-werror 
+        --enable-modules "lorawan;applications" $EXTRA_OPTIONS
+    # Build steps
+    - name: "Build ns-3"
+      shell: bash
+      run: ./ns3 build
+    # Post-build steps
+    - if: inputs.store-artifacts == 'true'
+      name: "Tar files to preserve permissions"
+      shell: bash
+      run: tar -cf build.tzst --exclude build.tzst -P -C $GITHUB_WORKSPACE --use-compress-program zstdmt build/ .lock-*
+    - if: inputs.store-artifacts == 'true'
+      name: "Upload build artifacts"
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: ${{ env.BUILD_ID }}
+        path: build.tzst
+        retention-days: 2

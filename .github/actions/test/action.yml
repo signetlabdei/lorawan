@@ -1,0 +1,14 @@
+name: "test"
+description: "Defines the central steps in testing ns-3"
+
+runs:
+  using: "composite"
+  steps:
+    # Test steps
+    - name: "Store ccache miss rate"
+      shell: bash
+      run: echo "CACHE_MISS=`./utils/ccache-miss-rate.py`" >> $GITHUB_ENV
+    - if: env.CACHE_MISS != '0' && env.MODE != 'debug'
+      name: "Test ns-3"
+      shell: bash
+      run: ./test.py -n

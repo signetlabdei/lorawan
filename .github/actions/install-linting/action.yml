@@ -1,0 +1,21 @@
+# Note: this action requires an ubuntu container and access to the repos's actions!
+# (see .linting.yml)
+name: "install-linting"
+description: "Installs required ubuntu packages and checks-out the repo in ns-3"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Install required system packages"
+      shell: bash
+      run: >
+        apt update && DEBIAN_FRONTEND=noninteractive apt install -y
+        clang cmake
+        clang-tidy clang-tidy-16
+        python3 python3-pip
+        libboost-all-dev libeigen3-dev libgtk-3-dev libsqlite3-dev
+        gsl-bin libgsl-dev libgsl27
+        git ssh
+        wget
+    - name: "Checkout this repository as ns-3 module"
+      uses: ./.github/actions/checkout-in-ns3

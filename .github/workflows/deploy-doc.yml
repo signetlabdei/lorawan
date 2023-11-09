@@ -1,0 +1,42 @@
+# CI job to deploy the documentation on another repository
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  deploy-doc:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux
+    timeout-minutes: 120
+    continue-on-error: true
+    steps:
+      # The following step is required in all jobs that use this repo's actions
+      - name: "Retrieve actions from repository"
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions
+      - name: "Install dependencies and checkout repo in ns-3"
+        uses: ./.github/actions/install-doc
+      - name: "Build ns-3"
+        env:
+          BUILD_ID: per-commit-g++-debug
+          COMPILER: g++
+          MODE: debug
+        uses: ./.github/actions/build
+        with:
+          save-ccache: "false"
+          store-artifacts: "false"
+      - name: "Build documentation"
+        run: ./ns3 docs all
+      - name: "Deploy documentation"
+        env:
+          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+        uses: cpina/github-action-push-to-another-repository@main
+        with:
+          source-directory: "doc/"
+          destination-github-username: "signetlabdei"
+          destination-repository-name: "lorawan-docs"
+          user-email: paginmatte@dei.unipd.it
+          target-branch: master

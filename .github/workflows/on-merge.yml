@@ -1,0 +1,13 @@
+name: "CI jobs to be run on PR merge"
+run-name: "on-merge"
+
+on:
+  pull_request:
+    branches: [develop]
+    types:
+      - closed
+
+jobs:
+  deploy-doc:
+    if: github.event.pull_request.merged == true
+    uses: ./.github/workflows/deploy-doc.yml

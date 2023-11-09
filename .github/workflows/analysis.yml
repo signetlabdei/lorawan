@@ -1,0 +1,71 @@
+# ns-3 CI/CD script with job for code quality and coverage
+#
+# Contains jobs to run code quality and coverage analysis.
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+env:
+  COMPILER: g++
+  MODE: default
+
+jobs:
+  # CodeQL
+  code-ql:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: "cpp"
+      # The following step is required in all jobs that use this repo's actions
+      - name: "Retrieve actions from repository"
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions
+      - name: "Install dependencies and checkout repo in ns-3"
+        uses: ./.github/actions/install-analysis
+      - name: "Build ns-3"
+        env:
+          BUILD_ID: ubuntu-codeql
+          COMPILER: g++
+          MODE: release
+          EXTRA_OPTIONS: --disable-werror
+        uses: ./.github/actions/build
+        with:
+          store-artifacts: "false"
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          checkout_path: ${{ github.workspace }}/src/lorawan
+
+  # CodeCov
+  code-cov:
+    runs-on: ubuntu-latest
+    steps:
+      # The following step is required in all jobs that use this repo's actions
+      - name: "Retrieve actions from repository"
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions
+      - name: "Install dependencies and checkout repo in ns-3"
+        uses: ./.github/actions/install-analysis
+      - name: "Build ns-3"
+        env:
+          BUILD_ID: ubuntu-coverage
+          COMPILER: g++
+          MODE: release
+          EXTRA_OPTIONS: --disable-werror --enable-gcov
+        uses: ./.github/actions/build
+        with:
+          store-artifacts: "false"
+      - name: "Extract ccache statistics"
+        run: echo "CACHE_MISSES=`./utils/ccache-miss-rate.py`" >> $GITHUB_ENV
+      - if: env.CACHE_MISSES != '0'
+        name: "Generate coverage data and submit to codecov.io"
+        run: |
+          ./ns3 build coverage_gcc
+          bash <(curl -s https://codecov.io/bash) -f build/coverage/ns3.info -R src/lorawan/ || echo "Codecov did not collect coverage reports"
