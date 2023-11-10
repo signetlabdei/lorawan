@@ -1,5 +1,5 @@
 # Note: this action requires an archlinux container and access to the repos's actions!
-# (see .doc.yml)
+# (see .test-doc.yml)
 name: "install-doc"
 description: "Installs required archlinux packages and checks-out the repo in ns-3"
 

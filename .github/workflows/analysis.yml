@@ -1,6 +1,8 @@
 # ns-3 CI/CD script with job for code quality and coverage
 #
 # Contains jobs to run code quality and coverage analysis.
+name: "Run code analysis"
+run-name: "analysis"
 
 on:
   workflow_call:

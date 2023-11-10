@@ -1,4 +1,4 @@
-name: "Per-commit ns-3 CI jobs"
+name: "Per-commit CI pipeline"
 run-name: "per-commit"
 
 on:
@@ -58,7 +58,7 @@ jobs:
 
   documentation:
     needs: code-linting
-    uses: ./.github/workflows/.doc.yml
+    uses: ./.github/workflows/.test-doc.yml
 
   code-analysis:
     needs: documentation

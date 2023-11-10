@@ -1,6 +1,8 @@
 # ns-3 CI/CD script with jobs of the code-linting stage
 #
 # Contains jobs to perform lint checking.
+name: "Check code linting"
+run-name: "linting"
 
 on: workflow_call
 

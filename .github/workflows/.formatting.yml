@@ -1,6 +1,8 @@
 # ns-3 CI/CD script with the pre-build stage
 #
 # Contains jobs to check the ns-3 code formatting and spell-checking.
+name: "Check code formatting"
+run-name: "formatting"
 
 on: workflow_call
 

@@ -1,4 +1,6 @@
 # CI job to deploy the documentation on another repository
+name: "Deploy the documentation"
+run-name: "deploy-doc"
 
 on:
   workflow_call:

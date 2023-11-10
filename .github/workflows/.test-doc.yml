@@ -1,4 +1,6 @@
 # Base ns-3 CI job template for per-commit jobs involving building and testing
+name: "Test documentation"
+run-name: "test-doc"
 
 on: workflow_call
 
