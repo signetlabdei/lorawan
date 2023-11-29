@@ -66,7 +66,7 @@ The module includes the following examples:
 - `complete-network-example`
 - `network-server-example`
 
-Examples can be run via the `./waf --run example-name` command.
+Examples can be run via the `./ns3 run example-name` command.
 
 ## Contributing ##
 
