@@ -1,6 +1,7 @@
 # LoRaWAN ns-3 module #
 
 [![CI](https://github.com/signetlabdei/lorawan/actions/workflows/per-commit.yml/badge.svg)](https://github.com/signetlabdei/lorawan/actions)
+[![codecov](https://codecov.io/gh/signetlabdei/lorawan/graph/badge.svg?token=EVBlTb4LgQ)](https://codecov.io/gh/signetlabdei/lorawan)
 
 This is an [ns-3](https://www.nsnam.org "ns-3 Website") module that can be used
 to perform simulations of a [LoRaWAN](http://www.lora-alliance.org/technology
