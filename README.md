@@ -15,14 +15,21 @@ to perform simulations of a [LoRaWAN](http://www.lora-alliance.org/technology
 
 ### Prerequisites ###
 
-To run simulations using this module, you will need to install ns-3. If you are on Ubuntu/Debian/Mint you can install the minimal required packages as follows (note that `ccache` is not strictly necessary; we'll comment on that further below):
+To run simulations using this module, you first need to install ns-3. If you are on Ubuntu/Debian/Mint, you can install the minimal required packages as follows:
 
 ```bash
 sudo apt install g++ python3 cmake ninja-build git ccache
 ```
 Otherwise please directly refer to the [prerequisites section of the ns-3 installation page](https://www.nsnam.org/wiki/Installation#Prerequisites).
 
-Then you need to clone the ns-3 codebase, clone this repository inside the `src` directory therein, and checkout the latest ns-3 version supported by this module. You can use the following all-in-one command:
+> Note: While the `ccache` package is not strictly required, it is highly recommended. It can significantly enhance future compilation times by saving tens of minutes, albeit with a higher disk space cost of approximately 5GB. This disk space usage can be eventually reduced through a setting.
+
+Then, you need to:
+1. Clone the ns-3 codebase,
+2. Clone this repository inside the `src` directory therein, and
+3. Checkout the latest ns-3 version supported by this module.
+
+You can use the following all-in-one command:
 
 ```bash
 git clone https://gitlab.com/nsnam/ns-3-dev.git && cd ns-3-dev &&
@@ -32,31 +39,31 @@ tag=$(< src/lorawan/NS3-VERSION) && tag=${tag#release } && git checkout $tag -b 
 
 ### Compilation ###
 
-Ns-3 adopts a development-oriented philosophy. Thus, before being able to run anything you'll need to compile the ns-3 code. You can either compile ns-3 as a whole (making all simulation modules available), or just focus on the lorawan module to speed up the compilation process which can otherwise take more and 30/40 min depending on your hardware.
+Ns-3 adopts a development-oriented philosophy. Before you can run anything, you'll need to compile the ns-3 code. You have two options:
 
-* To compile ns-3 as a whole, configure and then build it as follows (make sure you are in the `ns-3-dev` folder!):
-```bash
-./ns3 configure --enable-tests --enable-examples &&
-./ns3 build
-```
+1. **Compile ns-3 as a whole:** Make all simulation modules available by configuring and building as follows (ensure you are in the `ns-3-dev` folder!):
+   ```bash
+   ./ns3 configure --enable-tests --enable-examples &&
+   ./ns3 build
+   ```
 
-* Instead, if you are exclusively interested in using the `lorawan` module, you can change the configuration as follows:
-```bash
-./ns3 clean &&
-./ns3 configure --enable-tests --enable-examples --enable-modules lorawan &&
-./ns3 build
-```
-The first line was added to make sure you start from a clean build state. If not already, we highly suggest installing the optional `ccache` package to further improve future compilation times (at an higher diskspace cost of ~5GB, which can be eventually lowered as a setting).
+2. **Focus exclusively on the lorawan module:** To expedite the compilation process, as it can take more than 30/40 minutes on slow hardware, change the configuration as follows:
+   ```bash
+   ./ns3 clean &&
+   ./ns3 configure --enable-tests --enable-examples --enable-modules lorawan &&
+   ./ns3 build
+   ```
+   The first line ensures you start from a clean build state.
 
-Finally, make sure tests run smoothly with:
+Finally, ensure tests run smoothly with:
 ```bash
 ./test.py
 ```
-If the script returns that all tests passed of that just `three-gpp-propagation-loss-model` failed[^1], you are good to go.
+If the script reports that all tests passed or that just `three-gpp-propagation-loss-model` failed[^1], you are good to go.
 
-Otherwise, if other tests fail or crash, consider filing an issue.
+If other tests fail or crash, consider filing an issue.
 
-[^1]: That's unfortunately due to [a bug in the current ns-3 version](https://gitlab.com/nsnam/ns-3-dev/-/issues/965) when restricting compilation to the lorawan module and its dependencies. Consider compiling ns-3 as a whole or with the `--enable-modules "lorawan;applications"` option if you need to use the `three-gpp-propagation-loss-model`.
+[^1]: This is due to [a bug in the current ns-3 version](https://gitlab.com/nsnam/ns-3-dev/-/issues/965) when restricting compilation to the lorawan module and its dependencies. If you need to use the `three-gpp-propagation-loss-model`, you can solve this by compiling ns-3 as a whole or with the `--enable-modules "lorawan;applications"` option to reduce compilation time.
 
 ## Usage examples ##
 
@@ -66,7 +73,7 @@ The module includes the following examples:
 - `complete-network-example`
 - `network-server-example`
 
-Examples can be run via the `./ns3 run example-name` command.
+Examples can be run via the `./ns3 run example-name` command (refer to `./ns3 run --help` for more options).
 
 ## Contributing ##
 
