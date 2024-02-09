@@ -15,6 +15,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * Modified: Alessandro Aimi <alessandro.aimi@unibo.it> (12/02/2024)
  */
 
 #include "network-server-helper.h"
@@ -23,6 +25,7 @@
 #include "ns3/double.h"
 #include "ns3/log.h"
 #include "ns3/network-controller-components.h"
+#include "ns3/point-to-point-channel.h"
 #include "ns3/simulator.h"
 #include "ns3/string.h"
 #include "ns3/trace-source-accessor.h"
@@ -35,10 +38,9 @@ namespace lorawan
 NS_LOG_COMPONENT_DEFINE("NetworkServerHelper");
 
 NetworkServerHelper::NetworkServerHelper()
+    : m_adrEnabled(false)
 {
     m_factory.SetTypeId("ns3::NetworkServer");
-    p2pHelper.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
-    p2pHelper.SetChannelAttribute("Delay", StringValue("2ms"));
     SetAdr("ns3::AdrComponent");
 }
 
@@ -50,12 +52,6 @@ void
 NetworkServerHelper::SetAttribute(std::string name, const AttributeValue& value)
 {
     m_factory.Set(name, value);
-}
-
-void
-NetworkServerHelper::SetGateways(NodeContainer gateways)
-{
-    m_gateways = gateways;
 }
 
 void
@@ -86,28 +82,34 @@ Ptr<Application>
 NetworkServerHelper::InstallPriv(Ptr<Node> node)
 {
     NS_LOG_FUNCTION(this << node);
+    NS_ASSERT_MSG(node->GetNDevices() > 0, "No gateways connected to provided node");
 
     Ptr<NetworkServer> app = m_factory.Create<NetworkServer>();
 
     app->SetNode(node);
     node->AddApplication(app);
 
-    // Cycle on each gateway
-    for (auto i = m_gateways.Begin(); i != m_gateways.End(); i++)
-    {
-        // Add the connections with the gateway
-        // Create a PointToPoint link between gateway and NS
-        NetDeviceContainer container = p2pHelper.Install(node, *i);
-
-        // Add the gateway to the NS list
-        app->AddGateway(*i, container.Get(0));
-    }
-
-    // Link the NetworkServer to its NetDevices
     for (uint32_t i = 0; i < node->GetNDevices(); i++)
     {
+        // Link the NetworkServer app to its NetDevices
         Ptr<NetDevice> currentNetDevice = node->GetDevice(i);
         currentNetDevice->SetReceiveCallback(MakeCallback(&NetworkServer::Receive, app));
+
+        // Register gateways
+        Ptr<Channel> channel = currentNetDevice->GetChannel();
+        NS_ASSERT_MSG(DynamicCast<PointToPointChannel>(channel),
+                      "Connection with gateways is not PointToPoint");
+        for (uint32_t j = 0; j < channel->GetNDevices(); ++j)
+        {
+            Ptr<Node> gwNode = channel->GetDevice(j)->GetNode();
+            // Point to point, so channel only holds 2 devices
+            if (gwNode->GetId() != node->GetId())
+            {
+                // Add the gateway to the NS list
+                app->AddGateway(gwNode, currentNetDevice);
+                break;
+            }
+        }
     }
 
     // Add the end devices

@@ -182,9 +182,17 @@ main(int argc, char* argv[])
     NodeContainer networkServers;
     networkServers.Create(1);
 
+    // PointToPoint links between gateways and server
+    PointToPointHelper p2p;
+    p2p.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
+    p2p.SetChannelAttribute("Delay", StringValue("2ms"));
+    for (auto gw = gateways.Begin(); gw != gateways.End(); ++gw)
+    {
+        p2p.Install(networkServers.Get(0), *gw);
+    }
+
     // Install the NetworkServer application on the network server
     NetworkServerHelper networkServerHelper;
-    networkServerHelper.SetGateways(gateways);
     networkServerHelper.SetEndDevices(endDevices);
     networkServerHelper.Install(networkServers);
 

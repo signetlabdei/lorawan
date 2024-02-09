@@ -15,6 +15,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ *  * Modified: Alessandro Aimi <alessandro.aimi@unibo.it> (12/02/2024)
  */
 
 #ifndef NETWORK_SERVER_HELPER_H
@@ -54,11 +56,6 @@ class NetworkServerHelper
     ApplicationContainer Install(Ptr<Node> node);
 
     /**
-     * Set which gateways will need to be connected to this NS.
-     */
-    void SetGateways(NodeContainer gateways);
-
-    /**
      * Set which end devices will be managed by this NS.
      */
     void SetEndDevices(NodeContainer endDevices);
@@ -81,11 +78,7 @@ class NetworkServerHelper
 
     ObjectFactory m_factory;
 
-    NodeContainer m_gateways; //!< Set of gateways to connect to this NS
-
     NodeContainer m_endDevices; //!< Set of endDevices to connect to this NS
-
-    PointToPointHelper p2pHelper; //!< Helper to create PointToPoint links
 
     bool m_adrEnabled;
 
