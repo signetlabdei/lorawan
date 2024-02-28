@@ -38,7 +38,7 @@ jobs:
           ./ns3 clean
       - name: "Upload doxygen warnings as artifact"
         if: always()
-        uses: actions/upload-artifact@v3.0.0
+        uses: actions/upload-artifact@v4
         with:
           name: doxygen.warnings.log
           path: doc/doxygen.warnings.log
