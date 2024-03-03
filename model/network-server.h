@@ -51,6 +51,10 @@ namespace lorawan
 class NetworkServer : public Application
 {
   public:
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     NetworkServer();

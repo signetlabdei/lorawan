@@ -73,7 +73,10 @@ std::ostream& operator<<(std::ostream& os, const LoraTxParameters& params);
 class LoraPhy : public Object
 {
   public:
-    // TypeId
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     /**

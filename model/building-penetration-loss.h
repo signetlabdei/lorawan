@@ -36,6 +36,10 @@ namespace lorawan
 class BuildingPenetrationLoss : public PropagationLossModel
 {
   public:
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     BuildingPenetrationLoss();

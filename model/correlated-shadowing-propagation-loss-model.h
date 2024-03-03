@@ -107,6 +107,10 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
         static const double m_kInv[4][4];
     };
 
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     /**

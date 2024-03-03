@@ -77,7 +77,10 @@ std::ostream& operator<<(std::ostream& os, const LoraChannelParameters& params);
 class LoraChannel : public Channel
 {
   public:
-    // TypeId
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     // Constructor and destructor

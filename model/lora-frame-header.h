@@ -49,6 +49,11 @@ class LoraFrameHeader : public Header
     ~LoraFrameHeader() override;
 
     // Methods inherited from Header
+
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
     TypeId GetInstanceTypeId() const override;
 

@@ -37,6 +37,10 @@ class HexGridPositionAllocator : public PositionAllocator
 
     int64_t AssignStreams(int64_t stream) override;
 
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     double GetRadius() const;

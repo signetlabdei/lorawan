@@ -43,6 +43,10 @@ class SubBand;
 class LogicalLoraChannel : public Object
 {
   public:
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     LogicalLoraChannel();

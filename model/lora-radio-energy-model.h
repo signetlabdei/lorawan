@@ -147,6 +147,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
      * \return the object TypeId
      */
     static TypeId GetTypeId();
+
     LoraRadioEnergyModel();
     ~LoraRadioEnergyModel() override;
 

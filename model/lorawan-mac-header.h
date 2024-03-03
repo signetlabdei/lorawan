@@ -50,6 +50,10 @@ class LorawanMacHeader : public Header
         PROPRIETARY = 7
     };
 
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     LorawanMacHeader();

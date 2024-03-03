@@ -37,6 +37,10 @@ namespace lorawan
 class LoraTxCurrentModel : public Object
 {
   public:
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     LoraTxCurrentModel();
@@ -58,6 +62,10 @@ class LoraTxCurrentModel : public Object
 class LinearLoraTxCurrentModel : public LoraTxCurrentModel
 {
   public:
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     LinearLoraTxCurrentModel();

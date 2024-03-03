@@ -37,6 +37,10 @@ class PeriodicSender : public Application
     PeriodicSender();
     ~PeriodicSender() override;
 
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     /**

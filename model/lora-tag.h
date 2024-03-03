@@ -34,6 +34,10 @@ namespace lorawan
 class LoraTag : public Tag
 {
   public:
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
     TypeId GetInstanceTypeId() const override;
 

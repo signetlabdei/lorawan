@@ -47,6 +47,10 @@ class NetworkStatus;
 class NetworkControllerComponent : public Object
 {
   public:
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     // Constructor and destructor
@@ -84,6 +88,10 @@ class NetworkControllerComponent : public Object
 class ConfirmedMessagesComponent : public NetworkControllerComponent
 {
   public:
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     // Constructor and destructor
@@ -113,6 +121,10 @@ class ConfirmedMessagesComponent : public NetworkControllerComponent
 class LinkCheckComponent : public NetworkControllerComponent
 {
   public:
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     // Constructor and destructor

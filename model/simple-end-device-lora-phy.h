@@ -43,6 +43,10 @@ class LoraChannel;
 class SimpleEndDeviceLoraPhy : public EndDeviceLoraPhy
 {
   public:
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     // Constructor and destructor

@@ -51,6 +51,10 @@ class LoraChannel;
 class GatewayLoraPhy : public LoraPhy
 {
   public:
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     GatewayLoraPhy();

@@ -142,6 +142,10 @@ class EndDeviceLoraPhy : public LoraPhy
         RX
     };
 
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     // Constructor and destructor

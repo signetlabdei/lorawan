@@ -181,6 +181,10 @@ class EndDeviceStatus : public Object
     /* Proper EndDeviceStatus class definition */
     /*******************************************/
 
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     EndDeviceStatus();

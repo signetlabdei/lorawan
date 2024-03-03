@@ -46,6 +46,10 @@ namespace lorawan
 class NetworkStatus : public Object
 {
   public:
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     NetworkStatus();

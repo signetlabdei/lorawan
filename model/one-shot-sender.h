@@ -38,6 +38,10 @@ class OneShotSender : public Application
     OneShotSender(Time sendTime);
     ~OneShotSender() override;
 
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     /**

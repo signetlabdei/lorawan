@@ -42,6 +42,10 @@ namespace lorawan
 class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
 {
   public:
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
     static TypeId GetTypeId();
 
     ClassAEndDeviceLorawanMac();
