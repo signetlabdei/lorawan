@@ -31,6 +31,11 @@ namespace ns3
 namespace lorawan
 {
 
+/**
+ * \ingroup lorawan
+ *
+ * Implements a sender application generating packets following a periodic point process.
+ */
 class PeriodicSender : public Application
 {
   public:
@@ -44,77 +49,69 @@ class PeriodicSender : public Application
     static TypeId GetTypeId();
 
     /**
-     * Set the sending interval
+     * \brief Set the sending interval
+     *
      * \param interval the interval between two packet send instances
      */
     void SetInterval(Time interval);
 
     /**
-     * Get the sending interval
+     * \brief Get the sending interval
+     *
      * \returns the interval between two packet sends
      */
     Time GetInterval() const;
 
     /**
-     * Set the initial delay of this application
+     * \brief Set the initial delay of this application
+     *
+     * \param delay The initial delay value
      */
     void SetInitialDelay(Time delay);
 
     /**
-     * Set packet size
+     * \brief Set packet size
+     *
+     * \param size The base packet size value in bytes
      */
     void SetPacketSize(uint8_t size);
 
     /**
-     * Set if using randomness in the packet size
+     * \brief Set to add randomness to the base packet size.
+     *
+     * On each call to SendPacket(), an integer number is picked from a random variable. That
+     * integer number is then added to the base packet size to create the new packet.
+     *
+     * \param rv The random variable used to extract the additional number of packet bytes.
+     * Extracted values can be negative, but if they are lower than the base packet size they
+     * produce a runtime error. This check is left to the caller during definition of the random
+     * variable.
      */
     void SetPacketSizeRandomVariable(Ptr<RandomVariableStream> rv);
 
     /**
-     * Send a packet using the LoraNetDevice's Send method
+     * \brief Send a packet using the LoraNetDevice's Send method
      */
     void SendPacket();
 
     /**
-     * Start the application by scheduling the first SendPacket event
+     * \brief Start the application by scheduling the first SendPacket event
      */
     void StartApplication() override;
 
     /**
-     * Stop the application
+     * \brief Stop the application
      */
     void StopApplication() override;
 
   private:
-    /**
-     * The interval between to consecutive send events
-     */
-    Time m_interval;
-
-    /**
-     * The initial delay of this application
-     */
-    Time m_initialDelay;
-
-    /**
-     * The sending event scheduled as next
-     */
-    EventId m_sendEvent;
-
-    /**
-     * The MAC layer of this node
-     */
-    Ptr<LorawanMac> m_mac;
-
-    /**
-     * The packet size.
-     */
-    uint8_t m_basePktSize;
-
-    /**
-     * The random variable that adds bytes to the packet size
-     */
-    Ptr<RandomVariableStream> m_pktSizeRV;
+    Time m_interval;       //!< The interval between to consecutive send events.
+    Time m_initialDelay;   //!< The initial delay of this application.
+    EventId m_sendEvent;   //!< The sending event scheduled as next.
+    Ptr<LorawanMac> m_mac; //!< The MAC layer of this node.
+    uint8_t m_basePktSize; //!< The packet size.
+    Ptr<RandomVariableStream>
+        m_pktSizeRV; //!< The random variable that adds bytes to the packet size.
 };
 
 } // namespace lorawan
