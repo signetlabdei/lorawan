@@ -36,6 +36,15 @@ class LoraPhy;
 class LorawanMac;
 
 /**
+ * \defgroup lorawan LoRaWAN Models
+ *
+ * This section documents the API of the ns-3 lorawan module. For a generic functional description,
+ * please refer to the ns-3 manual.
+ */
+
+/**
+ * \ingroup lorawan
+ *
  * Hold together all LoRa related objects.
  *
  * This class holds together pointers to LoraChannel, LoraPhy and LorawanMac,

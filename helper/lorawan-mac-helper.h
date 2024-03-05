@@ -35,6 +35,11 @@ namespace ns3
 namespace lorawan
 {
 
+/**
+ * \ingroup lorawan
+ *
+ * Helper class for configuring and installing the LorawanMac class on devices and gateways
+ */
 class LorawanMacHelper
 {
   public:

@@ -30,6 +30,8 @@ namespace lorawan
 {
 
 /**
+ * \ingroup lorawan
+ *
  * This class generates sequential LoraDeviceAddress instances.
  */
 class LoraDeviceAddressGenerator : public Object

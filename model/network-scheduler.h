@@ -38,6 +38,11 @@ namespace lorawan
 class NetworkStatus;     // Forward declaration
 class NetworkController; // Forward declaration
 
+/**
+ * \ingroup lorawan
+ *
+ * Network server component in charge of scheduling downling packets onto devices' reception windows
+ */
 class NetworkScheduler : public Object
 {
   public:

@@ -30,9 +30,19 @@ class MobilityModel;
 namespace lorawan
 {
 
+/**
+ * \ingroup lorawan
+ *
+ * Propagation loss model for correlated shadowing in a city
+ */
 class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
 {
   public:
+    /**
+     * \ingroup lorawan
+     *
+     * Stores x,y values and overrides critical operators
+     */
     class Position
     {
       public:
@@ -45,30 +55,31 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
         bool operator<(const Position& other) const;
     };
 
+    /**
+     * \ingroup lorawan
+     *
+     * This initializes the shadowing map with a grid of independent
+     * shadowing values, one m_correlationDistance meters apart from the next
+     * one. The result is something like:
+     *  o---o---o---o---o
+     *  |   |   |   |   |
+     *  o---o---o---o---o
+     *  |   |   |   |   |
+     *  o---o---o---o---o
+     *  |   |   |   |   |
+     *  o---o---o---o---o
+     * where at each o we have an independently generated shadowing value.
+     * We can then interpolate the 4 values surrounding any point in space
+     * in order to get a correlated shadowing value. After generating this
+     * value, we will add it to the map so that we don't have to compute it
+     * twice. Also, since interpolation is a deterministic operation, we are
+     * guaranteed that, as long as the grid doesn't change, also two values
+     * generated in the same square will be correlated.
+     */
     class ShadowingMap
         : public SimpleRefCount<CorrelatedShadowingPropagationLossModel::ShadowingMap>
     {
       public:
-        /**
-         * Constructor.
-         * This initializes the shadowing map with a grid of independent
-         * shadowing values, one m_correlationDistance meters apart from the next
-         * one. The result is something like:
-         *  o---o---o---o---o
-         *  |   |   |   |   |
-         *  o---o---o---o---o
-         *  |   |   |   |   |
-         *  o---o---o---o---o
-         *  |   |   |   |   |
-         *  o---o---o---o---o
-         *  where at each o we have an independently generated shadowing value.
-         *  We can then interpolate the 4 values surrounding any point in space
-         *  in order to get a correlated shadowing value. After generating this
-         *  value, we will add it to the map so that we don't have to compute it
-         *  twice. Also, since interpolation is a deterministic operation, we are
-         *  guaranteed that, as long as the grid doesn't change, also two values
-         *  generated in the same square will be correlated.
-         */
         ShadowingMap();
 
         ~ShadowingMap();

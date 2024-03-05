@@ -42,6 +42,8 @@ namespace lorawan
 {
 
 /**
+ * \ingroup lorawan
+ *
  * The NetworkServer is an application standing on top of a node equipped with
  * links that connect it with the gateways.
  *

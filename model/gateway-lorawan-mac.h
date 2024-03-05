@@ -28,6 +28,11 @@ namespace ns3
 namespace lorawan
 {
 
+/**
+ * \ingroup lorawan
+ *
+ * Class representing the MAC layer of a LoRaWAN gateway.
+ */
 class GatewayLorawanMac : public LorawanMac
 {
   public:

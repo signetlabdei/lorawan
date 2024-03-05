@@ -33,6 +33,8 @@ namespace lorawan
 class LogicalLoraChannel;
 
 /**
+ * \ingroup lorawan
+ *
  * Class representing a SubBand, i.e., a frequency band subject to some
  * regulations on duty cycle and transmission power.
  */

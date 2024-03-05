@@ -33,7 +33,9 @@ namespace lorawan
 {
 
 /**
- * \ingroup energy
+ * \ingroup lorawan
+ *
+ * Installable listener for LoRa physiscal layer state changes
  */
 class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
 {
@@ -110,8 +112,8 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
 };
 
 /**
- * \ingroup energy
- * \brief A WiFi radio energy model.
+ * \ingroup lorawan
+ * \brief A LoRa radio energy model.
  *
  * 4 states are defined for the radio: TX, RX, STANDBY, SLEEP. Default state is
  * STANDBY.
@@ -127,7 +129,6 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
  * Energy calculation: For each transaction, this model notifies EnergySource
  * object. The EnergySource object will query this model for the total current.
  * Then the EnergySource object uses the total current to calculate energy.
- *
  */
 class LoraRadioEnergyModel : public DeviceEnergyModel
 {

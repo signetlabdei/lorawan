@@ -35,6 +35,8 @@ class NetworkStatus;
 class NetworkControllerComponent;
 
 /**
+ * \ingroup lorawan
+ *
  * This class collects a series of components that deal with various aspects
  * of managing the network, and queries them for action when a new packet is
  * received or other events occur in the network.

@@ -33,6 +33,8 @@ namespace lorawan
 {
 
 /**
+ * \ingroup lorawan
+ *
  * This application forwards packets between NetDevices:
  * LoraNetDevice -> PointToPointNetDevice and vice versa.
  */

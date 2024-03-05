@@ -49,6 +49,8 @@ class LoraPhy;
 struct LoraTxParameters;
 
 /**
+ * \ingroup lorawan
+ *
  * A struct that holds meaningful parameters for transmission on a
  * LoraChannel.
  */
@@ -66,6 +68,8 @@ struct LoraChannelParameters
 std::ostream& operator<<(std::ostream& os, const LoraChannelParameters& params);
 
 /**
+ * \ingroup lorawan
+ *
  * The class that delivers packets among PHY layers.
  *
  * This class is tasked with taking packets that PHY layers want to send and,

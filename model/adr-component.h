@@ -32,10 +32,11 @@ namespace ns3
 namespace lorawan
 {
 
-////////////////////////////////////////
-// LinkAdrRequest commands management //
-////////////////////////////////////////
-
+/**
+ * \ingroup lorawan
+ *
+ * LinkAdrRequest commands management
+ */
 class AdrComponent : public NetworkControllerComponent
 {
     enum CombiningMethod

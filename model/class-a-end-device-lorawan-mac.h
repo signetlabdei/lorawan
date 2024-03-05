@@ -37,6 +37,8 @@ namespace lorawan
 {
 
 /**
+ * \ingroup lorawan
+ *
  * Class representing the MAC layer of a Class A LoRaWAN device.
  */
 class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac

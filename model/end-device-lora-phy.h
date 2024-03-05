@@ -84,6 +84,8 @@ class EndDeviceLoraPhyListener
 };
 
 /**
+ * \ingroup lorawan
+ *
  * Class representing a LoRa transceiver.
  *
  * This class inherits some functionality by LoraPhy, like the GetOnAirTime

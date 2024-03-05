@@ -25,6 +25,37 @@
 namespace ns3
 {
 
+/**
+ * \ingroup lorawan
+ * \brief Position allocator for hexagonal tiling
+ *
+ * Starting starting with a first hexagon in the axes' center, following tiles are added as outward
+ * rings. The first position returned for a new ring is always the top one, followed by the others
+ * in ant-clockwise rotation.
+ *
+ * Useful formula:
+ *   nGateways = 3 * gatewayRings * gatewayRings - 3 * gatewayRings + 1
+ *
+ * Representation with 10 gateways, indexed 0-9:
+ *                     _____
+ *                    /     \
+ *              _____/   8   \
+ *             /     \   ˙   /
+ *            /   9   \_____/
+ *            \   ˙   /     \
+ *       next  \_____/   1   \_____
+ *         ˙   /     \   ˙   /     \
+ *            /   2   \_____/   7   \
+ *            \   ˙   /     \   ˙   /
+ *             \_____/   0   \_____/
+ *             /     \   ˙   /     \
+ *            /   3   \_____/   5   \
+ *            \   ˙   /     \   ˙   /
+ *             \_____/   4   \_____/
+ *                   \   ˙   /
+ *                    \_____/
+ *
+ */
 class HexGridPositionAllocator : public PositionAllocator
 {
   public:

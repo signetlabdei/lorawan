@@ -37,6 +37,8 @@ namespace lorawan
 class LoraChannel;
 
 /**
+ * \ingroup lorawan
+ *
  * Class representing a simple LoRa transceiver, with an error model based
  * on receiver sensitivity and a SIR table.
  */

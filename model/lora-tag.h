@@ -28,6 +28,8 @@ namespace lorawan
 {
 
 /**
+ * \ingroup lorawan
+ *
  * Tag used to save various data about a packet, like its Spreading Factor and
  * data about interference.
  */

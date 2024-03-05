@@ -41,10 +41,11 @@ using namespace lorawan;
 
 NS_LOG_COMPONENT_DEFINE("NetworkServerTestSuite");
 
-///////////////////////////
-// NetworkServer testing //
-///////////////////////////
-
+/**
+ * \ingroup lorawan
+ *
+ * It verifies that the NetworkServer can receive packets sent in uplink by devices
+ */
 class UplinkPacketTest : public TestCase
 {
   public:
@@ -115,10 +116,11 @@ UplinkPacketTest::DoRun()
     NS_ASSERT(m_receivedPacket == true);
 }
 
-////////////////////////
-// DownlinkPacketTest //
-////////////////////////
-
+/**
+ * \ingroup lorawan
+ *
+ * It verifies that devices requesting an acknowledgment receive a reply from the Network Server
+ */
 class DownlinkPacketTest : public TestCase
 {
   public:
@@ -207,10 +209,11 @@ DownlinkPacketTest::DoRun()
     NS_ASSERT(m_receivedPacketAtEd);
 }
 
-//////////////////////////
-// LinkCheckSupportTest //
-//////////////////////////
-
+/**
+ * \ingroup lorawan
+ *
+ * It verifies that the NetworkServer correctly responds to LinkCheck requests
+ */
 class LinkCheckTest : public TestCase
 {
   public:
@@ -300,14 +303,12 @@ LinkCheckTest::DoRun()
     NS_ASSERT(m_receivedPacketAtEd);
 }
 
-/**************
- * Test Suite *
- **************/
-
-// The TestSuite class names the TestSuite, identifies what type of TestSuite,
-// and enables the TestCases to be run. Typically, only the constructor for
-// this class must be defined
-
+/**
+ * \ingroup lorawan
+ *
+ * The TestSuite class names the TestSuite, identifies what type of TestSuite, and enables the
+ * TestCases to be run. Typically, only the constructor for this class must be defined
+ */
 class NetworkServerTestSuite : public TestSuite
 {
   public:

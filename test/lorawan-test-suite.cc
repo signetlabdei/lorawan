@@ -34,10 +34,12 @@ using namespace lorawan;
 
 NS_LOG_COMPONENT_DEFINE("LorawanTestSuite");
 
-/********************
- * InterferenceTest *
- ********************/
-
+/**
+ * \ingroup lorawan
+ *
+ * It tests interference computations in a number of possible scenarios using the
+ * LoraInterferenceHelper class
+ */
 class InterferenceTest : public TestCase
 {
   public:
@@ -196,10 +198,12 @@ InterferenceTest::DoRun()
     interferenceHelper.ClearAllEvents();
 }
 
-/***************
- * AddressTest *
- ***************/
-
+/**
+ * \ingroup lorawan
+ *
+ * It tests LoraDeviceAddress comparison operators overrides and generation of new addresses with
+ * LoraDeviceAddressGenerator
+ */
 class AddressTest : public TestCase
 {
   public:
@@ -278,10 +282,12 @@ AddressTest::DoRun()
                           "LoraDeviceAddressGenerator doesn't increment as expected");
 }
 
-/***************
- * HeaderTest *
- ***************/
-
+/**
+ * \ingroup lorawan
+ *
+ * It tests serialization/deserialization of LoRaWAN headers (the LorawanMacHeader and
+ * LoraFrameHeader classes) on packets
+ */
 class HeaderTest : public TestCase
 {
   public:
@@ -429,10 +435,13 @@ HeaderTest::DoRun()
                           "Removed header's MAC command contents don't match");
 }
 
-/*******************
- * ReceivePathTest *
- *******************/
-
+/**
+ * \ingroup lorawan
+ *
+ * It tests a number of cases related to SimpleGatewayLoraPhy's parallel reception paths
+ *
+ * \remark TODO: to be fixed, currently does nothing
+ */
 class ReceivePathTest : public TestCase
 {
   public:
@@ -832,10 +841,11 @@ ReceivePathTest::DoRun()
     // NS_TEST_EXPECT_MSG_EQ (m_maxOccupiedReceptionPaths, 1, "Unexpected value");
 }
 
-/**************************
- * LogicalLoraChannelTest *
- **************************/
-
+/**
+ * \ingroup lorawan
+ *
+ * It tests functionality of the LogicalLoraChannel, SubBand and LogicalLoraChannelHelper classes
+ */
 class LogicalLoraChannelTest : public TestCase
 {
   public:
@@ -955,10 +965,12 @@ LogicalLoraChannelTest::DoRun()
                           "Waiting time affects other subbands");
 }
 
-/*****************
- * TimeOnAirTest *
- *****************/
-
+/**
+ * \ingroup lorawan
+ *
+ * It tests the correctness of the LoraPhy::GetOnAirTime calculator against a number of pre-sourced
+ * time values of known scenarios
+ */
 class TimeOnAirTest : public TestCase
 {
   public:
@@ -1066,10 +1078,12 @@ TimeOnAirTest::DoRun()
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 2.301952, 0.0001, "Unexpected duration");
 }
 
-/**************************
- * PhyConnectivityTest *
- **************************/
-
+/**
+ * \ingroup lorawan
+ *
+ * It tests sending packets over a LoRa physical channel between multiple devices and the resulting
+ * possible outcomes
+ */
 class PhyConnectivityTest : public TestCase
 {
   public:
@@ -1515,10 +1529,13 @@ PhyConnectivityTest::DoRun()
                           "State didn't switch to STANDBY as expected");
 }
 
-/*****************
- * LorawanMacTest *
- *****************/
-
+/**
+ * \ingroup lorawan
+ *
+ * It tests the functionalities of the MAC layer of LoRaWAN devices
+ *
+ * \remark TODO: not implemented yet
+ */
 class LorawanMacTest : public TestCase
 {
   public:
@@ -1548,14 +1565,12 @@ LorawanMacTest::DoRun()
     NS_LOG_DEBUG("LorawanMacTest");
 }
 
-/**************
- * Test Suite *
- **************/
-
-// The TestSuite class names the TestSuite, identifies what type of TestSuite,
-// and enables the TestCases to be run. Typically, only the constructor for
-// this class must be defined
-
+/**
+ * \ingroup lorawan
+ *
+ * The TestSuite class names the TestSuite, identifies what type of TestSuite, and enables the
+ * TestCases to be run. Typically, only the constructor for this class must be defined
+ */
 class LorawanTestSuite : public TestSuite
 {
   public:

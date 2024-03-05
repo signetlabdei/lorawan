@@ -32,6 +32,8 @@ namespace lorawan
 class SubBand;
 
 /**
+ * \ingroup lorawan
+ *
  * This class represents a logical LoRaWAN channel.
  *
  * A logical channel is characterized by a central frequency and a range of data

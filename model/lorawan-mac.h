@@ -36,6 +36,8 @@ namespace lorawan
 class LoraPhy;
 
 /**
+ * \ingroup lorawan
+ *
  * Class representing the LoRaWAN MAC layer.
  *
  * This class is meant to be extended differently based on whether the layer

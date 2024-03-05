@@ -39,6 +39,8 @@ namespace lorawan
 class LoraChannel;
 
 /**
+ * \ingroup lorawan
+ *
  * Class modeling a Lora SX1301 chip.
  */
 class SimpleGatewayLoraPhy : public GatewayLoraPhy

@@ -29,7 +29,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup energy
+ * \ingroup lorawan
  *
  * \brief Model the transmit current as a function of the transmit power and
  * mode.
@@ -56,6 +56,8 @@ class LoraTxCurrentModel : public Object
 };
 
 /**
+ * \ingroup lorawan
+ *
  * A linear model of the transmission current for a LoRa device, based on the
  * WiFi model.
  */
@@ -115,6 +117,12 @@ class LinearLoraTxCurrentModel : public LoraTxCurrentModel
     double m_idleCurrent; //!< Standby current
 };
 
+/**
+ * \ingroup lorawan
+ *
+ * A constant model of the transmission current for a LoRa device, always yielding the same
+ * current independently from the transmission power provided.
+ */
 class ConstantLoraTxCurrentModel : public LoraTxCurrentModel
 {
   public:

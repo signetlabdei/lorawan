@@ -41,6 +41,11 @@ enum PhyPacketOutcome
     UNSET
 };
 
+/**
+ * \ingroup lorawan
+ *
+ * Stores PHY layer metrics of a packet sending process
+ */
 struct PacketStatus
 {
     Ptr<const Packet> packet;
@@ -49,6 +54,11 @@ struct PacketStatus
     std::map<int, enum PhyPacketOutcome> outcomes;
 };
 
+/**
+ * \ingroup lorawan
+ *
+ * Stores MAC layer metrics of a packet sending process
+ */
 struct MacPacketStatus
 {
     Ptr<const Packet> packet;
@@ -58,6 +68,11 @@ struct MacPacketStatus
     std::map<int, Time> receptionTimes;
 };
 
+/**
+ * \ingroup lorawan
+ *
+ * Stores metrics of the packet retransmission process
+ */
 struct RetransmissionStatus
 {
     Time firstAttempt;
@@ -70,6 +85,11 @@ typedef std::map<Ptr<const Packet>, MacPacketStatus> MacPacketData;
 typedef std::map<Ptr<const Packet>, PacketStatus> PhyPacketData;
 typedef std::map<Ptr<const Packet>, RetransmissionStatus> RetransmissionData;
 
+/**
+ * \ingroup lorawan
+ *
+ * Tracks and stores packets sent in the simulation and provides aggregation functionality
+ */
 class LoraPacketTracker
 {
   public:

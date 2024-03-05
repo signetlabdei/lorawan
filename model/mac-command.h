@@ -56,6 +56,8 @@ enum MacCommandType
 };
 
 /**
+ * \ingroup lorawan
+ *
  * This base class is used to represent a general MAC command.
  *
  * Pure virtual methods that handle serialization, deserialization and other
@@ -131,6 +133,8 @@ class MacCommand : public Object
 };
 
 /**
+ * \ingroup lorawan
+ *
  * Implementation of the LinkCheckReq LoRaWAN MAC command.
  *
  * This command holds no variables, and just consists in the CID.
@@ -146,6 +150,8 @@ class LinkCheckReq : public MacCommand
 };
 
 /**
+ * \ingroup lorawan
+ *
  * Implementation of the LinkCheckAns LoRaWAN MAC command.
  *
  * This command contains the demodulation margin and the number of receiving
@@ -207,6 +213,8 @@ class LinkCheckAns : public MacCommand
 };
 
 /**
+ * \ingroup lorawan
+ *
  * Implementation of the LinkAdrReq LoRaWAN MAC command.
  *
  * With this command, the network server can request a device to change its
@@ -270,6 +278,8 @@ class LinkAdrReq : public MacCommand
 };
 
 /**
+ * \ingroup lorawan
+ *
  * Implementation of the LinkAdrAns LoRaWAN MAC command.
  *
  * With this command, the end device acknowledges a LinkAdrReq.
@@ -292,6 +302,8 @@ class LinkAdrAns : public MacCommand
 };
 
 /**
+ * \ingroup lorawan
+ *
  * Implementation of the DutyCycleReq LoRaWAN MAC command.
  *
  * With this command, the network server can limit the maximum aggregated
@@ -325,6 +337,8 @@ class DutyCycleReq : public MacCommand
 };
 
 /**
+ * \ingroup lorawan
+ *
  * Implementation of the DutyCycleAns LoRaWAN MAC command.
  *
  * This command holds no variables, and just consists in the CID.
@@ -340,6 +354,8 @@ class DutyCycleAns : public MacCommand
 };
 
 /**
+ * \ingroup lorawan
+ *
  * Implementation of the RxParamSetupReq LoRaWAN MAC command.
  */
 class RxParamSetupReq : public MacCommand
@@ -388,6 +404,8 @@ class RxParamSetupReq : public MacCommand
 };
 
 /**
+ * \ingroup lorawan
+ *
  * Implementation of the RxParamSetupAns LoRaWAN MAC command.
  */
 class RxParamSetupAns : public MacCommand
@@ -414,6 +432,8 @@ class RxParamSetupAns : public MacCommand
 };
 
 /**
+ * \ingroup lorawan
+ *
  * Implementation of the DevStatusReq LoRaWAN MAC command.
  */
 class DevStatusReq : public MacCommand
@@ -427,6 +447,8 @@ class DevStatusReq : public MacCommand
 };
 
 /**
+ * \ingroup lorawan
+ *
  * Implementation of the DevStatusAns LoRaWAN MAC command.
  */
 class DevStatusAns : public MacCommand
@@ -465,6 +487,8 @@ class DevStatusAns : public MacCommand
 };
 
 /**
+ * \ingroup lorawan
+ *
  * Implementation of the NewChannelReq LoRaWAN MAC command.
  */
 class NewChannelReq : public MacCommand
@@ -499,6 +523,8 @@ class NewChannelReq : public MacCommand
 };
 
 /**
+ * \ingroup lorawan
+ *
  * Implementation of the NewChannelAns LoRaWAN MAC command.
  */
 class NewChannelAns : public MacCommand
@@ -526,6 +552,8 @@ class NewChannelAns : public MacCommand
 };
 
 /**
+ * \ingroup lorawan
+ *
  * Implementation of the RxTimingSetupReq LoRaWAN MAC command.
  */
 class RxTimingSetupReq : public MacCommand
@@ -556,6 +584,8 @@ class RxTimingSetupReq : public MacCommand
 };
 
 /**
+ * \ingroup lorawan
+ *
  * Implementation of the RxTimingSetupAns LoRaWAN MAC command.
  *
  * This MAC command has an empty payload.
@@ -573,6 +603,8 @@ class RxTimingSetupAns : public MacCommand
 };
 
 /**
+ * \ingroup lorawan
+ *
  * Implementation of the TxParamSetupAns LoRaWAN MAC command.
  */
 class TxParamSetupAns : public MacCommand
@@ -588,6 +620,8 @@ class TxParamSetupAns : public MacCommand
 };
 
 /**
+ * \ingroup lorawan
+ *
  * Implementation of the TxParamSetupReq LoRaWAN MAC command.
  */
 class TxParamSetupReq : public MacCommand
@@ -603,6 +637,8 @@ class TxParamSetupReq : public MacCommand
 };
 
 /**
+ * \ingroup lorawan
+ *
  * Implementation of the DlChannelAns LoRaWAN MAC command.
  */
 class DlChannelAns : public MacCommand

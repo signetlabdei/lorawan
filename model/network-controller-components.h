@@ -38,6 +38,8 @@ class NetworkStatus;
 ////////////////
 
 /**
+ * \ingroup lorawan
+ *
  * Generic class describing a component of the NetworkController.
  *
  * This is the class that is meant to be extended by all NetworkController
@@ -81,10 +83,11 @@ class NetworkControllerComponent : public Object
     virtual void OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus) = 0;
 };
 
-///////////////////////////////
-// Acknowledgment management //
-///////////////////////////////
-
+/**
+ * \ingroup lorawan
+ *
+ * Network controller component for acknowledgments management.
+ */
 class ConfirmedMessagesComponent : public NetworkControllerComponent
 {
   public:
@@ -114,10 +117,11 @@ class ConfirmedMessagesComponent : public NetworkControllerComponent
     void OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus) override;
 };
 
-///////////////////////////////////
-// LinkCheck commands management //
-///////////////////////////////////
-
+/**
+ * \ingroup lorawan
+ *
+ * Network controller component for LinkCheck commands management
+ */
 class LinkCheckComponent : public NetworkControllerComponent
 {
   public:

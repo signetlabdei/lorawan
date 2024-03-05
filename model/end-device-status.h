@@ -38,6 +38,8 @@ namespace lorawan
 {
 
 /**
+ * \ingroup lorawan
+ *
  * This class represents the Network Server's knowledge about an End Device in
  * the LoRaWAN network it is administering.
  *
@@ -50,9 +52,6 @@ namespace lorawan
  * called to update the information regarding the last received packet and its
  * parameters.
  *
- */
-
-/*
  * Diagram of the end-device-status data structure. One instance of this class
  * for each ED, that will be identified by its address.
  *
@@ -80,7 +79,6 @@ namespace lorawan
  *  (Gateway list) - Time at which the packet was received
  *                 - Reception power
  */
-
 class EndDeviceStatus : public Object
 {
   public:

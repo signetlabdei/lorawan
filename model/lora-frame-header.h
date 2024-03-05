@@ -31,6 +31,8 @@ namespace lorawan
 {
 
 /**
+ * \ingroup lorawan
+ *
  * This class represents the Frame header (FHDR) used in a LoraWAN network.
  *
  * Although the specification divides the FHDR from the FPort field, this

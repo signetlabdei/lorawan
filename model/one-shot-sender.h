@@ -31,6 +31,11 @@ namespace ns3
 namespace lorawan
 {
 
+/**
+ * \ingroup lorawan
+ *
+ * Packet sender application to send a single packet
+ */
 class OneShotSender : public Application
 {
   public:

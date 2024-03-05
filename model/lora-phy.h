@@ -40,6 +40,8 @@ namespace lorawan
 class LoraChannel;
 
 /**
+ * \ingroup lorawan
+ *
  * Structure to collect all parameters that are used to compute the duration of
  * a packet (excluding payload length).
  */

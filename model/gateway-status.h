@@ -31,6 +31,18 @@ namespace ns3
 namespace lorawan
 {
 
+/**
+ * \ingroup lorawan
+ *
+ * This class represents the Network Server's knowledge about a Gateway in
+ * the LoRaWAN network it is administering.
+ *
+ * The Network Server's NetworkStatus component contains a list of instances of
+ * this class, one for gateway in the network. Each instance contains all
+ * the parameters and information of the gateway. This class is used by the Network Server for
+ * downlink scheduling and sending purposes. That is, to check the Gateway's availability for radio
+ * transmission, and then to retrieve the correct Net Device to send the packet through.
+ */
 class GatewayStatus : public Object
 {
   public:

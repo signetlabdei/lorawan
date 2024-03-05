@@ -28,6 +28,8 @@ namespace lorawan
 {
 
 /**
+ * \ingroup lorawan
+ *
  * This class represents the Mac header of a LoRaWAN packet.
  */
 class LorawanMacHeader : public Header
