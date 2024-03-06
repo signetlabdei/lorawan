@@ -126,6 +126,12 @@ class LorawanMacHeader : public Header
      */
     bool IsUplink() const;
 
+    /**
+     * Check whether this header is for a confirmed message, i.e. a message asking from
+     * reception acknowledgment from the received
+     *
+     * \return True is the message MType is of the confirmed variant, false otherwise
+     */
     bool IsConfirmed() const;
 
   private:
