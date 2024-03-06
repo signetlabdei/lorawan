@@ -56,6 +56,11 @@ class LorawanMac : public Object
     LorawanMac();
     ~LorawanMac() override;
 
+    /**
+     * Matrix structure to store possible data rate value to be used by a LoRaWAN End Device for
+     * listening during the RX1 receive window. It is a function of the uplink data rate and the
+     * RX1DROffset [0:5]
+     */
     typedef std::array<std::array<uint8_t, 6>, 8> ReplyDataRateMatrix;
 
     /**
