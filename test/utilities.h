@@ -16,6 +16,7 @@
  *
  * Authors: Davide Magrin <magrinda@dei.unipd.it>
  */
+
 #ifndef TEST_UTILITIES_H
 #define TEST_UTILITIES_H
 
