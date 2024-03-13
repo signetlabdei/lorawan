@@ -440,7 +440,7 @@ HeaderTest::DoRun()
  *
  * It tests a number of cases related to SimpleGatewayLoraPhy's parallel reception paths
  *
- * \remark TODO: to be fixed, currently does nothing
+ * \todo The test is commented out
  */
 class ReceivePathTest : public TestCase
 {
@@ -1534,7 +1534,7 @@ PhyConnectivityTest::DoRun()
  *
  * It tests the functionalities of the MAC layer of LoRaWAN devices
  *
- * \remark TODO: not implemented yet
+ * \todo Not implemented
  */
 class LorawanMacTest : public TestCase
 {
