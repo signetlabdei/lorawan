@@ -295,8 +295,7 @@ main(int argc, char* argv[])
      ***************************/
 
     // Create the NS node
-    NodeContainer networkServer;
-    networkServer.Create(1);
+    Ptr<Node> networkServer = CreateObject<Node>();
 
     // PointToPoint links between gateways and server
     PointToPointHelper p2p;
@@ -304,7 +303,9 @@ main(int argc, char* argv[])
     p2p.SetChannelAttribute("Delay", StringValue("2ms"));
     for (auto gw = gateways.Begin(); gw != gateways.End(); ++gw)
     {
-        p2p.Install(networkServer.Get(0), *gw);
+        auto container = p2p.Install(networkServer, *gw);
+        auto serverP2PNetDev = DynamicCast<PointToPointNetDevice>(container.Get(0));
+        nsHelper.AddGatewayP2P(serverP2PNetDev, *gw);
     }
 
     // Create a NS for the network

@@ -16,7 +16,7 @@
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  *
- * Modified: Alessandro Aimi <alessandro.aimi@unibo.it> (12/02/2024)
+ * Modified by: Alessandro Aimi <alessandro.aimi@unibo.it>
  */
 
 #include "network-server-helper.h"
@@ -55,6 +55,14 @@ NetworkServerHelper::SetAttribute(std::string name, const AttributeValue& value)
 }
 
 void
+NetworkServerHelper::AddGatewayP2P(Ptr<PointToPointNetDevice> serverP2PNetDev, Ptr<Node> gwNode)
+{
+    NS_ASSERT_MSG(serverP2PNetDev->GetNode()->GetId() != gwNode->GetId(),
+                  "wrong P2P NetDevice detected, please provide the one on the NS's side instead");
+    m_gatewayRegistrationList.emplace_back(serverP2PNetDev, gwNode);
+}
+
+void
 NetworkServerHelper::SetEndDevices(NodeContainer endDevices)
 {
     m_endDevices = endDevices;
@@ -64,18 +72,6 @@ ApplicationContainer
 NetworkServerHelper::Install(Ptr<Node> node)
 {
     return ApplicationContainer(InstallPriv(node));
-}
-
-ApplicationContainer
-NetworkServerHelper::Install(NodeContainer c)
-{
-    ApplicationContainer apps;
-    for (auto i = c.Begin(); i != c.End(); ++i)
-    {
-        apps.Add(InstallPriv(*i));
-    }
-
-    return apps;
 }
 
 Ptr<Application>
@@ -89,27 +85,11 @@ NetworkServerHelper::InstallPriv(Ptr<Node> node)
     app->SetNode(node);
     node->AddApplication(app);
 
-    for (uint32_t i = 0; i < node->GetNDevices(); i++)
+    // Connect the net devices receive callback to the app and register the respective gateway
+    for (const auto& [currentNetDevice, gwNode] : m_gatewayRegistrationList)
     {
-        // Link the NetworkServer app to its NetDevices
-        Ptr<NetDevice> currentNetDevice = node->GetDevice(i);
         currentNetDevice->SetReceiveCallback(MakeCallback(&NetworkServer::Receive, app));
-
-        // Register gateways
-        Ptr<Channel> channel = currentNetDevice->GetChannel();
-        NS_ASSERT_MSG(DynamicCast<PointToPointChannel>(channel),
-                      "Connection with gateways is not PointToPoint");
-        for (uint32_t j = 0; j < channel->GetNDevices(); ++j)
-        {
-            Ptr<Node> gwNode = channel->GetDevice(j)->GetNode();
-            // Point to point, so channel only holds 2 devices
-            if (gwNode->GetId() != node->GetId())
-            {
-                // Add the gateway to the NS list
-                app->AddGateway(gwNode, currentNetDevice);
-                break;
-            }
-        }
+        app->AddGateway(gwNode, currentNetDevice);
     }
 
     // Add the end devices

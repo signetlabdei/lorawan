@@ -179,22 +179,29 @@ main(int argc, char* argv[])
     // Create NS
     ////////////
 
-    NodeContainer networkServers;
-    networkServers.Create(1);
+    Ptr<Node> networkServer = CreateObject<Node>();
 
     // PointToPoint links between gateways and server
     PointToPointHelper p2p;
     p2p.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
     p2p.SetChannelAttribute("Delay", StringValue("2ms"));
+    // Store NS app registration details for later
+    P2PGwRegistration_t gwRegistration;
     for (auto gw = gateways.Begin(); gw != gateways.End(); ++gw)
     {
-        p2p.Install(networkServers.Get(0), *gw);
+        auto container = p2p.Install(networkServer, *gw);
+        auto serverP2PNetDev = DynamicCast<PointToPointNetDevice>(container.Get(0));
+        gwRegistration.emplace_back(serverP2PNetDev, *gw);
     }
 
     // Install the NetworkServer application on the network server
     NetworkServerHelper networkServerHelper;
     networkServerHelper.SetEndDevices(endDevices);
-    networkServerHelper.Install(networkServers);
+    for (const auto& [serverP2PNetDev, gwNode] : gwRegistration)
+    {
+        networkServerHelper.AddGatewayP2P(serverP2PNetDev, gwNode);
+    }
+    networkServerHelper.Install(networkServer);
 
     // Install the Forwarder application on the gateways
     ForwarderHelper forwarderHelper;

@@ -16,7 +16,7 @@
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  *
- * Modified: Alessandro Aimi <alessandro.aimi@unibo.it> (12/02/2024)
+ * Modified by: Alessandro Aimi <alessandro.aimi@unibo.it>
  */
 
 #include "forwarder-helper.h"

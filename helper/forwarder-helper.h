@@ -15,8 +15,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
- *
- * Modified: Alessandro Aimi <alessandro.aimi@unibo.it> (12/02/2024)
  */
 
 #ifndef FORWARDER_HELPER_H
