@@ -61,23 +61,27 @@ class NetworkControllerComponent : public Object
 
     // Virtual methods whose implementation is left to child classes
     /**
-     * Method that is called when a new packet is received by the NetworkServer.
+     * \brief Function called as a new uplink packet is received by the NetworkServer.
      *
      * \param packet The newly received packet
+     * \param status A pointer to the status of the end device that sent the packet
      * \param networkStatus A pointer to the NetworkStatus object
      */
     virtual void OnReceivedPacket(Ptr<const Packet> packet,
                                   Ptr<EndDeviceStatus> status,
                                   Ptr<NetworkStatus> networkStatus) = 0;
-
+    /**
+     * \brief Function called as a downlink reply is about to leave the NetworkServer.
+     *
+     * \param status A pointer to the status of the end device which we are sending the reply to
+     * \param networkStatus A pointer to the NetworkStatus object
+     */
     virtual void BeforeSendingReply(Ptr<EndDeviceStatus> status,
                                     Ptr<NetworkStatus> networkStatus) = 0;
-
     /**
      * Method that is called when a packet cannot be sent in the downlink.
      *
-     * \param status The EndDeviceStatus of the device to which it was
-     *               impossible to send a reply.
+     * \param status The EndDeviceStatus of the device to which it was impossible to send a reply
      * \param networkStatus A pointer to the NetworkStatus object
      */
     virtual void OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus) = 0;
