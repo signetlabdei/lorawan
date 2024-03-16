@@ -30,15 +30,24 @@ namespace lorawan
 {
 
 /**
- * Class representing the NetworkId component of a LoraDeviceAddress (7 bits).
+ * \ingroup lorawan
+ *
+ * \brief Class representing the NetworkId component of a LoraDeviceAddress (7 bits).
  */
 class NwkID
 {
   public:
+    /**
+     * \brief Construct a new NwkID object
+     *
+     * \todo add warning as in Set()
+     *
+     * \param nwkId the network id value [0:127]
+     */
     NwkID(uint8_t nwkId = 0);
 
     /**
-     * Set the NwkID, starting from a 8-bit representation of a 7-bit integer.
+     * \brief Set the NwkID, starting from a 8-bit representation of a 7-bit integer.
      *
      * This method will ignore the most significant bit of the argument. This
      * means that all arguments such that nwkId > 127 will actually be
@@ -49,7 +58,7 @@ class NwkID
     void Set(uint8_t nwkId);
 
     /**
-     * Get an uint8_t representation of the 7-bit network ID.
+     * \brief Get an uint8_t representation of the 7-bit network ID.
      *
      * \return The Network Id.
      */
@@ -60,27 +69,36 @@ class NwkID
 };
 
 /**
- * Class representing the Network Address component of a LoraDeviceAddress (25
+ * \ingroup lorawan
+ *
+ * \brief Class representing the Network Address component of a LoraDeviceAddress (25
  * bits)
  */
 class NwkAddr
 {
   public:
+    /**
+     * \brief Construct a new NwkAddr object
+     *
+     * \todo add warning as in Set()
+     *
+     * \param nwkId network addr value [0:2^25-1]
+     */
     NwkAddr(uint32_t nwkId = 0);
 
     /**
-     * Set the NwkAddr, starting from a 32-bit representation of a 25-bit integer.
+     * \brief Set the NwkAddr, starting from a 32-bit representation of a 25-bit integer.
      *
      * This method will ignore the most significant bits of the argument. This
-     * means that all arguments such that nwkAddr > 2^25 will actually be
-     * considered as nwkAddr mod 2^25.
+     * means that all arguments such that nwkAddr > 2^25-1 will actually be
+     * considered as nwkAddr mod 2^25-1.
      *
      * \param nwkAddr The Network Address to set.
      */
     void Set(uint32_t nwkAddr);
 
     /**
-     * Get an uint32_t representation of the 25-bit network address.
+     * \brief Get an uint32_t representation of the 25-bit network address.
      *
      * \return The Network Address.
      */
@@ -91,7 +109,9 @@ class NwkAddr
 };
 
 /**
- * This class represents the device address of a LoraWAN End Device.
+ * \ingroup lorawan
+ *
+ * \brief This class represents the device address of a LoraWAN End Device.
  */
 class LoraDeviceAddress
 {
@@ -99,57 +119,82 @@ class LoraDeviceAddress
     LoraDeviceAddress();
 
     /**
-     * Build a new address from a 32-bit integer.
+     * \brief Build a new address from a 32-bit integer.
+     *
+     * \param address full numeric value of the address
      */
     LoraDeviceAddress(uint32_t address);
 
     /**
-     * Build a new address from a network id and network address.
+     * \brief Build a new address from a network id and network address.
+     *
+     * \param nwkId network id numeric value
+     * \param nwkAddr network address numeric value
      */
     LoraDeviceAddress(uint8_t nwkId, uint32_t nwkAddr);
 
     /**
-     * Build a new address from a network id and network address.
+     * \brief Build a new address from a network id and network address.
+     *
+     * \param nwkId network id object
+     * \param nwkAddr network address object
      */
     LoraDeviceAddress(NwkID nwkId, NwkAddr nwkAddr);
 
     /**
-     * Convert this address to a buffer.
+     * \brief Convert this address to a buffer.
+     *
+     * \param buf [out] buffer to fill with serialized address.
      */
     void Serialize(uint8_t buf[4]) const;
 
     /**
-     * Convert the input buffer into a new address.
+     * \brief Convert the input buffer into a new address.
+     *
+     * \param buf [in] buffer containing serialized address.
+     * \return the LoraDeviceAddress object
      */
     static LoraDeviceAddress Deserialize(const uint8_t buf[4]);
 
     /**
-     * Convert from an ordinary address to a LoraDeviceAddress instance.
+     * \brief Convert from an ordinary address to a LoraDeviceAddress instance.
+     *
+     * \param address reference to ordinary Address object
+     * \return the LoraDeviceAddress object
      */
     static LoraDeviceAddress ConvertFrom(const Address& address);
 
     /**
-     * Set the address as a 32 bit integer.
+     * \brief Set the address as a 32 bit integer.
+     *
+     * \param address full numeric value of the address
      */
     void Set(uint32_t address);
 
     /**
-     * Set the address, combining a network id and a network address.
+     * \brief Set the address, combining a network id and a network address.
      *
      * Note that nwkId is 7 bits long, and this function expects the 7 least
      * significant bits to contain the nwkId. Similarly for the nwkAddr, the 25
      * least significant bits of the uint32 are those that are expected to
      * contain the nwkAddr.
+     *
+     * \todo not implemented
+     *
+     * \param nwkId network id numeric value
+     * \param nwkAddr network address numeric value
      */
     void Set(uint8_t nwkId, uint32_t nwkAddr);
 
     /**
-     * Get the address in 32-bit integer form.
+     * \brief Get the address in 32-bit integer form.
+     *
+     * \return full numeric value of the address
      */
     uint32_t Get() const;
 
     /**
-     * Get the NwkID of this device.
+     * \brief Get the NwkID of this device.
      *
      * \remark The NwkID bit-by-bit representation will be contained in the 7
      * least significant bits of the returned uint8_t.
@@ -159,7 +204,7 @@ class LoraDeviceAddress
     uint8_t GetNwkID();
 
     /**
-     * Set the NwkID of this device.
+     * \brief Set the NwkID of this device.
      *
      * \remark The NwkID is expected to be contained on the 7 least significant
      * bits of the uint8_t.
@@ -169,7 +214,7 @@ class LoraDeviceAddress
     void SetNwkID(uint8_t nwkId);
 
     /**
-     * Get the NwkAddr of this device.
+     * \brief Get the NwkAddr of this device.
      *
      * \remark The NwkAddr will be contained on the 25 least significant bits of
      * the uint32_t.
@@ -179,7 +224,7 @@ class LoraDeviceAddress
     uint32_t GetNwkAddr();
 
     /**
-     * Set the NwkAddr of this device.
+     * \brief Set the NwkAddr of this device.
      *
      * \remark The NwkAddr is expected to be contained on the least significant
      * bits of the uint32_t.
@@ -189,29 +234,57 @@ class LoraDeviceAddress
     void SetNwkAddr(uint32_t nwkAddr);
 
     /**
-     * Print the address bit-by-bit to a human-readable string.
+     * \brief Print the address bit-by-bit to a human-readable string.
      *
      * \return The string containing the network address.
      */
     std::string Print() const;
 
+    /**
+     * \brief Equality comparison operator
+     * \param other address to compare
+     * \return true if the addresses are equal
+     */
     bool operator==(const LoraDeviceAddress& other) const;
+    /**
+     * \brief Inequality comparison operator
+     * \param other address to compare
+     * \return true if the addresses are different
+     */
     bool operator!=(const LoraDeviceAddress& other) const;
+    /**
+     * \brief Less-then comparison operator
+     * \param other address to compare
+     * \return true if the first address is less than the second
+     */
     bool operator<(const LoraDeviceAddress& other) const;
+    /**
+     * \brief Greater-then comparison operator
+     * \param other address to compare
+     * \return true if the first address is greater than the second
+     */
     bool operator>(const LoraDeviceAddress& other) const;
 
   private:
     /**
-     * Convert this instance of LoraDeviceAddress to an Address
+     * \brief Convert this instance of LoraDeviceAddress to an Address
+     *
+     * \return the Address object
      */
     Address ConvertTo() const;
+
+    /**
+     * \brief Get a new address type id.
+     * \return the new address type id
+     */
     static uint8_t GetType();
+
     NwkID m_nwkId;     //!< The network Id of this address
     NwkAddr m_nwkAddr; //!< The network address of this address
 };
 
 /**
- * Operator overload to correctly handle logging when an address is passed as
+ * \brief Operator overload to correctly handle logging when an address is passed as
  * an argument.
  */
 std::ostream& operator<<(std::ostream& os, const LoraDeviceAddress& address);
