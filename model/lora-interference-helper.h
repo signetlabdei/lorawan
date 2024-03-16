@@ -37,6 +37,8 @@ namespace lorawan
 {
 
 /**
+ * \ingroup lorawan
+ *
  * Helper for LoraPhy that manages interference calculations.
  *
  * This class keeps a list of signals that are impinging on the antenna of the
@@ -55,6 +57,15 @@ class LoraInterferenceHelper
     class Event : public SimpleRefCount<LoraInterferenceHelper::Event>
     {
       public:
+        /**
+         * \brief Construct a new interference signal Event object
+         *
+         * \param duration the duration in time
+         * \param rxPowerdBm the power of the signal
+         * \param spreadingFactor the modulation spreading factor
+         * \param packet the packet transmitted
+         * \param frequencyMHz the carrier frequency of the signal
+         */
         Event(Time duration,
               double rxPowerdBm,
               uint8_t spreadingFactor,
@@ -64,76 +75,72 @@ class LoraInterferenceHelper
 
         /**
          * Get the duration of the event.
+         *
+         * \return the duration in time
          */
         Time GetDuration() const;
 
         /**
          * Get the starting time of the event.
+         *
+         * \return the starting time
          */
         Time GetStartTime() const;
 
         /**
          * Get the ending time of the event.
+         *
+         * \return the end time
          */
         Time GetEndTime() const;
 
         /**
          * Get the power of the event.
+         *
+         * \return the power in dBm as a double
          */
         double GetRxPowerdBm() const;
 
         /**
          * Get the spreading factor used by this signal.
+         *
+         * \return the spreding factor value
          */
         uint8_t GetSpreadingFactor() const;
 
         /**
          * Get the packet this event was generated for.
+         *
+         * \return a pointer to the packet
          */
         Ptr<Packet> GetPacket() const;
 
         /**
          * Get the frequency this event was on.
+         *
+         * \return the carrier frequency as a double
          */
         double GetFrequency() const;
 
         /**
          * Print the current event in a human readable form.
+         *
+         * \param stream the output stream to use
          */
         void Print(std::ostream& stream) const;
 
       private:
-        /**
-         * The time this signal begins (at the device).
-         */
-        Time m_startTime;
-
-        /**
-         * The time this signal ends (at the device).
-         */
-        Time m_endTime;
-
-        /**
-         * The spreading factor of this signal.
-         */
-        uint8_t m_sf;
-
-        /**
-         * The power of this event in dBm (at the device).
-         */
-        double m_rxPowerdBm;
-
-        /**
-         * The packet this event was generated for.
-         */
-        Ptr<Packet> m_packet;
-
-        /**
-         * The frequency this event was on.
-         */
-        double m_frequencyMHz;
+        Time m_startTime;      //!< The time this signal begins (at the device).
+        Time m_endTime;        //!< The time this signal ends (at the device).
+        uint8_t m_sf;          //!< The spreading factor of this signal.
+        double m_rxPowerdBm;   //!< The power of this event in dBm (at the device).
+        Ptr<Packet> m_packet;  //!< The packet this event was generated for.
+        double m_frequencyMHz; //!<  The frequency this event was on.
     };
 
+    /**
+     * \brief Enumeration of types of collision matrices
+     */
     enum CollisionMatrix
     {
         GOURSAUD,
@@ -167,13 +174,16 @@ class LoraInterferenceHelper
                                            double frequencyMHz);
 
     /**
-     * Get a list of the interferers currently registered at this
-     * InterferenceHelper.
+     * Get a list of the interferers currently registered at this InterferenceHelper.
+     *
+     * \return the list of pointers to interference Event objects
      */
     std::list<Ptr<LoraInterferenceHelper::Event>> GetInterferers();
 
     /**
      * Print the events that are saved in this helper in a human readable format.
+     *
+     * \param stream the output stream
      */
     void PrintEvents(std::ostream& stream);
 
@@ -209,33 +219,34 @@ class LoraInterferenceHelper
      */
     void CleanOldEvents();
 
-    static CollisionMatrix collisionMatrix;
+    static CollisionMatrix collisionMatrix; //!< collision matrix type set by the constructor
 
-    static std::vector<std::vector<double>> collisionSnirAloha;
-    static std::vector<std::vector<double>> collisionSnirGoursaud;
+    static std::vector<std::vector<double>> collisionSnirAloha;    //!< ALOHA collision matrix
+    static std::vector<std::vector<double>> collisionSnirGoursaud; //!< GOURSAUD collision matrix
 
   private:
+    /**
+     * \brief Set the collision matrix
+     *
+     * \todo redundant, only used by constructor which also sets the matrix directly
+     *
+     * \param collisionMatrix the type of collision matrix to set
+     */
     void SetCollisionMatrix(enum CollisionMatrix collisionMatrix);
 
-    std::vector<std::vector<double>> m_collisionSnir;
-
-    /**
-     * A list of the events this LoraInterferenceHelper is keeping track of.
-     */
-    std::list<Ptr<LoraInterferenceHelper::Event>> m_events;
-
-    /**
-     * The matrix containing information about how packets survive interference.
-     */
-    /**
-     * The threshold after which an event is considered old and removed from the
-     * list.
-     */
-    static Time oldEventThreshold;
+    std::vector<std::vector<double>> m_collisionSnir; //!< The matrix containing information about
+                                                      //!< how packets survive interference
+    std::list<Ptr<LoraInterferenceHelper::Event>>
+        m_events; //!< list of the events this LoraInterferenceHelper is keeping track of
+    static Time oldEventThreshold; //!< The threshold after which an event is considered old and
+                                   //!< removed from the list
 };
 
 /**
  * Allow easy logging of LoraInterferenceHelper Events
+ *
+ * \param os the output stream for logging
+ * \param event the event to be logged
  */
 std::ostream& operator<<(std::ostream& os, const LoraInterferenceHelper::Event& event);
 } // namespace lorawan
