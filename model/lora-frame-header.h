@@ -138,7 +138,7 @@ class LoraFrameHeader : public Header
     /**
      * Set the Adr value.
      *
-     * \param Adr The Adr to set.
+     * \param adr The Adr to set.
      */
     void SetAdr(bool adr);
 
@@ -204,7 +204,7 @@ class LoraFrameHeader : public Header
     /**
      * Set the FCnt value
      *
-     * \param FCnt The FCnt to set.
+     * \param fCnt The FCnt to set.
      */
     void SetFCnt(uint16_t fCnt);
     /**
@@ -215,8 +215,10 @@ class LoraFrameHeader : public Header
     uint16_t GetFCnt() const;
 
     /**
-     * Return a pointer to a MacCommand, or 0 if the MacCommand does not exist
+     * Return a pointer to the first MacCommand of type T, or 0 if no such MacCommand exists
      * in this header.
+     *
+     * \return a pointer to a MacCommand of type T
      */
     template <typename T>
     inline Ptr<T> GetMacCommand();
@@ -294,7 +296,12 @@ class LoraFrameHeader : public Header
     void AddDevStatusReq();
 
     /**
-     * Add a NewChannelReq command.
+     * \brief Add a NewChannelReq command with provided fields.
+     *
+     * \param chIndex the ChIndex field
+     * \param frequency the Frequency field
+     * \param minDataRate the MinDR field
+     * \param maxDataRate the MaxDR field
      */
     void AddNewChannelReq(uint8_t chIndex,
                           double frequency,
@@ -303,36 +310,36 @@ class LoraFrameHeader : public Header
 
     /**
      * Return a list of pointers to all the MAC commands saved in this header.
+     *
+     * \return the list of pointers to MacCommand objects
      */
     std::list<Ptr<MacCommand>> GetCommands();
 
     /**
-     * Add a predefined command to the list.
+     * Add a predefined command to the list in this frame header.
+     *
+     * \param macCommand a pointer to the MacCommand object to add
      */
     void AddCommand(Ptr<MacCommand> macCommand);
 
   private:
-    uint8_t m_fPort;
+    uint8_t m_fPort; //!< the FPort field
 
-    LoraDeviceAddress m_address;
+    LoraDeviceAddress m_address; //!< the DevAddr field
 
-    bool m_adr;
-    bool m_adrAckReq;
-    bool m_ack;
-    bool m_fPending;
-    uint8_t m_fOptsLen;
+    bool m_adr;         //!< the ADR field of the FCtrl
+    bool m_adrAckReq;   //!< the ADRACKReq field of the FCtrl
+    bool m_ack;         //!< the ACK field of the FCtrl
+    bool m_fPending;    //!< the FPending/ClassB field of the FCtrl
+    uint8_t m_fOptsLen; //!< the FOptsLen field of the FCtrl
 
-    uint16_t m_fCnt;
+    uint16_t m_fCnt; //!< the FCnt field
 
-    Buffer m_fOpts;
+    Buffer m_fOpts;                           //!< the FOpts field
+    std::list<Ptr<MacCommand>> m_macCommands; //!< List containing all the MacCommand instances that
+                                              //!< are contained in this LoraFrameHeader
 
-    /**
-     * List containing all the MacCommand instances that are contained in this
-     * LoraFrameHeader.
-     */
-    std::list<Ptr<MacCommand>> m_macCommands;
-
-    bool m_isUplink;
+    bool m_isUplink; //!< whether this frame header is uplink or not
 };
 
 template <typename T>
