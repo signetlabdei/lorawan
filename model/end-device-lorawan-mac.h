@@ -86,8 +86,9 @@ class EndDeviceLorawanMac : public LorawanMac
      * present.
      *
      * \param nextTxDelay Delay at which the transmission will be performed.
+     * \param packet The packet to delay the transmission of.
      */
-    virtual void postponeTransmission(Time nextTxDelay, Ptr<Packet>);
+    virtual void postponeTransmission(Time nextTxDelay, Ptr<Packet> packet);
 
     ///////////////////////
     // Receiving methods //
@@ -109,6 +110,8 @@ class EndDeviceLorawanMac : public LorawanMac
      * Perform the actions that are required after a packet send.
      *
      * This function handles opening of the first receive window.
+     *
+     * \param packet The packet that just finished transmission.
      */
     void TxFinished(Ptr<const Packet> packet) override;
 
@@ -130,18 +133,24 @@ class EndDeviceLorawanMac : public LorawanMac
 
     /**
      * Get if data rate adaptation is enabled or not.
+     *
+     * \return true if the data rate adaptation is enabled, false if disabled.
      */
     bool GetDataRateAdaptation() const;
 
     /**
-     * Set the maximum number of transmissions allowed.
+     * \brief Set the default number of unacknowledged redundant transmissions of each packet. If,
+     * after a transmission, any acknowledgement is received, no more are sent for that packet.
      *
-     * \param maxNumbTx The maximum number of transmissions allowed
+     * \param maxNumbTx The number of transmissions
      */
     void SetMaxNumberOfTransmissions(uint8_t maxNumbTx);
 
     /**
-     * Set the maximum number of transmissions allowed.
+     * Get the default number of unacknowledged redundant transmissions of each packet. If,
+     * after a transmission, any acknowledgement is received, no more are sent for that packet.
+     *
+     * \return The number of transmissions as uint8_t
      */
     uint8_t GetMaxNumberOfTransmissions();
 
@@ -228,16 +237,22 @@ class EndDeviceLorawanMac : public LorawanMac
 
     /**
      * Set the message type to send when the Send method is called.
+     *
+     * \param mType the message type
      */
     void SetMType(LorawanMacHeader::MType mType);
 
     /**
      * Get the message type to send when the Send method is called.
+     *
+     * \return the message type
      */
     LorawanMacHeader::MType GetMType();
 
     /**
      * Parse and take action on the commands contained on this FrameHeader.
+     *
+     * \param frameHeader the frame header
      */
     void ParseCommands(LoraFrameHeader frameHeader);
 
@@ -291,7 +306,12 @@ class EndDeviceLorawanMac : public LorawanMac
     void OnDevStatusReq();
 
     /**
-     * Perform the actions that need to be taken when receiving a NewChannelReq command.
+     * \brief Perform the actions that need to be taken when receiving a NewChannelReq command.
+     *
+     * \param chIndex the ChIndex field of the received NewChannelReq command
+     * \param frequency the Frequency field of the received NewChannelReq command
+     * \param minDataRate the MinDR field of the received NewChannelReq command
+     * \param maxDataRate the MaxDR field of the received NewChannelReq command
      */
     void OnNewChannelReq(uint8_t chIndex,
                          double frequency,
@@ -325,7 +345,7 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Add a logical channel to the helper.
      *
-     * \param frequency The channel's center frequency.
+     * \param logicalChannel The logical channel to add
      */
     void AddLogicalChannel(Ptr<LogicalLoraChannel> logicalChannel);
 
@@ -345,6 +365,8 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Add a MAC command to the list of those that will be sent out in the next
      * packet.
+     *
+     * \param macCommand a pointer to the MAC command
      */
     void AddMacCommand(Ptr<MacCommand> macCommand);
 
@@ -355,50 +377,28 @@ class EndDeviceLorawanMac : public LorawanMac
      */
     struct LoraRetxParameters
     {
-        Time firstAttempt;
-        Ptr<Packet> packet = nullptr;
-        bool waitingAck = false;
-        uint8_t retxLeft;
+        Time firstAttempt;            //!< Timestamp of the first transmission of the packet
+        Ptr<Packet> packet = nullptr; //!< A pointer to the packet being retransmitted
+        bool waitingAck = false;      //!< Whether the packet requires explicit acknowledgment
+        uint8_t retxLeft;             //!< Number of retransmission attempts left
     };
 
-    /**
-     * Enable Data Rate adaptation during the retransmission procedure.
-     */
-    bool m_enableDRAdapt;
-
-    /**
-     * Maximum number of transmission allowed.
-     */
-    uint8_t m_maxNumbTx;
-
-    /**
-     * The DataRate this device is using to transmit.
-     */
-    TracedValue<uint8_t> m_dataRate;
-
-    /**
-     * The transmission power this device is using to transmit.
-     */
-    TracedValue<double> m_txPower;
-
-    /**
-     * The coding rate used by this device.
-     */
-    uint8_t m_codingRate;
-
-    /**
-     * Whether or not the header is disabled for communications by this device.
-     */
-    bool m_headerDisabled;
-
-    /**
-     * The address of this device.
-     */
-    LoraDeviceAddress m_address;
+    bool m_enableDRAdapt; //!< Enable Data Rate adaptation during the retransmission procedure.
+    uint8_t
+        m_maxNumbTx; //!< Default number of unacknowledged redundant transmissions of each packet.
+    TracedValue<uint8_t> m_dataRate; //!< The DataRate this device is using to transmit.
+    TracedValue<double> m_txPower;   //!< The transmission power this device is using to transmit.
+    uint8_t m_codingRate;            //!< The coding rate used by this device.
+    bool m_headerDisabled; //!< Whether or not the LoRa PHY header is disabled for communications by
+                           //!< this device.
+    LoraDeviceAddress m_address; //!< The address of this device.
 
     /**
      * Find the minimum waiting time before the next possible transmission based
      * on End Device's Class Type.
+     *
+     * \param waitingTime currently known minimum waiting time, possibly raised by this function
+     * \return the updated minimum waiting time in Time format
      */
     virtual Time GetNextClassTransmissionDelay(Time waitingTime);
 
@@ -406,6 +406,8 @@ class EndDeviceLorawanMac : public LorawanMac
      * Find a suitable channel for transmission. The channel is chosen among the
      * ones that are available in the ED's LogicalLoraChannel, based on their duty
      * cycle limitations.
+     *
+     * \return a pointer to the channel
      */
     Ptr<LogicalLoraChannel> GetChannelForTx();
 
@@ -426,8 +428,8 @@ class EndDeviceLorawanMac : public LorawanMac
      */
     std::list<Ptr<MacCommand>> m_macCommandList;
 
-    /* Structure containing the retransmission parameters
-     * for this device.
+    /**
+     * Structure containing the retransmission parameters for this device.
      */
     struct LoraRetxParameters m_retxParams;
 
@@ -453,11 +455,16 @@ class EndDeviceLorawanMac : public LorawanMac
      * Randomly shuffle a Ptr<LogicalLoraChannel> vector.
      *
      * Used to pick a random channel on which to send the packet.
+     *
+     * \param vector the vector of pointers to logical LoRa channels
+     * \return the shuffled vector
      */
     std::vector<Ptr<LogicalLoraChannel>> Shuffle(std::vector<Ptr<LogicalLoraChannel>> vector);
 
     /**
-     * Find the minimum waiting time before the next possible transmission.
+     * Find the base minimum waiting time before the next possible transmission.
+     *
+     * \return the base minumum waiting time
      */
     Time GetNextTransmissionDelay();
 
@@ -510,6 +517,9 @@ class EndDeviceLorawanMac : public LorawanMac
      */
     LorawanMacHeader::MType m_mType;
 
+    /**
+     * \brief current value of the device frame counter
+     */
     uint16_t m_currentFCnt;
 };
 
