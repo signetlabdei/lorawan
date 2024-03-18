@@ -58,9 +58,15 @@ using namespace lorawan;
 NS_LOG_COMPONENT_DEFINE("FrameCounterUpdateExample");
 
 // Network settings
-int nGateways = 1;
-double simulationTime = 3600;
+int nGateways = 1;            //!< number of gateway nodes to create
+double simulationTime = 3600; //!< scenario duration (s) in simulated time
 
+/**
+ * Record a packet TX start by the PHY layer of an end device
+ *
+ * \param packet The packet being transmitted
+ * \param index Id of end device transmitting the packet
+ */
 void
 OnPhySentPacket(Ptr<const Packet> packet, uint32_t index)
 {
@@ -78,6 +84,14 @@ OnPhySentPacket(Ptr<const Packet> packet, uint32_t index)
     // NS_LOG_DEBUG (fHdr);
 }
 
+/**
+ * Record the exit status of a MAC layer packet retransmission process of an end device
+ *
+ * \param transmissions Number of transmissions attempted during the process
+ * \param successful Whether the retransmission procedure was successful
+ * \param firstAttempt Timestamp of the initial transmission attempt
+ * \param packet The packet being retransmitted
+ */
 void
 OnMacPacketOutcome(uint8_t transmissions, bool successful, Time firstAttempt, Ptr<Packet> packet)
 {
@@ -91,6 +105,12 @@ OnMacPacketOutcome(uint8_t transmissions, bool successful, Time firstAttempt, Pt
     }
 }
 
+/**
+ * \brief Set the position of an end device either in range or out of range.
+ *
+ * \param endDevice A Ptr to the Node of the end device.
+ * \param inRange Whether to put the end device in range or out of range.
+ */
 void
 ChangeEndDevicePosition(Ptr<Node> endDevice, bool inRange)
 {
