@@ -49,13 +49,24 @@ using namespace lorawan;
 
 NS_LOG_COMPONENT_DEFINE("AdrExample");
 
-// Trace sources that are called when a node changes its DR or TX power
+/**
+ * \brief Record a change in the data rate setting on an end device.
+ *
+ * \param oldDr The previous data rate value.
+ * \param newDr The updated data rate value.
+ */
 void
 OnDataRateChange(uint8_t oldDr, uint8_t newDr)
 {
     NS_LOG_DEBUG("DR" << unsigned(oldDr) << " -> DR" << unsigned(newDr));
 }
 
+/**
+ * \brief Record a change in the transmission power setting on an end device.
+ *
+ * \param oldTxPower The previous transmission power value.
+ * \param newTxPower The updated transmission power value.
+ */
 void
 OnTxPowerChange(double oldTxPower, double newTxPower)
 {
