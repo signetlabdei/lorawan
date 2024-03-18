@@ -75,8 +75,7 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
      * \brief Switches the LoraRadioEnergyModel to TX state and switches back to
      * STANDBY after TX duration.
      *
-     * \param duration the expected transmission duration.
-     * \param txPowerDbm the nominal tx power in dBm
+     * \param txPowerDbm The nominal tx power in dBm.
      *
      * Defined in ns3::LoraEndDevicePhyListener
      */
