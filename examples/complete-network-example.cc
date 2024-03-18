@@ -55,18 +55,19 @@ using namespace lorawan;
 NS_LOG_COMPONENT_DEFINE("ComplexLorawanNetworkExample");
 
 // Network settings
-int nDevices = 200;
-int nGateways = 1;
-double radius = 6400; // Note that due to model updates, 7500 m is no longer the maximum distance
-double simulationTime = 600;
+int nDevices = 200;          //!< number of end device nodes to create
+int nGateways = 1;           //!< number of gateway nodes to create
+double radius = 6400;        //!< radius (m) of the deplyoment
+double simulationTime = 600; //!< scenario duration (s) in simulated time
 
 // Channel model
-bool realisticChannelModel = false;
+bool realisticChannelModel = false; //!< wheather to use a more realistic channel model with
+                                    //!< buildings and correlated shadowing
 
-int appPeriodSeconds = 600;
+int appPeriodSeconds = 600; //!< duration (s) of the inter-transmission time of end devices
 
 // Output control
-bool print = true;
+bool print = true; //!< whether to print building information
 
 int
 main(int argc, char* argv[])
