@@ -40,6 +40,11 @@ class OneShotSender : public Application
 {
   public:
     OneShotSender();
+    /**
+     * \brief Construct a new OneShotSender object with provided send time.
+     *
+     * \param sendTime The Time of sending.
+     */
     OneShotSender(Time sendTime);
     ~OneShotSender() override;
 
@@ -50,40 +55,31 @@ class OneShotSender : public Application
     static TypeId GetTypeId();
 
     /**
-     * Send a packet using the LoraNetDevice's Send method.
+     * \brief Send a packet using the LoraNetDevice's Send method.
      */
     void SendPacket();
 
     /**
-     * Set the time at which this app will send a packet.
+     * \brief Set the time at which this app will send a packet.
+     *
+     * \param sendTime The Time of sending.
      */
     void SetSendTime(Time sendTime);
 
     /**
-     * Start the application by scheduling the first SendPacket event.
+     * \brief Start the application by scheduling the first SendPacket event.
      */
     void StartApplication() override;
 
     /**
-     * Stop the application.
+     * \brief Stop the application.
      */
     void StopApplication() override;
 
   private:
-    /**
-     * The time at which to send the packet.
-     */
-    Time m_sendTime;
-
-    /**
-     * The sending event.
-     */
-    EventId m_sendEvent;
-
-    /**
-     * The MAC layer of this node.
-     */
-    Ptr<LorawanMac> m_mac;
+    Time m_sendTime;       //!< The time at which to send the packet.
+    EventId m_sendEvent;   //!< The sending event.
+    Ptr<LorawanMac> m_mac; //!< The MAC layer of this node.
 };
 
 } // namespace lorawan
