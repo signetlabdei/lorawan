@@ -462,7 +462,7 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Find the base minimum waiting time before the next possible transmission.
      *
-     * \return the base minumum waiting time
+     * \return the base minimum waiting time
      */
     Time GetNextTransmissionDelay();
 

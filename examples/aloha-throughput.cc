@@ -61,7 +61,7 @@ double radius = 1000;        //!< radius (m) of the deplyoment
 double simulationTime = 100; //!< scenario duration (s) in simulated time
 
 // Channel model
-bool realisticChannelModel = false; //!< wheather to use a more realistic channel model with
+bool realisticChannelModel = false; //!< whether to use a more realistic channel model with
                                     //!< buildings and correlated shadowing
 
 auto packetsSent = std::vector<int>(6, 0);     //!< Record pkts by DR (idx 0 -> DR5, 5 -> DR0)

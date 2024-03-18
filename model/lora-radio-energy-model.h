@@ -112,6 +112,7 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
 
 /**
  * \ingroup lorawan
+ *
  * \brief A LoRa radio energy model.
  *
  * 4 states are defined for the radio: TX, RX, STANDBY, SLEEP. Default state is

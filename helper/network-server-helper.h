@@ -49,6 +49,8 @@ namespace lorawan
 typedef std::list<std::pair<Ptr<PointToPointNetDevice>, Ptr<Node>>> P2PGwRegistration_t;
 
 /**
+ * \ingroup lorawan
+ *
  * This class can install Network Server applications on multiple nodes at once.
  */
 class NetworkServerHelper

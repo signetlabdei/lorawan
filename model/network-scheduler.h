@@ -55,7 +55,7 @@ class NetworkScheduler : public Object
     /**
      * \brief Construct a new NetworkScheduler object
      *
-     * \todo We shoud probably remove this or add getters and setters
+     * \todo We should probably remove this or add getters and setters
      */
     NetworkScheduler();
     /**

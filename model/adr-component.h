@@ -73,7 +73,7 @@ class AdrComponent : public NetworkControllerComponent
     /**
      * \brief Implementation of the default Adaptive Data Rate (ADR) procedure.
      *
-     * ADR is meant to optimize radio modulation paramters of end devices to improve energy
+     * ADR is meant to optimize radio modulation parameters of end devices to improve energy
      * consuption and radio resource utilization. For more details see
      * https://doi.org/10.1109/NOMS.2018.8406255
      *

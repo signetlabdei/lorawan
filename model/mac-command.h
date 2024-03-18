@@ -116,7 +116,7 @@ class MacCommand : public Object
     /**
      * Get the CID that corresponds to a type of MAC command.
      *
-     * \param commandType the tipe of MAC command
+     * \param commandType the type of MAC command
      * \return The CID as a uint8_t type.
      */
     static uint8_t GetCIDFromMacCommand(enum MacCommandType commandType);

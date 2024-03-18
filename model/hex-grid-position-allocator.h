@@ -27,6 +27,7 @@ namespace ns3
 
 /**
  * \ingroup lorawan
+ *
  * \brief Position allocator for hexagonal tiling
  *
  * Starting with a first hexagon in the axes' center, following tiles are added in outward

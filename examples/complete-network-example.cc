@@ -61,7 +61,7 @@ double radius = 6400;        //!< radius (m) of the deplyoment
 double simulationTime = 600; //!< scenario duration (s) in simulated time
 
 // Channel model
-bool realisticChannelModel = false; //!< wheather to use a more realistic channel model with
+bool realisticChannelModel = false; //!< whether to use a more realistic channel model with
                                     //!< buildings and correlated shadowing
 
 int appPeriodSeconds = 600; //!< duration (s) of the inter-transmission time of end devices
