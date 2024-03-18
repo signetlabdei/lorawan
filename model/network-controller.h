@@ -51,30 +51,40 @@ class NetworkController : public Object
     static TypeId GetTypeId();
 
     NetworkController();
+    /**
+     * \brief Construct a new NetworkController object providing the NetworkStatus.
+     *
+     * \param networkStatus A Ptr to the NetworkStatus object.
+     */
     NetworkController(Ptr<NetworkStatus> networkStatus);
     ~NetworkController() override;
 
     /**
-     * Add a new NetworkControllerComponent
+     * \brief Add a new NetworkControllerComponent.
+     *
+     * \param component A Ptr to the NetworkControllerComponent object.
      */
     void Install(Ptr<NetworkControllerComponent> component);
 
     /**
-     * Method that is called by the NetworkServer when a new packet is received.
+     * \brief Method that is called by the NetworkServer when a new packet is received.
      *
      * \param packet The newly received packet.
      */
     void OnNewPacket(Ptr<const Packet> packet);
 
     /**
-     * Method that is called by the NetworkScheduler just before sending a reply
+     * \brief Method that is called by the NetworkScheduler just before sending a reply
      * to a certain End Device.
+     *
+     * \param endDeviceStatus A Ptr to the EndDeviceStatus object.
      */
     void BeforeSendingReply(Ptr<EndDeviceStatus> endDeviceStatus);
 
   private:
-    Ptr<NetworkStatus> m_status;
-    std::list<Ptr<NetworkControllerComponent>> m_components;
+    Ptr<NetworkStatus> m_status; //!< A Ptr to the NetworkStatus object.
+    std::list<Ptr<NetworkControllerComponent>>
+        m_components; //!< List of NetworkControllerComponent objects.
 };
 
 } // namespace lorawan
