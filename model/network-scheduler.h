@@ -52,27 +52,47 @@ class NetworkScheduler : public Object
      */
     static TypeId GetTypeId();
 
+    /**
+     * \brief Construct a new NetworkScheduler object
+     *
+     * \todo We shoud probably remove this or add getters and setters
+     */
     NetworkScheduler();
+    /**
+     * \brief Construct a new NetworkScheduler providing the NetworkStatus and the NetworkController
+     * objects.
+     *
+     * \param status A Ptr to the NetworkStatus object.
+     * \param controller A Ptr to the NetworkController object.
+     */
     NetworkScheduler(Ptr<NetworkStatus> status, Ptr<NetworkController> controller);
     ~NetworkScheduler() override;
 
     /**
-     * Method called by NetworkServer to inform the Scheduler of a newly arrived
-     * uplink packet. This function schedules the OnReceiveWindowOpportunity
-     * events 1 and 2 seconds later.
+     * \brief Method called by NetworkServer to inform the Scheduler of a newly arrived uplink
+     * packet.
+     *
+     * This function schedules the OnReceiveWindowOpportunity events 1 and 2 seconds later.
+     *
+     * \param packet A Ptr to the new Packet instance
      */
     void OnReceivedPacket(Ptr<const Packet> packet);
 
     /**
-     * Method that is scheduled after packet arrivals in order to act on
-     * receive windows 1 and 2 seconds later receptions.
+     * \brief Method that is scheduled after packet arrival in order to take action on
+     * sender's receive windows openings.
+     *
+     * \param deviceAddress The Address of the end device
+     * \param window The reception window number (1 or 2)
      */
     void OnReceiveWindowOpportunity(LoraDeviceAddress deviceAddress, int window);
 
   private:
-    TracedCallback<Ptr<const Packet>> m_receiveWindowOpened;
-    Ptr<NetworkStatus> m_status;
-    Ptr<NetworkController> m_controller;
+    TracedCallback<Ptr<const Packet>>
+        m_receiveWindowOpened;   //!< Trace callback source for reception windows openings. \todo
+                                 //!< never called
+    Ptr<NetworkStatus> m_status; //!< A Ptr to the NetworkStatus object.
+    Ptr<NetworkController> m_controller; //!< A Ptr to the NetworkController object.
 };
 
 } // namespace lorawan
