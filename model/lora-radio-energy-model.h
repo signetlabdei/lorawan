@@ -65,8 +65,6 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
     /**
      * \brief Switches the LoraRadioEnergyModel to RX state.
      *
-     * \param duration the expected duration of the packet reception.
-     *
      * Defined in ns3::LoraEndDevicePhyListener
      */
     void NotifyRxStart() override;

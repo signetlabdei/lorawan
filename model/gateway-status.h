@@ -98,9 +98,9 @@ class GatewayStatus : public Object
      */
     Ptr<GatewayLorawanMac> GetGatewayMac();
 
-    /**
-     * Set a pointer to this gateway's MAC instance.
-     */
+    ///**
+    // * Set a pointer to this gateway's MAC instance.
+    // */
     // void SetGatewayMac (Ptr<GatewayLorawanMac> gwMac);
 
     /**

@@ -68,11 +68,11 @@ class SubBand : public Object
      */
     double GetFirstFrequency() const;
 
-    /**
-     * Get the last frequency of the subband.
-     *
-     * \return The lowest frequency of the SubBand.
-     */
+    ///**
+    // * Get the last frequency of the subband.
+    // *
+    // * \return The lowest frequency of the SubBand.
+    // */
     // double GetLastFrequency ();
 
     /**
