@@ -53,31 +53,48 @@ class GatewayStatus : public Object
     static TypeId GetTypeId();
 
     GatewayStatus();
+    /**
+     * \brief Construct a new GatewayStatus object with values
+     *
+     * \param address The Address of the P2PNetDevice of the gateway connected to the NS
+     * \param netDevice A Ptr to the NetDevice through which to reach this gateway from the server
+     * \param gwMac A Ptr to the MAC layer of the gateway
+     */
     GatewayStatus(Address address, Ptr<NetDevice> netDevice, Ptr<GatewayLorawanMac> gwMac);
     ~GatewayStatus() override;
 
     /**
      * Get this gateway's P2P link address.
+     *
+     * \return The Address instance
      */
     Address GetAddress();
 
     /**
      * Set this gateway's P2P link address.
+     *
+     * \param address The Address instance
      */
     void SetAddress(Address address);
 
     /**
      * Get the NetDevice through which it's possible to contact this gateway from the server.
+     *
+     * \return A Ptr to the NetDevice
      */
     Ptr<NetDevice> GetNetDevice();
 
     /**
      * Set the NetDevice through which it's possible to contact this gateway from the server.
+     *
+     * \param netDevice A Ptr to the NetDevice
      */
     void SetNetDevice(Ptr<NetDevice> netDevice);
 
     /**
      * Get a pointer to this gateway's MAC instance.
+     *
+     * \return A Ptr to the MAC layer object
      */
     Ptr<GatewayLorawanMac> GetGatewayMac();
 
@@ -96,6 +113,11 @@ class GatewayStatus : public Object
      */
     bool IsAvailableForTransmission(double frequency);
 
+    /**
+     * \brief Set the time of the next scheduled transmission for the gateway
+     *
+     * \param nextTransmissionTime The Time value
+     */
     void SetNextTransmissionTime(Time nextTransmissionTime);
     // Time GetNextTransmissionTime ();
 
