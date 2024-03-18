@@ -30,8 +30,8 @@ namespace lorawan
 /**
  * \ingroup lorawan
  *
- * Tag used to save various data about a packet, like its Spreading Factor and
- * data about interference.
+ * \brief Tag used to save various data about a packet, like its Spreading Factor and data about
+ * interference.
  */
 class LoraTag : public Tag
 {
@@ -44,7 +44,7 @@ class LoraTag : public Tag
     TypeId GetInstanceTypeId() const override;
 
     /**
-     * Create a LoraTag with a given spreading factor and collision.
+     * \brief Create a LoraTag with a given spreading factor and collision.
      *
      * \param sf The Spreading Factor.
      * \param destroyedBy The SF this tag's packet was destroyed by.
@@ -59,72 +59,78 @@ class LoraTag : public Tag
     void Print(std::ostream& os) const override;
 
     /**
-     * Read which Spreading Factor this packet was transmitted with.
+     * \brief Read which Spreading Factor this packet was transmitted with.
      *
      * \return This tag's packet's SF.
      */
     uint8_t GetSpreadingFactor() const;
 
     /**
-     * Read which Spreading Factor this packet was destroyed by.
+     * \brief Read which Spreading Factor this packet was destroyed by.
      *
      * \return The SF this packet was destroyed by.
      */
     uint8_t GetDestroyedBy() const;
 
     /**
-     * Read the power this packet arrived with.
+     * \brief Read the power this packet arrived with.
      *
      * \return This tag's packet received power.
      */
     double GetReceivePower() const;
 
     /**
-     * Set which Spreading Factor this packet was transmitted with.
+     * \brief Set which Spreading Factor this packet was transmitted with.
      *
      * \param sf The Spreading Factor.
      */
     void SetSpreadingFactor(uint8_t sf);
 
     /**
-     * Set which Spreading Factor this packet was destroyed by.
+     * \brief Set which Spreading Factor this packet was destroyed by.
      *
      * \param sf The Spreading Factor.
      */
     void SetDestroyedBy(uint8_t sf);
 
     /**
-     * Set the power this packet was received with.
+     * \brief Set the power this packet was received with.
      *
      * \param receivePower The power, in dBm.
      */
     void SetReceivePower(double receivePower);
 
     /**
-     * Set the frequency of the packet.
+     * \brief Set the frequency of the packet.
      *
      * This value works in two ways:
-     * - It is used by the GW to signal to the NS the frequency of the uplink
-         packet
-     * - It is used by the NS to signal to the GW the frequency of a downlink
-         packet
+     * - It is used by the GW to signal to the NS the frequency of the uplink packet
+     * - It is used by the NS to signal to the GW the frequency of a downlink packet
+     *
+     * \param frequency The frequency value [MHz].
      */
     void SetFrequency(double frequency);
 
     /**
-     * Get the frequency of the packet.
+     * \brief Get the frequency of the packet.
+     *
+     * This value works in two ways:
+     * - It is used by the GW to signal to the NS the frequency of the uplink packet
+     * - It is used by the NS to signal to the GW the frequency of a downlink packet
+     *
+     * \return The frequency value [MHz].
      */
     double GetFrequency() const;
 
     /**
-     * Get the data rate for this packet.
+     * \brief Get the data rate for this packet.
      *
      * \return The data rate that needs to be employed for this packet.
      */
     uint8_t GetDataRate() const;
 
     /**
-     * Set the data rate for this packet.
+     * \brief Set the data rate for this packet.
      *
      * \param dataRate The data rate.
      */
