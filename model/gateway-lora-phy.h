@@ -41,7 +41,7 @@ class LoraChannel;
 /**
  * \ingroup lorawan
  *
- * Class modeling a Lora SX1301 chip.
+ * \brief Class modeling a Lora SX1301 chip.
  *
  * This class models the behaviour of the chip employed in Lora gateways. These
  * chips are characterized by the presence of 8 receive paths, or parallel
@@ -75,38 +75,48 @@ class GatewayLoraPhy : public LoraPhy
               double frequencyMHz,
               double txPowerDbm) override = 0;
 
+    /**
+     * \brief Signals the end of a transmission by the GatewayLoraPhy.
+     *
+     * \param packet A Ptr to the Packet transmitted.
+     */
     virtual void TxFinished(Ptr<Packet> packet);
 
     bool IsTransmitting() override;
 
+    /**
+     * \brief Check whether the GatewayLoraPhy is currently listening to a frequency.
+     *
+     * \param frequencyMHz The value of the frequency [MHz].
+     * \return true if the frequency is among the one being listened to, false otherwise.
+     */
     bool IsOnFrequency(double frequencyMHz) override;
 
     /**
-     * Add a reception path, locked on a specific frequency.
+     * \brief Add a reception path, locked on a specific frequency.
      */
     void AddReceptionPath();
 
     /**
-     * Reset the list of reception paths.
+     * \brief Reset the list of reception paths.
      *
      * This method deletes all currently available ReceptionPath objects.
      */
     void ResetReceptionPaths();
 
     /**
-     * Add a frequency to the list of frequencies we are listening to.
+     * \brief Add a frequency to the list of frequencies we are listening to.
+     *
+     * \param frequencyMHz The value of the frequency [MHz]
      */
     void AddFrequency(double frequencyMHz);
 
-    /**
-     * A vector containing the sensitivities required to correctly decode
-     * different spreading factors.
-     */
-    static const double sensitivity[6];
+    static const double sensitivity[6]; //!< A vector containing the sensitivities required to
+                                        //!< correctly decode different spreading factors.
 
   protected:
     /**
-     * This class represents a configurable reception path.
+     * \brief This class represents a configurable reception path.
      *
      * Differently from EndDeviceLoraPhys, these do not need to be configured to
      * listen for a certain SF. ReceptionPaths be either locked on an event or
@@ -123,14 +133,14 @@ class GatewayLoraPhy : public LoraPhy
         ~ReceptionPath();
 
         /**
-         * Query whether this reception path is available to lock on a signal.
+         * \brief Query whether this reception path is available to lock on a signal.
          *
          * \return True if its current state is free, false if it's currently locked.
          */
         bool IsAvailable() const;
 
         /**
-         * Set this reception path as available.
+         * \brief Set this reception path as available.
          *
          * This function sets the m_available variable as true, and deletes the
          * LoraInterferenceHelper Event this ReceivePath was previously locked on.
@@ -138,7 +148,7 @@ class GatewayLoraPhy : public LoraPhy
         void Free();
 
         /**
-         * Set this reception path as not available and lock it on the
+         * \brief Set this reception path as not available and lock it on the
          * provided event.
          *
          * \param event The LoraInterferenceHelper Event to lock on.
@@ -146,14 +156,14 @@ class GatewayLoraPhy : public LoraPhy
         void LockOnEvent(Ptr<LoraInterferenceHelper::Event> event);
 
         /**
-         * Set the event this reception path is currently on.
+         * \brief Set the event this reception path is currently on.
          *
          * \param event the event to lock this ReceptionPath on.
          */
         void SetEvent(Ptr<LoraInterferenceHelper::Event> event);
 
         /**
-         * Get the event this reception path is currently on.
+         * \brief Get the event this reception path is currently on.
          *
          * \returns 0 if no event is currently being received, a pointer to
          * the event otherwise.
@@ -161,65 +171,50 @@ class GatewayLoraPhy : public LoraPhy
         Ptr<LoraInterferenceHelper::Event> GetEvent();
 
         /**
-         * Get the EventId of the EndReceive call associated to this ReceptionPath's
+         * \brief Get the EventId of the EndReceive call associated to this ReceptionPath's
          * packet.
+         *
+         * \return The EventId instance.
          */
         EventId GetEndReceive();
 
         /**
-         * Set the EventId of the EndReceive call associated to this ReceptionPath's
+         * \brief Set the EventId of the EndReceive call associated to this ReceptionPath's
          * packet.
+         *
+         * \param endReceiveEventId The EventId instance.
          */
         void SetEndReceive(EventId endReceiveEventId);
 
       private:
-        /**
-         * Whether this reception path is available to lock on a signal or not.
-         */
-        bool m_available;
-
-        /**
-         * The event this reception path is currently locked on.
-         */
-        Ptr<LoraInterferenceHelper::Event> m_event;
-
-        /**
-         * The EventId associated of the call to EndReceive that is scheduled to
-         * happen when the packet this ReceivePath is locked on finishes reception.
-         */
-        EventId m_endReceiveEventId;
+        bool m_available; //!< Whether this reception path is available to lock on a signal or not.
+        Ptr<LoraInterferenceHelper::Event>
+            m_event;                 //!< The event this reception path is currently locked on.
+        EventId m_endReceiveEventId; //!< The EventId associated of the call to EndReceive that is
+                                     //!< scheduled to happen when the packet this ReceivePath is
+                                     //!< locked on finishes reception.
     };
 
-    /**
-     * A list containing the various parallel receivers that are managed by this
-     * Gateway.
-     */
-    std::list<Ptr<ReceptionPath>> m_receptionPaths;
+    std::list<Ptr<ReceptionPath>> m_receptionPaths; //!< A list containing the various parallel
+                                                    //!< receivers that are managed by this Gateway.
+
+    TracedValue<int> m_occupiedReceptionPaths; //!< The number of occupied reception paths.
 
     /**
-     * The number of occupied reception paths.
-     */
-    TracedValue<int> m_occupiedReceptionPaths;
-
-    /**
-     * Trace source that is fired when a packet cannot be received because all
-     * available ReceivePath instances are busy.
-     *
-     * \see class CallBackTraceSource
+     * Trace source fired when a packet cannot be received because all available ReceivePath
+     * instances are busy.
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_noMoreDemodulators;
 
     /**
-     * Trace source that is fired when a packet cannot be received because
-     * the Gateway is in transmission state.
-     *
-     * \see class CallBackTraceSource
+     * Trace source fired when a packet cannot be received because the Gateway is in transmission
+     * state.
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_noReceptionBecauseTransmitting;
 
     bool m_isTransmitting; //!< Flag indicating whether a transmission is going on
 
-    std::list<double> m_frequencies;
+    std::list<double> m_frequencies; //!< List of frequencies the GatewayLoraPhy is listening to.
 };
 
 } // namespace lorawan
