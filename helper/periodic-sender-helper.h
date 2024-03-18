@@ -37,7 +37,9 @@ namespace lorawan
 {
 
 /**
- * This class can be used to install PeriodicSender applications on a wide
+ * \ingroup lorawan
+ *
+ * \brief This class can be used to install PeriodicSender applications on a wide
  * range of nodes.
  */
 class PeriodicSenderHelper
@@ -47,10 +49,31 @@ class PeriodicSenderHelper
 
     ~PeriodicSenderHelper();
 
+    /**
+     * \brief Helper function used to set the underlying application attributes.
+     *
+     * \param name the name of the application attribute to set
+     * \param value the value of the application attribute to set
+     */
     void SetAttribute(std::string name, const AttributeValue& value);
 
+    /**
+     * \brief Install a PeriodicSender application on each node of the input container
+     * configured with all the attributes set with SetAttribute or other functions of this class.
+     *
+     * \param c NodeContainer of the set of nodes on which an PeriodicSender
+     * will be installed.
+     * \returns Container of Ptr to the applications installed.
+     */
     ApplicationContainer Install(NodeContainer c) const;
 
+    /**
+     * Install a PeriodicSender application on the input Node configured with all the attributes set
+     * with SetAttribute or other functions of this class.
+     *
+     * \param node The node on which a PeriodicSender will be installed.
+     * \returns Container of the Ptr to the application installed.
+     */
     ApplicationContainer Install(Ptr<Node> node) const;
 
     /**
@@ -63,26 +86,41 @@ class PeriodicSenderHelper
      */
     void SetPeriod(Time period);
 
+    /**
+     * \brief Set a random variable to enable a random size to be added to the base packet size for
+     * each new transmission of PacketSender applications.
+     *
+     * \param rv The random variable.
+     */
     void SetPacketSizeRandomVariable(Ptr<RandomVariableStream> rv);
 
+    /**
+     * \brief Set the base value for applications packet size in bytes.
+     *
+     * \param size The packet size in bytes.
+     */
     void SetPacketSize(uint8_t size);
 
   private:
+    /**
+     * Install a PeriodicSender application on the input Node configured with all the attributes set
+     * with SetAttribute or other functions of this class.
+     *
+     * \param node The node on which a PeriodicSender will be installed.
+     * \returns A Ptr to the application installed.
+     */
     Ptr<Application> InstallPriv(Ptr<Node> node) const;
 
-    ObjectFactory m_factory;
-
-    Ptr<UniformRandomVariable> m_initialDelay;
-
-    Ptr<UniformRandomVariable> m_intervalProb;
-
-    Time m_period; //!< The period with which the application will be set to send
-                   // messages
-
+    ObjectFactory m_factory; //!< the factory to create PeriodicSender applications
+    Ptr<UniformRandomVariable> m_initialDelay; //!< The random variable used to extract a start
+                                               //!< off delay for each PeriodicSender application
+    Ptr<UniformRandomVariable>
+        m_intervalProb; //!< The random variable used to pick inter-transmission intervals of
+                        //!< different applications from a discrete probability distribution
+    Time m_period;      //!< The base period with which the application will be set to send messages
     Ptr<RandomVariableStream>
-        m_pktSizeRV; // whether or not a random component is added to the packet size
-
-    uint8_t m_pktSize; // the packet size.
+        m_pktSizeRV;   //!< Whether or not a random component is added to the packet size.
+    uint8_t m_pktSize; //!< The base packet size.
 };
 
 } // namespace lorawan
