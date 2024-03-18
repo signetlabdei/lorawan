@@ -33,7 +33,7 @@ namespace lorawan
 /**
  * \ingroup lorawan
  *
- * A class implementing the TR 45.820 model for building losses
+ * \brief A class implementing the TR 45.820 model for building losses
  */
 class BuildingPenetrationLoss : public PropagationLossModel
 {
@@ -49,10 +49,6 @@ class BuildingPenetrationLoss : public PropagationLossModel
     ~BuildingPenetrationLoss() override;
 
   private:
-    /**
-     * Perform the computation of the received power according to the current
-     * model.
-     */
     double DoCalcRxPower(double txPowerDbm,
                          Ptr<MobilityModel> a,
                          Ptr<MobilityModel> b) const override;
