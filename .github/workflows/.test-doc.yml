@@ -10,7 +10,6 @@ jobs:
     container:
       image: archlinux
     timeout-minutes: 120
-    continue-on-error: true
     steps:
       # The following step is required in all jobs that use this repo's actions
       - name: "Retrieve actions from repository"
