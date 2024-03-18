@@ -63,58 +63,77 @@ class NetworkServer : public Application
     ~NetworkServer() override;
 
     /**
-     * Start the NS application.
+     * \brief Start the NS application.
      */
     void StartApplication() override;
 
     /**
-     * Stop the NS application.
+     * \brief Stop the NS application.
      */
     void StopApplication() override;
 
     /**
-     * Inform the NetworkServer that these nodes are connected to the network.
+     * \brief Inform the NetworkServer that these nodes are connected to the network.
      *
      * This method will create a DeviceStatus object for each new node, and add
      * it to the list.
+     *
+     * \param nodes The end device NodeContainer.
      */
     void AddNodes(NodeContainer nodes);
 
     /**
-     * Inform the NetworkServer that this node is connected to the network.
+     * \brief Inform the NetworkServer that this node is connected to the network.
+     *
      * This method will create a DeviceStatus object for the new node (if it
      * doesn't already exist).
+     *
+     * \param node The end device Node.
      */
     void AddNode(Ptr<Node> node);
 
     /**
-     * Add this gateway to the list of gateways connected to this NS.
+     * \brief Add the gateway to the list of gateways connected to this NS.
+     *
      * Each GW is identified by its Address in the NS-GWs network.
+     *
+     * \param gateway A Ptr to the gateway Node.
+     * \param netDevice A Ptr to the NetDevice of the NS connected to the gateway.
      */
     void AddGateway(Ptr<Node> gateway, Ptr<NetDevice> netDevice);
 
     /**
-     * A NetworkControllerComponent to this NetworkServer instance.
+     * \brief Add a NetworkControllerComponent to this NetworkServer instance.
+     *
+     * \param component A Ptr to the NetworkControllerComponent object.
      */
     void AddComponent(Ptr<NetworkControllerComponent> component);
 
     /**
-     * Receive a packet from a gateway.
-     * \param packet the received packet
+     * \brief Receive a packet from a gateway.
+     *
+     * This function is meant to be provided to NetDevice objects as a ReceiveCallback.
+     *
+     * \copydoc ns3::NetDevice::ReceiveCallback
      */
     bool Receive(Ptr<NetDevice> device,
                  Ptr<const Packet> packet,
                  uint16_t protocol,
-                 const Address& address);
+                 const Address& sender);
 
+    /**
+     * \brief Get the NetworkStatus object of this NetworkServer.
+     *
+     * \return A Ptr to the NetworkStatus object.
+     */
     Ptr<NetworkStatus> GetNetworkStatus();
 
   protected:
-    Ptr<NetworkStatus> m_status;
-    Ptr<NetworkController> m_controller;
-    Ptr<NetworkScheduler> m_scheduler;
+    Ptr<NetworkStatus> m_status;         //!< Ptr to the NetworkStatus object.
+    Ptr<NetworkController> m_controller; //!< Ptr to the NetworkController object.
+    Ptr<NetworkScheduler> m_scheduler;   //!< Ptr to the NetworkScheduler object.
 
-    TracedCallback<Ptr<const Packet>> m_receivedPacket;
+    TracedCallback<Ptr<const Packet>> m_receivedPacket; //!< The `ReceivedPacket` trace source.
 };
 
 } // namespace lorawan
