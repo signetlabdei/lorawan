@@ -40,7 +40,7 @@ class NetworkStatus;
 /**
  * \ingroup lorawan
  *
- * Generic class describing a component of the NetworkController.
+ * \brief Generic class describing a component of the NetworkController.
  *
  * This is the class that is meant to be extended by all NetworkController
  * components, and provides a common interface for the NetworkController to
@@ -51,7 +51,7 @@ class NetworkControllerComponent : public Object
   public:
     /**
      * \brief Get the type ID.
-     * \return the object TypeId
+     * \return the object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -63,9 +63,9 @@ class NetworkControllerComponent : public Object
     /**
      * \brief Function called as a new uplink packet is received by the NetworkServer.
      *
-     * \param packet The newly received packet
-     * \param status A pointer to the status of the end device that sent the packet
-     * \param networkStatus A pointer to the NetworkStatus object
+     * \param packet The newly received packet.
+     * \param status A pointer to the status of the end device that sent the packet.
+     * \param networkStatus A pointer to the NetworkStatus object.
      */
     virtual void OnReceivedPacket(Ptr<const Packet> packet,
                                   Ptr<EndDeviceStatus> status,
@@ -73,16 +73,16 @@ class NetworkControllerComponent : public Object
     /**
      * \brief Function called as a downlink reply is about to leave the NetworkServer.
      *
-     * \param status A pointer to the status of the end device which we are sending the reply to
-     * \param networkStatus A pointer to the NetworkStatus object
+     * \param status A pointer to the status of the end device which we are sending the reply to.
+     * \param networkStatus A pointer to the NetworkStatus object.
      */
     virtual void BeforeSendingReply(Ptr<EndDeviceStatus> status,
                                     Ptr<NetworkStatus> networkStatus) = 0;
     /**
-     * Method that is called when a packet cannot be sent in the downlink.
+     * \brief Method that is called when a packet cannot be sent in the downlink.
      *
-     * \param status The EndDeviceStatus of the device to which it was impossible to send a reply
-     * \param networkStatus A pointer to the NetworkStatus object
+     * \param status The EndDeviceStatus of the device to which it was impossible to send a reply.
+     * \param networkStatus A pointer to the NetworkStatus object.
      */
     virtual void OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus) = 0;
 };
@@ -90,14 +90,14 @@ class NetworkControllerComponent : public Object
 /**
  * \ingroup lorawan
  *
- * Network controller component for acknowledgments management.
+ * \brief Network controller component for acknowledgments management.
  */
 class ConfirmedMessagesComponent : public NetworkControllerComponent
 {
   public:
     /**
      * \brief Get the type ID.
-     * \return the object TypeId
+     * \return the object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -109,8 +109,9 @@ class ConfirmedMessagesComponent : public NetworkControllerComponent
      * This method checks whether the received packet requires an acknowledgment
      * and sets up the appropriate reply in case it does.
      *
-     * \param packet The newly received packet
-     * \param networkStatus A pointer to the NetworkStatus object
+     * \param packet The newly received packet.
+     * \param status A Ptr to the EndDeviceStatus object of the sender.
+     * \param networkStatus A pointer to the NetworkStatus object.
      */
     void OnReceivedPacket(Ptr<const Packet> packet,
                           Ptr<EndDeviceStatus> status,
@@ -124,14 +125,14 @@ class ConfirmedMessagesComponent : public NetworkControllerComponent
 /**
  * \ingroup lorawan
  *
- * Network controller component for LinkCheck commands management
+ * \brief Network controller component for LinkCheck commands management.
  */
 class LinkCheckComponent : public NetworkControllerComponent
 {
   public:
     /**
      * \brief Get the type ID.
-     * \return the object TypeId
+     * \return the object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -143,8 +144,9 @@ class LinkCheckComponent : public NetworkControllerComponent
      * This method checks whether the received packet requires an acknowledgment
      * and sets up the appropriate reply in case it does.
      *
-     * \param packet The newly received packet
-     * \param networkStatus A pointer to the NetworkStatus object
+     * \param packet The newly received packet.
+     * \param status A Ptr to the EndDeviceStatus object of the sender.
+     * \param networkStatus A pointer to the NetworkStatus object.
      */
     void OnReceivedPacket(Ptr<const Packet> packet,
                           Ptr<EndDeviceStatus> status,
@@ -155,6 +157,14 @@ class LinkCheckComponent : public NetworkControllerComponent
     void OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus) override;
 
   private:
+    /**
+     * \brief Update the EndDeviceStatus object on LinkChackReq MAC command.
+     *
+     * \todo not implemented. Also not sure what this function is meant to do.
+     *
+     * \param packet A Ptr to the Packet.
+     * \param status A Ptr to the EndDeviceStatus object of the sender.
+     */
     void UpdateLinkCheckAns(Ptr<const Packet> packet, Ptr<EndDeviceStatus> status);
 };
 } // namespace lorawan
