@@ -52,12 +52,24 @@ class UplinkPacketTest : public TestCase
     UplinkPacketTest();
     ~UplinkPacketTest() override;
 
+    /**
+     * \brief Callback for tracing ReceivedPacket
+     *
+     * \param packet the packet received
+     */
     void ReceivedPacket(Ptr<const Packet> packet);
+
+    /**
+     * \brief Send a packet from the input end device
+     *
+     * \param endDevice A Ptr to the end device Node
+     */
     void SendPacket(Ptr<Node> endDevice);
 
   private:
     void DoRun() override;
-    bool m_receivedPacket = false;
+
+    bool m_receivedPacket = false; //!< Set to true if a packet is received by the server
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -127,15 +139,34 @@ class DownlinkPacketTest : public TestCase
     DownlinkPacketTest();
     ~DownlinkPacketTest() override;
 
+    /**
+     * Record the exit status of a MAC layer packet retransmission process of an end device.
+     *
+     * This trace sink is only used here to determine whether an ack was received by the end device
+     * after sending a package requiring an acknowledgement.
+     *
+     * \param requiredTransmissions Number of transmissions attempted during the process
+     * \param success Whether the retransmission procedure was successful
+     * \param time Timestamp of the initial transmission attempt
+     * \param packet The packet being retransmitted
+     */
     void ReceivedPacketAtEndDevice(uint8_t requiredTransmissions,
                                    bool success,
                                    Time time,
                                    Ptr<Packet> packet);
+
+    /**
+     * \brief Send a packet from the input end device
+     *
+     * \param endDevice A Ptr to the end device Node
+     * \param requestAck Whether to require an acknowledgement from the server
+     */
     void SendPacket(Ptr<Node> endDevice, bool requestAck);
 
   private:
     void DoRun() override;
-    bool m_receivedPacketAtEd = false;
+
+    bool m_receivedPacketAtEd = false; //!< Set to true if a packet is received by the end device
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -220,14 +251,30 @@ class LinkCheckTest : public TestCase
     LinkCheckTest();
     ~LinkCheckTest() override;
 
+    /**
+     * \brief Trace changes in the last known gateway count variable (updated on reception of
+     * LinkCheckAns MAC commands) of an end device
+     *
+     * \param newValue The updated value
+     * \param oldValue The previous value
+     */
     void LastKnownGatewayCount(int newValue, int oldValue);
 
+    /**
+     * \brief Send a packet containing a LinkCheckReq MAC command from the input end device
+     *
+     * \param endDevice A Ptr to the end device Node
+     * \param requestAck Whether to require an acknowledgement from the server
+     */
     void SendPacket(Ptr<Node> endDevice, bool requestAck);
 
   private:
     void DoRun() override;
-    bool m_receivedPacketAtEd = false;
-    int m_numberOfGatewaysThatReceivedPacket = 0;
+    bool m_receivedPacketAtEd = false; //!< Set to true if a packet containing a LinkCheckAns MAC
+                                       //!< command is received by the end device
+    int m_numberOfGatewaysThatReceivedPacket =
+        0; //!< Stores the number of gateways that received the last packet carrying a
+           //!< LinkCheckReq MAC command
 };
 
 // Add some help text to this case to describe what it is intended to test
