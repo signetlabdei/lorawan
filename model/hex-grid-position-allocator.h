@@ -78,6 +78,11 @@ class HexGridPositionAllocator : public PositionAllocator
 {
   public:
     HexGridPositionAllocator();
+    /**
+     * \brief Construct a new HexGridPositionAllocator object with given radius
+     *
+     * \param radius The radius length of the circle inscribed in the hexagonal tiles
+     */
     HexGridPositionAllocator(double radius);
 
     ~HexGridPositionAllocator() override;
@@ -92,32 +97,35 @@ class HexGridPositionAllocator : public PositionAllocator
      */
     static TypeId GetTypeId();
 
+    /**
+     * \brief Get the radius of the circle inscribed in the hexagonal tiles
+     *
+     * \return The radius length
+     */
     double GetRadius() const;
 
+    /**
+     * \brief Set the radius of the circle inscribed in the hexagonal tiles
+     *
+     * \param radius The radius length
+     */
     void SetRadius(double radius);
 
   private:
     /**
-     * This method adds to the given list of positions an outer ring of positions
-     * \param position the list of position around which to create the other positions
+     * \brief This method adds to the given list of positions an outer ring of positions
+     *
+     * \param positions The list of position around which to create the new positions.
+     * \return The input list of position with an added outer ring.
      */
     std::vector<Vector> AddRing(std::vector<Vector> positions);
 
-    /**
-     * The list of current positions
-     */
-    std::vector<Vector> m_positions;
-
-    /**
-     * The iterator pointing to the next position to return
-     */
-    mutable std::vector<Vector>::const_iterator m_next;
-
-    /**
-     * The radius of a cell (defined as the half the distance between two
-     * adjacent nodes)
-     */
-    double m_radius;
+    std::vector<Vector> m_positions; //!< The current list of positions
+    mutable std::vector<Vector>::const_iterator
+        m_next;      //!< The iterator pointing to the next position to return
+    double m_radius; //!< The radius of a cell (defined as the half the distance between two
+                     //!< adjacent nodes, that is, the radius of the circle inscribed in each
+                     //!< hexagonal tile)
 
     const static double pi; //!< Pi
 };
