@@ -58,8 +58,20 @@ class NetworkServerHelper
 
     ~NetworkServerHelper();
 
+    /**
+     * \brief Record an attribute to be set in each Application after it is is created.
+     *
+     * \param name the name of the application attribute to set
+     * \param value the value of the application attribute to set
+     */
     void SetAttribute(std::string name, const AttributeValue& value);
 
+    /**
+     * \brief Create one lorawan network server application on the Node.
+     *
+     * \param node The node on which to create the Application.
+     * \returns The application created.
+     */
     ApplicationContainer Install(Ptr<Node> node);
 
     /**
@@ -75,35 +87,53 @@ class NetworkServerHelper
 
     /**
      * Set which end devices will be managed by this NS.
+     *
+     * \param endDevices the end device nodes
      */
     void SetEndDevices(NodeContainer endDevices);
 
     /**
      * Enable (true) or disable (false) the ADR component in the Network
      * Server created by this helper.
+     *
+     * \param enableAdr Whether to enable adr in the Network Server
      */
     void EnableAdr(bool enableAdr);
 
     /**
      * Set the ADR implementation to use in the Network Server created
      * by this helper.
+     *
+     * \param type The type of ADR implementation
      */
     void SetAdr(std::string type);
 
   private:
+    /**
+     * \brief Install the NetworkServerComponent objects onto the NetworkServer application.
+     *
+     * \param netServer A pointer to the NetworkServer application.
+     */
     void InstallComponents(Ptr<NetworkServer> netServer);
+
+    /**
+     * \brief Do the actual NetworkServer application installation on the Node.
+     *
+     * This function creates the NetworkServer Application, installs it on the Node, connect the
+     * gateways to the Node with a PointToPoint link, registers gateways and devices in the
+     * NetworkServer Application, and installs the necessary NetworkServerComponent objects.
+     *
+     * \param node A pointer to the Node
+     * \return A pointer to the installed NetworkServer application
+     */
     Ptr<Application> InstallPriv(Ptr<Node> node);
 
-    ObjectFactory m_factory;
-
+    ObjectFactory m_factory; //!< Factory to create the Network server application
     std::list<std::pair<Ptr<NetDevice>, Ptr<Node>>>
-        m_gatewayRegistrationList; //!< List of gateway nodes to register to this NS net devices
-
-    NodeContainer m_endDevices; //!< Set of endDevices to connect to this NS
-
-    bool m_adrEnabled;
-
-    ObjectFactory m_adrSupportFactory;
+        m_gatewayRegistrationList;     //!< List of gateway nodes to register to this NS net devices
+    NodeContainer m_endDevices;        //!< Set of endDevices to connect to this NS
+    bool m_adrEnabled;                 //!< Whether to enable ADR on the NetworkServer application
+    ObjectFactory m_adrSupportFactory; //!< Factory to create the ADR component
 };
 
 } // namespace lorawan
