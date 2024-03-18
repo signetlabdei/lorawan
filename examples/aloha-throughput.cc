@@ -55,17 +55,24 @@ using namespace lorawan;
 NS_LOG_COMPONENT_DEFINE("AlohaThroughput");
 
 // Network settings
-int nDevices = 200;
-int nGateways = 1;
-double radius = 1000;
-double simulationTime = 100;
+int nDevices = 200;          //!< number of end device nodes to create
+int nGateways = 1;           //!< number of gateway nodes to create
+double radius = 1000;        //!< radius (m) of the deplyoment
+double simulationTime = 100; //!< scenario duration (s) in simulated time
 
 // Channel model
-bool realisticChannelModel = false;
+bool realisticChannelModel = false; //!< wheather to use a more realistic channel model with
+                                    //!< buildings and correlated shadowing
 
-std::vector<int> packetsSent(6, 0);
-std::vector<int> packetsReceived(6, 0);
+auto packetsSent = std::vector<int>(6, 0);     //!< Record pkts by DR (idx 0 -> DR5, 5 -> DR0)
+auto packetsReceived = std::vector<int>(6, 0); //!< Record pkts by DR (idx 0 -> DR5, 5 -> DR0)
 
+/**
+ * \brief Record the beginning of a transmission by an end device.
+ *
+ * \param packet A Ptr to the Packet sent.
+ * \param systemId Node id of the sender end device.
+ */
 void
 OnTransmissionCallback(Ptr<const Packet> packet, uint32_t systemId)
 {
@@ -75,6 +82,12 @@ OnTransmissionCallback(Ptr<const Packet> packet, uint32_t systemId)
     packetsSent.at(tag.GetSpreadingFactor() - 7)++;
 }
 
+/**
+ * \brief Record the correct reception of a packet by a gateway.
+ *
+ * \param packet A Ptr to the packet received.
+ * \param systemId Node id of the receiver gateway.
+ */
 void
 OnPacketReceptionCallback(Ptr<const Packet> packet, uint32_t systemId)
 {
