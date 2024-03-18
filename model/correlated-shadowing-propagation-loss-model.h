@@ -39,19 +39,40 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
 {
   public:
     /**
-     * \ingroup lorawan
-     *
      * Stores x,y values and overrides critical operators
      */
     class Position
     {
       public:
+        /**
+         * \brief Default constructor.
+         */
         Position();
+        /**
+         * \brief Construct a new Position object with values.
+         *
+         * \param x The x coordinate.
+         * \param y The y coordinate.
+         */
         Position(double x, double y);
-        double x;
-        double y;
 
+        double x; //!< Stores the x coordinate.
+        double y; //!< Stores the y coordinate.
+
+        /**
+         * \brief Equality comparison operator
+         *
+         * \param other second Position to compare rhis instance to
+         * \return true if the positions are equal
+         */
         bool operator==(const Position& other) const;
+        /**
+         * \brief Less-then comparison operator
+         *
+         * \param other second Position to compare this instance to
+         * \return true if either the x or y coordinate of first Position is less than the
+         * respective one of the second Position
+         */
         bool operator<(const Position& other) const;
     };
 
@@ -85,9 +106,13 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
         ~ShadowingMap();
 
         /**
-         * Get the loss for a certain position.
-         * If this position is not already in the map, add it by computing the
+         * \brief Get the loss for a certain position.
+         *
+         * If the position is not already in the map, add it by computing the
          * interpolation of neighboring shadowing values belonging to the grid.
+         *
+         * \param position The Position instance
+         * \return the loss as a double
          */
         double GetLoss(CorrelatedShadowingPropagationLossModel::Position position);
 
@@ -130,12 +155,20 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
     CorrelatedShadowingPropagationLossModel();
 
     /**
-     * Set the correlation distance for newly created ShadowingMap instances
+     * \brief Set the correlation distance for newly created ShadowingMap instances
+     *
+     * \todo not implemented
+     *
+     * \param distance The correlation distance to set
      */
     void SetCorrelationDistance(double distance);
 
     /**
-     * Get the correlation distance that is currently being used.
+     * \brief the correlation distance that is currently being used.
+     *
+     * \todo not implemented
+     *
+     * \return the correlation distance as a double
      */
     double GetCorrelationDistance();
 
