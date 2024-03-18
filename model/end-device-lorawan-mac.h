@@ -445,8 +445,6 @@ class EndDeviceLorawanMac : public LorawanMac
 
     /**
      * The trace source fired when the transmission procedure is finished.
-     *
-     * \see class CallBackTraceSource
      */
     TracedCallback<uint8_t, bool, Time, Ptr<Packet>> m_requiredTxCallback;
 

@@ -281,46 +281,34 @@ class LoraPhy : public Object
 
     /**
      * The trace source fired when a packet is sent.
-     *
-     * \see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_startSending;
 
     /**
      * The trace source fired when a packet begins the reception process from the
      * medium.
-     *
-     * \see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>> m_phyRxBeginTrace;
 
     /**
      * The trace source fired when a packet reception ends.
-     *
-     * \see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>> m_phyRxEndTrace;
 
     /**
      * The trace source fired when a packet was correctly received.
-     *
-     * \see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_successfullyReceivedPacket;
 
     /**
      * The trace source fired when a packet cannot be received because its power
      * is below the sensitivity threshold.
-     *
-     * \see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_underSensitivity;
 
     /**
      * The trace source fired when a packet cannot be correctly received because
      * of interference.
-     *
-     * \see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_interferedPacket;
 

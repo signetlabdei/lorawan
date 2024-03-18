@@ -227,8 +227,6 @@ class LorawanMac : public Object
     /**
      * The trace source that is fired when a packet cannot be sent because of duty
      * cycle limitations.
-     *
-     * \see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>> m_cannotSendBecauseDutyCycle;
 
