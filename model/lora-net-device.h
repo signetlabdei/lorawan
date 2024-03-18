@@ -45,7 +45,7 @@ class LorawanMac;
 /**
  * \ingroup lorawan
  *
- * Hold together all LoRa related objects.
+ * \brief Hold together all LoRa related objects.
  *
  * This class holds together pointers to LoraChannel, LoraPhy and LorawanMac,
  * exposing methods through which Application instances can send packets. The
@@ -66,48 +66,50 @@ class LoraNetDevice : public NetDevice
     ~LoraNetDevice() override;
 
     /**
-     * Set which LorawanMac instance is linked to this device.
+     * \brief Set which LorawanMac instance is linked to this device.
      *
      * \param mac the mac layer to use.
      */
     void SetMac(Ptr<LorawanMac> mac);
 
     /**
-     * Set which LoraPhy instance is linked to this device.
+     * \brief Set which LoraPhy instance is linked to this device.
      *
      * \param phy the phy layer to use.
      */
     void SetPhy(Ptr<LoraPhy> phy);
 
     /**
-     * Get the LorawanMac instance that is linked to this NetDevice.
+     * \brief Get the LorawanMac instance that is linked to this NetDevice.
      *
      * \return the mac we are currently using.
      */
     Ptr<LorawanMac> GetMac() const;
 
     /**
-     * Get the LoraPhy instance that is linked to this NetDevice.
+     * \brief Get the LoraPhy instance that is linked to this NetDevice.
      *
      * \return the phy we are currently using.
      */
     Ptr<LoraPhy> GetPhy() const;
 
     /**
-     * Send a packet through the LoRaWAN stack.
+     * \brief Send a packet through the LoRaWAN stack.
      *
      * \param packet The packet to send.
      */
     void Send(Ptr<Packet> packet);
 
     /**
-     * This function is implemented to achieve compliance with the NetDevice
+     * \copydoc ns3::NetDevice::Send
+
+     * \note This function is implemented to achieve compliance with the NetDevice
      * interface. Note that the dest and protocolNumber args are ignored.
      */
     bool Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber) override;
 
     /**
-     * Callback the Mac layer calls whenever a packet arrives and needs to be
+     * \brief Callback the Mac layer calls whenever a packet arrives and needs to be
      * forwarded up the stack.
      *
      * \param packet The packet that was received.
@@ -146,8 +148,10 @@ class LoraNetDevice : public NetDevice
 
   protected:
     /**
-     * Receive a packet from the lower layer and pass the
+     * \brief Receive a packet from the lower layer and pass the
      * packet up the stack.
+     *
+     * \todo not implemented
      *
      * \param packet The packet we need to forward.
      * \param from The from address.
@@ -157,12 +161,14 @@ class LoraNetDevice : public NetDevice
 
   private:
     /**
-     * Return the LoraChannel this device is connected to.
+     * \brief Return the LoraChannel this device is connected to.
+     *
+     * \return A Ptr to the LoraChannel object.
      */
     Ptr<LoraChannel> DoGetChannel() const;
 
     /**
-     * Complete the configuration of this LoRa device by connecting all lower
+     * \brief Complete the configuration of this LoRa device by connecting all lower
      * components (PHY, MAC, Channel) together.
      */
     void CompleteConfig();
