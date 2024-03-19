@@ -160,7 +160,7 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
     void SetCorrelationDistance(double distance);
 
     /**
-     * the correlation distance that is currently being used.
+     * The correlation distance that is currently being used.
      *
      * \todo Not implemented.
      *
@@ -183,27 +183,27 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
      * square is identified by a pair of coordinates. Coordinates are computed as
      * such:
      *
-     *  o---------o---------o---------o---------o---------o
-     *  |         |         |    '    |         |         |
-     *  |  (-2,2) |  (-1,2) |  (0,2)  |  (1,2)  |  (2,2)  |
-     *  |         |         |    '    |         |         |
-     *  o---------o---------o----+----o---------o---------o
-     *  |         |         |    '    |         |         |
-     *  |  (-2,1) |  (-1,1) |  (0,1)  |  (1,1)  |  (2,1)  |
-     *  |         |         |    '    |         |         |
-     *  o---------o---------o----+----o---------o---------o
-     *  |         |         |    '    |         |         |
-     *  |--(-2,0)-+--(-1,0)-+--(0,0)--+--(1,0)--+--(2,0)--|
-     *  |         |         |    '    |         |         |
-     *  o---------o---------o----+----o---------o---------o
-     *  |         |         |    '    |         |         |
-     *  | (-2,-1) | (-1,-1) | (0,-1)  | (1,-1)  | (2,-1)  |
-     *  |         |         |    '    |         |         |
-     *  o---------o---------o----+----o---------o---------o
-     *  |         |         |    '    |         |         |
-     *  | (-2,-2) | (-1,-2) | (0,-2)  | (1,-2)  | (2,-2)  |
-     *  |         |         |    '    |         |         |
-     *  o---------o---------o---------o---------o---------o
+     *        o---------o---------o---------o---------o---------o
+     *        |         |         |    '    |         |         |
+     *        |  (-2,2) |  (-1,2) |  (0,2)  |  (1,2)  |  (2,2)  |
+     *        |         |         |    '    |         |         |
+     *        o---------o---------o----+----o---------o---------o
+     *        |         |         |    '    |         |         |
+     *        |  (-2,1) |  (-1,1) |  (0,1)  |  (1,1)  |  (2,1)  |
+     *        |         |         |    '    |         |         |
+     *        o---------o---------o----+----o---------o---------o
+     *        |         |         |    '    |         |         |
+     *        |--(-2,0)-+--(-1,0)-+--(0,0)--+--(1,0)--+--(2,0)--|
+     *        |         |         |    '    |         |         |
+     *        o---------o---------o----+----o---------o---------o
+     *        |         |         |    '    |         |         |
+     *        | (-2,-1) | (-1,-1) | (0,-1)  | (1,-1)  | (2,-1)  |
+     *        |         |         |    '    |         |         |
+     *        o---------o---------o----+----o---------o---------o
+     *        |         |         |    '    |         |         |
+     *        | (-2,-2) | (-1,-2) | (0,-2)  | (1,-2)  | (2,-2)  |
+     *        |         |         |    '    |         |         |
+     *        o---------o---------o---------o---------o---------o
      *
      *  For each one of these coordinates, a ShadowingMap is computed. That is,
      *  each one of the points belonging to the same square sees the same
