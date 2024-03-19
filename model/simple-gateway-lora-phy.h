@@ -52,7 +52,7 @@ class SimpleGatewayLoraPhy : public GatewayLoraPhy
      */
     static TypeId GetTypeId();
 
-    SimpleGatewayLoraPhy();
+    SimpleGatewayLoraPhy();           //!< Default constructor
     ~SimpleGatewayLoraPhy() override; //!< Destructor
 
     void StartReceive(Ptr<Packet> packet,

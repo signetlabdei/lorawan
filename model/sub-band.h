@@ -47,7 +47,7 @@ class SubBand : public Object
      */
     static TypeId GetTypeId();
 
-    SubBand();
+    SubBand();           //!< Default constructor
     ~SubBand() override; //!< Destructor
 
     /**

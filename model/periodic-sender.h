@@ -39,7 +39,7 @@ namespace lorawan
 class PeriodicSender : public Application
 {
   public:
-    PeriodicSender();
+    PeriodicSender();           //!< Default constructor
     ~PeriodicSender() override; //!< Destructor
 
     /**

@@ -47,7 +47,7 @@ NS_LOG_COMPONENT_DEFINE("NetworkStatusTestSuite");
 class EndDeviceStatusTest : public TestCase
 {
   public:
-    EndDeviceStatusTest();
+    EndDeviceStatusTest();           //!< Default constructor
     ~EndDeviceStatusTest() override; //!< Destructor
 
   private:
@@ -84,7 +84,7 @@ EndDeviceStatusTest::DoRun()
 class NetworkStatusTest : public TestCase
 {
   public:
-    NetworkStatusTest();
+    NetworkStatusTest();           //!< Default constructor
     ~NetworkStatusTest() override; //!< Destructor
 
   private:
@@ -131,7 +131,7 @@ NetworkStatusTest::DoRun()
 class NetworkStatusTestSuite : public TestSuite
 {
   public:
-    NetworkStatusTestSuite();
+    NetworkStatusTestSuite(); //!< Default constructor
 };
 
 NetworkStatusTestSuite::NetworkStatusTestSuite()

@@ -58,7 +58,7 @@ class LorawanMacHeader : public Header
      */
     static TypeId GetTypeId();
 
-    LorawanMacHeader();
+    LorawanMacHeader();           //!< Default constructor
     ~LorawanMacHeader() override; //!< Destructor
 
     // Pure virtual methods from Header that need to be implemented by this class

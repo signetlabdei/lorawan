@@ -42,6 +42,8 @@ class NetworkController; // Forward declaration
  * \ingroup lorawan
  *
  * Network server component in charge of scheduling downling packets onto devices' reception windows
+ *
+ * \todo We should probably add getters and setters or remove default constructor
  */
 class NetworkScheduler : public Object
 {
@@ -52,12 +54,7 @@ class NetworkScheduler : public Object
      */
     static TypeId GetTypeId();
 
-    /**
-     * \brief Construct a new NetworkScheduler object
-     *
-     * \todo We should probably remove this or add getters and setters
-     */
-    NetworkScheduler();
+    NetworkScheduler();           //!< Default constructor
     ~NetworkScheduler() override; //!< Destructor
 
     /**

@@ -149,7 +149,7 @@ class EndDeviceLoraPhy : public LoraPhy
      */
     static TypeId GetTypeId();
 
-    EndDeviceLoraPhy();
+    EndDeviceLoraPhy();           //!< Default constructor
     ~EndDeviceLoraPhy() override; //!< Destructor
 
     // Implementation of LoraPhy's pure virtual functions

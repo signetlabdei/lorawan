@@ -54,7 +54,7 @@ class NetworkStatus : public Object
      */
     static TypeId GetTypeId();
 
-    NetworkStatus();
+    NetworkStatus();           //!< Default constructor
     ~NetworkStatus() override; //!< Destructor
 
     /**

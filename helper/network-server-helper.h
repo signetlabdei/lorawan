@@ -56,7 +56,7 @@ typedef std::list<std::pair<Ptr<PointToPointNetDevice>, Ptr<Node>>> P2PGwRegistr
 class NetworkServerHelper
 {
   public:
-    NetworkServerHelper();
+    NetworkServerHelper();  //!< Default constructor
     ~NetworkServerHelper(); //!< Destructor
 
     /**

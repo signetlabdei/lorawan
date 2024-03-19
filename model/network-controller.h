@@ -50,14 +50,15 @@ class NetworkController : public Object
      */
     static TypeId GetTypeId();
 
-    NetworkController();
+    NetworkController();           //!< Default constructor
+    ~NetworkController() override; //!< Destructor
+
     /**
      * \brief Construct a new NetworkController object providing the NetworkStatus.
      *
      * \param networkStatus A Ptr to the NetworkStatus object.
      */
     NetworkController(Ptr<NetworkStatus> networkStatus);
-    ~NetworkController() override; //!< Destructor
 
     /**
      * \brief Add a new NetworkControllerComponent.

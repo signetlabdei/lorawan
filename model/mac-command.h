@@ -73,7 +73,7 @@ class MacCommand : public Object
      */
     static TypeId GetTypeId();
 
-    MacCommand();
+    MacCommand();           //!< Default constructor
     ~MacCommand() override; //!< Destructor
 
     /**
@@ -154,7 +154,8 @@ class LinkCheckReq : public MacCommand
 class LinkCheckAns : public MacCommand
 {
   public:
-    LinkCheckAns();
+    LinkCheckAns(); //!< Default constructor
+
     /**
      * Constructor with given fields
      *
@@ -288,7 +289,8 @@ class LinkAdrReq : public MacCommand
 class LinkAdrAns : public MacCommand
 {
   public:
-    LinkAdrAns();
+    LinkAdrAns(); //!< Default constructor
+
     /**
      * Constructor with given fields
      *
@@ -353,7 +355,7 @@ class DutyCycleReq : public MacCommand
 class DutyCycleAns : public MacCommand
 {
   public:
-    DutyCycleAns();
+    DutyCycleAns(); //!< Default constructor
 
     void Serialize(Buffer::Iterator& start) const override;
     uint8_t Deserialize(Buffer::Iterator& start) override;
@@ -464,7 +466,8 @@ class DevStatusReq : public MacCommand
 class DevStatusAns : public MacCommand
 {
   public:
-    DevStatusAns();
+    DevStatusAns(); //!< Default constructor
+
     /**
      * Constructor with initialization of all parameters.
      *
@@ -563,7 +566,7 @@ class NewChannelReq : public MacCommand
 class NewChannelAns : public MacCommand
 {
   public:
-    NewChannelAns();
+    NewChannelAns(); //!< Default constructor
 
     /**
      * Constructor providing initialization of all parameters.
@@ -643,7 +646,7 @@ class RxTimingSetupAns : public MacCommand
 class TxParamSetupAns : public MacCommand
 {
   public:
-    TxParamSetupAns();
+    TxParamSetupAns(); //!< Default constructor
 
     void Serialize(Buffer::Iterator& start) const override;
     uint8_t Deserialize(Buffer::Iterator& start) override;
@@ -677,7 +680,7 @@ class TxParamSetupReq : public MacCommand
 class DlChannelAns : public MacCommand
 {
   public:
-    DlChannelAns();
+    DlChannelAns(); //!< Default constructor
 
     void Serialize(Buffer::Iterator& start) const override;
     uint8_t Deserialize(Buffer::Iterator& start) override;

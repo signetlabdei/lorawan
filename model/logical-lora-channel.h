@@ -51,7 +51,7 @@ class LogicalLoraChannel : public Object
      */
     static TypeId GetTypeId();
 
-    LogicalLoraChannel();
+    LogicalLoraChannel();           //!< Default constructor
     ~LogicalLoraChannel() override; //!< Destructor
 
     /**

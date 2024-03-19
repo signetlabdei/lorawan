@@ -45,7 +45,7 @@ namespace lorawan
 class PeriodicSenderHelper
 {
   public:
-    PeriodicSenderHelper();
+    PeriodicSenderHelper();  //!< Default constructor
     ~PeriodicSenderHelper(); //!< Destructor
 
     /**

@@ -56,8 +56,7 @@ class AdrComponent : public NetworkControllerComponent
      */
     static TypeId GetTypeId();
 
-    // Constructor
-    AdrComponent();
+    AdrComponent();           //!< Default constructor
     ~AdrComponent() override; //!< Destructor
 
     void OnReceivedPacket(Ptr<const Packet> packet,

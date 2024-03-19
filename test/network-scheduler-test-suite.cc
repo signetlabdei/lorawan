@@ -37,7 +37,7 @@ NS_LOG_COMPONENT_DEFINE("NetworkSchedulerTestSuite");
 class NetworkSchedulerTest : public TestCase
 {
   public:
-    NetworkSchedulerTest();
+    NetworkSchedulerTest();           //!< Default constructor
     ~NetworkSchedulerTest() override; //!< Destructor
 
   private:
@@ -75,7 +75,7 @@ NetworkSchedulerTest::DoRun()
 class NetworkSchedulerTestSuite : public TestSuite
 {
   public:
-    NetworkSchedulerTestSuite();
+    NetworkSchedulerTestSuite(); //!< Default constructor
 };
 
 NetworkSchedulerTestSuite::NetworkSchedulerTestSuite()

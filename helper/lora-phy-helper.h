@@ -36,7 +36,8 @@ namespace lorawan
 /**
  * \ingroup lorawan
  *
- * \brief Helper to install LoraPhy instances on multiple Nodes.
+ * \brief Helper to install LoraPhy instances on multiple Nodes. The
+ * user must set all parameters before calling Install on nodes.
  */
 class LoraPhyHelper
 {
@@ -50,11 +51,7 @@ class LoraPhyHelper
         ED
     };
 
-    /**
-     * \brief Create a phy helper without any parameter set. The user must set
-     * them all to be able to call Install later.
-     */
-    LoraPhyHelper();
+    LoraPhyHelper(); //!< Default constructor
 
     /**
      * \brief Set the LoraChannel to connect the PHYs to.

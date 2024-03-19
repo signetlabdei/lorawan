@@ -43,7 +43,7 @@ class LoraTxCurrentModel : public Object
      */
     static TypeId GetTypeId();
 
-    LoraTxCurrentModel();
+    LoraTxCurrentModel();           //!< Default constructor
     ~LoraTxCurrentModel() override; //!< Destructor
 
     /**
@@ -70,7 +70,7 @@ class LinearLoraTxCurrentModel : public LoraTxCurrentModel
      */
     static TypeId GetTypeId();
 
-    LinearLoraTxCurrentModel();
+    LinearLoraTxCurrentModel();           //!< Default constructor
     ~LinearLoraTxCurrentModel() override; //!< Destructor
 
     /**
@@ -138,7 +138,7 @@ class ConstantLoraTxCurrentModel : public LoraTxCurrentModel
      */
     static TypeId GetTypeId();
 
-    ConstantLoraTxCurrentModel();
+    ConstantLoraTxCurrentModel();           //!< Default constructor
     ~ConstantLoraTxCurrentModel() override; //!< Destructor
 
     /**

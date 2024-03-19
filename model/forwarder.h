@@ -41,7 +41,7 @@ namespace lorawan
 class Forwarder : public Application
 {
   public:
-    Forwarder();
+    Forwarder();           //!< Default constructor
     ~Forwarder() override; //!< Destructor
 
     /**

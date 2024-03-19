@@ -38,7 +38,8 @@ namespace lorawan
 /**
  * \ingroup lorawan
  *
- * Helper class for configuring and installing the LorawanMac class on devices and gateways
+ * Helper class for configuring and installing the LorawanMac class on devices and gateways. The
+ * user must set all parameters before calling Install on nodes.
  */
 class LorawanMacHelper
 {
@@ -69,11 +70,7 @@ class LorawanMacHelper
         ALOHA
     };
 
-    /**
-     * Create a mac helper without any parameter set. The user must set
-     * them all to be able to call Install later.
-     */
-    LorawanMacHelper();
+    LorawanMacHelper(); //!< Default constructor
 
     /**
      * Set an attribute of the underlying MAC object.

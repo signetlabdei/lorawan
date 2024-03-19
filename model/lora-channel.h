@@ -87,7 +87,7 @@ class LoraChannel : public Channel
      */
     static TypeId GetTypeId();
 
-    LoraChannel();
+    LoraChannel();           //!< Default constructor
     ~LoraChannel() override; //!< Destructor
 
     // Inherited from Channel.

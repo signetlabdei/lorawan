@@ -61,7 +61,7 @@ class LoraNetDevice : public NetDevice
      */
     static TypeId GetTypeId();
 
-    LoraNetDevice();
+    LoraNetDevice();           //!< Default constructor
     ~LoraNetDevice() override; //!< Destructor
 
     /**

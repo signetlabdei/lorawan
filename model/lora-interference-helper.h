@@ -154,7 +154,7 @@ class LoraInterferenceHelper
      */
     static TypeId GetTypeId();
 
-    LoraInterferenceHelper();
+    LoraInterferenceHelper();          //!< Default constructor
     virtual ~LoraInterferenceHelper(); //!< Destructor
 
     /**

@@ -59,7 +59,7 @@ class NetworkServer : public Application
      */
     static TypeId GetTypeId();
 
-    NetworkServer();
+    NetworkServer();           //!< Default constructor
     ~NetworkServer() override; //!< Destructor
 
     /**

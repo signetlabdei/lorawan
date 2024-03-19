@@ -52,7 +52,7 @@ class GatewayStatus : public Object
      */
     static TypeId GetTypeId();
 
-    GatewayStatus();
+    GatewayStatus();           //!< Default constructor
     ~GatewayStatus() override; //!< Destructor
 
     /**

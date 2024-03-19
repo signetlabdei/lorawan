@@ -42,7 +42,7 @@ class GatewayLorawanMac : public LorawanMac
      */
     static TypeId GetTypeId();
 
-    GatewayLorawanMac();
+    GatewayLorawanMac();           //!< Default constructor
     ~GatewayLorawanMac() override; //!< Destructor
 
     // Implementation of the LorawanMac interface

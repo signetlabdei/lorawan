@@ -81,7 +81,7 @@ namespace ns3
 class HexGridPositionAllocator : public PositionAllocator
 {
   public:
-    HexGridPositionAllocator();
+    HexGridPositionAllocator();           //!< Default constructor
     ~HexGridPositionAllocator() override; //!< Destructor
 
     /**

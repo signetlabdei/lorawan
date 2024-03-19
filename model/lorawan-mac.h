@@ -53,7 +53,7 @@ class LorawanMac : public Object
      */
     static TypeId GetTypeId();
 
-    LorawanMac();
+    LorawanMac();           //!< Default constructor
     ~LorawanMac() override; //!< Destructor
 
     /**

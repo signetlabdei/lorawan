@@ -116,7 +116,7 @@ class NwkAddr
 class LoraDeviceAddress
 {
   public:
-    LoraDeviceAddress();
+    LoraDeviceAddress(); //!< Default constructor
 
     /**
      * \brief Build a new address from a 32-bit integer.

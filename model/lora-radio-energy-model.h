@@ -45,7 +45,7 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
      */
     typedef Callback<void, double> UpdateTxCurrentCallback;
 
-    LoraRadioEnergyModelPhyListener();
+    LoraRadioEnergyModelPhyListener();           //!< Default constructor
     ~LoraRadioEnergyModelPhyListener() override; //!< Destructor
 
     /**

@@ -44,8 +44,7 @@ namespace lorawan
 class ForwarderHelper
 {
   public:
-    ForwarderHelper();
-
+    ForwarderHelper();  //!< Default constructor
     ~ForwarderHelper(); //!< Destructor
 
     /**

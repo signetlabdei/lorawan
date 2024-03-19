@@ -39,7 +39,7 @@ namespace lorawan
 class OneShotSender : public Application
 {
   public:
-    OneShotSender();
+    OneShotSender();           //!< Default constructor
     ~OneShotSender() override; //!< Destructor
 
     /**

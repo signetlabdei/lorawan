@@ -44,10 +44,8 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
     class Position
     {
       public:
-        /**
-         * \brief Default constructor.
-         */
-        Position();
+        Position(); //!< Default constructor
+
         /**
          * \brief Construct a new Position object with values.
          *
@@ -103,7 +101,7 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
         : public SimpleRefCount<CorrelatedShadowingPropagationLossModel::ShadowingMap>
     {
       public:
-        ShadowingMap();
+        ShadowingMap();  //!< Default constructor
         ~ShadowingMap(); //!< Destructor
 
         /**
@@ -150,10 +148,7 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
      */
     static TypeId GetTypeId();
 
-    /**
-     * Constructor.
-     */
-    CorrelatedShadowingPropagationLossModel();
+    CorrelatedShadowingPropagationLossModel(); //!< Default constructor
 
     /**
      * \brief Set the correlation distance for newly created ShadowingMap instances

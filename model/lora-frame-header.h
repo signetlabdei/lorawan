@@ -47,7 +47,7 @@ namespace lorawan
 class LoraFrameHeader : public Header
 {
   public:
-    LoraFrameHeader();
+    LoraFrameHeader();           //!< Default constructor
     ~LoraFrameHeader() override; //!< Destructor
 
     // Methods inherited from Header

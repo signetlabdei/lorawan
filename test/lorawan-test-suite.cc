@@ -43,7 +43,7 @@ NS_LOG_COMPONENT_DEFINE("LorawanTestSuite");
 class InterferenceTest : public TestCase
 {
   public:
-    InterferenceTest();
+    InterferenceTest();           //!< Default constructor
     ~InterferenceTest() override; //!< Destructor
 
   private:
@@ -207,7 +207,7 @@ InterferenceTest::DoRun()
 class AddressTest : public TestCase
 {
   public:
-    AddressTest();
+    AddressTest();           //!< Default constructor
     ~AddressTest() override; //!< Destructor
 
   private:
@@ -291,7 +291,7 @@ AddressTest::DoRun()
 class HeaderTest : public TestCase
 {
   public:
-    HeaderTest();
+    HeaderTest();           //!< Default constructor
     ~HeaderTest() override; //!< Destructor
 
   private:
@@ -445,7 +445,7 @@ HeaderTest::DoRun()
 class ReceivePathTest : public TestCase
 {
   public:
-    ReceivePathTest();
+    ReceivePathTest();           //!< Default constructor
     ~ReceivePathTest() override; //!< Destructor
 
   private:
@@ -877,7 +877,7 @@ ReceivePathTest::DoRun()
 class LogicalLoraChannelTest : public TestCase
 {
   public:
-    LogicalLoraChannelTest();
+    LogicalLoraChannelTest();           //!< Default constructor
     ~LogicalLoraChannelTest() override; //!< Destructor
 
   private:
@@ -1002,7 +1002,7 @@ LogicalLoraChannelTest::DoRun()
 class TimeOnAirTest : public TestCase
 {
   public:
-    TimeOnAirTest();
+    TimeOnAirTest();           //!< Default constructor
     ~TimeOnAirTest() override; //!< Destructor
 
   private:
@@ -1115,7 +1115,7 @@ TimeOnAirTest::DoRun()
 class PhyConnectivityTest : public TestCase
 {
   public:
-    PhyConnectivityTest();
+    PhyConnectivityTest();           //!< Default constructor
     ~PhyConnectivityTest() override; //!< Destructor
 
     /**
@@ -1617,7 +1617,7 @@ PhyConnectivityTest::DoRun()
 class LorawanMacTest : public TestCase
 {
   public:
-    LorawanMacTest();
+    LorawanMacTest();           //!< Default constructor
     ~LorawanMacTest() override; //!< Destructor
 
   private:
@@ -1652,7 +1652,7 @@ LorawanMacTest::DoRun()
 class LorawanTestSuite : public TestSuite
 {
   public:
-    LorawanTestSuite();
+    LorawanTestSuite(); //!< Default constructor
 };
 
 LorawanTestSuite::LorawanTestSuite()

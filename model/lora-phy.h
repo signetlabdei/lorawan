@@ -81,10 +81,7 @@ class LoraPhy : public Object
      */
     static TypeId GetTypeId();
 
-    /**
-     * \brief Constructor.
-     */
-    LoraPhy();
+    LoraPhy();           //!< Default constructor
     ~LoraPhy() override; //!< Destructor
 
     /**

@@ -98,7 +98,7 @@ typedef std::map<Ptr<const Packet>, RetransmissionStatus> RetransmissionData;
 class LoraPacketTracker
 {
   public:
-    LoraPacketTracker();
+    LoraPacketTracker();  //!< Default constructor
     ~LoraPacketTracker(); //!< Destructor
 
     ///////////////////////////

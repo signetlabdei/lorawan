@@ -47,9 +47,8 @@ namespace lorawan
 class LoraHelper
 {
   public:
+    LoraHelper();          //!< Default constructor
     virtual ~LoraHelper(); //!< Destructor
-
-    LoraHelper();
 
     /**
      * \brief Install LoraNetDevices on a list of nodes

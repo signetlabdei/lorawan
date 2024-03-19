@@ -49,7 +49,7 @@ NS_LOG_COMPONENT_DEFINE("NetworkServerTestSuite");
 class UplinkPacketTest : public TestCase
 {
   public:
-    UplinkPacketTest();
+    UplinkPacketTest();           //!< Default constructor
     ~UplinkPacketTest() override; //!< Destructor
 
     /**
@@ -136,7 +136,7 @@ UplinkPacketTest::DoRun()
 class DownlinkPacketTest : public TestCase
 {
   public:
-    DownlinkPacketTest();
+    DownlinkPacketTest();           //!< Default constructor
     ~DownlinkPacketTest() override; //!< Destructor
 
     /**
@@ -248,7 +248,7 @@ DownlinkPacketTest::DoRun()
 class LinkCheckTest : public TestCase
 {
   public:
-    LinkCheckTest();
+    LinkCheckTest();           //!< Default constructor
     ~LinkCheckTest() override; //!< Destructor
 
     /**
@@ -359,7 +359,7 @@ LinkCheckTest::DoRun()
 class NetworkServerTestSuite : public TestSuite
 {
   public:
-    NetworkServerTestSuite();
+    NetworkServerTestSuite(); //!< Default constructor
 };
 
 NetworkServerTestSuite::NetworkServerTestSuite()

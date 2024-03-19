@@ -38,10 +38,7 @@ namespace lorawan
 class LoraRadioEnergyModelHelper : public DeviceEnergyModelHelper
 {
   public:
-    /**
-     * Construct a helper which is used to add a radio energy model to a node
-     */
-    LoraRadioEnergyModelHelper();
+    LoraRadioEnergyModelHelper();           //!< Default constructor
     ~LoraRadioEnergyModelHelper() override; //!< Destructor
 
     /**

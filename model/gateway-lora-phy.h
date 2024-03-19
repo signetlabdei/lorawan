@@ -59,7 +59,7 @@ class GatewayLoraPhy : public LoraPhy
      */
     static TypeId GetTypeId();
 
-    GatewayLoraPhy();
+    GatewayLoraPhy();           //!< Default constructor
     ~GatewayLoraPhy() override; //!< Destructor
 
     void StartReceive(Ptr<Packet> packet,

@@ -44,7 +44,7 @@ namespace lorawan
 class OneShotSenderHelper
 {
   public:
-    OneShotSenderHelper();
+    OneShotSenderHelper();  //!< Default constructor
     ~OneShotSenderHelper(); //!< Destructor
 
     /**

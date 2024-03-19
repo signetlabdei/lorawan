@@ -50,7 +50,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      */
     static TypeId GetTypeId();
 
-    ClassAEndDeviceLorawanMac();
+    ClassAEndDeviceLorawanMac();           //!< Default constructor
     ~ClassAEndDeviceLorawanMac() override; //!< Destructor
 
     /////////////////////

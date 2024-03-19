@@ -56,7 +56,7 @@ class LogicalLoraChannelHelper : public Object
      */
     static TypeId GetTypeId();
 
-    LogicalLoraChannelHelper();
+    LogicalLoraChannelHelper();           //!< Default constructor
     ~LogicalLoraChannelHelper() override; //!< Destructor
 
     /**

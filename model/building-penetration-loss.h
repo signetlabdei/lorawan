@@ -44,7 +44,7 @@ class BuildingPenetrationLoss : public PropagationLossModel
      */
     static TypeId GetTypeId();
 
-    BuildingPenetrationLoss();
+    BuildingPenetrationLoss();           //!< Default constructor
     ~BuildingPenetrationLoss() override; //!< Destructor
 
   private:

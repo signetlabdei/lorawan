@@ -183,10 +183,7 @@ class EndDeviceStatus : public Object
      */
     static TypeId GetTypeId();
 
-    /**
-     * \brief Default constructor
-     */
-    EndDeviceStatus();
+    EndDeviceStatus();           //!< Default constructor
     ~EndDeviceStatus() override; //!< Destructor
 
     /**

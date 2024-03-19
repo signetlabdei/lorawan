@@ -55,7 +55,7 @@ class NetworkControllerComponent : public Object
      */
     static TypeId GetTypeId();
 
-    NetworkControllerComponent();
+    NetworkControllerComponent();           //!< Default constructor
     ~NetworkControllerComponent() override; //!< Destructor
 
     // Virtual methods whose implementation is left to child classes
@@ -100,7 +100,7 @@ class ConfirmedMessagesComponent : public NetworkControllerComponent
      */
     static TypeId GetTypeId();
 
-    ConfirmedMessagesComponent();
+    ConfirmedMessagesComponent();           //!< Default constructor
     ~ConfirmedMessagesComponent() override; //!< Destructor
 
     /**
@@ -134,7 +134,7 @@ class LinkCheckComponent : public NetworkControllerComponent
      */
     static TypeId GetTypeId();
 
-    LinkCheckComponent();
+    LinkCheckComponent();           //!< Default constructor
     ~LinkCheckComponent() override; //!< Destructor
 
     /**
