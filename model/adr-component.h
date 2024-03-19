@@ -94,7 +94,7 @@ class AdrComponent : public NetworkControllerComponent
     /**
      * \brief Convert reception power values [dBm] to Signal to Noise Ratio (SNR) values [dB]
      *
-     * The conversion comes from the formula \f$P_{rx}=-174+10\log_10(B)+SNR+NF\f$ where
+     * The conversion comes from the formula \f$P_{rx}=-174+10\log_{10}(B)+SNR+NF\f$ where
      * \f$P_{rx}\f$ is the received transmission power, \f$B\f$ is the transmission bandwidth and
      * \f$NF\f$ is the noise figure of the receiver. The constant \f$-174\f$ is the thermal noise
      * [dBm] in 1 Hz of bandwidth and is influenced the temperature of the receiver, assumed

@@ -23,6 +23,7 @@ runs:
       shell: bash
       working-directory: doc/models
       run: |
+        sed -i '/lte/i\ *     - lorawan' ../doc/main.h
         sed -i '/lr-wpan\/doc\/lr-wpan.rst/a\\t\$(SRC)\/lorawan\/doc\/lorawan.rst \\' Makefile
         sed -i '/lr-wpan\/doc\/lr-wpan-arch.dia/i\\t\$(SRC)\/lorawan\/doc\/figures\/LoRaWANTopology.pdf \\' Makefile
         sed -i '/lr-wpan/i\   lorawan' source/index.rst

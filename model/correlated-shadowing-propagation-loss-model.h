@@ -82,13 +82,15 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
      * This initializes the shadowing map with a grid of independent
      * shadowing values, one m_correlationDistance meters apart from the next
      * one. The result is something like:
-     *  o---o---o---o---o
-     *  |   |   |   |   |
-     *  o---o---o---o---o
-     *  |   |   |   |   |
-     *  o---o---o---o---o
-     *  |   |   |   |   |
-     *  o---o---o---o---o
+     *
+     *       o---o---o---o---o
+     *       |   |   |   |   |
+     *       o---o---o---o---o
+     *       |   |   |   |   |
+     *       o---o---o---o---o
+     *       |   |   |   |   |
+     *       o---o---o---o---o
+     *
      * where at each o we have an independently generated shadowing value.
      * We can then interpolate the 4 values surrounding any point in space
      * in order to get a correlated shadowing value. After generating this
