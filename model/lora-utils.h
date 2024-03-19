@@ -31,33 +31,33 @@ namespace lorawan
 /**
  * Convert from dBm to Watts.
  *
- * \param dbm the power in dBm
+ * \param dbm The power in dBm.
  *
- * \return the equivalent Watts for the given dBm
+ * \return The equivalent Watts for the given dBm value.
  */
 double DbmToW(double dbm);
 /**
  * Convert from dB to ratio.
  *
- * \param db
+ * \param db The dB value.
  *
- * \return ratio
+ * \return The equivalent ratio from the given dB value.
  */
 double DbToRatio(double db);
 /**
  * Convert from Watts to dBm.
  *
- * \param w the power in Watts
+ * \param w The power in Watts.
  *
- * \return the equivalent dBm for the given Watts
+ * \return The equivalent dBm for the given Watts.
  */
 double WToDbm(double w);
 /**
  * Convert from ratio to dB.
  *
- * \param ratio
+ * \param ratio The ratio value.
  *
- * \return dB
+ * \return The equivalent dB from the given ratio value.
  */
 double RatioToDb(double ratio);
 

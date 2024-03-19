@@ -119,7 +119,7 @@ class LorawanMacHeader : public Header
     uint8_t GetMajor() const;
 
     /**
-     * Check whether this header is for an uplink message
+     * Check whether this header is for an uplink message.
      *
      * \return True if the message is meant to be sent from an ED to a GW, false
      * otherwise.
@@ -128,9 +128,9 @@ class LorawanMacHeader : public Header
 
     /**
      * Check whether this header is for a confirmed message, i.e. a message asking from
-     * reception acknowledgment from the received
+     * reception acknowledgment from the received.
      *
-     * \return True is the message MType is of the confirmed variant, false otherwise
+     * \return True is the message MType is of the confirmed variant, false otherwise.
      */
     bool IsConfirmed() const;
 

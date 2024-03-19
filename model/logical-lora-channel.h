@@ -57,7 +57,7 @@ class LogicalLoraChannel : public Object
     /**
      * Construct a new LogicalLoraChannel object initializing the carrier frequency.
      *
-     * \param frequency The carrier frequency [MHz]
+     * \param frequency The carrier frequency [MHz].
      */
     LogicalLoraChannel(double frequency);
 

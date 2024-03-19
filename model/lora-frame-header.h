@@ -60,9 +60,9 @@ class LoraFrameHeader : public Header
     TypeId GetInstanceTypeId() const override;
 
     /**
-     * Return the size required for serialization of this header
+     * Return the size required for serialization of this header.
      *
-     * \return The serialized size in bytes
+     * \return The serialized size in bytes.
      */
     uint32_t GetSerializedSize() const override;
 
@@ -202,7 +202,7 @@ class LoraFrameHeader : public Header
     uint8_t GetFOptsLen() const;
 
     /**
-     * Set the FCnt value
+     * Set the FCnt value.
      *
      * \param fCnt The FCnt to set.
      */
@@ -218,7 +218,7 @@ class LoraFrameHeader : public Header
      * Return a pointer to the first MacCommand of type T, or 0 if no such MacCommand exists
      * in this header.
      *
-     * \return a pointer to a MacCommand of type T
+     * \return A pointer to a MacCommand of type T.
      */
     template <typename T>
     inline Ptr<T> GetMacCommand();
@@ -298,10 +298,10 @@ class LoraFrameHeader : public Header
     /**
      * Add a NewChannelReq command with provided fields.
      *
-     * \param chIndex the ChIndex field
-     * \param frequency the Frequency field
-     * \param minDataRate the MinDR field
-     * \param maxDataRate the MaxDR field
+     * \param chIndex The ChIndex field.
+     * \param frequency The Frequency field.
+     * \param minDataRate The MinDR field.
+     * \param maxDataRate The MaxDR field.
      */
     void AddNewChannelReq(uint8_t chIndex,
                           double frequency,
@@ -311,35 +311,35 @@ class LoraFrameHeader : public Header
     /**
      * Return a list of pointers to all the MAC commands saved in this header.
      *
-     * \return the list of pointers to MacCommand objects
+     * \return The list of pointers to MacCommand objects.
      */
     std::list<Ptr<MacCommand>> GetCommands();
 
     /**
      * Add a predefined command to the list in this frame header.
      *
-     * \param macCommand a pointer to the MacCommand object to add
+     * \param macCommand A pointer to the MacCommand object to add.
      */
     void AddCommand(Ptr<MacCommand> macCommand);
 
   private:
-    uint8_t m_fPort; //!< the FPort field
+    uint8_t m_fPort; //!< The FPort field
 
-    LoraDeviceAddress m_address; //!< the DevAddr field
+    LoraDeviceAddress m_address; //!< The DevAddr field
 
-    bool m_adr;         //!< the ADR field of the FCtrl
-    bool m_adrAckReq;   //!< the ADRACKReq field of the FCtrl
-    bool m_ack;         //!< the ACK field of the FCtrl
-    bool m_fPending;    //!< the FPending/ClassB field of the FCtrl
-    uint8_t m_fOptsLen; //!< the FOptsLen field of the FCtrl
+    bool m_adr;         //!< The ADR field of the FCtrl
+    bool m_adrAckReq;   //!< The ADRACKReq field of the FCtrl
+    bool m_ack;         //!< The ACK field of the FCtrl
+    bool m_fPending;    //!< The FPending/ClassB field of the FCtrl
+    uint8_t m_fOptsLen; //!< The FOptsLen field of the FCtrl
 
-    uint16_t m_fCnt; //!< the FCnt field
+    uint16_t m_fCnt; //!< The FCnt field
 
-    Buffer m_fOpts;                           //!< the FOpts field
+    Buffer m_fOpts;                           //!< The FOpts field
     std::list<Ptr<MacCommand>> m_macCommands; //!< List containing all the MacCommand instances that
                                               //!< are contained in this LoraFrameHeader
 
-    bool m_isUplink; //!< whether this frame header is uplink or not
+    bool m_isUplink; //!< Whether this frame header is uplink or not
 };
 
 template <typename T>

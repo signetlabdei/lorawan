@@ -50,8 +50,8 @@ class ForwarderHelper
     /**
      * Helper function used to set the underlying application attributes.
      *
-     * \param name the name of the application attribute to set.
-     * \param value the value of the application attribute to set.
+     * \param name The name of the application attribute to set.
+     * \param value The value of the application attribute to set.
      */
     void SetAttribute(std::string name, const AttributeValue& value);
 
@@ -60,7 +60,7 @@ class ForwarderHelper
      * all the attributes set with SetAttribute or other functions of this class.
      *
      * \param c NodeContainer of the set of nodes on which an Forwarder will be installed.
-     * \returns Container of Ptr to the applications installed.
+     * \return Container of Ptr to the applications installed.
      */
     ApplicationContainer Install(NodeContainer c) const;
 
@@ -69,7 +69,7 @@ class ForwarderHelper
      * set with SetAttribute or other functions of this class.
      *
      * \param node The node on which a Forwarder will be installed.
-     * \returns Container of the Ptr to the application installed.
+     * \return Container of the Ptr to the application installed.
      */
     ApplicationContainer Install(Ptr<Node> node) const;
 
@@ -79,7 +79,7 @@ class ForwarderHelper
      * set with SetAttribute or other functions of this class.
      *
      * \param node The node on which a Forwarder will be installed.
-     * \returns A Ptr to the applications installed.
+     * \return A Ptr to the applications installed.
      */
     Ptr<Application> InstallPriv(Ptr<Node> node) const;
 

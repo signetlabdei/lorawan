@@ -74,9 +74,9 @@ class LogicalLoraChannelHelper : public Object
      * \remark This function does not take into account aggregate waiting time.
      * Check on this should be performed before calling this function.
      *
-     * \param channel A pointer to the channel we want to know the waiting time
+     * \param channel A pointer to the channel we want to know the waiting time.
      * for.
-     * \return A Time instance containing the waiting time before transmission is
+     * \return A Time instance containing the waiting time before transmission is.
      * allowed on the channel.
      */
     Time GetWaitingTime(Ptr<LogicalLoraChannel> channel);
@@ -132,7 +132,7 @@ class LogicalLoraChannelHelper : public Object
      * \param firstFrequency The first frequency of the subband, in MHz.
      * \param lastFrequency The last frequency of the subband, in MHz.
      * \param dutyCycle The duty cycle that needs to be enforced on this subband.
-     * \param maxTxPowerDbm The maximum transmission power [dBm] that can be used
+     * \param maxTxPowerDbm The maximum transmission power [dBm] that can be used.
      * on this SubBand.
      */
     void AddSubBand(double firstFrequency,
@@ -157,7 +157,7 @@ class LogicalLoraChannelHelper : public Object
     /**
      * Returns the maximum transmission power [dBm] that is allowed on a channel.
      *
-     * \param logicalChannel The power for which to check the maximum allowed
+     * \param logicalChannel The power for which to check the maximum allowed.
      * transmission power.
      * \return The power in dBm.
      */

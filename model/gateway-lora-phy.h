@@ -88,7 +88,7 @@ class GatewayLoraPhy : public LoraPhy
      * Check whether the GatewayLoraPhy is currently listening to a frequency.
      *
      * \param frequencyMHz The value of the frequency [MHz].
-     * \return true if the frequency is among the one being listened to, false otherwise.
+     * \return True if the frequency is among the one being listened to, false otherwise.
      */
     bool IsOnFrequency(double frequencyMHz) override;
 
@@ -107,7 +107,7 @@ class GatewayLoraPhy : public LoraPhy
     /**
      * Add a frequency to the list of frequencies we are listening to.
      *
-     * \param frequencyMHz The value of the frequency [MHz]
+     * \param frequencyMHz The value of the frequency [MHz].
      */
     void AddFrequency(double frequencyMHz);
 
@@ -157,14 +157,14 @@ class GatewayLoraPhy : public LoraPhy
         /**
          * Set the event this reception path is currently on.
          *
-         * \param event the event to lock this ReceptionPath on.
+         * \param event The event to lock this ReceptionPath on.
          */
         void SetEvent(Ptr<LoraInterferenceHelper::Event> event);
 
         /**
          * Get the event this reception path is currently on.
          *
-         * \returns 0 if no event is currently being received, a pointer to
+         * \return 0 if no event is currently being received, a pointer to
          * the event otherwise.
          */
         Ptr<LoraInterferenceHelper::Event> GetEvent();

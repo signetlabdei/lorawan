@@ -38,11 +38,11 @@ class NwkID
 {
   public:
     /**
-     * Construct a new NwkID object
+     * Construct a new NwkID object.
      *
-     * \todo add warning as in Set()
+     * \todo Add warning as in Set().
      *
-     * \param nwkId the network id value [0:127]
+     * \param nwkId The network id value [0:127].
      */
     NwkID(uint8_t nwkId = 0);
 
@@ -78,11 +78,11 @@ class NwkAddr
 {
   public:
     /**
-     * Construct a new NwkAddr object
+     * Construct a new NwkAddr object.
      *
-     * \todo add warning as in Set()
+     * \todo Add warning as in Set().
      *
-     * \param nwkId network addr value [0:2^25-1]
+     * \param nwkId Network addr value [0:2^25-1].
      */
     NwkAddr(uint32_t nwkId = 0);
 
@@ -121,23 +121,23 @@ class LoraDeviceAddress
     /**
      * Build a new address from a 32-bit integer.
      *
-     * \param address full numeric value of the address
+     * \param address Full numeric value of the address.
      */
     LoraDeviceAddress(uint32_t address);
 
     /**
      * Build a new address from a network id and network address.
      *
-     * \param nwkId network id numeric value
-     * \param nwkAddr network address numeric value
+     * \param nwkId Network id numeric value.
+     * \param nwkAddr Network address numeric value.
      */
     LoraDeviceAddress(uint8_t nwkId, uint32_t nwkAddr);
 
     /**
      * Build a new address from a network id and network address.
      *
-     * \param nwkId network id object
-     * \param nwkAddr network address object
+     * \param nwkId Network id object.
+     * \param nwkAddr Network address object.
      */
     LoraDeviceAddress(NwkID nwkId, NwkAddr nwkAddr);
 
@@ -152,22 +152,22 @@ class LoraDeviceAddress
      * Convert the input buffer into a new address.
      *
      * \param buf [in] buffer containing serialized address.
-     * \return the LoraDeviceAddress object
+     * \return The LoraDeviceAddress object.
      */
     static LoraDeviceAddress Deserialize(const uint8_t buf[4]);
 
     /**
      * Convert from an ordinary address to a LoraDeviceAddress instance.
      *
-     * \param address reference to ordinary Address object
-     * \return the LoraDeviceAddress object
+     * \param address Reference to ordinary Address object.
+     * \return The LoraDeviceAddress object.
      */
     static LoraDeviceAddress ConvertFrom(const Address& address);
 
     /**
      * Set the address as a 32 bit integer.
      *
-     * \param address full numeric value of the address
+     * \param address Full numeric value of the address.
      */
     void Set(uint32_t address);
 
@@ -179,17 +179,17 @@ class LoraDeviceAddress
      * least significant bits of the uint32 are those that are expected to
      * contain the nwkAddr.
      *
-     * \todo not implemented
+     * \todo Not implemented.
      *
-     * \param nwkId network id numeric value
-     * \param nwkAddr network address numeric value
+     * \param nwkId Network id numeric value.
+     * \param nwkAddr Network address numeric value.
      */
     void Set(uint8_t nwkId, uint32_t nwkAddr);
 
     /**
      * Get the address in 32-bit integer form.
      *
-     * \return full numeric value of the address
+     * \return Full numeric value of the address.
      */
     uint32_t Get() const;
 
@@ -242,40 +242,40 @@ class LoraDeviceAddress
 
     /**
      * Equality comparison operator
-     * \param other address to compare
-     * \return true if the addresses are equal
+     * \param other Address to compare.
+     * \return True if the addresses are equal.
      */
     bool operator==(const LoraDeviceAddress& other) const;
     /**
      * Inequality comparison operator
-     * \param other address to compare
-     * \return true if the addresses are different
+     * \param other Address to compare.
+     * \return True if the addresses are different.
      */
     bool operator!=(const LoraDeviceAddress& other) const;
     /**
      * Less-then comparison operator
-     * \param other address to compare
-     * \return true if the first address is less than the second
+     * \param other Address to compare.
+     * \return True if the first address is less than the second.
      */
     bool operator<(const LoraDeviceAddress& other) const;
     /**
      * Greater-then comparison operator
-     * \param other address to compare
-     * \return true if the first address is greater than the second
+     * \param other Address to compare.
+     * \return True if the first address is greater than the second.
      */
     bool operator>(const LoraDeviceAddress& other) const;
 
   private:
     /**
-     * Convert this instance of LoraDeviceAddress to an Address
+     * Convert this instance of LoraDeviceAddress to an Address.
      *
-     * \return the Address object
+     * \return The Address object.
      */
     Address ConvertTo() const;
 
     /**
      * Get a new address type id.
-     * \return the new address type id
+     * \return The new address type id.
      */
     static uint8_t GetType();
 

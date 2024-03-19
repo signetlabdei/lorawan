@@ -55,13 +55,13 @@ using namespace lorawan;
 NS_LOG_COMPONENT_DEFINE("AlohaThroughput");
 
 // Network settings
-int nDevices = 200;          //!< number of end device nodes to create
-int nGateways = 1;           //!< number of gateway nodes to create
-double radius = 1000;        //!< radius (m) of the deplyoment
-double simulationTime = 100; //!< scenario duration (s) in simulated time
+int nDevices = 200;          //!< Number of end device nodes to create
+int nGateways = 1;           //!< Number of gateway nodes to create
+double radius = 1000;        //!< Radius (m) of the deplyoment
+double simulationTime = 100; //!< Scenario duration (s) in simulated time
 
 // Channel model
-bool realisticChannelModel = false; //!< whether to use a more realistic channel model with
+bool realisticChannelModel = false; //!< Whether to use a more realistic channel model with
                                     //!< buildings and correlated shadowing
 
 auto packetsSent = std::vector<int>(6, 0);     //!< Record pkts by DR (idx 0 -> DR5, 5 -> DR0)

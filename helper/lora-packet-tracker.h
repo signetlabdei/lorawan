@@ -108,48 +108,48 @@ class LoraPacketTracker
     // Packet transmission by end devices
 
     /**
-     * Trace a packet TX start by the PHY layer of an end device
+     * Trace a packet TX start by the PHY layer of an end device.
      *
-     * \param packet The packet being transmitted
-     * \param systemId Id of end device transmitting the packet
+     * \param packet The packet being transmitted.
+     * \param systemId Id of end device transmitting the packet.
      */
     void TransmissionCallback(Ptr<const Packet> packet, uint32_t systemId);
 
     // Packet reception outcome at gateways
 
     /**
-     * Trace a correct packet RX by the PHY layer of a gateway
+     * Trace a correct packet RX by the PHY layer of a gateway.
      *
-     * \param packet The packet being received
-     * \param systemId Id of the gateway receiving the packet
+     * \param packet The packet being received.
+     * \param systemId Id of the gateway receiving the packet.
      */
     void PacketReceptionCallback(Ptr<const Packet> packet, uint32_t systemId);
     /**
-     * Trace a gateway packet loss caused by interference
+     * Trace a gateway packet loss caused by interference.
      *
-     * \param packet The packet being lost
-     * \param systemId Id of the gateway losing the packet
+     * \param packet The packet being lost.
+     * \param systemId Id of the gateway losing the packet.
      */
     void InterferenceCallback(Ptr<const Packet> packet, uint32_t systemId);
     /**
-     * Trace a gateway packet loss caused by lack of free reception paths
+     * Trace a gateway packet loss caused by lack of free reception paths.
      *
-     * \param packet The packet being lost
-     * \param systemId Id of the gateway losing the packet
+     * \param packet The packet being lost.
+     * \param systemId Id of the gateway losing the packet.
      */
     void NoMoreReceiversCallback(Ptr<const Packet> packet, uint32_t systemId);
     /**
-     * Trace a gateway packet loss caused by signal strength under sensitivity
+     * Trace a gateway packet loss caused by signal strength under sensitivity.
      *
-     * \param packet The packet being lost
-     * \param systemId Id of the gateway losing the packet
+     * \param packet The packet being lost.
+     * \param systemId Id of the gateway losing the packet.
      */
     void UnderSensitivityCallback(Ptr<const Packet> packet, uint32_t systemId);
     /**
-     * Trace a gateway packet loss caused by concurrent downlink transmission
+     * Trace a gateway packet loss caused by concurrent downlink transmission.
      *
-     * \param packet The packet being lost
-     * \param systemId Id of the gateway losing the packet
+     * \param packet The packet being lost.
+     * \param systemId Id of the gateway losing the packet.
      */
     void LostBecauseTxCallback(Ptr<const Packet> packet, uint32_t systemId);
 
@@ -160,20 +160,20 @@ class LoraPacketTracker
     // Packet send
 
     /**
-     * Trace a packet leaving a node's MAC layer to go down the stack and be sent by the PHY layer
+     * Trace a packet leaving a node's MAC layer to go down the stack and be sent by the PHY layer.
      *
-     * \remark This trace sink is normally connected to both end devices and gateways
+     * \remark This trace sink is normally connected to both end devices and gateways.
      *
-     * \param packet The packet being sent
+     * \param packet The packet being sent.
      */
     void MacTransmissionCallback(Ptr<const Packet> packet);
     /**
-     * Trace the exit status of a MAC layer packet retransmission process of an end device
+     * Trace the exit status of a MAC layer packet retransmission process of an end device.
      *
-     * \param reqTx Number of transmissions attempted during the process
-     * \param success Whether the retransmission procedure was successful
-     * \param firstAttempt Timestamp of the initial transmission attempt
-     * \param packet The packet being retransmitted
+     * \param reqTx Number of transmissions attempted during the process.
+     * \param success Whether the retransmission procedure was successful.
+     * \param firstAttempt Timestamp of the initial transmission attempt.
+     * \param packet The packet being retransmitted.
      */
     void RequiredTransmissionsCallback(uint8_t reqTx,
                                        bool success,
@@ -184,9 +184,9 @@ class LoraPacketTracker
 
     /**
      * Trace a packet leaving a gateway's MAC layer to go up the stack and be delivered to the
-     * node's application
+     * node's application.
      *
-     * \param packet The packet being received
+     * \param packet The packet being received.
      */
     void MacGwReceptionCallback(Ptr<const Packet> packet);
 
@@ -195,10 +195,10 @@ class LoraPacketTracker
     ///////////////////////////////
 
     /**
-     * Check whether a packet is uplink
+     * Check whether a packet is uplink.
      *
-     * \param packet The packet to be checked
-     * \return True if the packet is uplink, false otherwise
+     * \param packet The packet to be checked.
+     * \return True if the packet is uplink, false otherwise.
      */
     bool IsUplink(Ptr<const Packet> packet);
 
@@ -213,9 +213,9 @@ class LoraPacketTracker
      * to interference, lost to unavailability of the gateway's reception paths, lost because under
      * RSSI sensitivity, and lost due to concurrent downlink transmission of the gateway.
      *
-     * \param startTime Timestamp of the start of the measurement
-     * \param stopTime Timestamp of the end of the measurement
-     * \param systemId Node id of the gateway
+     * \param startTime Timestamp of the start of the measurement.
+     * \param stopTime Timestamp of the end of the measurement.
+     * \param systemId Node id of the gateway.
      * \return A vector comprised of the following fields: [totPacketsSent, receivedPackets,
      * interferedPackets, noMoreGwPackets, underSensitivityPackets, lostBecauseTxPackets].
      */
@@ -227,29 +227,29 @@ class LoraPacketTracker
     std::string PrintPhyPacketsPerGw(Time startTime, Time stopTime, int systemId);
 
     /**
-     * \todo Not implemented
+     * \todo Not implemented.
      *
      * Count packets in a time interval to evaluate the performance at MAC level of a specific
      * gateway.
      *
-     * \param startTime Timestamp of the start of the measurement
-     * \param stopTime Timestamp of the end of the measurement
-     * \param systemId Node id of the gateway
-     * \return String of output values
+     * \param startTime Timestamp of the start of the measurement.
+     * \param stopTime Timestamp of the end of the measurement.
+     * \param systemId Node id of the gateway.
+     * \return String of output values.
      */
     std::string CountMacPacketsPerGw(Time startTime, Time stopTime, int systemId);
     /** \copydoc ns3::lorawan::LoraPacketTracker::CountMacPacketsPerGw */
     std::string PrintMacPacketsPerGw(Time startTime, Time stopTime, int systemId);
 
     /**
-     * \todo Not implemented
+     * \todo Not implemented.
      *
      * In a time interval, count the number of retransmissions that were needed to correctly deliver
      * a packet and receive the corresponding acknowledgment.
      *
-     * \param startTime Timestamp of the start of the measurement
-     * \param stopTime Timestamp of the end of the measurement
-     * \return String of output values
+     * \param startTime Timestamp of the start of the measurement.
+     * \param stopTime Timestamp of the end of the measurement.
+     * \return String of output values.
      */
     std::string CountRetransmissions(Time startTime, Time stopTime);
 
@@ -258,10 +258,10 @@ class LoraPacketTracker
      * whole network. In this case, a MAC layer packet is labeled as successful if it was successful
      * at at least one of the available gateways.
      *
-     * \param startTime Timestamp of the start of the measurement
-     * \param stopTime Timestamp of the end of the measurement
+     * \param startTime Timestamp of the start of the measurement.
+     * \param stopTime Timestamp of the end of the measurement.
      * \return Space-separated string containing two metrics: the number of sent packets and the
-     * number of packets that were received by at least one gateway
+     * number of packets that were received by at least one gateway.
      */
     std::string CountMacPacketsGlobally(Time startTime, Time stopTime);
 
@@ -271,10 +271,10 @@ class LoraPacketTracker
      * least one of the available gateways, and if the corresponding acknowledgment was correctly
      * delivered at the device.
      *
-     * \param startTime Timestamp of the start of the measurement
-     * \param stopTime Timestamp of the end of the measurement
+     * \param startTime Timestamp of the start of the measurement.
+     * \param stopTime Timestamp of the end of the measurement.
      * \return Space-separated string containing two metrics: the number of sent packets and the
-     * number of packets that generated a successful acknowledgment
+     * number of packets that generated a successful acknowledgment.
      */
     std::string CountMacPacketsGloballyCpsr(Time startTime, Time stopTime);
 

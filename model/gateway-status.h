@@ -56,46 +56,46 @@ class GatewayStatus : public Object
     ~GatewayStatus() override; //!< Destructor
 
     /**
-     * Construct a new GatewayStatus object with values
+     * Construct a new GatewayStatus object with values.
      *
-     * \param address The Address of the P2PNetDevice of the gateway connected to the NS
-     * \param netDevice A Ptr to the NetDevice through which to reach this gateway from the server
-     * \param gwMac A Ptr to the MAC layer of the gateway
+     * \param address The Address of the P2PNetDevice of the gateway connected to the NS.
+     * \param netDevice A Ptr to the NetDevice through which to reach this gateway from the server.
+     * \param gwMac A Ptr to the MAC layer of the gateway.
      */
     GatewayStatus(Address address, Ptr<NetDevice> netDevice, Ptr<GatewayLorawanMac> gwMac);
 
     /**
      * Get this gateway's P2P link address.
      *
-     * \return The Address instance
+     * \return The Address instance.
      */
     Address GetAddress();
 
     /**
      * Set this gateway's P2P link address.
      *
-     * \param address The Address instance
+     * \param address The Address instance.
      */
     void SetAddress(Address address);
 
     /**
      * Get the NetDevice through which it's possible to contact this gateway from the server.
      *
-     * \return A Ptr to the NetDevice
+     * \return A Ptr to the NetDevice.
      */
     Ptr<NetDevice> GetNetDevice();
 
     /**
      * Set the NetDevice through which it's possible to contact this gateway from the server.
      *
-     * \param netDevice A Ptr to the NetDevice
+     * \param netDevice A Ptr to the NetDevice.
      */
     void SetNetDevice(Ptr<NetDevice> netDevice);
 
     /**
      * Get a pointer to this gateway's MAC instance.
      *
-     * \return A Ptr to the MAC layer object
+     * \return A Ptr to the MAC layer object.
      */
     Ptr<GatewayLorawanMac> GetGatewayMac();
 
@@ -108,16 +108,15 @@ class GatewayStatus : public Object
      * Query whether or not this gateway is available for immediate transmission
      * on this frequency.
      *
-     * \param frequency The frequency at which the gateway's availability should
-     * be queried.
+     * \param frequency The frequency at which the gateway's availability should be queried.
      * \return True if the gateway's available, false otherwise.
      */
     bool IsAvailableForTransmission(double frequency);
 
     /**
-     * Set the time of the next scheduled transmission for the gateway
+     * Set the time of the next scheduled transmission for the gateway.
      *
-     * \param nextTransmissionTime The Time value
+     * \param nextTransmissionTime The Time value.
      */
     void SetNextTransmissionTime(Time nextTransmissionTime);
     // Time GetNextTransmissionTime ();

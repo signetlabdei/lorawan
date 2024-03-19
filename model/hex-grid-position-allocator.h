@@ -85,9 +85,9 @@ class HexGridPositionAllocator : public PositionAllocator
     ~HexGridPositionAllocator() override; //!< Destructor
 
     /**
-     * Construct a new HexGridPositionAllocator object with given radius
+     * Construct a new HexGridPositionAllocator object with given radius.
      *
-     * \param radius The radius length of the circle inscribed in the hexagonal tiles
+     * \param radius The radius length of the circle inscribed in the hexagonal tiles.
      */
     HexGridPositionAllocator(double radius);
 
@@ -102,22 +102,22 @@ class HexGridPositionAllocator : public PositionAllocator
     static TypeId GetTypeId();
 
     /**
-     * Get the radius of the circle inscribed in the hexagonal tiles
+     * Get the radius of the circle inscribed in the hexagonal tiles.
      *
-     * \return The radius length
+     * \return The radius length.
      */
     double GetRadius() const;
 
     /**
-     * Set the radius of the circle inscribed in the hexagonal tiles
+     * Set the radius of the circle inscribed in the hexagonal tiles.
      *
-     * \param radius The radius length
+     * \param radius The radius length.
      */
     void SetRadius(double radius);
 
   private:
     /**
-     * This method adds to the given list of positions an outer ring of positions
+     * This method adds to the given list of positions an outer ring of positions.
      *
      * \param positions The list of position around which to create the new positions.
      * \return The input list of position with an added outer ring.

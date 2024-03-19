@@ -50,8 +50,8 @@ class OneShotSenderHelper
     /**
      * Helper function used to set the underlying application attributes.
      *
-     * \param name the name of the application attribute to set
-     * \param value the value of the application attribute to set
+     * \param name The name of the application attribute to set.
+     * \param value The value of the application attribute to set.
      */
     void SetAttribute(std::string name, const AttributeValue& value);
 
@@ -60,7 +60,7 @@ class OneShotSenderHelper
      * configured with all the attributes set with SetAttribute or other functions of this class.
      *
      * \param c NodeContainer of the set of nodes on which an OneShotSender will be installed.
-     * \returns Container of Ptr to the applications installed.
+     * \return Container of Ptr to the applications installed.
      */
     ApplicationContainer Install(NodeContainer c) const;
 
@@ -69,16 +69,16 @@ class OneShotSenderHelper
      * with SetAttribute or other functions of this class.
      *
      * \param node The node on which a OneShotSender will be installed.
-     * \returns Container of the Ptr to the application installed.
+     * \return Container of the Ptr to the application installed.
      */
     ApplicationContainer Install(Ptr<Node> node) const;
 
     /**
-     * Set the send time of the applications
+     * Set the send time of the applications.
      *
      * \todo It does not make sense that all applications send at the exact same time.
      *
-     * \param sendTime The Time to set
+     * \param sendTime The Time to set.
      */
     void SetSendTime(Time sendTime);
 
@@ -88,7 +88,7 @@ class OneShotSenderHelper
      * with SetAttribute or other functions of this class.
      *
      * \param node The node on which a OneShotSender will be installed.
-     * \returns A Ptr to the applications installed.
+     * \return A Ptr to the applications installed.
      */
     Ptr<Application> InstallPriv(Ptr<Node> node) const;
 

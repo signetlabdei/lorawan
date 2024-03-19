@@ -451,44 +451,44 @@ class ReceivePathTest : public TestCase
   private:
     void DoRun() override;
     /**
-     * Reset counters and gateway PHY for new sub test case
+     * Reset counters and gateway PHY for new sub test case.
      */
     void Reset();
     /**
-     * Callback for tracing OccupiedReceptionPaths
+     * Callback for tracing OccupiedReceptionPaths.
      *
-     * \param oldValue the old value
-     * \param newValue the new value
+     * \param oldValue The old value.
+     * \param newValue The new value.
      */
     void OccupiedReceptionPaths(int oldValue, int newValue);
     /**
-     * Callback for tracing LostPacketBecauseNoMoreReceivers
+     * Callback for tracing LostPacketBecauseNoMoreReceivers.
      *
-     * \param packet the packet lost
-     * \param node the receiver node id if any, 0 otherwise
+     * \param packet The packet lost.
+     * \param node The receiver node id if any, 0 otherwise.
      */
     void NoMoreDemodulators(Ptr<const Packet> packet, uint32_t node);
     /**
-     * Callback for tracing LostPacketBecauseInterference
+     * Callback for tracing LostPacketBecauseInterference.
      *
-     * \param packet the packet lost
-     * \param node the receiver node id if any, 0 otherwise
+     * \param packet The packet lost.
+     * \param node The receiver node id if any, 0 otherwise.
      */
     void Interference(Ptr<const Packet> packet, uint32_t node);
     /**
-     * Callback for tracing ReceivedPacket
+     * Callback for tracing ReceivedPacket.
      *
-     * \param packet the packet received
-     * \param node the receiver node id if any, 0 otherwise
+     * \param packet The packet received.
+     * \param node The receiver node id if any, 0 otherwise.
      */
     void ReceivedPacket(Ptr<const Packet> packet, uint32_t node);
 
     Ptr<SimpleGatewayLoraPhy> gatewayPhy; //!< PHY layer of a gateway to be tested
 
-    int m_noMoreDemodulatorsCalls = 0;   //!< counter for LostPacketBecauseNoMoreReceivers calls
-    int m_interferenceCalls = 0;         //!< counter for LostPacketBecauseInterference calls
-    int m_receivedPacketCalls = 0;       //!< counter for ReceivedPacket calls
-    int m_maxOccupiedReceptionPaths = 0; //!< max number of concurrent OccupiedReceptionPaths
+    int m_noMoreDemodulatorsCalls = 0;   //!< Counter for LostPacketBecauseNoMoreReceivers calls
+    int m_interferenceCalls = 0;         //!< Counter for LostPacketBecauseInterference calls
+    int m_receivedPacketCalls = 0;       //!< Counter for ReceivedPacket calls
+    int m_maxOccupiedReceptionPaths = 0; //!< Max number of concurrent OccupiedReceptionPaths
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -1119,58 +1119,58 @@ class PhyConnectivityTest : public TestCase
     ~PhyConnectivityTest() override; //!< Destructor
 
     /**
-     * Reset counters and end devices' PHYs for new sub test case
+     * Reset counters and end devices' PHYs for new sub test case.
      */
     void Reset();
 
     /**
-     * Callback for tracing ReceivedPacket
+     * Callback for tracing ReceivedPacket.
      *
-     * \param packet the packet received
-     * \param node the receiver node id if any, 0 otherwise
+     * \param packet The packet received.
+     * \param node The receiver node id if any, 0 otherwise.
      */
     void ReceivedPacket(Ptr<const Packet> packet, uint32_t node);
 
     /**
-     * Callback for tracing LostPacketBecauseUnderSensitivity
+     * Callback for tracing LostPacketBecauseUnderSensitivity.
      *
-     * \param packet the packet lost
-     * \param node the receiver node id if any, 0 otherwise
+     * \param packet The packet lost.
+     * \param node The receiver node id if any, 0 otherwise.
      */
     void UnderSensitivity(Ptr<const Packet> packet, uint32_t node);
 
     /**
-     * Callback for tracing LostPacketBecauseInterference
+     * Callback for tracing LostPacketBecauseInterference.
      *
-     * \param packet the packet lost
-     * \param node the receiver node id if any, 0 otherwise
+     * \param packet The packet lost.
+     * \param node The receiver node id if any, 0 otherwise.
      */
     void Interference(Ptr<const Packet> packet, uint32_t node);
 
     /**
-     * Callback for tracing LostPacketBecauseNoMoreReceivers
+     * Callback for tracing LostPacketBecauseNoMoreReceivers.
      *
-     * \param packet the packet lost
-     * \param node the receiver node id if any, 0 otherwise
+     * \param packet The packet lost.
+     * \param node The receiver node id if any, 0 otherwise.
      *
-     * \todo this callback is never called because its only specified for gateways and here we test
-     * end devices. to be removed
+     * \todo This callback is never called because its only specified for gateways and here we test
+     * end devices. to be removed.
      */
     void NoMoreDemodulators(Ptr<const Packet> packet, uint32_t node);
 
     /**
-     * Callback for tracing LostPacketBecauseWrongFrequency
+     * Callback for tracing LostPacketBecauseWrongFrequency.
      *
-     * \param packet the packet lost
-     * \param node the receiver node id if any, 0 otherwise
+     * \param packet The packet lost.
+     * \param node The receiver node id if any, 0 otherwise.
      */
     void WrongFrequency(Ptr<const Packet> packet, uint32_t node);
 
     /**
-     * Callback for tracing LostPacketBecauseWrongSpreadingFactor
+     * Callback for tracing LostPacketBecauseWrongSpreadingFactor.
      *
-     * \param packet the packet lost
-     * \param node the receiver node id if any, 0 otherwise
+     * \param packet The packet lost.
+     * \param node The receiver node id if any, 0 otherwise.
      */
     void WrongSf(Ptr<const Packet> packet, uint32_t node);
 
@@ -1187,18 +1187,18 @@ class PhyConnectivityTest : public TestCase
   private:
     void DoRun() override;
 
-    Ptr<LoraChannel> channel;           //!< the LoRa channel used for tests
-    Ptr<SimpleEndDeviceLoraPhy> edPhy1; //!< the first end device's PHY layer used in tests
-    Ptr<SimpleEndDeviceLoraPhy> edPhy2; //!< the second end device's PHY layer used in tests
-    Ptr<SimpleEndDeviceLoraPhy> edPhy3; //!< the third end device's PHY layer used in tests
+    Ptr<LoraChannel> channel;           //!< The LoRa channel used for tests
+    Ptr<SimpleEndDeviceLoraPhy> edPhy1; //!< The first end device's PHY layer used in tests
+    Ptr<SimpleEndDeviceLoraPhy> edPhy2; //!< The second end device's PHY layer used in tests
+    Ptr<SimpleEndDeviceLoraPhy> edPhy3; //!< The third end device's PHY layer used in tests
 
-    Ptr<Packet> m_latestReceivedPacket; //!< pointer to track the last received packet
-    int m_receivedPacketCalls = 0;      //!< counter for ReceivedPacket calls
-    int m_underSensitivityCalls = 0;    //!< counter for LostPacketBecauseUnderSensitivity calls
-    int m_interferenceCalls = 0;        //!< counter for LostPacketBecauseInterference calls
-    int m_noMoreDemodulatorsCalls = 0;  //!< counter for LostPacketBecauseNoMoreReceivers calls
-    int m_wrongSfCalls = 0;             //!< counter for LostPacketBecauseWrongSpreadingFactor calls
-    int m_wrongFrequencyCalls = 0;      //!< counter for LostPacketBecauseWrongFrequency calls
+    Ptr<Packet> m_latestReceivedPacket; //!< Pointer to track the last received packet
+    int m_receivedPacketCalls = 0;      //!< Counter for ReceivedPacket calls
+    int m_underSensitivityCalls = 0;    //!< Counter for LostPacketBecauseUnderSensitivity calls
+    int m_interferenceCalls = 0;        //!< Counter for LostPacketBecauseInterference calls
+    int m_noMoreDemodulatorsCalls = 0;  //!< Counter for LostPacketBecauseNoMoreReceivers calls
+    int m_wrongSfCalls = 0;             //!< Counter for LostPacketBecauseWrongSpreadingFactor calls
+    int m_wrongFrequencyCalls = 0;      //!< Counter for LostPacketBecauseWrongFrequency calls
 };
 
 // Add some help text to this case to describe what it is intended to test

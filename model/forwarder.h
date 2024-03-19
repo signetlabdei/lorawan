@@ -71,7 +71,7 @@ class Forwarder : public Application
      * \param packet The packet we received.
      * \param protocol The protocol number associated to this packet.
      * \param sender The address of the sender.
-     * \returns True if we can handle the packet, false otherwise.
+     * \return True if we can handle the packet, false otherwise.
      */
     bool ReceiveFromLora(Ptr<NetDevice> loraNetDevice,
                          Ptr<const Packet> packet,
@@ -89,12 +89,12 @@ class Forwarder : public Application
                                  const Address& sender);
 
     /**
-     * Start the application
+     * Start the application.
      */
     void StartApplication() override;
 
     /**
-     * Stop the application
+     * Stop the application.
      */
     void StopApplication() override;
 

@@ -156,7 +156,7 @@ class LoraPhy : public Object
     /**
      * Whether this device is transmitting or not.
      *
-     * \returns true if the device is currently transmitting a packet, false
+     * \return True if the device is currently transmitting a packet, false
      * otherwise.
      */
     virtual bool IsTransmitting() = 0;
@@ -165,7 +165,7 @@ class LoraPhy : public Object
      * Whether this device is listening on the specified frequency or not.
      *
      * \param frequency The frequency to query.
-     * \returns true if the device is listening on that frequency, false
+     * \return True if the device is listening on that frequency, false
      * otherwise.
      */
     virtual bool IsOnFrequency(double frequency) = 0;
@@ -248,7 +248,7 @@ class LoraPhy : public Object
     /**
      * Compute the symbol time from SF and BW.
      *
-     * \param txParams The parameters for transmission
+     * \param txParams The parameters for transmission.
      * \return TSym, the time required to send a LoRa modulation symbol.
      */
     static Time GetTSym(LoraTxParameters txParams);

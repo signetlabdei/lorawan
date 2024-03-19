@@ -60,7 +60,7 @@ class LoraDeviceAddressGenerator : public Object
      * This resets the address to the base address that was used for
      * initialization.
      *
-     * \return the LoraDeviceAddress address of the next network
+     * \return The LoraDeviceAddress address of the next network.
      */
     LoraDeviceAddress NextNetwork();
 
@@ -72,7 +72,7 @@ class LoraDeviceAddressGenerator : public Object
      *
      * This keeps the nwkId constant, only incrementing nwkAddr.
      *
-     * \return the LoraDeviceAddress address
+     * \return The LoraDeviceAddress address.
      */
     LoraDeviceAddress NextAddress();
 
@@ -81,9 +81,9 @@ class LoraDeviceAddressGenerator : public Object
      * NextAddress.
      *
      * Does not change the internal state; is just used to peek at the next
-     * address that will be allocated upon a call to NextAddress
+     * address that will be allocated upon a call to NextAddress.
      *
-     * \return the LoraDeviceAddress
+     * \return The LoraDeviceAddress.
      */
     LoraDeviceAddress GetNextAddress();
 

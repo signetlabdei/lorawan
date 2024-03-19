@@ -58,14 +58,14 @@ using namespace lorawan;
 NS_LOG_COMPONENT_DEFINE("FrameCounterUpdateExample");
 
 // Network settings
-int nGateways = 1;            //!< number of gateway nodes to create
-double simulationTime = 3600; //!< scenario duration (s) in simulated time
+int nGateways = 1;            //!< Number of gateway nodes to create
+double simulationTime = 3600; //!< Scenario duration (s) in simulated time
 
 /**
  * Record a packet TX start by the PHY layer of an end device
  *
- * \param packet The packet being transmitted
- * \param index Id of end device transmitting the packet
+ * \param packet The packet being transmitted.
+ * \param index Id of end device transmitting the packet.
  */
 void
 OnPhySentPacket(Ptr<const Packet> packet, uint32_t index)
@@ -87,10 +87,10 @@ OnPhySentPacket(Ptr<const Packet> packet, uint32_t index)
 /**
  * Record the exit status of a MAC layer packet retransmission process of an end device
  *
- * \param transmissions Number of transmissions attempted during the process
- * \param successful Whether the retransmission procedure was successful
- * \param firstAttempt Timestamp of the initial transmission attempt
- * \param packet The packet being retransmitted
+ * \param transmissions Number of transmissions attempted during the process.
+ * \param successful Whether the retransmission procedure was successful.
+ * \param firstAttempt Timestamp of the initial transmission attempt.
+ * \param packet The packet being retransmitted.
  */
 void
 OnMacPacketOutcome(uint8_t transmissions, bool successful, Time firstAttempt, Ptr<Packet> packet)

@@ -72,7 +72,7 @@ class NetworkScheduler : public Object
      *
      * This function schedules the OnReceiveWindowOpportunity events 1 and 2 seconds later.
      *
-     * \param packet A Ptr to the new Packet instance
+     * \param packet A Ptr to the new Packet instance.
      */
     void OnReceivedPacket(Ptr<const Packet> packet);
 
@@ -80,15 +80,15 @@ class NetworkScheduler : public Object
      * Method that is scheduled after packet arrival in order to take action on
      * sender's receive windows openings.
      *
-     * \param deviceAddress The Address of the end device
-     * \param window The reception window number (1 or 2)
+     * \param deviceAddress The Address of the end device.
+     * \param window The reception window number (1 or 2).
      */
     void OnReceiveWindowOpportunity(LoraDeviceAddress deviceAddress, int window);
 
   private:
     TracedCallback<Ptr<const Packet>>
         m_receiveWindowOpened;   //!< Trace callback source for reception windows openings. \todo
-                                 //!< never called
+                                 //!< Never called.
     Ptr<NetworkStatus> m_status; //!< A Ptr to the NetworkStatus object.
     Ptr<NetworkController> m_controller; //!< A Ptr to the NetworkController object.
 };

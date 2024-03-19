@@ -157,7 +157,7 @@ class LinkCheckComponent : public NetworkControllerComponent
     /**
      * Update the EndDeviceStatus object on LinkChackReq MAC command.
      *
-     * \todo not implemented. Also not sure what this function is meant to do.
+     * \todo Not implemented. Also not sure what this function is meant to do.
      *
      * \param packet A Ptr to the Packet.
      * \param status A Ptr to the EndDeviceStatus object of the sender.

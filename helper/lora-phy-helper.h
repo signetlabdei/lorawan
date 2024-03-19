@@ -43,7 +43,7 @@ class LoraPhyHelper
 {
   public:
     /**
-     * Enum for the type of device: End Device (ED) or Gateway (GW)
+     * Enum for the type of device: End Device (ED) or Gateway (GW).
      */
     enum DeviceType
     {
@@ -58,14 +58,14 @@ class LoraPhyHelper
      *
      * Every PHY created by a call to Install is associated to this channel.
      *
-     * \param channel the channel to associate to this helper.
+     * \param channel The channel to associate to this helper.
      */
     void SetChannel(Ptr<LoraChannel> channel);
 
     /**
      * Set the kind of PHY this helper will create.
      *
-     * \param dt the device type.
+     * \param dt The device type.
      */
     void SetDeviceType(enum DeviceType dt);
 
@@ -79,31 +79,31 @@ class LoraPhyHelper
     /**
      * Set an attribute of the underlying PHY object.
      *
-     * \param name the name of the attribute to set.
-     * \param v the value of the attribute.
+     * \param name The name of the attribute to set.
+     * \param v The value of the attribute.
      */
     void Set(std::string name, const AttributeValue& v);
 
     /**
      * Create a LoraPhy and connect it to a device on a node.
      *
-     * \param node the node on which we wish to create a wifi PHY.
-     * \param device the device within which this PHY will be created.
-     * \return a newly-created PHY object.
+     * \param node The node on which we wish to create a wifi PHY.
+     * \param device The device within which this PHY will be created.
+     * \return A newly-created PHY object.
      */
     Ptr<LoraPhy> Create(Ptr<Node> node, Ptr<NetDevice> device) const;
 
     /**
-     * Set the maximum number of gateway receive paths
+     * Set the maximum number of gateway receive paths.
      *
      * \param maxReceptionPaths The maximum number of reception paths at
-     *  the gateway
+     *  the gateway.
      */
     void SetMaxReceptionPaths(int maxReceptionPaths);
 
     /**
      * Set if giving priority to downlink transmission over reception at
-     * the gateways
+     * the gateways.
      *
      * \param txPriority Whether gateway transmission interrupt all receptions for their duration.
      */
@@ -114,7 +114,7 @@ class LoraPhyHelper
     Ptr<LoraChannel> m_channel; //!< The channel instance the PHYs will be connected to.
     int m_maxReceptionPaths;    //!< The maximum number of receive paths at the gateway.
     bool m_txPriority; //!< Whether to give priority to downlink transmission over reception at the
-                       //!< gateways. \todo this parameter does nothing
+                       //!< gateways. \todo This parameter does nothing.
 };
 
 } // namespace lorawan

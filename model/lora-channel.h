@@ -176,7 +176,7 @@ class LoraChannel : public Channel
      *
      * \param i The index of the phy to start reception on.
      * \param packet The packet the phy will receive.
-     * \param parameters The parameters that characterize this transmission
+     * \param parameters The parameters that characterize this transmission.
      */
     void Receive(uint32_t i, Ptr<Packet> packet, LoraChannelParameters parameters) const;
 

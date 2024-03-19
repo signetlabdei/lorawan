@@ -60,7 +60,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /**
      * Add headers and send a packet with the sending function of the physical layer.
      *
-     * \param packet the packet to send
+     * \param packet The packet to send.
      */
     void SendToPhy(Ptr<Packet> packet) override;
 
@@ -74,7 +74,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      * This method is typically registered as a callback in the underlying PHY
      * layer so that it's called when a packet is going up the stack.
      *
-     * \param packet the received packet.
+     * \param packet The received packet.
      */
     void Receive(Ptr<const Packet> packet) override;
 
@@ -119,7 +119,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /**
      * Get the Data Rate that will be used in the first receive window.
      *
-     * \return The Data Rate
+     * \return The Data Rate.
      */
     uint8_t GetFirstReceiveWindowDataRate();
 
@@ -133,21 +133,21 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /**
      * Get the Data Rate that will be used in the second receive window.
      *
-     * \return The Data Rate
+     * \return The Data Rate.
      */
     uint8_t GetSecondReceiveWindowDataRate() const;
 
     /**
      * Set the frequency that will be used for the second receive window.
      *
-     * \param frequencyMHz the Frequency.
+     * \param frequencyMHz The Frequency.
      */
     void SetSecondReceiveWindowFrequency(double frequencyMHz);
 
     /**
      * Get the frequency that is used for the second receive window.
      *
-     * \return The frequency, in MHz
+     * \return The frequency, in MHz.
      */
     double GetSecondReceiveWindowFrequency() const;
 
@@ -209,7 +209,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     uint8_t m_secondReceiveWindowDataRate;
 
     /**
-     * The RX1DROffset parameter value
+     * The RX1DROffset parameter value.
      */
     uint8_t m_rx1DrOffset;
 

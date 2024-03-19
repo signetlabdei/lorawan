@@ -67,28 +67,28 @@ class LoraNetDevice : public NetDevice
     /**
      * Set which LorawanMac instance is linked to this device.
      *
-     * \param mac the mac layer to use.
+     * \param mac The mac layer to use.
      */
     void SetMac(Ptr<LorawanMac> mac);
 
     /**
      * Set which LoraPhy instance is linked to this device.
      *
-     * \param phy the phy layer to use.
+     * \param phy The phy layer to use.
      */
     void SetPhy(Ptr<LoraPhy> phy);
 
     /**
      * Get the LorawanMac instance that is linked to this NetDevice.
      *
-     * \return the mac we are currently using.
+     * \return The mac we are currently using.
      */
     Ptr<LorawanMac> GetMac() const;
 
     /**
      * Get the LoraPhy instance that is linked to this NetDevice.
      *
-     * \return the phy we are currently using.
+     * \return The phy we are currently using.
      */
     Ptr<LoraPhy> GetPhy() const;
 
@@ -150,7 +150,7 @@ class LoraNetDevice : public NetDevice
      * Receive a packet from the lower layer and pass the
      * packet up the stack.
      *
-     * \todo not implemented
+     * \todo Not implemented.
      *
      * \param packet The packet we need to forward.
      * \param from The from address.

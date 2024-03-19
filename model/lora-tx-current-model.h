@@ -49,8 +49,8 @@ class LoraTxCurrentModel : public Object
     /**
      * Get the current for transmission at this power.
      *
-     * \param txPowerDbm The nominal tx power in dBm
-     * \returns The transmit current (in Ampere)
+     * \param txPowerDbm The nominal tx power in dBm.
+     * \return The transmit current (in Ampere).
      */
     virtual double CalcTxCurrent(double txPowerDbm) const = 0;
 };

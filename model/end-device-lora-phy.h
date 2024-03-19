@@ -67,17 +67,17 @@ class EndDeviceLoraPhyListener
      * channel implicitly reverts to the idle state
      * unless they have received a cca busy report.
      *
-     * \param txPowerDbm the nominal tx power in dBm
+     * \param txPowerDbm The nominal tx power in dBm.
      */
     virtual void NotifyTxStart(double txPowerDbm) = 0;
 
     /**
-     * Notify listeners that we went to sleep
+     * Notify listeners that we went to sleep.
      */
     virtual void NotifySleep() = 0;
 
     /**
-     * Notify listeners that we woke up
+     * Notify listeners that we woke up.
      */
     virtual void NotifyStandby() = 0;
 };
@@ -222,7 +222,7 @@ class EndDeviceLoraPhy : public LoraPhy
      * Add the input listener to the list of objects to be notified of PHY-level
      * events.
      *
-     * \param listener the new listener
+     * \param listener The new listener.
      */
     void RegisterListener(EndDeviceLoraPhyListener* listener);
 
@@ -230,7 +230,7 @@ class EndDeviceLoraPhy : public LoraPhy
      * Remove the input listener from the list of objects to be notified of
      * PHY-level events.
      *
-     * \param listener the listener to be unregistered
+     * \param listener The listener to be unregistered.
      */
     void UnregisterListener(EndDeviceLoraPhyListener* listener);
 
@@ -238,7 +238,7 @@ class EndDeviceLoraPhy : public LoraPhy
 
   protected:
     /**
-     * Switch to the RX state
+     * Switch to the RX state.
      */
     void SwitchToRx();
 
@@ -272,11 +272,11 @@ class EndDeviceLoraPhy : public LoraPhy
     uint8_t m_sf; //!< The Spreading Factor this device is listening for
 
     /**
-     * typedef for a list of EndDeviceLoraPhyListener
+     * typedef for a list of EndDeviceLoraPhyListener.
      */
     typedef std::vector<EndDeviceLoraPhyListener*> Listeners;
     /**
-     * typedef for a list of EndDeviceLoraPhyListener iterator
+     * typedef for a list of EndDeviceLoraPhyListener iterator.
      */
     typedef std::vector<EndDeviceLoraPhyListener*>::iterator ListenersI;
 

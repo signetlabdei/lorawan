@@ -59,19 +59,19 @@ class LorawanMac : public Object
     /**
      * Matrix structure to store possible data rate value to be used by a LoRaWAN End Device for
      * listening during the RX1 receive window. It is a function of the uplink data rate and the
-     * RX1DROffset [0:5]
+     * RX1DROffset [0:5].
      */
     typedef std::array<std::array<uint8_t, 6>, 8> ReplyDataRateMatrix;
 
     /**
-     * Set the underlying PHY layer
+     * Set the underlying PHY layer.
      *
-     * \param phy the phy layer
+     * \param phy The phy layer.
      */
     void SetPhy(Ptr<LoraPhy> phy);
 
     /**
-     * Get the underlying PHY layer
+     * Get the underlying PHY layer.
      *
      * \return The PHY layer that this MAC is connected to.
      */
@@ -87,7 +87,7 @@ class LorawanMac : public Object
     /**
      * Receive a packet from the lower layer.
      *
-     * \param packet the received packet
+     * \param packet The received packet.
      */
     virtual void Receive(Ptr<const Packet> packet) = 0;
 
@@ -95,7 +95,7 @@ class LorawanMac : public Object
      * Function called by lower layers to inform this layer that reception of a
      * packet we were locked on failed.
      *
-     * \param packet the packet we failed to receive
+     * \param packet The packet we failed to receive.
      */
     virtual void FailedReception(Ptr<const Packet> packet) = 0;
 
@@ -145,7 +145,7 @@ class LorawanMac : public Object
     uint8_t GetSfFromDataRate(uint8_t dataRate);
 
     /**
-     * Get the BW corresponding to a data rate, based on this MAC's region
+     * Get the BW corresponding to a data rate, based on this MAC's region.
      *
      * \param dataRate The Data Rate we need to convert to a bandwidth value.
      * \return The bandwidth that corresponds to the parameter Data Rate in this

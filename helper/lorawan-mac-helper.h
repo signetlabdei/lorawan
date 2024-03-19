@@ -75,38 +75,38 @@ class LorawanMacHelper
     /**
      * Set an attribute of the underlying MAC object.
      *
-     * \param name the name of the attribute to set.
-     * \param v the value of the attribute.
+     * \param name The name of the attribute to set.
+     * \param v The value of the attribute.
      */
     void Set(std::string name, const AttributeValue& v);
 
     /**
      * Set the address generator to use for creation of these nodes.
      *
-     * \param addrGen pointer to the address generator object
+     * \param addrGen Pointer to the address generator object.
      */
     void SetAddressGenerator(Ptr<LoraDeviceAddressGenerator> addrGen);
 
     /**
      * Set the kind of MAC this helper will create.
      *
-     * \param dt the device type (either gateway or end device).
+     * \param dt The device type (either gateway or end device).
      */
     void SetDeviceType(enum DeviceType dt);
 
     /**
      * Set the region in which the device is to operate.
      *
-     * \param region the region enum value
+     * \param region The region enum value.
      */
     void SetRegion(enum Regions region);
 
     /**
-     * Create the LorawanMac instance and connect it to a device
+     * Create the LorawanMac instance and connect it to a device.
      *
-     * \param node the node on which we wish to create a wifi MAC.
-     * \param device the device within which this MAC will be created.
-     * \returns a newly-created LorawanMac object.
+     * \param node The node on which we wish to create a wifi MAC.
+     * \param device The device within which this MAC will be created.
+     * \return A newly-created LorawanMac object.
      */
     Ptr<LorawanMac> Create(Ptr<Node> node, Ptr<NetDevice> device) const;
 
@@ -120,26 +120,29 @@ class LorawanMacHelper
      * assignment may be suboptimal in scenarios with a stochastical channel.
      *
      * This function uses the following convention (EU868) to compute the transmission range:
-     * DR5 -> SF7
-     * DR4 -> SF8
-     * DR3 -> SF9
-     * DR2 -> SF10
-     * DR1 -> SF11
-     * DR0 -> SF12
+     *
+     * DR5 -> SF7  \n
+     * DR4 -> SF8  \n
+     * DR3 -> SF9  \n
+     * DR2 -> SF10 \n
+     * DR1 -> SF11 \n
+     * DR0 -> SF12 \n
+     *
      *
      * It returns a DR distribution vector with the following counters:
-     * v[0] -> number of devices using DR5
-     * v[1] -> number of devices using DR4
-     * v[2] -> number of devices using DR3
-     * v[3] -> number of devices using DR2
-     * v[4] -> number of devices using DR1
-     * v[5] -> number of devices using DR0, in range of at least a gateway
-     * v[6] -> number of devices using DR0, out of range
      *
-     * \param endDevices the end devices to configure
-     * \param gateways the gateways to consider for RSSI measurements
-     * \param channel the radio channel to consider for RSSI measurements
-     * \return a vector containing the final number of devices per DR
+     * v[0] -> number of devices using DR5                                 \n
+     * v[1] -> number of devices using DR4                                 \n
+     * v[2] -> number of devices using DR3                                 \n
+     * v[3] -> number of devices using DR2                                 \n
+     * v[4] -> number of devices using DR1                                 \n
+     * v[5] -> number of devices using DR0, in range of at least a gateway \n
+     * v[6] -> number of devices using DR0, out of range                   \n
+     *
+     * \param endDevices The end devices to configure.
+     * \param gateways The gateways to consider for RSSI measurements.
+     * \param channel The radio channel to consider for RSSI measurements.
+     * \return A vector containing the final number of devices per DR.
      */
     static std::vector<int> SetSpreadingFactorsUp(NodeContainer endDevices,
                                                   NodeContainer gateways,
@@ -153,30 +156,32 @@ class LorawanMacHelper
      * numbers summing up to 1. The value at index \f$i\f$ is considered to be the fraction of
      * devices to be assigned DR \f$5-i\f$, for example:
      *
-     * distribution[0] == 0.2 -> fraction of devices to be assigned to DR5
-     * distribution[1] == 0.1 -> fraction of devices to be assigned to DR4
-     * distribution[2] == 0.1 -> fraction of devices to be assigned to DR3
-     * distribution[3] == 0.1 -> fraction of devices to be assigned to DR2
-     * distribution[4] == 0.2 -> fraction of devices to be assigned to DR1
-     * distribution[5] == 0.3 -> fraction of devices to be assigned to DR0
+     * distribution[0] == 0.2 -> fraction of devices to be assigned to DR5 \n
+     * distribution[1] == 0.1 -> fraction of devices to be assigned to DR4 \n
+     * distribution[2] == 0.1 -> fraction of devices to be assigned to DR3 \n
+     * distribution[3] == 0.1 -> fraction of devices to be assigned to DR2 \n
+     * distribution[4] == 0.2 -> fraction of devices to be assigned to DR1 \n
+     * distribution[5] == 0.3 -> fraction of devices to be assigned to DR0 \n
+     *
      *
      * Devices are then randomly assigned a DR following the provided distribution.
      *
      * It returns a DR distribution vector with the following counters:
-     * v[0] -> number of devices using DR5
-     * v[1] -> number of devices using DR4
-     * v[2] -> number of devices using DR3
-     * v[3] -> number of devices using DR2
-     * v[4] -> number of devices using DR1
-     * v[5] -> number of devices using DR0
      *
-     * \todo this function will always cause an array out of bound access error because at one point
+     * v[0] -> number of devices using DR5 \n
+     * v[1] -> number of devices using DR4 \n
+     * v[2] -> number of devices using DR3 \n
+     * v[3] -> number of devices using DR2 \n
+     * v[4] -> number of devices using DR1 \n
+     * v[5] -> number of devices using DR0 \n
+     *
+     * \todo This function will always cause an array out of bound access error because at one point
      * it tries to access index 6 of a 6-length vector (cumdistr).
      *
-     * \param endDevices the end devices to configure
-     * \param gateways \todo unused parameter
-     * \param distribution the distribution (probability mass function) of DR assignment
-     * \return a vector containing the final number of devices per DR
+     * \param endDevices The end devices to configure.
+     * \param gateways \todo Unused parameter.
+     * \param distribution The distribution (probability mass function) of DR assignment.
+     * \return A vector containing the final number of devices per DR.
      */
     static std::vector<int> SetSpreadingFactorsGivenDistribution(NodeContainer endDevices,
                                                                  NodeContainer gateways,
@@ -186,14 +191,14 @@ class LorawanMacHelper
     /**
      * Perform region-specific configurations for the 868 MHz EU band.
      *
-     * \param edMac pointer to the device MAC layer to configure
+     * \param edMac Pointer to the device MAC layer to configure.
      */
     void ConfigureForEuRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) const;
 
     /**
      * Perform region-specific configurations for the 868 MHz EU band.
      *
-     * \param gwMac pointer to the gateway MAC layer to configure
+     * \param gwMac Pointer to the gateway MAC layer to configure.
      */
     void ConfigureForEuRegion(Ptr<GatewayLorawanMac> gwMac) const;
 
@@ -201,21 +206,21 @@ class LorawanMacHelper
      * Apply configurations that are common both for the GatewayLorawanMac and the
      * ClassAEndDeviceLorawanMac classes.
      *
-     * \param lorawanMac pointer to the MAC layer to configure
+     * \param lorawanMac Pointer to the MAC layer to configure.
      */
     void ApplyCommonEuConfigurations(Ptr<LorawanMac> lorawanMac) const;
 
     /**
      * Perform region-specific configurations for the SINGLECHANNEL band.
      *
-     * \param edMac pointer to the device MAC layer to configure
+     * \param edMac Pointer to the device MAC layer to configure.
      */
     void ConfigureForSingleChannelRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) const;
 
     /**
      * Perform region-specific configurations for the SINGLECHANNEL band.
      *
-     * \param gwMac pointer to the gateway MAC layer to configure
+     * \param gwMac Pointer to the gateway MAC layer to configure.
      */
     void ConfigureForSingleChannelRegion(Ptr<GatewayLorawanMac> gwMac) const;
 
@@ -223,21 +228,21 @@ class LorawanMacHelper
      * Apply configurations that are common both for the GatewayLorawanMac and the
      * ClassAEndDeviceLorawanMac classes.
      *
-     * \param lorawanMac pointer to the MAC layer to configure
+     * \param lorawanMac Pointer to the MAC layer to configure.
      */
     void ApplyCommonSingleChannelConfigurations(Ptr<LorawanMac> lorawanMac) const;
 
     /**
      * Perform region-specific configurations for the ALOHA band.
      *
-     * \param edMac pointer to the device MAC layer to configure
+     * \param edMac Pointer to the device MAC layer to configure.
      */
     void ConfigureForAlohaRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) const;
 
     /**
      * Perform region-specific configurations for the ALOHA band.
      *
-     * \param gwMac pointer to the gateway MAC layer to configure
+     * \param gwMac Pointer to the gateway MAC layer to configure.
      */
     void ConfigureForAlohaRegion(Ptr<GatewayLorawanMac> gwMac) const;
 
@@ -245,7 +250,7 @@ class LorawanMacHelper
      * Apply configurations that are common both for the GatewayLorawanMac and the
      * ClassAEndDeviceLorawanMac classes.
      *
-     * \param lorawanMac pointer to the MAC layer to configure
+     * \param lorawanMac Pointer to the MAC layer to configure.
      */
     void ApplyCommonAlohaConfigurations(Ptr<LorawanMac> lorawanMac) const;
 

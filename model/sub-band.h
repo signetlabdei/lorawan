@@ -105,7 +105,7 @@ class SubBand : public Object
     /**
      * Return whether or not a frequency belongs to this SubBand.
      *
-     * \param frequency the frequency we want to test against the current subband
+     * \param frequency The frequency we want to test against the current subband.
      * \return True if the frequency is between firstFrequency and lastFrequency,
      * false otherwise.
      */
@@ -114,7 +114,7 @@ class SubBand : public Object
     /**
      * Return whether or not a channel belongs to this SubBand.
      *
-     * \param channel the channel we want to test against the current subband
+     * \param channel The channel we want to test against the current subband.
      * \return True if the channel's center frequency is between firstFrequency
      * and lastFrequency, false otherwise.
      */
@@ -128,7 +128,7 @@ class SubBand : public Object
     void SetMaxTxPowerDbm(double maxTxPowerDbm);
 
     /**
-     * Return the maximum transmission power that is allowed on this SubBand
+     * Return the maximum transmission power that is allowed on this SubBand.
      *
      * \return The maximum transmission power, in dBm.
      */

@@ -39,7 +39,7 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
 {
   public:
     /**
-     * Stores x,y values and overrides critical operators
+     * Stores x,y values and overrides critical operators.
      */
     class Position
     {
@@ -60,15 +60,15 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
         /**
          * Equality comparison operator
          *
-         * \param other second Position to compare rhis instance to
-         * \return true if the positions are equal
+         * \param other Second Position to compare this instance to.
+         * \return True if the positions are equal.
          */
         bool operator==(const Position& other) const;
         /**
          * Less-then comparison operator
          *
-         * \param other second Position to compare this instance to
-         * \return true if either the x or y coordinate of first Position is less than the
+         * \param other Second Position to compare this instance to.
+         * \return True if either the x or y coordinate of first Position is less than the
          * respective one of the second Position
          */
         bool operator<(const Position& other) const;
@@ -110,8 +110,8 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
          * If the position is not already in the map, add it by computing the
          * interpolation of neighboring shadowing values belonging to the grid.
          *
-         * \param position The Position instance
-         * \return the loss as a double
+         * \param position The Position instance.
+         * \return The loss as a double.
          */
         double GetLoss(CorrelatedShadowingPropagationLossModel::Position position);
 
@@ -151,20 +151,20 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
     CorrelatedShadowingPropagationLossModel(); //!< Default constructor
 
     /**
-     * Set the correlation distance for newly created ShadowingMap instances
+     * Set the correlation distance for newly created ShadowingMap instances.
      *
-     * \todo not implemented
+     * \todo Not implemented.
      *
-     * \param distance The correlation distance to set
+     * \param distance The correlation distance to set.
      */
     void SetCorrelationDistance(double distance);
 
     /**
      * the correlation distance that is currently being used.
      *
-     * \todo not implemented
+     * \todo Not implemented.
      *
-     * \return the correlation distance as a double
+     * \return The correlation distance as a double.
      */
     double GetCorrelationDistance();
 

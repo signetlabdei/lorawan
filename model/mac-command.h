@@ -88,7 +88,7 @@ class MacCommand : public Object
      * Deserialize the buffer into a MAC command.
      *
      * \param start A pointer to the buffer that contains the serialized command.
-     * \return the number of bytes that were consumed.
+     * \return The number of bytes that were consumed.
      */
     virtual uint8_t Deserialize(Buffer::Iterator& start) = 0;
 
@@ -116,7 +116,7 @@ class MacCommand : public Object
     /**
      * Get the CID that corresponds to a type of MAC command.
      *
-     * \param commandType the type of MAC command
+     * \param commandType The type of MAC command.
      * \return The CID as a uint8_t type.
      */
     static uint8_t GetCIDFromMacCommand(enum MacCommandType commandType);
@@ -157,7 +157,7 @@ class LinkCheckAns : public MacCommand
     LinkCheckAns(); //!< Default constructor
 
     /**
-     * Constructor with given fields
+     * Constructor with given fields.
      *
      * \param margin The demodulation margin to set.
      * \param gwCnt The gateway count to set.
@@ -220,13 +220,13 @@ class LinkAdrReq : public MacCommand
   public:
     LinkAdrReq();
     /**
-     * Constructor with given fields
+     * Constructor with given fields.
      *
-     * \param dataRate The DataRate field to set
-     * \param txPower The TXPower field to set
-     * \param channelMask The ChMask field to set
-     * \param chMaskCntl The ChMaskCntl field to set
-     * \param nbRep The NbTrans field to set
+     * \param dataRate The DataRate field to set.
+     * \param txPower The TXPower field to set.
+     * \param channelMask The ChMask field to set.
+     * \param chMaskCntl The ChMaskCntl field to set.
+     * \param nbRep The NbTrans field to set.
      */
     LinkAdrReq(uint8_t dataRate,
                uint8_t txPower,
@@ -292,11 +292,11 @@ class LinkAdrAns : public MacCommand
     LinkAdrAns(); //!< Default constructor
 
     /**
-     * Constructor with given fields
+     * Constructor with given fields.
      *
-     * \param powerAck The PowerACK field to set
-     * \param dataRateAck The DataRateACK field to set
-     * \param channelMaskAck The ChannelMaskACK field to set
+     * \param powerAck The PowerACK field to set.
+     * \param dataRateAck The DataRateACK field to set.
+     * \param channelMaskAck The ChannelMaskACK field to set.
      */
     LinkAdrAns(bool powerAck, bool dataRateAck, bool channelMaskAck);
 
@@ -367,7 +367,7 @@ class DutyCycleAns : public MacCommand
  *
  * Implementation of the RxParamSetupReq LoRaWAN MAC command.
  *
- * \todo the use of frequencies in Hz here will cause problems for users, as frequencies are in MHz
+ * \todo The use of frequencies in Hz here will cause problems for users, as frequencies are in MHz
  * in the rest of the module code. IMO it would be better to have freqs in Hz as uint32_t
  */
 class RxParamSetupReq : public MacCommand
@@ -438,9 +438,9 @@ class RxParamSetupAns : public MacCommand
     void Print(std::ostream& os) const override;
 
   private:
-    bool m_rx1DrOffsetAck; //!< the RX1DROffsetACK field
-    bool m_rx2DataRateAck; //!< the RX2DataRateACK field
-    bool m_channelAck;     //!< the ChannelACK field
+    bool m_rx1DrOffsetAck; //!< The RX1DROffsetACK field
+    bool m_rx2DataRateAck; //!< The RX2DataRateACK field
+    bool m_channelAck;     //!< The ChannelACK field
 };
 
 /**
@@ -495,8 +495,8 @@ class DevStatusAns : public MacCommand
     uint8_t GetMargin() const;
 
   private:
-    uint8_t m_battery; //!< the Battery field
-    uint8_t m_margin;  //!< the RadioStatus field
+    uint8_t m_battery; //!< The Battery field
+    uint8_t m_margin;  //!< The RadioStatus field
 };
 
 /**
@@ -504,7 +504,7 @@ class DevStatusAns : public MacCommand
  *
  * Implementation of the NewChannelReq LoRaWAN MAC command.
  *
- * \todo the use of frequencies in Hz here will cause problems for users, as frequencies are in
+ * \todo The use of frequencies in Hz here will cause problems for users, as frequencies are in
  * MHz in the rest of the module code. IMO it would be better to have freqs in Hz as uint32_t
  */
 class NewChannelReq : public MacCommand
@@ -529,33 +529,33 @@ class NewChannelReq : public MacCommand
     /**
      * Get the the ChIndex field contained in this MAC command.
      *
-     * \return the ChIndex field
+     * \return The ChIndex field.
      */
     uint8_t GetChannelIndex() const;
     /**
      * Get the the Frequency field contained in this MAC command.
      *
-     * \return the Frequency field in Hz
+     * \return The Frequency field in Hz.
      */
     double GetFrequency() const;
     /**
      * Get the the MinDR field contained in this MAC command.
      *
-     * \return the MinDR field
+     * \return The MinDR field.
      */
     uint8_t GetMinDataRate() const;
     /**
      * Get the the MaxDR field contained in this MAC command.
      *
-     * \return the MaxDR field
+     * \return The MaxDR field.
      */
     uint8_t GetMaxDataRate() const;
 
   private:
-    uint8_t m_chIndex;     //!< the ChIndex field
-    double m_frequency;    //!< the Frequency field, in Hz
-    uint8_t m_minDataRate; //!< the MinDR field
-    uint8_t m_maxDataRate; //!< the MaxDR field
+    uint8_t m_chIndex;     //!< The ChIndex field
+    double m_frequency;    //!< The Frequency field, in Hz
+    uint8_t m_minDataRate; //!< The MinDR field
+    uint8_t m_maxDataRate; //!< The MaxDR field
 };
 
 /**
@@ -583,8 +583,8 @@ class NewChannelAns : public MacCommand
     void Print(std::ostream& os) const override;
 
   private:
-    bool m_dataRateRangeOk;    //!< the Data-rate range ok field
-    bool m_channelFrequencyOk; //!< the Channel frequency ok field
+    bool m_dataRateRangeOk;    //!< The Data-rate range ok field
+    bool m_channelFrequencyOk; //!< The Channel frequency ok field
 };
 
 /**
@@ -616,7 +616,7 @@ class RxTimingSetupReq : public MacCommand
     Time GetDelay();
 
   private:
-    uint8_t m_delay; //!< the Del field
+    uint8_t m_delay; //!< The Del field
 };
 
 /**

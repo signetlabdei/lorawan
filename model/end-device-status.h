@@ -152,7 +152,7 @@ class EndDeviceStatus : public Object
     };
 
     /**
-     * typedef of a list of gateways with relative reception information
+     * typedef of a list of gateways with relative reception information.
      */
     typedef std::map<Address, PacketInfoPerGw> GatewayList;
 
@@ -169,7 +169,7 @@ class EndDeviceStatus : public Object
     };
 
     /**
-     * typedef of a list of packets paired to their reception info
+     * typedef of a list of packets paired to their reception info.
      */
     typedef std::list<std::pair<Ptr<const Packet>, ReceivedPacketInfo>> ReceivedPacketList;
 
@@ -187,10 +187,10 @@ class EndDeviceStatus : public Object
     ~EndDeviceStatus() override; //!< Destructor
 
     /**
-     * Constructor with initialization parameters
+     * Constructor with initialization parameters.
      *
-     * \param endDeviceAddress address of the end device
-     * \param endDeviceMac pointer to the MAC layer of the end device
+     * \param endDeviceAddress Address of the end device.
+     * \param endDeviceMac Pointer to the MAC layer of the end device.
      */
     EndDeviceStatus(LoraDeviceAddress endDeviceAddress,
                     Ptr<ClassAEndDeviceLorawanMac> endDeviceMac);
@@ -205,7 +205,7 @@ class EndDeviceStatus : public Object
     /**
      * Get the first window frequency of this device.
      *
-     * \return the frequency [MHz]
+     * \return The frequency [MHz].
      */
     double GetFirstReceiveWindowFrequency() const;
 
@@ -223,7 +223,7 @@ class EndDeviceStatus : public Object
     /**
      * Return the second window frequency of this device.
      *
-     * \return the frequency [MHz]
+     * \return The frequency [MHz].
      */
     double GetSecondReceiveWindowFrequency() const;
 
@@ -237,21 +237,21 @@ class EndDeviceStatus : public Object
     /**
      * Set the spreading factor this device is using in the first receive window.
      *
-     * \param sf the spreading factor
+     * \param sf The spreading factor.
      */
     void SetFirstReceiveWindowSpreadingFactor(uint8_t sf);
 
     /**
      * Set the first window frequency of this device.
      *
-     * \param frequency the frequency [MHz]
+     * \param frequency The frequency [MHz].
      */
     void SetFirstReceiveWindowFrequency(double frequency);
 
     /**
      * Set the spreading factor this device is using in the second receive window.
      *
-     * \param offset the spreading factor
+     * \param offset The spreading factor.
      *
      * \todo rename this to SetSecondReceiveWindowSpreadingFactor. No such thing as a SF offset for
      * RX2 in the specifications. Also this function is unused.
@@ -261,35 +261,35 @@ class EndDeviceStatus : public Object
     /**
      * Set the second window frequency of this device.
      *
-     * \param frequency the frequency [MHz]
+     * \param frequency The frequency [MHz].
      */
     void SetSecondReceiveWindowFrequency(double frequency);
 
     /**
      * Set the reply packet mac header.
      *
-     * \param macHeader the mac header (MHDR)
+     * \param macHeader The mac header (MHDR).
      */
     void SetReplyMacHeader(LorawanMacHeader macHeader);
 
     /**
      * Set the reply packet frame header.
      *
-     * \param frameHeader the frame header (FHDR + FPort)
+     * \param frameHeader The frame header (FHDR + FPort).
      */
     void SetReplyFrameHeader(LoraFrameHeader frameHeader);
 
     /**
      * Set the packet reply payload.
      *
-     * \param replyPayload packet containing the FRMPayload
+     * \param replyPayload Packet containing the FRMPayload.
      */
     void SetReplyPayload(Ptr<Packet> replyPayload);
 
     /**
-     * Get the MAC layer of the end device
+     * Get the MAC layer of the end device.
      *
-     * \return a pointer to the MAC layer
+     * \return A pointer to the MAC layer.
      */
     Ptr<ClassAEndDeviceLorawanMac> GetMac();
 
@@ -300,15 +300,15 @@ class EndDeviceStatus : public Object
     /**
      * Insert a received packet in the packet list.
      *
-     * \param receivedPacket the packet received
-     * \param gwAddress the address of the receiver gateway
+     * \param receivedPacket The packet received.
+     * \param gwAddress The address of the receiver gateway.
      */
     void InsertReceivedPacket(Ptr<const Packet> receivedPacket, const Address& gwAddress);
 
     /**
      * Return the last packet that was received from this device.
      *
-     * \return the last received packet
+     * \return The last received packet.
      */
     Ptr<const Packet> GetLastPacketReceivedFromDevice();
 
@@ -316,7 +316,7 @@ class EndDeviceStatus : public Object
      * Return the information about the last packet that was received from the
      * device.
      *
-     * \return the information about the last received packet
+     * \return The information about the last received packet.
      */
     EndDeviceStatus::ReceivedPacketInfo GetLastReceivedPacketInfo();
 
@@ -328,37 +328,37 @@ class EndDeviceStatus : public Object
     /**
      * Add MAC command to the frame header of next reply.
      *
-     * \param macCommand the MAC command
+     * \param macCommand The MAC command.
      */
     void AddMACCommand(Ptr<MacCommand> macCommand);
 
     /**
      * Update Gateway data when more then one gateway receive the same packet.
      *
-     * \param gwList list of gateways with previous receptions
-     * \param gwAddress gateway address of the current reception
-     * \param rcvPower reception power
+     * \param gwList List of gateways with previous receptions.
+     * \param gwAddress Gateway address of the current reception.
+     * \param rcvPower Reception power.
      *
-     * \todo not implemented
+     * \todo not implemented.
      */
     void UpdateGatewayData(GatewayList gwList, Address gwAddress, double rcvPower);
 
     /**
-     * Check if there is already a running reception window event scheduled for this ED
+     * Check if there is already a running reception window event scheduled for this ED.
      *
-     * \return true if a reception window event is already scheduled, false otherwise
+     * \return True if a reception window event is already scheduled, false otherwise.
      */
     bool HasReceiveWindowOpportunityScheduled();
 
     /**
-     * Store next scheduled reception window event
+     * Store next scheduled reception window event.
      *
-     * \param event the event
+     * \param event The event.
      */
     void SetReceiveWindowOpportunity(EventId event);
 
     /**
-     * Cancel next scheduled reception window event
+     * Cancel next scheduled reception window event.
      */
     void RemoveReceiveWindowOpportunity();
 
@@ -366,7 +366,7 @@ class EndDeviceStatus : public Object
      * Get the gateways which received the last packet from the end device. Gateways are mapped
      * to their measured reception power of the last packet, in ascending order.
      *
-     * \return the ordered map of reception power values and gateways
+     * \return The ordered map of reception power values and gateways.
      */
     std::map<double, Address> GetPowerGatewayMap();
 
@@ -376,9 +376,9 @@ class EndDeviceStatus : public Object
     /**
      * Stream insertion operator.
      *
-     * \param os the stream
-     * \param status the status
-     * \returns a reference to the stream
+     * \param os The stream.
+     * \param status The status.
+     * \return A reference to the stream.
      */
     friend std::ostream& operator<<(std::ostream& os, const EndDeviceStatus& status);
 
@@ -387,9 +387,9 @@ class EndDeviceStatus : public Object
     uint8_t m_firstReceiveWindowSpreadingFactor = 0; //!< SF for RX1 window
     double m_firstReceiveWindowFrequency = 0;        //!< Frequency [MHz] for RX1 window
     uint8_t m_secondReceiveWindowOffset =
-        0; //!< SF for RX2 window /todo rename to sf, offset makes no sense
+        0; //!< SF for RX2 window. \todo Rename to sf, offset makes no sense.
     double m_secondReceiveWindowFrequency = 869.525; //!< Frequency [MHz] for RX2 window
-    EventId m_receiveWindowEvent; //!< event storing the next scheduled downlink transmission
+    EventId m_receiveWindowEvent; //!< Event storing the next scheduled downlink transmission
 
     ReceivedPacketList m_receivedPacketList; //!< List of received packets
 

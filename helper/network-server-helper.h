@@ -62,8 +62,8 @@ class NetworkServerHelper
     /**
      * Record an attribute to be set in each Application after it is is created.
      *
-     * \param name the name of the application attribute to set
-     * \param value the value of the application attribute to set
+     * \param name The name of the application attribute to set.
+     * \param value The value of the application attribute to set.
      */
     void SetAttribute(std::string name, const AttributeValue& value);
 
@@ -73,7 +73,7 @@ class NetworkServerHelper
      *
      * \param c The nodes on which to create the Applications. The nodes
      *          are specified by a NodeContainer.
-     * \returns The applications created, one Application per Node in the
+     * \return The applications created, one Application per Node in the
      *          NodeContainer.
      */
     ApplicationContainer Install(NodeContainer c);
@@ -82,7 +82,7 @@ class NetworkServerHelper
      * Create one lorawan network server application on the Node.
      *
      * \param node The node on which to create the Application.
-     * \returns The application created.
+     * \return The application created.
      */
     ApplicationContainer Install(Ptr<Node> node);
 
@@ -100,7 +100,7 @@ class NetworkServerHelper
     /**
      * Set which end devices will be managed by this NS.
      *
-     * \param endDevices the end device nodes
+     * \param endDevices The end device nodes.
      */
     void SetEndDevices(NodeContainer endDevices);
 
@@ -108,7 +108,7 @@ class NetworkServerHelper
      * Enable (true) or disable (false) the ADR component in the Network
      * Server created by this helper.
      *
-     * \param enableAdr Whether to enable adr in the Network Server
+     * \param enableAdr Whether to enable adr in the Network Server.
      */
     void EnableAdr(bool enableAdr);
 
@@ -116,7 +116,7 @@ class NetworkServerHelper
      * Set the ADR implementation to use in the Network Server created
      * by this helper.
      *
-     * \param type The type of ADR implementation
+     * \param type The type of ADR implementation.
      */
     void SetAdr(std::string type);
 
@@ -135,8 +135,8 @@ class NetworkServerHelper
      * gateways to the Node with a PointToPoint link, registers gateways and devices in the
      * NetworkServer Application, and installs the necessary NetworkServerComponent objects.
      *
-     * \param node A pointer to the Node
-     * \return A pointer to the installed NetworkServer application
+     * \param node A pointer to the Node.
+     * \return A pointer to the installed NetworkServer application.
      */
     Ptr<Application> InstallPriv(Ptr<Node> node);
 

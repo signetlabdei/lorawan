@@ -51,8 +51,8 @@ class PeriodicSenderHelper
     /**
      * Helper function used to set the underlying application attributes.
      *
-     * \param name the name of the application attribute to set
-     * \param value the value of the application attribute to set
+     * \param name The name of the application attribute to set.
+     * \param value The value of the application attribute to set.
      */
     void SetAttribute(std::string name, const AttributeValue& value);
 
@@ -62,7 +62,7 @@ class PeriodicSenderHelper
      *
      * \param c NodeContainer of the set of nodes on which an PeriodicSender
      * will be installed.
-     * \returns Container of Ptr to the applications installed.
+     * \return Container of Ptr to the applications installed.
      */
     ApplicationContainer Install(NodeContainer c) const;
 
@@ -71,7 +71,7 @@ class PeriodicSenderHelper
      * with SetAttribute or other functions of this class.
      *
      * \param node The node on which a PeriodicSender will be installed.
-     * \returns Container of the Ptr to the application installed.
+     * \return Container of the Ptr to the application installed.
      */
     ApplicationContainer Install(Ptr<Node> node) const;
 
@@ -81,7 +81,7 @@ class PeriodicSenderHelper
      * A value of Seconds (0) results in randomly generated periods according to
      * the model contained in the TR 45.820 document.
      *
-     * \param period The period to set
+     * \param period The period to set.
      */
     void SetPeriod(Time period);
 
@@ -106,11 +106,11 @@ class PeriodicSenderHelper
      * with SetAttribute or other functions of this class.
      *
      * \param node The node on which a PeriodicSender will be installed.
-     * \returns A Ptr to the application installed.
+     * \return A Ptr to the application installed.
      */
     Ptr<Application> InstallPriv(Ptr<Node> node) const;
 
-    ObjectFactory m_factory; //!< the factory to create PeriodicSender applications
+    ObjectFactory m_factory; //!< The factory to create PeriodicSender applications
     Ptr<UniformRandomVariable> m_initialDelay; //!< The random variable used to extract a start
                                                //!< off delay for each PeriodicSender application
     Ptr<UniformRandomVariable>
