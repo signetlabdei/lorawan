@@ -47,7 +47,7 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
         Position(); //!< Default constructor
 
         /**
-         * \brief Construct a new Position object with values.
+         * Construct a new Position object with values.
          *
          * \param x The x coordinate.
          * \param y The y coordinate.
@@ -58,14 +58,14 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
         double y; //!< Stores the y coordinate.
 
         /**
-         * \brief Equality comparison operator
+         * Equality comparison operator
          *
          * \param other second Position to compare rhis instance to
          * \return true if the positions are equal
          */
         bool operator==(const Position& other) const;
         /**
-         * \brief Less-then comparison operator
+         * Less-then comparison operator
          *
          * \param other second Position to compare this instance to
          * \return true if either the x or y coordinate of first Position is less than the
@@ -105,7 +105,7 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
         ~ShadowingMap(); //!< Destructor
 
         /**
-         * \brief Get the loss for a certain position.
+         * Get the loss for a certain position.
          *
          * If the position is not already in the map, add it by computing the
          * interpolation of neighboring shadowing values belonging to the grid.
@@ -151,7 +151,7 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
     CorrelatedShadowingPropagationLossModel(); //!< Default constructor
 
     /**
-     * \brief Set the correlation distance for newly created ShadowingMap instances
+     * Set the correlation distance for newly created ShadowingMap instances
      *
      * \todo not implemented
      *
@@ -160,7 +160,7 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
     void SetCorrelationDistance(double distance);
 
     /**
-     * \brief the correlation distance that is currently being used.
+     * the correlation distance that is currently being used.
      *
      * \todo not implemented
      *

@@ -28,7 +28,7 @@ namespace ns3
 /**
  * \ingroup lorawan
  *
- * \brief Position allocator for hexagonal tiling
+ * Position allocator for hexagonal tiling
  *
  * Starting with a first hexagon in the axes' center, following tiles are added in outward
  * rings. The first position returned for a new ring is always the top one, followed by the others
@@ -85,7 +85,7 @@ class HexGridPositionAllocator : public PositionAllocator
     ~HexGridPositionAllocator() override; //!< Destructor
 
     /**
-     * \brief Construct a new HexGridPositionAllocator object with given radius
+     * Construct a new HexGridPositionAllocator object with given radius
      *
      * \param radius The radius length of the circle inscribed in the hexagonal tiles
      */
@@ -102,14 +102,14 @@ class HexGridPositionAllocator : public PositionAllocator
     static TypeId GetTypeId();
 
     /**
-     * \brief Get the radius of the circle inscribed in the hexagonal tiles
+     * Get the radius of the circle inscribed in the hexagonal tiles
      *
      * \return The radius length
      */
     double GetRadius() const;
 
     /**
-     * \brief Set the radius of the circle inscribed in the hexagonal tiles
+     * Set the radius of the circle inscribed in the hexagonal tiles
      *
      * \param radius The radius length
      */
@@ -117,7 +117,7 @@ class HexGridPositionAllocator : public PositionAllocator
 
   private:
     /**
-     * \brief This method adds to the given list of positions an outer ring of positions
+     * This method adds to the given list of positions an outer ring of positions
      *
      * \param positions The list of position around which to create the new positions.
      * \return The input list of position with an added outer ring.

@@ -39,7 +39,7 @@ namespace lorawan
 /**
  * \ingroup lorawan
  *
- * \brief Helps to create LoraNetDevice objects
+ * Helps to create LoraNetDevice objects
  *
  * This class can help create a large set of similar LoraNetDevice objects and
  * configure a large set of their attributes during creation.
@@ -51,7 +51,7 @@ class LoraHelper
     virtual ~LoraHelper(); //!< Destructor
 
     /**
-     * \brief Install LoraNetDevices on a list of nodes
+     * Install LoraNetDevices on a list of nodes
      *
      * \param phyHelper the PHY helper to create PHY objects
      * \param macHelper the MAC helper to create MAC objects
@@ -64,7 +64,7 @@ class LoraHelper
                                        NodeContainer c) const;
 
     /**
-     * \brief Install LoraNetDevice on a single node
+     * Install LoraNetDevice on a single node
      *
      * \param phyHelper the PHY helper to create PHY objects
      * \param macHelper the MAC helper to create MAC objects
@@ -77,7 +77,7 @@ class LoraHelper
                                        Ptr<Node> node) const;
 
     /**
-     * \brief Enable tracking of packets via trace sources.
+     * Enable tracking of packets via trace sources.
      *
      * This method automatically connects to trace sources to computes relevant
      * metrics.
@@ -85,14 +85,14 @@ class LoraHelper
     void EnablePacketTracking();
 
     /**
-     * \brief Periodically prints the simulation time to the standard output.
+     * Periodically prints the simulation time to the standard output.
      *
      * \param interval the time period of the interval
      */
     void EnableSimulationTimePrinting(Time interval);
 
     /**
-     * \brief Periodically prints the status of devices in the network to a file.
+     * Periodically prints the status of devices in the network to a file.
      *
      * For each input device print the current position, data rate and transmission power settings
      *
@@ -107,7 +107,7 @@ class LoraHelper
                                             Time interval);
 
     /**
-     * \brief Periodically prints PHY-level performance at every gateway in the container.
+     * Periodically prints PHY-level performance at every gateway in the container.
      *
      * For each input gateway print counters for totPacketsSent, receivedPackets, interferedPackets,
      * noMoreGwPackets, underSensitivityPackets and lostBecauseTxPackets
@@ -121,7 +121,7 @@ class LoraHelper
                                               Time interval);
 
     /**
-     * \brief Print PHY-level performance at every gateway in the container since last
+     * Print PHY-level performance at every gateway in the container since last
      * performance update
      *
      * For each input gateway print counters for totPacketsSent, receivedPackets, interferedPackets,
@@ -133,7 +133,7 @@ class LoraHelper
     void DoPrintPhyPerformance(NodeContainer gateways, std::string filename);
 
     /**
-     * \brief Periodically print global performance as the total number of send and received
+     * Periodically print global performance as the total number of send and received
      * packets.
      *
      * \param filename the output filename
@@ -142,7 +142,7 @@ class LoraHelper
     void EnablePeriodicGlobalPerformancePrinting(std::string filename, Time interval);
 
     /**
-     * \brief Print global performance as the total number of send and received packets since last
+     * Print global performance as the total number of send and received packets since last
      * performance update
      *
      * \param filename the output filename
@@ -150,7 +150,7 @@ class LoraHelper
     void DoPrintGlobalPerformance(std::string filename);
 
     /**
-     * \brief Get a reference to the Packet Tracker object
+     * Get a reference to the Packet Tracker object
      *
      * \return the reference to the Packet Tracker object
      */
@@ -160,7 +160,7 @@ class LoraHelper
     time_t m_oldtime;                             //!< Real time of the last simulation time print
 
     /**
-     * \brief Print a summary of the current status of input devices.
+     * Print a summary of the current status of input devices.
      *
      * For each input device print the current position, data rate and transmission power settings
      *
@@ -174,7 +174,7 @@ class LoraHelper
 
   private:
     /**
-     * \brief Actually print the simulation time and re-schedule execution of this
+     * Actually print the simulation time and re-schedule execution of this
      * function.
      *
      * \param interval the delay for next printing

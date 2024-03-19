@@ -111,7 +111,7 @@ class LorawanMacHelper
     Ptr<LorawanMac> Create(Ptr<Node> node, Ptr<NetDevice> device) const;
 
     /**
-     * \brief Initialize the end devices' data rate parameter.
+     * Initialize the end devices' data rate parameter.
      *
      * The DR of each device is set to the maximum possible for its transmissions to be correctly
      * received by the gateway measuring the best RSSI from the device, mimicking the DR
@@ -146,7 +146,7 @@ class LorawanMacHelper
                                                   Ptr<LoraChannel> channel);
 
     /**
-     * \brief Randomly initialize the end devices' data rate parameter according to the given
+     * Randomly initialize the end devices' data rate parameter according to the given
      * distribution.
      *
      * This function expects a data rate (DR) distribution vector of length 6 filled with real
@@ -184,21 +184,21 @@ class LorawanMacHelper
 
   private:
     /**
-     * \brief Perform region-specific configurations for the 868 MHz EU band.
+     * Perform region-specific configurations for the 868 MHz EU band.
      *
      * \param edMac pointer to the device MAC layer to configure
      */
     void ConfigureForEuRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) const;
 
     /**
-     * \brief Perform region-specific configurations for the 868 MHz EU band.
+     * Perform region-specific configurations for the 868 MHz EU band.
      *
      * \param gwMac pointer to the gateway MAC layer to configure
      */
     void ConfigureForEuRegion(Ptr<GatewayLorawanMac> gwMac) const;
 
     /**
-     * \brief Apply configurations that are common both for the GatewayLorawanMac and the
+     * Apply configurations that are common both for the GatewayLorawanMac and the
      * ClassAEndDeviceLorawanMac classes.
      *
      * \param lorawanMac pointer to the MAC layer to configure
@@ -206,21 +206,21 @@ class LorawanMacHelper
     void ApplyCommonEuConfigurations(Ptr<LorawanMac> lorawanMac) const;
 
     /**
-     * \brief Perform region-specific configurations for the SINGLECHANNEL band.
+     * Perform region-specific configurations for the SINGLECHANNEL band.
      *
      * \param edMac pointer to the device MAC layer to configure
      */
     void ConfigureForSingleChannelRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) const;
 
     /**
-     * \brief Perform region-specific configurations for the SINGLECHANNEL band.
+     * Perform region-specific configurations for the SINGLECHANNEL band.
      *
      * \param gwMac pointer to the gateway MAC layer to configure
      */
     void ConfigureForSingleChannelRegion(Ptr<GatewayLorawanMac> gwMac) const;
 
     /**
-     * \brief Apply configurations that are common both for the GatewayLorawanMac and the
+     * Apply configurations that are common both for the GatewayLorawanMac and the
      * ClassAEndDeviceLorawanMac classes.
      *
      * \param lorawanMac pointer to the MAC layer to configure
@@ -228,21 +228,21 @@ class LorawanMacHelper
     void ApplyCommonSingleChannelConfigurations(Ptr<LorawanMac> lorawanMac) const;
 
     /**
-     * \brief Perform region-specific configurations for the ALOHA band.
+     * Perform region-specific configurations for the ALOHA band.
      *
      * \param edMac pointer to the device MAC layer to configure
      */
     void ConfigureForAlohaRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) const;
 
     /**
-     * \brief Perform region-specific configurations for the ALOHA band.
+     * Perform region-specific configurations for the ALOHA band.
      *
      * \param gwMac pointer to the gateway MAC layer to configure
      */
     void ConfigureForAlohaRegion(Ptr<GatewayLorawanMac> gwMac) const;
 
     /**
-     * \brief Apply configurations that are common both for the GatewayLorawanMac and the
+     * Apply configurations that are common both for the GatewayLorawanMac and the
      * ClassAEndDeviceLorawanMac classes.
      *
      * \param lorawanMac pointer to the MAC layer to configure

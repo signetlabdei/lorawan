@@ -58,7 +58,7 @@ class LoraInterferenceHelper
     {
       public:
         /**
-         * \brief Construct a new interference signal Event object
+         * Construct a new interference signal Event object
          *
          * \param duration the duration in time
          * \param rxPowerdBm the power of the signal
@@ -140,7 +140,7 @@ class LoraInterferenceHelper
     };
 
     /**
-     * \brief Enumeration of types of collision matrices
+     * Enumeration of types of collision matrices
      */
     enum CollisionMatrix
     {
@@ -227,7 +227,7 @@ class LoraInterferenceHelper
 
   private:
     /**
-     * \brief Set the collision matrix
+     * Set the collision matrix
      *
      * \todo redundant, only used by constructor which also sets the matrix directly
      *

@@ -30,7 +30,7 @@ namespace lorawan
 /**
  * \ingroup lorawan
  *
- * \brief Tag used to save various data about a packet, like its Spreading Factor and data about
+ * Tag used to save various data about a packet, like its Spreading Factor and data about
  * interference.
  */
 class LoraTag : public Tag
@@ -44,7 +44,7 @@ class LoraTag : public Tag
     TypeId GetInstanceTypeId() const override;
 
     /**
-     * \brief Create a LoraTag with a given spreading factor and collision.
+     * Create a LoraTag with a given spreading factor and collision.
      *
      * \param sf The Spreading Factor.
      * \param destroyedBy The SF this tag's packet was destroyed by.
@@ -59,49 +59,49 @@ class LoraTag : public Tag
     void Print(std::ostream& os) const override;
 
     /**
-     * \brief Read which Spreading Factor this packet was transmitted with.
+     * Read which Spreading Factor this packet was transmitted with.
      *
      * \return This tag's packet's SF.
      */
     uint8_t GetSpreadingFactor() const;
 
     /**
-     * \brief Read which Spreading Factor this packet was destroyed by.
+     * Read which Spreading Factor this packet was destroyed by.
      *
      * \return The SF this packet was destroyed by.
      */
     uint8_t GetDestroyedBy() const;
 
     /**
-     * \brief Read the power this packet arrived with.
+     * Read the power this packet arrived with.
      *
      * \return This tag's packet received power.
      */
     double GetReceivePower() const;
 
     /**
-     * \brief Set which Spreading Factor this packet was transmitted with.
+     * Set which Spreading Factor this packet was transmitted with.
      *
      * \param sf The Spreading Factor.
      */
     void SetSpreadingFactor(uint8_t sf);
 
     /**
-     * \brief Set which Spreading Factor this packet was destroyed by.
+     * Set which Spreading Factor this packet was destroyed by.
      *
      * \param sf The Spreading Factor.
      */
     void SetDestroyedBy(uint8_t sf);
 
     /**
-     * \brief Set the power this packet was received with.
+     * Set the power this packet was received with.
      *
      * \param receivePower The power, in dBm.
      */
     void SetReceivePower(double receivePower);
 
     /**
-     * \brief Set the frequency of the packet.
+     * Set the frequency of the packet.
      *
      * This value works in two ways:
      * - It is used by the GW to signal to the NS the frequency of the uplink packet
@@ -112,7 +112,7 @@ class LoraTag : public Tag
     void SetFrequency(double frequency);
 
     /**
-     * \brief Get the frequency of the packet.
+     * Get the frequency of the packet.
      *
      * This value works in two ways:
      * - It is used by the GW to signal to the NS the frequency of the uplink packet
@@ -123,14 +123,14 @@ class LoraTag : public Tag
     double GetFrequency() const;
 
     /**
-     * \brief Get the data rate for this packet.
+     * Get the data rate for this packet.
      *
      * \return The data rate that needs to be employed for this packet.
      */
     uint8_t GetDataRate() const;
 
     /**
-     * \brief Set the data rate for this packet.
+     * Set the data rate for this packet.
      *
      * \param dataRate The data rate.
      */

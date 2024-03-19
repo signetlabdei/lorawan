@@ -296,7 +296,7 @@ class LoraFrameHeader : public Header
     void AddDevStatusReq();
 
     /**
-     * \brief Add a NewChannelReq command with provided fields.
+     * Add a NewChannelReq command with provided fields.
      *
      * \param chIndex the ChIndex field
      * \param frequency the Frequency field

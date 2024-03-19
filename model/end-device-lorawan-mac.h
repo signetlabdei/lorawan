@@ -139,7 +139,7 @@ class EndDeviceLorawanMac : public LorawanMac
     bool GetDataRateAdaptation() const;
 
     /**
-     * \brief Set the default number of unacknowledged redundant transmissions of each packet. If,
+     * Set the default number of unacknowledged redundant transmissions of each packet. If,
      * after a transmission, any acknowledgement is received, no more are sent for that packet.
      *
      * \param maxNumbTx The number of transmissions
@@ -306,7 +306,7 @@ class EndDeviceLorawanMac : public LorawanMac
     void OnDevStatusReq();
 
     /**
-     * \brief Perform the actions that need to be taken when receiving a NewChannelReq command.
+     * Perform the actions that need to be taken when receiving a NewChannelReq command.
      *
      * \param chIndex the ChIndex field of the received NewChannelReq command
      * \param frequency the Frequency field of the received NewChannelReq command
@@ -516,7 +516,7 @@ class EndDeviceLorawanMac : public LorawanMac
     LorawanMacHeader::MType m_mType;
 
     /**
-     * \brief current value of the device frame counter
+     * current value of the device frame counter
      */
     uint16_t m_currentFCnt;
 };

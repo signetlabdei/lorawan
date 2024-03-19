@@ -60,7 +60,7 @@ class NetworkServerHelper
     ~NetworkServerHelper(); //!< Destructor
 
     /**
-     * \brief Record an attribute to be set in each Application after it is is created.
+     * Record an attribute to be set in each Application after it is is created.
      *
      * \param name the name of the application attribute to set
      * \param value the value of the application attribute to set
@@ -68,7 +68,18 @@ class NetworkServerHelper
     void SetAttribute(std::string name, const AttributeValue& value);
 
     /**
-     * \brief Create one lorawan network server application on the Node.
+     * Create one lorawan network server application on each of the Nodes in the
+     * NodeContainer.
+     *
+     * \param c The nodes on which to create the Applications. The nodes
+     *          are specified by a NodeContainer.
+     * \returns The applications created, one Application per Node in the
+     *          NodeContainer.
+     */
+    ApplicationContainer Install(NodeContainer c);
+
+    /**
+     * Create one lorawan network server application on the Node.
      *
      * \param node The node on which to create the Application.
      * \returns The application created.
@@ -111,14 +122,14 @@ class NetworkServerHelper
 
   private:
     /**
-     * \brief Install the NetworkServerComponent objects onto the NetworkServer application.
+     * Install the NetworkServerComponent objects onto the NetworkServer application.
      *
      * \param netServer A pointer to the NetworkServer application.
      */
     void InstallComponents(Ptr<NetworkServer> netServer);
 
     /**
-     * \brief Do the actual NetworkServer application installation on the Node.
+     * Do the actual NetworkServer application installation on the Node.
      *
      * This function creates the NetworkServer Application, installs it on the Node, connect the
      * gateways to the Node with a PointToPoint link, registers gateways and devices in the

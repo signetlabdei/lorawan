@@ -53,14 +53,14 @@ class UplinkPacketTest : public TestCase
     ~UplinkPacketTest() override; //!< Destructor
 
     /**
-     * \brief Callback for tracing ReceivedPacket
+     * Callback for tracing ReceivedPacket
      *
      * \param packet the packet received
      */
     void ReceivedPacket(Ptr<const Packet> packet);
 
     /**
-     * \brief Send a packet from the input end device
+     * Send a packet from the input end device
      *
      * \param endDevice A Ptr to the end device Node
      */
@@ -156,7 +156,7 @@ class DownlinkPacketTest : public TestCase
                                    Ptr<Packet> packet);
 
     /**
-     * \brief Send a packet from the input end device
+     * Send a packet from the input end device
      *
      * \param endDevice A Ptr to the end device Node
      * \param requestAck Whether to require an acknowledgement from the server
@@ -252,7 +252,7 @@ class LinkCheckTest : public TestCase
     ~LinkCheckTest() override; //!< Destructor
 
     /**
-     * \brief Trace changes in the last known gateway count variable (updated on reception of
+     * Trace changes in the last known gateway count variable (updated on reception of
      * LinkCheckAns MAC commands) of an end device
      *
      * \param newValue The updated value
@@ -261,7 +261,7 @@ class LinkCheckTest : public TestCase
     void LastKnownGatewayCount(int newValue, int oldValue);
 
     /**
-     * \brief Send a packet containing a LinkCheckReq MAC command from the input end device
+     * Send a packet containing a LinkCheckReq MAC command from the input end device
      *
      * \param endDevice A Ptr to the end device Node
      * \param requestAck Whether to require an acknowledgement from the server

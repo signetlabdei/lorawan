@@ -48,7 +48,7 @@ class OneShotSenderHelper
     ~OneShotSenderHelper(); //!< Destructor
 
     /**
-     * \brief Helper function used to set the underlying application attributes.
+     * Helper function used to set the underlying application attributes.
      *
      * \param name the name of the application attribute to set
      * \param value the value of the application attribute to set
@@ -56,7 +56,7 @@ class OneShotSenderHelper
     void SetAttribute(std::string name, const AttributeValue& value);
 
     /**
-     * \brief Install a OneShotSender application on each node of the input container
+     * Install a OneShotSender application on each node of the input container
      * configured with all the attributes set with SetAttribute or other functions of this class.
      *
      * \param c NodeContainer of the set of nodes on which an OneShotSender will be installed.
@@ -74,7 +74,7 @@ class OneShotSenderHelper
     ApplicationContainer Install(Ptr<Node> node) const;
 
     /**
-     * \brief Set the send time of the applications
+     * Set the send time of the applications
      *
      * \todo It does not make sense that all applications send at the exact same time.
      *

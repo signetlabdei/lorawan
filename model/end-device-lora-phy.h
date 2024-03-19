@@ -72,12 +72,12 @@ class EndDeviceLoraPhyListener
     virtual void NotifyTxStart(double txPowerDbm) = 0;
 
     /**
-     * \brief Notify listeners that we went to sleep
+     * Notify listeners that we went to sleep
      */
     virtual void NotifySleep() = 0;
 
     /**
-     * \brief Notify listeners that we woke up
+     * Notify listeners that we woke up
      */
     virtual void NotifyStandby() = 0;
 };
@@ -175,7 +175,7 @@ class EndDeviceLoraPhy : public LoraPhy
     bool IsTransmitting() override;
 
     /**
-     * \brief Set the frequency this EndDevice will listen on.
+     * Set the frequency this EndDevice will listen on.
      *
      * Should a packet be transmitted on a frequency different than that the
      * EndDeviceLoraPhy is listening on, the packet will be discarded.
@@ -185,7 +185,7 @@ class EndDeviceLoraPhy : public LoraPhy
     void SetFrequency(double frequencyMHz);
 
     /**
-     * \brief Set the Spreading Factor this EndDevice will listen for.
+     * Set the Spreading Factor this EndDevice will listen for.
      *
      * The EndDeviceLoraPhy object will not be able to lock on transmissions that
      * use a different SF than the one it's listening for.
@@ -195,31 +195,31 @@ class EndDeviceLoraPhy : public LoraPhy
     void SetSpreadingFactor(uint8_t sf);
 
     /**
-     * \brief Get the Spreading Factor this EndDevice is listening for.
+     * Get the Spreading Factor this EndDevice is listening for.
      *
      * \return The Spreading Factor we are listening for.
      */
     uint8_t GetSpreadingFactor() const;
 
     /**
-     * \brief Return the state this End Device is currently in.
+     * Return the state this End Device is currently in.
      *
      * \return The state this EndDeviceLoraPhy is currently in.
      */
     EndDeviceLoraPhy::State GetState();
 
     /**
-     * \brief Switch to the STANDBY state.
+     * Switch to the STANDBY state.
      */
     void SwitchToStandby();
 
     /**
-     * \brief Switch to the SLEEP state.
+     * Switch to the SLEEP state.
      */
     void SwitchToSleep();
 
     /**
-     * \brief Add the input listener to the list of objects to be notified of PHY-level
+     * Add the input listener to the list of objects to be notified of PHY-level
      * events.
      *
      * \param listener the new listener
@@ -227,7 +227,7 @@ class EndDeviceLoraPhy : public LoraPhy
     void RegisterListener(EndDeviceLoraPhyListener* listener);
 
     /**
-     * \brief Remove the input listener from the list of objects to be notified of
+     * Remove the input listener from the list of objects to be notified of
      * PHY-level events.
      *
      * \param listener the listener to be unregistered
@@ -238,12 +238,12 @@ class EndDeviceLoraPhy : public LoraPhy
 
   protected:
     /**
-     * \brief Switch to the RX state
+     * Switch to the RX state
      */
     void SwitchToRx();
 
     /**
-     * \brief Switch to the TX state.
+     * Switch to the TX state.
      *
      * \param txPowerDbm The transmission power [dBm].
      */

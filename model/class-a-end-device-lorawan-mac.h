@@ -58,7 +58,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /////////////////////
 
     /**
-     * \brief Add headers and send a packet with the sending function of the physical layer.
+     * Add headers and send a packet with the sending function of the physical layer.
      *
      * \param packet the packet to send
      */
@@ -69,7 +69,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     //////////////////////////
 
     /**
-     * \brief Receive a packet.
+     * Receive a packet.
      *
      * This method is typically registered as a callback in the underlying PHY
      * layer so that it's called when a packet is going up the stack.
@@ -83,22 +83,22 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     void TxFinished(Ptr<const Packet> packet) override;
 
     /**
-     * \brief Perform operations needed to open the first receive window.
+     * Perform operations needed to open the first receive window.
      */
     void OpenFirstReceiveWindow();
 
     /**
-     * \brief Perform operations needed to open the second receive window.
+     * Perform operations needed to open the second receive window.
      */
     void OpenSecondReceiveWindow();
 
     /**
-     * \brief Perform operations needed to close the first receive window.
+     * Perform operations needed to close the first receive window.
      */
     void CloseFirstReceiveWindow();
 
     /**
-     * \brief Perform operations needed to close the second receive window.
+     * Perform operations needed to close the second receive window.
      */
     void CloseSecondReceiveWindow();
 
@@ -107,7 +107,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /////////////////////////
 
     /**
-     * \brief Find the minimum waiting time before the next possible transmission based
+     * Find the minimum waiting time before the next possible transmission based
      * on End Device's Class Type.
      *
      * \param waitingTime The minimum waiting time that has to be respected,
@@ -117,35 +117,35 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     Time GetNextClassTransmissionDelay(Time waitingTime) override;
 
     /**
-     * \brief Get the Data Rate that will be used in the first receive window.
+     * Get the Data Rate that will be used in the first receive window.
      *
      * \return The Data Rate
      */
     uint8_t GetFirstReceiveWindowDataRate();
 
     /**
-     * \brief Set the Data Rate to be used in the second receive window.
+     * Set the Data Rate to be used in the second receive window.
      *
      * \param dataRate The Data Rate.
      */
     void SetSecondReceiveWindowDataRate(uint8_t dataRate);
 
     /**
-     * \brief Get the Data Rate that will be used in the second receive window.
+     * Get the Data Rate that will be used in the second receive window.
      *
      * \return The Data Rate
      */
     uint8_t GetSecondReceiveWindowDataRate() const;
 
     /**
-     * \brief Set the frequency that will be used for the second receive window.
+     * Set the frequency that will be used for the second receive window.
      *
      * \param frequencyMHz the Frequency.
      */
     void SetSecondReceiveWindowFrequency(double frequencyMHz);
 
     /**
-     * \brief Get the frequency that is used for the second receive window.
+     * Get the frequency that is used for the second receive window.
      *
      * \return The frequency, in MHz
      */
@@ -156,7 +156,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /////////////////////////
 
     /**
-     * \brief Perform the actions that need to be taken when receiving a RxParamSetupReq
+     * Perform the actions that need to be taken when receiving a RxParamSetupReq
      * command based on the Device's Class Type.
      *
      * \param rxParamSetupReq The Parameter Setup Request, which contains:

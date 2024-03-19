@@ -40,7 +40,7 @@ class NetworkStatus;
 /**
  * \ingroup lorawan
  *
- * \brief Generic class describing a component of the NetworkController.
+ * Generic class describing a component of the NetworkController.
  *
  * This is the class that is meant to be extended by all NetworkController
  * components, and provides a common interface for the NetworkController to
@@ -60,7 +60,7 @@ class NetworkControllerComponent : public Object
 
     // Virtual methods whose implementation is left to child classes
     /**
-     * \brief Function called as a new uplink packet is received by the NetworkServer.
+     * Function called as a new uplink packet is received by the NetworkServer.
      *
      * \param packet The newly received packet.
      * \param status A pointer to the status of the end device that sent the packet.
@@ -70,7 +70,7 @@ class NetworkControllerComponent : public Object
                                   Ptr<EndDeviceStatus> status,
                                   Ptr<NetworkStatus> networkStatus) = 0;
     /**
-     * \brief Function called as a downlink reply is about to leave the NetworkServer.
+     * Function called as a downlink reply is about to leave the NetworkServer.
      *
      * \param status A pointer to the status of the end device which we are sending the reply to.
      * \param networkStatus A pointer to the NetworkStatus object.
@@ -78,7 +78,7 @@ class NetworkControllerComponent : public Object
     virtual void BeforeSendingReply(Ptr<EndDeviceStatus> status,
                                     Ptr<NetworkStatus> networkStatus) = 0;
     /**
-     * \brief Method that is called when a packet cannot be sent in the downlink.
+     * Method that is called when a packet cannot be sent in the downlink.
      *
      * \param status The EndDeviceStatus of the device to which it was impossible to send a reply.
      * \param networkStatus A pointer to the NetworkStatus object.
@@ -89,7 +89,7 @@ class NetworkControllerComponent : public Object
 /**
  * \ingroup lorawan
  *
- * \brief Network controller component for acknowledgments management.
+ * Network controller component for acknowledgments management.
  */
 class ConfirmedMessagesComponent : public NetworkControllerComponent
 {
@@ -123,7 +123,7 @@ class ConfirmedMessagesComponent : public NetworkControllerComponent
 /**
  * \ingroup lorawan
  *
- * \brief Network controller component for LinkCheck commands management.
+ * Network controller component for LinkCheck commands management.
  */
 class LinkCheckComponent : public NetworkControllerComponent
 {
@@ -155,7 +155,7 @@ class LinkCheckComponent : public NetworkControllerComponent
 
   private:
     /**
-     * \brief Update the EndDeviceStatus object on LinkChackReq MAC command.
+     * Update the EndDeviceStatus object on LinkChackReq MAC command.
      *
      * \todo not implemented. Also not sure what this function is meant to do.
      *

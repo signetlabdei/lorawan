@@ -49,28 +49,28 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
     ~LoraRadioEnergyModelPhyListener() override; //!< Destructor
 
     /**
-     * \brief Sets the change state callback. Used by helper class.
+     * Sets the change state callback. Used by helper class.
      *
      * \param callback Change state callback.
      */
     void SetChangeStateCallback(DeviceEnergyModel::ChangeStateCallback callback);
 
     /**
-     * \brief Sets the update tx current callback.
+     * Sets the update tx current callback.
      *
      * \param callback Update tx current callback.
      */
     void SetUpdateTxCurrentCallback(UpdateTxCurrentCallback callback);
 
     /**
-     * \brief Switches the LoraRadioEnergyModel to RX state.
+     * Switches the LoraRadioEnergyModel to RX state.
      *
      * Defined in ns3::LoraEndDevicePhyListener
      */
     void NotifyRxStart() override;
 
     /**
-     * \brief Switches the LoraRadioEnergyModel to TX state and switches back to
+     * Switches the LoraRadioEnergyModel to TX state and switches back to
      * STANDBY after TX duration.
      *
      * \param txPowerDbm The nominal tx power in dBm.
@@ -111,7 +111,7 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
 /**
  * \ingroup lorawan
  *
- * \brief A LoRa radio energy model.
+ * A LoRa radio energy model.
  *
  * 4 states are defined for the radio: TX, RX, STANDBY, SLEEP. Default state is
  * STANDBY.
@@ -151,7 +151,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
     ~LoraRadioEnergyModel() override; //!< Destructor
 
     /**
-     * \brief Sets pointer to EnergySouce installed on node.
+     * Sets pointer to EnergySouce installed on node.
      *
      * \param source Pointer to EnergySource installed on node.
      *
@@ -168,49 +168,49 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
 
     // Setter & getters for state power consumption.
     /**
-     * \brief Gets idle current.
+     * Gets idle current.
      *
      * \returns idle current of the lora device.
      */
     double GetStandbyCurrentA() const;
     /**
-     * \brief Sets idle current.
+     * Sets idle current.
      *
      * \param idleCurrentA the idle current
      */
     void SetStandbyCurrentA(double idleCurrentA);
     /**
-     * \brief Gets transmit current.
+     * Gets transmit current.
      *
      * \returns transmit current of the lora device.
      */
     double GetTxCurrentA() const;
     /**
-     * \brief Sets transmit current.
+     * Sets transmit current.
      *
      * \param txCurrentA the transmit current
      */
     void SetTxCurrentA(double txCurrentA);
     /**
-     * \brief Gets receive current.
+     * Gets receive current.
      *
      * \returns receive current of the lora device.
      */
     double GetRxCurrentA() const;
     /**
-     * \brief Sets receive current.
+     * Sets receive current.
      *
      * \param rxCurrentA the receive current
      */
     void SetRxCurrentA(double rxCurrentA);
     /**
-     * \brief Gets sleep current.
+     * Gets sleep current.
      *
      * \returns sleep current of the lora device.
      */
     double GetSleepCurrentA() const;
     /**
-     * \brief Sets sleep current.
+     * Sets sleep current.
      *
      * \param sleepCurrentA the sleep current
      */
@@ -242,7 +242,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
     void SetTxCurrentModel(Ptr<LoraTxCurrentModel> model);
 
     /**
-     * \brief Calls the CalcTxCurrent method of the tx current model to
+     * Calls the CalcTxCurrent method of the tx current model to
      *        compute the tx current based on such model
      *
      * \param txPowerDbm the nominal tx power in dBm
@@ -251,7 +251,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
     void SetTxCurrentFromModel(double txPowerDbm);
 
     /**
-     * \brief Changes state of the LoraRadioEnergyMode.
+     * Changes state of the LoraRadioEnergyMode.
      *
      * \param newState New state the lora radio is in.
      *
@@ -260,21 +260,21 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
     void ChangeState(int newState) override;
 
     /**
-     * \brief Handles energy depletion.
+     * Handles energy depletion.
      *
      * Implements DeviceEnergyModel::HandleEnergyDepletion
      */
     void HandleEnergyDepletion() override;
 
     /**
-     * \brief Handles energy recharged.
+     * Handles energy recharged.
      *
      * Implements DeviceEnergyModel::HandleEnergyChanged
      */
     void HandleEnergyChanged() override;
 
     /**
-     * \brief Handles energy recharged.
+     * Handles energy recharged.
      *
      * Implements DeviceEnergyModel::HandleEnergyRecharged
      */

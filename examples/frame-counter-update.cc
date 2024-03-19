@@ -106,7 +106,7 @@ OnMacPacketOutcome(uint8_t transmissions, bool successful, Time firstAttempt, Pt
 }
 
 /**
- * \brief Set the position of an end device either in range or out of range.
+ * Set the position of an end device either in range or out of range.
  *
  * \param endDevice A Ptr to the Node of the end device.
  * \param inRange Whether to put the end device in range or out of range.

@@ -63,17 +63,17 @@ class NetworkServer : public Application
     ~NetworkServer() override; //!< Destructor
 
     /**
-     * \brief Start the NS application.
+     * Start the NS application.
      */
     void StartApplication() override;
 
     /**
-     * \brief Stop the NS application.
+     * Stop the NS application.
      */
     void StopApplication() override;
 
     /**
-     * \brief Inform the NetworkServer that these nodes are connected to the network.
+     * Inform the NetworkServer that these nodes are connected to the network.
      *
      * This method will create a DeviceStatus object for each new node, and add
      * it to the list.
@@ -83,7 +83,7 @@ class NetworkServer : public Application
     void AddNodes(NodeContainer nodes);
 
     /**
-     * \brief Inform the NetworkServer that this node is connected to the network.
+     * Inform the NetworkServer that this node is connected to the network.
      *
      * This method will create a DeviceStatus object for the new node (if it
      * doesn't already exist).
@@ -93,7 +93,7 @@ class NetworkServer : public Application
     void AddNode(Ptr<Node> node);
 
     /**
-     * \brief Add the gateway to the list of gateways connected to this NS.
+     * Add the gateway to the list of gateways connected to this NS.
      *
      * Each GW is identified by its Address in the NS-GWs network.
      *
@@ -103,14 +103,14 @@ class NetworkServer : public Application
     void AddGateway(Ptr<Node> gateway, Ptr<NetDevice> netDevice);
 
     /**
-     * \brief Add a NetworkControllerComponent to this NetworkServer instance.
+     * Add a NetworkControllerComponent to this NetworkServer instance.
      *
      * \param component A Ptr to the NetworkControllerComponent object.
      */
     void AddComponent(Ptr<NetworkControllerComponent> component);
 
     /**
-     * \brief Receive a packet from a gateway.
+     * Receive a packet from a gateway.
      *
      * This function is meant to be provided to NetDevice objects as a ReceiveCallback.
      *
@@ -122,7 +122,7 @@ class NetworkServer : public Application
                  const Address& sender);
 
     /**
-     * \brief Get the NetworkStatus object of this NetworkServer.
+     * Get the NetworkStatus object of this NetworkServer.
      *
      * \return A Ptr to the NetworkStatus object.
      */

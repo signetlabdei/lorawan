@@ -49,7 +49,7 @@ class GatewayLorawanMac : public LorawanMac
     void Send(Ptr<Packet> packet) override;
 
     /**
-     * \brief Check whether the underlying PHY layer of the gateway is currently transmitting.
+     * Check whether the underlying PHY layer of the gateway is currently transmitting.
      *
      * \return True if it is transmitting, false otherwise.
      */

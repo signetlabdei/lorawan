@@ -41,7 +41,7 @@ class LoraChannel;
 /**
  * \ingroup lorawan
  *
- * \brief Class modeling a Lora SX1301 chip.
+ * Class modeling a Lora SX1301 chip.
  *
  * This class models the behaviour of the chip employed in Lora gateways. These
  * chips are characterized by the presence of 8 receive paths, or parallel
@@ -76,7 +76,7 @@ class GatewayLoraPhy : public LoraPhy
               double txPowerDbm) override = 0;
 
     /**
-     * \brief Signals the end of a transmission by the GatewayLoraPhy.
+     * Signals the end of a transmission by the GatewayLoraPhy.
      *
      * \param packet A Ptr to the Packet transmitted.
      */
@@ -85,7 +85,7 @@ class GatewayLoraPhy : public LoraPhy
     bool IsTransmitting() override;
 
     /**
-     * \brief Check whether the GatewayLoraPhy is currently listening to a frequency.
+     * Check whether the GatewayLoraPhy is currently listening to a frequency.
      *
      * \param frequencyMHz The value of the frequency [MHz].
      * \return true if the frequency is among the one being listened to, false otherwise.
@@ -93,19 +93,19 @@ class GatewayLoraPhy : public LoraPhy
     bool IsOnFrequency(double frequencyMHz) override;
 
     /**
-     * \brief Add a reception path, locked on a specific frequency.
+     * Add a reception path, locked on a specific frequency.
      */
     void AddReceptionPath();
 
     /**
-     * \brief Reset the list of reception paths.
+     * Reset the list of reception paths.
      *
      * This method deletes all currently available ReceptionPath objects.
      */
     void ResetReceptionPaths();
 
     /**
-     * \brief Add a frequency to the list of frequencies we are listening to.
+     * Add a frequency to the list of frequencies we are listening to.
      *
      * \param frequencyMHz The value of the frequency [MHz]
      */
@@ -116,7 +116,7 @@ class GatewayLoraPhy : public LoraPhy
 
   protected:
     /**
-     * \brief This class represents a configurable reception path.
+     * This class represents a configurable reception path.
      *
      * Differently from EndDeviceLoraPhys, these do not need to be configured to
      * listen for a certain SF. ReceptionPaths be either locked on an event or
@@ -132,14 +132,14 @@ class GatewayLoraPhy : public LoraPhy
         ~ReceptionPath(); //!< Destructor
 
         /**
-         * \brief Query whether this reception path is available to lock on a signal.
+         * Query whether this reception path is available to lock on a signal.
          *
          * \return True if its current state is free, false if it's currently locked.
          */
         bool IsAvailable() const;
 
         /**
-         * \brief Set this reception path as available.
+         * Set this reception path as available.
          *
          * This function sets the m_available variable as true, and deletes the
          * LoraInterferenceHelper Event this ReceivePath was previously locked on.
@@ -147,7 +147,7 @@ class GatewayLoraPhy : public LoraPhy
         void Free();
 
         /**
-         * \brief Set this reception path as not available and lock it on the
+         * Set this reception path as not available and lock it on the
          * provided event.
          *
          * \param event The LoraInterferenceHelper Event to lock on.
@@ -155,14 +155,14 @@ class GatewayLoraPhy : public LoraPhy
         void LockOnEvent(Ptr<LoraInterferenceHelper::Event> event);
 
         /**
-         * \brief Set the event this reception path is currently on.
+         * Set the event this reception path is currently on.
          *
          * \param event the event to lock this ReceptionPath on.
          */
         void SetEvent(Ptr<LoraInterferenceHelper::Event> event);
 
         /**
-         * \brief Get the event this reception path is currently on.
+         * Get the event this reception path is currently on.
          *
          * \returns 0 if no event is currently being received, a pointer to
          * the event otherwise.
@@ -170,7 +170,7 @@ class GatewayLoraPhy : public LoraPhy
         Ptr<LoraInterferenceHelper::Event> GetEvent();
 
         /**
-         * \brief Get the EventId of the EndReceive call associated to this ReceptionPath's
+         * Get the EventId of the EndReceive call associated to this ReceptionPath's
          * packet.
          *
          * \return The EventId instance.
@@ -178,7 +178,7 @@ class GatewayLoraPhy : public LoraPhy
         EventId GetEndReceive();
 
         /**
-         * \brief Set the EventId of the EndReceive call associated to this ReceptionPath's
+         * Set the EventId of the EndReceive call associated to this ReceptionPath's
          * packet.
          *
          * \param endReceiveEventId The EventId instance.

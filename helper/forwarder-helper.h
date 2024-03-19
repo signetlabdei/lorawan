@@ -39,7 +39,7 @@ namespace lorawan
 /**
  * \ingroup lorawan
  *
- * \brief This class can be used to install Forwarder applications on a set of gateways.
+ * This class can be used to install Forwarder applications on a set of gateways.
  */
 class ForwarderHelper
 {
@@ -48,7 +48,7 @@ class ForwarderHelper
     ~ForwarderHelper(); //!< Destructor
 
     /**
-     * \brief Helper function used to set the underlying application attributes.
+     * Helper function used to set the underlying application attributes.
      *
      * \param name the name of the application attribute to set.
      * \param value the value of the application attribute to set.
@@ -56,7 +56,7 @@ class ForwarderHelper
     void SetAttribute(std::string name, const AttributeValue& value);
 
     /**
-     * \brief Install a Forwarder application on each node of the input container configured with
+     * Install a Forwarder application on each node of the input container configured with
      * all the attributes set with SetAttribute or other functions of this class.
      *
      * \param c NodeContainer of the set of nodes on which an Forwarder will be installed.
@@ -65,7 +65,7 @@ class ForwarderHelper
     ApplicationContainer Install(NodeContainer c) const;
 
     /**
-     * \brief Install a Forwarder application on the input Node configured with all the attributes
+     * Install a Forwarder application on the input Node configured with all the attributes
      * set with SetAttribute or other functions of this class.
      *
      * \param node The node on which a Forwarder will be installed.
@@ -75,7 +75,7 @@ class ForwarderHelper
 
   private:
     /**
-     * \brief Install a Forwarder application on the input Node configured with all the attributes
+     * Install a Forwarder application on the input Node configured with all the attributes
      * set with SetAttribute or other functions of this class.
      *
      * \param node The node on which a Forwarder will be installed.

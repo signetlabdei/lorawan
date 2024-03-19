@@ -55,14 +55,14 @@ class LogicalLoraChannel : public Object
     ~LogicalLoraChannel() override; //!< Destructor
 
     /**
-     * \brief Construct a new LogicalLoraChannel object initializing the carrier frequency.
+     * Construct a new LogicalLoraChannel object initializing the carrier frequency.
      *
      * \param frequency The carrier frequency [MHz]
      */
     LogicalLoraChannel(double frequency);
 
     /**
-     * \brief Constructor providing initialization of frequency and data rate limits.
+     * Constructor providing initialization of frequency and data rate limits.
      *
      * \param frequency This channel's frequency [MHz].
      * \param minDataRate This channel's minimum data rate.
@@ -71,28 +71,28 @@ class LogicalLoraChannel : public Object
     LogicalLoraChannel(double frequency, uint8_t minDataRate, uint8_t maxDataRate);
 
     /**
-     * \brief Get the frequency (MHz).
+     * Get the frequency (MHz).
      *
      * \return The center frequency of this channel.
      */
     double GetFrequency() const;
 
     ///**
-    // * \brief Set the frequency (MHz).
+    // * Set the frequency (MHz).
     // *
     // * \param frequencyMHz The center frequency this channel should be at.
     // */
     // void SetFrequency (double frequencyMHz);
 
     /**
-     * \brief Set the minimum Data Rate that is allowed on this channel.
+     * Set the minimum Data Rate that is allowed on this channel.
      *
      * \param minDataRate The minimum data rate value.
      */
     void SetMinimumDataRate(uint8_t minDataRate);
 
     /**
-     * \brief Set the maximum Data Rate that is allowed on this channel.
+     * Set the maximum Data Rate that is allowed on this channel.
      *
      * \param maxDataRate The maximum data rate value.
      */
@@ -106,24 +106,24 @@ class LogicalLoraChannel : public Object
     uint8_t GetMinimumDataRate() const;
 
     /**
-     * \brief Get the maximum Data Rate that is allowed on this channel.
+     * Get the maximum Data Rate that is allowed on this channel.
      *
      * \return The maximum data rate value.
      */
     uint8_t GetMaximumDataRate() const;
 
     /**
-     * \brief Set this channel as enabled for uplink.
+     * Set this channel as enabled for uplink.
      */
     void SetEnabledForUplink();
 
     /**
-     * \brief Set this channel as disabled for uplink.
+     * Set this channel as disabled for uplink.
      */
     void DisableForUplink();
 
     /**
-     * \brief Test whether this channel is marked as enabled for uplink.
+     * Test whether this channel is marked as enabled for uplink.
      *
      * \return True if the channel can be used for uplink, false otherwise.
      */

@@ -187,7 +187,7 @@ class EndDeviceStatus : public Object
     ~EndDeviceStatus() override; //!< Destructor
 
     /**
-     * \brief Constructor with initialization parameters
+     * Constructor with initialization parameters
      *
      * \param endDeviceAddress address of the end device
      * \param endDeviceMac pointer to the MAC layer of the end device
@@ -374,7 +374,7 @@ class EndDeviceStatus : public Object
     LoraDeviceAddress m_endDeviceAddress; //!< The address of this device
 
     /**
-     * \brief Stream insertion operator.
+     * Stream insertion operator.
      *
      * \param os the stream
      * \param status the status

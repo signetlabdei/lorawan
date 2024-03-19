@@ -64,7 +64,7 @@ std::ostream& operator<<(std::ostream& os, const LoraTxParameters& params);
 /**
  * \ingroup lorawan
  *
- * \brief Base class for PHY layers implementing the LoRa modulation scheme.
+ * Base class for PHY layers implementing the LoRa modulation scheme.
  *
  * This class features common callbacks and defines the interfaces that are used
  * to send and receive packets at the PHY layer. Furthermore, it features an
@@ -109,7 +109,7 @@ class LoraPhy : public Object
     typedef Callback<void, Ptr<const Packet>> TxFinishedCallback;
 
     /**
-     * \brief Start receiving a packet.
+     * Start receiving a packet.
      *
      * This method is typically called by LoraChannel.
      *
@@ -127,7 +127,7 @@ class LoraPhy : public Object
                               double frequencyMHz) = 0;
 
     /**
-     * \brief Finish reception of a packet.
+     * Finish reception of a packet.
      *
      * This method is scheduled by StartReceive, based on the packet duration. By
      * passing a LoraInterferenceHelper Event to this method, the class will be
@@ -141,7 +141,7 @@ class LoraPhy : public Object
     virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) = 0;
 
     /**
-     * \brief Instruct the PHY to send a packet according to some parameters.
+     * Instruct the PHY to send a packet according to some parameters.
      *
      * \param packet The packet to send.
      * \param txParams The desired transmission parameters.
@@ -154,7 +154,7 @@ class LoraPhy : public Object
                       double txPowerDbm) = 0;
 
     /**
-     * \brief Whether this device is transmitting or not.
+     * Whether this device is transmitting or not.
      *
      * \returns true if the device is currently transmitting a packet, false
      * otherwise.
@@ -162,7 +162,7 @@ class LoraPhy : public Object
     virtual bool IsTransmitting() = 0;
 
     /**
-     * \brief Whether this device is listening on the specified frequency or not.
+     * Whether this device is listening on the specified frequency or not.
      *
      * \param frequency The frequency to query.
      * \returns true if the device is listening on that frequency, false
@@ -171,7 +171,7 @@ class LoraPhy : public Object
     virtual bool IsOnFrequency(double frequency) = 0;
 
     /**
-     * \brief Set the callback to call upon successful reception of a packet.
+     * Set the callback to call upon successful reception of a packet.
      *
      * This method is typically called by an upper MAC layer that wants to be
      * notified after the successful reception of a packet.
@@ -181,7 +181,7 @@ class LoraPhy : public Object
     void SetReceiveOkCallback(RxOkCallback callback);
 
     /**
-     * \brief Set the callback to call upon failed reception of a packet we were
+     * Set the callback to call upon failed reception of a packet we were
      * previously locked on.
      *
      * This method is typically called by an upper MAC layer that wants to be
@@ -192,7 +192,7 @@ class LoraPhy : public Object
     void SetReceiveFailedCallback(RxFailedCallback callback);
 
     /**
-     * \brief Set the callback to call after transmission of a packet.
+     * Set the callback to call after transmission of a packet.
      *
      * This method is typically called by an upper MAC layer that wants to be
      * notified after the transmission of a packet.
@@ -202,21 +202,21 @@ class LoraPhy : public Object
     void SetTxFinishedCallback(TxFinishedCallback callback);
 
     /**
-     * \brief Get the mobility model associated to this PHY.
+     * Get the mobility model associated to this PHY.
      *
      * \return The MobilityModel associated to this PHY.
      */
     Ptr<MobilityModel> GetMobility();
 
     /**
-     * \brief Set the mobility model associated to this PHY.
+     * Set the mobility model associated to this PHY.
      *
      * \param mobility The mobility model to associate to this PHY.
      */
     void SetMobility(Ptr<MobilityModel> mobility);
 
     /**
-     * \brief Set the LoraChannel instance PHY transmits on.
+     * Set the LoraChannel instance PHY transmits on.
      *
      * Typically, there is only one instance per simulation.
      *
@@ -225,28 +225,28 @@ class LoraPhy : public Object
     void SetChannel(Ptr<LoraChannel> channel);
 
     /**
-     * \brief Get the channel instance associated to this PHY.
+     * Get the channel instance associated to this PHY.
      *
      * \return The LoraChannel instance this PHY transmits on.
      */
     Ptr<LoraChannel> GetChannel() const;
 
     /**
-     * \brief Get the NetDevice associated to this PHY.
+     * Get the NetDevice associated to this PHY.
      *
      * \return The NetDevice associated to this PHY.
      */
     Ptr<NetDevice> GetDevice() const;
 
     /**
-     * \brief Set the NetDevice that owns this PHY.
+     * Set the NetDevice that owns this PHY.
      *
      * \param device The NetDevice this PHY will reference as its owner.
      */
     void SetDevice(Ptr<NetDevice> device);
 
     /**
-     * \brief Compute the symbol time from SF and BW.
+     * Compute the symbol time from SF and BW.
      *
      * \param txParams The parameters for transmission
      * \return TSym, the time required to send a LoRa modulation symbol.
@@ -254,7 +254,7 @@ class LoraPhy : public Object
     static Time GetTSym(LoraTxParameters txParams);
 
     /**
-     * \brief Compute the time that a packet with certain characteristics will take to be
+     * Compute the time that a packet with certain characteristics will take to be
      * transmitted.
      *
      * Besides from the ones saved in LoraTxParameters, the packet's payload

@@ -43,7 +43,7 @@ class OneShotSender : public Application
     ~OneShotSender() override; //!< Destructor
 
     /**
-     * \brief Construct a new OneShotSender object with provided send time.
+     * Construct a new OneShotSender object with provided send time.
      *
      * \param sendTime The Time of sending.
      */
@@ -56,24 +56,24 @@ class OneShotSender : public Application
     static TypeId GetTypeId();
 
     /**
-     * \brief Send a packet using the LoraNetDevice's Send method.
+     * Send a packet using the LoraNetDevice's Send method.
      */
     void SendPacket();
 
     /**
-     * \brief Set the time at which this app will send a packet.
+     * Set the time at which this app will send a packet.
      *
      * \param sendTime The Time of sending.
      */
     void SetSendTime(Time sendTime);
 
     /**
-     * \brief Start the application by scheduling the first SendPacket event.
+     * Start the application by scheduling the first SendPacket event.
      */
     void StartApplication() override;
 
     /**
-     * \brief Stop the application.
+     * Stop the application.
      */
     void StopApplication() override;
 

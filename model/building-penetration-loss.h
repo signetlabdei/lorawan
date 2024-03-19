@@ -33,7 +33,7 @@ namespace lorawan
 /**
  * \ingroup lorawan
  *
- * \brief A class implementing the TR 45.820 model for building losses
+ * A class implementing the TR 45.820 model for building losses
  */
 class BuildingPenetrationLoss : public PropagationLossModel
 {

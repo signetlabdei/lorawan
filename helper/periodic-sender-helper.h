@@ -39,7 +39,7 @@ namespace lorawan
 /**
  * \ingroup lorawan
  *
- * \brief This class can be used to install PeriodicSender applications on a wide
+ * This class can be used to install PeriodicSender applications on a wide
  * range of nodes.
  */
 class PeriodicSenderHelper
@@ -49,7 +49,7 @@ class PeriodicSenderHelper
     ~PeriodicSenderHelper(); //!< Destructor
 
     /**
-     * \brief Helper function used to set the underlying application attributes.
+     * Helper function used to set the underlying application attributes.
      *
      * \param name the name of the application attribute to set
      * \param value the value of the application attribute to set
@@ -57,7 +57,7 @@ class PeriodicSenderHelper
     void SetAttribute(std::string name, const AttributeValue& value);
 
     /**
-     * \brief Install a PeriodicSender application on each node of the input container
+     * Install a PeriodicSender application on each node of the input container
      * configured with all the attributes set with SetAttribute or other functions of this class.
      *
      * \param c NodeContainer of the set of nodes on which an PeriodicSender
@@ -86,7 +86,7 @@ class PeriodicSenderHelper
     void SetPeriod(Time period);
 
     /**
-     * \brief Set a random variable to enable a random size to be added to the base packet size for
+     * Set a random variable to enable a random size to be added to the base packet size for
      * each new transmission of PacketSender applications.
      *
      * \param rv The random variable.
@@ -94,7 +94,7 @@ class PeriodicSenderHelper
     void SetPacketSizeRandomVariable(Ptr<RandomVariableStream> rv);
 
     /**
-     * \brief Set the base value for applications packet size in bytes.
+     * Set the base value for applications packet size in bytes.
      *
      * \param size The packet size in bytes.
      */

@@ -68,7 +68,7 @@ auto packetsSent = std::vector<int>(6, 0);     //!< Record pkts by DR (idx 0 -> 
 auto packetsReceived = std::vector<int>(6, 0); //!< Record pkts by DR (idx 0 -> DR5, 5 -> DR0)
 
 /**
- * \brief Record the beginning of a transmission by an end device.
+ * Record the beginning of a transmission by an end device.
  *
  * \param packet A Ptr to the Packet sent.
  * \param systemId Node id of the sender end device.
@@ -83,7 +83,7 @@ OnTransmissionCallback(Ptr<const Packet> packet, uint32_t systemId)
 }
 
 /**
- * \brief Record the correct reception of a packet by a gateway.
+ * Record the correct reception of a packet by a gateway.
  *
  * \param packet A Ptr to the packet received.
  * \param systemId Node id of the receiver gateway.

@@ -58,14 +58,14 @@ class NetworkStatus : public Object
     ~NetworkStatus() override; //!< Destructor
 
     /**
-     * \brief Add a device to the ones that are tracked by this NetworkStatus object.
+     * Add a device to the ones that are tracked by this NetworkStatus object.
      *
      * \param edMac pointer to the MAC layer object of the device to be tracked.
      */
     void AddNode(Ptr<ClassAEndDeviceLorawanMac> edMac);
 
     /**
-     * \brief Add a new gateway to the list of gateways connected to the network.
+     * Add a new gateway to the list of gateways connected to the network.
      *
      * Each GW is identified by its NetDevice Address in the NS-GW connection.
      *
@@ -75,7 +75,7 @@ class NetworkStatus : public Object
     void AddGateway(Address& address, Ptr<GatewayStatus> gwStatus);
 
     /**
-     * \brief Update network status on a received packet.
+     * Update network status on a received packet.
      *
      * \param packet the received packet.
      * \param gwaddress address of the gateway this packet was received from.
@@ -83,7 +83,7 @@ class NetworkStatus : public Object
     void OnReceivedPacket(Ptr<const Packet> packet, const Address& gwaddress);
 
     /**
-     * \brief Return whether the specified device needs a reply.
+     * Return whether the specified device needs a reply.
      *
      * \param deviceAddress the address of the device we are interested in.
      * \return true if we need to reply to the last packet from the device, false otherwise.
@@ -91,7 +91,7 @@ class NetworkStatus : public Object
     bool NeedsReply(LoraDeviceAddress deviceAddress);
 
     /**
-     * \brief Return whether we have a gateway that is available to send a reply to the specified
+     * Return whether we have a gateway that is available to send a reply to the specified
      * device.
      *
      * \param deviceAddress the address of the device we are interested in
@@ -102,7 +102,7 @@ class NetworkStatus : public Object
     Address GetBestGatewayForDevice(LoraDeviceAddress deviceAddress, int window);
 
     /**
-     * \brief Send a packet through a Gateway.
+     * Send a packet through a Gateway.
      *
      * This function assumes that the packet is already tagged with a LoraTag
      * that will inform the gateway of the parameters to use for the
@@ -114,7 +114,7 @@ class NetworkStatus : public Object
     void SendThroughGateway(Ptr<Packet> packet, Address gwAddress);
 
     /**
-     * \brief Get the reply packet prepared for a reception window of a device.
+     * Get the reply packet prepared for a reception window of a device.
      *
      * \param edAddress the address of the device
      * \param windowNumber the reception window number (1 or 2)
@@ -123,7 +123,7 @@ class NetworkStatus : public Object
     Ptr<Packet> GetReplyForDevice(LoraDeviceAddress edAddress, int windowNumber);
 
     /**
-     * \brief Get the EndDeviceStatus of the device that sent a packet.
+     * Get the EndDeviceStatus of the device that sent a packet.
      *
      * \param packet the packet sent by the end device
      * \return a pointer to the end device status
@@ -131,7 +131,7 @@ class NetworkStatus : public Object
     Ptr<EndDeviceStatus> GetEndDeviceStatus(Ptr<const Packet> packet);
 
     /**
-     * \brief Get the EndDeviceStatus corresponding to a LoraDeviceAddress.
+     * Get the EndDeviceStatus corresponding to a LoraDeviceAddress.
      *
      * \param address the LoraDeviceAddress of the end device
      * \return a pointer to the end device status
@@ -139,7 +139,7 @@ class NetworkStatus : public Object
     Ptr<EndDeviceStatus> GetEndDeviceStatus(LoraDeviceAddress address);
 
     /**
-     * \brief Return the number of end devices currently managed by the server.
+     * Return the number of end devices currently managed by the server.
      *
      * \return the number of end devices as an int
      */

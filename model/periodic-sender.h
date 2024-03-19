@@ -49,35 +49,35 @@ class PeriodicSender : public Application
     static TypeId GetTypeId();
 
     /**
-     * \brief Set the sending interval
+     * Set the sending interval
      *
      * \param interval the interval between two packet send instances
      */
     void SetInterval(Time interval);
 
     /**
-     * \brief Get the sending interval
+     * Get the sending interval
      *
      * \returns the interval between two packet sends
      */
     Time GetInterval() const;
 
     /**
-     * \brief Set the initial delay of this application
+     * Set the initial delay of this application
      *
      * \param delay The initial delay value
      */
     void SetInitialDelay(Time delay);
 
     /**
-     * \brief Set packet size
+     * Set packet size
      *
      * \param size The base packet size value in bytes
      */
     void SetPacketSize(uint8_t size);
 
     /**
-     * \brief Set to add randomness to the base packet size.
+     * Set to add randomness to the base packet size.
      *
      * On each call to SendPacket(), an integer number is picked from a random variable. That
      * integer number is then added to the base packet size to create the new packet.
@@ -90,17 +90,17 @@ class PeriodicSender : public Application
     void SetPacketSizeRandomVariable(Ptr<RandomVariableStream> rv);
 
     /**
-     * \brief Send a packet using the LoraNetDevice's Send method
+     * Send a packet using the LoraNetDevice's Send method
      */
     void SendPacket();
 
     /**
-     * \brief Start the application by scheduling the first SendPacket event
+     * Start the application by scheduling the first SendPacket event
      */
     void StartApplication() override;
 
     /**
-     * \brief Stop the application
+     * Stop the application
      */
     void StopApplication() override;
 

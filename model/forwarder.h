@@ -35,7 +35,7 @@ namespace lorawan
 /**
  * \ingroup lorawan
  *
- * \brief This application forwards packets between NetDevices:
+ * This application forwards packets between NetDevices:
  * LoraNetDevice -> PointToPointNetDevice and vice versa.
  */
 class Forwarder : public Application
@@ -51,21 +51,21 @@ class Forwarder : public Application
     static TypeId GetTypeId();
 
     /**
-     * \brief Sets the device to use to communicate with the EDs.
+     * Sets the device to use to communicate with the EDs.
      *
      * \param loraNetDevice The LoraNetDevice on this node.
      */
     void SetLoraNetDevice(Ptr<LoraNetDevice> loraNetDevice);
 
     /**
-     * \brief Sets the P2P device to use to communicate with the NS.
+     * Sets the P2P device to use to communicate with the NS.
      *
      * \param pointToPointNetDevice The P2PNetDevice on this node.
      */
     void SetPointToPointNetDevice(Ptr<PointToPointNetDevice> pointToPointNetDevice);
 
     /**
-     * \brief Receive a packet from the LoraNetDevice.
+     * Receive a packet from the LoraNetDevice.
      *
      * \param loraNetDevice The LoraNetDevice we received the packet from.
      * \param packet The packet we received.
@@ -79,7 +79,7 @@ class Forwarder : public Application
                          const Address& sender);
 
     /**
-     * \brief Receive a packet from the PointToPointNetDevice.
+     * Receive a packet from the PointToPointNetDevice.
      *
      * \copydoc ns3::NetDevice::ReceiveCallback
      */
@@ -89,12 +89,12 @@ class Forwarder : public Application
                                  const Address& sender);
 
     /**
-     * \brief Start the application
+     * Start the application
      */
     void StartApplication() override;
 
     /**
-     * \brief Stop the application
+     * Stop the application
      */
     void StopApplication() override;
 

@@ -56,7 +56,7 @@ class GatewayStatus : public Object
     ~GatewayStatus() override; //!< Destructor
 
     /**
-     * \brief Construct a new GatewayStatus object with values
+     * Construct a new GatewayStatus object with values
      *
      * \param address The Address of the P2PNetDevice of the gateway connected to the NS
      * \param netDevice A Ptr to the NetDevice through which to reach this gateway from the server
@@ -115,7 +115,7 @@ class GatewayStatus : public Object
     bool IsAvailableForTransmission(double frequency);
 
     /**
-     * \brief Set the time of the next scheduled transmission for the gateway
+     * Set the time of the next scheduled transmission for the gateway
      *
      * \param nextTransmissionTime The Time value
      */

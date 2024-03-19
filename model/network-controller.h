@@ -54,28 +54,28 @@ class NetworkController : public Object
     ~NetworkController() override; //!< Destructor
 
     /**
-     * \brief Construct a new NetworkController object providing the NetworkStatus.
+     * Construct a new NetworkController object providing the NetworkStatus.
      *
      * \param networkStatus A Ptr to the NetworkStatus object.
      */
     NetworkController(Ptr<NetworkStatus> networkStatus);
 
     /**
-     * \brief Add a new NetworkControllerComponent.
+     * Add a new NetworkControllerComponent.
      *
      * \param component A Ptr to the NetworkControllerComponent object.
      */
     void Install(Ptr<NetworkControllerComponent> component);
 
     /**
-     * \brief Method that is called by the NetworkServer when a new packet is received.
+     * Method that is called by the NetworkServer when a new packet is received.
      *
      * \param packet The newly received packet.
      */
     void OnNewPacket(Ptr<const Packet> packet);
 
     /**
-     * \brief Method that is called by the NetworkScheduler just before sending a reply
+     * Method that is called by the NetworkScheduler just before sending a reply
      * to a certain End Device.
      *
      * \param endDeviceStatus A Ptr to the EndDeviceStatus object.

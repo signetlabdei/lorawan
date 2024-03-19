@@ -36,14 +36,14 @@ namespace lorawan
 /**
  * \ingroup lorawan
  *
- * \brief Helper to install LoraPhy instances on multiple Nodes. The
+ * Helper to install LoraPhy instances on multiple Nodes. The
  * user must set all parameters before calling Install on nodes.
  */
 class LoraPhyHelper
 {
   public:
     /**
-     * \brief Enum for the type of device: End Device (ED) or Gateway (GW)
+     * Enum for the type of device: End Device (ED) or Gateway (GW)
      */
     enum DeviceType
     {
@@ -54,7 +54,7 @@ class LoraPhyHelper
     LoraPhyHelper(); //!< Default constructor
 
     /**
-     * \brief Set the LoraChannel to connect the PHYs to.
+     * Set the LoraChannel to connect the PHYs to.
      *
      * Every PHY created by a call to Install is associated to this channel.
      *
@@ -63,21 +63,21 @@ class LoraPhyHelper
     void SetChannel(Ptr<LoraChannel> channel);
 
     /**
-     * \brief Set the kind of PHY this helper will create.
+     * Set the kind of PHY this helper will create.
      *
      * \param dt the device type.
      */
     void SetDeviceType(enum DeviceType dt);
 
     /**
-     * \brief Get the TypeId of the object to be created with LoraPhyHelper.
+     * Get the TypeId of the object to be created with LoraPhyHelper.
      *
      * \return The TypeId instance.
      */
     TypeId GetDeviceType() const;
 
     /**
-     * \brief Set an attribute of the underlying PHY object.
+     * Set an attribute of the underlying PHY object.
      *
      * \param name the name of the attribute to set.
      * \param v the value of the attribute.
@@ -85,7 +85,7 @@ class LoraPhyHelper
     void Set(std::string name, const AttributeValue& v);
 
     /**
-     * \brief Create a LoraPhy and connect it to a device on a node.
+     * Create a LoraPhy and connect it to a device on a node.
      *
      * \param node the node on which we wish to create a wifi PHY.
      * \param device the device within which this PHY will be created.
@@ -94,7 +94,7 @@ class LoraPhyHelper
     Ptr<LoraPhy> Create(Ptr<Node> node, Ptr<NetDevice> device) const;
 
     /**
-     * \brief Set the maximum number of gateway receive paths
+     * Set the maximum number of gateway receive paths
      *
      * \param maxReceptionPaths The maximum number of reception paths at
      *  the gateway
@@ -102,7 +102,7 @@ class LoraPhyHelper
     void SetMaxReceptionPaths(int maxReceptionPaths);
 
     /**
-     * \brief Set if giving priority to downlink transmission over reception at
+     * Set if giving priority to downlink transmission over reception at
      * the gateways
      *
      * \param txPriority Whether gateway transmission interrupt all receptions for their duration.

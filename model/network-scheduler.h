@@ -58,7 +58,7 @@ class NetworkScheduler : public Object
     ~NetworkScheduler() override; //!< Destructor
 
     /**
-     * \brief Construct a new NetworkScheduler providing the NetworkStatus and the NetworkController
+     * Construct a new NetworkScheduler providing the NetworkStatus and the NetworkController
      * objects.
      *
      * \param status A Ptr to the NetworkStatus object.
@@ -67,7 +67,7 @@ class NetworkScheduler : public Object
     NetworkScheduler(Ptr<NetworkStatus> status, Ptr<NetworkController> controller);
 
     /**
-     * \brief Method called by NetworkServer to inform the Scheduler of a newly arrived uplink
+     * Method called by NetworkServer to inform the Scheduler of a newly arrived uplink
      * packet.
      *
      * This function schedules the OnReceiveWindowOpportunity events 1 and 2 seconds later.
@@ -77,7 +77,7 @@ class NetworkScheduler : public Object
     void OnReceivedPacket(Ptr<const Packet> packet);
 
     /**
-     * \brief Method that is scheduled after packet arrival in order to take action on
+     * Method that is scheduled after packet arrival in order to take action on
      * sender's receive windows openings.
      *
      * \param deviceAddress The Address of the end device

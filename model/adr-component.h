@@ -40,7 +40,7 @@ namespace lorawan
 class AdrComponent : public NetworkControllerComponent
 {
     /**
-     * \brief Available policies for combining radio metrics in packet history
+     * Available policies for combining radio metrics in packet history
      */
     enum CombiningMethod
     {
@@ -69,7 +69,7 @@ class AdrComponent : public NetworkControllerComponent
 
   private:
     /**
-     * \brief Implementation of the default Adaptive Data Rate (ADR) procedure.
+     * Implementation of the default Adaptive Data Rate (ADR) procedure.
      *
      * ADR is meant to optimize radio modulation parameters of end devices to improve energy
      * consuption and radio resource utilization. For more details see
@@ -82,7 +82,7 @@ class AdrComponent : public NetworkControllerComponent
     void AdrImplementation(uint8_t* newDataRate, uint8_t* newTxPower, Ptr<EndDeviceStatus> status);
 
     /**
-     * \brief Convert spreading factor values [7:12] to respective data rate values [0:5]
+     * Convert spreading factor values [7:12] to respective data rate values [0:5]
      *
      * \param sf the spreding factor value
      * \return value of the data rate as uint8_t
@@ -90,7 +90,7 @@ class AdrComponent : public NetworkControllerComponent
     uint8_t SfToDr(uint8_t sf);
 
     /**
-     * \brief Convert reception power values [dBm] to Signal to Noise Ratio (SNR) values [dB]
+     * Convert reception power values [dBm] to Signal to Noise Ratio (SNR) values [dB]
      *
      * The conversion comes from the formula \f$P_{rx}=-174+10\log_{10}(B)+SNR+NF\f$ where
      * \f$P_{rx}\f$ is the received transmission power, \f$B\f$ is the transmission bandwidth and
@@ -104,28 +104,28 @@ class AdrComponent : public NetworkControllerComponent
     double RxPowerToSNR(double transmissionPower) const;
 
     /**
-     * \brief Get the min RSSI (dBm) among gateway receptions of a same transmission
+     * Get the min RSSI (dBm) among gateway receptions of a same transmission
      *
      * \param gwList list of gateways paired with reception information
      * \return min RSSI of transmission as double
      */
     double GetMinTxFromGateways(EndDeviceStatus::GatewayList gwList);
     /**
-     * \brief Get the max RSSI (dBm) among gateway receptions of a same transmission
+     * Get the max RSSI (dBm) among gateway receptions of a same transmission
      *
      * \param gwList list of gateways paired with packet reception information
      * \return max RSSI of transmission as double
      */
     double GetMaxTxFromGateways(EndDeviceStatus::GatewayList gwList);
     /**
-     * \brief Get the average RSSI (dBm) of gateway receptions of a same transmission
+     * Get the average RSSI (dBm) of gateway receptions of a same transmission
      *
      * \param gwList list of gateways paired with packet reception information
      * \return average RSSI of transmission as double
      */
     double GetAverageTxFromGateways(EndDeviceStatus::GatewayList gwList);
     /**
-     * \brief Get RSSI metric for a transmission according to chosen gatewy aggregation policy
+     * Get RSSI metric for a transmission according to chosen gatewy aggregation policy
      *
      * \param gwList list of gateways paired with packet reception information
      * \return RSSI of tranmsmission as double
@@ -133,7 +133,7 @@ class AdrComponent : public NetworkControllerComponent
     double GetReceivedPower(EndDeviceStatus::GatewayList gwList);
 
     /**
-     * \brief Get the min SNR of received packet history
+     * Get the min SNR of received packet history
      *
      * \param packetList history of received packets with reception information
      * \param historyRange number of packets to consider going back in time
@@ -141,7 +141,7 @@ class AdrComponent : public NetworkControllerComponent
      */
     double GetMinSNR(EndDeviceStatus::ReceivedPacketList packetList, int historyRange);
     /**
-     * \brief Get the max SNR of received packet history
+     * Get the max SNR of received packet history
      *
      * \param packetList history of received packets with reception information
      * \param historyRange number of packets to consider going back in time
@@ -149,7 +149,7 @@ class AdrComponent : public NetworkControllerComponent
      */
     double GetMaxSNR(EndDeviceStatus::ReceivedPacketList packetList, int historyRange);
     /**
-     * \brief Get the average SNR of received packet history
+     * Get the average SNR of received packet history
      *
      * \param packetList history of received packets with reception information
      * \param historyRange number of packets to consider going back in time
@@ -158,7 +158,7 @@ class AdrComponent : public NetworkControllerComponent
     double GetAverageSNR(EndDeviceStatus::ReceivedPacketList packetList, int historyRange);
 
     /**
-     * \brief Get the LoRaWAN protocol TXPower configuration index from the Equivalent Isotropically
+     * Get the LoRaWAN protocol TXPower configuration index from the Equivalent Isotropically
      * Radiated Power (EIRP) in dBm
      *
      * \param txPower transission EIRP configuration

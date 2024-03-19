@@ -455,28 +455,28 @@ class ReceivePathTest : public TestCase
      */
     void Reset();
     /**
-     * \brief Callback for tracing OccupiedReceptionPaths
+     * Callback for tracing OccupiedReceptionPaths
      *
      * \param oldValue the old value
      * \param newValue the new value
      */
     void OccupiedReceptionPaths(int oldValue, int newValue);
     /**
-     * \brief Callback for tracing LostPacketBecauseNoMoreReceivers
+     * Callback for tracing LostPacketBecauseNoMoreReceivers
      *
      * \param packet the packet lost
      * \param node the receiver node id if any, 0 otherwise
      */
     void NoMoreDemodulators(Ptr<const Packet> packet, uint32_t node);
     /**
-     * \brief Callback for tracing LostPacketBecauseInterference
+     * Callback for tracing LostPacketBecauseInterference
      *
      * \param packet the packet lost
      * \param node the receiver node id if any, 0 otherwise
      */
     void Interference(Ptr<const Packet> packet, uint32_t node);
     /**
-     * \brief Callback for tracing ReceivedPacket
+     * Callback for tracing ReceivedPacket
      *
      * \param packet the packet received
      * \param node the receiver node id if any, 0 otherwise
@@ -1124,7 +1124,7 @@ class PhyConnectivityTest : public TestCase
     void Reset();
 
     /**
-     * \brief Callback for tracing ReceivedPacket
+     * Callback for tracing ReceivedPacket
      *
      * \param packet the packet received
      * \param node the receiver node id if any, 0 otherwise
@@ -1132,7 +1132,7 @@ class PhyConnectivityTest : public TestCase
     void ReceivedPacket(Ptr<const Packet> packet, uint32_t node);
 
     /**
-     * \brief Callback for tracing LostPacketBecauseUnderSensitivity
+     * Callback for tracing LostPacketBecauseUnderSensitivity
      *
      * \param packet the packet lost
      * \param node the receiver node id if any, 0 otherwise
@@ -1140,7 +1140,7 @@ class PhyConnectivityTest : public TestCase
     void UnderSensitivity(Ptr<const Packet> packet, uint32_t node);
 
     /**
-     * \brief Callback for tracing LostPacketBecauseInterference
+     * Callback for tracing LostPacketBecauseInterference
      *
      * \param packet the packet lost
      * \param node the receiver node id if any, 0 otherwise
@@ -1148,7 +1148,7 @@ class PhyConnectivityTest : public TestCase
     void Interference(Ptr<const Packet> packet, uint32_t node);
 
     /**
-     * \brief Callback for tracing LostPacketBecauseNoMoreReceivers
+     * Callback for tracing LostPacketBecauseNoMoreReceivers
      *
      * \param packet the packet lost
      * \param node the receiver node id if any, 0 otherwise
@@ -1159,7 +1159,7 @@ class PhyConnectivityTest : public TestCase
     void NoMoreDemodulators(Ptr<const Packet> packet, uint32_t node);
 
     /**
-     * \brief Callback for tracing LostPacketBecauseWrongFrequency
+     * Callback for tracing LostPacketBecauseWrongFrequency
      *
      * \param packet the packet lost
      * \param node the receiver node id if any, 0 otherwise
@@ -1167,7 +1167,7 @@ class PhyConnectivityTest : public TestCase
     void WrongFrequency(Ptr<const Packet> packet, uint32_t node);
 
     /**
-     * \brief Callback for tracing LostPacketBecauseWrongSpreadingFactor
+     * Callback for tracing LostPacketBecauseWrongSpreadingFactor
      *
      * \param packet the packet lost
      * \param node the receiver node id if any, 0 otherwise
