@@ -51,8 +51,8 @@ class AdrComponent : public NetworkControllerComponent
 
   public:
     /**
-     * \brief Get the type ID.
-     * \return the object TypeId
+     *  Register this type.
+     *  \return The object TypeId.
      */
     static TypeId GetTypeId();
 

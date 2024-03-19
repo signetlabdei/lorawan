@@ -50,8 +50,8 @@ class NetworkControllerComponent : public Object
 {
   public:
     /**
-     * \brief Get the type ID.
-     * \return the object TypeId.
+     *  Register this type.
+     *  \return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -96,8 +96,8 @@ class ConfirmedMessagesComponent : public NetworkControllerComponent
 {
   public:
     /**
-     * \brief Get the type ID.
-     * \return the object TypeId.
+     *  Register this type.
+     *  \return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -131,8 +131,8 @@ class LinkCheckComponent : public NetworkControllerComponent
 {
   public:
     /**
-     * \brief Get the type ID.
-     * \return the object TypeId.
+     *  Register this type.
+     *  \return The object TypeId.
      */
     static TypeId GetTypeId();
 

@@ -38,8 +38,8 @@ class LoraTxCurrentModel : public Object
 {
   public:
     /**
-     * \brief Get the type ID.
-     * \return the object TypeId
+     *  Register this type.
+     *  \return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -65,8 +65,8 @@ class LinearLoraTxCurrentModel : public LoraTxCurrentModel
 {
   public:
     /**
-     * \brief Get the type ID.
-     * \return the object TypeId
+     *  Register this type.
+     *  \return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -133,8 +133,8 @@ class ConstantLoraTxCurrentModel : public LoraTxCurrentModel
 {
   public:
     /**
-     * \brief Get the type ID.
-     * \return the object TypeId
+     *  Register this type.
+     *  \return The object TypeId.
      */
     static TypeId GetTypeId();
 

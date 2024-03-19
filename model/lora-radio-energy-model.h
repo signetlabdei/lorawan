@@ -142,8 +142,8 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
     typedef Callback<void> LoraRadioEnergyRechargedCallback;
 
     /**
-     * \brief Get the type ID.
-     * \return the object TypeId
+     *  Register this type.
+     *  \return The object TypeId.
      */
     static TypeId GetTypeId();
 

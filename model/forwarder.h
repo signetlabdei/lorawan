@@ -45,8 +45,8 @@ class Forwarder : public Application
     ~Forwarder() override;
 
     /**
-     * \brief Get the type ID.
-     * \return the object TypeId
+     *  Register this type.
+     *  \return The object TypeId.
      */
     static TypeId GetTypeId();
 
