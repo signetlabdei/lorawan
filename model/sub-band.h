@@ -48,6 +48,7 @@ class SubBand : public Object
     static TypeId GetTypeId();
 
     SubBand();
+    ~SubBand() override; //!< Destructor
 
     /**
      * Create a new SubBand by specifying all of its properties.
@@ -58,8 +59,6 @@ class SubBand : public Object
      * \param maxTxPowerDbm The maximum transmission power [dBm] allowed on this SubBand.
      */
     SubBand(double firstFrequency, double lastFrequency, double dutyCycle, double maxTxPowerDbm);
-
-    ~SubBand() override;
 
     /**
      * Get the lowest frequency of the SubBand.

@@ -53,7 +53,7 @@ class SimpleGatewayLoraPhy : public GatewayLoraPhy
     static TypeId GetTypeId();
 
     SimpleGatewayLoraPhy();
-    ~SimpleGatewayLoraPhy() override;
+    ~SimpleGatewayLoraPhy() override; //!< Destructor
 
     void StartReceive(Ptr<Packet> packet,
                       double rxPowerDbm,

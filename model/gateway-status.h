@@ -53,6 +53,8 @@ class GatewayStatus : public Object
     static TypeId GetTypeId();
 
     GatewayStatus();
+    ~GatewayStatus() override; //!< Destructor
+
     /**
      * \brief Construct a new GatewayStatus object with values
      *
@@ -61,7 +63,6 @@ class GatewayStatus : public Object
      * \param gwMac A Ptr to the MAC layer of the gateway
      */
     GatewayStatus(Address address, Ptr<NetDevice> netDevice, Ptr<GatewayLorawanMac> gwMac);
-    ~GatewayStatus() override;
 
     /**
      * Get this gateway's P2P link address.

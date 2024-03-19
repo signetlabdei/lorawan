@@ -58,6 +58,8 @@ class NetworkScheduler : public Object
      * \todo We should probably remove this or add getters and setters
      */
     NetworkScheduler();
+    ~NetworkScheduler() override; //!< Destructor
+
     /**
      * \brief Construct a new NetworkScheduler providing the NetworkStatus and the NetworkController
      * objects.
@@ -66,7 +68,6 @@ class NetworkScheduler : public Object
      * \param controller A Ptr to the NetworkController object.
      */
     NetworkScheduler(Ptr<NetworkStatus> status, Ptr<NetworkController> controller);
-    ~NetworkScheduler() override;
 
     /**
      * \brief Method called by NetworkServer to inform the Scheduler of a newly arrived uplink

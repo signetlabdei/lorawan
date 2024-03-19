@@ -74,7 +74,7 @@ class MacCommand : public Object
     static TypeId GetTypeId();
 
     MacCommand();
-    ~MacCommand() override;
+    ~MacCommand() override; //!< Destructor
 
     /**
      * Serialize the contents of this MAC command into a buffer, according to the
@@ -137,7 +137,7 @@ class LinkCheckReq : public MacCommand
 {
   public:
     LinkCheckReq();
-    ~LinkCheckReq() override;
+    ~LinkCheckReq() override; //!< Destructor
     void Serialize(Buffer::Iterator& start) const override;
     uint8_t Deserialize(Buffer::Iterator& start) override;
     void Print(std::ostream& os) const override;

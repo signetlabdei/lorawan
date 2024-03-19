@@ -38,7 +38,7 @@ class NetworkSchedulerTest : public TestCase
 {
   public:
     NetworkSchedulerTest();
-    ~NetworkSchedulerTest() override;
+    ~NetworkSchedulerTest() override; //!< Destructor
 
   private:
     void DoRun() override;

@@ -45,8 +45,7 @@ class OneShotSenderHelper
 {
   public:
     OneShotSenderHelper();
-
-    ~OneShotSenderHelper();
+    ~OneShotSenderHelper(); //!< Destructor
 
     /**
      * \brief Helper function used to set the underlying application attributes.

@@ -61,9 +61,8 @@ class LoraNetDevice : public NetDevice
      */
     static TypeId GetTypeId();
 
-    // Constructor and destructor
     LoraNetDevice();
-    ~LoraNetDevice() override;
+    ~LoraNetDevice() override; //!< Destructor
 
     /**
      * \brief Set which LorawanMac instance is linked to this device.

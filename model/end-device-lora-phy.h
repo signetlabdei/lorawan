@@ -46,7 +46,7 @@ class LoraChannel;
 class EndDeviceLoraPhyListener
 {
   public:
-    virtual ~EndDeviceLoraPhyListener();
+    virtual ~EndDeviceLoraPhyListener(); //!< Destructor
 
     /**
      * We have received the first bit of a packet. We decided
@@ -149,9 +149,8 @@ class EndDeviceLoraPhy : public LoraPhy
      */
     static TypeId GetTypeId();
 
-    // Constructor and destructor
     EndDeviceLoraPhy();
-    ~EndDeviceLoraPhy() override;
+    ~EndDeviceLoraPhy() override; //!< Destructor
 
     // Implementation of LoraPhy's pure virtual functions
     void StartReceive(Ptr<Packet> packet,

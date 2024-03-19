@@ -87,9 +87,8 @@ class LoraChannel : public Channel
      */
     static TypeId GetTypeId();
 
-    // Constructor and destructor
     LoraChannel();
-    ~LoraChannel() override;
+    ~LoraChannel() override; //!< Destructor
 
     // Inherited from Channel.
     std::size_t GetNDevices() const override;

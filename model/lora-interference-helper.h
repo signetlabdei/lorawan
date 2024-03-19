@@ -71,7 +71,8 @@ class LoraInterferenceHelper
               uint8_t spreadingFactor,
               Ptr<Packet> packet,
               double frequencyMHz);
-        ~Event();
+
+        ~Event(); //!< Destructor
 
         /**
          * Get the duration of the event.
@@ -154,7 +155,7 @@ class LoraInterferenceHelper
     static TypeId GetTypeId();
 
     LoraInterferenceHelper();
-    virtual ~LoraInterferenceHelper();
+    virtual ~LoraInterferenceHelper(); //!< Destructor
 
     /**
      * Add an event to the InterferenceHelper

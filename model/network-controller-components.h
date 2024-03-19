@@ -55,9 +55,8 @@ class NetworkControllerComponent : public Object
      */
     static TypeId GetTypeId();
 
-    // Constructor and destructor
     NetworkControllerComponent();
-    ~NetworkControllerComponent() override;
+    ~NetworkControllerComponent() override; //!< Destructor
 
     // Virtual methods whose implementation is left to child classes
     /**
@@ -101,9 +100,8 @@ class ConfirmedMessagesComponent : public NetworkControllerComponent
      */
     static TypeId GetTypeId();
 
-    // Constructor and destructor
     ConfirmedMessagesComponent();
-    ~ConfirmedMessagesComponent() override;
+    ~ConfirmedMessagesComponent() override; //!< Destructor
 
     /**
      * This method checks whether the received packet requires an acknowledgment
@@ -136,9 +134,8 @@ class LinkCheckComponent : public NetworkControllerComponent
      */
     static TypeId GetTypeId();
 
-    // Constructor and destructor
     LinkCheckComponent();
-    ~LinkCheckComponent() override;
+    ~LinkCheckComponent() override; //!< Destructor
 
     /**
      * This method checks whether the received packet requires an acknowledgment

@@ -40,13 +40,14 @@ class OneShotSender : public Application
 {
   public:
     OneShotSender();
+    ~OneShotSender() override; //!< Destructor
+
     /**
      * \brief Construct a new OneShotSender object with provided send time.
      *
      * \param sendTime The Time of sending.
      */
     OneShotSender(Time sendTime);
-    ~OneShotSender() override;
 
     /**
      *  Register this type.

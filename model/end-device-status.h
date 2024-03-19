@@ -187,6 +187,7 @@ class EndDeviceStatus : public Object
      * \brief Default constructor
      */
     EndDeviceStatus();
+    ~EndDeviceStatus() override; //!< Destructor
 
     /**
      * \brief Constructor with initialization parameters
@@ -196,11 +197,6 @@ class EndDeviceStatus : public Object
      */
     EndDeviceStatus(LoraDeviceAddress endDeviceAddress,
                     Ptr<ClassAEndDeviceLorawanMac> endDeviceMac);
-
-    /**
-     * \brief Destructor.
-     */
-    ~EndDeviceStatus() override;
 
     /**
      * Get the spreading factor this device is using in the first receive window.

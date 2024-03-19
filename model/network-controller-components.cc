@@ -36,7 +36,6 @@ NetworkControllerComponent::GetTypeId()
     return tid;
 }
 
-// Constructor and destructor
 NetworkControllerComponent::NetworkControllerComponent()
 {
 }

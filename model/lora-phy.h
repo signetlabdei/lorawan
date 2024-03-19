@@ -85,7 +85,7 @@ class LoraPhy : public Object
      * \brief Constructor.
      */
     LoraPhy();
-    ~LoraPhy() override;
+    ~LoraPhy() override; //!< Destructor
 
     /**
      * Type definition for a callback for when a packet is correctly received.

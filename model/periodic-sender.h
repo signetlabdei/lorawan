@@ -40,7 +40,7 @@ class PeriodicSender : public Application
 {
   public:
     PeriodicSender();
-    ~PeriodicSender() override;
+    ~PeriodicSender() override; //!< Destructor
 
     /**
      *  Register this type.

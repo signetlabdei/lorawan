@@ -99,7 +99,7 @@ class LoraPacketTracker
 {
   public:
     LoraPacketTracker();
-    ~LoraPacketTracker();
+    ~LoraPacketTracker(); //!< Destructor
 
     ///////////////////////////
     // PHY layer trace sinks //

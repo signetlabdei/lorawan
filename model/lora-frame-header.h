@@ -48,7 +48,7 @@ class LoraFrameHeader : public Header
 {
   public:
     LoraFrameHeader();
-    ~LoraFrameHeader() override;
+    ~LoraFrameHeader() override; //!< Destructor
 
     // Methods inherited from Header
 

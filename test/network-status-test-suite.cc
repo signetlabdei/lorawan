@@ -48,7 +48,7 @@ class EndDeviceStatusTest : public TestCase
 {
   public:
     EndDeviceStatusTest();
-    ~EndDeviceStatusTest() override;
+    ~EndDeviceStatusTest() override; //!< Destructor
 
   private:
     void DoRun() override;
@@ -85,7 +85,7 @@ class NetworkStatusTest : public TestCase
 {
   public:
     NetworkStatusTest();
-    ~NetworkStatusTest() override;
+    ~NetworkStatusTest() override; //!< Destructor
 
   private:
     void DoRun() override;

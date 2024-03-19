@@ -57,7 +57,7 @@ class LogicalLoraChannelHelper : public Object
     static TypeId GetTypeId();
 
     LogicalLoraChannelHelper();
-    ~LogicalLoraChannelHelper() override;
+    ~LogicalLoraChannelHelper() override; //!< Destructor
 
     /**
      * Get the time it is necessary to wait before transmitting again, according

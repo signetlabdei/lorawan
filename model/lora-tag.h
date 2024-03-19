@@ -51,7 +51,7 @@ class LoraTag : public Tag
      */
     LoraTag(uint8_t sf = 0, uint8_t destroyedBy = 0);
 
-    ~LoraTag() override;
+    ~LoraTag() override; //!< Destructor
 
     void Serialize(TagBuffer i) const override;
     void Deserialize(TagBuffer i) override;

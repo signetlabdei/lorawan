@@ -51,9 +51,8 @@ class SimpleEndDeviceLoraPhy : public EndDeviceLoraPhy
      */
     static TypeId GetTypeId();
 
-    // Constructor and destructor
     SimpleEndDeviceLoraPhy();
-    ~SimpleEndDeviceLoraPhy() override;
+    ~SimpleEndDeviceLoraPhy() override; //!< Destructor
 
     // Implementation of EndDeviceLoraPhy's pure virtual functions
     void StartReceive(Ptr<Packet> packet,

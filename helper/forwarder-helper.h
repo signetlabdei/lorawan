@@ -46,7 +46,7 @@ class ForwarderHelper
   public:
     ForwarderHelper();
 
-    ~ForwarderHelper();
+    ~ForwarderHelper(); //!< Destructor
 
     /**
      * \brief Helper function used to set the underlying application attributes.

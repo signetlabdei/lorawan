@@ -47,7 +47,7 @@ namespace lorawan
 class LoraHelper
 {
   public:
-    virtual ~LoraHelper();
+    virtual ~LoraHelper(); //!< Destructor
 
     LoraHelper();
 

@@ -46,8 +46,7 @@ class PeriodicSenderHelper
 {
   public:
     PeriodicSenderHelper();
-
-    ~PeriodicSenderHelper();
+    ~PeriodicSenderHelper(); //!< Destructor
 
     /**
      * \brief Helper function used to set the underlying application attributes.

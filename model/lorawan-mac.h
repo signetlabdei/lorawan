@@ -54,7 +54,7 @@ class LorawanMac : public Object
     static TypeId GetTypeId();
 
     LorawanMac();
-    ~LorawanMac() override;
+    ~LorawanMac() override; //!< Destructor
 
     /**
      * Matrix structure to store possible data rate value to be used by a LoRaWAN End Device for

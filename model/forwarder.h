@@ -42,7 +42,7 @@ class Forwarder : public Application
 {
   public:
     Forwarder();
-    ~Forwarder() override;
+    ~Forwarder() override; //!< Destructor
 
     /**
      *  Register this type.

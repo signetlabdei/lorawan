@@ -45,8 +45,7 @@ class BuildingPenetrationLoss : public PropagationLossModel
     static TypeId GetTypeId();
 
     BuildingPenetrationLoss();
-
-    ~BuildingPenetrationLoss() override;
+    ~BuildingPenetrationLoss() override; //!< Destructor
 
   private:
     double DoCalcRxPower(double txPowerDbm,

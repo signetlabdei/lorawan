@@ -58,8 +58,7 @@ class AdrComponent : public NetworkControllerComponent
 
     // Constructor
     AdrComponent();
-    // Destructor
-    ~AdrComponent() override;
+    ~AdrComponent() override; //!< Destructor
 
     void OnReceivedPacket(Ptr<const Packet> packet,
                           Ptr<EndDeviceStatus> status,

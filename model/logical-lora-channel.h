@@ -52,7 +52,7 @@ class LogicalLoraChannel : public Object
     static TypeId GetTypeId();
 
     LogicalLoraChannel();
-    ~LogicalLoraChannel() override;
+    ~LogicalLoraChannel() override; //!< Destructor
 
     /**
      * \brief Construct a new LogicalLoraChannel object initializing the carrier frequency.

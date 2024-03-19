@@ -44,7 +44,7 @@ class LoraTxCurrentModel : public Object
     static TypeId GetTypeId();
 
     LoraTxCurrentModel();
-    ~LoraTxCurrentModel() override;
+    ~LoraTxCurrentModel() override; //!< Destructor
 
     /**
      * Get the current for transmission at this power.
@@ -71,7 +71,7 @@ class LinearLoraTxCurrentModel : public LoraTxCurrentModel
     static TypeId GetTypeId();
 
     LinearLoraTxCurrentModel();
-    ~LinearLoraTxCurrentModel() override;
+    ~LinearLoraTxCurrentModel() override; //!< Destructor
 
     /**
      * \brief Set the power amplifier efficiency.
@@ -139,7 +139,7 @@ class ConstantLoraTxCurrentModel : public LoraTxCurrentModel
     static TypeId GetTypeId();
 
     ConstantLoraTxCurrentModel();
-    ~ConstantLoraTxCurrentModel() override;
+    ~ConstantLoraTxCurrentModel() override; //!< Destructor
 
     /**
      * \brief Set the current in the TX state.

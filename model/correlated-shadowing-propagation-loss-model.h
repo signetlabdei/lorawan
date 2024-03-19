@@ -104,8 +104,7 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
     {
       public:
         ShadowingMap();
-
-        ~ShadowingMap();
+        ~ShadowingMap(); //!< Destructor
 
         /**
          * \brief Get the loss for a certain position.

@@ -42,11 +42,7 @@ class LoraRadioEnergyModelHelper : public DeviceEnergyModelHelper
      * Construct a helper which is used to add a radio energy model to a node
      */
     LoraRadioEnergyModelHelper();
-
-    /**
-     * Destroy a RadioEnergy Helper
-     */
-    ~LoraRadioEnergyModelHelper() override;
+    ~LoraRadioEnergyModelHelper() override; //!< Destructor
 
     /**
      * \param name the name of the attribute to set

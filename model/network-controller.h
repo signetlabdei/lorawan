@@ -57,7 +57,7 @@ class NetworkController : public Object
      * \param networkStatus A Ptr to the NetworkStatus object.
      */
     NetworkController(Ptr<NetworkStatus> networkStatus);
-    ~NetworkController() override;
+    ~NetworkController() override; //!< Destructor
 
     /**
      * \brief Add a new NetworkControllerComponent.

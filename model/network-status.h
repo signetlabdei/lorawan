@@ -55,7 +55,7 @@ class NetworkStatus : public Object
     static TypeId GetTypeId();
 
     NetworkStatus();
-    ~NetworkStatus() override;
+    ~NetworkStatus() override; //!< Destructor
 
     /**
      * \brief Add a device to the ones that are tracked by this NetworkStatus object.

@@ -50,7 +50,7 @@ class UplinkPacketTest : public TestCase
 {
   public:
     UplinkPacketTest();
-    ~UplinkPacketTest() override;
+    ~UplinkPacketTest() override; //!< Destructor
 
     /**
      * \brief Callback for tracing ReceivedPacket
@@ -137,7 +137,7 @@ class DownlinkPacketTest : public TestCase
 {
   public:
     DownlinkPacketTest();
-    ~DownlinkPacketTest() override;
+    ~DownlinkPacketTest() override; //!< Destructor
 
     /**
      * Record the exit status of a MAC layer packet retransmission process of an end device.
@@ -249,7 +249,7 @@ class LinkCheckTest : public TestCase
 {
   public:
     LinkCheckTest();
-    ~LinkCheckTest() override;
+    ~LinkCheckTest() override; //!< Destructor
 
     /**
      * \brief Trace changes in the last known gateway count variable (updated on reception of

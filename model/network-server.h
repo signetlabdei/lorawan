@@ -60,7 +60,7 @@ class NetworkServer : public Application
     static TypeId GetTypeId();
 
     NetworkServer();
-    ~NetworkServer() override;
+    ~NetworkServer() override; //!< Destructor
 
     /**
      * \brief Start the NS application.

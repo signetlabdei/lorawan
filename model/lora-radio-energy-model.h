@@ -46,7 +46,7 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
     typedef Callback<void, double> UpdateTxCurrentCallback;
 
     LoraRadioEnergyModelPhyListener();
-    ~LoraRadioEnergyModelPhyListener() override;
+    ~LoraRadioEnergyModelPhyListener() override; //!< Destructor
 
     /**
      * \brief Sets the change state callback. Used by helper class.
@@ -148,7 +148,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
     static TypeId GetTypeId();
 
     LoraRadioEnergyModel();
-    ~LoraRadioEnergyModel() override;
+    ~LoraRadioEnergyModel() override; //!< Destructor
 
     /**
      * \brief Sets pointer to EnergySouce installed on node.

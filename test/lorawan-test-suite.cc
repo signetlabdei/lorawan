@@ -44,7 +44,7 @@ class InterferenceTest : public TestCase
 {
   public:
     InterferenceTest();
-    ~InterferenceTest() override;
+    ~InterferenceTest() override; //!< Destructor
 
   private:
     void DoRun() override;
@@ -208,7 +208,7 @@ class AddressTest : public TestCase
 {
   public:
     AddressTest();
-    ~AddressTest() override;
+    ~AddressTest() override; //!< Destructor
 
   private:
     void DoRun() override;
@@ -292,7 +292,7 @@ class HeaderTest : public TestCase
 {
   public:
     HeaderTest();
-    ~HeaderTest() override;
+    ~HeaderTest() override; //!< Destructor
 
   private:
     void DoRun() override;
@@ -446,7 +446,7 @@ class ReceivePathTest : public TestCase
 {
   public:
     ReceivePathTest();
-    ~ReceivePathTest() override;
+    ~ReceivePathTest() override; //!< Destructor
 
   private:
     void DoRun() override;
@@ -878,7 +878,7 @@ class LogicalLoraChannelTest : public TestCase
 {
   public:
     LogicalLoraChannelTest();
-    ~LogicalLoraChannelTest() override;
+    ~LogicalLoraChannelTest() override; //!< Destructor
 
   private:
     void DoRun() override;
@@ -1003,7 +1003,7 @@ class TimeOnAirTest : public TestCase
 {
   public:
     TimeOnAirTest();
-    ~TimeOnAirTest() override;
+    ~TimeOnAirTest() override; //!< Destructor
 
   private:
     void DoRun() override;
@@ -1116,7 +1116,7 @@ class PhyConnectivityTest : public TestCase
 {
   public:
     PhyConnectivityTest();
-    ~PhyConnectivityTest() override;
+    ~PhyConnectivityTest() override; //!< Destructor
 
     /**
      * Reset counters and end devices' PHYs for new sub test case
@@ -1618,7 +1618,7 @@ class LorawanMacTest : public TestCase
 {
   public:
     LorawanMacTest();
-    ~LorawanMacTest() override;
+    ~LorawanMacTest() override; //!< Destructor
 
   private:
     void DoRun() override;

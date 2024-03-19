@@ -57,8 +57,7 @@ class NetworkServerHelper
 {
   public:
     NetworkServerHelper();
-
-    ~NetworkServerHelper();
+    ~NetworkServerHelper(); //!< Destructor
 
     /**
      * \brief Record an attribute to be set in each Application after it is is created.

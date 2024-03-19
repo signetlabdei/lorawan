@@ -82,14 +82,14 @@ class HexGridPositionAllocator : public PositionAllocator
 {
   public:
     HexGridPositionAllocator();
+    ~HexGridPositionAllocator() override; //!< Destructor
+
     /**
      * \brief Construct a new HexGridPositionAllocator object with given radius
      *
      * \param radius The radius length of the circle inscribed in the hexagonal tiles
      */
     HexGridPositionAllocator(double radius);
-
-    ~HexGridPositionAllocator() override;
 
     Vector GetNext() const override;
 

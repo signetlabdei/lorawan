@@ -60,7 +60,7 @@ class GatewayLoraPhy : public LoraPhy
     static TypeId GetTypeId();
 
     GatewayLoraPhy();
-    ~GatewayLoraPhy() override;
+    ~GatewayLoraPhy() override; //!< Destructor
 
     void StartReceive(Ptr<Packet> packet,
                       double rxPowerDbm,
@@ -129,8 +129,7 @@ class GatewayLoraPhy : public LoraPhy
          * Constructor.
          */
         ReceptionPath();
-
-        ~ReceptionPath();
+        ~ReceptionPath(); //!< Destructor
 
         /**
          * \brief Query whether this reception path is available to lock on a signal.
