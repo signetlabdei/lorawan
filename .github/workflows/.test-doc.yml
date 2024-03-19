@@ -33,9 +33,9 @@ jobs:
       - name: "Check documentation coverage and formatting"
         run: |
           doc/doxygen.warnings.report.sh -i -m lorawan
-          python3 utils/check-style-clang-format.py --no-formatting --no-tabs doc/introspected-doxygen.h
-          python3 utils/check-style-clang-format.py --no-formatting --no-tabs doc/introspected-command-line.h
+          python3 utils/check-style-clang-format.py --no-formatting --no-tabs doc/introspected-doxygen.h doc/introspected-command-line.h
           ./ns3 clean
+          doxygen -v
       - name: "Upload doxygen warnings as artifact"
         if: always()
         uses: actions/upload-artifact@v4

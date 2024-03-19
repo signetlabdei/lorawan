@@ -14,7 +14,7 @@ jobs:
       image: ubuntu:rolling
     strategy:
       matrix:
-        version: [14, 15, 16]
+        version: [14, 15, 16, 17]
     timeout-minutes: 60
     steps:
       # The following step is required in all jobs that use this repo's actions
