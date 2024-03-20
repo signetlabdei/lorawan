@@ -85,7 +85,7 @@ class GatewayLoraPhy : public LoraPhy
     bool IsTransmitting() override;
 
     /**
-     * Check whether the GatewayLoraPhy is currently listening to a frequency.
+     * Check whether the GatewayLoraPhy is currently listening to the specified frequency.
      *
      * \param frequencyMHz The value of the frequency [MHz].
      * \return True if the frequency is among the one being listened to, false otherwise.

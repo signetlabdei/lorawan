@@ -170,49 +170,49 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
     /**
      * Gets idle current.
      *
-     * \return Idle current of the lora device.
+     * \return Idle current [A] of the lora device.
      */
     double GetStandbyCurrentA() const;
     /**
      * Sets idle current.
      *
-     * \param idleCurrentA The idle current.
+     * \param idleCurrentA The idle current [A].
      */
     void SetStandbyCurrentA(double idleCurrentA);
     /**
      * Gets transmit current.
      *
-     * \return Transmit current of the lora device.
+     * \return Transmit current [A] of the lora device.
      */
     double GetTxCurrentA() const;
     /**
      * Sets transmit current.
      *
-     * \param txCurrentA The transmit current.
+     * \param txCurrentA The transmit current [A].
      */
     void SetTxCurrentA(double txCurrentA);
     /**
      * Gets receive current.
      *
-     * \return Receive current of the lora device.
+     * \return Receive current [A] of the lora device.
      */
     double GetRxCurrentA() const;
     /**
      * Sets receive current.
      *
-     * \param rxCurrentA The receive current.
+     * \param rxCurrentA The receive current [A].
      */
     void SetRxCurrentA(double rxCurrentA);
     /**
      * Gets sleep current.
      *
-     * \return Sleep current of the lora device.
+     * \return Sleep current [A] of the lora device.
      */
     double GetSleepCurrentA() const;
     /**
      * Sets sleep current.
      *
-     * \param sleepCurrentA The sleep current.
+     * \param sleepCurrentA The sleep current [A].
      */
     void SetSleepCurrentA(double sleepCurrentA);
 

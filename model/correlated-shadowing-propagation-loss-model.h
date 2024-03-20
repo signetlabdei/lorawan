@@ -33,7 +33,7 @@ namespace lorawan
 /**
  * \ingroup lorawan
  *
- * Propagation loss model for correlated shadowing in a city
+ * Propagation loss model for spatially correlated shadowing in a city
  */
 class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
 {
@@ -149,24 +149,6 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
     static TypeId GetTypeId();
 
     CorrelatedShadowingPropagationLossModel(); //!< Default constructor
-
-    /**
-     * Set the correlation distance for newly created ShadowingMap instances.
-     *
-     * \todo Not implemented.
-     *
-     * \param distance The correlation distance to set.
-     */
-    void SetCorrelationDistance(double distance);
-
-    /**
-     * The correlation distance that is currently being used.
-     *
-     * \todo Not implemented.
-     *
-     * \return The correlation distance as a double.
-     */
-    double GetCorrelationDistance();
 
   private:
     double DoCalcRxPower(double txPowerDbm,

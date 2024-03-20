@@ -67,28 +67,28 @@ class LoraNetDevice : public NetDevice
     /**
      * Set which LorawanMac instance is linked to this device.
      *
-     * \param mac The mac layer to use.
+     * \param mac The MAC layer to use.
      */
     void SetMac(Ptr<LorawanMac> mac);
 
     /**
      * Set which LoraPhy instance is linked to this device.
      *
-     * \param phy The phy layer to use.
+     * \param phy The PHY layer to use.
      */
     void SetPhy(Ptr<LoraPhy> phy);
 
     /**
      * Get the LorawanMac instance that is linked to this NetDevice.
      *
-     * \return The mac we are currently using.
+     * \return The MAC we are currently using.
      */
     Ptr<LorawanMac> GetMac() const;
 
     /**
      * Get the LoraPhy instance that is linked to this NetDevice.
      *
-     * \return The phy we are currently using.
+     * \return The PHY we are currently using.
      */
     Ptr<LoraPhy> GetPhy() const;
 

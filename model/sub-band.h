@@ -53,8 +53,8 @@ class SubBand : public Object
     /**
      * Create a new SubBand by specifying all of its properties.
      *
-     * \param firstFrequency The SubBand's lowest frequency.
-     * \param lastFrequency The SubBand's highest frequency.
+     * \param firstFrequency The SubBand's lowest frequency [MHz].
+     * \param lastFrequency The SubBand's highest frequency [MHz].
      * \param dutyCycle The duty cycle (as a fraction) allowed on this SubBand.
      * \param maxTxPowerDbm The maximum transmission power [dBm] allowed on this SubBand.
      */
@@ -63,14 +63,14 @@ class SubBand : public Object
     /**
      * Get the lowest frequency of the SubBand.
      *
-     * \return The lowest frequency of the SubBand.
+     * \return The lowest frequency [MHz] of the SubBand.
      */
     double GetFirstFrequency() const;
 
     ///**
     // * Get the last frequency of the subband.
     // *
-    // * \return The lowest frequency of the SubBand.
+    // * \return The lowest frequency [MHz] of the SubBand.
     // */
     // double GetLastFrequency ();
 
@@ -105,7 +105,7 @@ class SubBand : public Object
     /**
      * Return whether or not a frequency belongs to this SubBand.
      *
-     * \param frequency The frequency we want to test against the current subband.
+     * \param frequency The frequency [MHz] we want to test against the current subband.
      * \return True if the frequency is between firstFrequency and lastFrequency,
      * false otherwise.
      */

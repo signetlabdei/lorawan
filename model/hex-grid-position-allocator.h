@@ -28,11 +28,11 @@ namespace ns3
 /**
  * \ingroup lorawan
  *
- * Position allocator for hexagonal tiling
+ * Position allocator for hexagonal tiling.
  *
  * Starting with a first hexagon in the axes' center, following tiles are added in outward
  * rings. The first position returned for a new ring is always the top one, followed by the others
- * in ant-clockwise rotation.
+ * in anti-clockwise rotation.
  *
  * Visual example with 10 tiles, indexed 0-9:
  *
@@ -61,7 +61,7 @@ namespace ns3
  * hexagonal tiles. This leaves us with two questions: (i) which value should we choose for the
  * internal radius? (ii) how many access point nodes (i.e., tiles) do we need to instantiate?
  *
- * For instamce, to guarantee that no point is further than 1km from the center of any tile (i.e.,
+ * For instance, to guarantee that no point is further than 1km from the center of any tile (i.e.,
  * to have no uncovered patches), we can choose the radius \f$\rho_{c}\f$ of the
  * \b circumscribed (external) circle of each hexagonal tile to be exactly 1km. Then, question
  * (i) can be solved by setting the internal radius to \f$\rho_{i}=\frac{\sqrt{3}}{2}\rho_{c}\f$
@@ -77,6 +77,8 @@ namespace ns3
  * \f$r=\left\lfloor\frac{d}{2\rho_{i}}\right\rfloor+1\f$ \b additional rings around it. Then,
  * the total number of tiles \f$n\f$ in a tiling of \f$r\f$ complete rings around a central tile
  * evaluates to \f$n=3r^{2}-3r+1\f$ providing a possible solution for question (ii).
+ *
+ * \todo Move this into the module .rst documentation
  */
 class HexGridPositionAllocator : public PositionAllocator
 {

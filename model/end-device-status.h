@@ -92,7 +92,7 @@ class EndDeviceStatus : public Object
      */
     struct Reply
     {
-        LorawanMacHeader macHeader;  //!< The Mac Header to attach to the reply packet.
+        LorawanMacHeader macHeader;  //!< The MAC Header to attach to the reply packet.
         LoraFrameHeader frameHeader; //!< The Frame Header to attach to the reply packet.
         Ptr<Packet> payload;         //!< The data packet that will be sent as a reply.
         bool needsReply = false;     //!< Whether or not this device needs a reply
@@ -214,11 +214,8 @@ class EndDeviceStatus : public Object
      * receive window.
      *
      * \return An unsigned 8-bit integer containing the spreading factor.
-     *
-     * \todo rename this to GetSecondReceiveWindowSpreadingFactor. No such thing as a SF offset for
-     * RX2 in the specifications. Also this function is unused.
      */
-    uint8_t GetSecondReceiveWindowOffset() const;
+    uint8_t GetSecondReceiveWindowSpreadingFactor() const;
 
     /**
      * Return the second window frequency of this device.
@@ -251,12 +248,9 @@ class EndDeviceStatus : public Object
     /**
      * Set the spreading factor this device is using in the second receive window.
      *
-     * \param offset The spreading factor.
-     *
-     * \todo rename this to SetSecondReceiveWindowSpreadingFactor. No such thing as a SF offset for
-     * RX2 in the specifications. Also this function is unused.
+     * \param sf The spreading factor.
      */
-    void SetSecondReceiveWindowOffset(uint8_t offset);
+    void SetSecondReceiveWindowSpreadingFactor(uint8_t sf);
 
     /**
      * Set the second window frequency of this device.
@@ -384,11 +378,10 @@ class EndDeviceStatus : public Object
 
   private:
     // Receive window data
-    uint8_t m_firstReceiveWindowSpreadingFactor = 0; //!< SF for RX1 window
-    double m_firstReceiveWindowFrequency = 0;        //!< Frequency [MHz] for RX1 window
-    uint8_t m_secondReceiveWindowOffset =
-        0; //!< SF for RX2 window. \todo Rename to sf, offset makes no sense.
-    double m_secondReceiveWindowFrequency = 869.525; //!< Frequency [MHz] for RX2 window
+    uint8_t m_firstReceiveWindowSpreadingFactor = 0;  //!< SF for RX1 window
+    double m_firstReceiveWindowFrequency = 0;         //!< Frequency [MHz] for RX1 window
+    uint8_t m_secondReceiveWindowSpreadingFactor = 0; //!< SF for RX2 window.
+    double m_secondReceiveWindowFrequency = 869.525;  //!< Frequency [MHz] for RX2 window
     EventId m_receiveWindowEvent; //!< Event storing the next scheduled downlink transmission
 
     ReceivedPacketList m_receivedPacketList; //!< List of received packets

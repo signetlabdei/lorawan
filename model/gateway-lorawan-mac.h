@@ -65,7 +65,7 @@ class GatewayLorawanMac : public LorawanMac
     void TxFinished(Ptr<const Packet> packet) override;
 
     /**
-     * Return the next time at which we will be able to transmit on a frequency.
+     * Return the next time at which we will be able to transmit on the specified frequency.
      *
      * \param frequency The frequency value [MHz].
      * \return The next transmission time.

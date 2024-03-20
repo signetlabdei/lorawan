@@ -119,7 +119,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /**
      * Get the Data Rate that will be used in the first receive window.
      *
-     * \return The Data Rate.
+     * \return The data rate.
      */
     uint8_t GetFirstReceiveWindowDataRate();
 
@@ -133,7 +133,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /**
      * Get the Data Rate that will be used in the second receive window.
      *
-     * \return The Data Rate.
+     * \return The data rate.
      */
     uint8_t GetSecondReceiveWindowDataRate() const;
 

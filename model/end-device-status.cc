@@ -94,11 +94,11 @@ EndDeviceStatus::GetFirstReceiveWindowFrequency() const
 }
 
 uint8_t
-EndDeviceStatus::GetSecondReceiveWindowOffset() const
+EndDeviceStatus::GetSecondReceiveWindowSpreadingFactor() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    return m_secondReceiveWindowOffset;
+    return m_secondReceiveWindowSpreadingFactor;
 }
 
 double
@@ -202,10 +202,10 @@ EndDeviceStatus::SetFirstReceiveWindowFrequency(double frequency)
 }
 
 void
-EndDeviceStatus::SetSecondReceiveWindowOffset(uint8_t offset)
+EndDeviceStatus::SetSecondReceiveWindowSpreadingFactor(uint8_t sf)
 {
     NS_LOG_FUNCTION_NOARGS();
-    m_secondReceiveWindowOffset = offset;
+    m_firstReceiveWindowSpreadingFactor = sf;
 }
 
 void

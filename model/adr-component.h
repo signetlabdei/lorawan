@@ -104,28 +104,28 @@ class AdrComponent : public NetworkControllerComponent
     double RxPowerToSNR(double transmissionPower) const;
 
     /**
-     * Get the min RSSI (dBm) among gateway receptions of a same transmission.
+     * Get the min RSSI (dBm) among gateways receiving the same transmission.
      *
      * \param gwList List of gateways paired with reception information.
      * \return Min RSSI of transmission as double.
      */
     double GetMinTxFromGateways(EndDeviceStatus::GatewayList gwList);
     /**
-     * Get the max RSSI (dBm) among gateway receptions of a same transmission.
+     * Get the max RSSI (dBm) among gateways receiving the same transmission.
      *
      * \param gwList List of gateways paired with packet reception information.
      * \return Max RSSI of transmission as double.
      */
     double GetMaxTxFromGateways(EndDeviceStatus::GatewayList gwList);
     /**
-     * Get the average RSSI (dBm) of gateway receptions of a same transmission.
+     * Get the average RSSI (dBm) of gateways receiving the same transmission.
      *
      * \param gwList List of gateways paired with packet reception information.
      * \return Average RSSI of transmission as double.
      */
     double GetAverageTxFromGateways(EndDeviceStatus::GatewayList gwList);
     /**
-     * Get RSSI metric for a transmission according to chosen gatewy aggregation policy.
+     * Get RSSI metric for a transmission according to chosen gateway aggregation policy.
      *
      * \param gwList List of gateways paired with packet reception information.
      * \return RSSI of tranmsmission as double.
@@ -133,7 +133,7 @@ class AdrComponent : public NetworkControllerComponent
     double GetReceivedPower(EndDeviceStatus::GatewayList gwList);
 
     /**
-     * Get the min SNR of received packet history.
+     * Get the min Signal Noise Ratio (SNR) of the receive packet history.
      *
      * \param packetList History of received packets with reception information.
      * \param historyRange Number of packets to consider going back in time.
@@ -141,7 +141,7 @@ class AdrComponent : public NetworkControllerComponent
      */
     double GetMinSNR(EndDeviceStatus::ReceivedPacketList packetList, int historyRange);
     /**
-     * Get the max SNR of received packet history.
+     * Get the max Signal Noise Ratio (SNR) of the receive packet history.
      *
      * \param packetList History of received packets with reception information.
      * \param historyRange Number of packets to consider going back in time.
@@ -149,7 +149,7 @@ class AdrComponent : public NetworkControllerComponent
      */
     double GetMaxSNR(EndDeviceStatus::ReceivedPacketList packetList, int historyRange);
     /**
-     * Get the average SNR of received packet history.
+     * Get the average Signal to Noise Ratio (SNR) of the received packet history.
      *
      * \param packetList History of received packets with reception information.
      * \param historyRange Number of packets to consider going back in time.

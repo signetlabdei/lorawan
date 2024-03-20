@@ -111,7 +111,7 @@ class EndDeviceLorawanMac : public LorawanMac
      *
      * This function handles opening of the first receive window.
      *
-     * \param packet The packet that just finished transmission.
+     * \param packet The packet that has just been transmitted.
      */
     void TxFinished(Ptr<const Packet> packet) override;
 
@@ -139,7 +139,7 @@ class EndDeviceLorawanMac : public LorawanMac
     bool GetDataRateAdaptation() const;
 
     /**
-     * Set the default number of unacknowledged redundant transmissions of each packet. If,
+     * Set the max number of unacknowledged redundant transmissions of each packet. If,
      * after a transmission, any acknowledgement is received, no more are sent for that packet.
      *
      * \param maxNumbTx The number of transmissions.
@@ -147,7 +147,7 @@ class EndDeviceLorawanMac : public LorawanMac
     void SetMaxNumberOfTransmissions(uint8_t maxNumbTx);
 
     /**
-     * Get the default number of unacknowledged redundant transmissions of each packet. If,
+     * Get the max number of unacknowledged redundant transmissions of each packet. If,
      * after a transmission, any acknowledgement is received, no more are sent for that packet.
      *
      * \return The number of transmissions as uint8_t.
@@ -194,7 +194,7 @@ class EndDeviceLorawanMac : public LorawanMac
     ///**
     // * Set a value for the RX1DROffset parameter.
     // *
-    // * This value decides the offset to use when deciding the DataRate of the
+    // * This value determines the offset to use when deciding the DataRate of the
     // * downlink transmission during the first receive window from the
     // * replyDataRateMatrix.
     // *
@@ -383,10 +383,11 @@ class EndDeviceLorawanMac : public LorawanMac
         uint8_t retxLeft;             //!< Number of retransmission attempts left
     };
 
-    bool m_enableDRAdapt; //!< Enable Data Rate adaptation during the retransmission procedure.
+    bool
+        m_enableDRAdapt; //!< Enable data rate adaptation (ADR) during the retransmission procedure.
     uint8_t
         m_maxNumbTx; //!< Default number of unacknowledged redundant transmissions of each packet.
-    TracedValue<uint8_t> m_dataRate; //!< The DataRate this device is using to transmit.
+    TracedValue<uint8_t> m_dataRate; //!< The data rate this device is using to transmit.
     TracedValue<double> m_txPower;   //!< The transmission power this device is using to transmit.
     uint8_t m_codingRate;            //!< The coding rate used by this device.
     bool m_headerDisabled; //!< Whether or not the LoRa PHY header is disabled for communications by

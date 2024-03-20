@@ -57,14 +57,14 @@ class BuildingPenetrationLoss : public PropagationLossModel
     /**
      * Generate a random p value.
      * The distribution of the returned value is as specified in TR 45.820.
-     * \return A value in the 0-3 range.
+     * \return A random value in the 0-3 range.
      */
     int GetPValue() const;
 
     /**
      * Get a value to compute the wall loss.
      * The distribution of the returned value is as specified in TR 45.820.
-     * \return A value in the 0-2 range.
+     * \return A random value in the 0-2 range.
      */
     int GetWallLossValue() const;
 
