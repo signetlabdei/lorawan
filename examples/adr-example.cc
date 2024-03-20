@@ -80,13 +80,13 @@ main(int argc, char* argv[])
     bool adrEnabled = true;
     bool initializeSF = false;
     int nDevices = 400;
-    int nPeriods = 20;
+    int nPeriodsOf20Minutes = 20;
     double mobileNodeProbability = 0;
-    double sideLength = 10000;
-    int gatewayDistance = 5000;
-    double maxRandomLoss = 10;
-    double minSpeed = 2;
-    double maxSpeed = 16;
+    double sideLengthMeters = 10000;
+    int gatewayDistanceMeters = 5000;
+    double maxRandomLossDB = 10;
+    double minSpeedMetersPerSecond = 2;
+    double maxSpeedMetersPerSecond = 16;
     std::string adrType = "ns3::AdrComponent";
 
     CommandLine cmd(__FILE__);
@@ -100,24 +100,24 @@ main(int argc, char* argv[])
     cmd.AddValue("ChangeTransmissionPower", "ns3::AdrComponent::ChangeTransmissionPower");
     cmd.AddValue("AdrEnabled", "Whether to enable ADR", adrEnabled);
     cmd.AddValue("nDevices", "Number of devices to simulate", nDevices);
-    cmd.AddValue("PeriodsToSimulate", "Number of periods to simulate", nPeriods);
+    cmd.AddValue("PeriodsToSimulate", "Number of periods (20m) to simulate", nPeriodsOf20Minutes);
     cmd.AddValue("MobileNodeProbability",
                  "Probability of a node being a mobile node",
                  mobileNodeProbability);
     cmd.AddValue("sideLength",
-                 "Length of the side of the rectangle nodes will be placed in",
-                 sideLength);
+                 "Length (m) of the side of the rectangle nodes will be placed in",
+                 sideLengthMeters);
     cmd.AddValue("maxRandomLoss",
-                 "Maximum amount in dB of the random loss component",
-                 maxRandomLoss);
-    cmd.AddValue("gatewayDistance", "Distance between gateways", gatewayDistance);
+                 "Maximum amount (dB) of the random loss component",
+                 maxRandomLossDB);
+    cmd.AddValue("gatewayDistance", "Distance (m) between gateways", gatewayDistanceMeters);
     cmd.AddValue("initializeSF", "Whether to initialize the SFs", initializeSF);
-    cmd.AddValue("MinSpeed", "Minimum speed for mobile devices", minSpeed);
-    cmd.AddValue("MaxSpeed", "Maximum speed for mobile devices", maxSpeed);
+    cmd.AddValue("MinSpeed", "Minimum speed (m/s) for mobile devices", minSpeedMetersPerSecond);
+    cmd.AddValue("MaxSpeed", "Maximum speed (m/s) for mobile devices", maxSpeedMetersPerSecond);
     cmd.AddValue("MaxTransmissions", "ns3::EndDeviceLorawanMac::MaxTransmissions");
     cmd.Parse(argc, argv);
 
-    int gatewayRings = 2 + (std::sqrt(2) * sideLength) / (gatewayDistance);
+    int gatewayRings = 2 + (std::sqrt(2) * sideLengthMeters) / (gatewayDistanceMeters);
     int nGateways = 3 * gatewayRings * gatewayRings - 3 * gatewayRings + 1;
 
     // Logging
@@ -153,7 +153,7 @@ main(int argc, char* argv[])
 
     Ptr<UniformRandomVariable> x = CreateObject<UniformRandomVariable>();
     x->SetAttribute("Min", DoubleValue(0.0));
-    x->SetAttribute("Max", DoubleValue(maxRandomLoss));
+    x->SetAttribute("Max", DoubleValue(maxRandomLossDB));
 
     Ptr<RandomPropagationLossModel> randomLoss = CreateObject<RandomPropagationLossModel>();
     randomLoss->SetAttribute("Variable", PointerValue(x));
@@ -170,18 +170,19 @@ main(int argc, char* argv[])
     // End Device mobility
     MobilityHelper mobilityEd;
     MobilityHelper mobilityGw;
-    mobilityEd.SetPositionAllocator(
-        "ns3::RandomRectanglePositionAllocator",
-        "X",
-        PointerValue(CreateObjectWithAttributes<UniformRandomVariable>("Min",
-                                                                       DoubleValue(-sideLength),
-                                                                       "Max",
-                                                                       DoubleValue(sideLength))),
-        "Y",
-        PointerValue(CreateObjectWithAttributes<UniformRandomVariable>("Min",
-                                                                       DoubleValue(-sideLength),
-                                                                       "Max",
-                                                                       DoubleValue(sideLength))));
+    mobilityEd.SetPositionAllocator("ns3::RandomRectanglePositionAllocator",
+                                    "X",
+                                    PointerValue(CreateObjectWithAttributes<UniformRandomVariable>(
+                                        "Min",
+                                        DoubleValue(-sideLengthMeters),
+                                        "Max",
+                                        DoubleValue(sideLengthMeters))),
+                                    "Y",
+                                    PointerValue(CreateObjectWithAttributes<UniformRandomVariable>(
+                                        "Min",
+                                        DoubleValue(-sideLengthMeters),
+                                        "Max",
+                                        DoubleValue(sideLengthMeters))));
 
     // // Gateway mobility
     // Ptr<ListPositionAllocator> positionAllocGw = CreateObject<ListPositionAllocator> ();
@@ -193,7 +194,7 @@ main(int argc, char* argv[])
     // mobilityGw.SetPositionAllocator (positionAllocGw);
     // mobilityGw.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
     Ptr<HexGridPositionAllocator> hexAllocator =
-        CreateObject<HexGridPositionAllocator>(gatewayDistance / 2);
+        CreateObject<HexGridPositionAllocator>(gatewayDistanceMeters / 2);
     mobilityGw.SetPositionAllocator(hexAllocator);
     mobilityGw.SetMobilityModel("ns3::ConstantPositionMobilityModel");
 
@@ -238,14 +239,16 @@ main(int argc, char* argv[])
     mobilityEd.SetMobilityModel(
         "ns3::RandomWalk2dMobilityModel",
         "Bounds",
-        RectangleValue(Rectangle(-sideLength, sideLength, -sideLength, sideLength)),
+        RectangleValue(
+            Rectangle(-sideLengthMeters, sideLengthMeters, -sideLengthMeters, sideLengthMeters)),
         "Distance",
         DoubleValue(1000),
         "Speed",
-        PointerValue(CreateObjectWithAttributes<UniformRandomVariable>("Min",
-                                                                       DoubleValue(minSpeed),
-                                                                       "Max",
-                                                                       DoubleValue(maxSpeed))));
+        PointerValue(CreateObjectWithAttributes<UniformRandomVariable>(
+            "Min",
+            DoubleValue(minSpeedMetersPerSecond),
+            "Max",
+            DoubleValue(maxSpeedMetersPerSecond))));
     for (int i = fixedPositionNodes; i < (int)endDevices.GetN(); ++i)
     {
         mobilityEd.Install(endDevices.Get(i));
@@ -327,13 +330,13 @@ main(int argc, char* argv[])
     LoraPacketTracker& tracker = helper.GetPacketTracker();
 
     // Start simulation
-    Time simulationTime = Seconds(1200 * nPeriods);
+    Time simulationTime = Seconds(1200 * nPeriodsOf20Minutes);
     Simulator::Stop(simulationTime);
     Simulator::Run();
     Simulator::Destroy();
 
-    std::cout << tracker.CountMacPacketsGlobally(Seconds(1200 * (nPeriods - 2)),
-                                                 Seconds(1200 * (nPeriods - 1)))
+    std::cout << tracker.CountMacPacketsGlobally(Seconds(1200 * (nPeriodsOf20Minutes - 2)),
+                                                 Seconds(1200 * (nPeriodsOf20Minutes - 1)))
               << std::endl;
 
     return 0;

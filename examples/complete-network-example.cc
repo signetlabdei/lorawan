@@ -55,10 +55,10 @@ using namespace lorawan;
 NS_LOG_COMPONENT_DEFINE("ComplexLorawanNetworkExample");
 
 // Network settings
-int nDevices = 200;          //!< Number of end device nodes to create
-int nGateways = 1;           //!< Number of gateway nodes to create
-double radius = 6400;        //!< Radius (m) of the deplyoment
-double simulationTime = 600; //!< Scenario duration (s) in simulated time
+int nDevices = 200;                 //!< Number of end device nodes to create
+int nGateways = 1;                  //!< Number of gateway nodes to create
+double radiusMeters = 6400;         //!< Radius (m) of the deplyoment
+double simulationTimeSeconds = 600; //!< Scenario duration (s) in simulated time
 
 // Channel model
 bool realisticChannelModel = false; //!< Whether to use a more realistic channel model with
@@ -67,19 +67,19 @@ bool realisticChannelModel = false; //!< Whether to use a more realistic channel
 int appPeriodSeconds = 600; //!< Duration (s) of the inter-transmission time of end devices
 
 // Output control
-bool print = true; //!< Whether to print building information
+bool printBuildingInfo = true; //!< Whether to print building information
 
 int
 main(int argc, char* argv[])
 {
     CommandLine cmd(__FILE__);
     cmd.AddValue("nDevices", "Number of end devices to include in the simulation", nDevices);
-    cmd.AddValue("radius", "The radius of the area to simulate", radius);
-    cmd.AddValue("simulationTime", "The time for which to simulate", simulationTime);
+    cmd.AddValue("radius", "The radius (m) of the area to simulate", radiusMeters);
+    cmd.AddValue("simulationTime", "The time (s) for which to simulate", simulationTimeSeconds);
     cmd.AddValue("appPeriod",
                  "The period in seconds to be used by periodically transmitting applications",
                  appPeriodSeconds);
-    cmd.AddValue("print", "Whether or not to print various information", print);
+    cmd.AddValue("print", "Whether or not to print building information", printBuildingInfo);
     cmd.Parse(argc, argv);
 
     // Set up logging
@@ -118,7 +118,7 @@ main(int argc, char* argv[])
     MobilityHelper mobility;
     mobility.SetPositionAllocator("ns3::UniformDiscPositionAllocator",
                                   "rho",
-                                  DoubleValue(radius),
+                                  DoubleValue(radiusMeters),
                                   "X",
                                   DoubleValue(0.0),
                                   "Y",
@@ -244,8 +244,8 @@ main(int argc, char* argv[])
     double deltaX = 32;
     double yLength = 64;
     double deltaY = 17;
-    int gridWidth = 2 * radius / (xLength + deltaX);
-    int gridHeight = 2 * radius / (yLength + deltaY);
+    int gridWidth = 2 * radiusMeters / (xLength + deltaX);
+    int gridHeight = 2 * radiusMeters / (yLength + deltaY);
     if (!realisticChannelModel)
     {
         gridWidth = 0;
@@ -274,7 +274,7 @@ main(int argc, char* argv[])
     BuildingsHelper::Install(gateways);
 
     // Print the buildings
-    if (print)
+    if (printBuildingInfo)
     {
         std::ofstream myfile;
         myfile.open("buildings.txt");
@@ -302,7 +302,7 @@ main(int argc, char* argv[])
      *  Install applications on the end devices  *
      *********************************************/
 
-    Time appStopTime = Seconds(simulationTime);
+    Time appStopTime = Seconds(simulationTimeSeconds);
     PeriodicSenderHelper appHelper = PeriodicSenderHelper();
     appHelper.SetPeriod(Seconds(appPeriodSeconds));
     appHelper.SetPacketSize(23);

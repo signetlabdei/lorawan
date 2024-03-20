@@ -58,8 +58,8 @@ using namespace lorawan;
 NS_LOG_COMPONENT_DEFINE("FrameCounterUpdateExample");
 
 // Network settings
-int nGateways = 1;            //!< Number of gateway nodes to create
-double simulationTime = 3600; //!< Scenario duration (s) in simulated time
+int nGateways = 1;                   //!< Number of gateway nodes to create
+double simulationTimeSeconds = 3600; //!< Scenario duration (s) in simulated time
 
 /**
  * Record a packet TX start by the PHY layer of an end device
@@ -106,10 +106,10 @@ OnMacPacketOutcome(uint8_t transmissions, bool successful, Time firstAttempt, Pt
 }
 
 /**
- * Set the position of an end device either in range or out of range.
+ * Set the position of an end device as either in range or out of range.
  *
- * \param endDevice A Ptr to the Node of the end device.
- * \param inRange Whether to put the end device in range or out of range.
+ * \param endDevice A pointer to the Node of the end device.
+ * \param inRange Whether to set the end device in range or out of range.
  */
 void
 ChangeEndDevicePosition(Ptr<Node> endDevice, bool inRange)
@@ -130,7 +130,7 @@ int
 main(int argc, char* argv[])
 {
     CommandLine cmd(__FILE__);
-    cmd.AddValue("simulationTime", "The time for which to simulate", simulationTime);
+    cmd.AddValue("simulationTime", "The time (s) for which to simulate", simulationTimeSeconds);
     cmd.AddValue("MaxTransmissions", "ns3::EndDeviceLorawanMac::MaxTransmissions");
     cmd.AddValue("MType", "ns3::EndDeviceLorawanMac::MType");
     cmd.Parse(argc, argv);
@@ -248,7 +248,7 @@ main(int argc, char* argv[])
      *  Install applications on the end devices  *
      *********************************************/
 
-    Time appStopTime = Seconds(simulationTime);
+    Time appStopTime = Seconds(simulationTimeSeconds);
     OneShotSenderHelper appHelper = OneShotSenderHelper();
     appHelper.SetSendTime(Seconds(0));
     ApplicationContainer appContainer = appHelper.Install(endDevices);
