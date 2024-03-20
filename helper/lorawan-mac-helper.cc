@@ -602,12 +602,13 @@ LorawanMacHelper::SetSpreadingFactorsGivenDistribution(NodeContainer endDevices,
                                                        std::vector<double> distribution)
 {
     NS_LOG_FUNCTION_NOARGS();
+    NS_ASSERT(distribution.size() == 6);
 
     std::vector<int> sfQuantity(7, 0);
     Ptr<UniformRandomVariable> uniformRV = CreateObject<UniformRandomVariable>();
     std::vector<double> cumdistr(6);
     cumdistr[0] = distribution[0];
-    for (int i = 1; i < 7; ++i)
+    for (int i = 1; i < 6; ++i)
     {
         cumdistr[i] = distribution[i] + cumdistr[i - 1];
     }
