@@ -133,7 +133,7 @@ class AdrComponent : public NetworkControllerComponent
     double GetReceivedPower(EndDeviceStatus::GatewayList gwList);
 
     /**
-     * Get the min Signal Noise Ratio (SNR) of the receive packet history.
+     * Get the min Signal to Noise Ratio (SNR) of the receive packet history.
      *
      * \param packetList History of received packets with reception information.
      * \param historyRange Number of packets to consider going back in time.
@@ -141,7 +141,7 @@ class AdrComponent : public NetworkControllerComponent
      */
     double GetMinSNR(EndDeviceStatus::ReceivedPacketList packetList, int historyRange);
     /**
-     * Get the max Signal Noise Ratio (SNR) of the receive packet history.
+     * Get the max Signal to Noise Ratio (SNR) of the receive packet history.
      *
      * \param packetList History of received packets with reception information.
      * \param historyRange Number of packets to consider going back in time.

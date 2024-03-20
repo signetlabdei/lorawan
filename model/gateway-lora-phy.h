@@ -78,7 +78,7 @@ class GatewayLoraPhy : public LoraPhy
     /**
      * Signals the end of a transmission by the GatewayLoraPhy.
      *
-     * \param packet A Ptr to the Packet transmitted.
+     * \param packet A pointer to the Packet transmitted.
      */
     virtual void TxFinished(Ptr<Packet> packet);
 

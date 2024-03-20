@@ -162,7 +162,7 @@ class LoraNetDevice : public NetDevice
     /**
      * Return the LoraChannel this device is connected to.
      *
-     * \return A Ptr to the LoraChannel object.
+     * \return A pointer to the LoraChannel object.
      */
     Ptr<LoraChannel> DoGetChannel() const;
 

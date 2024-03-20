@@ -38,10 +38,10 @@ namespace lorawan
  */
 struct NetworkComponents
 {
-    Ptr<LoraChannel> channel; //!< A Ptr to the LoraChannel object.
+    Ptr<LoraChannel> channel; //!< A pointer to the LoraChannel object.
     NodeContainer endDevices; //!< Container of the end device nodes.
     NodeContainer gateways;   //!< Container of the gateway nodes.
-    Ptr<Node> nsNode;         //!< A Ptr to the network server Node.
+    Ptr<Node> nsNode;         //!< A pointer to the network server Node.
 };
 
 Ptr<LoraChannel> CreateChannel();

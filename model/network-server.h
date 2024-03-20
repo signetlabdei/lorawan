@@ -97,15 +97,15 @@ class NetworkServer : public Application
      *
      * Each GW is identified by its Address in the NS-GWs network.
      *
-     * \param gateway A Ptr to the gateway Node.
-     * \param netDevice A Ptr to the NetDevice of the NS connected to the gateway.
+     * \param gateway A pointer to the gateway Node.
+     * \param netDevice A pointer to the NetDevice of the NS connected to the gateway.
      */
     void AddGateway(Ptr<Node> gateway, Ptr<NetDevice> netDevice);
 
     /**
      * Add a NetworkControllerComponent to this NetworkServer instance.
      *
-     * \param component A Ptr to the NetworkControllerComponent object.
+     * \param component A pointer to the NetworkControllerComponent object.
      */
     void AddComponent(Ptr<NetworkControllerComponent> component);
 
@@ -124,7 +124,7 @@ class NetworkServer : public Application
     /**
      * Get the NetworkStatus object of this NetworkServer.
      *
-     * \return A Ptr to the NetworkStatus object.
+     * \return A pointer to the NetworkStatus object.
      */
     Ptr<NetworkStatus> GetNetworkStatus();
 

@@ -62,7 +62,7 @@ class UplinkPacketTest : public TestCase
     /**
      * Send a packet from the input end device.
      *
-     * \param endDevice A Ptr to the end device Node.
+     * \param endDevice A pointer to the end device Node.
      */
     void SendPacket(Ptr<Node> endDevice);
 
@@ -158,7 +158,7 @@ class DownlinkPacketTest : public TestCase
     /**
      * Send a packet from the input end device.
      *
-     * \param endDevice A Ptr to the end device Node.
+     * \param endDevice A pointer to the end device Node.
      * \param requestAck Whether to require an acknowledgement from the server.
      */
     void SendPacket(Ptr<Node> endDevice, bool requestAck);
@@ -263,7 +263,7 @@ class LinkCheckTest : public TestCase
     /**
      * Send a packet containing a LinkCheckReq MAC command from the input end device.
      *
-     * \param endDevice A Ptr to the end device Node.
+     * \param endDevice A pointer to the end device Node.
      * \param requestAck Whether to require an acknowledgement from the server.
      */
     void SendPacket(Ptr<Node> endDevice, bool requestAck);

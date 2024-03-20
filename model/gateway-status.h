@@ -59,8 +59,8 @@ class GatewayStatus : public Object
      * Construct a new GatewayStatus object with values.
      *
      * \param address The Address of the P2PNetDevice of the gateway connected to the NS.
-     * \param netDevice A Ptr to the NetDevice through which to reach this gateway from the server.
-     * \param gwMac A Ptr to the MAC layer of the gateway.
+     * \param netDevice A pointer to the NetDevice through which to reach this gateway from the
+     * server. \param gwMac A pointer to the MAC layer of the gateway.
      */
     GatewayStatus(Address address, Ptr<NetDevice> netDevice, Ptr<GatewayLorawanMac> gwMac);
 
@@ -81,21 +81,21 @@ class GatewayStatus : public Object
     /**
      * Get the NetDevice through which it's possible to contact this gateway from the server.
      *
-     * \return A Ptr to the NetDevice.
+     * \return A pointer to the NetDevice.
      */
     Ptr<NetDevice> GetNetDevice();
 
     /**
      * Set the NetDevice through which it's possible to contact this gateway from the server.
      *
-     * \param netDevice A Ptr to the NetDevice.
+     * \param netDevice A pointer to the NetDevice.
      */
     void SetNetDevice(Ptr<NetDevice> netDevice);
 
     /**
      * Get a pointer to this gateway's MAC instance.
      *
-     * \return A Ptr to the MAC layer object.
+     * \return A pointer to the MAC layer object.
      */
     Ptr<GatewayLorawanMac> GetGatewayMac();
 

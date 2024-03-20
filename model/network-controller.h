@@ -56,14 +56,14 @@ class NetworkController : public Object
     /**
      * Construct a new NetworkController object providing the NetworkStatus.
      *
-     * \param networkStatus A Ptr to the NetworkStatus object.
+     * \param networkStatus A pointer to the NetworkStatus object.
      */
     NetworkController(Ptr<NetworkStatus> networkStatus);
 
     /**
      * Add a new NetworkControllerComponent.
      *
-     * \param component A Ptr to the NetworkControllerComponent object.
+     * \param component A pointer to the NetworkControllerComponent object.
      */
     void Install(Ptr<NetworkControllerComponent> component);
 
@@ -78,12 +78,12 @@ class NetworkController : public Object
      * Method that is called by the NetworkScheduler just before sending a reply
      * to a certain End Device.
      *
-     * \param endDeviceStatus A Ptr to the EndDeviceStatus object.
+     * \param endDeviceStatus A pointer to the EndDeviceStatus object.
      */
     void BeforeSendingReply(Ptr<EndDeviceStatus> endDeviceStatus);
 
   private:
-    Ptr<NetworkStatus> m_status; //!< A Ptr to the NetworkStatus object.
+    Ptr<NetworkStatus> m_status; //!< A pointer to the NetworkStatus object.
     std::list<Ptr<NetworkControllerComponent>>
         m_components; //!< List of NetworkControllerComponent objects.
 };

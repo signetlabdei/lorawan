@@ -108,7 +108,7 @@ class ConfirmedMessagesComponent : public NetworkControllerComponent
      * and sets up the appropriate reply in case it does.
      *
      * \param packet The newly received packet.
-     * \param status A Ptr to the EndDeviceStatus object of the sender.
+     * \param status A pointer to the EndDeviceStatus object of the sender.
      * \param networkStatus A pointer to the NetworkStatus object.
      */
     void OnReceivedPacket(Ptr<const Packet> packet,
@@ -142,7 +142,7 @@ class LinkCheckComponent : public NetworkControllerComponent
      * and sets up the appropriate reply in case it does.
      *
      * \param packet The newly received packet.
-     * \param status A Ptr to the EndDeviceStatus object of the sender.
+     * \param status A pointer to the EndDeviceStatus object of the sender.
      * \param networkStatus A pointer to the NetworkStatus object.
      */
     void OnReceivedPacket(Ptr<const Packet> packet,
@@ -159,8 +159,8 @@ class LinkCheckComponent : public NetworkControllerComponent
      *
      * \todo Not implemented. Also not sure what this function is meant to do.
      *
-     * \param packet A Ptr to the Packet.
-     * \param status A Ptr to the EndDeviceStatus object of the sender.
+     * \param packet A pointer to the Packet.
+     * \param status A pointer to the EndDeviceStatus object of the sender.
      */
     void UpdateLinkCheckAns(Ptr<const Packet> packet, Ptr<EndDeviceStatus> status);
 };
