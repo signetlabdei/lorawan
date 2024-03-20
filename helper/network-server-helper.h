@@ -105,7 +105,7 @@ class NetworkServerHelper
     void SetEndDevices(NodeContainer endDevices);
 
     /**
-     * Enable (true) or disable (false) the ADR component in the Network
+     * Enable (true) or disable (false) the Adaptive Data Rate (ADR) component in the Network
      * Server created by this helper.
      *
      * \param enableAdr Whether to enable adr in the Network Server.

@@ -106,7 +106,7 @@ class PeriodicSenderHelper
      * with SetAttribute or other functions of this class.
      *
      * \param node The node on which a PeriodicSender will be installed.
-     * \return A Ptr to the application installed.
+     * \return A pointer to the application installed.
      */
     Ptr<Application> InstallPriv(Ptr<Node> node) const;
 

@@ -44,7 +44,7 @@ enum PhyPacketOutcome
 /**
  * \ingroup lorawan
  *
- * Stores uplink packet metrics from the PHY layer of sender/receivers
+ * Stores PHY-layer uplink packet metrics of sender/receivers.
  */
 struct PacketStatus
 {
@@ -52,15 +52,15 @@ struct PacketStatus
     uint32_t senderId;                             //!< Node id of the packet sender
     Time sendTime;                                 //!< Timestamp of pkt radio tx start
     std::map<int, enum PhyPacketOutcome> outcomes; //!< Reception outcome of this pkt at the end of
-                                                   // the tx, mapped by gateway's node id
+                                                   //!< the tx, mapped by gateway's node id
 };
 
 /**
  * \ingroup lorawan
  *
- * Stores packet metrics from the MAC layer of sender/receivers
+ * Stores MAC-layer packet metrics of sender/receivers.
  *
- * \remark Can be used for both uplink and downlink packets
+ * \remark Can be used for both uplink and downlink packets.
  */
 struct MacPacketStatus
 {
@@ -69,14 +69,13 @@ struct MacPacketStatus
     Time sendTime;     //!< Timestamp of the pkt leaving MAC layer to go down the stack of sender
     Time receivedTime; //!< Time of first reception \todo Parameter set to max and not used
     std::map<int, Time> receptionTimes; //!< Timestamp of the pkt leaving MAC layer to go up the
-                                        // stack, mapped by receiver's node id
+                                        //!< stack, mapped by receiver's node id
 };
 
 /**
  * \ingroup lorawan
  *
- * Stores metrics of the packet retransmission process optionally enabled in the MAC layer of
- * end devices
+ * Stores (optionally enabled) MAC layer packet retransmission process metrics of end devices.
  */
 struct RetransmissionStatus
 {
@@ -209,9 +208,10 @@ class LoraPacketTracker
     /**
      * Count packets in a time interval to evaluate the performance at PHY level of a specific
      * gateway. It counts the total number of uplink packets sent over the radio medium, and - from
-     * the perspective of the specified gateway - the number of such packets well received, lost
-     * to interference, lost to unavailability of the gateway's reception paths, lost because under
-     * RSSI sensitivity, and lost due to concurrent downlink transmission of the gateway.
+     * the perspective of the specified gateway - the number of such packets correctly received,
+     * lost to interference, lost to unavailability of the gateway's reception paths, lost for being
+     * under the RSSI sensitivity threshold, and lost due to concurrent downlink transmission of the
+     * gateway.
      *
      * \param startTime Timestamp of the start of the measurement.
      * \param stopTime Timestamp of the end of the measurement.

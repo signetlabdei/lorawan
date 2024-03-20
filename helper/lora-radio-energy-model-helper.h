@@ -31,7 +31,7 @@ namespace lorawan
 /**
  * \ingroup lorawan
  *
- * Assign LoraRadioEnergyModel to devices.
+ * Installs LoraRadioEnergyModel on devices.
  *
  * This installer installs LoraRadioEnergyModel for only LoraNetDevice objects.
  */

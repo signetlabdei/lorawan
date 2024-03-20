@@ -113,11 +113,11 @@ class LorawanMacHelper
     /**
      * Initialize the end devices' data rate parameter.
      *
-     * The DR of each device is set to the maximum possible for its transmissions to be correctly
-     * received by the gateway measuring the best RSSI from the device, mimicking the DR
-     * maximization part of the default online LoRaWAN ADR algorithm. Mind that a single RSSI
-     * measurement between each device and gateway pair is taken for the DR assignment, so the
-     * assignment may be suboptimal in scenarios with a stochastical channel.
+     * The Data Rate (DR) of each device is set to the maximum possible for its transmissions to be
+     * correctly received by the gateway measuring the best RSSI from the device, mimicking the DR
+     * maximization part of the default online LoRaWAN Adaptive Data Rate (ADR) algorithm. Please
+     * note that a single RSSI measurement between each device and gateway pair is taken for the DR
+     * assignment, so the assignment may be suboptimal in scenarios with a time-varying channel.
      *
      * This function uses the following convention (EU868) to compute the transmission range:
      *
@@ -175,8 +175,6 @@ class LorawanMacHelper
      * v[4] -> number of devices using DR1 \n
      * v[5] -> number of devices using DR0 \n
      *
-     * \todo This function will always cause an array out of bound access error because at one point
-     * it tries to access index 6 of a 6-length vector (cumdistr).
      *
      * \param endDevices The end devices to configure.
      * \param gateways \todo Unused parameter.
@@ -254,7 +252,7 @@ class LorawanMacHelper
      */
     void ApplyCommonAlohaConfigurations(Ptr<LorawanMac> lorawanMac) const;
 
-    ObjectFactory m_mac;                       //!< Mac layer object factory
+    ObjectFactory m_mac;                       //!< MAC-layer object factory
     Ptr<LoraDeviceAddressGenerator> m_addrGen; //!< Pointer to the address generator to use
     enum DeviceType m_deviceType;              //!< The kind of device to install
     enum Regions m_region;                     //!< The region in which the device will operate

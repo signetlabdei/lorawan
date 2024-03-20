@@ -55,7 +55,7 @@ class LoraHelper
      *
      * \param phyHelper The PHY helper to create PHY objects.
      * \param macHelper The MAC helper to create MAC objects.
-     * \param c The set of nodes on which a lora device must be created.
+     * \param c The set of nodes on which a lora device will be installed.
      * \return A device container which contains all the devices created by this method.
      */
     virtual NetDeviceContainer Install(const LoraPhyHelper& phyHelper,
@@ -67,7 +67,7 @@ class LoraHelper
      *
      * \param phyHelper The PHY helper to create PHY objects.
      * \param macHelper The MAC helper to create MAC objects.
-     * \param node The node on which a lora device must be created.
+     * \param node The node on which a lora device will be installed.
      * \return A device container which contains all the devices created by this method.
      */
     virtual NetDeviceContainer Install(const LoraPhyHelper& phyHelper,
@@ -95,9 +95,11 @@ class LoraHelper
      * For each input device print the current position, data rate and transmission power settings.
      *
      * \param endDevices The devices to track.
-     * \param gateways \todo Unused parameter.
+     * \param gateways The gateways in the network (this is only a placeholder parameter).
      * \param filename The output filename.
      * \param interval The time interval for printing.
+     *
+     * \todo Remove unused parameter gateways.
      */
     void EnablePeriodicDeviceStatusPrinting(NodeContainer endDevices,
                                             NodeContainer gateways,
@@ -119,7 +121,7 @@ class LoraHelper
                                               Time interval);
 
     /**
-     * Print PHY-level performance at every gateway in the container since last
+     * Print the PHY-level performance of every gateway in the container since the last
      * performance update.
      *
      * For each input gateway print counters for totPacketsSent, receivedPackets, interferedPackets,
@@ -155,7 +157,7 @@ class LoraHelper
     LoraPacketTracker& GetPacketTracker();
 
     LoraPacketTracker* m_packetTracker = nullptr; //!< Pointer to the Packet Tracker object
-    time_t m_oldtime;                             //!< Real time of the last simulation time print
+    time_t m_oldtime; //!< Real time (i.e., physical) of the last simulation time print
 
     /**
      * Print a summary of the current status of input devices.

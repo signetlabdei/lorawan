@@ -79,7 +79,7 @@ class ForwarderHelper
      * set with SetAttribute or other functions of this class.
      *
      * \param node The node on which a Forwarder will be installed.
-     * \return A Ptr to the applications installed.
+     * \return A pointer to the applications installed.
      */
     Ptr<Application> InstallPriv(Ptr<Node> node) const;
 
