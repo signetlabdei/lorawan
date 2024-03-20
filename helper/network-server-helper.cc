@@ -135,7 +135,7 @@ NetworkServerHelper::InstallComponents(Ptr<NetworkServer> netServer)
     Ptr<LinkCheckComponent> linkCheckSupport = CreateObject<LinkCheckComponent>();
     netServer->AddComponent(linkCheckSupport);
 
-    // Add Adr support
+    // Add Adaptive Data Rate (ADR) support
     if (m_adrEnabled)
     {
         netServer->AddComponent(m_adrSupportFactory.Create<NetworkControllerComponent>());

@@ -104,7 +104,7 @@ AdrComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus>
     myPacket->RemoveHeader(mHdr);
     myPacket->RemoveHeader(fHdr);
 
-    // Execute the ADR algorithm only if the request bit is set
+    // Execute the Adaptive Data Rate (ADR) algorithm only if the request bit is set
     if (fHdr.GetAdr())
     {
         if (int(status->GetReceivedPacketList().size()) < historyRange)
@@ -115,7 +115,7 @@ AdrComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus>
         }
         else
         {
-            NS_LOG_DEBUG("New ADR request");
+            NS_LOG_DEBUG("New Adaptive Data Rate (ADR) request");
 
             // Get the SF used by the device
             uint8_t spreadingFactor = status->GetFirstReceiveWindowSpreadingFactor();
@@ -127,7 +127,7 @@ AdrComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus>
             uint8_t newDataRate;
             uint8_t newTxPower;
 
-            // ADR Algorithm
+            // Adaptive Data Rate (ADR) Algorithm
             AdrImplementation(&newDataRate, &newTxPower, status);
 
             // Change the power back to the default if we don't want to change it

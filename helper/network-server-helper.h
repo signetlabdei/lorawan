@@ -108,12 +108,12 @@ class NetworkServerHelper
      * Enable (true) or disable (false) the Adaptive Data Rate (ADR) component in the Network
      * Server created by this helper.
      *
-     * \param enableAdr Whether to enable adr in the Network Server.
+     * \param enableAdr Whether to enable ADR in the Network Server.
      */
     void EnableAdr(bool enableAdr);
 
     /**
-     * Set the ADR implementation to use in the Network Server created
+     * Set the Adaptive Data Rate (ADR) implementation to use in the Network Server created
      * by this helper.
      *
      * \param type The type of ADR implementation.
@@ -142,10 +142,11 @@ class NetworkServerHelper
 
     ObjectFactory m_factory; //!< Factory to create the Network server application
     std::list<std::pair<Ptr<NetDevice>, Ptr<Node>>>
-        m_gatewayRegistrationList;     //!< List of gateway nodes to register to this NS net devices
-    NodeContainer m_endDevices;        //!< Set of endDevices to connect to this NS
-    bool m_adrEnabled;                 //!< Whether to enable ADR on the NetworkServer application
-    ObjectFactory m_adrSupportFactory; //!< Factory to create the ADR component
+        m_gatewayRegistrationList; //!< List of gateway nodes to register to this NS net devices
+    NodeContainer m_endDevices;    //!< Set of endDevices to connect to this NS
+    bool m_adrEnabled; //!< Whether to enable the Adaptive Data Rate (ADR) algorithm on the
+                       //!< NetworkServer application
+    ObjectFactory m_adrSupportFactory; //!< Factory to create the Adaptive Data Rate (ADR) component
 };
 
 } // namespace lorawan

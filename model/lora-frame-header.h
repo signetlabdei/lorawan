@@ -136,58 +136,58 @@ class LoraFrameHeader : public Header
     LoraDeviceAddress GetAddress() const;
 
     /**
-     * Set the Adr value.
+     * Set the value of the ADR bit field.
      *
-     * \param adr The Adr to set.
+     * \param adr Whether or not to set the ADR bit field.
      */
     void SetAdr(bool adr);
 
     /**
-     * Get the Adr value.
+     * Get the value of the ADR bit field.
      *
-     * \return The Adr value.
+     * \return True if the ADR bit is set, false otherwise.
      */
     bool GetAdr() const;
 
     /**
-     * Set the AdrAckReq value.
+     * Set the value of the ADRACKReq bit field.
      *
-     * \param adrAckReq The AdrAckReq to set.
+     * \param adrAckReq Whether or not to set the ADRACKReq bit field.
      */
     void SetAdrAckReq(bool adrAckReq);
 
     /**
-     * Get the AdrAckReq value.
+     * Get the value of the ADRACKReq bit field.
      *
-     * \return The AdrAckReq value.
+     * \return True if the ADRACKReq bit is set, false otherwise.
      */
     bool GetAdrAckReq() const;
 
     /**
-     * Set the Ack bit.
+     * Set the value of the ACK bit field.
      *
      * \param ack Whether or not to set the ACK bit.
      */
     void SetAck(bool ack);
 
     /**
-     * Get the Ack bit value.
+     * Get the value of the ACK bit field.
      *
      * \return True if the ACK bit is set, false otherwise.
      */
     bool GetAck() const;
 
     /**
-     * Set the FPending value.
+     * Set the value of the FPending bit field.
      *
-     * \param fPending The FPending to set.
+     * \param fPending Whether or not to set the FPending bit.
      */
     void SetFPending(bool fPending);
 
     /**
-     * Get the FPending value.
+     * Get the value of the FPending bit field.
      *
-     * \return The FPending value.
+     * \return True if the FPending bit is set, false otherwise.
      */
     bool GetFPending() const;
 

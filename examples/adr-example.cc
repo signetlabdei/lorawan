@@ -18,7 +18,7 @@
  */
 
 /*
- * This program creates a simple network which uses an ADR algorithm to set up
+ * This program creates a simple network which uses an Adaptive Data Rate (ADR) algorithm to set up
  * the Spreading Factors of the devices in the Network.
  */
 
@@ -98,7 +98,7 @@ main(int argc, char* argv[])
     cmd.AddValue("MType", "ns3::EndDeviceLorawanMac::MType");
     cmd.AddValue("EDDRAdaptation", "ns3::EndDeviceLorawanMac::EnableEDDataRateAdaptation");
     cmd.AddValue("ChangeTransmissionPower", "ns3::AdrComponent::ChangeTransmissionPower");
-    cmd.AddValue("AdrEnabled", "Whether to enable ADR", adrEnabled);
+    cmd.AddValue("AdrEnabled", "Whether to enable Adaptive Data Rate (ADR)", adrEnabled);
     cmd.AddValue("nDevices", "Number of devices to simulate", nDevices);
     cmd.AddValue("PeriodsToSimulate", "Number of periods (20m) to simulate", nPeriodsOf20Minutes);
     cmd.AddValue("MobileNodeProbability",

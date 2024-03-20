@@ -363,10 +363,10 @@ HeaderTest::DoRun()
 
     NS_TEST_EXPECT_MSG_EQ(frameHdr.GetAck(),
                           true,
-                          "Ack changes in the serialization/deserialization process");
+                          "ACK bit changes in the serialization/deserialization process");
     NS_TEST_EXPECT_MSG_EQ(frameHdr.GetAdr(),
                           false,
-                          "Adr changes in the serialization/deserialization process");
+                          "ADR bit changes in the serialization/deserialization process");
     NS_TEST_EXPECT_MSG_EQ(frameHdr.GetFCnt(),
                           1,
                           "FCnt changes in the serialization/deserialization process");
