@@ -8,7 +8,7 @@ on: workflow_call
 
 jobs:
   # Clang-tidy
-  clang-tidy-16:
+  clang-tidy-17:
     runs-on: ubuntu-latest
     container:
       image: ubuntu:rolling
@@ -36,13 +36,13 @@ jobs:
           git -C src/lorawan/ tag empty $(git hash-object -t tree /dev/null) &&
           git -C src/lorawan/ diff -U0 empty 
           --src-prefix=a/src/lorawan/ --dst-prefix=b/src/lorawan/ |
-          clang-tidy-diff-16.py -path cmake-cache/ -p1 -quiet -use-color
+          clang-tidy-diff-17.py -path cmake-cache/ -p1 -quiet -use-color
           -iregex "src\/lorawan\/.+\.(cpp|cc|cxx|c|h|hpp)"
           1> $CLANG_TIDY_OUTPUT
           2> /dev/null
       - name: "Check job results"
         run: |
-          (! egrep -A 3 "error:|warning:|note:" $CLANG_TIDY_OUTPUT)
+          (! egrep -v "file not found \[clang-diagnostic-error\]" $CLANG_TIDY_OUTPUT | egrep -A3 "error:|warning:|note:")
           echo "No clang-tidy errors found"
       - if: failure()
         name: "Upload clang-tidy-output.log"
