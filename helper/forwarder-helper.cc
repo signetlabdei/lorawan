@@ -15,6 +15,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * Modified by: Alessandro Aimi <alessandro.aimi@unibo.it>
  */
 
 #include "forwarder-helper.h"
@@ -22,6 +24,7 @@
 #include "ns3/double.h"
 #include "ns3/forwarder.h"
 #include "ns3/log.h"
+#include "ns3/lora-net-device.h"
 #include "ns3/random-variable-stream.h"
 #include "ns3/simulator.h"
 #include "ns3/string.h"
@@ -71,6 +74,8 @@ Ptr<Application>
 ForwarderHelper::InstallPriv(Ptr<Node> node) const
 {
     NS_LOG_FUNCTION(this << node);
+    NS_ASSERT_MSG(node->GetNDevices() == 2,
+                  "NDevices != 2, the node must have a LoraNetDevice and a PointToPointNetDevice");
 
     Ptr<Forwarder> app = m_factory.Create<Forwarder>();
 
@@ -80,22 +85,16 @@ ForwarderHelper::InstallPriv(Ptr<Node> node) const
     // Link the Forwarder to the NetDevices
     for (uint32_t i = 0; i < node->GetNDevices(); i++)
     {
-        Ptr<NetDevice> currentNetDevice = node->GetDevice(i);
-        if (currentNetDevice->GetObject<LoraNetDevice>())
+        Ptr<NetDevice> currNetDev = node->GetDevice(i);
+        if (auto loraNetDev = DynamicCast<LoraNetDevice>(currNetDev); loraNetDev)
         {
-            Ptr<LoraNetDevice> loraNetDevice = currentNetDevice->GetObject<LoraNetDevice>();
-            app->SetLoraNetDevice(loraNetDevice);
-            loraNetDevice->SetReceiveCallback(MakeCallback(&Forwarder::ReceiveFromLora, app));
+            app->SetLoraNetDevice(loraNetDev);
+            loraNetDev->SetReceiveCallback(MakeCallback(&Forwarder::ReceiveFromLora, app));
         }
-        else if (currentNetDevice->GetObject<PointToPointNetDevice>())
+        else if (auto p2pNetDev = DynamicCast<PointToPointNetDevice>(currNetDev); p2pNetDev)
         {
-            Ptr<PointToPointNetDevice> pointToPointNetDevice =
-                currentNetDevice->GetObject<PointToPointNetDevice>();
-
-            app->SetPointToPointNetDevice(pointToPointNetDevice);
-
-            pointToPointNetDevice->SetReceiveCallback(
-                MakeCallback(&Forwarder::ReceiveFromPointToPoint, app));
+            app->SetPointToPointNetDevice(p2pNetDev);
+            p2pNetDev->SetReceiveCallback(MakeCallback(&Forwarder::ReceiveFromPointToPoint, app));
         }
         else
         {

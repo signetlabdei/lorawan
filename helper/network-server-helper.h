@@ -15,6 +15,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * Modified by: Alessandro Aimi <alessandro.aimi@unibo.it>
  */
 
 #ifndef NETWORK_SERVER_HELPER_H
@@ -38,6 +40,15 @@ namespace lorawan
 {
 
 /**
+ * Store NS app registration details for gateway nodes having a P2P link with the NS.
+ *
+ * For each gateway, store in a pair:
+ * - The Point-to-point net device of the network server;
+ * - The gateway node connected to the P2P net device.
+ */
+typedef std::list<std::pair<Ptr<PointToPointNetDevice>, Ptr<Node>>> P2PGwRegistration_t;
+
+/**
  * This class can install Network Server applications on multiple nodes at once.
  */
 class NetworkServerHelper
@@ -49,14 +60,18 @@ class NetworkServerHelper
 
     void SetAttribute(std::string name, const AttributeValue& value);
 
-    ApplicationContainer Install(NodeContainer c);
-
     ApplicationContainer Install(Ptr<Node> node);
 
     /**
-     * Set which gateways will need to be connected to this NS.
+     * Register gateways connected with point-to-point to this NS.
+     *
+     * \remark For the moment, only P2P connections are supported.
+     *
+     * \param registration The gateways registration data.
+     *
+     * \see ns3::lorawan::P2PGwRegistration_t
      */
-    void SetGateways(NodeContainer gateways);
+    void SetGatewaysP2P(const P2PGwRegistration_t& registration);
 
     /**
      * Set which end devices will be managed by this NS.
@@ -81,11 +96,10 @@ class NetworkServerHelper
 
     ObjectFactory m_factory;
 
-    NodeContainer m_gateways; //!< Set of gateways to connect to this NS
+    std::list<std::pair<Ptr<NetDevice>, Ptr<Node>>>
+        m_gatewayRegistrationList; //!< List of gateway nodes to register to this NS net devices
 
     NodeContainer m_endDevices; //!< Set of endDevices to connect to this NS
-
-    PointToPointHelper p2pHelper; //!< Helper to create PointToPoint links
 
     bool m_adrEnabled;
 
