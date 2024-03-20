@@ -301,14 +301,17 @@ main(int argc, char* argv[])
     PointToPointHelper p2p;
     p2p.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
     p2p.SetChannelAttribute("Delay", StringValue("2ms"));
+    // Store NS app registration details for later
+    P2PGwRegistration_t gwRegistration;
     for (auto gw = gateways.Begin(); gw != gateways.End(); ++gw)
     {
         auto container = p2p.Install(networkServer, *gw);
         auto serverP2PNetDev = DynamicCast<PointToPointNetDevice>(container.Get(0));
-        nsHelper.AddGatewayP2P(serverP2PNetDev, *gw);
+        gwRegistration.emplace_back(serverP2PNetDev, *gw);
     }
 
     // Create a NS for the network
+    nsHelper.SetGatewaysP2P(gwRegistration);
     nsHelper.SetEndDevices(endDevices);
     nsHelper.Install(networkServer);
 

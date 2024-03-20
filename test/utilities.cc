@@ -113,11 +113,8 @@ CreateNetworkServer(NodeContainer endDevices, NodeContainer gateways)
 
     // Install server application
     NetworkServerHelper networkServerHelper;
+    networkServerHelper.SetGatewaysP2P(gwRegistration);
     networkServerHelper.SetEndDevices(endDevices);
-    for (const auto& [serverP2PNetDev, gwNode] : gwRegistration)
-    {
-        networkServerHelper.AddGatewayP2P(serverP2PNetDev, gwNode);
-    }
     networkServerHelper.Install(nsNode);
 
     // Install a forwarder on the gateways

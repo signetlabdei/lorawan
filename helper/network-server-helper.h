@@ -40,7 +40,11 @@ namespace lorawan
 {
 
 /**
- * \brief Store NS app registration details for gateway nodes having a P2P link with the NS
+ * Store NS app registration details for gateway nodes having a P2P link with the NS.
+ *
+ * For each gateway, store in a pair:
+ * - The Point-to-point net device of the network server;
+ * - The gateway node connected to the P2P net device.
  */
 typedef std::list<std::pair<Ptr<PointToPointNetDevice>, Ptr<Node>>> P2PGwRegistration_t;
 
@@ -59,14 +63,15 @@ class NetworkServerHelper
     ApplicationContainer Install(Ptr<Node> node);
 
     /**
-     * \brief Add a gateway connected with point-to-point to this NS.
+     * Register gateways connected with point-to-point to this NS.
      *
      * \remark For the moment, only P2P connections are supported.
      *
-     * \param serverP2PNetDev Point-to-point net device of the network server
-     * \param gwNode The gateway node connected to the P2P net device
+     * \param registration The gateways registration data.
+     *
+     * \see ns3::lorawan::P2PGwRegistration_t
      */
-    void AddGatewayP2P(Ptr<PointToPointNetDevice> serverP2PNetDev, Ptr<Node> gwNode);
+    void SetGatewaysP2P(const P2PGwRegistration_t& registration);
 
     /**
      * Set which end devices will be managed by this NS.

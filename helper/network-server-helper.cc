@@ -55,11 +55,15 @@ NetworkServerHelper::SetAttribute(std::string name, const AttributeValue& value)
 }
 
 void
-NetworkServerHelper::AddGatewayP2P(Ptr<PointToPointNetDevice> serverP2PNetDev, Ptr<Node> gwNode)
+NetworkServerHelper::SetGatewaysP2P(const P2PGwRegistration_t& registration)
 {
-    NS_ASSERT_MSG(serverP2PNetDev->GetNode()->GetId() != gwNode->GetId(),
-                  "wrong P2P NetDevice detected, please provide the one on the NS's side instead");
-    m_gatewayRegistrationList.emplace_back(serverP2PNetDev, gwNode);
+    for (const auto& [serverP2PNetDev, gwNode] : registration)
+    {
+        NS_ASSERT_MSG(
+            serverP2PNetDev->GetNode()->GetId() != gwNode->GetId(),
+            "wrong P2P NetDevice detected, please provide the one on the NS's side instead");
+        m_gatewayRegistrationList.emplace_back(serverP2PNetDev, gwNode);
+    }
 }
 
 void

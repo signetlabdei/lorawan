@@ -286,13 +286,10 @@ main(int argc, char* argv[])
 
     // Install the NetworkServer application on the network server
     NetworkServerHelper networkServerHelper;
-    networkServerHelper.SetEndDevices(endDevices);
     networkServerHelper.EnableAdr(adrEnabled);
     networkServerHelper.SetAdr(adrType);
-    for (const auto& [serverP2PNetDev, gwNode] : gwRegistration)
-    {
-        networkServerHelper.AddGatewayP2P(serverP2PNetDev, gwNode);
-    }
+    networkServerHelper.SetGatewaysP2P(gwRegistration);
+    networkServerHelper.SetEndDevices(endDevices);
     networkServerHelper.Install(networkServer);
 
     // Install the Forwarder application on the gateways
