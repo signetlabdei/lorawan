@@ -145,7 +145,7 @@ class LorawanMac : public Object
     uint8_t GetSfFromDataRate(uint8_t dataRate);
 
     /**
-     * Get the BW corresponding to a data rate, based on this MAC's region.
+     * Get the bandwidth corresponding to a data rate, based on this MAC's region.
      *
      * \param dataRate The data rate we need to convert to a bandwidth value.
      * \return The bandwidth that corresponds to the parameter data rate in this

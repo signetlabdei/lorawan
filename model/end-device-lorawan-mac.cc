@@ -728,7 +728,7 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
     // Check the dataRate
     /////////////////////
     // We need to know we can use it at all
-    // To assess this, we try and convert it to a SF/BW combination and check if
+    // To assess this, we try and convert it to a SF/bandwidth combination and check if
     // those values are valid. Since GetSfFromDataRate and
     // GetBandwidthFromDataRate return 0 if the dataRate is not recognized, we
     // can check against this.
