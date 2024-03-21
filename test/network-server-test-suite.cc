@@ -187,7 +187,7 @@ DownlinkPacketTest::ReceivedPacketAtEndDevice(uint8_t requiredTransmissions,
                                               Time time,
                                               Ptr<Packet> packet)
 {
-    NS_LOG_DEBUG("Received a packet at the ED");
+    NS_LOG_DEBUG("Received a packet at the end device");
     m_receivedPacketAtEd = success;
 }
 
@@ -220,7 +220,7 @@ DownlinkPacketTest::DoRun()
     NodeContainer gateways = components.gateways;
     Ptr<Node> nsNode = components.nsNode;
 
-    // Connect the ED's trace source for received packets
+    // Connect the end device's trace source for received packets
     endDevices.Get(0)
         ->GetDevice(0)
         ->GetObject<LoraNetDevice>()
@@ -331,7 +331,7 @@ LinkCheckTest::DoRun()
     NodeContainer gateways = components.gateways;
     Ptr<Node> nsNode = components.nsNode;
 
-    // Connect the ED's trace source for last known gateway count
+    // Connect the end device's trace source for last known gateway count
     endDevices.Get(0)
         ->GetDevice(0)
         ->GetObject<LoraNetDevice>()

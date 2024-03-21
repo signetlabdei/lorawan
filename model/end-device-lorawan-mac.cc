@@ -90,13 +90,13 @@ EndDeviceLorawanMac::GetTypeId()
                           MakeIntegerAccessor(&EndDeviceLorawanMac::m_maxNumbTx),
                           MakeIntegerChecker<uint8_t>())
             .AddAttribute("EnableEDDataRateAdaptation",
-                          "Whether the End Device should up its data rate "
+                          "Whether the end device should up its data rate "
                           "in case it doesn't get a reply from the NS.",
                           BooleanValue(false),
                           MakeBooleanAccessor(&EndDeviceLorawanMac::m_enableDRAdapt),
                           MakeBooleanChecker())
             .AddAttribute("MType",
-                          "Specify type of message will be sent by this ED.",
+                          "Specify type of message will be sent by this end device.",
                           EnumValue(LorawanMacHeader::UNCONFIRMED_DATA_UP),
                           MakeEnumAccessor<LorawanMacHeader::MType>(&EndDeviceLorawanMac::m_mType),
                           MakeEnumChecker(LorawanMacHeader::UNCONFIRMED_DATA_UP,

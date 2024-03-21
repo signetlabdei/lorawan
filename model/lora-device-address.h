@@ -111,7 +111,7 @@ class NwkAddr
 /**
  * \ingroup lorawan
  *
- * This class represents the device address of a LoraWAN End Device.
+ * This class represents the device address of a LoraWAN end device.
  */
 class LoraDeviceAddress
 {

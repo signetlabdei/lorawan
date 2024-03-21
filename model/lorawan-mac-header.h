@@ -121,7 +121,7 @@ class LorawanMacHeader : public Header
     /**
      * Check whether this header is for an uplink message.
      *
-     * \return True if the message is meant to be sent from an ED to a gateway, false
+     * \return True if the message is meant to be sent from an end device to a gateway, false
      * otherwise.
      */
     bool IsUplink() const;

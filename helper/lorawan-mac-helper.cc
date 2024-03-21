@@ -498,7 +498,7 @@ LorawanMacHelper::SetSpreadingFactorsUp(NodeContainer endDevices,
         // NS_LOG_DEBUG ("Rx Power: " << highestRxPower);
         double rxPower = highestRxPower;
 
-        // Get the ED sensitivity
+        // Get the end device sensitivity
         Ptr<EndDeviceLoraPhy> edPhy = loraNetDevice->GetPhy()->GetObject<EndDeviceLoraPhy>();
         const double* edSensitivity = edPhy->sensitivity;
 

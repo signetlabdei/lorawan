@@ -167,7 +167,7 @@ main(int argc, char* argv[])
     // Helpers
     //////////
 
-    // End Device mobility
+    // End device mobility
     MobilityHelper mobilityEd;
     MobilityHelper mobilityGw;
     mobilityEd.SetPositionAllocator("ns3::RandomRectanglePositionAllocator",
@@ -318,7 +318,7 @@ main(int argc, char* argv[])
         "/NodeList/*/DeviceList/0/$ns3::LoraNetDevice/Mac/$ns3::EndDeviceLorawanMac/DataRate",
         MakeCallback(&OnDataRateChange));
 
-    // Activate printing of ED MAC parameters
+    // Activate printing of end device MAC parameters
     Time stateSamplePeriod = Seconds(1200);
     helper.EnablePeriodicDeviceStatusPrinting(endDevices,
                                               gateways,

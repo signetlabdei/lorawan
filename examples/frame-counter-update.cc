@@ -116,12 +116,12 @@ ChangeEndDevicePosition(Ptr<Node> endDevice, bool inRange)
 {
     if (inRange)
     {
-        NS_LOG_INFO("Moving ED in range");
+        NS_LOG_INFO("Moving end device in range");
         endDevice->GetObject<MobilityModel>()->SetPosition(Vector(0.0, 0.0, 0.0));
     }
     else
     {
-        NS_LOG_INFO("Moving ED out of range");
+        NS_LOG_INFO("Moving end device out of range");
         endDevice->GetObject<MobilityModel>()->SetPosition(Vector(10000.0, 0.0, 0.0));
     }
 }
@@ -146,7 +146,7 @@ main(int argc, char* argv[])
     MobilityHelper mobility;
     Ptr<ListPositionAllocator> allocator = CreateObject<ListPositionAllocator>();
     // Make it so that nodes are at a certain height > 0
-    allocator->Add(Vector(100000.0, 0.0, 15.0)); // ED position
+    allocator->Add(Vector(100000.0, 0.0, 15.0)); // End device position
     allocator->Add(Vector(0.0, 0.0, 15.0));      // Gateway position
     mobility.SetPositionAllocator(allocator);
     mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");

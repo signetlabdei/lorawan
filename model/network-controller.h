@@ -76,7 +76,7 @@ class NetworkController : public Object
 
     /**
      * Method that is called by the NetworkScheduler just before sending a reply
-     * to a certain End Device.
+     * to a certain end device.
      *
      * \param endDeviceStatus A pointer to the EndDeviceStatus object.
      */

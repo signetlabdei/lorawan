@@ -60,7 +60,7 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Send a packet.
      *
-     * The MAC layer of the ED will take care of using the right parameters.
+     * The MAC layer of the end device will take care of using the right parameters.
      *
      * \param packet The packet to send.
      */
@@ -396,7 +396,7 @@ class EndDeviceLorawanMac : public LorawanMac
 
     /**
      * Find the minimum waiting time before the next possible transmission based
-     * on End Device's Class Type.
+     * on end device's Class Type.
      *
      * \param waitingTime Currently known minimum waiting time, possibly raised by this function.
      * \return The updated minimum waiting time in Time format.
@@ -405,7 +405,7 @@ class EndDeviceLorawanMac : public LorawanMac
 
     /**
      * Find a suitable channel for transmission. The channel is chosen among the
-     * ones that are available in the ED's LogicalLoraChannel, based on their duty
+     * ones that are available in the end device, based on their duty
      * cycle limitations.
      *
      * \return A pointer to the channel.

@@ -175,7 +175,7 @@ class EndDeviceLoraPhy : public LoraPhy
     bool IsTransmitting() override;
 
     /**
-     * Set the frequency this EndDevice will listen on.
+     * Set the frequency this end device will listen on.
      *
      * Should a packet be transmitted on a frequency different than that the
      * EndDeviceLoraPhy is listening on, the packet will be discarded.
@@ -185,7 +185,7 @@ class EndDeviceLoraPhy : public LoraPhy
     void SetFrequency(double frequencyMHz);
 
     /**
-     * Set the Spreading Factor this EndDevice will listen for.
+     * Set the Spreading Factor this end device will listen for.
      *
      * The EndDeviceLoraPhy object will not be able to lock on transmissions that
      * use a different SF than the one it's listening for.
@@ -195,14 +195,14 @@ class EndDeviceLoraPhy : public LoraPhy
     void SetSpreadingFactor(uint8_t sf);
 
     /**
-     * Get the Spreading Factor this EndDevice is listening for.
+     * Get the Spreading Factor this end device is listening for.
      *
      * \return The Spreading Factor we are listening for.
      */
     uint8_t GetSpreadingFactor() const;
 
     /**
-     * Return the state this End Device is currently in.
+     * Return the state this end device is currently in.
      *
      * \return The state this EndDeviceLoraPhy is currently in.
      */

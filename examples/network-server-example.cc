@@ -96,7 +96,7 @@ main(int argc, char* argv[])
     // Helpers
     //////////
 
-    // End Device mobility
+    // End device mobility
     MobilityHelper mobilityEd;
     MobilityHelper mobilityGw;
     Ptr<ListPositionAllocator> positionAllocEd = CreateObject<ListPositionAllocator>();

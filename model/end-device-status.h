@@ -40,7 +40,7 @@ namespace lorawan
 /**
  * \ingroup lorawan
  *
- * This class represents the Network Server's knowledge about an End Device in
+ * This class represents the Network Server's knowledge about an end device in
  * the LoRaWAN network it is administering.
  *
  * The Network Server's NetworkStatus component contains a list of instances of
@@ -53,20 +53,20 @@ namespace lorawan
  * parameters.
  *
  * Diagram of the end-device-status data structure. One instance of this class
- * for each ED, that will be identified by its address.
+ * for each end device, that will be identified by its address.
  *
  * Public Access:
  *
- *  (ED address) --- Current device parameters:
- *                   - First Receive Window SF and DRRe
- *                   - First Receive Window frequency
- *                   - Second Window SF and Data Rate (DR)
- *                   - Second Receive Window frequency
- *               --- Reply
- *                   - Need for reply (true/false)
- *                   - Updated reply
- *               --- Received Packets
- *                   - Received packets list (see below).
+ *  (End device address) --- Current device parameters:
+ *                           - First Receive Window SF and DRRe
+ *                           - First Receive Window frequency
+ *                           - Second Window SF and Data Rate (DR)
+ *                           - Second Receive Window frequency
+ *                       --- Reply
+ *                           - Need for reply (true/false)
+ *                           - Updated reply
+ *                       --- Received Packets
+ *                           - Received packets list (see below).
  *
  *
  * Private Access:
@@ -338,7 +338,7 @@ class EndDeviceStatus : public Object
     void UpdateGatewayData(GatewayList gwList, Address gwAddress, double rcvPower);
 
     /**
-     * Check if there is already a running reception window event scheduled for this ED.
+     * Check if there is already a running reception window event scheduled for this end device.
      *
      * \return True if a reception window event is already scheduled, false otherwise.
      */

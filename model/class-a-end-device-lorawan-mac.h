@@ -108,7 +108,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
 
     /**
      * Find the minimum waiting time before the next possible transmission based
-     * on End Device's Class Type.
+     * on end device's Class Type.
      *
      * \param waitingTime The minimum waiting time that has to be respected,
      * irrespective of the class (e.g., because of duty cycle limitations).
