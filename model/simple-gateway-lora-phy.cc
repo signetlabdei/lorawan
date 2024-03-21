@@ -34,7 +34,7 @@ NS_LOG_COMPONENT_DEFINE("SimpleGatewayLoraPhy");
 NS_OBJECT_ENSURE_REGISTERED(SimpleGatewayLoraPhy);
 
 /***********************************************************************
- *                 Implementation of Gateway methods                   *
+ *                 Implementation of gateway methods                   *
  ***********************************************************************/
 
 TypeId

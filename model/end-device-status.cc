@@ -271,7 +271,7 @@ EndDeviceStatus::InsertReceivedPacket(Ptr<const Packet> receivedPacket, const Ad
     double rcvPower = tag.GetReceivePower();
 
     // Perform insertion in list, also checking that the packet isn't already in
-    // the list (it could have been received by another GW already)
+    // the list (it could have been already received by another gateway)
 
     // Start searching from the end
     auto it = m_receivedPacketList.rbegin();

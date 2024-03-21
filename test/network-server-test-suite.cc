@@ -292,7 +292,7 @@ LinkCheckTest::~LinkCheckTest()
 void
 LinkCheckTest::LastKnownGatewayCount(int newValue, int oldValue)
 {
-    NS_LOG_DEBUG("Updated Gateway Count");
+    NS_LOG_DEBUG("Updated gateway count");
     m_receivedPacketAtEd = true;
 
     m_numberOfGatewaysThatReceivedPacket = newValue;
@@ -331,7 +331,7 @@ LinkCheckTest::DoRun()
     NodeContainer gateways = components.gateways;
     Ptr<Node> nsNode = components.nsNode;
 
-    // Connect the ED's trace source for Last known Gateway Count
+    // Connect the ED's trace source for last known gateway count
     endDevices.Get(0)
         ->GetDevice(0)
         ->GetObject<LoraNetDevice>()

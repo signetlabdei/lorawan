@@ -195,7 +195,7 @@ class GatewayLoraPhy : public LoraPhy
     };
 
     std::list<Ptr<ReceptionPath>> m_receptionPaths; //!< A list containing the various parallel
-                                                    //!< receivers that are managed by this Gateway.
+                                                    //!< receivers that are managed by this gateway.
 
     TracedValue<int> m_occupiedReceptionPaths; //!< The number of occupied reception paths.
 
@@ -206,7 +206,7 @@ class GatewayLoraPhy : public LoraPhy
     TracedCallback<Ptr<const Packet>, uint32_t> m_noMoreDemodulators;
 
     /**
-     * Trace source fired when a packet cannot be received because the Gateway is in transmission
+     * Trace source fired when a packet cannot be received because the gateway is in transmission
      * state.
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_noReceptionBecauseTransmitting;

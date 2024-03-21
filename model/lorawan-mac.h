@@ -41,7 +41,7 @@ class LoraPhy;
  * Class representing the LoRaWAN MAC layer.
  *
  * This class is meant to be extended differently based on whether the layer
- * belongs to an End Device or a Gateway, while holding some functionality that
+ * belongs to an End Device or a gateway, while holding some functionality that
  * is common to both.
  */
 class LorawanMac : public Object
@@ -283,7 +283,7 @@ class LorawanMac : public Object
     std::vector<double> m_txDbmForTxPower;
 
     /**
-     * The matrix that decides the data rate the GW will use in a reply based on the ED's
+     * The matrix that decides the data rate the gateway will use in a reply based on the ED's
      * sending data rate and on the value of the RX1DROffset parameter.
      */
     ReplyDataRateMatrix m_replyDataRateMatrix;

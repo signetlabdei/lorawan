@@ -67,7 +67,7 @@ class NetworkStatus : public Object
     /**
      * Add a new gateway to the list of gateways connected to the network.
      *
-     * Each GW is identified by its NetDevice Address in the NS-GW connection.
+     * Each gateway is identified by its NetDevice Address in the NS-gateway connection.
      *
      * \param address The gateway's NetDevice Address.
      * \param gwStatus A pointer to a GatewayStatus object for the gateway.
@@ -102,7 +102,7 @@ class NetworkStatus : public Object
     Address GetBestGatewayForDevice(LoraDeviceAddress deviceAddress, int window);
 
     /**
-     * Send a packet through a Gateway.
+     * Send a packet through a gateway.
      *
      * This function assumes that the packet is already tagged with a LoraTag
      * that will inform the gateway of the parameters to use for the

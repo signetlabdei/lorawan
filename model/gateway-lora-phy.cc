@@ -96,7 +96,7 @@ GatewayLoraPhy::ReceptionPath::SetEndReceive(EventId endReceiveEventId)
 }
 
 /***********************************************************************
- *                 Implementation of Gateway methods                   *
+ *                 Implementation of gateway methods                   *
  ***********************************************************************/
 
 TypeId
@@ -110,7 +110,7 @@ GatewayLoraPhy::GetTypeId()
                 "NoReceptionBecauseTransmitting",
                 "Trace source indicating a packet "
                 "could not be correctly received because"
-                "the GW is in transmission mode",
+                "the gateway is in transmission mode",
                 MakeTraceSourceAccessor(&GatewayLoraPhy::m_noReceptionBecauseTransmitting),
                 "ns3::Packet::TracedCallback")
             .AddTraceSource("LostPacketBecauseNoMoreReceivers",

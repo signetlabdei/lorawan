@@ -327,7 +327,7 @@ class EndDeviceStatus : public Object
     void AddMACCommand(Ptr<MacCommand> macCommand);
 
     /**
-     * Update Gateway data when more then one gateway receive the same packet.
+     * Update gateway data when more then one gateway receive the same packet.
      *
      * \param gwList List of gateways with previous receptions.
      * \param gwAddress Gateway address of the current reception.

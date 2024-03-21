@@ -157,7 +157,7 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Set the data rate this end device will use when transmitting. For End
      * Devices, this value is assumed to be fixed, and can be modified via MAC
-     * commands issued by the GW.
+     * commands issued by the gateway.
      *
      * \param dataRate The dataRate to use when transmitting.
      */

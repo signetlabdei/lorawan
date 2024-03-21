@@ -147,7 +147,7 @@ main(int argc, char* argv[])
     Ptr<ListPositionAllocator> allocator = CreateObject<ListPositionAllocator>();
     // Make it so that nodes are at a certain height > 0
     allocator->Add(Vector(100000.0, 0.0, 15.0)); // ED position
-    allocator->Add(Vector(0.0, 0.0, 15.0));      // GW position
+    allocator->Add(Vector(0.0, 0.0, 15.0));      // Gateway position
     mobility.SetPositionAllocator(allocator);
     mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
 

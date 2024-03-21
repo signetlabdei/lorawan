@@ -104,8 +104,8 @@ class LoraTag : public Tag
      * Set the frequency of the packet.
      *
      * This value works in two ways:
-     * - It is used by the GW to signal to the NS the frequency of the uplink packet
-     * - It is used by the NS to signal to the GW the frequency of a downlink packet.
+     * - It is used by the gateway to signal to the NS the frequency of the uplink packet
+     * - It is used by the NS to signal to the gateway the frequency of a downlink packet.
      *
      * \param frequency The frequency value [MHz].
      */
@@ -115,8 +115,8 @@ class LoraTag : public Tag
      * Get the frequency of the packet.
      *
      * This value works in two ways:
-     * - It is used by the GW to signal to the NS the frequency of the uplink packet
-     * - It is used by the NS to signal to the GW the frequency of a downlink packet.
+     * - It is used by the gateway to signal to the NS the frequency of the uplink packet
+     * - It is used by the NS to signal to the gateway the frequency of a downlink packet.
      *
      * \return The frequency value [MHz].
      */
