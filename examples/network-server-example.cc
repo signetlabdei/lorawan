@@ -123,7 +123,7 @@ main(int argc, char* argv[])
     // Create the LoraHelper
     LoraHelper helper = LoraHelper();
 
-    // Create EDs
+    // Create end devices
     /////////////
 
     NodeContainer endDevices;
@@ -148,7 +148,7 @@ main(int argc, char* argv[])
     Ptr<ClassAEndDeviceLorawanMac> edLorawanMac1 = edMac1->GetObject<ClassAEndDeviceLorawanMac>();
     edLorawanMac1->SetMType(LorawanMacHeader::CONFIRMED_DATA_UP);
 
-    // Install applications in EDs
+    // Install applications in end devices
     OneShotSenderHelper oneShotHelper = OneShotSenderHelper();
     oneShotHelper.SetSendTime(Seconds(4));
     oneShotHelper.Install(endDevices.Get(0));
@@ -160,7 +160,7 @@ main(int argc, char* argv[])
     // oneShotHelper.Install(endDevices.Get (2));
 
     ////////////////
-    // Create GWs //
+    // Create gateways //
     ////////////////
 
     NodeContainer gateways;

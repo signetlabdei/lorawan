@@ -1626,7 +1626,7 @@ class LorawanMacTest : public TestCase
 
 // Add some help text to this case to describe what it is intended to test
 LorawanMacTest::LorawanMacTest()
-    : TestCase("Verify that the MAC layer of EDs behaves as expected")
+    : TestCase("Verify that the MAC layer of end devices behaves as expected")
 {
 }
 

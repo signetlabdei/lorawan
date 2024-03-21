@@ -95,7 +95,7 @@ class NetworkServer : public Application
     /**
      * Add the gateway to the list of gateways connected to this NS.
      *
-     * Each gateway is identified by its Address in the NS-GWs network.
+     * Each gateway is identified by its Address in the NS-gateways network.
      *
      * \param gateway A pointer to the gateway Node.
      * \param netDevice A pointer to the NetDevice of the NS connected to the gateway.

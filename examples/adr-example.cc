@@ -141,7 +141,7 @@ main(int argc, char* argv[])
     LogComponentEnableAll(LOG_PREFIX_NODE);
     LogComponentEnableAll(LOG_PREFIX_TIME);
 
-    // Set the EDs to allow data rate control (i.e. adaptive data rate) from the NS
+    // Set the end devices to allow data rate control (i.e. adaptive data rate) from the NS
     Config::SetDefault("ns3::EndDeviceLorawanMac::DRControl", BooleanValue(true));
 
     // Create a simple wireless channel
@@ -210,7 +210,7 @@ main(int argc, char* argv[])
     helper.EnablePacketTracking();
 
     ////////////////
-    // Create GWs //
+    // Create gateways //
     ////////////////
 
     NodeContainer gateways;
@@ -222,7 +222,7 @@ main(int argc, char* argv[])
     macHelper.SetDeviceType(LorawanMacHelper::GW);
     helper.Install(phyHelper, macHelper, gateways);
 
-    // Create EDs
+    // Create end devices
     /////////////
 
     NodeContainer endDevices;
@@ -267,7 +267,7 @@ main(int argc, char* argv[])
     macHelper.SetRegion(LorawanMacHelper::EU);
     helper.Install(phyHelper, macHelper, endDevices);
 
-    // Install applications in EDs
+    // Install applications in end devices
     int appPeriodSeconds = 1200; // One packet every 20 minutes
     PeriodicSenderHelper appHelper = PeriodicSenderHelper();
     appHelper.SetPeriod(Seconds(appPeriodSeconds));
