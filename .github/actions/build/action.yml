@@ -13,6 +13,8 @@ runs:
   using: "composite"
   steps:
     # Pre-configuration steps
+    # (skip ccache for --disable-precompiled-headers because it won't use it)
+    # (skip ccache for optimized because built files are too architecture dependent)
     - if: env.MODE != 'optimized' && ( ! contains(env.EXTRA_OPTIONS, '--disable-precompiled-headers') )
       name: "Restore build cache of this job"
       uses: hendrikmuhs/ccache-action@v1.2
@@ -30,6 +32,28 @@ runs:
     - name: "Build ns-3"
       shell: bash
       run: ./ns3 build
+    - name: "Show ccache stats"
+      shell: bash
+      run: ccache -s
+    # Manage inter-run placeholder for tests
+    - name: "Prepare env and get cache miss rate"
+      shell: bash
+      run: |
+        echo "CACHE_MISS=`./utils/ccache-miss-rate.py`" >> $GITHUB_ENV
+        echo "REF_NAME=`echo $GITHUB_REF_NAME | sed -r 's/[/]+/-/g'`" >> $GITHUB_ENV
+        echo "NOW=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+        touch build/tests-base.txt
+    - if: env.CACHE_MISS != '0'
+      name: "Create tests placeholder"
+      shell: bash
+      run: |
+        touch build/tests-$BUILD_ID.txt
+    - if: env.CACHE_MISS != '0'
+      name: "Store tests placeholder"
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ format('tests-{0}-{1}-{2}', env.BUILD_ID, env.REF_NAME, env.NOW) }}
+        path: build/tests-*.txt
     # Post-build steps
     - if: inputs.store-artifacts == 'true'
       name: "Tar files to preserve permissions"
