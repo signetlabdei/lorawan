@@ -141,7 +141,8 @@ main(int argc, char* argv[])
     LogComponentEnableAll(LOG_PREFIX_NODE);
     LogComponentEnableAll(LOG_PREFIX_TIME);
 
-    // Set the end devices to allow data rate control (i.e. adaptive data rate) from the NS
+    // Set the end devices to allow data rate control (i.e. adaptive data rate) from the network
+    // server
     Config::SetDefault("ns3::EndDeviceLorawanMac::DRControl", BooleanValue(true));
 
     // Create a simple wireless channel
@@ -273,14 +274,14 @@ main(int argc, char* argv[])
     appHelper.SetPeriod(Seconds(appPeriodSeconds));
     ApplicationContainer appContainer = appHelper.Install(endDevices);
 
-    // Do not set spreading factors up: we will wait for the NS to do this
+    // Do not set spreading factors up: we will wait for the network server to do this
     if (initializeSF)
     {
         LorawanMacHelper::SetSpreadingFactorsUp(endDevices, gateways, channel);
     }
 
     ////////////
-    // Create NS
+    // Create network server
     ////////////
 
     Ptr<Node> networkServer = CreateObject<Node>();
@@ -289,7 +290,7 @@ main(int argc, char* argv[])
     PointToPointHelper p2p;
     p2p.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
     p2p.SetChannelAttribute("Delay", StringValue("2ms"));
-    // Store NS app registration details for later
+    // Store network server app registration details for later
     P2PGwRegistration_t gwRegistration;
     for (auto gw = gateways.Begin(); gw != gateways.End(); ++gw)
     {

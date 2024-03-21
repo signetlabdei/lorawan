@@ -19,7 +19,7 @@
 
 /*
  * This example creates a simple network in which all LoRaWAN components are
- * simulated: End Devices, some Gateways and a Network Server.
+ * simulated: end devices, some gateways and a network server.
  * Two end devices are already configured to send unconfirmed and confirmed messages respectively.
  */
 
@@ -176,7 +176,7 @@ main(int argc, char* argv[])
     LorawanMacHelper::SetSpreadingFactorsUp(endDevices, gateways, channel);
 
     ////////////
-    // Create NS
+    // Create network serverNS
     ////////////
 
     Ptr<Node> networkServer = CreateObject<Node>();
@@ -185,7 +185,7 @@ main(int argc, char* argv[])
     PointToPointHelper p2p;
     p2p.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
     p2p.SetChannelAttribute("Delay", StringValue("2ms"));
-    // Store NS app registration details for later
+    // Store network server app registration details for later
     P2PGwRegistration_t gwRegistration;
     for (auto gw = gateways.Begin(); gw != gateways.End(); ++gw)
     {

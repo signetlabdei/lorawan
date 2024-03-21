@@ -32,7 +32,7 @@ NS_LOG_COMPONENT_DEFINE("NetworkSchedulerTestSuite");
 /**
  * \ingroup lorawan
  *
- * It tests the correct functionality of the NetworkScheduler component class of the Network Server
+ * It tests the correct functionality of the NetworkScheduler component class of the network server
  */
 class NetworkSchedulerTest : public TestCase
 {

@@ -60,7 +60,7 @@ class NetworkControllerComponent : public Object
 
     // Virtual methods whose implementation is left to child classes
     /**
-     * Function called as a new uplink packet is received by the NetworkServer.
+     * Function called as a new uplink packet is received by the NetworkServer application.
      *
      * \param packet The newly received packet.
      * \param status A pointer to the status of the end device that sent the packet.
@@ -70,7 +70,7 @@ class NetworkControllerComponent : public Object
                                   Ptr<EndDeviceStatus> status,
                                   Ptr<NetworkStatus> networkStatus) = 0;
     /**
-     * Function called as a downlink reply is about to leave the NetworkServer.
+     * Function called as a downlink reply is about to leave the NetworkServer application.
      *
      * \param status A pointer to the status of the end device which we are sending the reply to.
      * \param networkStatus A pointer to the NetworkStatus object.

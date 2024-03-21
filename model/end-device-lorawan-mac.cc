@@ -59,11 +59,12 @@ EndDeviceLorawanMac::GetTypeId()
                             "Data rate currently employed by this end device",
                             MakeTraceSourceAccessor(&EndDeviceLorawanMac::m_dataRate),
                             "ns3::TracedValueCallback::uint8_t")
-            .AddAttribute("DRControl",
-                          "Whether to request the NS to control this device's data rate",
-                          BooleanValue(),
-                          MakeBooleanAccessor(&EndDeviceLorawanMac::m_controlDataRate),
-                          MakeBooleanChecker())
+            .AddAttribute(
+                "DRControl",
+                "Whether to request the network server to control this device's data rate",
+                BooleanValue(),
+                MakeBooleanAccessor(&EndDeviceLorawanMac::m_controlDataRate),
+                MakeBooleanChecker())
             .AddTraceSource("TxPower",
                             "Transmission power currently employed by this end device",
                             MakeTraceSourceAccessor(&EndDeviceLorawanMac::m_txPower),
@@ -91,7 +92,7 @@ EndDeviceLorawanMac::GetTypeId()
                           MakeIntegerChecker<uint8_t>())
             .AddAttribute("EnableEDDataRateAdaptation",
                           "Whether the end device should up its data rate "
-                          "in case it doesn't get a reply from the NS.",
+                          "in case it doesn't get a reply from the network server.",
                           BooleanValue(false),
                           MakeBooleanAccessor(&EndDeviceLorawanMac::m_enableDRAdapt),
                           MakeBooleanChecker())

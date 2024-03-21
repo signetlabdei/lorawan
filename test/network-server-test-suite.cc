@@ -19,8 +19,6 @@
 
 /*
  * This file includes testing for the following components:
- * - EndDeviceServer
- * - GatewayServer
  * - NetworkServer
  */
 
@@ -44,7 +42,7 @@ NS_LOG_COMPONENT_DEFINE("NetworkServerTestSuite");
 /**
  * \ingroup lorawan
  *
- * It verifies that the NetworkServer can receive packets sent in uplink by devices
+ * It verifies that the NetworkServer application can receive packets sent in uplink by devices
  */
 class UplinkPacketTest : public TestCase
 {
@@ -74,7 +72,7 @@ class UplinkPacketTest : public TestCase
 
 // Add some help text to this case to describe what it is intended to test
 UplinkPacketTest::UplinkPacketTest()
-    : TestCase("Verify that the NetworkServer can receive"
+    : TestCase("Verify that the NetworkServer application can receive"
                " packets sent in the uplink by devices")
 {
 }
@@ -87,7 +85,7 @@ UplinkPacketTest::~UplinkPacketTest()
 void
 UplinkPacketTest::ReceivedPacket(Ptr<const Packet> packet)
 {
-    NS_LOG_DEBUG("Received a packet at the NS");
+    NS_LOG_DEBUG("Received a packet at the network server");
     m_receivedPacket = true;
 }
 
@@ -131,7 +129,7 @@ UplinkPacketTest::DoRun()
 /**
  * \ingroup lorawan
  *
- * It verifies that devices requesting an acknowledgment receive a reply from the Network Server
+ * It verifies that devices requesting an acknowledgment receive a reply from the network server
  */
 class DownlinkPacketTest : public TestCase
 {
@@ -172,7 +170,7 @@ class DownlinkPacketTest : public TestCase
 // Add some help text to this case to describe what it is intended to test
 DownlinkPacketTest::DownlinkPacketTest()
     : TestCase("Verify that devices requesting an acknowledgment receive"
-               " a reply from the Network Server.")
+               " a reply from the network server.")
 {
 }
 
@@ -243,7 +241,7 @@ DownlinkPacketTest::DoRun()
 /**
  * \ingroup lorawan
  *
- * It verifies that the NetworkServer correctly responds to LinkCheck requests
+ * It verifies that the NetworkServer application correctly responds to LinkCheck requests
  */
 class LinkCheckTest : public TestCase
 {
@@ -279,7 +277,7 @@ class LinkCheckTest : public TestCase
 
 // Add some help text to this case to describe what it is intended to test
 LinkCheckTest::LinkCheckTest()
-    : TestCase("Verify that the NetworkServer correctly responds to "
+    : TestCase("Verify that the NetworkServer application correctly responds to "
                "LinkCheck requests")
 {
 }

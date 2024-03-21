@@ -68,7 +68,7 @@ class NetworkController : public Object
     void Install(Ptr<NetworkControllerComponent> component);
 
     /**
-     * Method that is called by the NetworkServer when a new packet is received.
+     * Method that is called by the NetworkServer application when a new packet is received.
      *
      * \param packet The newly received packet.
      */

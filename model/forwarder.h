@@ -51,14 +51,14 @@ class Forwarder : public Application
     static TypeId GetTypeId();
 
     /**
-     * Sets the device to use to communicate with the EDs.
+     * Sets the device to use to communicate with the end devices.
      *
      * \param loraNetDevice The LoraNetDevice on this node.
      */
     void SetLoraNetDevice(Ptr<LoraNetDevice> loraNetDevice);
 
     /**
-     * Sets the P2P device to use to communicate with the NS.
+     * Sets the P2P device to use to communicate with the network server.
      *
      * \param pointToPointNetDevice The P2PNetDevice on this node.
      */
@@ -101,8 +101,8 @@ class Forwarder : public Application
   private:
     Ptr<LoraNetDevice> m_loraNetDevice; //!< Pointer to the node's LoraNetDevice
 
-    Ptr<PointToPointNetDevice>
-        m_pointToPointNetDevice; //!< Pointer to the P2PNetDevice we use to communicate with the NS
+    Ptr<PointToPointNetDevice> m_pointToPointNetDevice; //!< Pointer to the P2PNetDevice we use to
+                                                        //!< communicate with the network server
 };
 
 } // namespace lorawan

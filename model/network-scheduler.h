@@ -67,7 +67,7 @@ class NetworkScheduler : public Object
     NetworkScheduler(Ptr<NetworkStatus> status, Ptr<NetworkController> controller);
 
     /**
-     * Method called by NetworkServer to inform the Scheduler of a newly arrived uplink
+     * Method called by NetworkServer application to inform the Scheduler of a newly arrived uplink
      * packet.
      *
      * This function schedules the OnReceiveWindowOpportunity events 1 and 2 seconds later.

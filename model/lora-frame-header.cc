@@ -157,12 +157,12 @@ LoraFrameHeader::Deserialize(Buffer::Iterator start)
         // Divide Uplink and Downlink messages
         // This needs to be done because they have the same CID, and the context
         // about where this message will be Serialized/Deserialized (i.e., at the
-        // end device or at the NS) is umportant.
+        // end device or at the network server) is umportant.
         if (m_isUplink)
         {
             switch (cid)
             {
-            // In the case of Uplink messages, the NS will deserialize the
+            // In the case of Uplink messages, the network server will deserialize the
             // request for a link check
             case (0x02): {
                 NS_LOG_DEBUG("Creating a LinkCheckReq command");

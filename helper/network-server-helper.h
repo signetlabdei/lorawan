@@ -40,7 +40,8 @@ namespace lorawan
 {
 
 /**
- * Store NS app registration details for gateway nodes having a P2P link with the NS.
+ * Store network server app registration details for gateway nodes having a P2P link with the
+ * network server.
  *
  * For each gateway, store in a pair:
  * - The Point-to-point net device of the network server;
@@ -51,7 +52,7 @@ typedef std::list<std::pair<Ptr<PointToPointNetDevice>, Ptr<Node>>> P2PGwRegistr
 /**
  * \ingroup lorawan
  *
- * This class can install Network Server applications on multiple nodes at once.
+ * This class can install a NetworkServer application on a node.
  */
 class NetworkServerHelper
 {
@@ -68,17 +69,6 @@ class NetworkServerHelper
     void SetAttribute(std::string name, const AttributeValue& value);
 
     /**
-     * Create one lorawan network server application on each of the Nodes in the
-     * NodeContainer.
-     *
-     * \param c The nodes on which to create the Applications. The nodes
-     *          are specified by a NodeContainer.
-     * \return The applications created, one Application per Node in the
-     *          NodeContainer.
-     */
-    ApplicationContainer Install(NodeContainer c);
-
-    /**
      * Create one lorawan network server application on the Node.
      *
      * \param node The node on which to create the Application.
@@ -87,7 +77,7 @@ class NetworkServerHelper
     ApplicationContainer Install(Ptr<Node> node);
 
     /**
-     * Register gateways connected with point-to-point to this NS.
+     * Register gateways connected with point-to-point to this network server.
      *
      * \remark For the moment, only P2P connections are supported.
      *
@@ -98,7 +88,7 @@ class NetworkServerHelper
     void SetGatewaysP2P(const P2PGwRegistration_t& registration);
 
     /**
-     * Set which end devices will be managed by this NS.
+     * Set which end devices will be managed by this network server.
      *
      * \param endDevices The end device nodes.
      */
@@ -108,12 +98,12 @@ class NetworkServerHelper
      * Enable (true) or disable (false) the Adaptive Data Rate (ADR) component in the Network
      * Server created by this helper.
      *
-     * \param enableAdr Whether to enable ADR in the Network Server.
+     * \param enableAdr Whether to enable ADR in the network server.
      */
     void EnableAdr(bool enableAdr);
 
     /**
-     * Set the Adaptive Data Rate (ADR) implementation to use in the Network Server created
+     * Set the Adaptive Data Rate (ADR) implementation to use in the network server created
      * by this helper.
      *
      * \param type The type of ADR implementation.
@@ -131,9 +121,9 @@ class NetworkServerHelper
     /**
      * Do the actual NetworkServer application installation on the Node.
      *
-     * This function creates the NetworkServer Application, installs it on the Node, connect the
+     * This function creates the NetworkServer application, installs it on the Node, connect the
      * gateways to the Node with a PointToPoint link, registers gateways and devices in the
-     * NetworkServer Application, and installs the necessary NetworkServerComponent objects.
+     * NetworkServer application, and installs the necessary NetworkServerComponent objects.
      *
      * \param node A pointer to the Node.
      * \return A pointer to the installed NetworkServer application.
@@ -142,8 +132,8 @@ class NetworkServerHelper
 
     ObjectFactory m_factory; //!< Factory to create the Network server application
     std::list<std::pair<Ptr<NetDevice>, Ptr<Node>>>
-        m_gatewayRegistrationList; //!< List of gateway nodes to register to this NS net devices
-    NodeContainer m_endDevices;    //!< Set of endDevices to connect to this NS
+        m_gatewayRegistrationList; //!< List of gateway to register to this network server
+    NodeContainer m_endDevices;    //!< Set of end devices to connect to this network server
     bool m_adrEnabled; //!< Whether to enable the Adaptive Data Rate (ADR) algorithm on the
                        //!< NetworkServer application
     ObjectFactory m_adrSupportFactory; //!< Factory to create the Adaptive Data Rate (ADR) component

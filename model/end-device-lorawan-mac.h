@@ -468,7 +468,7 @@ class EndDeviceLorawanMac : public LorawanMac
     Time GetNextTransmissionDelay();
 
     /**
-     * Whether this device's data rate should be controlled by the NS.
+     * Whether this device's data rate should be controlled by the network server.
      */
     bool m_controlDataRate;
 

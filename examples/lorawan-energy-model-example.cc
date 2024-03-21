@@ -184,7 +184,7 @@ main(int argc, char* argv[])
                                         "TxCurrent",
                                         DoubleValue(0.028));
 
-    // install source on EDs' nodes
+    // install source on end devices' nodes
     EnergySourceContainer sources = basicSourceHelper.Install(endDevices);
     Names::Add("/Names/EnergySource", sources.Get(0));
 

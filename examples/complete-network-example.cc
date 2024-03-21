@@ -317,17 +317,17 @@ main(int argc, char* argv[])
     appContainer.Stop(appStopTime);
 
     /**************************
-     *  Create Network Server  *
+     *  Create network server  *
      ***************************/
 
-    // Create the NS node
+    // Create the network server node
     Ptr<Node> networkServer = CreateObject<Node>();
 
     // PointToPoint links between gateways and server
     PointToPointHelper p2p;
     p2p.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
     p2p.SetChannelAttribute("Delay", StringValue("2ms"));
-    // Store NS app registration details for later
+    // Store network server app registration details for later
     P2PGwRegistration_t gwRegistration;
     for (auto gw = gateways.Begin(); gw != gateways.End(); ++gw)
     {
@@ -336,7 +336,7 @@ main(int argc, char* argv[])
         gwRegistration.emplace_back(serverP2PNetDev, *gw);
     }
 
-    // Create a NS for the network
+    // Create a network server for the network
     nsHelper.SetGatewaysP2P(gwRegistration);
     nsHelper.SetEndDevices(endDevices);
     nsHelper.Install(networkServer);

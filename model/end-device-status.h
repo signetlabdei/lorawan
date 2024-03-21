@@ -40,15 +40,15 @@ namespace lorawan
 /**
  * \ingroup lorawan
  *
- * This class represents the Network Server's knowledge about an end device in
+ * This class represents the network server's knowledge about an end device in
  * the LoRaWAN network it is administering.
  *
- * The Network Server's NetworkStatus component contains a list of instances of
+ * The network server's NetworkStatus component contains a list of instances of
  * this class, one for each device in the network. Each instance contains all
  * the parameters and information of the end device and the packets received
  * from it. Furthermore, this class holds the reply packet that the network
  * server will send to this device at the first available receive window. Upon
- * new packet arrivals at the Network Server, the OnReceivedPacket method is
+ * new packet arrivals at the network server, the OnReceivedPacket method is
  * called to update the information regarding the last received packet and its
  * parameters.
  *

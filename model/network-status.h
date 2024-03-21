@@ -38,7 +38,7 @@ namespace lorawan
  * \ingroup lorawan
  *
  * This class represents the knowledge about the state of the network that is
- * available at the Network Server. It is essentially a collection of two maps:
+ * available at the network server. It is essentially a collection of two maps:
  * one containing DeviceStatus objects, and the other containing GatewayStatus
  * objects.
  *
@@ -67,7 +67,8 @@ class NetworkStatus : public Object
     /**
      * Add a new gateway to the list of gateways connected to the network.
      *
-     * Each gateway is identified by its NetDevice Address in the NS-gateway connection.
+     * Each gateway is identified by its NetDevice Address in the network connecting it to the
+     * network server.
      *
      * \param address The gateway's NetDevice Address.
      * \param gwStatus A pointer to a GatewayStatus object for the gateway.
