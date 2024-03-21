@@ -47,13 +47,13 @@ class LoraChannel;
  */
 struct LoraTxParameters
 {
-    uint8_t sf = 7;                              //!< Spreading Factor
-    bool headerDisabled = false;                 //!< Whether to use implicit header mode
-    uint8_t codingRate = 1;                      //!< Code rate (obtained as 4/(codingRate+4))
-    double bandwidthHz = 125000;                 //!< Bandwidth in Hz
-    uint32_t nPreamble = 8;                      //!< Number of preamble symbols
-    bool crcEnabled = true;                      //!< Whether Cyclic Redundancy Check is enabled
-    bool lowDataRateOptimizationEnabled = false; //!< Whether Low Data Rate Optimization is enabled
+    uint8_t sf = 7;              //!< Spreading Factor
+    bool headerDisabled = false; //!< Whether to use implicit header mode
+    uint8_t codingRate = 1;      //!< Code rate (obtained as 4/(codingRate+4))
+    double bandwidthHz = 125000; //!< Bandwidth in Hz
+    uint32_t nPreamble = 8;      //!< Number of preamble symbols
+    bool crcEnabled = true;      //!< Whether Cyclic Redundancy Check (CRC) is enabled
+    bool lowDataRateOptimizationEnabled = false; //!< Whether low data rate optimization is enabled
 };
 
 /**

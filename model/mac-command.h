@@ -378,8 +378,8 @@ class RxParamSetupReq : public MacCommand
     /**
      * Constructor providing initialization of all fields.
      *
-     * \param rx1DrOffset The Data Rate offset to use for the first receive window.
-     * \param rx2DataRate The Data Rate to use for the second receive window.
+     * \param rx1DrOffset The data rate offset to use for the first receive window.
+     * \param rx2DataRate The data rate to use for the second receive window.
      * \param frequency The frequency in Hz to use for the second receive window.
      */
     RxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency);

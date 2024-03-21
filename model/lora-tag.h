@@ -140,9 +140,8 @@ class LoraTag : public Tag
     uint8_t m_sf;          //!< The Spreading Factor used by the packet.
     uint8_t m_destroyedBy; //!< The Spreading Factor that destroyed the packet.
     double m_receivePower; //!< The reception power of this packet.
-    uint8_t m_dataRate;    //!< The Data Rate that needs to be used to send this
-    //! packet.
-    double m_frequency; //!< The frequency of this packet
+    uint8_t m_dataRate;    //!< The data rate that needs to be used to send this packet.
+    double m_frequency;    //!< The frequency of this packet
 };
 } // namespace lorawan
 } // namespace ns3

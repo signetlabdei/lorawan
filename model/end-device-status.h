@@ -60,7 +60,7 @@ namespace lorawan
  *  (ED address) --- Current device parameters:
  *                   - First Receive Window SF and DRRe
  *                   - First Receive Window frequency
- *                   - Second Window SF and DR
+ *                   - Second Window SF and Data Rate (DR)
  *                   - Second Receive Window frequency
  *               --- Reply
  *                   - Need for reply (true/false)

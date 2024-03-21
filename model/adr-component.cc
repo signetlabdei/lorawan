@@ -218,7 +218,7 @@ AdrComponent::AdrImplementation(uint8_t* newDataRate,
 
     NS_LOG_DEBUG("Margin = " << margin_SNR);
 
-    // Number of steps to decrement the SF (thereby increasing the Data Rate)
+    // Number of steps to decrement the SF (thereby increasing the data rate)
     // and the TP.
     int steps = std::floor(margin_SNR / 3);
 

@@ -85,28 +85,28 @@ class LogicalLoraChannel : public Object
     // void SetFrequency (double frequencyMHz);
 
     /**
-     * Set the minimum Data Rate that is allowed on this channel.
+     * Set the minimum data rate that is allowed on this channel.
      *
      * \param minDataRate The minimum data rate value.
      */
     void SetMinimumDataRate(uint8_t minDataRate);
 
     /**
-     * Set the maximum Data Rate that is allowed on this channel.
+     * Set the maximum data rate that is allowed on this channel.
      *
      * \param maxDataRate The maximum data rate value.
      */
     void SetMaximumDataRate(uint8_t maxDataRate);
 
     /**
-     * Get the minimum Data Rate that is allowed on this channel.
+     * Get the minimum data rate that is allowed on this channel.
      *
      * \return The minimum data rate value.
      */
     uint8_t GetMinimumDataRate() const;
 
     /**
-     * Get the maximum Data Rate that is allowed on this channel.
+     * Get the maximum data rate that is allowed on this channel.
      *
      * \return The maximum data rate value.
      */
@@ -131,8 +131,8 @@ class LogicalLoraChannel : public Object
 
   private:
     double m_frequency;      //!< The central frequency of this channel, in MHz.
-    uint8_t m_minDataRate;   //!< The minimum Data Rate that is allowed on this channel.
-    uint8_t m_maxDataRate;   //!< The maximum Data Rate that is allowed on this channel.
+    uint8_t m_minDataRate;   //!< The minimum data rate that is allowed on this channel.
+    uint8_t m_maxDataRate;   //!< The maximum data rate that is allowed on this channel.
     bool m_enabledForUplink; //!< Whether this channel can be used for uplink or not.
 };
 

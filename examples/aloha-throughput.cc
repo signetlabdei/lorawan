@@ -64,8 +64,10 @@ double simulationTimeSeconds = 100; //!< Scenario duration (s) in simulated time
 bool realisticChannelModel = false; //!< Whether to use a more realistic channel model with
                                     //!< buildings and correlated shadowing
 
-auto packetsSent = std::vector<int>(6, 0);     //!< Record pkts by DR (idx 0 -> DR5, 5 -> DR0)
-auto packetsReceived = std::vector<int>(6, 0); //!< Record pkts by DR (idx 0 -> DR5, 5 -> DR0)
+/** Record received pkts by Data Rate (DR) [index 0 -> DR5, index 5 -> DR0]. */
+auto packetsSent = std::vector<int>(6, 0);
+/** Record received pkts by Data Rate (DR) [index 0 -> DR5, index 5 -> DR0]. */
+auto packetsReceived = std::vector<int>(6, 0);
 
 /**
  * Record the beginning of a transmission by an end device.

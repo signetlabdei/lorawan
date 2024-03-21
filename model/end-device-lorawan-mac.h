@@ -194,7 +194,7 @@ class EndDeviceLorawanMac : public LorawanMac
     ///**
     // * Set a value for the RX1DROffset parameter.
     // *
-    // * This value determines the offset to use when deciding the DataRate of the
+    // * This value determines the offset to use when deciding the data rate of the
     // * downlink transmission during the first receive window from the
     // * replyDataRateMatrix.
     // *

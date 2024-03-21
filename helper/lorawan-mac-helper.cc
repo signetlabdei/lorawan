@@ -149,7 +149,7 @@ LorawanMacHelper::ConfigureForAlohaRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) 
     edMac->SetTxDbmForTxPower(std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
 
     ////////////////////////////////////////////////////////////
-    // Matrix to know which DataRate the GW will respond with //
+    // Matrix to know which data rate the GW will respond with //
     ////////////////////////////////////////////////////////////
     LorawanMac::ReplyDataRateMatrix matrix = {{{{0, 0, 0, 0, 0, 0}},
                                                {{1, 0, 0, 0, 0, 0}},
@@ -246,7 +246,7 @@ LorawanMacHelper::ConfigureForEuRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) con
     edMac->SetTxDbmForTxPower(std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
 
     ////////////////////////////////////////////////////////////
-    // Matrix to know which DataRate the GW will respond with //
+    // Matrix to know which data rate the GW will respond with //
     ////////////////////////////////////////////////////////////
     LorawanMac::ReplyDataRateMatrix matrix = {{{{0, 0, 0, 0, 0, 0}},
                                                {{1, 0, 0, 0, 0, 0}},

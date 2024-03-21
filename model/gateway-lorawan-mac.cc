@@ -59,7 +59,7 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
 {
     NS_LOG_FUNCTION(this << packet);
 
-    // Get DataRate to send this packet with
+    // Get data rate to send this packet with
     LoraTag tag;
     packet->RemovePacketTag(tag);
     uint8_t dataRate = tag.GetDataRate();

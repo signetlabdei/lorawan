@@ -141,7 +141,7 @@ main(int argc, char* argv[])
     LogComponentEnableAll(LOG_PREFIX_NODE);
     LogComponentEnableAll(LOG_PREFIX_TIME);
 
-    // Set the EDs to require Data Rate control from the NS
+    // Set the EDs to allow data rate control (i.e. adaptive data rate) from the NS
     Config::SetDefault("ns3::EndDeviceLorawanMac::DRControl", BooleanValue(true));
 
     // Create a simple wireless channel

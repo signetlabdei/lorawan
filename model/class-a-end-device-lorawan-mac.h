@@ -117,21 +117,21 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     Time GetNextClassTransmissionDelay(Time waitingTime) override;
 
     /**
-     * Get the Data Rate that will be used in the first receive window.
+     * Get the data rate that will be used in the first receive window.
      *
      * \return The data rate.
      */
     uint8_t GetFirstReceiveWindowDataRate();
 
     /**
-     * Set the Data Rate to be used in the second receive window.
+     * Set the data rate to be used in the second receive window.
      *
-     * \param dataRate The Data Rate.
+     * \param dataRate The data rate.
      */
     void SetSecondReceiveWindowDataRate(uint8_t dataRate);
 
     /**
-     * Get the Data Rate that will be used in the second receive window.
+     * Get the data rate that will be used in the second receive window.
      *
      * \return The data rate.
      */
@@ -204,7 +204,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     double m_secondReceiveWindowFrequency;
 
     /**
-     * The Data Rate to listen for during the second downlink transmission.
+     * The data rate to listen for during the second downlink transmission.
      */
     uint8_t m_secondReceiveWindowDataRate;
 

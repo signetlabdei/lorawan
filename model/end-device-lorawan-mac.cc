@@ -51,16 +51,16 @@ EndDeviceLorawanMac::GetTypeId()
                             MakeTraceSourceAccessor(&EndDeviceLorawanMac::m_requiredTxCallback),
                             "ns3::TracedValueCallback::uint8_t")
             .AddAttribute("DataRate",
-                          "Data Rate currently employed by this end device",
+                          "Data rate currently employed by this end device",
                           UintegerValue(0),
                           MakeUintegerAccessor(&EndDeviceLorawanMac::m_dataRate),
                           MakeUintegerChecker<uint8_t>(0, 5))
             .AddTraceSource("DataRate",
-                            "Data Rate currently employed by this end device",
+                            "Data rate currently employed by this end device",
                             MakeTraceSourceAccessor(&EndDeviceLorawanMac::m_dataRate),
                             "ns3::TracedValueCallback::uint8_t")
             .AddAttribute("DRControl",
-                          "Whether to request the NS to control this device's Data Rate",
+                          "Whether to request the NS to control this device's data rate",
                           BooleanValue(),
                           MakeBooleanAccessor(&EndDeviceLorawanMac::m_controlDataRate),
                           MakeBooleanChecker())
@@ -90,7 +90,7 @@ EndDeviceLorawanMac::GetTypeId()
                           MakeIntegerAccessor(&EndDeviceLorawanMac::m_maxNumbTx),
                           MakeIntegerChecker<uint8_t>())
             .AddAttribute("EnableEDDataRateAdaptation",
-                          "Whether the End Device should up its Data Rate "
+                          "Whether the End Device should up its data rate "
                           "in case it doesn't get a reply from the NS.",
                           BooleanValue(false),
                           MakeBooleanAccessor(&EndDeviceLorawanMac::m_enableDRAdapt),
@@ -226,7 +226,7 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
         if (packet->GetSize() > m_maxAppPayloadForDataRate.at(m_dataRate))
         {
             NS_LOG_WARN("Attempting to send a packet larger than the maximum allowed"
-                        << " size at this DataRate (DR" << unsigned(m_dataRate)
+                        << " size at this Data Rate (DR" << unsigned(m_dataRate)
                         << "). Transmission canceled.");
             return;
         }

@@ -85,7 +85,7 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
 
     NS_LOG_DEBUG("PacketToSend: " << packetToSend);
 
-    // Data Rate Adaptation as in LoRaWAN specification, V1.0.2 (2016)
+    // Data rate adaptation as in LoRaWAN specification, V1.0.2 (2016)
     if (m_enableDRAdapt && (m_dataRate > 0) && (m_retxParams.retxLeft < m_maxNumbTx) &&
         (m_retxParams.retxLeft % 2 == 0))
     {
@@ -304,7 +304,7 @@ ClassAEndDeviceLorawanMac::OpenFirstReceiveWindow()
     // Set Phy in Standby mode
     m_phy->GetObject<EndDeviceLoraPhy>()->SwitchToStandby();
 
-    // Calculate the duration of a single symbol for the first receive window DR
+    // Calculate the duration of a single symbol for the first receive window data rate
     double tSym = pow(2, GetSfFromDataRate(GetFirstReceiveWindowDataRate())) /
                   GetBandwidthFromDataRate(GetFirstReceiveWindowDataRate());
 
@@ -372,7 +372,7 @@ ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow()
     m_phy->GetObject<EndDeviceLoraPhy>()->SetSpreadingFactor(
         GetSfFromDataRate(m_secondReceiveWindowDataRate));
 
-    // Calculate the duration of a single symbol for the second receive window DR
+    // Calculate the duration of a single symbol for the second receive window data rate
     double tSym = pow(2, GetSfFromDataRate(GetSecondReceiveWindowDataRate())) /
                   GetBandwidthFromDataRate(GetSecondReceiveWindowDataRate());
 
@@ -471,7 +471,7 @@ ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitingTime)
         {
             NS_LOG_WARN("Attempting to send when there are receive windows:"
                         << " Transmission postponed.");
-            // Compute the duration of a single symbol for the second receive window DR
+            // Compute the duration of a single symbol for the second receive window data rate
             double tSym = pow(2, GetSfFromDataRate(GetSecondReceiveWindowDataRate())) /
                           GetBandwidthFromDataRate(GetSecondReceiveWindowDataRate());
             // Compute the closing time of the second receive window
