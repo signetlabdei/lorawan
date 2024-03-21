@@ -47,7 +47,7 @@ class LoraTag : public Tag
      * Create a LoraTag with a given spreading factor and collision.
      *
      * \param sf The Spreading Factor.
-     * \param destroyedBy The SF this tag's packet was destroyed by.
+     * \param destroyedBy The spreading factor this tag's packet was destroyed by.
      */
     LoraTag(uint8_t sf = 0, uint8_t destroyedBy = 0);
 
@@ -61,14 +61,14 @@ class LoraTag : public Tag
     /**
      * Read which Spreading Factor this packet was transmitted with.
      *
-     * \return This tag's packet's SF.
+     * \return This tag's packet's spreading factor.
      */
     uint8_t GetSpreadingFactor() const;
 
     /**
      * Read which Spreading Factor this packet was destroyed by.
      *
-     * \return The SF this packet was destroyed by.
+     * \return The spreading factor this packet was destroyed by.
      */
     uint8_t GetDestroyedBy() const;
 

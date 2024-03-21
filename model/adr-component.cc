@@ -117,7 +117,7 @@ AdrComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus>
         {
             NS_LOG_DEBUG("New Adaptive Data Rate (ADR) request");
 
-            // Get the SF used by the device
+            // Get the spreading factor used by the device
             uint8_t spreadingFactor = status->GetFirstReceiveWindowSpreadingFactor();
 
             // Get the device transmission power (dBm)
@@ -197,7 +197,7 @@ AdrComponent::AdrImplementation(uint8_t* newDataRate,
 
     NS_LOG_DEBUG("m_SNR = " << m_SNR);
 
-    // Get the SF used by the device
+    // Get the spreading factor used by the device
     uint8_t spreadingFactor = status->GetFirstReceiveWindowSpreadingFactor();
 
     NS_LOG_DEBUG("SF = " << (unsigned)spreadingFactor);
@@ -218,7 +218,7 @@ AdrComponent::AdrImplementation(uint8_t* newDataRate,
 
     NS_LOG_DEBUG("Margin = " << margin_SNR);
 
-    // Number of steps to decrement the SF (thereby increasing the data rate)
+    // Number of steps to decrement the spreading factor (thereby increasing the data rate)
     // and the TP.
     int steps = std::floor(margin_SNR / 3);
 
@@ -227,12 +227,12 @@ AdrComponent::AdrImplementation(uint8_t* newDataRate,
     // If the number of steps is positive (margin_SNR is positive, so its
     // decimal value is high) increment the data rate, if there are some
     // leftover steps after reaching the maximum possible data rate
-    //(corresponding to the minimum SF) decrement the transmission power as
+    //(corresponding to the minimum spreading factor) decrement the transmission power as
     // well for the number of steps left.
     // If, on the other hand, the number of steps is negative (margin_SNR is
     // negative, so its decimal value is low) increase the transmission power
-    //(note that the SF is not incremented as this particular algorithm
-    // expects the node itself to raise its SF whenever necessary).
+    //(note that the spreading factor is not incremented as this particular algorithm
+    // expects the node itself to raise its spreading factor whenever necessary).
     while (steps > 0 && spreadingFactor > min_spreadingFactor)
     {
         spreadingFactor--;

@@ -333,20 +333,20 @@ LoraInterferenceHelper::IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Ev
         it++;
     }
 
-    // For each SF, check if there was destructive interference
+    // For each spreading factor, check if there was destructive interference
     for (auto currentSf = uint8_t(7); currentSf <= uint8_t(12); currentSf++)
     {
         NS_LOG_DEBUG("Cumulative Interference Energy: "
                      << cumulativeInterferenceEnergy.at(unsigned(currentSf) - 7));
 
         // Use the computed cumulativeInterferenceEnergy to determine whether the
-        // interference with this SF destroys the packet
+        // interference with this spreading factor destroys the packet
         double signalPowerW = pow(10, rxPowerDbm / 10) / 1000;
         double signalEnergy = duration.GetSeconds() * signalPowerW;
         NS_LOG_DEBUG("Signal power in W: " << signalPowerW);
         NS_LOG_DEBUG("Signal energy: " << signalEnergy);
 
-        // Check whether the packet survives the interference of this SF
+        // Check whether the packet survives the interference of this spreading factor
         double snirIsolation = m_collisionSnir[unsigned(sf) - 7][unsigned(currentSf) - 7];
         NS_LOG_DEBUG("The needed isolation to survive is " << snirIsolation << " dB");
         double snir =

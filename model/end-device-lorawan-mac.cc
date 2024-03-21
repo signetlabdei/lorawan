@@ -728,10 +728,9 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
     // Check the dataRate
     /////////////////////
     // We need to know we can use it at all
-    // To assess this, we try and convert it to a SF/bandwidth combination and check if
-    // those values are valid. Since GetSfFromDataRate and
-    // GetBandwidthFromDataRate return 0 if the dataRate is not recognized, we
-    // can check against this.
+    // To assess this, we try and convert it to a spreading factor / bandwidth combination and check
+    // if those values are valid. Since GetSfFromDataRate and GetBandwidthFromDataRate return 0 if
+    // the dataRate is not recognized, we can check against this.
     uint8_t sf = GetSfFromDataRate(dataRate);
     double bw = GetBandwidthFromDataRate(dataRate);
     NS_LOG_DEBUG("SF: " << unsigned(sf) << ", BW: " << bw);

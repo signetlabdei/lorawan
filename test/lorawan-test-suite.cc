@@ -149,8 +149,8 @@ InterferenceTest::DoRun()
     interferenceHelper.ClearAllEvents();
 
     // Different SFs
-    // Packet would be destroyed if they both were SF7, but survives thanks to SF
-    // orthogonality
+    // Packet would be destroyed if they both were SF7, but survives thanks to spreading factor
+    // semi-orthogonality
     event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
     interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
@@ -158,7 +158,7 @@ InterferenceTest::DoRun()
                           "Packet did not survive interference as expected");
     interferenceHelper.ClearAllEvents();
 
-    // SF imperfect orthogonality
+    // Spreading factor imperfect orthogonality
     // Different SFs are orthogonal only up to a point
     event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
     interferenceHelper.Add(Seconds(2), 14 + 17, 8, nullptr, frequency);
@@ -167,7 +167,7 @@ InterferenceTest::DoRun()
                           "Packet was not destroyed by interference as expected");
     interferenceHelper.ClearAllEvents();
 
-    // If a more 'distant' SF is used, isolation gets better
+    // If a more 'distant' spreading factor is used, isolation gets better
     event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
     interferenceHelper.Add(Seconds(2), 14 + 17, 10, nullptr, frequency);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
@@ -176,7 +176,7 @@ InterferenceTest::DoRun()
     interferenceHelper.ClearAllEvents();
 
     // Cumulative interference
-    // Same-SF interference is cumulative
+    // Same spreading factor interference is cumulative
     event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
     interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
     interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
@@ -596,7 +596,7 @@ ReceivePathTest::DoRun()
     // Reset ();
 
     // //////////////////////////////////////////////////////////////////////////////
-    // // A ReceptionPath can receive a packet of any SF without any preconfiguration
+    // // A ReceptionPath can receive a packet of any spreading factor without any preconfiguration
     // //////////////////////////////////////////////////////////////////////////////
 
     // Simulator::Schedule (Seconds (1), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
@@ -1441,7 +1441,7 @@ PhyConnectivityTest::DoRun()
 
     Reset();
 
-    // Packet that arrives under sensitivity is received correctly if SF increases
+    // Packet that arrives under sensitivity is received correctly if the spreading factor increases
 
     txParams.sf = 7;
     edPhy2->SetSpreadingFactor(7);
@@ -1467,7 +1467,7 @@ PhyConnectivityTest::DoRun()
 
     Reset();
 
-    // Try again using a packet with higher SF
+    // Try again using a packet with higher spreading factor
     txParams.sf = 8;
     edPhy2->SetSpreadingFactor(8);
     edPhy2->GetMobility()->GetObject<ConstantPositionMobilityModel>()->SetPosition(
@@ -1539,7 +1539,7 @@ PhyConnectivityTest::DoRun()
 
     Reset();
 
-    // Packets can be lost because the PHY is not listening for the right SF
+    // Packets can be lost because the PHY is not listening for the right spreading factor
 
     txParams.sf = 8; // Send with 8, listening for 12
     Simulator::Schedule(Seconds(2),
@@ -1554,9 +1554,10 @@ PhyConnectivityTest::DoRun()
     Simulator::Run();
     Simulator::Destroy();
 
-    NS_TEST_EXPECT_MSG_EQ(m_wrongSfCalls,
-                          2,
-                          "Packets were received even though PHY was listening for a different SF");
+    NS_TEST_EXPECT_MSG_EQ(
+        m_wrongSfCalls,
+        2,
+        "Packets were received even though PHY was listening for a different spreading factor.");
 
     Reset();
 

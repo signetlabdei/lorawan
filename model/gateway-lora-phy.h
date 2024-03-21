@@ -119,7 +119,7 @@ class GatewayLoraPhy : public LoraPhy
      * This class represents a configurable reception path.
      *
      * Differently from EndDeviceLoraPhys, these do not need to be configured to
-     * listen for a certain SF. ReceptionPaths be either locked on an event or
+     * listen for a certain spreading factor. ReceptionPaths be either locked on an event or
      * free.
      */
     class ReceptionPath : public SimpleRefCount<GatewayLoraPhy::ReceptionPath>

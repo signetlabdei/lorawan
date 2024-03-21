@@ -58,9 +58,9 @@ namespace lorawan
  * Public Access:
  *
  *  (End device address) --- Current device parameters:
- *                           - First Receive Window SF and DRRe
+ *                           - First Receive Window Spreading Factor (SF) and Data Rate (DR)
  *                           - First Receive Window frequency
- *                           - Second Window SF and Data Rate (DR)
+ *                           - Second Window Spreading Factor (SF) and Data Rate (DR)
  *                           - Second Receive Window frequency
  *                       --- Reply
  *                           - Need for reply (true/false)
@@ -72,7 +72,7 @@ namespace lorawan
  * Private Access:
  *
  *  (Received packets list) - List of gateways that received the packet (see below)
- *                          - SF of the received packet
+ *                          - Spreading Factor (SF) of the received packet
  *                          - Frequency of the received packet
  *                          - Bandwidth of the received packet
  *
@@ -378,9 +378,9 @@ class EndDeviceStatus : public Object
 
   private:
     // Receive window data
-    uint8_t m_firstReceiveWindowSpreadingFactor = 0;  //!< SF for RX1 window
+    uint8_t m_firstReceiveWindowSpreadingFactor = 0;  //!< Spreading Factor (SF) for RX1 window
     double m_firstReceiveWindowFrequency = 0;         //!< Frequency [MHz] for RX1 window
-    uint8_t m_secondReceiveWindowSpreadingFactor = 0; //!< SF for RX2 window.
+    uint8_t m_secondReceiveWindowSpreadingFactor = 0; //!< Spreading Factor (SF) for RX2 window.
     double m_secondReceiveWindowFrequency = 869.525;  //!< Frequency [MHz] for RX2 window
     EventId m_receiveWindowEvent; //!< Event storing the next scheduled downlink transmission
 

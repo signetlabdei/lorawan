@@ -59,7 +59,7 @@ LoraTag::~LoraTag()
 uint32_t
 LoraTag::GetSerializedSize() const
 {
-    // Each datum about a SF is 1 byte + receivePower (the size of a double) +
+    // Each datum about a spreading factor is 1 byte + receivePower (the size of a double) +
     // frequency (the size of a double)
     return 3 + 2 * sizeof(double);
 }

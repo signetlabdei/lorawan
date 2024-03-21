@@ -135,11 +135,11 @@ class LorawanMac : public Object
     void SetLogicalLoraChannelHelper(LogicalLoraChannelHelper helper);
 
     /**
-     * Get the SF corresponding to a data rate, based on this MAC's region.
+     * Get the spreading factor corresponding to a data rate, based on this MAC's region.
      *
      * \param dataRate The data rate we need to convert to a Spreading Factor
      * value.
-     * \return The SF that corresponds to a data rate in this MAC's region, or 0
+     * \return The spreading factor that corresponds to a data rate in this MAC's region, or 0
      * if the dataRate is not valid.
      */
     uint8_t GetSfFromDataRate(uint8_t dataRate);
@@ -165,9 +165,9 @@ class LorawanMac : public Object
     double GetDbmForTxPower(uint8_t txPower);
 
     /**
-     * Set the vector to use to check up correspondence between SF and data rate.
+     * Set the vector to use to check up correspondence between spreading factor and data rate.
      *
-     * \param sfForDataRate A vector that contains at position i the SF that
+     * \param sfForDataRate A vector that contains at position i the spreading factor that
      * should correspond to data rate i.
      */
     void SetSfForDataRate(std::vector<uint8_t> sfForDataRate);
@@ -257,7 +257,7 @@ class LorawanMac : public Object
     LogicalLoraChannelHelper m_channelHelper;
 
     /**
-     * A vector holding the SF each data rate corresponds to.
+     * A vector holding the spreading factor each data rate corresponds to.
      */
     std::vector<uint8_t> m_sfForDataRate;
 

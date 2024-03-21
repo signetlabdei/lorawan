@@ -105,7 +105,7 @@ class LoraInterferenceHelper
         /**
          * Get the spreading factor used by this signal.
          *
-         * \return The spreding factor value.
+         * \return The spreading factor value.
          */
         uint8_t GetSpreadingFactor() const;
 

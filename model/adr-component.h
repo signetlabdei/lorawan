@@ -84,7 +84,7 @@ class AdrComponent : public NetworkControllerComponent
     /**
      * Convert spreading factor values [7:12] to respective data rate values [0:5].
      *
-     * \param sf The spreding factor value.
+     * \param sf The spreading factor value.
      * \return Value of the data rate as uint8_t.
      */
     uint8_t SfToDr(uint8_t sf);
@@ -170,19 +170,20 @@ class AdrComponent : public NetworkControllerComponent
     int historyRange;                      //!< Number of previous packets to consider
     enum CombiningMethod historyAveraging; //!< Received SNR history policy
 
-    const int min_spreadingFactor = 7;    //!< SF lower limit
+    const int min_spreadingFactor = 7;    //!< Spreading factor lower limit
     const int min_transmissionPower = 2;  //!< Minimum transmission power (dBm) (Europe)
     const int max_transmissionPower = 14; //!< Maximum transmission power (dBm) (Europe)
     // const int offset = 10;                //!< Device specific SNR margin (dB)
     const int B = 125000; //!< Bandwidth (Hz)
     const int NF = 6;     //!< Noise Figure (dB)
-    double threshold[6] = {-20.0,
-                           -17.5,
-                           -15.0,
-                           -12.5,
-                           -10.0,
-                           -7.5}; //!< Vector containing the required SNR for the 6 allowed SF
-                                  //!< levels ranging from 7 to 12 (the SNR values are in dB).
+    double threshold[6] = {
+        -20.0,
+        -17.5,
+        -15.0,
+        -12.5,
+        -10.0,
+        -7.5}; //!< Vector containing the required SNR for the 6 allowed spreading factor
+               //!< levels ranging from 7 to 12 (the SNR values are in dB).
 
     bool m_toggleTxPower; //!< Whether to control transmission power of end devices or not
 };

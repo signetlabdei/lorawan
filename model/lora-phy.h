@@ -246,7 +246,7 @@ class LoraPhy : public Object
     void SetDevice(Ptr<NetDevice> device);
 
     /**
-     * Compute the symbol time from SF and bandwidth.
+     * Compute the symbol time from spreading factor and bandwidth.
      *
      * \param txParams The parameters for transmission.
      * \return TSym, the time required to send a LoRa modulation symbol.

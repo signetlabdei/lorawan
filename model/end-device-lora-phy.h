@@ -188,7 +188,7 @@ class EndDeviceLoraPhy : public LoraPhy
      * Set the Spreading Factor this end device will listen for.
      *
      * The EndDeviceLoraPhy object will not be able to lock on transmissions that
-     * use a different SF than the one it's listening for.
+     * use a different spreading factor than the one it's listening for.
      *
      * \param sf The spreading factor to listen for.
      */
@@ -250,7 +250,7 @@ class EndDeviceLoraPhy : public LoraPhy
     void SwitchToTx(double txPowerDbm);
 
     /**
-     * Trace source for when a packet is lost because it was using a SF different from
+     * Trace source for when a packet is lost because it was using a spreading factor different from
      * the one this EndDeviceLoraPhy was configured to listen for.
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_wrongSf;
