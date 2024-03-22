@@ -1227,14 +1227,6 @@ PhyConnectivityTest::Interference(Ptr<const Packet> packet, uint32_t node)
 }
 
 void
-PhyConnectivityTest::NoMoreDemodulators(Ptr<const Packet> packet, uint32_t node)
-{
-    NS_LOG_FUNCTION(packet << node);
-
-    m_noMoreDemodulatorsCalls++;
-}
-
-void
 PhyConnectivityTest::WrongSf(Ptr<const Packet> packet, uint32_t node)
 {
     NS_LOG_FUNCTION(packet << node);
