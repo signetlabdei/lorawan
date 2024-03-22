@@ -222,6 +222,12 @@ class LinkAdrReq : public MacCommand
     /**
      * Constructor with given fields.
      *
+     * The parameters of this constructor are serializable fields of the MAC command specified by
+     * the LoRaWAN protocol. They represent MAC and PHY layer configurations to be applied by the
+     * receiving end device. See, [LoRaWAN® L2 1.0.4 Specification (TS001-1.0.4)] and [LoRaWAN®
+     * Regional Parameters RP002-1.0.4] for more details on how the fields are used and which
+     * physical values they stand for.
+     *
      * \param dataRate The DataRate field to set.
      * \param txPower The TXPower field to set.
      * \param channelMask The ChMask field to set.
@@ -272,8 +278,10 @@ class LinkAdrReq : public MacCommand
     int GetRepetitions();
 
   private:
-    uint8_t m_dataRate;     //!< The DataRate field
-    uint8_t m_txPower;      //!< The TXPower field
+    uint8_t m_dataRate;     //!< The DataRate field, a serializable parameter for setting the
+                            //!< spreading factor and bandwidth of end devices
+    uint8_t m_txPower;      //!< The TXPower field, a serializable parameter for setting the
+                            //!< transmission power of end devices
     uint16_t m_channelMask; //!< The ChMask field
     uint8_t m_chMaskCntl;   //!< The ChMaskCntl field
     uint8_t m_nbRep;        //!< The NbTrans field
