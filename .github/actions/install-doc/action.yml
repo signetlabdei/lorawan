@@ -25,5 +25,6 @@ runs:
       run: |
         sed -i '/lte/i\ *     - lorawan' ../main.h
         sed -i '/lr-wpan\/doc\/lr-wpan.rst/a\\t\$(SRC)\/lorawan\/doc\/lorawan.rst \\' Makefile
-        sed -i '/lr-wpan\/doc\/lr-wpan-arch.dia/i\\t\$(SRC)\/lorawan\/doc\/figures\/LoRaWANTopology.pdf \\' Makefile
+        sed -i '/lr-wpan\/doc\/lr-wpan-arch.dia/i\\t\$(SRC)\/lorawan\/doc\/figures\/lorawan-topology.pdf \\' Makefile
+        sed -i '/lr-wpan\/doc\/lr-wpan-arch.dia/i\\t\$(SRC)\/lorawan\/doc\/figures\/lorawan-topology.png \\' Makefile
         sed -i '/lr-wpan/i\   lorawan' source/index.rst

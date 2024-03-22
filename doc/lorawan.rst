@@ -86,7 +86,7 @@ MAC layer model section of this document.
 
 .. _lorawan-topology:
 
-.. figure:: figures/LoRaWANTopology.*
+.. figure:: figures/lorawan-topology.*
 
    Topology of the LoRaWAN architecture.
 
