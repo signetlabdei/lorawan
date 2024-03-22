@@ -76,9 +76,9 @@ class OneShotSenderHelper
     /**
      * Set the send time of the applications.
      *
-     * \todo It does not make sense that all applications send at the exact same time.
-     *
      * \param sendTime The Time to set.
+     *
+     * \todo It does not make sense that all applications send at the exact same time.
      */
     void SetSendTime(Time sendTime);
 

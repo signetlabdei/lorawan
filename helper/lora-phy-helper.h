@@ -114,7 +114,7 @@ class LoraPhyHelper
     Ptr<LoraChannel> m_channel; //!< The channel instance the PHYs will be connected to.
     int m_maxReceptionPaths;    //!< The maximum number of receive paths at the gateway.
     bool m_txPriority; //!< Whether to give priority to downlink transmission over reception at the
-                       //!< gateways. \todo This parameter does nothing.
+                       //!< gateways. \todo This parameter does nothing, to be removed.
 };
 
 } // namespace lorawan

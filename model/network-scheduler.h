@@ -87,9 +87,9 @@ class NetworkScheduler : public Object
 
   private:
     TracedCallback<Ptr<const Packet>>
-        m_receiveWindowOpened;   //!< Trace callback source for reception windows openings. \todo
-                                 //!< Never called.
-    Ptr<NetworkStatus> m_status; //!< A pointer to the NetworkStatus object.
+        m_receiveWindowOpened;           //!< Trace callback source for reception windows openings.
+                                         //!< \todo Never called. Place calls in the right places.
+    Ptr<NetworkStatus> m_status;         //!< A pointer to the NetworkStatus object.
     Ptr<NetworkController> m_controller; //!< A pointer to the NetworkController object.
 };
 

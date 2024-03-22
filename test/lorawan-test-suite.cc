@@ -440,7 +440,7 @@ HeaderTest::DoRun()
  *
  * It tests a number of cases related to SimpleGatewayLoraPhy's parallel reception paths
  *
- * \todo The test is commented out
+ * \todo The test is commented out. To be fixed.
  */
 class ReceivePathTest : public TestCase
 {
@@ -1148,17 +1148,6 @@ class PhyConnectivityTest : public TestCase
     void Interference(Ptr<const Packet> packet, uint32_t node);
 
     /**
-     * Callback for tracing LostPacketBecauseNoMoreReceivers.
-     *
-     * \param packet The packet lost.
-     * \param node The receiver node id if any, 0 otherwise.
-     *
-     * \todo This callback is never called because its only specified for gateways and here we test
-     * end devices. to be removed.
-     */
-    void NoMoreDemodulators(Ptr<const Packet> packet, uint32_t node);
-
-    /**
      * Callback for tracing LostPacketBecauseWrongFrequency.
      *
      * \param packet The packet lost.
@@ -1196,7 +1185,6 @@ class PhyConnectivityTest : public TestCase
     int m_receivedPacketCalls = 0;      //!< Counter for ReceivedPacket calls
     int m_underSensitivityCalls = 0;    //!< Counter for LostPacketBecauseUnderSensitivity calls
     int m_interferenceCalls = 0;        //!< Counter for LostPacketBecauseInterference calls
-    int m_noMoreDemodulatorsCalls = 0;  //!< Counter for LostPacketBecauseNoMoreReceivers calls
     int m_wrongSfCalls = 0;             //!< Counter for LostPacketBecauseWrongSpreadingFactor calls
     int m_wrongFrequencyCalls = 0;      //!< Counter for LostPacketBecauseWrongFrequency calls
 };
@@ -1349,16 +1337,6 @@ PhyConnectivityTest::Reset()
                                        MakeCallback(&PhyConnectivityTest::Interference, this));
     edPhy3->TraceConnectWithoutContext("LostPacketBecauseInterference",
                                        MakeCallback(&PhyConnectivityTest::Interference, this));
-
-    edPhy1->TraceConnectWithoutContext(
-        "LostPacketBecauseNoMoreReceivers",
-        MakeCallback(&PhyConnectivityTest::NoMoreDemodulators, this));
-    edPhy2->TraceConnectWithoutContext(
-        "LostPacketBecauseNoMoreReceivers",
-        MakeCallback(&PhyConnectivityTest::NoMoreDemodulators, this));
-    edPhy3->TraceConnectWithoutContext(
-        "LostPacketBecauseNoMoreReceivers",
-        MakeCallback(&PhyConnectivityTest::NoMoreDemodulators, this));
 
     edPhy1->TraceConnectWithoutContext("LostPacketBecauseWrongFrequency",
                                        MakeCallback(&PhyConnectivityTest::WrongFrequency, this));
@@ -1613,7 +1591,7 @@ PhyConnectivityTest::DoRun()
  *
  * It tests the functionalities of the MAC layer of LoRaWAN devices
  *
- * \todo Not implemented
+ * \todo Not implemented yet.
  */
 class LorawanMacTest : public TestCase
 {

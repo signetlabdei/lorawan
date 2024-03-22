@@ -177,9 +177,11 @@ class LorawanMacHelper
      *
      *
      * \param endDevices The end devices to configure.
-     * \param gateways \todo Unused parameter.
+     * \param gateways The gateways in the network (this is only a placeholder parameter).
      * \param distribution The distribution (probability mass function) of DR assignment.
      * \return A vector containing the final number of devices per DR.
+     *
+     * \todo Remove unused parameter gateways.
      */
     static std::vector<int> SetSpreadingFactorsGivenDistribution(NodeContainer endDevices,
                                                                  NodeContainer gateways,

@@ -327,17 +327,6 @@ class EndDeviceStatus : public Object
     void AddMACCommand(Ptr<MacCommand> macCommand);
 
     /**
-     * Update gateway data when more then one gateway receive the same packet.
-     *
-     * \param gwList List of gateways with previous receptions.
-     * \param gwAddress Gateway address of the current reception.
-     * \param rcvPower Reception power.
-     *
-     * \todo not implemented.
-     */
-    void UpdateGatewayData(GatewayList gwList, Address gwAddress, double rcvPower);
-
-    /**
      * Check if there is already a running reception window event scheduled for this end device.
      *
      * \return True if a reception window event is already scheduled, false otherwise.

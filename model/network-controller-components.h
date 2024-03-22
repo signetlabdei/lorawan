@@ -154,15 +154,6 @@ class LinkCheckComponent : public NetworkControllerComponent
     void OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus) override;
 
   private:
-    /**
-     * Update the EndDeviceStatus object on LinkChackReq MAC command.
-     *
-     * \todo Not implemented. Also not sure what this function is meant to do.
-     *
-     * \param packet A pointer to the Packet.
-     * \param status A pointer to the EndDeviceStatus object of the sender.
-     */
-    void UpdateLinkCheckAns(Ptr<const Packet> packet, Ptr<EndDeviceStatus> status);
 };
 } // namespace lorawan
 

@@ -40,9 +40,9 @@ class NwkID
     /**
      * Construct a new NwkID object.
      *
-     * \todo Add warning as in Set().
-     *
      * \param nwkId The network id value [0:127].
+     *
+     * \todo Add warning as in Set().
      */
     NwkID(uint8_t nwkId = 0);
 
@@ -80,9 +80,9 @@ class NwkAddr
     /**
      * Construct a new NwkAddr object.
      *
-     * \todo Add warning as in Set().
-     *
      * \param nwkId Network addr value [0:2^25-1].
+     *
+     * \todo Add warning as in Set().
      */
     NwkAddr(uint32_t nwkId = 0);
 
@@ -179,10 +179,10 @@ class LoraDeviceAddress
      * least significant bits of the uint32 are those that are expected to
      * contain the nwkAddr.
      *
-     * \todo Not implemented.
-     *
      * \param nwkId Network id numeric value.
      * \param nwkAddr Network address numeric value.
+     *
+     * \todo Not implemented, this is a placeholder for future implementation.
      */
     void Set(uint8_t nwkId, uint32_t nwkAddr);
 

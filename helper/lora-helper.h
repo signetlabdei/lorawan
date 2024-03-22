@@ -165,8 +165,10 @@ class LoraHelper
      * For each input device print the current position, data rate and transmission power settings.
      *
      * \param endDevices The devices to track.
-     * \param gateways \todo unused parameter.
+     * \param gateways The gateways in the network (this is only a placeholder parameter).
      * \param filename The output filename.
+     *
+     * \todo Remove unused parameter gateways.
      */
     void DoPrintDeviceStatus(NodeContainer endDevices,
                              NodeContainer gateways,

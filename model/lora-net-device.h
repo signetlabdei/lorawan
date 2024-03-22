@@ -150,11 +150,11 @@ class LoraNetDevice : public NetDevice
      * Receive a packet from the lower layer and pass the
      * packet up the stack.
      *
-     * \todo Not implemented.
-     *
      * \param packet The packet we need to forward.
      * \param from The from address.
      * \param to The to address.
+     *
+     * \todo Not implemented, this is a placeholder for future implementation.
      */
     void ForwardUp(Ptr<Packet> packet, Mac48Address from, Mac48Address to);
 

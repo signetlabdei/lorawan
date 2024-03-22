@@ -229,9 +229,9 @@ class LoraInterferenceHelper
     /**
      * Set the collision matrix.
      *
-     * \todo Redundant, only used by constructor which also sets the matrix directly.
-     *
      * \param collisionMatrix The type of collision matrix to set.
+     *
+     * \todo Redundant, only used by constructor which also sets the matrix directly. To be removed.
      */
     void SetCollisionMatrix(enum CollisionMatrix collisionMatrix);
 

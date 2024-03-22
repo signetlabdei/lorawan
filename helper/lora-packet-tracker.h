@@ -67,7 +67,8 @@ struct MacPacketStatus
     Ptr<const Packet> packet; //!< Packet being tracked
     uint32_t senderId;        //!< Node id of the packet sender
     Time sendTime;     //!< Timestamp of the pkt leaving MAC layer to go down the stack of sender
-    Time receivedTime; //!< Time of first reception \todo Parameter set to max and not used
+    Time receivedTime; //!< Time of first reception (placeholder field)
+                       //!< \todo Field set to max and not used
     std::map<int, Time> receptionTimes; //!< Timestamp of the pkt leaving MAC layer to go up the
                                         //!< stack, mapped by receiver's node id
 };
@@ -227,8 +228,6 @@ class LoraPacketTracker
     std::string PrintPhyPacketsPerGw(Time startTime, Time stopTime, int systemId);
 
     /**
-     * \todo Not implemented.
-     *
      * Count packets in a time interval to evaluate the performance at MAC level of a specific
      * gateway.
      *
@@ -236,20 +235,22 @@ class LoraPacketTracker
      * \param stopTime Timestamp of the end of the measurement.
      * \param systemId Node id of the gateway.
      * \return String of output values.
+     *
+     * \todo Not implemented, this is a placeholder for future implementation.
      */
     std::string CountMacPacketsPerGw(Time startTime, Time stopTime, int systemId);
     /** \copydoc ns3::lorawan::LoraPacketTracker::CountMacPacketsPerGw */
     std::string PrintMacPacketsPerGw(Time startTime, Time stopTime, int systemId);
 
     /**
-     * \todo Not implemented.
-     *
      * In a time interval, count the number of retransmissions that were needed to correctly deliver
      * a packet and receive the corresponding acknowledgment.
      *
      * \param startTime Timestamp of the start of the measurement.
      * \param stopTime Timestamp of the end of the measurement.
      * \return String of output values.
+     *
+     * \todo Not implemented, this is a placeholder for future implementation.
      */
     std::string CountRetransmissions(Time startTime, Time stopTime);
 
