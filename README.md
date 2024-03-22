@@ -4,12 +4,12 @@
 [![codecov](https://codecov.io/gh/signetlabdei/lorawan/graph/badge.svg?token=EVBlTb4LgQ)](https://codecov.io/gh/signetlabdei/lorawan)
 
 This is an [ns-3](https://www.nsnam.org "ns-3 Website") module that can be used
-to perform simulations of a [LoRaWAN](http://www.lora-alliance.org/technology
+to perform simulations of a [LoRaWAN](https://lora-alliance.org/about-lorawan
 "LoRa Alliance") network.
 
-[API documentation](https://signetlabdei.github.io/lorawan-docs/html/index.html).
-
 [Module Documentation](https://signetlabdei.github.io/lorawan-docs/models/build/html/lorawan.html).
+
+[Doxygen API Documentation](https://signetlabdei.github.io/lorawan-docs/html/index.html).
 
 ## Getting started ##
 
@@ -20,11 +20,13 @@ To run simulations using this module, you first need to install ns-3. If you are
 ```bash
 sudo apt install g++ python3 cmake ninja-build git ccache
 ```
+
 Otherwise please directly refer to the [prerequisites section of the ns-3 installation page](https://www.nsnam.org/wiki/Installation#Prerequisites).
 
 > Note: While the `ccache` package is not strictly required, it is highly recommended. It can significantly enhance future compilation times by saving tens of minutes, albeit with a higher disk space cost of approximately 5GB. This disk space usage can be eventually reduced through a setting.
 
 Then, you need to:
+
 1. Clone the ns-3 codebase,
 2. Clone this repository inside the `src` directory therein, and
 3. Checkout the latest ns-3 version supported by this module.
@@ -42,23 +44,28 @@ tag=$(< src/lorawan/NS3-VERSION) && tag=${tag#release } && git checkout $tag -b 
 Ns-3 adopts a development-oriented philosophy. Before you can run anything, you'll need to compile the ns-3 code. You have two options:
 
 1. **Compile ns-3 as a whole:** Make all simulation modules available by configuring and building as follows (ensure you are in the `ns-3-dev` folder!):
+
    ```bash
    ./ns3 configure --enable-tests --enable-examples &&
    ./ns3 build
    ```
 
 2. **Focus exclusively on the lorawan module:** To expedite the compilation process, as it can take more than 30/40 minutes on slow hardware, change the configuration as follows:
+
    ```bash
    ./ns3 clean &&
    ./ns3 configure --enable-tests --enable-examples --enable-modules lorawan &&
    ./ns3 build
    ```
+
    The first line ensures you start from a clean build state.
 
 Finally, ensure tests run smoothly with:
+
 ```bash
 ./test.py
 ```
+
 If the script reports that all tests passed or that just `three-gpp-propagation-loss-model` failed[^1], you are good to go.
 
 If other tests fail or crash, consider filing an issue.
@@ -72,6 +79,11 @@ The module includes the following examples:
 - `simple-network-example`
 - `complete-network-example`
 - `network-server-example`
+- `adr-example`
+- `aloha-throughput`
+- `frame-counter-update`
+- `lora-energy-model-example`
+- `parallel-reception-example`
 
 Examples can be run via the `./ns3 run example-name` command (refer to `./ns3 run --help` for more options).
 
@@ -82,17 +94,18 @@ about how to contribute to this module.
 
 ## Documentation ##
 
-For a complete description of the module, refer to `doc/lorawan.rst`.
+For a description of the foundational models of this module, refer to `doc/lorawan.rst`.
 
-- [ns-3 tutorial](https://www.nsnam.org/docs/tutorial/html "ns-3 Tutorial")
-- [ns-3 manual](https://www.nsnam.org/docs/manual/html "ns-3 Manual")
+Other useful documentation sources:
+
+- [ns-3 tutorial](https://www.nsnam.org/docs/tutorial/html/ "ns-3 Tutorial"): start here if you are new to ns-3!
+- [ns-3 manual](https://www.nsnam.org/docs/manual/html/ "ns-3 Manual"): overview of the fundamental tools and abstractions in ns-3.
 - The LoRaWAN specification can be requested at the [LoRa Alliance
   website](http://www.lora-alliance.org)
 
 ## Getting help ##
 
-To discuss and get help on how to use this module, you can write to us on [our
-gitter chat](https://gitter.im/ns-3-lorawan "lorawan Gitter chat").
+To discuss and get help on how to use this module, you can open an issue here.
 
 ## Authors ##
 
@@ -114,6 +127,7 @@ supervision of Prof. Lorenzo Vangelista, Prof. Michele Zorzi and with the help
 of Marco Centenaro.
 
 Publications:
+
 - D. Magrin, M. Capuzzo and A. Zanella, "A Thorough Study of LoRaWAN Performance Under Different
   Parameter Settings," in IEEE Internet of Things Journal. 2019.
   [Link](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8863372&isnumber=6702522).
