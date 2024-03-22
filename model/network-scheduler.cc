@@ -82,7 +82,7 @@ NetworkScheduler::OnReceiveWindowOpportunity(LoraDeviceAddress deviceAddress, in
     {
         NS_LOG_DEBUG("No suitable gateway found for first window.");
 
-        // No suitable GW was found, but there's still hope to find one for the
+        // No suitable gateway was found, but there's still hope to find one for the
         // second window.
         // Schedule another OnReceiveWindowOpportunity event
         m_status->GetEndDeviceStatus(deviceAddress)
@@ -95,7 +95,7 @@ NetworkScheduler::OnReceiveWindowOpportunity(LoraDeviceAddress deviceAddress, in
     }
     else if (gwAddress == Address() && window == 2)
     {
-        // No suitable GW was found and this was our last opportunity
+        // No suitable gateway was found and this was our last opportunity
         // Simply give up.
         NS_LOG_DEBUG("Giving up on reply: no suitable gateway was found "
                      << "on the second receive window");

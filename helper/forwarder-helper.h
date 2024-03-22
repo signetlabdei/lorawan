@@ -37,26 +37,53 @@ namespace lorawan
 {
 
 /**
- * This class can be used to install Forwarder applications on a set of
- * gateways.
+ * \ingroup lorawan
+ *
+ * This class can be used to install Forwarder applications on a set of gateways.
  */
 class ForwarderHelper
 {
   public:
-    ForwarderHelper();
+    ForwarderHelper();  //!< Default constructor
+    ~ForwarderHelper(); //!< Destructor
 
-    ~ForwarderHelper();
-
+    /**
+     * Helper function used to set the underlying application attributes.
+     *
+     * \param name The name of the application attribute to set.
+     * \param value The value of the application attribute to set.
+     */
     void SetAttribute(std::string name, const AttributeValue& value);
 
+    /**
+     * Install a Forwarder application on each node of the input container configured with
+     * all the attributes set with SetAttribute or other functions of this class.
+     *
+     * \param c NodeContainer of the set of nodes on which an Forwarder will be installed.
+     * \return Container of Ptr to the applications installed.
+     */
     ApplicationContainer Install(NodeContainer c) const;
 
+    /**
+     * Install a Forwarder application on the input Node configured with all the attributes
+     * set with SetAttribute or other functions of this class.
+     *
+     * \param node The node on which a Forwarder will be installed.
+     * \return Container of the Ptr to the application installed.
+     */
     ApplicationContainer Install(Ptr<Node> node) const;
 
   private:
+    /**
+     * Install a Forwarder application on the input Node configured with all the attributes
+     * set with SetAttribute or other functions of this class.
+     *
+     * \param node The node on which a Forwarder will be installed.
+     * \return A pointer to the applications installed.
+     */
     Ptr<Application> InstallPriv(Ptr<Node> node) const;
 
-    ObjectFactory m_factory;
+    ObjectFactory m_factory; //!< The object factory
 };
 
 } // namespace lorawan

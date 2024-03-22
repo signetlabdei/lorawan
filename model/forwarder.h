@@ -33,26 +33,32 @@ namespace lorawan
 {
 
 /**
+ * \ingroup lorawan
+ *
  * This application forwards packets between NetDevices:
  * LoraNetDevice -> PointToPointNetDevice and vice versa.
  */
 class Forwarder : public Application
 {
   public:
-    Forwarder();
-    ~Forwarder() override;
+    Forwarder();           //!< Default constructor
+    ~Forwarder() override; //!< Destructor
 
+    /**
+     *  Register this type.
+     *  \return The object TypeId.
+     */
     static TypeId GetTypeId();
 
     /**
-     * Sets the device to use to communicate with the EDs.
+     * Sets the device to use to communicate with the end devices.
      *
      * \param loraNetDevice The LoraNetDevice on this node.
      */
     void SetLoraNetDevice(Ptr<LoraNetDevice> loraNetDevice);
 
     /**
-     * Sets the P2P device to use to communicate with the NS.
+     * Sets the P2P device to use to communicate with the network server.
      *
      * \param pointToPointNetDevice The P2PNetDevice on this node.
      */
@@ -65,7 +71,7 @@ class Forwarder : public Application
      * \param packet The packet we received.
      * \param protocol The protocol number associated to this packet.
      * \param sender The address of the sender.
-     * \returns True if we can handle the packet, false otherwise.
+     * \return True if we can handle the packet, false otherwise.
      */
     bool ReceiveFromLora(Ptr<NetDevice> loraNetDevice,
                          Ptr<const Packet> packet,
@@ -73,29 +79,30 @@ class Forwarder : public Application
                          const Address& sender);
 
     /**
-     * Receive a packet from the PointToPointNetDevice
+     * Receive a packet from the PointToPointNetDevice.
+     *
+     * \copydoc ns3::NetDevice::ReceiveCallback
      */
-    bool ReceiveFromPointToPoint(Ptr<NetDevice> pointToPointNetDevice,
+    bool ReceiveFromPointToPoint(Ptr<NetDevice> device,
                                  Ptr<const Packet> packet,
                                  uint16_t protocol,
                                  const Address& sender);
 
     /**
-     * Start the application
+     * Start the application.
      */
     void StartApplication() override;
 
     /**
-     * Stop the application
+     * Stop the application.
      */
     void StopApplication() override;
 
   private:
     Ptr<LoraNetDevice> m_loraNetDevice; //!< Pointer to the node's LoraNetDevice
 
-    Ptr<PointToPointNetDevice> m_pointToPointNetDevice; //!< Pointer to the
-                                                        //! P2PNetDevice we use to
-    //! communicate with the NS
+    Ptr<PointToPointNetDevice> m_pointToPointNetDevice; //!< Pointer to the P2PNetDevice we use to
+                                                        //!< communicate with the network server
 };
 
 } // namespace lorawan

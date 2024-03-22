@@ -35,6 +35,8 @@ class NetworkStatus;
 class NetworkControllerComponent;
 
 /**
+ * \ingroup lorawan
+ *
  * This class collects a series of components that deal with various aspects
  * of managing the network, and queries them for action when a new packet is
  * received or other events occur in the network.
@@ -42,19 +44,31 @@ class NetworkControllerComponent;
 class NetworkController : public Object
 {
   public:
+    /**
+     *  Register this type.
+     *  \return The object TypeId.
+     */
     static TypeId GetTypeId();
 
-    NetworkController();
-    NetworkController(Ptr<NetworkStatus> networkStatus);
-    ~NetworkController() override;
+    NetworkController();           //!< Default constructor
+    ~NetworkController() override; //!< Destructor
 
     /**
-     * Add a new NetworkControllerComponent
+     * Construct a new NetworkController object providing the NetworkStatus.
+     *
+     * \param networkStatus A pointer to the NetworkStatus object.
+     */
+    NetworkController(Ptr<NetworkStatus> networkStatus);
+
+    /**
+     * Add a new NetworkControllerComponent.
+     *
+     * \param component A pointer to the NetworkControllerComponent object.
      */
     void Install(Ptr<NetworkControllerComponent> component);
 
     /**
-     * Method that is called by the NetworkServer when a new packet is received.
+     * Method that is called by the NetworkServer application when a new packet is received.
      *
      * \param packet The newly received packet.
      */
@@ -62,13 +76,16 @@ class NetworkController : public Object
 
     /**
      * Method that is called by the NetworkScheduler just before sending a reply
-     * to a certain End Device.
+     * to a certain end device.
+     *
+     * \param endDeviceStatus A pointer to the EndDeviceStatus object.
      */
     void BeforeSendingReply(Ptr<EndDeviceStatus> endDeviceStatus);
 
   private:
-    Ptr<NetworkStatus> m_status;
-    std::list<Ptr<NetworkControllerComponent>> m_components;
+    Ptr<NetworkStatus> m_status; //!< A pointer to the NetworkStatus object.
+    std::list<Ptr<NetworkControllerComponent>>
+        m_components; //!< List of NetworkControllerComponent objects.
 };
 
 } // namespace lorawan

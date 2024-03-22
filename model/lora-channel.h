@@ -49,6 +49,8 @@ class LoraPhy;
 struct LoraTxParameters;
 
 /**
+ * \ingroup lorawan
+ *
  * A struct that holds meaningful parameters for transmission on a
  * LoraChannel.
  */
@@ -66,6 +68,8 @@ struct LoraChannelParameters
 std::ostream& operator<<(std::ostream& os, const LoraChannelParameters& params);
 
 /**
+ * \ingroup lorawan
+ *
  * The class that delivers packets among PHY layers.
  *
  * This class is tasked with taking packets that PHY layers want to send and,
@@ -77,12 +81,14 @@ std::ostream& operator<<(std::ostream& os, const LoraChannelParameters& params);
 class LoraChannel : public Channel
 {
   public:
-    // TypeId
+    /**
+     *  Register this type.
+     *  \return The object TypeId.
+     */
     static TypeId GetTypeId();
 
-    // Constructor and destructor
-    LoraChannel();
-    ~LoraChannel() override;
+    LoraChannel();           //!< Default constructor
+    ~LoraChannel() override; //!< Destructor
 
     // Inherited from Channel.
     std::size_t GetNDevices() const override;
@@ -170,7 +176,7 @@ class LoraChannel : public Channel
      *
      * \param i The index of the phy to start reception on.
      * \param packet The packet the phy will receive.
-     * \param parameters The parameters that characterize this transmission
+     * \param parameters The parameters that characterize this transmission.
      */
     void Receive(uint32_t i, Ptr<Packet> packet, LoraChannelParameters parameters) const;
 

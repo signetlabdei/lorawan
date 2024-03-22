@@ -28,12 +28,18 @@ namespace lorawan
 {
 
 /**
- * Tag used to save various data about a packet, like its Spreading Factor and
- * data about interference.
+ * \ingroup lorawan
+ *
+ * Tag used to save various data about a packet, like its Spreading Factor and data about
+ * interference.
  */
 class LoraTag : public Tag
 {
   public:
+    /**
+     *  Register this type.
+     *  \return The object TypeId.
+     */
     static TypeId GetTypeId();
     TypeId GetInstanceTypeId() const override;
 
@@ -41,11 +47,11 @@ class LoraTag : public Tag
      * Create a LoraTag with a given spreading factor and collision.
      *
      * \param sf The Spreading Factor.
-     * \param destroyedBy The SF this tag's packet was destroyed by.
+     * \param destroyedBy The spreading factor this tag's packet was destroyed by.
      */
     LoraTag(uint8_t sf = 0, uint8_t destroyedBy = 0);
 
-    ~LoraTag() override;
+    ~LoraTag() override; //!< Destructor
 
     void Serialize(TagBuffer i) const override;
     void Deserialize(TagBuffer i) override;
@@ -55,14 +61,14 @@ class LoraTag : public Tag
     /**
      * Read which Spreading Factor this packet was transmitted with.
      *
-     * \return This tag's packet's SF.
+     * \return This tag's packet's spreading factor.
      */
     uint8_t GetSpreadingFactor() const;
 
     /**
      * Read which Spreading Factor this packet was destroyed by.
      *
-     * \return The SF this packet was destroyed by.
+     * \return The spreading factor this packet was destroyed by.
      */
     uint8_t GetDestroyedBy() const;
 
@@ -98,15 +104,25 @@ class LoraTag : public Tag
      * Set the frequency of the packet.
      *
      * This value works in two ways:
-     * - It is used by the GW to signal to the NS the frequency of the uplink
-         packet
-     * - It is used by the NS to signal to the GW the frequency of a downlink
-         packet
+     * - It is used by the gateway to signal to the network server the frequency of the uplink
+     * packet
+     * - It is used by the network server to signal to the gateway the frequency of a downlink
+     * packet.
+     *
+     * \param frequency The frequency value [MHz].
      */
     void SetFrequency(double frequency);
 
     /**
      * Get the frequency of the packet.
+     *
+     * This value works in two ways:
+     * - It is used by the gateway to signal to the network server the frequency of the uplink
+     * packet
+     * - It is used by the network server to signal to the gateway the frequency of a downlink
+     * packet.
+     *
+     * \return The frequency value [MHz].
      */
     double GetFrequency() const;
 
@@ -128,9 +144,8 @@ class LoraTag : public Tag
     uint8_t m_sf;          //!< The Spreading Factor used by the packet.
     uint8_t m_destroyedBy; //!< The Spreading Factor that destroyed the packet.
     double m_receivePower; //!< The reception power of this packet.
-    uint8_t m_dataRate;    //!< The Data Rate that needs to be used to send this
-    //! packet.
-    double m_frequency; //!< The frequency of this packet
+    uint8_t m_dataRate;    //!< The data rate that needs to be used to send this packet.
+    double m_frequency;    //!< The frequency of this packet
 };
 } // namespace lorawan
 } // namespace ns3

@@ -37,17 +37,22 @@ namespace lorawan
 class LoraChannel;
 
 /**
+ * \ingroup lorawan
+ *
  * Class representing a simple LoRa transceiver, with an error model based
  * on receiver sensitivity and a SIR table.
  */
 class SimpleEndDeviceLoraPhy : public EndDeviceLoraPhy
 {
   public:
+    /**
+     *  Register this type.
+     *  \return The object TypeId.
+     */
     static TypeId GetTypeId();
 
-    // Constructor and destructor
-    SimpleEndDeviceLoraPhy();
-    ~SimpleEndDeviceLoraPhy() override;
+    SimpleEndDeviceLoraPhy();           //!< Default constructor
+    ~SimpleEndDeviceLoraPhy() override; //!< Destructor
 
     // Implementation of EndDeviceLoraPhy's pure virtual functions
     void StartReceive(Ptr<Packet> packet,

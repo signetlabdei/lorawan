@@ -160,8 +160,8 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
         // There are a series of properties the packet needs to respect in order
         // for us to be able to lock on it:
         // - It's on frequency we are listening on
-        // - It uses the SF we are configured to look for
-        // - Its receive power is above the device sensitivity for that SF
+        // - It uses the spreading factor we are configured to look for
+        // - Its receive power is above the device sensitivity for that spreading factor
 
         // Flag to signal whether we can receive the packet or not
         bool canLockOnPacket = true;

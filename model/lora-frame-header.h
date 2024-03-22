@@ -31,6 +31,8 @@ namespace lorawan
 {
 
 /**
+ * \ingroup lorawan
+ *
  * This class represents the Frame header (FHDR) used in a LoraWAN network.
  *
  * Although the specification divides the FHDR from the FPort field, this
@@ -45,17 +47,22 @@ namespace lorawan
 class LoraFrameHeader : public Header
 {
   public:
-    LoraFrameHeader();
-    ~LoraFrameHeader() override;
+    LoraFrameHeader();           //!< Default constructor
+    ~LoraFrameHeader() override; //!< Destructor
 
     // Methods inherited from Header
+
+    /**
+     *  Register this type.
+     *  \return The object TypeId.
+     */
     static TypeId GetTypeId();
     TypeId GetInstanceTypeId() const override;
 
     /**
-     * Return the size required for serialization of this header
+     * Return the size required for serialization of this header.
      *
-     * \return The serialized size in bytes
+     * \return The serialized size in bytes.
      */
     uint32_t GetSerializedSize() const override;
 
@@ -129,58 +136,58 @@ class LoraFrameHeader : public Header
     LoraDeviceAddress GetAddress() const;
 
     /**
-     * Set the Adr value.
+     * Set the value of the ADR bit field.
      *
-     * \param Adr The Adr to set.
+     * \param adr Whether or not to set the ADR bit field.
      */
     void SetAdr(bool adr);
 
     /**
-     * Get the Adr value.
+     * Get the value of the ADR bit field.
      *
-     * \return The Adr value.
+     * \return True if the ADR bit is set, false otherwise.
      */
     bool GetAdr() const;
 
     /**
-     * Set the AdrAckReq value.
+     * Set the value of the ADRACKReq bit field.
      *
-     * \param adrAckReq The AdrAckReq to set.
+     * \param adrAckReq Whether or not to set the ADRACKReq bit field.
      */
     void SetAdrAckReq(bool adrAckReq);
 
     /**
-     * Get the AdrAckReq value.
+     * Get the value of the ADRACKReq bit field.
      *
-     * \return The AdrAckReq value.
+     * \return True if the ADRACKReq bit is set, false otherwise.
      */
     bool GetAdrAckReq() const;
 
     /**
-     * Set the Ack bit.
+     * Set the value of the ACK bit field.
      *
      * \param ack Whether or not to set the ACK bit.
      */
     void SetAck(bool ack);
 
     /**
-     * Get the Ack bit value.
+     * Get the value of the ACK bit field.
      *
      * \return True if the ACK bit is set, false otherwise.
      */
     bool GetAck() const;
 
     /**
-     * Set the FPending value.
+     * Set the value of the FPending bit field.
      *
-     * \param fPending The FPending to set.
+     * \param fPending Whether or not to set the FPending bit.
      */
     void SetFPending(bool fPending);
 
     /**
-     * Get the FPending value.
+     * Get the value of the FPending bit field.
      *
-     * \return The FPending value.
+     * \return True if the FPending bit is set, false otherwise.
      */
     bool GetFPending() const;
 
@@ -195,9 +202,9 @@ class LoraFrameHeader : public Header
     uint8_t GetFOptsLen() const;
 
     /**
-     * Set the FCnt value
+     * Set the FCnt value.
      *
-     * \param FCnt The FCnt to set.
+     * \param fCnt The FCnt to set.
      */
     void SetFCnt(uint16_t fCnt);
     /**
@@ -208,8 +215,10 @@ class LoraFrameHeader : public Header
     uint16_t GetFCnt() const;
 
     /**
-     * Return a pointer to a MacCommand, or 0 if the MacCommand does not exist
+     * Return a pointer to the first MacCommand of type T, or 0 if no such MacCommand exists
      * in this header.
+     *
+     * \return A pointer to a MacCommand of type T.
      */
     template <typename T>
     inline Ptr<T> GetMacCommand();
@@ -287,7 +296,12 @@ class LoraFrameHeader : public Header
     void AddDevStatusReq();
 
     /**
-     * Add a NewChannelReq command.
+     * Add a NewChannelReq command with provided fields.
+     *
+     * \param chIndex The ChIndex field.
+     * \param frequency The Frequency field.
+     * \param minDataRate The MinDR field.
+     * \param maxDataRate The MaxDR field.
      */
     void AddNewChannelReq(uint8_t chIndex,
                           double frequency,
@@ -296,36 +310,36 @@ class LoraFrameHeader : public Header
 
     /**
      * Return a list of pointers to all the MAC commands saved in this header.
+     *
+     * \return The list of pointers to MacCommand objects.
      */
     std::list<Ptr<MacCommand>> GetCommands();
 
     /**
-     * Add a predefined command to the list.
+     * Add a predefined command to the list in this frame header.
+     *
+     * \param macCommand A pointer to the MacCommand object to add.
      */
     void AddCommand(Ptr<MacCommand> macCommand);
 
   private:
-    uint8_t m_fPort;
+    uint8_t m_fPort; //!< The FPort field
 
-    LoraDeviceAddress m_address;
+    LoraDeviceAddress m_address; //!< The DevAddr field
 
-    bool m_adr;
-    bool m_adrAckReq;
-    bool m_ack;
-    bool m_fPending;
-    uint8_t m_fOptsLen;
+    bool m_adr;         //!< The ADR field of the FCtrl
+    bool m_adrAckReq;   //!< The ADRACKReq field of the FCtrl
+    bool m_ack;         //!< The ACK field of the FCtrl
+    bool m_fPending;    //!< The FPending/ClassB field of the FCtrl
+    uint8_t m_fOptsLen; //!< The FOptsLen field of the FCtrl
 
-    uint16_t m_fCnt;
+    uint16_t m_fCnt; //!< The FCnt field
 
-    Buffer m_fOpts;
+    Buffer m_fOpts;                           //!< The FOpts field
+    std::list<Ptr<MacCommand>> m_macCommands; //!< List containing all the MacCommand instances that
+                                              //!< are contained in this LoraFrameHeader
 
-    /**
-     * List containing all the MacCommand instances that are contained in this
-     * LoraFrameHeader.
-     */
-    std::list<Ptr<MacCommand>> m_macCommands;
-
-    bool m_isUplink;
+    bool m_isUplink; //!< Whether this frame header is uplink or not
 };
 
 template <typename T>

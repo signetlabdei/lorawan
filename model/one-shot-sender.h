@@ -31,13 +31,28 @@ namespace ns3
 namespace lorawan
 {
 
+/**
+ * \ingroup lorawan
+ *
+ * Packet sender application to send a single packet
+ */
 class OneShotSender : public Application
 {
   public:
-    OneShotSender();
-    OneShotSender(Time sendTime);
-    ~OneShotSender() override;
+    OneShotSender();           //!< Default constructor
+    ~OneShotSender() override; //!< Destructor
 
+    /**
+     * Construct a new OneShotSender object with provided send time.
+     *
+     * \param sendTime The Time of sending.
+     */
+    OneShotSender(Time sendTime);
+
+    /**
+     *  Register this type.
+     *  \return The object TypeId.
+     */
     static TypeId GetTypeId();
 
     /**
@@ -47,6 +62,8 @@ class OneShotSender : public Application
 
     /**
      * Set the time at which this app will send a packet.
+     *
+     * \param sendTime The Time of sending.
      */
     void SetSendTime(Time sendTime);
 
@@ -61,20 +78,9 @@ class OneShotSender : public Application
     void StopApplication() override;
 
   private:
-    /**
-     * The time at which to send the packet.
-     */
-    Time m_sendTime;
-
-    /**
-     * The sending event.
-     */
-    EventId m_sendEvent;
-
-    /**
-     * The MAC layer of this node.
-     */
-    Ptr<LorawanMac> m_mac;
+    Time m_sendTime;       //!< The time at which to send the packet.
+    EventId m_sendEvent;   //!< The sending event.
+    Ptr<LorawanMac> m_mac; //!< The MAC layer of this node.
 };
 
 } // namespace lorawan

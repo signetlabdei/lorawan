@@ -28,6 +28,8 @@ namespace lorawan
 {
 
 /**
+ * \ingroup lorawan
+ *
  * This class represents the Mac header of a LoRaWAN packet.
  */
 class LorawanMacHeader : public Header
@@ -50,10 +52,14 @@ class LorawanMacHeader : public Header
         PROPRIETARY = 7
     };
 
+    /**
+     *  Register this type.
+     *  \return The object TypeId.
+     */
     static TypeId GetTypeId();
 
-    LorawanMacHeader();
-    ~LorawanMacHeader() override;
+    LorawanMacHeader();           //!< Default constructor
+    ~LorawanMacHeader() override; //!< Destructor
 
     // Pure virtual methods from Header that need to be implemented by this class
     TypeId GetInstanceTypeId() const override;
@@ -113,13 +119,19 @@ class LorawanMacHeader : public Header
     uint8_t GetMajor() const;
 
     /**
-     * Check whether this header is for an uplink message
+     * Check whether this header is for an uplink message.
      *
-     * \return True if the message is meant to be sent from an ED to a GW, false
+     * \return True if the message is meant to be sent from an end device to a gateway, false
      * otherwise.
      */
     bool IsUplink() const;
 
+    /**
+     * Check whether this header is for a confirmed message, i.e. a message asking from
+     * reception acknowledgment from the received.
+     *
+     * \return True is the message MType is of the confirmed variant, false otherwise.
+     */
     bool IsConfirmed() const;
 
   private:

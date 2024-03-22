@@ -40,18 +40,20 @@ namespace lorawan
 class LoraChannel;
 
 /**
+ * \ingroup lorawan
+ *
  * Structure to collect all parameters that are used to compute the duration of
  * a packet (excluding payload length).
  */
 struct LoraTxParameters
 {
-    uint8_t sf = 7;                              //!< Spreading Factor
-    bool headerDisabled = false;                 //!< Whether to use implicit header mode
-    uint8_t codingRate = 1;                      //!< Code rate (obtained as 4/(codingRate+4))
-    double bandwidthHz = 125000;                 //!< Bandwidth in Hz
-    uint32_t nPreamble = 8;                      //!< Number of preamble symbols
-    bool crcEnabled = true;                      //!< Whether Cyclic Redundancy Check is enabled
-    bool lowDataRateOptimizationEnabled = false; //!< Whether Low Data Rate Optimization is enabled
+    uint8_t sf = 7;              //!< Spreading Factor
+    bool headerDisabled = false; //!< Whether to use implicit header mode
+    uint8_t codingRate = 1;      //!< Code rate (obtained as 4/(codingRate+4))
+    double bandwidthHz = 125000; //!< Bandwidth in Hz
+    uint32_t nPreamble = 8;      //!< Number of preamble symbols
+    bool crcEnabled = true;      //!< Whether Cyclic Redundancy Check (CRC) is enabled
+    bool lowDataRateOptimizationEnabled = false; //!< Whether low data rate optimization is enabled
 };
 
 /**
@@ -73,14 +75,14 @@ std::ostream& operator<<(std::ostream& os, const LoraTxParameters& params);
 class LoraPhy : public Object
 {
   public:
-    // TypeId
+    /**
+     *  Register this type.
+     *  \return The object TypeId.
+     */
     static TypeId GetTypeId();
 
-    /**
-     * Constructor and destructor
-     */
-    LoraPhy();
-    ~LoraPhy() override;
+    LoraPhy();           //!< Default constructor
+    ~LoraPhy() override; //!< Destructor
 
     /**
      * Type definition for a callback for when a packet is correctly received.
@@ -112,8 +114,8 @@ class LoraPhy : public Object
      * This method is typically called by LoraChannel.
      *
      * \param packet The packet that is arriving at this PHY layer.
-     * \param rxPowerDbm The power of the arriving packet (assumed to be constant
-     * for the whole reception).
+     * \param rxPowerDbm The power of the arriving packet (assumed to be constant for the whole
+     * reception).
      * \param sf The Spreading Factor of the arriving packet.
      * \param duration The on air time of this packet.
      * \param frequencyMHz The frequency this packet is being transmitted on.
@@ -154,7 +156,7 @@ class LoraPhy : public Object
     /**
      * Whether this device is transmitting or not.
      *
-     * \returns true if the device is currently transmitting a packet, false
+     * \return True if the device is currently transmitting a packet, false
      * otherwise.
      */
     virtual bool IsTransmitting() = 0;
@@ -163,7 +165,7 @@ class LoraPhy : public Object
      * Whether this device is listening on the specified frequency or not.
      *
      * \param frequency The frequency to query.
-     * \returns true if the device is listening on that frequency, false
+     * \return True if the device is listening on that frequency, false
      * otherwise.
      */
     virtual bool IsOnFrequency(double frequency) = 0;
@@ -173,6 +175,8 @@ class LoraPhy : public Object
      *
      * This method is typically called by an upper MAC layer that wants to be
      * notified after the successful reception of a packet.
+     *
+     * \param callback The RxOkCallback instance.
      */
     void SetReceiveOkCallback(RxOkCallback callback);
 
@@ -182,6 +186,8 @@ class LoraPhy : public Object
      *
      * This method is typically called by an upper MAC layer that wants to be
      * notified after the failed reception of a packet.
+     *
+     * \param callback The RxFailedCallback instance.
      */
     void SetReceiveFailedCallback(RxFailedCallback callback);
 
@@ -190,6 +196,8 @@ class LoraPhy : public Object
      *
      * This method is typically called by an upper MAC layer that wants to be
      * notified after the transmission of a packet.
+     *
+     * \param callback The TxFinishedCallback instance.
      */
     void SetTxFinishedCallback(TxFinishedCallback callback);
 
@@ -238,9 +246,9 @@ class LoraPhy : public Object
     void SetDevice(Ptr<NetDevice> device);
 
     /**
-     * Compute the symbol time from SF and BW.
+     * Compute the symbol time from spreading factor and bandwidth.
      *
-     * \param txParams The parameters for transmission
+     * \param txParams The parameters for transmission.
      * \return TSym, the time required to send a LoRa modulation symbol.
      */
     static Time GetTSym(LoraTxParameters txParams);
@@ -269,53 +277,40 @@ class LoraPhy : public Object
 
     Ptr<LoraChannel> m_channel; //!< The channel this PHY transmits on.
 
-    LoraInterferenceHelper m_interference; //!< The LoraInterferenceHelper
-    //! associated to this PHY.
+    LoraInterferenceHelper m_interference; //!< The LoraInterferenceHelper associated to this PHY.
 
     // Trace sources
 
     /**
      * The trace source fired when a packet is sent.
-     *
-     * \see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_startSending;
 
     /**
      * The trace source fired when a packet begins the reception process from the
      * medium.
-     *
-     * \see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>> m_phyRxBeginTrace;
 
     /**
      * The trace source fired when a packet reception ends.
-     *
-     * \see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>> m_phyRxEndTrace;
 
     /**
      * The trace source fired when a packet was correctly received.
-     *
-     * \see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_successfullyReceivedPacket;
 
     /**
      * The trace source fired when a packet cannot be received because its power
      * is below the sensitivity threshold.
-     *
-     * \see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_underSensitivity;
 
     /**
      * The trace source fired when a packet cannot be correctly received because
      * of interference.
-     *
-     * \see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_interferedPacket;
 

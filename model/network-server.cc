@@ -50,7 +50,7 @@ NetworkServer::GetTypeId()
             .AddConstructor<NetworkServer>()
             .AddTraceSource(
                 "ReceivedPacket",
-                "Trace source that is fired when a packet arrives at the Network Server",
+                "Trace source that is fired when a packet arrives at the network server",
                 MakeTraceSourceAccessor(&NetworkServer::m_receivedPacket),
                 "ns3::Packet::TracedCallback")
             .SetGroupName("lorawan");

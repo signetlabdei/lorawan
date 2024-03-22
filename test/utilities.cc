@@ -95,14 +95,14 @@ CreateGateways(int nGateways, MobilityHelper mobility, Ptr<LoraChannel> channel)
 Ptr<Node>
 CreateNetworkServer(NodeContainer endDevices, NodeContainer gateways)
 {
-    // Create the NetworkServer node
+    // Create the network server node
     Ptr<Node> nsNode = CreateObject<Node>();
 
     // PointToPoint links between gateways and server
     PointToPointHelper p2p;
     p2p.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
     p2p.SetChannelAttribute("Delay", StringValue("2ms"));
-    // Store NS app registration details for later
+    // Store network server app registration details for later
     P2PGwRegistration_t gwRegistration;
     for (auto gw = gateways.Begin(); gw != gateways.End(); ++gw)
     {

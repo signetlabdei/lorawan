@@ -115,7 +115,7 @@ GatewayStatus::IsAvailableForTransmission(double frequency)
     if (waitingTime > Seconds(0))
     {
         NS_LOG_INFO("Gateway cannot be used because of duty cycle");
-        NS_LOG_INFO("Waiting time at current GW: " << waitingTime.GetSeconds() << " seconds");
+        NS_LOG_INFO("Waiting time at current gateway: " << waitingTime.GetSeconds() << " seconds");
 
         return false;
     }

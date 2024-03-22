@@ -28,18 +28,31 @@ namespace ns3
 namespace lorawan
 {
 
+/**
+ * \ingroup lorawan
+ *
+ * Class representing the MAC layer of a LoRaWAN gateway.
+ */
 class GatewayLorawanMac : public LorawanMac
 {
   public:
+    /**
+     *  Register this type.
+     *  \return The object TypeId.
+     */
     static TypeId GetTypeId();
 
-    GatewayLorawanMac();
-    ~GatewayLorawanMac() override;
+    GatewayLorawanMac();           //!< Default constructor
+    ~GatewayLorawanMac() override; //!< Destructor
 
     // Implementation of the LorawanMac interface
     void Send(Ptr<Packet> packet) override;
 
-    // Implementation of the LorawanMac interface
+    /**
+     * Check whether the underlying PHY layer of the gateway is currently transmitting.
+     *
+     * \return True if it is transmitting, false otherwise.
+     */
     bool IsTransmitting();
 
     // Implementation of the LorawanMac interface
@@ -52,8 +65,9 @@ class GatewayLorawanMac : public LorawanMac
     void TxFinished(Ptr<const Packet> packet) override;
 
     /**
-     * Return the next time at which we will be able to transmit.
+     * Return the next time at which we will be able to transmit on the specified frequency.
      *
+     * \param frequency The frequency value [MHz].
      * \return The next transmission time.
      */
     Time GetWaitingTime(double frequency);

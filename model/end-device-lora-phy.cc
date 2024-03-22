@@ -53,13 +53,13 @@ EndDeviceLoraPhy::GetTypeId()
             .AddTraceSource("LostPacketBecauseWrongFrequency",
                             "Trace source indicating a packet "
                             "could not be correctly decoded because"
-                            "the ED was listening on a different frequency",
+                            "the end device was listening on a different frequency",
                             MakeTraceSourceAccessor(&EndDeviceLoraPhy::m_wrongFrequency),
                             "ns3::Packet::TracedCallback")
             .AddTraceSource("LostPacketBecauseWrongSpreadingFactor",
                             "Trace source indicating a packet "
                             "could not be correctly decoded because"
-                            "the ED was listening for a different Spreading Factor",
+                            "the end device was listening for a different Spreading Factor",
                             MakeTraceSourceAccessor(&EndDeviceLoraPhy::m_wrongSf),
                             "ns3::Packet::TracedCallback")
             .AddTraceSource("EndDeviceState",

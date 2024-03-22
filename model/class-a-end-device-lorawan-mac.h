@@ -37,15 +37,21 @@ namespace lorawan
 {
 
 /**
+ * \ingroup lorawan
+ *
  * Class representing the MAC layer of a Class A LoRaWAN device.
  */
 class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
 {
   public:
+    /**
+     *  Register this type.
+     *  \return The object TypeId.
+     */
     static TypeId GetTypeId();
 
-    ClassAEndDeviceLorawanMac();
-    ~ClassAEndDeviceLorawanMac() override;
+    ClassAEndDeviceLorawanMac();           //!< Default constructor
+    ~ClassAEndDeviceLorawanMac() override; //!< Destructor
 
     /////////////////////
     // Sending methods //
@@ -54,7 +60,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /**
      * Add headers and send a packet with the sending function of the physical layer.
      *
-     * \param packet the packet to send
+     * \param packet The packet to send.
      */
     void SendToPhy(Ptr<Packet> packet) override;
 
@@ -68,17 +74,12 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      * This method is typically registered as a callback in the underlying PHY
      * layer so that it's called when a packet is going up the stack.
      *
-     * \param packet the received packet.
+     * \param packet The received packet.
      */
     void Receive(Ptr<const Packet> packet) override;
 
     void FailedReception(Ptr<const Packet> packet) override;
 
-    /**
-     * Perform the actions that are required after a packet send.
-     *
-     * This function handles opening of the first receive window.
-     */
     void TxFinished(Ptr<const Packet> packet) override;
 
     /**
@@ -107,45 +108,46 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
 
     /**
      * Find the minimum waiting time before the next possible transmission based
-     * on End Device's Class Type.
+     * on end device's Class Type.
      *
      * \param waitingTime The minimum waiting time that has to be respected,
      * irrespective of the class (e.g., because of duty cycle limitations).
+     * \return The Time value.
      */
     Time GetNextClassTransmissionDelay(Time waitingTime) override;
 
     /**
-     * Get the Data Rate that will be used in the first receive window.
+     * Get the data rate that will be used in the first receive window.
      *
-     * \return The Data Rate
+     * \return The data rate.
      */
     uint8_t GetFirstReceiveWindowDataRate();
 
     /**
-     * Set the Data Rate to be used in the second receive window.
+     * Set the data rate to be used in the second receive window.
      *
-     * \param dataRate The Data Rate.
+     * \param dataRate The data rate.
      */
     void SetSecondReceiveWindowDataRate(uint8_t dataRate);
 
     /**
-     * Get the Data Rate that will be used in the second receive window.
+     * Get the data rate that will be used in the second receive window.
      *
-     * \return The Data Rate
+     * \return The data rate.
      */
     uint8_t GetSecondReceiveWindowDataRate() const;
 
     /**
      * Set the frequency that will be used for the second receive window.
      *
-     * \param frequencyMHz the Frequency.
+     * \param frequencyMHz The Frequency.
      */
     void SetSecondReceiveWindowFrequency(double frequencyMHz);
 
     /**
      * Get the frequency that is used for the second receive window.
      *
-     * @return The frequency, in MHz
+     * \return The frequency, in MHz.
      */
     double GetSecondReceiveWindowFrequency() const;
 
@@ -165,11 +167,8 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     void OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq) override;
 
   private:
-    /**
-     * The interval between when a packet is done sending and when the first
-     * receive window is opened.
-     */
-    Time m_receiveDelay1;
+    Time m_receiveDelay1; //!< The interval between when a packet is done sending and when the first
+                          //!< receive window is opened.
 
     /**
      * The interval between when a packet is done sending and when the second
@@ -205,12 +204,12 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     double m_secondReceiveWindowFrequency;
 
     /**
-     * The Data Rate to listen for during the second downlink transmission.
+     * The data rate to listen for during the second downlink transmission.
      */
     uint8_t m_secondReceiveWindowDataRate;
 
     /**
-     * The RX1DROffset parameter value
+     * The RX1DROffset parameter value.
      */
     uint8_t m_rx1DrOffset;
 

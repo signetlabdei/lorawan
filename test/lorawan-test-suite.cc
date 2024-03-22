@@ -34,15 +34,17 @@ using namespace lorawan;
 
 NS_LOG_COMPONENT_DEFINE("LorawanTestSuite");
 
-/********************
- * InterferenceTest *
- ********************/
-
+/**
+ * \ingroup lorawan
+ *
+ * It tests interference computations in a number of possible scenarios using the
+ * LoraInterferenceHelper class
+ */
 class InterferenceTest : public TestCase
 {
   public:
-    InterferenceTest();
-    ~InterferenceTest() override;
+    InterferenceTest();           //!< Default constructor
+    ~InterferenceTest() override; //!< Destructor
 
   private:
     void DoRun() override;
@@ -147,8 +149,8 @@ InterferenceTest::DoRun()
     interferenceHelper.ClearAllEvents();
 
     // Different SFs
-    // Packet would be destroyed if they both were SF7, but survives thanks to SF
-    // orthogonality
+    // Packet would be destroyed if they both were SF7, but survives thanks to spreading factor
+    // semi-orthogonality
     event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
     interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
@@ -156,7 +158,7 @@ InterferenceTest::DoRun()
                           "Packet did not survive interference as expected");
     interferenceHelper.ClearAllEvents();
 
-    // SF imperfect orthogonality
+    // Spreading factor imperfect orthogonality
     // Different SFs are orthogonal only up to a point
     event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
     interferenceHelper.Add(Seconds(2), 14 + 17, 8, nullptr, frequency);
@@ -165,7 +167,7 @@ InterferenceTest::DoRun()
                           "Packet was not destroyed by interference as expected");
     interferenceHelper.ClearAllEvents();
 
-    // If a more 'distant' SF is used, isolation gets better
+    // If a more 'distant' spreading factor is used, isolation gets better
     event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
     interferenceHelper.Add(Seconds(2), 14 + 17, 10, nullptr, frequency);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
@@ -174,7 +176,7 @@ InterferenceTest::DoRun()
     interferenceHelper.ClearAllEvents();
 
     // Cumulative interference
-    // Same-SF interference is cumulative
+    // Same spreading factor interference is cumulative
     event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
     interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
     interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
@@ -196,15 +198,17 @@ InterferenceTest::DoRun()
     interferenceHelper.ClearAllEvents();
 }
 
-/***************
- * AddressTest *
- ***************/
-
+/**
+ * \ingroup lorawan
+ *
+ * It tests LoraDeviceAddress comparison operators overrides and generation of new addresses with
+ * LoraDeviceAddressGenerator
+ */
 class AddressTest : public TestCase
 {
   public:
-    AddressTest();
-    ~AddressTest() override;
+    AddressTest();           //!< Default constructor
+    ~AddressTest() override; //!< Destructor
 
   private:
     void DoRun() override;
@@ -278,15 +282,17 @@ AddressTest::DoRun()
                           "LoraDeviceAddressGenerator doesn't increment as expected");
 }
 
-/***************
- * HeaderTest *
- ***************/
-
+/**
+ * \ingroup lorawan
+ *
+ * It tests serialization/deserialization of LoRaWAN headers (the LorawanMacHeader and
+ * LoraFrameHeader classes) on packets
+ */
 class HeaderTest : public TestCase
 {
   public:
-    HeaderTest();
-    ~HeaderTest() override;
+    HeaderTest();           //!< Default constructor
+    ~HeaderTest() override; //!< Destructor
 
   private:
     void DoRun() override;
@@ -357,10 +363,10 @@ HeaderTest::DoRun()
 
     NS_TEST_EXPECT_MSG_EQ(frameHdr.GetAck(),
                           true,
-                          "Ack changes in the serialization/deserialization process");
+                          "ACK bit changes in the serialization/deserialization process");
     NS_TEST_EXPECT_MSG_EQ(frameHdr.GetAdr(),
                           false,
-                          "Adr changes in the serialization/deserialization process");
+                          "ADR bit changes in the serialization/deserialization process");
     NS_TEST_EXPECT_MSG_EQ(frameHdr.GetFCnt(),
                           1,
                           "FCnt changes in the serialization/deserialization process");
@@ -429,29 +435,60 @@ HeaderTest::DoRun()
                           "Removed header's MAC command contents don't match");
 }
 
-/*******************
- * ReceivePathTest *
- *******************/
-
+/**
+ * \ingroup lorawan
+ *
+ * It tests a number of cases related to SimpleGatewayLoraPhy's parallel reception paths
+ *
+ * \todo The test is commented out. To be fixed.
+ */
 class ReceivePathTest : public TestCase
 {
   public:
-    ReceivePathTest();
-    ~ReceivePathTest() override;
+    ReceivePathTest();           //!< Default constructor
+    ~ReceivePathTest() override; //!< Destructor
 
   private:
     void DoRun() override;
+    /**
+     * Reset counters and gateway PHY for new sub test case.
+     */
     void Reset();
+    /**
+     * Callback for tracing OccupiedReceptionPaths.
+     *
+     * \param oldValue The old value.
+     * \param newValue The new value.
+     */
     void OccupiedReceptionPaths(int oldValue, int newValue);
+    /**
+     * Callback for tracing LostPacketBecauseNoMoreReceivers.
+     *
+     * \param packet The packet lost.
+     * \param node The receiver node id if any, 0 otherwise.
+     */
     void NoMoreDemodulators(Ptr<const Packet> packet, uint32_t node);
+    /**
+     * Callback for tracing LostPacketBecauseInterference.
+     *
+     * \param packet The packet lost.
+     * \param node The receiver node id if any, 0 otherwise.
+     */
     void Interference(Ptr<const Packet> packet, uint32_t node);
+    /**
+     * Callback for tracing ReceivedPacket.
+     *
+     * \param packet The packet received.
+     * \param node The receiver node id if any, 0 otherwise.
+     */
     void ReceivedPacket(Ptr<const Packet> packet, uint32_t node);
 
-    Ptr<SimpleGatewayLoraPhy> gatewayPhy;
-    int m_noMoreDemodulatorsCalls = 0;
-    int m_interferenceCalls = 0;
-    int m_receivedPacketCalls = 0;
-    int m_maxOccupiedReceptionPaths = 0;
+    Ptr<SimpleGatewayLoraPhy> gatewayPhy; //!< PHY layer of a gateway to be tested
+
+    int m_noMoreDemodulatorsCalls = 0;   //!< Counter for LostPacketBecauseNoMoreReceivers calls
+    int m_interferenceCalls = 0;         //!< Counter for LostPacketBecauseInterference calls
+    int m_receivedPacketCalls = 0;       //!< Counter for ReceivedPacket calls
+    int m_maxOccupiedReceptionPaths = 0; //!< Max number of concurrent OccupiedReceptionPaths
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -559,7 +596,7 @@ ReceivePathTest::DoRun()
     // Reset ();
 
     // //////////////////////////////////////////////////////////////////////////////
-    // // A ReceptionPath can receive a packet of any SF without any preconfiguration
+    // // A ReceptionPath can receive a packet of any spreading factor without any preconfiguration
     // //////////////////////////////////////////////////////////////////////////////
 
     // Simulator::Schedule (Seconds (1), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
@@ -832,15 +869,16 @@ ReceivePathTest::DoRun()
     // NS_TEST_EXPECT_MSG_EQ (m_maxOccupiedReceptionPaths, 1, "Unexpected value");
 }
 
-/**************************
- * LogicalLoraChannelTest *
- **************************/
-
+/**
+ * \ingroup lorawan
+ *
+ * It tests functionality of the LogicalLoraChannel, SubBand and LogicalLoraChannelHelper classes
+ */
 class LogicalLoraChannelTest : public TestCase
 {
   public:
-    LogicalLoraChannelTest();
-    ~LogicalLoraChannelTest() override;
+    LogicalLoraChannelTest();           //!< Default constructor
+    ~LogicalLoraChannelTest() override; //!< Destructor
 
   private:
     void DoRun() override;
@@ -955,15 +993,17 @@ LogicalLoraChannelTest::DoRun()
                           "Waiting time affects other subbands");
 }
 
-/*****************
- * TimeOnAirTest *
- *****************/
-
+/**
+ * \ingroup lorawan
+ *
+ * It tests the correctness of the LoraPhy::GetOnAirTime calculator against a number of pre-sourced
+ * time values of known scenarios
+ */
 class TimeOnAirTest : public TestCase
 {
   public:
-    TimeOnAirTest();
-    ~TimeOnAirTest() override;
+    TimeOnAirTest();           //!< Default constructor
+    ~TimeOnAirTest() override; //!< Destructor
 
   private:
     void DoRun() override;
@@ -1066,21 +1106,61 @@ TimeOnAirTest::DoRun()
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 2.301952, 0.0001, "Unexpected duration");
 }
 
-/**************************
- * PhyConnectivityTest *
- **************************/
-
+/**
+ * \ingroup lorawan
+ *
+ * It tests sending packets over a LoRa physical channel between multiple devices and the resulting
+ * possible outcomes
+ */
 class PhyConnectivityTest : public TestCase
 {
   public:
-    PhyConnectivityTest();
-    ~PhyConnectivityTest() override;
+    PhyConnectivityTest();           //!< Default constructor
+    ~PhyConnectivityTest() override; //!< Destructor
+
+    /**
+     * Reset counters and end devices' PHYs for new sub test case.
+     */
     void Reset();
+
+    /**
+     * Callback for tracing ReceivedPacket.
+     *
+     * \param packet The packet received.
+     * \param node The receiver node id if any, 0 otherwise.
+     */
     void ReceivedPacket(Ptr<const Packet> packet, uint32_t node);
+
+    /**
+     * Callback for tracing LostPacketBecauseUnderSensitivity.
+     *
+     * \param packet The packet lost.
+     * \param node The receiver node id if any, 0 otherwise.
+     */
     void UnderSensitivity(Ptr<const Packet> packet, uint32_t node);
+
+    /**
+     * Callback for tracing LostPacketBecauseInterference.
+     *
+     * \param packet The packet lost.
+     * \param node The receiver node id if any, 0 otherwise.
+     */
     void Interference(Ptr<const Packet> packet, uint32_t node);
-    void NoMoreDemodulators(Ptr<const Packet> packet, uint32_t node);
+
+    /**
+     * Callback for tracing LostPacketBecauseWrongFrequency.
+     *
+     * \param packet The packet lost.
+     * \param node The receiver node id if any, 0 otherwise.
+     */
     void WrongFrequency(Ptr<const Packet> packet, uint32_t node);
+
+    /**
+     * Callback for tracing LostPacketBecauseWrongSpreadingFactor.
+     *
+     * \param packet The packet lost.
+     * \param node The receiver node id if any, 0 otherwise.
+     */
     void WrongSf(Ptr<const Packet> packet, uint32_t node);
 
     /**
@@ -1095,18 +1175,18 @@ class PhyConnectivityTest : public TestCase
 
   private:
     void DoRun() override;
-    Ptr<LoraChannel> channel;
-    Ptr<SimpleEndDeviceLoraPhy> edPhy1;
-    Ptr<SimpleEndDeviceLoraPhy> edPhy2;
-    Ptr<SimpleEndDeviceLoraPhy> edPhy3;
 
-    Ptr<Packet> m_latestReceivedPacket;
-    int m_receivedPacketCalls = 0;
-    int m_underSensitivityCalls = 0;
-    int m_interferenceCalls = 0;
-    int m_noMoreDemodulatorsCalls = 0;
-    int m_wrongSfCalls = 0;
-    int m_wrongFrequencyCalls = 0;
+    Ptr<LoraChannel> channel;           //!< The LoRa channel used for tests
+    Ptr<SimpleEndDeviceLoraPhy> edPhy1; //!< The first end device's PHY layer used in tests
+    Ptr<SimpleEndDeviceLoraPhy> edPhy2; //!< The second end device's PHY layer used in tests
+    Ptr<SimpleEndDeviceLoraPhy> edPhy3; //!< The third end device's PHY layer used in tests
+
+    Ptr<Packet> m_latestReceivedPacket; //!< Pointer to track the last received packet
+    int m_receivedPacketCalls = 0;      //!< Counter for ReceivedPacket calls
+    int m_underSensitivityCalls = 0;    //!< Counter for LostPacketBecauseUnderSensitivity calls
+    int m_interferenceCalls = 0;        //!< Counter for LostPacketBecauseInterference calls
+    int m_wrongSfCalls = 0;             //!< Counter for LostPacketBecauseWrongSpreadingFactor calls
+    int m_wrongFrequencyCalls = 0;      //!< Counter for LostPacketBecauseWrongFrequency calls
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -1144,14 +1224,6 @@ PhyConnectivityTest::Interference(Ptr<const Packet> packet, uint32_t node)
     NS_LOG_FUNCTION(packet << node);
 
     m_interferenceCalls++;
-}
-
-void
-PhyConnectivityTest::NoMoreDemodulators(Ptr<const Packet> packet, uint32_t node)
-{
-    NS_LOG_FUNCTION(packet << node);
-
-    m_noMoreDemodulatorsCalls++;
 }
 
 void
@@ -1258,16 +1330,6 @@ PhyConnectivityTest::Reset()
     edPhy3->TraceConnectWithoutContext("LostPacketBecauseInterference",
                                        MakeCallback(&PhyConnectivityTest::Interference, this));
 
-    edPhy1->TraceConnectWithoutContext(
-        "LostPacketBecauseNoMoreReceivers",
-        MakeCallback(&PhyConnectivityTest::NoMoreDemodulators, this));
-    edPhy2->TraceConnectWithoutContext(
-        "LostPacketBecauseNoMoreReceivers",
-        MakeCallback(&PhyConnectivityTest::NoMoreDemodulators, this));
-    edPhy3->TraceConnectWithoutContext(
-        "LostPacketBecauseNoMoreReceivers",
-        MakeCallback(&PhyConnectivityTest::NoMoreDemodulators, this));
-
     edPhy1->TraceConnectWithoutContext("LostPacketBecauseWrongFrequency",
                                        MakeCallback(&PhyConnectivityTest::WrongFrequency, this));
     edPhy2->TraceConnectWithoutContext("LostPacketBecauseWrongFrequency",
@@ -1349,7 +1411,7 @@ PhyConnectivityTest::DoRun()
 
     Reset();
 
-    // Packet that arrives under sensitivity is received correctly if SF increases
+    // Packet that arrives under sensitivity is received correctly if the spreading factor increases
 
     txParams.sf = 7;
     edPhy2->SetSpreadingFactor(7);
@@ -1375,7 +1437,7 @@ PhyConnectivityTest::DoRun()
 
     Reset();
 
-    // Try again using a packet with higher SF
+    // Try again using a packet with higher spreading factor
     txParams.sf = 8;
     edPhy2->SetSpreadingFactor(8);
     edPhy2->GetMobility()->GetObject<ConstantPositionMobilityModel>()->SetPosition(
@@ -1447,7 +1509,7 @@ PhyConnectivityTest::DoRun()
 
     Reset();
 
-    // Packets can be lost because the PHY is not listening for the right SF
+    // Packets can be lost because the PHY is not listening for the right spreading factor
 
     txParams.sf = 8; // Send with 8, listening for 12
     Simulator::Schedule(Seconds(2),
@@ -1462,9 +1524,10 @@ PhyConnectivityTest::DoRun()
     Simulator::Run();
     Simulator::Destroy();
 
-    NS_TEST_EXPECT_MSG_EQ(m_wrongSfCalls,
-                          2,
-                          "Packets were received even though PHY was listening for a different SF");
+    NS_TEST_EXPECT_MSG_EQ(
+        m_wrongSfCalls,
+        2,
+        "Packets were received even though PHY was listening for a different spreading factor.");
 
     Reset();
 
@@ -1515,15 +1578,18 @@ PhyConnectivityTest::DoRun()
                           "State didn't switch to STANDBY as expected");
 }
 
-/*****************
- * LorawanMacTest *
- *****************/
-
+/**
+ * \ingroup lorawan
+ *
+ * It tests the functionalities of the MAC layer of LoRaWAN devices
+ *
+ * \todo Not implemented yet.
+ */
 class LorawanMacTest : public TestCase
 {
   public:
-    LorawanMacTest();
-    ~LorawanMacTest() override;
+    LorawanMacTest();           //!< Default constructor
+    ~LorawanMacTest() override; //!< Destructor
 
   private:
     void DoRun() override;
@@ -1531,7 +1597,7 @@ class LorawanMacTest : public TestCase
 
 // Add some help text to this case to describe what it is intended to test
 LorawanMacTest::LorawanMacTest()
-    : TestCase("Verify that the MAC layer of EDs behaves as expected")
+    : TestCase("Verify that the MAC layer of end devices behaves as expected")
 {
 }
 
@@ -1548,18 +1614,16 @@ LorawanMacTest::DoRun()
     NS_LOG_DEBUG("LorawanMacTest");
 }
 
-/**************
- * Test Suite *
- **************/
-
-// The TestSuite class names the TestSuite, identifies what type of TestSuite,
-// and enables the TestCases to be run. Typically, only the constructor for
-// this class must be defined
-
+/**
+ * \ingroup lorawan
+ *
+ * The TestSuite class names the TestSuite, identifies what type of TestSuite, and enables the
+ * TestCases to be run. Typically, only the constructor for this class must be defined
+ */
 class LorawanTestSuite : public TestSuite
 {
   public:
-    LorawanTestSuite();
+    LorawanTestSuite(); //!< Default constructor
 };
 
 LorawanTestSuite::LorawanTestSuite()

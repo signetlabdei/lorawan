@@ -51,19 +51,20 @@ EndDeviceLorawanMac::GetTypeId()
                             MakeTraceSourceAccessor(&EndDeviceLorawanMac::m_requiredTxCallback),
                             "ns3::TracedValueCallback::uint8_t")
             .AddAttribute("DataRate",
-                          "Data Rate currently employed by this end device",
+                          "Data rate currently employed by this end device",
                           UintegerValue(0),
                           MakeUintegerAccessor(&EndDeviceLorawanMac::m_dataRate),
                           MakeUintegerChecker<uint8_t>(0, 5))
             .AddTraceSource("DataRate",
-                            "Data Rate currently employed by this end device",
+                            "Data rate currently employed by this end device",
                             MakeTraceSourceAccessor(&EndDeviceLorawanMac::m_dataRate),
                             "ns3::TracedValueCallback::uint8_t")
-            .AddAttribute("DRControl",
-                          "Whether to request the NS to control this device's Data Rate",
-                          BooleanValue(),
-                          MakeBooleanAccessor(&EndDeviceLorawanMac::m_controlDataRate),
-                          MakeBooleanChecker())
+            .AddAttribute(
+                "DRControl",
+                "Whether to request the network server to control this device's data rate",
+                BooleanValue(),
+                MakeBooleanAccessor(&EndDeviceLorawanMac::m_controlDataRate),
+                MakeBooleanChecker())
             .AddTraceSource("TxPower",
                             "Transmission power currently employed by this end device",
                             MakeTraceSourceAccessor(&EndDeviceLorawanMac::m_txPower),
@@ -90,13 +91,13 @@ EndDeviceLorawanMac::GetTypeId()
                           MakeIntegerAccessor(&EndDeviceLorawanMac::m_maxNumbTx),
                           MakeIntegerChecker<uint8_t>())
             .AddAttribute("EnableEDDataRateAdaptation",
-                          "Whether the End Device should up its Data Rate "
-                          "in case it doesn't get a reply from the NS.",
+                          "Whether the end device should up its data rate "
+                          "in case it doesn't get a reply from the network server.",
                           BooleanValue(false),
                           MakeBooleanAccessor(&EndDeviceLorawanMac::m_enableDRAdapt),
                           MakeBooleanChecker())
             .AddAttribute("MType",
-                          "Specify type of message will be sent by this ED.",
+                          "Specify type of message will be sent by this end device.",
                           EnumValue(LorawanMacHeader::UNCONFIRMED_DATA_UP),
                           MakeEnumAccessor<LorawanMacHeader::MType>(&EndDeviceLorawanMac::m_mType),
                           MakeEnumChecker(LorawanMacHeader::UNCONFIRMED_DATA_UP,
@@ -226,7 +227,7 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
         if (packet->GetSize() > m_maxAppPayloadForDataRate.at(m_dataRate))
         {
             NS_LOG_WARN("Attempting to send a packet larger than the maximum allowed"
-                        << " size at this DataRate (DR" << unsigned(m_dataRate)
+                        << " size at this Data Rate (DR" << unsigned(m_dataRate)
                         << "). Transmission canceled.");
             return;
         }
@@ -727,10 +728,9 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
     // Check the dataRate
     /////////////////////
     // We need to know we can use it at all
-    // To assess this, we try and convert it to a SF/BW combination and check if
-    // those values are valid. Since GetSfFromDataRate and
-    // GetBandwidthFromDataRate return 0 if the dataRate is not recognized, we
-    // can check against this.
+    // To assess this, we try and convert it to a spreading factor / bandwidth combination and check
+    // if those values are valid. Since GetSfFromDataRate and GetBandwidthFromDataRate return 0 if
+    // the dataRate is not recognized, we can check against this.
     uint8_t sf = GetSfFromDataRate(dataRate);
     double bw = GetBandwidthFromDataRate(dataRate);
     NS_LOG_DEBUG("SF: " << unsigned(sf) << ", BW: " << bw);

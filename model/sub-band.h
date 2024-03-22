@@ -33,40 +33,45 @@ namespace lorawan
 class LogicalLoraChannel;
 
 /**
+ * \ingroup lorawan
+ *
  * Class representing a SubBand, i.e., a frequency band subject to some
  * regulations on duty cycle and transmission power.
  */
 class SubBand : public Object
 {
   public:
+    /**
+     *  Register this type.
+     *  \return The object TypeId.
+     */
     static TypeId GetTypeId();
 
-    SubBand();
+    SubBand();           //!< Default constructor
+    ~SubBand() override; //!< Destructor
 
     /**
      * Create a new SubBand by specifying all of its properties.
      *
-     * \param firstFrequency The SubBand's lowest frequency.
-     * \param lastFrequency The SubBand's highest frequency.
+     * \param firstFrequency The SubBand's lowest frequency [MHz].
+     * \param lastFrequency The SubBand's highest frequency [MHz].
      * \param dutyCycle The duty cycle (as a fraction) allowed on this SubBand.
      * \param maxTxPowerDbm The maximum transmission power [dBm] allowed on this SubBand.
      */
     SubBand(double firstFrequency, double lastFrequency, double dutyCycle, double maxTxPowerDbm);
 
-    ~SubBand() override;
-
     /**
      * Get the lowest frequency of the SubBand.
      *
-     * \return The lowest frequency of the SubBand.
+     * \return The lowest frequency [MHz] of the SubBand.
      */
     double GetFirstFrequency() const;
 
-    /**
-     * Get the last frequency of the subband.
-     *
-     * \return The lowest frequency of the SubBand.
-     */
+    ///**
+    // * Get the last frequency of the subband.
+    // *
+    // * \return The lowest frequency [MHz] of the SubBand.
+    // */
     // double GetLastFrequency ();
 
     /**
@@ -100,7 +105,7 @@ class SubBand : public Object
     /**
      * Return whether or not a frequency belongs to this SubBand.
      *
-     * \param frequency the frequency we want to test against the current subband
+     * \param frequency The frequency [MHz] we want to test against the current subband.
      * \return True if the frequency is between firstFrequency and lastFrequency,
      * false otherwise.
      */
@@ -109,7 +114,7 @@ class SubBand : public Object
     /**
      * Return whether or not a channel belongs to this SubBand.
      *
-     * \param channel the channel we want to test against the current subband
+     * \param channel The channel we want to test against the current subband.
      * \return True if the channel's center frequency is between firstFrequency
      * and lastFrequency, false otherwise.
      */
@@ -123,7 +128,7 @@ class SubBand : public Object
     void SetMaxTxPowerDbm(double maxTxPowerDbm);
 
     /**
-     * Return the maximum transmission power that is allowed on this SubBand
+     * Return the maximum transmission power that is allowed on this SubBand.
      *
      * \return The maximum transmission power, in dBm.
      */

@@ -29,73 +29,89 @@ namespace lorawan
 {
 
 /**
- * \ingroup energy
+ * \ingroup lorawan
  *
- * \brief Model the transmit current as a function of the transmit power and
+ * Model the transmit current as a function of the transmit power and
  * mode.
  */
 class LoraTxCurrentModel : public Object
 {
   public:
+    /**
+     *  Register this type.
+     *  \return The object TypeId.
+     */
     static TypeId GetTypeId();
 
-    LoraTxCurrentModel();
-    ~LoraTxCurrentModel() override;
+    LoraTxCurrentModel();           //!< Default constructor
+    ~LoraTxCurrentModel() override; //!< Destructor
 
     /**
      * Get the current for transmission at this power.
      *
-     * \param txPowerDbm The nominal tx power in dBm
-     * \returns The transmit current (in Ampere)
+     * \param txPowerDbm The nominal tx power in dBm.
+     * \return The transmit current (in Ampere).
      */
     virtual double CalcTxCurrent(double txPowerDbm) const = 0;
 };
 
 /**
+ * \ingroup lorawan
+ *
  * A linear model of the transmission current for a LoRa device, based on the
  * WiFi model.
  */
 class LinearLoraTxCurrentModel : public LoraTxCurrentModel
 {
   public:
+    /**
+     *  Register this type.
+     *  \return The object TypeId.
+     */
     static TypeId GetTypeId();
 
-    LinearLoraTxCurrentModel();
-    ~LinearLoraTxCurrentModel() override;
+    LinearLoraTxCurrentModel();           //!< Default constructor
+    ~LinearLoraTxCurrentModel() override; //!< Destructor
 
     /**
-     * \param eta (dimension-less)
-     *
      * Set the power amplifier efficiency.
+     *
+     * \param eta The power amplifier efficiency.
      */
     void SetEta(double eta);
 
     /**
-     * \param voltage (Volts)
-     *
      * Set the supply voltage.
+     *
+     * \param voltage The supply voltage [Volts].
      */
     void SetVoltage(double voltage);
 
     /**
-     * \param idleCurrent (Ampere)
-     *
      * Set the current in the STANDBY state.
+     *
+     * \param idleCurrent The idle current value [Ampere].
      */
     void SetStandbyCurrent(double idleCurrent);
 
     /**
-     * \return the power amplifier efficiency.
+     * Get the power amplifier efficiency.
+     *
+     * \return The power amplifier efficiency.
      */
     double GetEta() const;
 
     /**
-     * \return the supply voltage.
+     * Get the supply voltage.
+     *
+     * \return The supply voltage [Volts].
      */
     double GetVoltage() const;
 
     /**
-     * \return the current in the STANDBY state.
+     * Get the current in the STANDBY state.
+     *
+     * \return The idle current value [Ampere].
      */
     double GetStandbyCurrent() const;
 
@@ -107,34 +123,42 @@ class LinearLoraTxCurrentModel : public LoraTxCurrentModel
     double m_idleCurrent; //!< Standby current
 };
 
+/**
+ * \ingroup lorawan
+ *
+ * A constant model of the transmission current for a LoRa device, always yielding the same
+ * current independently from the transmission power provided.
+ */
 class ConstantLoraTxCurrentModel : public LoraTxCurrentModel
 {
   public:
     /**
-     * \brief Get the type ID.
-     * \return the object TypeId
+     *  Register this type.
+     *  \return The object TypeId.
      */
     static TypeId GetTypeId();
 
-    ConstantLoraTxCurrentModel();
-    ~ConstantLoraTxCurrentModel() override;
+    ConstantLoraTxCurrentModel();           //!< Default constructor
+    ~ConstantLoraTxCurrentModel() override; //!< Destructor
 
     /**
-     * \param txCurrent (Ampere)
-     *
      * Set the current in the TX state.
+     *
+     * \param txCurrent The TX current value [Ampere].
      */
     void SetTxCurrent(double txCurrent);
 
     /**
-     * \return the current in the TX state.
+     * Get the current of the TX state.
+     *
+     * \return The TX current value.
      */
     double GetTxCurrent() const;
 
     double CalcTxCurrent(double txPowerDbm) const override;
 
   private:
-    double m_txCurrent;
+    double m_txCurrent; //!< The transmission current [Ampere]
 };
 
 } // namespace lorawan

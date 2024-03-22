@@ -59,9 +59,9 @@ NetworkServerHelper::SetGatewaysP2P(const P2PGwRegistration_t& registration)
 {
     for (const auto& [serverP2PNetDev, gwNode] : registration)
     {
-        NS_ASSERT_MSG(
-            serverP2PNetDev->GetNode()->GetId() != gwNode->GetId(),
-            "wrong P2P NetDevice detected, please provide the one on the NS's side instead");
+        NS_ASSERT_MSG(serverP2PNetDev->GetNode()->GetId() != gwNode->GetId(),
+                      "wrong P2P NetDevice detected, please provide the one on the network "
+                      "server's side instead");
         m_gatewayRegistrationList.emplace_back(serverP2PNetDev, gwNode);
     }
 }
@@ -135,7 +135,7 @@ NetworkServerHelper::InstallComponents(Ptr<NetworkServer> netServer)
     Ptr<LinkCheckComponent> linkCheckSupport = CreateObject<LinkCheckComponent>();
     netServer->AddComponent(linkCheckSupport);
 
-    // Add Adr support
+    // Add Adaptive Data Rate (ADR) support
     if (m_adrEnabled)
     {
         netServer->AddComponent(m_adrSupportFactory.Create<NetworkControllerComponent>());

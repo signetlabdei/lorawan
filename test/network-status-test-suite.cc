@@ -39,15 +39,16 @@ using namespace lorawan;
 
 NS_LOG_COMPONENT_DEFINE("NetworkStatusTestSuite");
 
-/////////////////////////////
-// EndDeviceStatus testing //
-/////////////////////////////
-
+/**
+ * \ingroup lorawan
+ *
+ * It tests the constructor of the EndDeviceStatus class
+ */
 class EndDeviceStatusTest : public TestCase
 {
   public:
-    EndDeviceStatusTest();
-    ~EndDeviceStatusTest() override;
+    EndDeviceStatusTest();           //!< Default constructor
+    ~EndDeviceStatusTest() override; //!< Destructor
 
   private:
     void DoRun() override;
@@ -75,15 +76,16 @@ EndDeviceStatusTest::DoRun()
     EndDeviceStatus eds = EndDeviceStatus();
 }
 
-/////////////////////////////
-// NetworkStatus testing //
-/////////////////////////////
-
+/**
+ * \ingroup lorawan
+ *
+ * It tests the function NetworkStatus::AddNode
+ */
 class NetworkStatusTest : public TestCase
 {
   public:
-    NetworkStatusTest();
-    ~NetworkStatusTest() override;
+    NetworkStatusTest();           //!< Default constructor
+    ~NetworkStatusTest() override; //!< Destructor
 
   private:
     void DoRun() override;
@@ -120,18 +122,16 @@ NetworkStatusTest::DoRun()
     ns.AddNode(GetMacLayerFromNode<ClassAEndDeviceLorawanMac>(endDevices.Get(0)));
 }
 
-/**************
- * Test Suite *
- **************/
-
-// The TestSuite class names the TestSuite, identifies what type of TestSuite,
-// and enables the TestCases to be run. Typically, only the constructor for
-// this class must be defined
-
+/**
+ * \ingroup lorawan
+ *
+ * The TestSuite class names the TestSuite, identifies what type of TestSuite, and enables the
+ * TestCases to be run. Typically, only the constructor for this class must be defined
+ */
 class NetworkStatusTestSuite : public TestSuite
 {
   public:
-    NetworkStatusTestSuite();
+    NetworkStatusTestSuite(); //!< Default constructor
 };
 
 NetworkStatusTestSuite::NetworkStatusTestSuite()

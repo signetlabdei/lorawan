@@ -181,8 +181,10 @@ LoraPacketTracker::LostBecauseTxCallback(Ptr<const Packet> packet, uint32_t gwId
 {
     if (IsUplink(packet))
     {
-        NS_LOG_INFO("PHY packet " << packet << " was lost because of GW transmission at gateway "
-                                  << gwId);
+        NS_LOG_INFO(
+            "PHY packet " << packet
+                          << " was lost because of concurrent downlink transmission at gateway "
+                          << gwId);
 
         auto it = m_packetTracker.find(packet);
         (*it).second.outcomes.insert(std::pair<int, enum PhyPacketOutcome>(gwId, LOST_BECAUSE_TX));

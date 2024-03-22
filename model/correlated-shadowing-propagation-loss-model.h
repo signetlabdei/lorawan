@@ -30,53 +30,88 @@ class MobilityModel;
 namespace lorawan
 {
 
+/**
+ * \ingroup lorawan
+ *
+ * Propagation loss model for spatially correlated shadowing in a city
+ */
 class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
 {
   public:
+    /**
+     * Stores x,y values and overrides critical operators.
+     */
     class Position
     {
       public:
-        Position();
-        Position(double x, double y);
-        double x;
-        double y;
+        Position(); //!< Default constructor
 
+        /**
+         * Construct a new Position object with values.
+         *
+         * \param x The x coordinate.
+         * \param y The y coordinate.
+         */
+        Position(double x, double y);
+
+        double x; //!< Stores the x coordinate.
+        double y; //!< Stores the y coordinate.
+
+        /**
+         * Equality comparison operator
+         *
+         * \param other Second Position to compare this instance to.
+         * \return True if the positions are equal.
+         */
         bool operator==(const Position& other) const;
+        /**
+         * Less-then comparison operator
+         *
+         * \param other Second Position to compare this instance to.
+         * \return True if either the x or y coordinate of first Position is less than the
+         * respective one of the second Position
+         */
         bool operator<(const Position& other) const;
     };
 
+    /**
+     * \ingroup lorawan
+     *
+     * This initializes the shadowing map with a grid of independent
+     * shadowing values, one m_correlationDistance meters apart from the next
+     * one. The result is something like:
+     *
+     *       o---o---o---o---o
+     *       |   |   |   |   |
+     *       o---o---o---o---o
+     *       |   |   |   |   |
+     *       o---o---o---o---o
+     *       |   |   |   |   |
+     *       o---o---o---o---o
+     *
+     * where at each o we have an independently generated shadowing value.
+     * We can then interpolate the 4 values surrounding any point in space
+     * in order to get a correlated shadowing value. After generating this
+     * value, we will add it to the map so that we don't have to compute it
+     * twice. Also, since interpolation is a deterministic operation, we are
+     * guaranteed that, as long as the grid doesn't change, also two values
+     * generated in the same square will be correlated.
+     */
     class ShadowingMap
         : public SimpleRefCount<CorrelatedShadowingPropagationLossModel::ShadowingMap>
     {
       public:
-        /**
-         * Constructor.
-         * This initializes the shadowing map with a grid of independent
-         * shadowing values, one m_correlationDistance meters apart from the next
-         * one. The result is something like:
-         *  o---o---o---o---o
-         *  |   |   |   |   |
-         *  o---o---o---o---o
-         *  |   |   |   |   |
-         *  o---o---o---o---o
-         *  |   |   |   |   |
-         *  o---o---o---o---o
-         *  where at each o we have an independently generated shadowing value.
-         *  We can then interpolate the 4 values surrounding any point in space
-         *  in order to get a correlated shadowing value. After generating this
-         *  value, we will add it to the map so that we don't have to compute it
-         *  twice. Also, since interpolation is a deterministic operation, we are
-         *  guaranteed that, as long as the grid doesn't change, also two values
-         *  generated in the same square will be correlated.
-         */
-        ShadowingMap();
-
-        ~ShadowingMap();
+        ShadowingMap();  //!< Default constructor
+        ~ShadowingMap(); //!< Destructor
 
         /**
          * Get the loss for a certain position.
-         * If this position is not already in the map, add it by computing the
+         *
+         * If the position is not already in the map, add it by computing the
          * interpolation of neighboring shadowing values belonging to the grid.
+         *
+         * \param position The Position instance.
+         * \return The loss as a double.
          */
         double GetLoss(CorrelatedShadowingPropagationLossModel::Position position);
 
@@ -107,22 +142,13 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
         static const double m_kInv[4][4];
     };
 
+    /**
+     *  Register this type.
+     *  \return The object TypeId.
+     */
     static TypeId GetTypeId();
 
-    /**
-     * Constructor.
-     */
-    CorrelatedShadowingPropagationLossModel();
-
-    /**
-     * Set the correlation distance for newly created ShadowingMap instances
-     */
-    void SetCorrelationDistance(double distance);
-
-    /**
-     * Get the correlation distance that is currently being used.
-     */
-    double GetCorrelationDistance();
+    CorrelatedShadowingPropagationLossModel(); //!< Default constructor
 
   private:
     double DoCalcRxPower(double txPowerDbm,
@@ -139,27 +165,27 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
      * square is identified by a pair of coordinates. Coordinates are computed as
      * such:
      *
-     *  o---------o---------o---------o---------o---------o
-     *  |         |         |    '    |         |         |
-     *  |  (-2,2) |  (-1,2) |  (0,2)  |  (1,2)  |  (2,2)  |
-     *  |         |         |    '    |         |         |
-     *  o---------o---------o----+----o---------o---------o
-     *  |         |         |    '    |         |         |
-     *  |  (-2,1) |  (-1,1) |  (0,1)  |  (1,1)  |  (2,1)  |
-     *  |         |         |    '    |         |         |
-     *  o---------o---------o----+----o---------o---------o
-     *  |         |         |    '    |         |         |
-     *  |--(-2,0)-+--(-1,0)-+--(0,0)--+--(1,0)--+--(2,0)--|
-     *  |         |         |    '    |         |         |
-     *  o---------o---------o----+----o---------o---------o
-     *  |         |         |    '    |         |         |
-     *  | (-2,-1) | (-1,-1) | (0,-1)  | (1,-1)  | (2,-1)  |
-     *  |         |         |    '    |         |         |
-     *  o---------o---------o----+----o---------o---------o
-     *  |         |         |    '    |         |         |
-     *  | (-2,-2) | (-1,-2) | (0,-2)  | (1,-2)  | (2,-2)  |
-     *  |         |         |    '    |         |         |
-     *  o---------o---------o---------o---------o---------o
+     *        o---------o---------o---------o---------o---------o
+     *        |         |         |    '    |         |         |
+     *        |  (-2,2) |  (-1,2) |  (0,2)  |  (1,2)  |  (2,2)  |
+     *        |         |         |    '    |         |         |
+     *        o---------o---------o----+----o---------o---------o
+     *        |         |         |    '    |         |         |
+     *        |  (-2,1) |  (-1,1) |  (0,1)  |  (1,1)  |  (2,1)  |
+     *        |         |         |    '    |         |         |
+     *        o---------o---------o----+----o---------o---------o
+     *        |         |         |    '    |         |         |
+     *        |--(-2,0)-+--(-1,0)-+--(0,0)--+--(1,0)--+--(2,0)--|
+     *        |         |         |    '    |         |         |
+     *        o---------o---------o----+----o---------o---------o
+     *        |         |         |    '    |         |         |
+     *        | (-2,-1) | (-1,-1) | (0,-1)  | (1,-1)  | (2,-1)  |
+     *        |         |         |    '    |         |         |
+     *        o---------o---------o----+----o---------o---------o
+     *        |         |         |    '    |         |         |
+     *        | (-2,-2) | (-1,-2) | (0,-2)  | (1,-2)  | (2,-2)  |
+     *        |         |         |    '    |         |         |
+     *        o---------o---------o---------o---------o---------o
      *
      *  For each one of these coordinates, a ShadowingMap is computed. That is,
      *  each one of the points belonging to the same square sees the same

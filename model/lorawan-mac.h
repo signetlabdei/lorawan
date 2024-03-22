@@ -36,31 +36,42 @@ namespace lorawan
 class LoraPhy;
 
 /**
+ * \ingroup lorawan
+ *
  * Class representing the LoRaWAN MAC layer.
  *
  * This class is meant to be extended differently based on whether the layer
- * belongs to an End Device or a Gateway, while holding some functionality that
+ * belongs to an end device or a gateway, while holding some functionality that
  * is common to both.
  */
 class LorawanMac : public Object
 {
   public:
+    /**
+     *  Register this type.
+     *  \return The object TypeId.
+     */
     static TypeId GetTypeId();
 
-    LorawanMac();
-    ~LorawanMac() override;
+    LorawanMac();           //!< Default constructor
+    ~LorawanMac() override; //!< Destructor
 
+    /**
+     * Matrix structure to store possible data rate value to be used by a LoRaWAN end device for
+     * listening during the RX1 receive window. It is a function of the uplink data rate and the
+     * RX1DROffset [0:5].
+     */
     typedef std::array<std::array<uint8_t, 6>, 8> ReplyDataRateMatrix;
 
     /**
-     * Set the underlying PHY layer
+     * Set the underlying PHY layer.
      *
-     * \param phy the phy layer
+     * \param phy The phy layer.
      */
     void SetPhy(Ptr<LoraPhy> phy);
 
     /**
-     * Get the underlying PHY layer
+     * Get the underlying PHY layer.
      *
      * \return The PHY layer that this MAC is connected to.
      */
@@ -76,7 +87,7 @@ class LorawanMac : public Object
     /**
      * Receive a packet from the lower layer.
      *
-     * \param packet the received packet
+     * \param packet The received packet.
      */
     virtual void Receive(Ptr<const Packet> packet) = 0;
 
@@ -84,7 +95,7 @@ class LorawanMac : public Object
      * Function called by lower layers to inform this layer that reception of a
      * packet we were locked on failed.
      *
-     * \param packet the packet we failed to receive
+     * \param packet The packet we failed to receive.
      */
     virtual void FailedReception(Ptr<const Packet> packet) = 0;
 
@@ -124,20 +135,20 @@ class LorawanMac : public Object
     void SetLogicalLoraChannelHelper(LogicalLoraChannelHelper helper);
 
     /**
-     * Get the SF corresponding to a data rate, based on this MAC's region.
+     * Get the spreading factor corresponding to a data rate, based on this MAC's region.
      *
-     * \param dataRate The Data Rate we need to convert to a Spreading Factor
+     * \param dataRate The data rate we need to convert to a Spreading Factor
      * value.
-     * \return The SF that corresponds to a Data Rate in this MAC's region, or 0
+     * \return The spreading factor that corresponds to a data rate in this MAC's region, or 0
      * if the dataRate is not valid.
      */
     uint8_t GetSfFromDataRate(uint8_t dataRate);
 
     /**
-     * Get the BW corresponding to a data rate, based on this MAC's region
+     * Get the bandwidth corresponding to a data rate, based on this MAC's region.
      *
-     * \param dataRate The Data Rate we need to convert to a bandwidth value.
-     * \return The bandwidth that corresponds to the parameter Data Rate in this
+     * \param dataRate The data rate we need to convert to a bandwidth value.
+     * \return The bandwidth that corresponds to the parameter data rate in this
      * MAC's region, or 0 if the dataRate is not valid.
      */
     double GetBandwidthFromDataRate(uint8_t dataRate);
@@ -154,27 +165,27 @@ class LorawanMac : public Object
     double GetDbmForTxPower(uint8_t txPower);
 
     /**
-     * Set the vector to use to check up correspondence between SF and DataRate.
+     * Set the vector to use to check up correspondence between spreading factor and data rate.
      *
-     * \param sfForDataRate A vector that contains at position i the SF that
-     * should correspond to DR i.
+     * \param sfForDataRate A vector that contains at position i the spreading factor that
+     * should correspond to data rate i.
      */
     void SetSfForDataRate(std::vector<uint8_t> sfForDataRate);
 
     /**
      * Set the vector to use to check up correspondence between bandwidth and
-     * DataRate.
+     * data rate.
      *
      * \param bandwidthForDataRate A vector that contains at position i the
-     * bandwidth that should correspond to DR i in this MAC's region.
+     * bandwidth that should correspond to data rate i in this MAC's region.
      */
     void SetBandwidthForDataRate(std::vector<double> bandwidthForDataRate);
 
     /**
-     * Set the maximum App layer payload for a set DataRate.
+     * Set the maximum App layer payload for a set data rate.
      *
      * \param maxAppPayloadForDataRate A vector that contains at position i the
-     * maximum Application layer payload that should correspond to DR i in this
+     * maximum Application layer payload that should correspond to data rate i in this
      * MAC's region.
      */
     void SetMaxAppPayloadForDataRate(std::vector<uint32_t> maxAppPayloadForDataRate);
@@ -190,11 +201,11 @@ class LorawanMac : public Object
     void SetTxDbmForTxPower(std::vector<double> txDbmForTxPower);
 
     /**
-     * Set the matrix to use when deciding with which DataRate to respond. Region
+     * Set the matrix to use when deciding with which data rate to respond. Region
      * based.
      *
      * \param replyDataRateMatrix A matrix containing the reply DataRates, based
-     * on the sending DataRate and on the value of the RX1DROffset parameter.
+     * on the sending data rate and on the value of the RX1DROffset parameter.
      */
     void SetReplyDataRateMatrix(ReplyDataRateMatrix replyDataRateMatrix);
 
@@ -216,8 +227,6 @@ class LorawanMac : public Object
     /**
      * The trace source that is fired when a packet cannot be sent because of duty
      * cycle limitations.
-     *
-     * \see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>> m_cannotSendBecauseDutyCycle;
 
@@ -248,18 +257,18 @@ class LorawanMac : public Object
     LogicalLoraChannelHelper m_channelHelper;
 
     /**
-     * A vector holding the SF each Data Rate corresponds to.
+     * A vector holding the spreading factor each data rate corresponds to.
      */
     std::vector<uint8_t> m_sfForDataRate;
 
     /**
-     * A vector holding the bandwidth each Data Rate corresponds to.
+     * A vector holding the bandwidth each data rate corresponds to.
      */
     std::vector<double> m_bandwidthForDataRate;
 
     /**
      * A vector holding the maximum app payload size that corresponds to a
-     * certain DataRate.
+     * certain data rate.
      */
     std::vector<uint32_t> m_maxAppPayloadForDataRate;
 
@@ -274,8 +283,8 @@ class LorawanMac : public Object
     std::vector<double> m_txDbmForTxPower;
 
     /**
-     * The matrix that decides the DR the GW will use in a reply based on the ED's
-     * sending DR and on the value of the RX1DROffset parameter.
+     * The matrix that decides the data rate the gateway will use in a reply based on the end
+     * device's sending data rate and on the value of the RX1DROffset parameter.
      */
     ReplyDataRateMatrix m_replyDataRateMatrix;
 };

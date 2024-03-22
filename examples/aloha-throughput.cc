@@ -55,30 +55,45 @@ using namespace lorawan;
 NS_LOG_COMPONENT_DEFINE("AlohaThroughput");
 
 // Network settings
-int nDevices = 200;
-int nGateways = 1;
-double radius = 1000;
-double simulationTime = 100;
+int nDevices = 200;                 //!< Number of end device nodes to create
+int nGateways = 1;                  //!< Number of gateway nodes to create
+double radiusMeters = 1000;         //!< Radius (m) of the deplyoment
+double simulationTimeSeconds = 100; //!< Scenario duration (s) in simulated time
 
 // Channel model
-bool realisticChannelModel = false;
+bool realisticChannelModel = false; //!< Whether to use a more realistic channel model with
+                                    //!< buildings and correlated shadowing
 
-std::vector<int> packetsSent(6, 0);
-std::vector<int> packetsReceived(6, 0);
+/** Record received pkts by Data Rate (DR) [index 0 -> DR5, index 5 -> DR0]. */
+auto packetsSent = std::vector<int>(6, 0);
+/** Record received pkts by Data Rate (DR) [index 0 -> DR5, index 5 -> DR0]. */
+auto packetsReceived = std::vector<int>(6, 0);
 
+/**
+ * Record the beginning of a transmission by an end device.
+ *
+ * \param packet A pointer to the packet sent.
+ * \param senderNodeId Node id of the sender end device.
+ */
 void
-OnTransmissionCallback(Ptr<const Packet> packet, uint32_t systemId)
+OnTransmissionCallback(Ptr<const Packet> packet, uint32_t senderNodeId)
 {
-    NS_LOG_FUNCTION(packet << systemId);
+    NS_LOG_FUNCTION(packet << senderNodeId);
     LoraTag tag;
     packet->PeekPacketTag(tag);
     packetsSent.at(tag.GetSpreadingFactor() - 7)++;
 }
 
+/**
+ * Record the correct reception of a packet by a gateway.
+ *
+ * \param packet A pointer to the packet received.
+ * \param receiverNodeId Node id of the receiver gateway.
+ */
 void
-OnPacketReceptionCallback(Ptr<const Packet> packet, uint32_t systemId)
+OnPacketReceptionCallback(Ptr<const Packet> packet, uint32_t receiverNodeId)
 {
-    NS_LOG_FUNCTION(packet << systemId);
+    NS_LOG_FUNCTION(packet << receiverNodeId);
     LoraTag tag;
     packet->PeekPacketTag(tag);
     packetsReceived.at(tag.GetSpreadingFactor() - 7)++;
@@ -91,14 +106,14 @@ main(int argc, char* argv[])
 
     CommandLine cmd(__FILE__);
     cmd.AddValue("nDevices", "Number of end devices to include in the simulation", nDevices);
-    cmd.AddValue("simulationTime", "Simulation Time", simulationTime);
+    cmd.AddValue("simulationTime", "Simulation Time (s)", simulationTimeSeconds);
     cmd.AddValue("interferenceMatrix",
                  "Interference matrix to use [aloha, goursaud]",
                  interferenceMatrix);
-    cmd.AddValue("radius", "Radius of the deployment", radius);
+    cmd.AddValue("radius", "Radius (m) of the deployment", radiusMeters);
     cmd.Parse(argc, argv);
 
-    int appPeriodSeconds = simulationTime;
+    int appPeriodSeconds = simulationTimeSeconds;
 
     // Set up logging
     LogComponentEnable("AlohaThroughput", LOG_LEVEL_ALL);
@@ -123,7 +138,7 @@ main(int argc, char* argv[])
     MobilityHelper mobility;
     mobility.SetPositionAllocator("ns3::UniformDiscPositionAllocator",
                                   "rho",
-                                  DoubleValue(radius),
+                                  DoubleValue(radiusMeters),
                                   "X",
                                   DoubleValue(0.0),
                                   "Y",
@@ -247,7 +262,7 @@ main(int argc, char* argv[])
      *  Install applications on the end devices  *
      *********************************************/
 
-    Time appStopTime = Seconds(simulationTime);
+    Time appStopTime = Seconds(simulationTimeSeconds);
     int packetSize = 50;
     PeriodicSenderHelper appHelper = PeriodicSenderHelper();
     appHelper.SetPeriod(Seconds(appPeriodSeconds));
@@ -291,17 +306,17 @@ main(int argc, char* argv[])
     outputFile.close();
 
     /**************************
-     *  Create Network Server  *
+     *  Create network server  *
      ***************************/
 
-    // Create the NS node
+    // Create the network server node
     Ptr<Node> networkServer = CreateObject<Node>();
 
     // PointToPoint links between gateways and server
     PointToPointHelper p2p;
     p2p.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
     p2p.SetChannelAttribute("Delay", StringValue("2ms"));
-    // Store NS app registration details for later
+    // Store network server app registration details for later
     P2PGwRegistration_t gwRegistration;
     for (auto gw = gateways.Begin(); gw != gateways.End(); ++gw)
     {
@@ -310,7 +325,7 @@ main(int argc, char* argv[])
         gwRegistration.emplace_back(serverP2PNetDev, *gw);
     }
 
-    // Create a NS for the network
+    // Create a network server for the network
     nsHelper.SetGatewaysP2P(gwRegistration);
     nsHelper.SetEndDevices(endDevices);
     nsHelper.Install(networkServer);

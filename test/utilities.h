@@ -31,12 +31,17 @@ namespace ns3
 namespace lorawan
 {
 
+/**
+ * \ingroup lorawan
+ *
+ * Stores the main elements of a simulated LoRaWAN network
+ */
 struct NetworkComponents
 {
-    Ptr<LoraChannel> channel;
-    NodeContainer endDevices;
-    NodeContainer gateways;
-    Ptr<Node> nsNode;
+    Ptr<LoraChannel> channel; //!< A pointer to the LoraChannel object.
+    NodeContainer endDevices; //!< Container of the end device nodes.
+    NodeContainer gateways;   //!< Container of the gateway nodes.
+    Ptr<Node> nsNode;         //!< A pointer to the network server Node.
 };
 
 Ptr<LoraChannel> CreateChannel();

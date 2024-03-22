@@ -38,32 +38,59 @@ namespace lorawan
 class NetworkStatus;     // Forward declaration
 class NetworkController; // Forward declaration
 
+/**
+ * \ingroup lorawan
+ *
+ * Network server component in charge of scheduling downling packets onto devices' reception windows
+ *
+ * \todo We should probably add getters and setters or remove default constructor
+ */
 class NetworkScheduler : public Object
 {
   public:
+    /**
+     *  Register this type.
+     *  \return The object TypeId.
+     */
     static TypeId GetTypeId();
 
-    NetworkScheduler();
-    NetworkScheduler(Ptr<NetworkStatus> status, Ptr<NetworkController> controller);
-    ~NetworkScheduler() override;
+    NetworkScheduler();           //!< Default constructor
+    ~NetworkScheduler() override; //!< Destructor
 
     /**
-     * Method called by NetworkServer to inform the Scheduler of a newly arrived
-     * uplink packet. This function schedules the OnReceiveWindowOpportunity
-     * events 1 and 2 seconds later.
+     * Construct a new NetworkScheduler providing the NetworkStatus and the NetworkController
+     * objects.
+     *
+     * \param status A pointer to the NetworkStatus object.
+     * \param controller A pointer to the NetworkController object.
+     */
+    NetworkScheduler(Ptr<NetworkStatus> status, Ptr<NetworkController> controller);
+
+    /**
+     * Method called by NetworkServer application to inform the Scheduler of a newly arrived uplink
+     * packet.
+     *
+     * This function schedules the OnReceiveWindowOpportunity events 1 and 2 seconds later.
+     *
+     * \param packet A pointer to the new Packet instance.
      */
     void OnReceivedPacket(Ptr<const Packet> packet);
 
     /**
-     * Method that is scheduled after packet arrivals in order to act on
-     * receive windows 1 and 2 seconds later receptions.
+     * Method that is scheduled after packet arrival in order to take action on
+     * sender's receive windows openings.
+     *
+     * \param deviceAddress The Address of the end device.
+     * \param window The reception window number (1 or 2).
      */
     void OnReceiveWindowOpportunity(LoraDeviceAddress deviceAddress, int window);
 
   private:
-    TracedCallback<Ptr<const Packet>> m_receiveWindowOpened;
-    Ptr<NetworkStatus> m_status;
-    Ptr<NetworkController> m_controller;
+    TracedCallback<Ptr<const Packet>>
+        m_receiveWindowOpened;           //!< Trace callback source for reception windows openings.
+                                         //!< \todo Never called. Place calls in the right places.
+    Ptr<NetworkStatus> m_status;         //!< A pointer to the NetworkStatus object.
+    Ptr<NetworkController> m_controller; //!< A pointer to the NetworkController object.
 };
 
 } // namespace lorawan

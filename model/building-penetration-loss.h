@@ -31,22 +31,23 @@ namespace lorawan
 {
 
 /**
+ * \ingroup lorawan
+ *
  * A class implementing the TR 45.820 model for building losses
  */
 class BuildingPenetrationLoss : public PropagationLossModel
 {
   public:
+    /**
+     *  Register this type.
+     *  \return The object TypeId.
+     */
     static TypeId GetTypeId();
 
-    BuildingPenetrationLoss();
-
-    ~BuildingPenetrationLoss() override;
+    BuildingPenetrationLoss();           //!< Default constructor
+    ~BuildingPenetrationLoss() override; //!< Destructor
 
   private:
-    /**
-     * Perform the computation of the received power according to the current
-     * model.
-     */
     double DoCalcRxPower(double txPowerDbm,
                          Ptr<MobilityModel> a,
                          Ptr<MobilityModel> b) const override;
@@ -56,14 +57,14 @@ class BuildingPenetrationLoss : public PropagationLossModel
     /**
      * Generate a random p value.
      * The distribution of the returned value is as specified in TR 45.820.
-     * \returns A value in the 0-3 range.
+     * \return A random value in the 0-3 range.
      */
     int GetPValue() const;
 
     /**
      * Get a value to compute the wall loss.
      * The distribution of the returned value is as specified in TR 45.820.
-     * \returns A value in the 0-2 range.
+     * \return A random value in the 0-2 range.
      */
     int GetWallLossValue() const;
 
@@ -71,7 +72,7 @@ class BuildingPenetrationLoss : public PropagationLossModel
      * Compute the wall loss associated to this mobility model
      * \param b The mobility model associated to the node whose wall loss we need
      * to compute.
-     * \returns The power loss due to external walls.
+     * \return The power loss due to external walls.
      */
     double GetWallLoss(Ptr<MobilityModel> b) const;
 
@@ -79,14 +80,14 @@ class BuildingPenetrationLoss : public PropagationLossModel
      * Get the Tor1 value used in the TR 45.820 standard to account for internal
      * wall loss.
      * \param b The mobility model of the node we want to compute the value for.
-     * \returns The tor1 value.
+     * \return The tor1 value.
      */
     double GetTor1(Ptr<MobilityModel> b) const;
 
     Ptr<UniformRandomVariable> m_uniformRV; //!< An uniform RV
 
     /**
-     * A map linking each mobility model to a p value
+     * A map linking each mobility model to a p value.
      */
     mutable std::map<Ptr<MobilityModel>, int> m_pMap;
 
