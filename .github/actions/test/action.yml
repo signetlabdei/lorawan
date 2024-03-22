@@ -4,11 +4,31 @@ description: "Defines the central steps in testing ns-3"
 runs:
   using: "composite"
   steps:
+    - name: "Prepare env"
+      run: |
+        echo "REF_NAME=`echo $GITHUB_REF_NAME | sed -r 's/[/]+/-/g'`" >> $GITHUB_ENV
+        echo "NOW=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+      shell: bash
+    - name: "Restore tests placeholder"
+      uses: actions/cache/restore@v4
+      with:
+        key: ${{ format('tests-{0}-{1}-', env.BUILD_ID, env.REF_NAME) }}
+        restore-keys: ${{ format('tests-{0}-{1}-', env.BUILD_ID, env.REF_NAME) }}
+        path: build/tests-*.txt
+    - run: ls -al build/ | grep tests
+      shell: bash
     # Test steps
-    - name: "Store ccache miss rate"
+    - name: "Test ns-3"
       shell: bash
-      run: echo "CACHE_MISS=`./utils/ccache-miss-rate.py`" >> $GITHUB_ENV
-    - if: env.CACHE_MISS != '0' && env.MODE != 'debug'
-      name: "Test ns-3"
-      shell: bash
-      run: ./test.py -n
+      run: >
+        if [[ "$MODE" != "debug" ]] && [[ -f build/tests-$BUILD_ID.txt ]];
+        then ./test.py -n;
+        if [[ $? == 0 ]];
+        then `rm build/tests-$BUILD_ID.txt` || true;
+        fi;
+        fi
+    - name: "Update tests placeholder"
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ format('tests-{0}-{1}-{2}', env.BUILD_ID, env.REF_NAME, env.NOW) }}
+        path: build/tests-*.txt
