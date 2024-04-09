@@ -37,7 +37,7 @@ jobs:
           SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
         uses: cpina/github-action-push-to-another-repository@main
         with:
-          source-directory: "doc/"
+          source-directory: "doc/models/build/singlehtml/"
           destination-github-username: "signetlabdei"
           destination-repository-name: "lorawan-docs"
           user-email: paginmatte@dei.unipd.it
