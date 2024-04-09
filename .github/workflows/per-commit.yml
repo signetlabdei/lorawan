@@ -67,7 +67,8 @@ jobs:
 
   deploy-doc:
     # do not run on PR events
-    if: github.event_name == 'push'
+    # temp enable this
+    # if: github.event_name == 'push' 
     needs: documentation
     uses: ./.github/workflows/deploy-doc.yml
     secrets: inherit
