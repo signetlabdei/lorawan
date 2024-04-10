@@ -40,8 +40,8 @@ jobs:
           touch doc/html/.nojekyll
       - name: Prevent gitignore to exclude useful dirs
         run: |
-          grep -v "html" .gitignore > tmpfile && mv tmpfile .gitignore
-          grep -v "build" .gitignore > tmpfile && mv tmpfile .gitignore
+          grep -v "html" doc/.gitignore > tmpfile && mv tmpfile .gitignore
+          grep -v "build" doc/.gitignore > tmpfile && mv tmpfile .gitignore
       - name: "Deploy documentation"
         env:
           SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
