@@ -35,13 +35,15 @@ jobs:
       # Prevent Github from using Jekyll 
       # (see https://github.com/orgs/community/discussions/23166#discussioncomment-3239429)
       - name: Disable Jekyll
-        run: touch doc/models/build/singlehtml/.nojekyll
+        run: |
+          touch doc/models/build/html/.nojekyll 
+          touch doc/html/.nojekyll
       - name: "Deploy documentation"
         env:
           SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
         uses: cpina/github-action-push-to-another-repository@main
         with:
-          source-directory: "doc/models/build/singlehtml/"
+          source-directory: "doc/"
           destination-github-username: "signetlabdei"
           destination-repository-name: "lorawan-docs"
           user-email: paginmatte@dei.unipd.it
