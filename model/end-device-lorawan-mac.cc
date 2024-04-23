@@ -203,8 +203,9 @@ EndDeviceLorawanMac::postponeTransmission(Time netxTxDelay, Ptr<Packet> packet)
     if (packet == m_retxParams.packet)
     {
         m_nextTx = eid;
-    } // this is not a retransmission 
-    else {
+    } // this is not a retransmission
+    else
+    {
         m_nextTx = EventId();
     }
     NS_LOG_WARN("Attempting to send, but the aggregate duty cycle won't allow it. Scheduling a tx "
