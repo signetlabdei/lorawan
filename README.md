@@ -9,7 +9,7 @@ to perform simulations of a [LoRaWAN](https://lora-alliance.org/about-lorawan
 
 [Module Documentation](https://signetlabdei.github.io/lorawan-docs/models/build/html/lorawan.html).
 
-[Doxygen API Documentation](https://signetlabdei.github.io/lorawan-docs/html/index.html).
+[Doxygen API Documentation](https://www.nsnam.org/docs/doxygen/index.html).
 
 ## Getting started ##
 
