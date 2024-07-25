@@ -68,3 +68,22 @@ jobs:
       - run: git log --pretty=%B HEAD...upstream/develop ^upstream/develop > git_messages.txt
       # Check source code and commit messages
       - run: codespell -f -C0 --skip="./experiments" ./
+
+  # CMake formatting
+  cmake-format:
+    runs-on: ubuntu-latest
+    container:
+      image: python:latest
+    timeout-minutes: 60
+    steps:
+      # The following step is required in all jobs that use this repo's actions
+      - name: "Retrieve actions from repository"
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions
+      - run: pip install pyyaml cmake cmake-format ninja wget
+      - name: "Checkout this repository as ns-3 module"
+        uses: ./.github/actions/checkout-in-ns3
+      - run: |
+          ./ns3 configure --enable-modules=core
+          ./ns3 build cmake-format-check
