@@ -15,4 +15,8 @@ runs:
         tag=$(< src/lorawan/NS3-VERSION) && tag=${tag#release }
         wget -nv -O ns-3-dev.tar https://gitlab.com/api/v4/projects/nsnam%2Fns-3-dev/repository/archive.tar?sha=$tag
         tar -xf ns-3-dev.tar && cp -a ns-3-dev-$tag-*/. . && rm -R ns-3-dev.tar ns-3-dev-$tag*
+        echo
+        echo "###################################################"
+        echo "######  WARNING! CURRENT NS-3 VERSION: $tag  ######"
+        echo "###################################################"
       shell: bash
