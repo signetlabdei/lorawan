@@ -1627,17 +1627,17 @@ class LorawanTestSuite : public TestSuite
 };
 
 LorawanTestSuite::LorawanTestSuite()
-    : TestSuite("lorawan", UNIT)
+    : TestSuite("lorawan", Type::UNIT)
 {
     LogComponentEnable("LorawanTestSuite", LOG_LEVEL_DEBUG);
     // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
-    AddTestCase(new InterferenceTest, TestCase::QUICK);
-    AddTestCase(new AddressTest, TestCase::QUICK);
-    AddTestCase(new HeaderTest, TestCase::QUICK);
-    AddTestCase(new ReceivePathTest, TestCase::QUICK);
-    AddTestCase(new LogicalLoraChannelTest, TestCase::QUICK);
-    AddTestCase(new TimeOnAirTest, TestCase::QUICK);
-    AddTestCase(new PhyConnectivityTest, TestCase::QUICK);
+    AddTestCase(new InterferenceTest, Duration::QUICK);
+    AddTestCase(new AddressTest, Duration::QUICK);
+    AddTestCase(new HeaderTest, Duration::QUICK);
+    AddTestCase(new ReceivePathTest, Duration::QUICK);
+    AddTestCase(new LogicalLoraChannelTest, Duration::QUICK);
+    AddTestCase(new TimeOnAirTest, Duration::QUICK);
+    AddTestCase(new PhyConnectivityTest, Duration::QUICK);
 }
 
 // Do not forget to allocate an instance of this TestSuite
