@@ -545,7 +545,7 @@ EndDeviceLorawanMac::GetNextTransmissionDelay()
 
         waitingTime = std::min(waitingTime, m_channelHelper.GetWaitingTime(logicalChannel));
 
-        NS_LOG_DEBUG("Waiting time before the next transmission in channel with frequecy "
+        NS_LOG_DEBUG("Waiting time before the next transmission in channel with frequency "
                      << frequency << " is = " << waitingTime.GetSeconds() << ".");
     }
 

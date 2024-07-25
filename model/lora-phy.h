@@ -271,7 +271,7 @@ class LoraPhy : public Object
     /**
      * Internal call when transmission of a packet finishes.
      *
-     * Calls to this function are tipically scheduled by the Send function.
+     * Calls to this function are typically scheduled by the Send function.
      *
      * \param packet A pointer to the packet that has been transmitted.
      */
