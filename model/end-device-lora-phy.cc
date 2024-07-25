@@ -118,6 +118,20 @@ EndDeviceLoraPhy::SetFrequency(double frequencyMHz)
 }
 
 void
+EndDeviceLoraPhy::TxFinished(Ptr<const Packet> packet)
+{
+    NS_LOG_FUNCTION(this << packet);
+    // Switch back to STANDBY mode.
+    // For reference see SX1272 datasheet, section 4.1.6
+    SwitchToStandby();
+    // Forward packet to the upper layer (if the callback was set).
+    if (!m_txFinishedCallback.IsNull())
+    {
+        m_txFinishedCallback(packet);
+    }
+}
+
+void
 EndDeviceLoraPhy::SwitchToStandby()
 {
     NS_LOG_FUNCTION_NOARGS();

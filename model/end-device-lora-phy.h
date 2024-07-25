@@ -238,6 +238,13 @@ class EndDeviceLoraPhy : public LoraPhy
 
   protected:
     /**
+     * Signals the end of a transmission by the EndDeviceLoraPhy.
+     *
+     * \param packet A pointer to the Packet transmitted.
+     */
+    void TxFinished(Ptr<const Packet> packet) override;
+
+    /**
      * Switch to the RX state.
      */
     void SwitchToRx();
