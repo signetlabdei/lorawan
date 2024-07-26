@@ -2,7 +2,9 @@
 name: "Test documentation"
 run-name: "test-doc"
 
-on: workflow_call
+on:
+  workflow_call:
+  workflow_dispatch:
 
 jobs:
   doxygen:

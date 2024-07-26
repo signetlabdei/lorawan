@@ -10,7 +10,7 @@ on:
 
 jobs:
   code-formatting:
-    uses: ./.github/workflows/.formatting.yml
+    uses: ./.github/workflows/formatting.yml
 
   compile:
     needs: code-formatting
@@ -60,11 +60,11 @@ jobs:
 
   code-linting:
     needs: compile
-    uses: ./.github/workflows/.linting.yml
+    uses: ./.github/workflows/linting.yml
 
   documentation:
     needs: code-linting
-    uses: ./.github/workflows/.test-doc.yml
+    uses: ./.github/workflows/test-doc.yml
 
   code-analysis:
     needs: documentation

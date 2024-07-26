@@ -4,7 +4,9 @@
 name: "Check code formatting"
 run-name: "formatting"
 
-on: workflow_call
+on:
+  workflow_call:
+  workflow_dispatch:
 
 jobs:
   # Clang-format
@@ -24,7 +26,7 @@ jobs:
           sparse-checkout: .github/actions
       - name: "Install required system packages"
         run: >
-          apt update && DEBIAN_FRONTEND=noninteractive apt install -y 
+          apt update && DEBIAN_FRONTEND=noninteractive apt install -y
           python3
           clang-format-${{ matrix.version }}
           wget
