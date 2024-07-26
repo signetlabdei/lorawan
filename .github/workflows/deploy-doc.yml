@@ -31,11 +31,13 @@ jobs:
           save-ccache: "false"
           store-artifacts: "false"
       - name: "Build documentation"
-        run: ./ns3 docs all
+        run: |
+          ./ns3 docs doxygen-no-build
+          make -C doc/models html
       - name: "Upload pages artifact"
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "doc/html/"
+          path: "doc/"
 
   deploy:
     # Add a dependency to the build job
