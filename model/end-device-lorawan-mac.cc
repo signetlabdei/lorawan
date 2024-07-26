@@ -445,17 +445,11 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
 
             break;
         }
-        case (RX_TIMING_SETUP_REQ): {
-            break;
-        }
-        case (TX_PARAM_SETUP_REQ): {
-            break;
-        }
-        case (DL_CHANNEL_REQ): {
-            break;
-        }
+        case (RX_TIMING_SETUP_REQ):
+        case (TX_PARAM_SETUP_REQ):
+        case (DL_CHANNEL_REQ):
         default: {
-            NS_LOG_ERROR("CID not recognized");
+            NS_LOG_ERROR("CID not recognized or supported");
             break;
         }
         }
