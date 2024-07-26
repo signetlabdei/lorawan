@@ -36,7 +36,7 @@ jobs:
           ./ns3 clean
           doxygen -v
       - name: "Upload doxygen warnings as artifact"
-        if: always()
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: doxygen.warnings.log
