@@ -10,7 +10,7 @@ on:
 
 jobs:
   code-formatting:
-    uses: ./.github/workflows/.formatting.yml
+    uses: ./.github/workflows/formatting.yml
 
   compile:
     needs: code-formatting
@@ -20,24 +20,30 @@ jobs:
     timeout-minutes: 720
     strategy:
       matrix:
-        compiler: [g++]
-        mode: [default, optimized]
-        stage: [test]
         include:
           - compiler: clang++
-            mode: debug
+            mode: optimized
+            cxxflags: -stdlib=libc++
+            stage: test
           - compiler: g++
             mode: debug
-          - compiler: g++ # this job is the longest (~ 30 min)
+          - compiler: g++
+            mode: default
+            stage: test
+          - compiler: g++
+            mode: optimized
+            stage: test
+          - compiler: g++
             mode: debug
             extra_options: --disable-precompiled-headers
-          - compiler: g++
+          - compiler: clang++
             mode: debug
-            extra_options: --disable-asserts
+            extra_options: --disable-asserts --disable-logs
     env:
       COMPILER: ${{ matrix.compiler }}
       MODE: ${{ matrix.mode }}
       EXTRA_OPTIONS: ${{ matrix.extra_options }}
+      CXXFLAGS: ${{ matrix.cxxflags }}
     steps:
       # The following step is required in all jobs that use this repo's actions
       - name: "Retrieve actions from repository"
@@ -54,11 +60,11 @@ jobs:
 
   code-linting:
     needs: compile
-    uses: ./.github/workflows/.linting.yml
+    uses: ./.github/workflows/linting.yml
 
   documentation:
     needs: code-linting
-    uses: ./.github/workflows/.test-doc.yml
+    uses: ./.github/workflows/test-doc.yml
 
   code-analysis:
     needs: documentation

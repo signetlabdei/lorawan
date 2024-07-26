@@ -158,7 +158,7 @@ GatewayLoraPhy::ResetReceptionPaths()
 }
 
 void
-GatewayLoraPhy::TxFinished(Ptr<Packet> packet)
+GatewayLoraPhy::TxFinished(Ptr<const Packet> packet)
 {
     m_isTransmitting = false;
 }

@@ -57,7 +57,7 @@ NS_LOG_COMPONENT_DEFINE("AlohaThroughput");
 // Network settings
 int nDevices = 200;                 //!< Number of end device nodes to create
 int nGateways = 1;                  //!< Number of gateway nodes to create
-double radiusMeters = 1000;         //!< Radius (m) of the deplyoment
+double radiusMeters = 1000;         //!< Radius (m) of the deployment
 double simulationTimeSeconds = 100; //!< Scenario duration (s) in simulated time
 
 // Channel model

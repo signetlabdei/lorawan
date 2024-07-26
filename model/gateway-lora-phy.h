@@ -75,13 +75,6 @@ class GatewayLoraPhy : public LoraPhy
               double frequencyMHz,
               double txPowerDbm) override = 0;
 
-    /**
-     * Signals the end of a transmission by the GatewayLoraPhy.
-     *
-     * \param packet A pointer to the Packet transmitted.
-     */
-    virtual void TxFinished(Ptr<Packet> packet);
-
     bool IsTransmitting() override;
 
     /**
@@ -115,6 +108,13 @@ class GatewayLoraPhy : public LoraPhy
                                         //!< correctly decode different spreading factors.
 
   protected:
+    /**
+     * Signals the end of a transmission by the GatewayLoraPhy.
+     *
+     * \param packet A pointer to the Packet transmitted.
+     */
+    void TxFinished(Ptr<const Packet> packet) override;
+
     /**
      * This class represents a configurable reception path.
      *

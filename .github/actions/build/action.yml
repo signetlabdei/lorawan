@@ -42,7 +42,7 @@ runs:
         echo "CACHE_MISS=`./utils/ccache-miss-rate.py`" >> $GITHUB_ENV
         echo "REF_NAME=`echo $GITHUB_REF_NAME | sed -r 's/[/]+/-/g'`" >> $GITHUB_ENV
         echo "NOW=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
-        touch build/tests-base.txt
+        touch build/tests-base-artifact-placeholder.txt
     - if: env.CACHE_MISS != '0'
       name: "Create tests placeholder"
       shell: bash

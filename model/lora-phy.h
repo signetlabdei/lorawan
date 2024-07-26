@@ -268,6 +268,15 @@ class LoraPhy : public Object
     static Time GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams);
 
   private:
+    /**
+     * Internal call when transmission of a packet finishes.
+     *
+     * Calls to this function are typically scheduled by the Send function.
+     *
+     * \param packet A pointer to the packet that has been transmitted.
+     */
+    virtual void TxFinished(Ptr<const Packet> packet) = 0;
+
     Ptr<MobilityModel> m_mobility; //!< The mobility model associated to this PHY.
 
   protected:

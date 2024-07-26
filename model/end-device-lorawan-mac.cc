@@ -445,17 +445,11 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
 
             break;
         }
-        case (RX_TIMING_SETUP_REQ): {
-            break;
-        }
-        case (TX_PARAM_SETUP_REQ): {
-            break;
-        }
-        case (DL_CHANNEL_REQ): {
-            break;
-        }
+        case (RX_TIMING_SETUP_REQ):
+        case (TX_PARAM_SETUP_REQ):
+        case (DL_CHANNEL_REQ):
         default: {
-            NS_LOG_ERROR("CID not recognized");
+            NS_LOG_ERROR("CID not recognized or supported");
             break;
         }
         }
@@ -545,7 +539,7 @@ EndDeviceLorawanMac::GetNextTransmissionDelay()
 
         waitingTime = std::min(waitingTime, m_channelHelper.GetWaitingTime(logicalChannel));
 
-        NS_LOG_DEBUG("Waiting time before the next transmission in channel with frequecy "
+        NS_LOG_DEBUG("Waiting time before the next transmission in channel with frequency "
                      << frequency << " is = " << waitingTime.GetSeconds() << ".");
     }
 

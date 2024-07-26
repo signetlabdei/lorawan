@@ -4,7 +4,9 @@
 name: "Check code linting"
 run-name: "linting"
 
-on: workflow_call
+on:
+  workflow_call:
+  workflow_dispatch:
 
 jobs:
   # Clang-tidy
@@ -34,7 +36,7 @@ jobs:
         shell: bash
         run: >
           git -C src/lorawan/ tag empty $(git hash-object -t tree /dev/null) &&
-          git -C src/lorawan/ diff -U0 empty 
+          git -C src/lorawan/ diff -U0 empty
           --src-prefix=a/src/lorawan/ --dst-prefix=b/src/lorawan/ |
           clang-tidy-diff-17.py -path cmake-cache/ -p1 -quiet -use-color
           -iregex "src\/lorawan\/.+\.(cpp|cc|cxx|c|h|hpp)"

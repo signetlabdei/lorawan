@@ -361,7 +361,7 @@ class NetworkServerTestSuite : public TestSuite
 };
 
 NetworkServerTestSuite::NetworkServerTestSuite()
-    : TestSuite("network-server", UNIT)
+    : TestSuite("network-server", Type::UNIT)
 {
     LogComponentEnable("NetworkServerTestSuite", LOG_LEVEL_DEBUG);
 
@@ -381,9 +381,9 @@ NetworkServerTestSuite::NetworkServerTestSuite()
     LogComponentEnableAll(LOG_PREFIX_TIME);
 
     // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
-    AddTestCase(new UplinkPacketTest, TestCase::QUICK);
-    AddTestCase(new DownlinkPacketTest, TestCase::QUICK);
-    AddTestCase(new LinkCheckTest, TestCase::QUICK);
+    AddTestCase(new UplinkPacketTest, Duration::QUICK);
+    AddTestCase(new DownlinkPacketTest, Duration::QUICK);
+    AddTestCase(new LinkCheckTest, Duration::QUICK);
 }
 
 // Do not forget to allocate an instance of this TestSuite

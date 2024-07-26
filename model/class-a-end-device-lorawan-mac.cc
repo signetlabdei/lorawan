@@ -336,7 +336,6 @@ ClassAEndDeviceLorawanMac::CloseFirstReceiveWindow()
         break;
     case EndDeviceLoraPhy::RX:
         // PHY is receiving: let it finish. The Receive method will switch it back to SLEEP.
-        break;
     case EndDeviceLoraPhy::SLEEP:
         // PHY has received, and the MAC's Receive already put the device to sleep
         break;
@@ -400,7 +399,6 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
     switch (phy->GetState())
     {
     case EndDeviceLoraPhy::TX:
-        break;
     case EndDeviceLoraPhy::SLEEP:
         break;
     case EndDeviceLoraPhy::RX:

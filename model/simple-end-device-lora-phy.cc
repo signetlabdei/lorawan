@@ -89,21 +89,8 @@ SimpleEndDeviceLoraPhy::Send(Ptr<Packet> packet,
     NS_LOG_INFO("Sending the packet in the channel");
     m_channel->Send(this, packet, txPowerDbm, txParams, duration, frequencyMHz);
 
-    // Schedule the switch back to STANDBY mode.
-    // For reference see SX1272 datasheet, section 4.1.6
-    Simulator::Schedule(duration, &EndDeviceLoraPhy::SwitchToStandby, this);
-
-    // Schedule the txFinished callback, if it was set
-    // The call is scheduled just after the switch to standby in case the upper
-    // layer wishes to change the state. This ensures that it will find a PHY in
-    // STANDBY mode.
-    if (!m_txFinishedCallback.IsNull())
-    {
-        Simulator::Schedule(duration + NanoSeconds(10),
-                            &SimpleEndDeviceLoraPhy::m_txFinishedCallback,
-                            this,
-                            packet);
-    }
+    // Schedule a call to signal the transmission end.
+    Simulator::Schedule(duration, &SimpleEndDeviceLoraPhy::TxFinished, this, packet);
 
     // Call the trace source
     if (m_device)

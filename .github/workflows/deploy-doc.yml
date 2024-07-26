@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-doc:
+  build:
     runs-on: ubuntu-latest
     container:
       image: archlinux
@@ -32,13 +32,25 @@ jobs:
           store-artifacts: "false"
       - name: "Build documentation"
         run: ./ns3 docs all
-      - name: "Deploy documentation"
-        env:
-          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
-        uses: cpina/github-action-push-to-another-repository@main
+      - name: "Upload pages artifact"
+        uses: actions/upload-pages-artifact@v3
         with:
-          source-directory: "doc/"
-          destination-github-username: "signetlabdei"
-          destination-repository-name: "lorawan-docs"
-          user-email: paginmatte@dei.unipd.it
-          target-branch: master
+          path: "doc/html/"
+
+  deploy:
+    # Add a dependency to the build job
+    needs: build
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # Specify runner + deployment step
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Deploy to GitHub Pages"
+        id: deployment
+        uses: actions/deploy-pages@v4
