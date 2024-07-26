@@ -12,7 +12,6 @@ runs:
         sudo apt update && DEBIAN_FRONTEND=noninteractive sudo apt install -y
         apt-utils
         git gcc g++ cmake python3 make ninja-build
-        tcpdump libgsl-dev libxml2-dev
         curl unzip tar
         ccache
         lcov

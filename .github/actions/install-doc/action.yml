@@ -10,7 +10,7 @@ runs:
       shell: bash
       run: >
         pacman-key --init && pacman -Syu --noconfirm
-        base-devel ninja cmake python ccache gsl gtk3 boost openssh
+        base-devel ninja cmake python ccache
         graphviz imagemagick texlive-basic texlive-bin texlive-binextra texlive-latexextra
         texlive-fontutils texlive-fontsrecommended python-sphinx 
         wget &&
