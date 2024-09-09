@@ -198,7 +198,16 @@ EndDeviceLorawanMac::postponeTransmission(Time netxTxDelay, Ptr<Packet> packet)
     NS_LOG_FUNCTION(this);
     // Delete previously scheduled transmissions if any.
     Simulator::Cancel(m_nextTx);
-    m_nextTx = Simulator::Schedule(netxTxDelay, &EndDeviceLorawanMac::DoSend, this, packet);
+    EventId eid = Simulator::Schedule(netxTxDelay, &EndDeviceLorawanMac::Send, this, packet);
+    // Checking if this is the transmission of a new packet
+    if (packet == m_retxParams.packet)
+    {
+        m_nextTx = eid;
+    } // this is not a retransmission
+    else
+    {
+        m_nextTx = EventId();
+    }
     NS_LOG_WARN("Attempting to send, but the aggregate duty cycle won't allow it. Scheduling a tx "
                 "at a delay "
                 << netxTxDelay.GetSeconds() << ".");
@@ -613,6 +622,7 @@ EndDeviceLorawanMac::Shuffle(std::vector<Ptr<LogicalLoraChannel>> vector)
 void
 EndDeviceLorawanMac::resetRetransmissionParameters()
 {
+    NS_LOG_FUNCTION(this);
     m_retxParams.waitingAck = false;
     m_retxParams.retxLeft = m_maxNumbTx;
     m_retxParams.packet = nullptr;
