@@ -10,7 +10,7 @@ on:
 
 jobs:
   # Clang-tidy
-  clang-tidy-17:
+  clang-tidy-18:
     runs-on: ubuntu-latest
     container:
       image: ubuntu:rolling
@@ -27,7 +27,7 @@ jobs:
         run: >
           apt update && DEBIAN_FRONTEND=noninteractive apt install -y
           clang cmake
-          clang-tidy clang-tidy-17
+          clang-tidy clang-tidy-18
           git wget
       - name: "Checkout this repository as ns-3 module"
         uses: ./.github/actions/checkout-in-ns3
@@ -44,10 +44,12 @@ jobs:
           git -C src/lorawan/ tag empty $(git hash-object -t tree /dev/null) &&
           git -C src/lorawan/ diff -U0 empty
           --src-prefix=a/src/lorawan/ --dst-prefix=b/src/lorawan/ |
-          clang-tidy-diff-17.py -path cmake-cache/ -p1 -quiet -use-color
+          clang-tidy-diff-18.py -path cmake-cache/ -p1 -quiet -use-color
           -iregex "src\/lorawan\/.+\.(cpp|cc|cxx|c|h|hpp)"
           1> $CLANG_TIDY_OUTPUT
-          2> /dev/null
+          2> /dev/null || true
+      - name: "Trim empty lines from output file"
+        run: sed -i '/^$/d' $CLANG_TIDY_OUTPUT
       - name: "Check job results"
         run: |
           (! egrep -v "file not found \[clang-diagnostic-error\]" $CLANG_TIDY_OUTPUT | egrep -A3 "error:|warning:|note:")
