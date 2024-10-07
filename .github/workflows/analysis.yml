@@ -1,6 +1,6 @@
-# ns-3 CI/CD script with job for code quality and coverage
+# ns-3 CI/CD script with job for code analysis
 #
-# Contains jobs to run code quality and coverage analysis.
+# Contains jobs to run code analysis tasks.
 name: "Run code analysis"
 run-name: "analysis"
 
@@ -13,37 +13,6 @@ env:
   MODE: default
 
 jobs:
-  # CodeQL
-  code-ql:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      # Initializes the CodeQL tools for scanning.
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: "cpp"
-      # The following step is required in all jobs that use this repo's actions
-      - name: "Retrieve actions from repository"
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: .github/actions
-      - name: "Install dependencies and checkout repo in ns-3"
-        uses: ./.github/actions/install-analysis
-      - name: "Build ns-3"
-        env:
-          BUILD_ID: ubuntu-codeql
-          COMPILER: g++
-          MODE: release
-          EXTRA_OPTIONS: --disable-werror
-        uses: ./.github/actions/build
-        with:
-          store-artifacts: "false"
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-        with:
-          checkout_path: ${{ github.workspace }}/src/lorawan
-
   # CodeCov
   code-cov:
     runs-on: ubuntu-latest
