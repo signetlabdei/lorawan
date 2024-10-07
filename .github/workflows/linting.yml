@@ -23,8 +23,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           sparse-checkout: .github/actions
-      - name: "Install dependencies and checkout repo in ns-3"
-        uses: ./.github/actions/install-linting
+      - name: "Install required system packages"
+        run: >
+          apt update && DEBIAN_FRONTEND=noninteractive apt install -y
+          clang cmake
+          clang-tidy clang-tidy-17
+          git wget
+      - name: "Checkout this repository as ns-3 module"
+        uses: ./.github/actions/checkout-in-ns3
       - name: "Configure ns-3 CMake"
         run: >
           ./ns3 configure -d debug

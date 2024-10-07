@@ -22,8 +22,17 @@ jobs:
         uses: actions/checkout@v4
         with:
           sparse-checkout: .github/actions
-      - name: "Install dependencies and checkout repo in ns-3"
-        uses: ./.github/actions/install-analysis
+      - name: "Install required system packages"
+        run: >
+          sudo apt update && DEBIAN_FRONTEND=noninteractive sudo apt install -y
+          apt-utils
+          git gcc g++ cmake python3 make ninja-build
+          curl unzip tar
+          ccache
+          lcov
+          wget
+      - name: "Checkout this repository as ns-3 module"
+        uses: ./.github/actions/checkout-in-ns3
       - name: "Build ns-3"
         env:
           BUILD_ID: ubuntu-coverage
