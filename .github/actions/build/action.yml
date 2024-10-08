@@ -27,7 +27,7 @@ runs:
       run: >
         CXX=$COMPILER ./ns3 configure -d $MODE -GNinja 
         --enable-examples --enable-tests --enable-asserts --enable-werror 
-        --enable-modules "lorawan;applications" $EXTRA_OPTIONS
+        --enable-modules lorawan $EXTRA_OPTIONS
     # Build steps
     - name: "Build ns-3"
       shell: bash

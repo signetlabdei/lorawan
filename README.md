@@ -70,11 +70,9 @@ Finally, ensure tests run smoothly with:
 ./test.py
 ```
 
-If the script reports that all tests passed or that just `three-gpp-propagation-loss-model` failed[^1], you are good to go.
+If the script reports that all tests passed you are good to go.
 
-If other tests fail or crash, consider filing an issue.
-
-[^1]: This is due to [a bug in the current ns-3 version](https://gitlab.com/nsnam/ns-3-dev/-/issues/965) when restricting compilation to the lorawan module and its dependencies. If you need to use the `three-gpp-propagation-loss-model`, you can solve this by compiling ns-3 as a whole or with the `--enable-modules "lorawan;applications"` option to reduce compilation time.
+If some tests fail or crash, consider filing an issue.
 
 ## Usage examples
 

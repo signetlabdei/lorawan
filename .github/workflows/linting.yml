@@ -35,7 +35,7 @@ jobs:
         run: >
           ./ns3 configure -d debug
           --enable-examples --enable-tests --enable-asserts
-          --enable-modules "lorawan;applications"
+          --enable-modules lorawan
           --enable-clang-tidy
       # Use a trick (git diff on empty tag) to only run clang-tidy on the lorawan module
       - name: "Running clang-tidy"
