@@ -76,8 +76,8 @@ LoraPacketTracker::MacGwReceptionCallback(Ptr<const Packet> packet)
 {
     if (IsUplink(packet))
     {
-        NS_LOG_INFO("A packet was successfully received" << " at the MAC layer of gateway "
-                                                         << Simulator::GetContext());
+        NS_LOG_INFO("A packet was successfully received at the MAC layer of gateway "
+                    << Simulator::GetContext());
 
         // Find the received packet in the m_macPacketTracker
         auto it = m_macPacketTracker.find(packet);

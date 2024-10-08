@@ -180,7 +180,7 @@ SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
             }
             else // We have sufficient sensitivity to start receiving
             {
-                NS_LOG_INFO("Scheduling reception of a packet, " << "occupying one demodulator");
+                NS_LOG_INFO("Scheduling reception of a packet, occupying one demodulator");
 
                 // Block this resource
                 currentPath->LockOnEvent(event);

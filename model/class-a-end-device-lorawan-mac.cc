@@ -320,7 +320,7 @@ ClassAEndDeviceLorawanMac::CloseFirstReceiveWindow()
     switch (phy->GetState())
     {
     case EndDeviceLoraPhy::TX:
-        NS_ABORT_MSG("PHY was in TX mode when attempting to " << "close a receive window.");
+        NS_ABORT_MSG("PHY was in TX mode when attempting to close a receive window.");
         break;
     case EndDeviceLoraPhy::RX:
         // PHY is receiving: let it finish. The Receive method will switch it back to SLEEP.
@@ -456,7 +456,7 @@ ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitingTime)
             !m_secondReceiveWindow.IsExpired())
         {
             NS_LOG_WARN(
-                "Attempting to send when there are receive windows:" << " Transmission postponed.");
+                "Attempting to send when there are receive windows: Transmission postponed.");
             // Compute the duration of a single symbol for the second receive window data rate
             double tSym = pow(2, GetSfFromDataRate(GetSecondReceiveWindowDataRate())) /
                           GetBandwidthFromDataRate(GetSecondReceiveWindowDataRate());

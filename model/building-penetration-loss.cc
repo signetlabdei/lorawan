@@ -105,9 +105,9 @@ BuildingPenetrationLoss::DoCalcRxPower(double txPowerDbm,
         }
     }
 
-    NS_LOG_DEBUG("Building penetration loss:" << " externalWallLoss = " << externalWallLoss
-                                              << ", tor1 = " << tor1 << ", tor3 = " << tor3
-                                              << ", GFH = " << gfh);
+    NS_LOG_DEBUG("Building penetration loss: externalWallLoss = " << externalWallLoss << ", tor1 = "
+                                                                  << tor1 << ", tor3 = " << tor3
+                                                                  << ", GFH = " << gfh);
 
     // Put together all the pieces
     double loss = externalWallLoss + std::max(tor1, tor3) - gfh;

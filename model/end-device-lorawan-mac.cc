@@ -756,9 +756,9 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
         txPowerOk = false;
     }
 
-    NS_LOG_DEBUG("Finished checking. " << "ChannelMaskOk: " << channelMaskOk << ", "
-                                       << "DataRateOk: " << dataRateOk << ", "
-                                       << "txPowerOk: " << txPowerOk);
+    NS_LOG_DEBUG("Finished checking. ChannelMaskOk: " << channelMaskOk << ", "
+                                                      << "DataRateOk: " << dataRateOk << ", "
+                                                      << "txPowerOk: " << txPowerOk);
 
     // If all checks are successful, set parameters up
     //////////////////////////////////////////////////
