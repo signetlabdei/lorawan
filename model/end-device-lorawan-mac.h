@@ -191,29 +191,14 @@ class EndDeviceLorawanMac : public LorawanMac
      */
     LoraDeviceAddress GetDeviceAddress();
 
-    ///**
-    // * Set a value for the RX1DROffset parameter.
-    // *
-    // * This value determines the offset to use when deciding the data rate of the
-    // * downlink transmission during the first receive window from the
-    // * replyDataRateMatrix.
-    // *
-    // * \param rx1DrOffset The value to set for the offset.
-    // */
     // void SetRx1DrOffset (uint8_t rx1DrOffset);
 
-    ///**
-    // * Get the value of the RX1DROffset parameter.
-    // *
-    // * \return The value of the RX1DROffset parameter.
-    // */
     // uint8_t GetRx1DrOffset ();
 
     /**
      * Get the aggregated duty cycle.
      *
-     * \return A time instance containing the aggregated duty cycle in fractional.
-     * form.
+     * \return A time instance containing the aggregated duty cycle in fractional form.
      */
     double GetAggregatedDutyCycle();
 

@@ -77,11 +77,6 @@ class LogicalLoraChannel : public Object
      */
     double GetFrequency() const;
 
-    ///**
-    // * Set the frequency (MHz).
-    // *
-    // * \param frequencyMHz The center frequency this channel should be at.
-    // */
     // void SetFrequency (double frequencyMHz);
 
     /**
