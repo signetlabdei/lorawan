@@ -1,16 +1,5 @@
 /*
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation;
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * SPDX-License-Identifier: GPL-2.0-only
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
@@ -116,9 +105,9 @@ BuildingPenetrationLoss::DoCalcRxPower(double txPowerDbm,
         }
     }
 
-    NS_LOG_DEBUG("Building penetration loss:"
-                 << " externalWallLoss = " << externalWallLoss << ", tor1 = " << tor1
-                 << ", tor3 = " << tor3 << ", GFH = " << gfh);
+    NS_LOG_DEBUG("Building penetration loss:" << " externalWallLoss = " << externalWallLoss
+                                              << ", tor1 = " << tor1 << ", tor3 = " << tor3
+                                              << ", GFH = " << gfh);
 
     // Put together all the pieces
     double loss = externalWallLoss + std::max(tor1, tor3) - gfh;

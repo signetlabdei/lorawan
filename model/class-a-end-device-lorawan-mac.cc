@@ -1,18 +1,7 @@
 /*
  * Copyright (c) 2017 University of Padova
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation;
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * SPDX-License-Identifier: GPL-2.0-only
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  *         Martina Capuzzo <capuzzom@dei.unipd.it>
@@ -331,8 +320,7 @@ ClassAEndDeviceLorawanMac::CloseFirstReceiveWindow()
     switch (phy->GetState())
     {
     case EndDeviceLoraPhy::TX:
-        NS_ABORT_MSG("PHY was in TX mode when attempting to "
-                     << "close a receive window.");
+        NS_ABORT_MSG("PHY was in TX mode when attempting to " << "close a receive window.");
         break;
     case EndDeviceLoraPhy::RX:
         // PHY is receiving: let it finish. The Receive method will switch it back to SLEEP.
@@ -467,8 +455,8 @@ ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitingTime)
         if (!m_closeFirstWindow.IsExpired() || !m_closeSecondWindow.IsExpired() ||
             !m_secondReceiveWindow.IsExpired())
         {
-            NS_LOG_WARN("Attempting to send when there are receive windows:"
-                        << " Transmission postponed.");
+            NS_LOG_WARN(
+                "Attempting to send when there are receive windows:" << " Transmission postponed.");
             // Compute the duration of a single symbol for the second receive window data rate
             double tSym = pow(2, GetSfFromDataRate(GetSecondReceiveWindowDataRate())) /
                           GetBandwidthFromDataRate(GetSecondReceiveWindowDataRate());
