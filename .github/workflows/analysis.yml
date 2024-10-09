@@ -71,3 +71,5 @@ jobs:
         run: |
           ./ns3 build coverage_gcc
           bash <(curl -s https://codecov.io/bash) -f build/coverage/ns3.info -R src/lorawan/ || echo "Codecov did not collect coverage reports"
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
