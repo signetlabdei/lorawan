@@ -45,10 +45,15 @@ jobs:
       - name: "Extract ccache statistics"
         run: echo "CACHE_MISSES=`./utils/ccache-miss-rate.py`" >> $GITHUB_ENV
       - if: env.CACHE_MISSES != '0'
-        name: "Generate coverage data and submit to codecov.io"
+        name: "Generate coverage data"
         run: |
           ./ns3 build coverage_gcc
-          cd ./build/coverage
-          bash <(curl -s https://codecov.io/bash) -f ns3.info -R $GITHUB_WORKSPACE/src/lorawan || echo "Codecov did not collect coverage reports"
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          mv build/coverage/ns3.info src/lorawan
+      - if: env.CACHE_MISSES != '0'
+        name: "Submit coverage data to codecov.io"
+        uses: codecov/codecov-action@v4
+        with:
+          working-directory: src/lorawan
+          file: ns3.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
