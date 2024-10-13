@@ -9,7 +9,7 @@
 cpp_examples = [
     ("simple-network-example", "True", "True"),
     ("network-server-example", "True", "True"),
-    ("complete-network-example", "True", "True"),
+    ("complete-network-example --realisticChannel", "True", "True"),
     ("adr-example", "True", "True"),
     ("lorawan-energy-model-example", "True", "True"),
     ("aloha-throughput", "True", "True"),
