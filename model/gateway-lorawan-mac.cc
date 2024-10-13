@@ -77,7 +77,7 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
     params.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(params) > MilliSeconds(16);
 
     // Get the duration
-    Time duration = m_phy->GetOnAirTime(packet, params);
+    Time duration = LoraPhy::GetOnAirTime(packet, params);
 
     NS_LOG_DEBUG("Duration: " << duration.GetSeconds());
 
