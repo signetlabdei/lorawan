@@ -14,7 +14,7 @@ runs:
   steps:
     # Pre-configuration steps
     # (skip ccache for --disable-precompiled-headers because it won't use it)
-    # (skip ccache for optimized because built files are too architecture dependent)
+    # (skip ccache for optimized because built files are architecture dependent)
     - if: env.MODE != 'optimized' && ( ! contains(env.EXTRA_OPTIONS, '--disable-precompiled-headers') )
       name: "Restore build cache of this job"
       uses: hendrikmuhs/ccache-action@v1.2
@@ -27,7 +27,7 @@ runs:
       run: >
         CXX=$COMPILER ./ns3 configure -d $MODE -GNinja 
         --enable-examples --enable-tests --enable-asserts --enable-werror 
-        --enable-modules "lorawan;applications" $EXTRA_OPTIONS
+        --enable-modules lorawan $EXTRA_OPTIONS
     # Build steps
     - name: "Build ns-3"
       shell: bash

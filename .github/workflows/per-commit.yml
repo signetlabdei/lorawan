@@ -9,11 +9,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  code-formatting:
+  formatting:
     uses: ./.github/workflows/formatting.yml
 
-  compile:
-    needs: code-formatting
+  compilation:
+    needs: formatting
     runs-on: ubuntu-latest
     container:
       image: archlinux
@@ -58,15 +58,15 @@ jobs:
         name: "Test ns-3"
         uses: ./.github/actions/test
 
-  code-linting:
-    needs: compile
+  linting:
+    needs: compilation
     uses: ./.github/workflows/linting.yml
 
   documentation:
-    needs: code-linting
+    needs: linting
     uses: ./.github/workflows/test-doc.yml
 
-  code-analysis:
+  analysis:
     needs: documentation
     uses: ./.github/workflows/analysis.yml
     secrets: inherit

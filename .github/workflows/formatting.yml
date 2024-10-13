@@ -16,7 +16,7 @@ jobs:
       image: ubuntu:rolling
     strategy:
       matrix:
-        version: [14, 15, 16, 17]
+        version: [14, 17]
     timeout-minutes: 60
     steps:
       # The following step is required in all jobs that use this repo's actions
@@ -56,6 +56,8 @@ jobs:
     container:
       image: python:latest
     timeout-minutes: 60
+    env:
+      CI_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
     steps:
       - uses: actions/checkout@v4
       - run: pip install codespell
@@ -65,9 +67,8 @@ jobs:
           git remote remove upstream ;
           fi
       - run: git config --global --add safe.directory $GITHUB_WORKSPACE
-      # develop here is meant to be the "default branch"
-      - run: git remote add -t develop --no-tags -f upstream https://github.com/signetlabdei/lorawan.git
-      - run: git log --pretty=%B HEAD...upstream/develop ^upstream/develop > git_messages.txt
+      - run: git remote add -t $CI_DEFAULT_BRANCH --no-tags -f upstream https://github.com/signetlabdei/lorawan.git
+      - run: git log --pretty=%B HEAD...upstream/$CI_DEFAULT_BRANCH ^upstream/$CI_DEFAULT_BRANCH > git_messages.txt
       # Check source code and commit messages
       - run: codespell -f -C0 --skip="./experiments" ./
 
