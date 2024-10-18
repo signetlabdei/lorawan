@@ -104,12 +104,9 @@ build_lib(
   SOURCE_FILES ${source_files}
   HEADER_FILES ${header_files}
   LIBRARIES_TO_LINK
-    ${libnetwork}
-    ${libpropagation}
     ${libenergy}
     ${libpoint-to-point}
     ${libbuildings}
-    ${libmobility}
   TEST_SOURCES
     test/utilities.cc
     test/lorawan-test-suite.cc
