@@ -59,7 +59,7 @@ NetworkStatus::AddNode(Ptr<ClassAEndDeviceLorawanMac> edMac)
     {
         // The device doesn't exist. Create new EndDeviceStatus
         Ptr<EndDeviceStatus> edStatus =
-            CreateObject<EndDeviceStatus>(edAddress, edMac->GetObject<ClassAEndDeviceLorawanMac>());
+            CreateObject<EndDeviceStatus>(edAddress, DynamicCast<ClassAEndDeviceLorawanMac>(edMac));
 
         // Add it to the map
         m_endDeviceStatuses.insert(

@@ -71,14 +71,14 @@ LorawanMacHelper::Create(Ptr<Node> node, Ptr<NetDevice> device) const
     // If we are operating on an end device, add an address to it
     if (m_deviceType == ED_A && m_addrGen)
     {
-        mac->GetObject<ClassAEndDeviceLorawanMac>()->SetDeviceAddress(m_addrGen->NextAddress());
+        DynamicCast<ClassAEndDeviceLorawanMac>(mac)->SetDeviceAddress(m_addrGen->NextAddress());
     }
 
     // Add a basic list of channels based on the region where the device is
     // operating
     if (m_deviceType == ED_A)
     {
-        Ptr<ClassAEndDeviceLorawanMac> edMac = mac->GetObject<ClassAEndDeviceLorawanMac>();
+        Ptr<ClassAEndDeviceLorawanMac> edMac = DynamicCast<ClassAEndDeviceLorawanMac>(mac);
         switch (m_region)
         {
         case LorawanMacHelper::EU: {
@@ -101,7 +101,7 @@ LorawanMacHelper::Create(Ptr<Node> node, Ptr<NetDevice> device) const
     }
     else
     {
-        Ptr<GatewayLorawanMac> gwMac = mac->GetObject<GatewayLorawanMac>();
+        Ptr<GatewayLorawanMac> gwMac = DynamicCast<GatewayLorawanMac>(mac);
         switch (m_region)
         {
         case LorawanMacHelper::EU: {
@@ -171,7 +171,7 @@ LorawanMacHelper::ConfigureForAlohaRegion(Ptr<GatewayLorawanMac> gwMac) const
     // ReceivePath configuration //
     ///////////////////////////////
     Ptr<GatewayLoraPhy> gwPhy =
-        gwMac->GetDevice()->GetObject<LoraNetDevice>()->GetPhy()->GetObject<GatewayLoraPhy>();
+        DynamicCast<GatewayLoraPhy>(DynamicCast<LoraNetDevice>(gwMac->GetDevice())->GetPhy());
 
     ApplyCommonAlohaConfigurations(gwMac);
 
@@ -184,7 +184,7 @@ LorawanMacHelper::ConfigureForAlohaRegion(Ptr<GatewayLorawanMac> gwMac) const
         int maxReceptionPaths = 1;
         while (receptionPaths < maxReceptionPaths)
         {
-            gwPhy->GetObject<GatewayLoraPhy>()->AddReceptionPath();
+            DynamicCast<GatewayLoraPhy>(gwPhy)->AddReceptionPath();
             receptionPaths++;
         }
         gwPhy->AddFrequency(868.1);
@@ -268,7 +268,7 @@ LorawanMacHelper::ConfigureForEuRegion(Ptr<GatewayLorawanMac> gwMac) const
     // ReceivePath configuration //
     ///////////////////////////////
     Ptr<GatewayLoraPhy> gwPhy =
-        gwMac->GetDevice()->GetObject<LoraNetDevice>()->GetPhy()->GetObject<GatewayLoraPhy>();
+        DynamicCast<GatewayLoraPhy>(DynamicCast<LoraNetDevice>(gwMac->GetDevice())->GetPhy());
 
     ApplyCommonEuConfigurations(gwMac);
 
@@ -291,7 +291,7 @@ LorawanMacHelper::ConfigureForEuRegion(Ptr<GatewayLorawanMac> gwMac) const
         int maxReceptionPaths = 8;
         while (receptionPaths < maxReceptionPaths)
         {
-            gwPhy->GetObject<GatewayLoraPhy>()->AddReceptionPath();
+            DynamicCast<GatewayLoraPhy>(gwPhy)->AddReceptionPath();
             receptionPaths++;
         }
     }
@@ -382,7 +382,7 @@ LorawanMacHelper::ConfigureForSingleChannelRegion(Ptr<GatewayLorawanMac> gwMac) 
     // ReceivePath configuration //
     ///////////////////////////////
     Ptr<GatewayLoraPhy> gwPhy =
-        gwMac->GetDevice()->GetObject<LoraNetDevice>()->GetPhy()->GetObject<GatewayLoraPhy>();
+        DynamicCast<GatewayLoraPhy>(DynamicCast<LoraNetDevice>(gwMac->GetDevice())->GetPhy());
 
     ApplyCommonEuConfigurations(gwMac);
 
@@ -403,7 +403,7 @@ LorawanMacHelper::ConfigureForSingleChannelRegion(Ptr<GatewayLorawanMac> gwMac) 
         int maxReceptionPaths = 8;
         while (receptionPaths < maxReceptionPaths)
         {
-            gwPhy->GetObject<GatewayLoraPhy>()->AddReceptionPath();
+            gwPhy->AddReceptionPath();
             receptionPaths++;
         }
     }
@@ -456,10 +456,10 @@ LorawanMacHelper::SetSpreadingFactorsUp(NodeContainer endDevices,
         Ptr<MobilityModel> position = object->GetObject<MobilityModel>();
         NS_ASSERT(position);
         Ptr<NetDevice> netDevice = object->GetDevice(0);
-        Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice>();
+        Ptr<LoraNetDevice> loraNetDevice = DynamicCast<LoraNetDevice>(netDevice);
         NS_ASSERT(loraNetDevice);
         Ptr<ClassAEndDeviceLorawanMac> mac =
-            loraNetDevice->GetMac()->GetObject<ClassAEndDeviceLorawanMac>();
+            DynamicCast<ClassAEndDeviceLorawanMac>(loraNetDevice->GetMac());
         NS_ASSERT(mac);
 
         // Try computing the distance from each gateway and find the best one
@@ -479,7 +479,7 @@ LorawanMacHelper::SetSpreadingFactorsUp(NodeContainer endDevices,
             if (currentRxPower > highestRxPower)
             {
                 bestGateway = curr;
-                bestGatewayPosition = curr->GetObject<MobilityModel>();
+                bestGatewayPosition = currPosition;
                 highestRxPower = currentRxPower;
             }
         }
@@ -488,7 +488,7 @@ LorawanMacHelper::SetSpreadingFactorsUp(NodeContainer endDevices,
         double rxPower = highestRxPower;
 
         // Get the end device sensitivity
-        Ptr<EndDeviceLoraPhy> edPhy = loraNetDevice->GetPhy()->GetObject<EndDeviceLoraPhy>();
+        Ptr<EndDeviceLoraPhy> edPhy = DynamicCast<EndDeviceLoraPhy>(loraNetDevice->GetPhy());
         const double* edSensitivity = EndDeviceLoraPhy::sensitivity;
 
         if (rxPower > *edSensitivity)
@@ -533,9 +533,9 @@ LorawanMacHelper::SetSpreadingFactorsUp(NodeContainer endDevices,
 
         // Get the Gw sensitivity
         Ptr<NetDevice> gatewayNetDevice = bestGateway->GetDevice (0);
-        Ptr<LoraNetDevice> gatewayLoraNetDevice = gatewayNetDevice->GetObject<LoraNetDevice> ();
-        Ptr<GatewayLoraPhy> gatewayPhy = gatewayLoraNetDevice->GetPhy ()->GetObject<GatewayLoraPhy>
-        (); const double *gwSensitivity = gatewayPhy->sensitivity;
+        Ptr<LoraNetDevice> gatewayLoraNetDevice = DynamicCast<LoraNetDevice>(gatewayNetDevice);
+        Ptr<GatewayLoraPhy> gatewayPhy = DynamicCast<GatewayLoraPhy>
+        (gatewayLoraNetDevice->GetPhy ()); const double *gwSensitivity = gatewayPhy->sensitivity;
 
         if(rxPower > *gwSensitivity)
           {
@@ -615,10 +615,10 @@ LorawanMacHelper::SetSpreadingFactorsGivenDistribution(NodeContainer endDevices,
         Ptr<MobilityModel> position = object->GetObject<MobilityModel>();
         NS_ASSERT(position);
         Ptr<NetDevice> netDevice = object->GetDevice(0);
-        Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice>();
+        Ptr<LoraNetDevice> loraNetDevice = DynamicCast<LoraNetDevice>(netDevice);
         NS_ASSERT(loraNetDevice);
         Ptr<ClassAEndDeviceLorawanMac> mac =
-            loraNetDevice->GetMac()->GetObject<ClassAEndDeviceLorawanMac>();
+            DynamicCast<ClassAEndDeviceLorawanMac>(loraNetDevice->GetMac());
         NS_ASSERT(mac);
 
         double prob = uniformRV->GetValue(0, 1);

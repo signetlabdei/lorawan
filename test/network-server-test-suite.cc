@@ -183,10 +183,8 @@ DownlinkPacketTest::SendPacket(Ptr<Node> endDevice, bool requestAck)
 {
     if (requestAck)
     {
-        endDevice->GetDevice(0)
-            ->GetObject<LoraNetDevice>()
-            ->GetMac()
-            ->GetObject<EndDeviceLorawanMac>()
+        DynamicCast<EndDeviceLorawanMac>(
+            DynamicCast<LoraNetDevice>(endDevice->GetDevice(0))->GetMac())
             ->SetMType(LorawanMacHeader::CONFIRMED_DATA_UP);
     }
     endDevice->GetDevice(0)->Send(Create<Packet>(20), Address(), 0);
@@ -208,11 +206,8 @@ DownlinkPacketTest::DoRun()
     Ptr<Node> nsNode = components.nsNode;
 
     // Connect the end device's trace source for received packets
-    endDevices.Get(0)
-        ->GetDevice(0)
-        ->GetObject<LoraNetDevice>()
-        ->GetMac()
-        ->GetObject<EndDeviceLorawanMac>()
+    DynamicCast<EndDeviceLorawanMac>(
+        DynamicCast<LoraNetDevice>(endDevices.Get(0)->GetDevice(0))->GetMac())
         ->TraceConnectWithoutContext(
             "RequiredTransmissions",
             MakeCallback(&DownlinkPacketTest::ReceivedPacketAtEndDevice, this));
@@ -288,10 +283,8 @@ LinkCheckTest::LastKnownGatewayCount(int newValue, int oldValue)
 void
 LinkCheckTest::SendPacket(Ptr<Node> endDevice, bool requestAck)
 {
-    Ptr<EndDeviceLorawanMac> macLayer = endDevice->GetDevice(0)
-                                            ->GetObject<LoraNetDevice>()
-                                            ->GetMac()
-                                            ->GetObject<EndDeviceLorawanMac>();
+    Ptr<EndDeviceLorawanMac> macLayer = DynamicCast<EndDeviceLorawanMac>(
+        DynamicCast<LoraNetDevice>(endDevice->GetDevice(0))->GetMac());
 
     if (requestAck)
     {
@@ -319,11 +312,8 @@ LinkCheckTest::DoRun()
     Ptr<Node> nsNode = components.nsNode;
 
     // Connect the end device's trace source for last known gateway count
-    endDevices.Get(0)
-        ->GetDevice(0)
-        ->GetObject<LoraNetDevice>()
-        ->GetMac()
-        ->GetObject<EndDeviceLorawanMac>()
+    DynamicCast<EndDeviceLorawanMac>(
+        DynamicCast<LoraNetDevice>(endDevices.Get(0)->GetDevice(0))->GetMac())
         ->TraceConnectWithoutContext("LastKnownGatewayCount",
                                      MakeCallback(&LinkCheckTest::LastKnownGatewayCount, this));
 

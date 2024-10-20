@@ -133,8 +133,8 @@ main(int argc, char* argv[])
     helper.Install(phyHelper, macHelper, endDevices);
 
     // Set message type (Default is unconfirmed)
-    Ptr<LorawanMac> edMac1 = endDevices.Get(1)->GetDevice(0)->GetObject<LoraNetDevice>()->GetMac();
-    Ptr<ClassAEndDeviceLorawanMac> edLorawanMac1 = edMac1->GetObject<ClassAEndDeviceLorawanMac>();
+    Ptr<LorawanMac> edMac1 = DynamicCast<LoraNetDevice>(endDevices.Get(1)->GetDevice(0))->GetMac();
+    Ptr<ClassAEndDeviceLorawanMac> edLorawanMac1 = DynamicCast<ClassAEndDeviceLorawanMac>(edMac1);
     edLorawanMac1->SetMType(LorawanMacHeader::CONFIRMED_DATA_UP);
 
     // Install applications in end devices

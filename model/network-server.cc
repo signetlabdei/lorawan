@@ -80,7 +80,7 @@ NetworkServer::AddGateway(Ptr<Node> gateway, Ptr<NetDevice> netDevice)
     Ptr<PointToPointNetDevice> p2pNetDevice;
     for (uint32_t i = 0; i < gateway->GetNDevices(); i++)
     {
-        p2pNetDevice = gateway->GetDevice(i)->GetObject<PointToPointNetDevice>();
+        p2pNetDevice = DynamicCast<PointToPointNetDevice>(gateway->GetDevice(i));
         if (p2pNetDevice)
         {
             // We found a p2pNetDevice on the gateway
@@ -90,7 +90,7 @@ NetworkServer::AddGateway(Ptr<Node> gateway, Ptr<NetDevice> netDevice)
 
     // Get the gateway's LoRa MAC layer (assumes gateway's MAC is configured as first device)
     Ptr<GatewayLorawanMac> gwMac =
-        gateway->GetDevice(0)->GetObject<LoraNetDevice>()->GetMac()->GetObject<GatewayLorawanMac>();
+        DynamicCast<GatewayLorawanMac>(DynamicCast<LoraNetDevice>(gateway->GetDevice(0))->GetMac());
     NS_ASSERT(gwMac);
 
     // Get the Address
@@ -124,7 +124,7 @@ NetworkServer::AddNode(Ptr<Node> node)
     Ptr<LoraNetDevice> loraNetDevice;
     for (uint32_t i = 0; i < node->GetNDevices(); i++)
     {
-        loraNetDevice = node->GetDevice(i)->GetObject<LoraNetDevice>();
+        loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(i));
         if (loraNetDevice)
         {
             // We found a LoraNetDevice on the node
@@ -134,7 +134,7 @@ NetworkServer::AddNode(Ptr<Node> node)
 
     // Get the MAC
     Ptr<ClassAEndDeviceLorawanMac> edLorawanMac =
-        loraNetDevice->GetMac()->GetObject<ClassAEndDeviceLorawanMac>();
+        DynamicCast<ClassAEndDeviceLorawanMac>(loraNetDevice->GetMac());
 
     // Update the NetworkStatus about the existence of this node
     m_status->AddNode(edLorawanMac);

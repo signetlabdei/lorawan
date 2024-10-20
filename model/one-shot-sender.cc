@@ -78,7 +78,7 @@ OneShotSender::StartApplication()
     if (!m_mac)
     {
         // Assumes there's only one device
-        Ptr<LoraNetDevice> loraNetDevice = m_node->GetDevice(0)->GetObject<LoraNetDevice>();
+        Ptr<LoraNetDevice> loraNetDevice = DynamicCast<LoraNetDevice>(m_node->GetDevice(0));
 
         m_mac = loraNetDevice->GetMac();
         NS_ASSERT(m_mac);

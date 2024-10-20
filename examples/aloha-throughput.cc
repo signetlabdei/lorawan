@@ -222,7 +222,7 @@ main(int argc, char* argv[])
     for (auto j = endDevices.Begin(); j != endDevices.End(); ++j)
     {
         Ptr<Node> node = *j;
-        Ptr<LoraNetDevice> loraNetDevice = node->GetDevice(0)->GetObject<LoraNetDevice>();
+        Ptr<LoraNetDevice> loraNetDevice = DynamicCast<LoraNetDevice>(node->GetDevice(0));
         Ptr<LoraPhy> phy = loraNetDevice->GetPhy();
     }
 
@@ -325,17 +325,17 @@ main(int argc, char* argv[])
     // Install trace sources
     for (auto node = gateways.Begin(); node != gateways.End(); node++)
     {
-        (*node)->GetDevice(0)->GetObject<LoraNetDevice>()->GetPhy()->TraceConnectWithoutContext(
-            "ReceivedPacket",
-            MakeCallback(OnPacketReceptionCallback));
+        DynamicCast<LoraNetDevice>((*node)->GetDevice(0))
+            ->GetPhy()
+            ->TraceConnectWithoutContext("ReceivedPacket", MakeCallback(OnPacketReceptionCallback));
     }
 
     // Install trace sources
     for (auto node = endDevices.Begin(); node != endDevices.End(); node++)
     {
-        (*node)->GetDevice(0)->GetObject<LoraNetDevice>()->GetPhy()->TraceConnectWithoutContext(
-            "StartSending",
-            MakeCallback(OnTransmissionCallback));
+        DynamicCast<LoraNetDevice>((*node)->GetDevice(0))
+            ->GetPhy()
+            ->TraceConnectWithoutContext("StartSending", MakeCallback(OnTransmissionCallback));
     }
 
     LorawanMacHelper::SetSpreadingFactorsUp(endDevices, gateways, channel);
