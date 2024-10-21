@@ -85,31 +85,31 @@ LogicalLoraChannelHelper::GetSubBandFromChannel(Ptr<LogicalLoraChannel> channel)
 }
 
 Ptr<SubBand>
-LogicalLoraChannelHelper::GetSubBandFromFrequency(double frequency)
+LogicalLoraChannelHelper::GetSubBandFromFrequency(uint32_t frequencyHz)
 {
     // Get the SubBand this frequency belongs to
     std::list<Ptr<SubBand>>::iterator it;
     for (it = m_subBandList.begin(); it != m_subBandList.end(); it++)
     {
-        if ((*it)->BelongsToSubBand(frequency))
+        if ((*it)->BelongsToSubBand(frequencyHz))
         {
             return *it;
         }
     }
 
-    NS_LOG_ERROR("Requested frequency: " << frequency);
+    NS_LOG_ERROR("Requested frequency: " << frequencyHz);
     NS_ABORT_MSG("Warning: frequency is outside any known SubBand.");
 
     return nullptr; // If no SubBand is found, return 0
 }
 
 void
-LogicalLoraChannelHelper::AddChannel(double frequency)
+LogicalLoraChannelHelper::AddChannel(uint32_t frequencyHz)
 {
-    NS_LOG_FUNCTION(this << frequency);
+    NS_LOG_FUNCTION(this << frequencyHz);
 
     // Create the new channel and increment the counter
-    Ptr<LogicalLoraChannel> channel = Create<LogicalLoraChannel>(frequency);
+    Ptr<LogicalLoraChannel> channel = Create<LogicalLoraChannel>(frequencyHz);
 
     // Add it to the list
     m_channelList.push_back(channel);
@@ -136,14 +136,15 @@ LogicalLoraChannelHelper::SetChannel(uint8_t chIndex, Ptr<LogicalLoraChannel> lo
 }
 
 void
-LogicalLoraChannelHelper::AddSubBand(double firstFrequency,
-                                     double lastFrequency,
+LogicalLoraChannelHelper::AddSubBand(uint32_t firstFrequencyHz,
+                                     uint32_t lastFrequencyHz,
                                      double dutyCycle,
                                      double maxTxPowerDbm)
 {
-    NS_LOG_FUNCTION(this << firstFrequency << lastFrequency);
+    NS_LOG_FUNCTION(this << firstFrequencyHz << lastFrequencyHz);
 
-    Ptr<SubBand> subBand = Create<SubBand>(firstFrequency, lastFrequency, dutyCycle, maxTxPowerDbm);
+    Ptr<SubBand> subBand =
+        Create<SubBand>(firstFrequencyHz, lastFrequencyHz, dutyCycle, maxTxPowerDbm);
 
     m_subBandList.push_back(subBand);
 }

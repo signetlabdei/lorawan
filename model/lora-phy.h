@@ -36,12 +36,12 @@ class LoraChannel;
  */
 struct LoraTxParameters
 {
-    uint8_t sf = 7;              //!< Spreading Factor
-    bool headerDisabled = false; //!< Whether to use implicit header mode
-    uint8_t codingRate = 1;      //!< Code rate (obtained as 4/(codingRate+4))
-    double bandwidthHz = 125000; //!< Bandwidth in Hz
-    uint32_t nPreamble = 8;      //!< Number of preamble symbols
-    bool crcEnabled = true;      //!< Whether Cyclic Redundancy Check (CRC) is enabled
+    uint8_t sf = 7;                //!< Spreading Factor
+    bool headerDisabled = false;   //!< Whether to use implicit header mode
+    uint8_t codingRate = 1;        //!< Code rate (obtained as 4/(codingRate+4))
+    uint32_t bandwidthHz = 125000; //!< Bandwidth in Hz
+    uint32_t nPreamble = 8;        //!< Number of preamble symbols
+    bool crcEnabled = true;        //!< Whether Cyclic Redundancy Check (CRC) is enabled
     bool lowDataRateOptimizationEnabled = false; //!< Whether low data rate optimization is enabled
 };
 
@@ -107,13 +107,13 @@ class LoraPhy : public Object
      * reception).
      * \param sf The Spreading Factor of the arriving packet.
      * \param duration The on air time of this packet.
-     * \param frequencyMHz The frequency this packet is being transmitted on.
+     * \param frequencyHz The frequency this packet is being transmitted on.
      */
     virtual void StartReceive(Ptr<Packet> packet,
                               double rxPowerDbm,
                               uint8_t sf,
                               Time duration,
-                              double frequencyMHz) = 0;
+                              uint32_t frequencyHz) = 0;
 
     /**
      * Finish reception of a packet.
@@ -134,12 +134,12 @@ class LoraPhy : public Object
      *
      * \param packet The packet to send.
      * \param txParams The desired transmission parameters.
-     * \param frequencyMHz The frequency on which to transmit.
+     * \param frequencyHz The frequency on which to transmit.
      * \param txPowerDbm The power in dBm with which to transmit the packet.
      */
     virtual void Send(Ptr<Packet> packet,
                       LoraTxParameters txParams,
-                      double frequencyMHz,
+                      uint32_t frequencyHz,
                       double txPowerDbm) = 0;
 
     /**
@@ -153,11 +153,11 @@ class LoraPhy : public Object
     /**
      * Whether this device is listening on the specified frequency or not.
      *
-     * \param frequency The frequency to query.
+     * \param frequencyHz The frequency to query.
      * \return True if the device is listening on that frequency, false
      * otherwise.
      */
-    virtual bool IsOnFrequency(double frequency) = 0;
+    virtual bool IsOnFrequency(uint32_t frequencyHz) = 0;
 
     /**
      * Set the callback to call upon successful reception of a packet.

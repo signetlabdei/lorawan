@@ -97,10 +97,10 @@ class GatewayStatus : public Object
      * Query whether or not this gateway is available for immediate transmission
      * on this frequency.
      *
-     * \param frequency The frequency at which the gateway's availability should be queried.
+     * \param frequencyHz The frequency at which the gateway's availability should be queried.
      * \return True if the gateway's available, false otherwise.
      */
-    bool IsAvailableForTransmission(double frequency);
+    bool IsAvailableForTransmission(uint32_t frequencyHz);
 
     /**
      * Set the time of the next scheduled transmission for the gateway.

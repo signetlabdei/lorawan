@@ -52,11 +52,11 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
     LoraTag tag;
     packet->RemovePacketTag(tag);
     uint8_t dataRate = tag.GetDataRate();
-    double frequency = tag.GetFrequency();
+    uint32_t frequency = tag.GetFrequency();
     NS_LOG_DEBUG("DR: " << unsigned(dataRate));
     NS_LOG_DEBUG("SF: " << unsigned(GetSfFromDataRate(dataRate)));
     NS_LOG_DEBUG("BW: " << GetBandwidthFromDataRate(dataRate));
-    NS_LOG_DEBUG("Freq: " << frequency << " MHz");
+    NS_LOG_DEBUG("Freq: " << frequency << " Hz");
     packet->AddPacketTag(tag);
 
     // Make sure we can transmit this packet
@@ -139,11 +139,11 @@ GatewayLorawanMac::TxFinished(Ptr<const Packet> packet)
 }
 
 Time
-GatewayLorawanMac::GetWaitingTime(double frequency)
+GatewayLorawanMac::GetWaitingTime(uint32_t frequencyHz)
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    return m_channelHelper.GetWaitingTime(CreateObject<LogicalLoraChannel>(frequency));
+    return m_channelHelper.GetWaitingTime(CreateObject<LogicalLoraChannel>(frequencyHz));
 }
 } // namespace lorawan
 } // namespace ns3

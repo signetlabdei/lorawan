@@ -56,10 +56,10 @@ class GatewayLorawanMac : public LorawanMac
     /**
      * Return the next time at which we will be able to transmit on the specified frequency.
      *
-     * \param frequency The frequency value [MHz].
+     * \param frequencyHz The frequency value [Hz].
      * \return The next transmission time.
      */
-    Time GetWaitingTime(double frequency);
+    Time GetWaitingTime(uint32_t frequencyHz);
 
   private:
   protected:

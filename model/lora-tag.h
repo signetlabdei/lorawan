@@ -98,9 +98,9 @@ class LoraTag : public Tag
      * - It is used by the network server to signal to the gateway the frequency of a downlink
      * packet.
      *
-     * \param frequency The frequency value [MHz].
+     * \param frequencyHz The frequency value [Hz].
      */
-    void SetFrequency(double frequency);
+    void SetFrequency(uint32_t frequencyHz);
 
     /**
      * Get the frequency of the packet.
@@ -111,9 +111,9 @@ class LoraTag : public Tag
      * - It is used by the network server to signal to the gateway the frequency of a downlink
      * packet.
      *
-     * \return The frequency value [MHz].
+     * \return The frequency value [Hz].
      */
-    double GetFrequency() const;
+    uint32_t GetFrequency() const;
 
     /**
      * Get the data rate for this packet.
@@ -130,11 +130,11 @@ class LoraTag : public Tag
     void SetDataRate(uint8_t dataRate);
 
   private:
-    uint8_t m_sf;          //!< The Spreading Factor used by the packet.
-    uint8_t m_destroyedBy; //!< The Spreading Factor that destroyed the packet.
-    double m_receivePower; //!< The reception power of this packet.
-    uint8_t m_dataRate;    //!< The data rate that needs to be used to send this packet.
-    double m_frequency;    //!< The frequency of this packet
+    uint8_t m_sf;           //!< The Spreading Factor used by the packet.
+    uint8_t m_destroyedBy;  //!< The Spreading Factor that destroyed the packet.
+    double m_receivePower;  //!< The reception power of this packet.
+    uint8_t m_dataRate;     //!< The data rate that needs to be used to send this packet.
+    uint32_t m_frequencyHz; //!< The frequency [Hz] of this packet
 };
 } // namespace lorawan
 } // namespace ns3

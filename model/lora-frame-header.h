@@ -270,9 +270,9 @@ class LoraFrameHeader : public Header
      *
      * \param rx1DrOffset The requested data rate offset for the first receive window.
      * \param rx2DataRate The requested data rate for the second receive window.
-     * \param frequency The frequency at which to listen for the second receive window.
+     * \param frequencyHz The frequency [Hz] at which to listen for the second receive window.
      */
-    void AddRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency);
+    void AddRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, uint32_t frequencyHz);
 
     /**
      * Add a RxParamSetupAns command.
@@ -288,12 +288,12 @@ class LoraFrameHeader : public Header
      * Add a NewChannelReq command with provided fields.
      *
      * \param chIndex The ChIndex field.
-     * \param frequency The Frequency field.
+     * \param frequencyHz The Frequency field in Hz.
      * \param minDataRate The MinDR field.
      * \param maxDataRate The MaxDR field.
      */
     void AddNewChannelReq(uint8_t chIndex,
-                          double frequency,
+                          uint32_t frequencyHz,
                           uint8_t minDataRate,
                           uint8_t maxDataRate);
 

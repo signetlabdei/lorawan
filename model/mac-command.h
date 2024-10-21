@@ -363,9 +363,6 @@ class DutyCycleAns : public MacCommand
  * \ingroup lorawan
  *
  * Implementation of the RxParamSetupReq LoRaWAN MAC command.
- *
- * \todo The use of frequencies in Hz here will cause problems for users, as frequencies are in MHz
- * in the rest of the module code. IMO it would be better to have freqs in Hz as uint32_t
  */
 class RxParamSetupReq : public MacCommand
 {
@@ -377,9 +374,9 @@ class RxParamSetupReq : public MacCommand
      *
      * \param rx1DrOffset The data rate offset to use for the first receive window.
      * \param rx2DataRate The data rate to use for the second receive window.
-     * \param frequency The frequency in Hz to use for the second receive window.
+     * \param frequencyHz The frequency in Hz to use for the second receive window.
      */
-    RxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency);
+    RxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, uint32_t frequencyHz);
 
     void Serialize(Buffer::Iterator& start) const override;
     uint8_t Deserialize(Buffer::Iterator& start) override;
@@ -404,12 +401,12 @@ class RxParamSetupReq : public MacCommand
      *
      * \return The frequency parameter, in Hz.
      */
-    double GetFrequency();
+    uint32_t GetFrequency();
 
   private:
-    uint8_t m_rx1DrOffset; //!< The RX1DROffset field
-    uint8_t m_rx2DataRate; //!< The RX2DataRate field
-    double m_frequency;    //!< The Frequency field, _in Hz_
+    uint8_t m_rx1DrOffset;  //!< The RX1DROffset field
+    uint8_t m_rx2DataRate;  //!< The RX2DataRate field
+    uint32_t m_frequencyHz; //!< The Frequency field, _in Hz_
 };
 
 /**
@@ -500,9 +497,6 @@ class DevStatusAns : public MacCommand
  * \ingroup lorawan
  *
  * Implementation of the NewChannelReq LoRaWAN MAC command.
- *
- * \todo The use of frequencies in Hz here will cause problems for users, as frequencies are in
- * MHz in the rest of the module code. IMO it would be better to have freqs in Hz as uint32_t
  */
 class NewChannelReq : public MacCommand
 {
@@ -513,11 +507,11 @@ class NewChannelReq : public MacCommand
      * Constructor providing initialization of all parameters.
      *
      * \param chIndex The index of the channel this command wants to operate on.
-     * \param frequency The new frequency for this channel in Hz.
+     * \param frequencyHz The new frequency for this channel in Hz.
      * \param minDataRate The minimum data rate allowed on this channel.
      * \param maxDataRate The maximum data rate allowed on this channel.
      */
-    NewChannelReq(uint8_t chIndex, double frequency, uint8_t minDataRate, uint8_t maxDataRate);
+    NewChannelReq(uint8_t chIndex, uint32_t frequencyHz, uint8_t minDataRate, uint8_t maxDataRate);
 
     void Serialize(Buffer::Iterator& start) const override;
     uint8_t Deserialize(Buffer::Iterator& start) override;
@@ -534,7 +528,7 @@ class NewChannelReq : public MacCommand
      *
      * \return The Frequency field in Hz.
      */
-    double GetFrequency() const;
+    uint32_t GetFrequency() const;
     /**
      * Get the the MinDR field contained in this MAC command.
      *
@@ -549,10 +543,10 @@ class NewChannelReq : public MacCommand
     uint8_t GetMaxDataRate() const;
 
   private:
-    uint8_t m_chIndex;     //!< The ChIndex field
-    double m_frequency;    //!< The Frequency field, in Hz
-    uint8_t m_minDataRate; //!< The MinDR field
-    uint8_t m_maxDataRate; //!< The MaxDR field
+    uint8_t m_chIndex;      //!< The ChIndex field
+    uint32_t m_frequencyHz; //!< The Frequency field, in Hz
+    uint8_t m_minDataRate;  //!< The MinDR field
+    uint8_t m_maxDataRate;  //!< The MaxDR field
 };
 
 /**

@@ -59,8 +59,8 @@ InterferenceTest::DoRun()
 
     LoraInterferenceHelper interferenceHelper;
 
-    double frequency = 868.1;
-    double differentFrequency = 868.3;
+    uint32_t frequency = 868100000;
+    uint32_t differentFrequency = 868300000;
 
     Ptr<LoraInterferenceHelper::Event> event;
     Ptr<LoraInterferenceHelper::Event> event1;
@@ -895,10 +895,10 @@ LogicalLoraChannelTest::DoRun()
     /////////////////////////////
 
     // Setup
-    Ptr<LogicalLoraChannel> channel1 = CreateObject<LogicalLoraChannel>(868);
-    Ptr<LogicalLoraChannel> channel2 = CreateObject<LogicalLoraChannel>(868);
-    Ptr<LogicalLoraChannel> channel3 = CreateObject<LogicalLoraChannel>(868.1);
-    Ptr<LogicalLoraChannel> channel4 = CreateObject<LogicalLoraChannel>(868.001);
+    Ptr<LogicalLoraChannel> channel1 = CreateObject<LogicalLoraChannel>(868000000);
+    Ptr<LogicalLoraChannel> channel2 = CreateObject<LogicalLoraChannel>(868000000);
+    Ptr<LogicalLoraChannel> channel3 = CreateObject<LogicalLoraChannel>(868100000);
+    Ptr<LogicalLoraChannel> channel4 = CreateObject<LogicalLoraChannel>(868001000);
 
     // Equality between channels
     // Test the == and != operators
@@ -911,8 +911,8 @@ LogicalLoraChannelTest::DoRun()
     //////////////////
 
     // Setup
-    SubBand subBand(868, 868.7, 0.01, 14);
-    Ptr<LogicalLoraChannel> channel5 = CreateObject<LogicalLoraChannel>(870);
+    SubBand subBand(868000000, 868700000, 0.01, 14);
+    Ptr<LogicalLoraChannel> channel5 = CreateObject<LogicalLoraChannel>(870000000);
 
     // Test BelongsToSubBand
     NS_TEST_EXPECT_MSG_EQ(subBand.BelongsToSubBand(channel3),
@@ -931,12 +931,12 @@ LogicalLoraChannelTest::DoRun()
 
     // Setup
     Ptr<LogicalLoraChannelHelper> channelHelper = CreateObject<LogicalLoraChannelHelper>();
-    SubBand subBand1(869, 869.4, 0.1, 27);
-    channel1 = CreateObject<LogicalLoraChannel>(868.1);
-    channel2 = CreateObject<LogicalLoraChannel>(868.3);
-    channel3 = CreateObject<LogicalLoraChannel>(868.5);
-    channel4 = CreateObject<LogicalLoraChannel>(869.1);
-    channel5 = CreateObject<LogicalLoraChannel>(869.3);
+    SubBand subBand1(869000000, 869400000, 0.1, 27);
+    channel1 = CreateObject<LogicalLoraChannel>(868100000);
+    channel2 = CreateObject<LogicalLoraChannel>(868300000);
+    channel3 = CreateObject<LogicalLoraChannel>(868500000);
+    channel4 = CreateObject<LogicalLoraChannel>(869100000);
+    channel5 = CreateObject<LogicalLoraChannel>(869300000);
 
     // Channel diagram
     //
@@ -1259,9 +1259,9 @@ PhyConnectivityTest::Reset()
     edPhy2 = CreateObject<SimpleEndDeviceLoraPhy>();
     edPhy3 = CreateObject<SimpleEndDeviceLoraPhy>();
 
-    edPhy1->SetFrequency(868.1);
-    edPhy2->SetFrequency(868.1);
-    edPhy3->SetFrequency(868.1);
+    edPhy1->SetFrequency(868100000);
+    edPhy2->SetFrequency(868100000);
+    edPhy3->SetFrequency(868100000);
 
     Ptr<ConstantPositionMobilityModel> mob1 = CreateObject<ConstantPositionMobilityModel>();
     Ptr<ConstantPositionMobilityModel> mob2 = CreateObject<ConstantPositionMobilityModel>();
@@ -1293,9 +1293,9 @@ PhyConnectivityTest::Reset()
     edPhy3->SetSpreadingFactor(12);
 
     // Listen on a specific frequency
-    edPhy1->SetFrequency(868.1);
-    edPhy2->SetFrequency(868.1);
-    edPhy3->SetFrequency(868.1);
+    edPhy1->SetFrequency(868100000);
+    edPhy2->SetFrequency(868100000);
+    edPhy3->SetFrequency(868100000);
 
     edPhy1->TraceConnectWithoutContext("ReceivedPacket",
                                        MakeCallback(&PhyConnectivityTest::ReceivedPacket, this));
@@ -1362,7 +1362,7 @@ PhyConnectivityTest::DoRun()
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1385,7 +1385,7 @@ PhyConnectivityTest::DoRun()
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1411,7 +1411,7 @@ PhyConnectivityTest::DoRun()
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1436,7 +1436,7 @@ PhyConnectivityTest::DoRun()
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1457,14 +1457,14 @@ PhyConnectivityTest::DoRun()
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
     Simulator::Schedule(Seconds(2),
                         &SimpleEndDeviceLoraPhy::Send,
                         edPhy3,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1484,7 +1484,7 @@ PhyConnectivityTest::DoRun()
                         edPhy1,
                         packet,
                         txParams,
-                        868.3,
+                        868300000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1505,7 +1505,7 @@ PhyConnectivityTest::DoRun()
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1528,7 +1528,7 @@ PhyConnectivityTest::DoRun()
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1551,7 +1551,7 @@ PhyConnectivityTest::DoRun()
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));

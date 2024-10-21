@@ -37,7 +37,7 @@ LoraTag::LoraTag(uint8_t sf, uint8_t destroyedBy)
       m_destroyedBy(destroyedBy),
       m_receivePower(0),
       m_dataRate(0),
-      m_frequency(0)
+      m_frequencyHz(0)
 {
 }
 
@@ -49,8 +49,8 @@ uint32_t
 LoraTag::GetSerializedSize() const
 {
     // Each datum about a spreading factor is 1 byte + receivePower (the size of a double) +
-    // frequency (the size of a double)
-    return 3 + 2 * sizeof(double);
+    // frequency (4 bytes)
+    return 3 + sizeof(double) + 4;
 }
 
 void
@@ -60,7 +60,7 @@ LoraTag::Serialize(TagBuffer i) const
     i.WriteU8(m_destroyedBy);
     i.WriteDouble(m_receivePower);
     i.WriteU8(m_dataRate);
-    i.WriteDouble(m_frequency);
+    i.WriteU32(m_frequencyHz);
 }
 
 void
@@ -70,7 +70,7 @@ LoraTag::Deserialize(TagBuffer i)
     m_destroyedBy = i.ReadU8();
     m_receivePower = i.ReadDouble();
     m_dataRate = i.ReadU8();
-    m_frequency = i.ReadDouble();
+    m_frequencyHz = i.ReadU32();
 }
 
 void
@@ -116,15 +116,15 @@ LoraTag::SetReceivePower(double receivePower)
 }
 
 void
-LoraTag::SetFrequency(double frequency)
+LoraTag::SetFrequency(uint32_t frequencyHz)
 {
-    m_frequency = frequency;
+    m_frequencyHz = frequencyHz;
 }
 
-double
+uint32_t
 LoraTag::GetFrequency() const
 {
-    return m_frequency;
+    return m_frequencyHz;
 }
 
 uint8_t

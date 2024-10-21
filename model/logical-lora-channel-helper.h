@@ -96,9 +96,9 @@ class LogicalLoraChannelHelper : public Object
     /**
      * Add a new channel to the list.
      *
-     * \param frequency The frequency of the channel to create.
+     * \param frequencyHz The frequency of the channel to create.
      */
-    void AddChannel(double frequency);
+    void AddChannel(uint32_t frequencyHz);
 
     /**
      * Add a new channel to the list.
@@ -118,14 +118,14 @@ class LogicalLoraChannelHelper : public Object
     /**
      * Add a new SubBand to this helper.
      *
-     * \param firstFrequency The first frequency of the subband, in MHz.
-     * \param lastFrequency The last frequency of the subband, in MHz.
+     * \param firstFrequencyHz The first frequency [Hz] of the subband, in Hz.
+     * \param lastFrequencyHz The last frequency [Hz] of the subband, in Hz.
      * \param dutyCycle The duty cycle that needs to be enforced on this subband.
      * \param maxTxPowerDbm The maximum transmission power [dBm] that can be used.
      * on this SubBand.
      */
-    void AddSubBand(double firstFrequency,
-                    double lastFrequency,
+    void AddSubBand(uint32_t firstFrequencyHz,
+                    uint32_t lastFrequencyHz,
                     double dutyCycle,
                     double maxTxPowerDbm);
 
@@ -163,10 +163,10 @@ class LogicalLoraChannelHelper : public Object
     /**
      * Get the SubBand a frequency belongs to.
      *
-     * \param frequency The frequency we want to check.
+     * \param frequencyHz The frequency we want to check.
      * \return The SubBand the frequency belongs to.
      */
-    Ptr<SubBand> GetSubBandFromFrequency(double frequency);
+    Ptr<SubBand> GetSubBandFromFrequency(uint32_t frequencyHz);
 
     /**
      * Disable the channel at a specified index.

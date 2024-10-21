@@ -104,9 +104,9 @@ LoraChannel::Send(Ptr<LoraPhy> sender,
                   double txPowerDbm,
                   LoraTxParameters txParams,
                   Time duration,
-                  double frequencyMHz) const
+                  uint32_t frequencyHz) const
 {
-    NS_LOG_FUNCTION(this << sender << packet << txPowerDbm << txParams << duration << frequencyMHz);
+    NS_LOG_FUNCTION(this << sender << packet << txPowerDbm << txParams << duration << frequencyHz);
 
     // Get the mobility model of the sender
     Ptr<MobilityModel> senderMobility = sender->GetMobility()->GetObject<MobilityModel>();
@@ -159,7 +159,7 @@ LoraChannel::Send(Ptr<LoraPhy> sender,
             parameters.rxPowerDbm = rxPowerDbm;
             parameters.sf = txParams.sf;
             parameters.duration = duration;
-            parameters.frequencyMHz = frequencyMHz;
+            parameters.frequencyHz = frequencyHz;
 
             // Schedule the receive event
             NS_LOG_INFO("Scheduling reception of the packet");
@@ -187,7 +187,7 @@ LoraChannel::Receive(uint32_t i, Ptr<Packet> packet, LoraChannelParameters param
                                parameters.rxPowerDbm,
                                parameters.sf,
                                parameters.duration,
-                               parameters.frequencyMHz);
+                               parameters.frequencyHz);
 }
 
 double
@@ -203,7 +203,7 @@ operator<<(std::ostream& os, const LoraChannelParameters& params)
 {
     os << "(rxPowerDbm: " << params.rxPowerDbm << ", SF: " << unsigned(params.sf)
        << ", durationSec: " << params.duration.GetSeconds()
-       << ", frequencyMHz: " << params.frequencyMHz << ")";
+       << ", frequencyHz: " << params.frequencyHz << ")";
     return os;
 }
 } // namespace lorawan

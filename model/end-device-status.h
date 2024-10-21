@@ -48,9 +48,9 @@ namespace lorawan
  *
  *  (End device address) --- Current device parameters:
  *                           - First Receive Window Spreading Factor (SF) and Data Rate (DR)
- *                           - First Receive Window frequency
+ *                           - First Receive Window frequency [Hz]
  *                           - Second Window Spreading Factor (SF) and Data Rate (DR)
- *                           - Second Receive Window frequency
+ *                           - Second Receive Window frequency [Hz]
  *                       --- Reply
  *                           - Need for reply (true/false)
  *                           - Updated reply
@@ -62,8 +62,8 @@ namespace lorawan
  *
  *  (Received packets list) - List of gateways that received the packet (see below)
  *                          - Spreading Factor (SF) of the received packet
- *                          - Frequency of the received packet
- *                          - Bandwidth of the received packet
+ *                          - Frequency [Hz] of the received packet
+ *                          - Bandwidth [Hz] of the received packet
  *
  *  (Gateway list) - Time at which the packet was received
  *                 - Reception power
@@ -154,7 +154,7 @@ class EndDeviceStatus : public Object
         Ptr<const Packet> packet = nullptr; //!< The received packet
         GatewayList gwList;                 //!< List of gateways that received this packet
         uint8_t sf;                         //!< Spreading factor used to send this packet
-        double frequency;                   //!< Carrier frequency [MHz] used to send this packet
+        uint32_t frequencyHz;               //!< Carrier frequency [Hz] used to send this packet
     };
 
     /**
@@ -194,9 +194,9 @@ class EndDeviceStatus : public Object
     /**
      * Get the first window frequency of this device.
      *
-     * \return The frequency [MHz].
+     * \return The frequency [Hz].
      */
-    double GetFirstReceiveWindowFrequency() const;
+    uint32_t GetFirstReceiveWindowFrequency() const;
 
     /**
      * Get the spreading factor this device is using in the second
@@ -209,9 +209,9 @@ class EndDeviceStatus : public Object
     /**
      * Return the second window frequency of this device.
      *
-     * \return The frequency [MHz].
+     * \return The frequency [Hz].
      */
-    double GetSecondReceiveWindowFrequency() const;
+    uint32_t GetSecondReceiveWindowFrequency() const;
 
     /**
      * Get the received packet list.
@@ -230,9 +230,9 @@ class EndDeviceStatus : public Object
     /**
      * Set the first window frequency of this device.
      *
-     * \param frequency The frequency [MHz].
+     * \param frequencyHz The frequency [Hz].
      */
-    void SetFirstReceiveWindowFrequency(double frequency);
+    void SetFirstReceiveWindowFrequency(uint32_t frequencyHz);
 
     /**
      * Set the spreading factor this device is using in the second receive window.
@@ -244,9 +244,9 @@ class EndDeviceStatus : public Object
     /**
      * Set the second window frequency of this device.
      *
-     * \param frequency The frequency [MHz].
+     * \param frequencyHz The frequency [Hz].
      */
-    void SetSecondReceiveWindowFrequency(double frequency);
+    void SetSecondReceiveWindowFrequency(uint32_t frequencyHz);
 
     /**
      * Set the reply packet mac header.
@@ -357,9 +357,9 @@ class EndDeviceStatus : public Object
   private:
     // Receive window data
     uint8_t m_firstReceiveWindowSpreadingFactor = 0;  //!< Spreading Factor (SF) for RX1 window
-    double m_firstReceiveWindowFrequency = 0;         //!< Frequency [MHz] for RX1 window
+    uint32_t m_firstReceiveWindowFrequencyHz = 0;     //!< Frequency [Hz] for RX1 window
     uint8_t m_secondReceiveWindowSpreadingFactor = 0; //!< Spreading Factor (SF) for RX2 window.
-    double m_secondReceiveWindowFrequency = 869.525;  //!< Frequency [MHz] for RX2 window
+    uint32_t m_secondReceiveWindowFrequencyHz = 869525000; //!< Frequency [Hz] for RX2 window
     EventId m_receiveWindowEvent; //!< Event storing the next scheduled downlink transmission
 
     ReceivedPacketList m_receivedPacketList; //!< List of received packets

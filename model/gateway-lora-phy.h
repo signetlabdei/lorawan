@@ -55,13 +55,13 @@ class GatewayLoraPhy : public LoraPhy
                       double rxPowerDbm,
                       uint8_t sf,
                       Time duration,
-                      double frequencyMHz) override = 0;
+                      uint32_t frequencyHz) override = 0;
 
     void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) override = 0;
 
     void Send(Ptr<Packet> packet,
               LoraTxParameters txParams,
-              double frequencyMHz,
+              uint32_t frequencyHz,
               double txPowerDbm) override = 0;
 
     bool IsTransmitting() override;
@@ -69,10 +69,10 @@ class GatewayLoraPhy : public LoraPhy
     /**
      * Check whether the GatewayLoraPhy is currently listening to the specified frequency.
      *
-     * \param frequencyMHz The value of the frequency [MHz].
+     * \param frequencyHz The value of the frequency [Hz].
      * \return True if the frequency is among the one being listened to, false otherwise.
      */
-    bool IsOnFrequency(double frequencyMHz) override;
+    bool IsOnFrequency(uint32_t frequencyHz) override;
 
     /**
      * Add a reception path, locked on a specific frequency.
@@ -89,9 +89,9 @@ class GatewayLoraPhy : public LoraPhy
     /**
      * Add a frequency to the list of frequencies we are listening to.
      *
-     * \param frequencyMHz The value of the frequency [MHz].
+     * \param frequencyHz The value of the frequency [Hz].
      */
-    void AddFrequency(double frequencyMHz);
+    void AddFrequency(uint32_t frequencyHz);
 
     static const double sensitivity[6]; //!< A vector containing the sensitivities required to
                                         //!< correctly decode different spreading factors.
@@ -202,7 +202,8 @@ class GatewayLoraPhy : public LoraPhy
 
     bool m_isTransmitting; //!< Flag indicating whether a transmission is going on
 
-    std::list<double> m_frequencies; //!< List of frequencies the GatewayLoraPhy is listening to.
+    std::list<uint32_t>
+        m_frequenciesHz; //!< List of frequencies [Hz] the GatewayLoraPhy is listening to.
 };
 
 } // namespace lorawan
