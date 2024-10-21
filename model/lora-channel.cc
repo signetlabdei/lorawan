@@ -95,7 +95,7 @@ LoraChannel::GetNDevices() const
 Ptr<NetDevice>
 LoraChannel::GetDevice(std::size_t i) const
 {
-    return m_phyList[i]->GetDevice()->GetObject<NetDevice>();
+    return DynamicCast<NetDevice>(m_phyList[i]->GetDevice());
 }
 
 void

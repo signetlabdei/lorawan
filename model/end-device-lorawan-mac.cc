@@ -366,7 +366,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
             NS_LOG_DEBUG("Detected a LinkCheckAns command.");
 
             // Cast the command
-            Ptr<LinkCheckAns> linkCheckAns = (*it)->GetObject<LinkCheckAns>();
+            Ptr<LinkCheckAns> linkCheckAns = DynamicCast<LinkCheckAns>(*it);
 
             // Call the appropriate function to take action
             OnLinkCheckAns(linkCheckAns->GetMargin(), linkCheckAns->GetGwCnt());
@@ -377,7 +377,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
             NS_LOG_DEBUG("Detected a LinkAdrReq command.");
 
             // Cast the command
-            Ptr<LinkAdrReq> linkAdrReq = (*it)->GetObject<LinkAdrReq>();
+            Ptr<LinkAdrReq> linkAdrReq = DynamicCast<LinkAdrReq>(*it);
 
             // Call the appropriate function to take action
             OnLinkAdrReq(linkAdrReq->GetDataRate(),
@@ -391,7 +391,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
             NS_LOG_DEBUG("Detected a DutyCycleReq command.");
 
             // Cast the command
-            Ptr<DutyCycleReq> dutyCycleReq = (*it)->GetObject<DutyCycleReq>();
+            Ptr<DutyCycleReq> dutyCycleReq = DynamicCast<DutyCycleReq>(*it);
 
             // Call the appropriate function to take action
             OnDutyCycleReq(dutyCycleReq->GetMaximumAllowedDutyCycle());
@@ -402,7 +402,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
             NS_LOG_DEBUG("Detected a RxParamSetupReq command.");
 
             // Cast the command
-            Ptr<RxParamSetupReq> rxParamSetupReq = (*it)->GetObject<RxParamSetupReq>();
+            Ptr<RxParamSetupReq> rxParamSetupReq = DynamicCast<RxParamSetupReq>(*it);
 
             // Call the appropriate function to take action
             OnRxParamSetupReq(rxParamSetupReq);
@@ -413,7 +413,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
             NS_LOG_DEBUG("Detected a DevStatusReq command.");
 
             // Cast the command
-            Ptr<DevStatusReq> devStatusReq = (*it)->GetObject<DevStatusReq>();
+            Ptr<DevStatusReq> devStatusReq = DynamicCast<DevStatusReq>(*it);
 
             // Call the appropriate function to take action
             OnDevStatusReq();
@@ -424,7 +424,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
             NS_LOG_DEBUG("Detected a NewChannelReq command.");
 
             // Cast the command
-            Ptr<NewChannelReq> newChannelReq = (*it)->GetObject<NewChannelReq>();
+            Ptr<NewChannelReq> newChannelReq = DynamicCast<NewChannelReq>(*it);
 
             // Call the appropriate function to take action
             OnNewChannelReq(newChannelReq->GetChannelIndex(),

@@ -339,9 +339,9 @@ LoraFrameHeader::GetMacCommand()
     std::list<Ptr<MacCommand>>::const_iterator it;
     for (it = m_macCommands.begin(); it != m_macCommands.end(); ++it)
     {
-        if ((*it)->GetObject<T>())
+        if (DynamicCast<T>(*it))
         {
-            return (*it)->GetObject<T>();
+            return DynamicCast<T>(*it);
         }
     }
 

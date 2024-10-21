@@ -90,7 +90,7 @@ LoraPhyHelper::Create(Ptr<Node> node, Ptr<NetDevice> device) const
 
         for (auto& f : frequencies)
         {
-            phy->GetObject<SimpleGatewayLoraPhy>()->AddFrequency(f);
+            DynamicCast<SimpleGatewayLoraPhy>(phy)->AddFrequency(f);
         }
 
         int receptionPaths = 0;
@@ -98,7 +98,7 @@ LoraPhyHelper::Create(Ptr<Node> node, Ptr<NetDevice> device) const
         // int maxReceptionPaths = 8;
         while (receptionPaths < m_maxReceptionPaths)
         {
-            phy->GetObject<SimpleGatewayLoraPhy>()->AddReceptionPath();
+            DynamicCast<SimpleGatewayLoraPhy>(phy)->AddReceptionPath();
             receptionPaths++;
         }
     }

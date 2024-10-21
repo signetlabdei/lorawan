@@ -114,7 +114,7 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
     //////////////////////////////
 
     // Switch the PHY to the channel so that it will listen here for downlink
-    m_phy->GetObject<EndDeviceLoraPhy>()->SetFrequency(txChannel->GetFrequency());
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->SetFrequency(txChannel->GetFrequency());
 
     // Instruct the PHY on the right Spreading Factor to listen for during the window
     // create a SetReplyDataRate function?
@@ -123,7 +123,7 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
                                 << ", m_rx1DrOffset: " << unsigned(m_rx1DrOffset)
                                 << ", replyDataRate: " << unsigned(replyDataRate) << ".");
 
-    m_phy->GetObject<EndDeviceLoraPhy>()->SetSpreadingFactor(GetSfFromDataRate(replyDataRate));
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->SetSpreadingFactor(GetSfFromDataRate(replyDataRate));
 }
 
 //////////////////////////
@@ -228,7 +228,7 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
         }
     }
 
-    m_phy->GetObject<EndDeviceLoraPhy>()->SwitchToSleep();
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->SwitchToSleep();
 }
 
 void
@@ -237,7 +237,7 @@ ClassAEndDeviceLorawanMac::FailedReception(Ptr<const Packet> packet)
     NS_LOG_FUNCTION(this << packet);
 
     // Switch to sleep after a failed reception
-    m_phy->GetObject<EndDeviceLoraPhy>()->SwitchToSleep();
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->SwitchToSleep();
 
     if (m_secondReceiveWindow.IsExpired() && m_retxParams.waitingAck)
     {
@@ -282,7 +282,7 @@ ClassAEndDeviceLorawanMac::TxFinished(Ptr<const Packet> packet)
     //                                              this);
 
     // Switch the PHY to sleep
-    m_phy->GetObject<EndDeviceLoraPhy>()->SwitchToSleep();
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->SwitchToSleep();
 }
 
 void
@@ -291,7 +291,7 @@ ClassAEndDeviceLorawanMac::OpenFirstReceiveWindow()
     NS_LOG_FUNCTION_NOARGS();
 
     // Set Phy in Standby mode
-    m_phy->GetObject<EndDeviceLoraPhy>()->SwitchToStandby();
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->SwitchToStandby();
 
     // Calculate the duration of a single symbol for the first receive window data rate
     double tSym = pow(2, GetSfFromDataRate(GetFirstReceiveWindowDataRate())) /
@@ -310,7 +310,7 @@ ClassAEndDeviceLorawanMac::CloseFirstReceiveWindow()
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    Ptr<EndDeviceLoraPhy> phy = m_phy->GetObject<EndDeviceLoraPhy>();
+    Ptr<EndDeviceLoraPhy> phy = DynamicCast<EndDeviceLoraPhy>(m_phy);
 
     // Check the Phy layer's state:
     // - RX -> We are receiving a preamble.
@@ -341,7 +341,7 @@ ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow()
 
     // Check for receiver status: if it's locked on a packet, don't open this
     // window at all.
-    if (m_phy->GetObject<EndDeviceLoraPhy>()->GetState() == EndDeviceLoraPhy::RX)
+    if (DynamicCast<EndDeviceLoraPhy>(m_phy)->GetState() == EndDeviceLoraPhy::RX)
     {
         NS_LOG_INFO("Won't open second receive window since we are in RX mode.");
 
@@ -349,14 +349,14 @@ ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow()
     }
 
     // Set Phy in Standby mode
-    m_phy->GetObject<EndDeviceLoraPhy>()->SwitchToStandby();
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->SwitchToStandby();
 
     // Switch to appropriate channel and data rate
     NS_LOG_INFO("Using parameters: " << m_secondReceiveWindowFrequency << "Hz, DR"
                                      << unsigned(m_secondReceiveWindowDataRate));
 
-    m_phy->GetObject<EndDeviceLoraPhy>()->SetFrequency(m_secondReceiveWindowFrequency);
-    m_phy->GetObject<EndDeviceLoraPhy>()->SetSpreadingFactor(
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->SetFrequency(m_secondReceiveWindowFrequency);
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->SetSpreadingFactor(
         GetSfFromDataRate(m_secondReceiveWindowDataRate));
 
     // Calculate the duration of a single symbol for the second receive window data rate
@@ -376,7 +376,7 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    Ptr<EndDeviceLoraPhy> phy = m_phy->GetObject<EndDeviceLoraPhy>();
+    Ptr<EndDeviceLoraPhy> phy = DynamicCast<EndDeviceLoraPhy>(m_phy);
 
     // NS_ASSERT (phy->m_state != EndDeviceLoraPhy::TX &&
     // phy->m_state != EndDeviceLoraPhy::SLEEP);
@@ -410,7 +410,7 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
         }
 
         else if (m_retxParams.retxLeft == 0 &&
-                 m_phy->GetObject<EndDeviceLoraPhy>()->GetState() != EndDeviceLoraPhy::RX)
+                 DynamicCast<EndDeviceLoraPhy>(m_phy)->GetState() != EndDeviceLoraPhy::RX)
         {
             uint8_t txs = m_maxNumbTx - (m_retxParams.retxLeft);
             m_requiredTxCallback(txs, false, m_retxParams.firstAttempt, m_retxParams.packet);

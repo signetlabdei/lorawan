@@ -147,11 +147,8 @@ main(int argc, char* argv[])
      ******************/
     for (uint32_t i = 0; i < endDevices.GetN(); i++)
     {
-        endDevices.Get(i)
-            ->GetDevice(0)
-            ->GetObject<LoraNetDevice>()
-            ->GetMac()
-            ->GetObject<EndDeviceLorawanMac>()
+        DynamicCast<EndDeviceLorawanMac>(
+            DynamicCast<LoraNetDevice>(endDevices.Get(i)->GetDevice(0))->GetMac())
             ->SetDataRate(5 - i);
     }
 

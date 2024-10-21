@@ -346,7 +346,7 @@ HeaderTest::DoRun()
     // Deserialization
     frameHdr.Deserialize(serialized);
 
-    Ptr<LinkCheckAns> command = (*(frameHdr.GetCommands().begin()))->GetObject<LinkCheckAns>();
+    Ptr<LinkCheckAns> command = DynamicCast<LinkCheckAns>(*frameHdr.GetCommands().begin());
     uint8_t margin = command->GetMargin();
     uint8_t gwCnt = command->GetGwCnt();
 
@@ -388,8 +388,7 @@ HeaderTest::DoRun()
     frameHdr1.SetAsDownlink();
 
     pkt->RemoveHeader(frameHdr1);
-    Ptr<LinkCheckAns> linkCheckAns =
-        (*(frameHdr1.GetCommands().begin()))->GetObject<LinkCheckAns>();
+    Ptr<LinkCheckAns> linkCheckAns = DynamicCast<LinkCheckAns>(*frameHdr1.GetCommands().begin());
 
     NS_TEST_EXPECT_MSG_EQ((pkt->GetSize()),
                           10,
@@ -1404,8 +1403,8 @@ PhyConnectivityTest::DoRun()
 
     txParams.sf = 7;
     edPhy2->SetSpreadingFactor(7);
-    edPhy2->GetMobility()->GetObject<ConstantPositionMobilityModel>()->SetPosition(
-        Vector(2990, 0, 0));
+    DynamicCast<ConstantPositionMobilityModel>(edPhy2->GetMobility())
+        ->SetPosition(Vector(2990, 0, 0));
 
     Simulator::Schedule(Seconds(2),
                         &SimpleEndDeviceLoraPhy::Send,
@@ -1429,8 +1428,8 @@ PhyConnectivityTest::DoRun()
     // Try again using a packet with higher spreading factor
     txParams.sf = 8;
     edPhy2->SetSpreadingFactor(8);
-    edPhy2->GetMobility()->GetObject<ConstantPositionMobilityModel>()->SetPosition(
-        Vector(2990, 0, 0));
+    DynamicCast<ConstantPositionMobilityModel>(edPhy2->GetMobility())
+        ->SetPosition(Vector(2990, 0, 0));
 
     Simulator::Schedule(Seconds(2),
                         &SimpleEndDeviceLoraPhy::Send,
