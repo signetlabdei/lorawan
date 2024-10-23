@@ -107,7 +107,7 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
     Time duration = LoraPhy::GetOnAirTime(packetToSend, params);
 
     // Register the sent packet into the DutyCycleHelper
-    m_channelHelper.AddEvent(duration, txChannel);
+    m_channelHelper->AddEvent(duration, txChannel);
 
     //////////////////////////////
     // Prepare for the downlink //

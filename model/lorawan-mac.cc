@@ -84,14 +84,14 @@ LorawanMac::SetPhy(Ptr<LoraPhy> phy)
     m_phy->SetTxFinishedCallback(MakeCallback(&LorawanMac::TxFinished, this));
 }
 
-LogicalLoraChannelHelper
+Ptr<LogicalLoraChannelHelper>
 LorawanMac::GetLogicalLoraChannelHelper()
 {
     return m_channelHelper;
 }
 
 void
-LorawanMac::SetLogicalLoraChannelHelper(LogicalLoraChannelHelper helper)
+LorawanMac::SetLogicalLoraChannelHelper(Ptr<LogicalLoraChannelHelper> helper)
 {
     m_channelHelper = helper;
 }
