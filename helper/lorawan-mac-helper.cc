@@ -200,14 +200,14 @@ LorawanMacHelper::ApplyCommonAlohaConfigurations(Ptr<LorawanMac> lorawanMac) con
     // SubBands //
     //////////////
 
-    LogicalLoraChannelHelper channelHelper;
-    channelHelper.AddSubBand(868, 868.6, 1, 14);
+    Ptr<LogicalLoraChannelHelper> channelHelper = CreateObject<LogicalLoraChannelHelper>();
+    channelHelper->AddSubBand(868, 868.6, 1, 14);
 
     //////////////////////
     // Default channels //
     //////////////////////
     Ptr<LogicalLoraChannel> lc1 = CreateObject<LogicalLoraChannel>(868.1, 0, 5);
-    channelHelper.AddChannel(lc1);
+    channelHelper->AddChannel(lc1);
 
     lorawanMac->SetLogicalLoraChannelHelper(channelHelper);
 
@@ -306,10 +306,10 @@ LorawanMacHelper::ApplyCommonEuConfigurations(Ptr<LorawanMac> lorawanMac) const
     // SubBands //
     //////////////
 
-    LogicalLoraChannelHelper channelHelper;
-    channelHelper.AddSubBand(868, 868.6, 0.01, 14);
-    channelHelper.AddSubBand(868.7, 869.2, 0.001, 14);
-    channelHelper.AddSubBand(869.4, 869.65, 0.1, 27);
+    Ptr<LogicalLoraChannelHelper> channelHelper = CreateObject<LogicalLoraChannelHelper>();
+    channelHelper->AddSubBand(868, 868.6, 0.01, 14);
+    channelHelper->AddSubBand(868.7, 869.2, 0.001, 14);
+    channelHelper->AddSubBand(869.4, 869.65, 0.1, 27);
 
     //////////////////////
     // Default channels //
@@ -317,9 +317,9 @@ LorawanMacHelper::ApplyCommonEuConfigurations(Ptr<LorawanMac> lorawanMac) const
     Ptr<LogicalLoraChannel> lc1 = CreateObject<LogicalLoraChannel>(868.1, 0, 5);
     Ptr<LogicalLoraChannel> lc2 = CreateObject<LogicalLoraChannel>(868.3, 0, 5);
     Ptr<LogicalLoraChannel> lc3 = CreateObject<LogicalLoraChannel>(868.5, 0, 5);
-    channelHelper.AddChannel(lc1);
-    channelHelper.AddChannel(lc2);
-    channelHelper.AddChannel(lc3);
+    channelHelper->AddChannel(lc1);
+    channelHelper->AddChannel(lc2);
+    channelHelper->AddChannel(lc3);
 
     lorawanMac->SetLogicalLoraChannelHelper(channelHelper);
 
@@ -418,16 +418,16 @@ LorawanMacHelper::ApplyCommonSingleChannelConfigurations(Ptr<LorawanMac> lorawan
     // SubBands //
     //////////////
 
-    LogicalLoraChannelHelper channelHelper;
-    channelHelper.AddSubBand(868, 868.6, 0.01, 14);
-    channelHelper.AddSubBand(868.7, 869.2, 0.001, 14);
-    channelHelper.AddSubBand(869.4, 869.65, 0.1, 27);
+    Ptr<LogicalLoraChannelHelper> channelHelper = CreateObject<LogicalLoraChannelHelper>();
+    channelHelper->AddSubBand(868, 868.6, 0.01, 14);
+    channelHelper->AddSubBand(868.7, 869.2, 0.001, 14);
+    channelHelper->AddSubBand(869.4, 869.65, 0.1, 27);
 
     //////////////////////
     // Default channels //
     //////////////////////
     Ptr<LogicalLoraChannel> lc1 = CreateObject<LogicalLoraChannel>(868.1, 0, 5);
-    channelHelper.AddChannel(lc1);
+    channelHelper->AddChannel(lc1);
 
     lorawanMac->SetLogicalLoraChannelHelper(channelHelper);
 

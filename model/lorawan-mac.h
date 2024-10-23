@@ -112,16 +112,16 @@ class LorawanMac : public Object
     /**
      * Get the logical lora channel helper associated with this MAC.
      *
-     * \return The instance of LogicalLoraChannelHelper that this MAC is using.
+     * \return A Ptr to the instance of LogicalLoraChannelHelper that this MAC is using.
      */
-    LogicalLoraChannelHelper GetLogicalLoraChannelHelper();
+    Ptr<LogicalLoraChannelHelper> GetLogicalLoraChannelHelper();
 
     /**
      * Set the LogicalLoraChannelHelper this MAC instance will use.
      *
-     * \param helper The instance of the helper to use.
+     * \param helper A Ptr to the instance of the helper to use.
      */
-    void SetLogicalLoraChannelHelper(LogicalLoraChannelHelper helper);
+    void SetLogicalLoraChannelHelper(Ptr<LogicalLoraChannelHelper> helper);
 
     /**
      * Get the spreading factor corresponding to a data rate, based on this MAC's region.
@@ -243,7 +243,7 @@ class LorawanMac : public Object
     /**
      * The LogicalLoraChannelHelper instance that is assigned to this MAC.
      */
-    LogicalLoraChannelHelper m_channelHelper;
+    Ptr<LogicalLoraChannelHelper> m_channelHelper;
 
     /**
      * A vector holding the spreading factor each data rate corresponds to.
