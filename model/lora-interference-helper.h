@@ -108,9 +108,9 @@ class LoraInterferenceHelper
         /**
          * Get the frequency this event was on.
          *
-         * \return The carrier frequency as a double.
+         * \return The carrier frequency [Hz] as a uint32_t.
          */
-        double GetFrequency() const;
+        uint32_t GetFrequency() const;
 
         /**
          * Print the current event in a human readable form.
@@ -120,12 +120,12 @@ class LoraInterferenceHelper
         void Print(std::ostream& stream) const;
 
       private:
-        Time m_startTime;     //!< The time this signal begins (at the device).
-        Time m_endTime;       //!< The time this signal ends (at the device).
-        uint8_t m_sf;         //!< The spreading factor of this signal.
-        double m_rxPowerdBm;  //!< The power of this event in dBm (at the device).
-        Ptr<Packet> m_packet; //!< The packet this event was generated for.
-        double m_frequencyHz; //!<  The frequency this event was on.
+        Time m_startTime;       //!< The time this signal begins (at the device).
+        Time m_endTime;         //!< The time this signal ends (at the device).
+        uint8_t m_sf;           //!< The spreading factor of this signal.
+        double m_rxPowerdBm;    //!< The power of this event in dBm (at the device).
+        Ptr<Packet> m_packet;   //!< The packet this event was generated for.
+        uint32_t m_frequencyHz; //!< The carrier frequency [Hz] this event was on.
     };
 
     /**

@@ -331,8 +331,8 @@ class EndDeviceLorawanMac : public LorawanMac
      * \param dutyCycle The SubBand's duty cycle, in fraction form.
      * \param maxTxPowerDbm The maximum transmission power allowed on the SubBand.
      */
-    void AddSubBand(double startFrequencyHz,
-                    double endFrequencyHz,
+    void AddSubBand(uint32_t startFrequencyHz,
+                    uint32_t endFrequencyHz,
                     double dutyCycle,
                     double maxTxPowerDbm);
 

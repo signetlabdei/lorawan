@@ -886,8 +886,8 @@ EndDeviceLorawanMac::SetLogicalChannel(uint8_t chIndex,
 }
 
 void
-EndDeviceLorawanMac::AddSubBand(double startFrequencyHz,
-                                double endFrequencyHz,
+EndDeviceLorawanMac::AddSubBand(uint32_t startFrequencyHz,
+                                uint32_t endFrequencyHz,
                                 double dutyCycle,
                                 double maxTxPowerDbm)
 {
