@@ -45,10 +45,10 @@ struct LoraTxParameters;
  */
 struct LoraChannelParameters
 {
-    double rxPowerDbm;   //!< The reception power.
-    uint8_t sf;          //!< The Spreading Factor of this transmission.
-    Time duration;       //!< The duration of the transmission.
-    double frequencyMHz; //!< The frequency [MHz] of this transmission.
+    double rxPowerDbm;    //!< The reception power.
+    uint8_t sf;           //!< The Spreading Factor of this transmission.
+    Time duration;        //!< The duration of the transmission.
+    uint32_t frequencyHz; //!< The frequency [Hz] of this transmission.
 };
 
 /**
@@ -125,7 +125,7 @@ class LoraChannel : public Channel
      * \param txPowerDbm The power of the transmission.
      * \param txParams The set of parameters that are used by the transmitter.
      * \param duration The on-air duration of this packet.
-     * \param frequencyMHz The frequency this transmission will happen at.
+     * \param frequencyHz The frequency this transmission will happen at.
      *
      * \internal
      *
@@ -137,7 +137,7 @@ class LoraChannel : public Channel
               double txPowerDbm,
               LoraTxParameters txParams,
               Time duration,
-              double frequencyMHz) const;
+              uint32_t frequencyHz) const;
 
     /**
      * Compute the received power when transmitting from a point to another one.

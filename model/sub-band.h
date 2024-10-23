@@ -42,26 +42,29 @@ class SubBand : public Object
     /**
      * Create a new SubBand by specifying all of its properties.
      *
-     * \param firstFrequency The SubBand's lowest frequency [MHz].
-     * \param lastFrequency The SubBand's highest frequency [MHz].
+     * \param firstFrequencyHz The SubBand's lowest frequency [Hz].
+     * \param lastFrequencyHz The SubBand's highest frequency [Hz].
      * \param dutyCycle The duty cycle (as a fraction) allowed on this SubBand.
      * \param maxTxPowerDbm The maximum transmission power [dBm] allowed on this SubBand.
      */
-    SubBand(double firstFrequency, double lastFrequency, double dutyCycle, double maxTxPowerDbm);
+    SubBand(uint32_t firstFrequencyHz,
+            uint32_t lastFrequencyHz,
+            double dutyCycle,
+            double maxTxPowerDbm);
 
     /**
      * Get the lowest frequency of the SubBand.
      *
-     * \return The lowest frequency [MHz] of the SubBand.
+     * \return The lowest frequency [Hz] of the SubBand.
      */
-    double GetFirstFrequency() const;
+    uint32_t GetFirstFrequency() const;
 
     ///**
     // * Get the last frequency of the subband.
     // *
-    // * \return The lowest frequency [MHz] of the SubBand.
+    // * \return The lowest frequency [Hz] of the SubBand.
     // */
-    // double GetLastFrequency ();
+    // uint32_t GetLastFrequency ();
 
     /**
      * Get the duty cycle of the subband.
@@ -94,18 +97,18 @@ class SubBand : public Object
     /**
      * Return whether or not a frequency belongs to this SubBand.
      *
-     * \param frequency The frequency [MHz] we want to test against the current subband.
-     * \return True if the frequency is between firstFrequency and lastFrequency,
+     * \param frequencyHz The frequency [Hz] we want to test against the current subband.
+     * \return True if the frequency is between firstFrequencyHz and lastFrequencyHz,
      * false otherwise.
      */
-    bool BelongsToSubBand(double frequency) const;
+    bool BelongsToSubBand(uint32_t frequencyHz) const;
 
     /**
      * Return whether or not a channel belongs to this SubBand.
      *
      * \param channel The channel we want to test against the current subband.
-     * \return True if the channel's center frequency is between firstFrequency
-     * and lastFrequency, false otherwise.
+     * \return True if the channel's center frequency is between firstFrequencyHz
+     * and lastFrequencyHz, false otherwise.
      */
     bool BelongsToSubBand(Ptr<LogicalLoraChannel> channel) const;
 
@@ -124,8 +127,8 @@ class SubBand : public Object
     double GetMaxTxPowerDbm() const;
 
   private:
-    double m_firstFrequency;     //!< Starting frequency of the subband, in MHz
-    double m_lastFrequency;      //!< Ending frequency of the subband, in MHz
+    uint32_t m_firstFrequencyHz; //!< Starting frequency of the subband, in Hz
+    uint32_t m_lastFrequencyHz;  //!< Ending frequency of the subband, in Hz
     double m_dutyCycle;          //!< The duty cycle that needs to be enforced on this subband
     Time m_nextTransmissionTime; //!< The next time a transmission will be allowed in this subband
     double m_maxTxPowerDbm; //!< The maximum transmission power that is admitted on this subband

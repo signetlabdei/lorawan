@@ -48,10 +48,10 @@ SimpleEndDeviceLoraPhy::~SimpleEndDeviceLoraPhy()
 void
 SimpleEndDeviceLoraPhy::Send(Ptr<Packet> packet,
                              LoraTxParameters txParams,
-                             double frequencyMHz,
+                             uint32_t frequencyHz,
                              double txPowerDbm)
 {
-    NS_LOG_FUNCTION(this << packet << txParams << frequencyMHz << txPowerDbm);
+    NS_LOG_FUNCTION(this << packet << txParams << frequencyHz << txPowerDbm);
 
     NS_LOG_INFO("Current state: " << m_state);
 
@@ -76,7 +76,7 @@ SimpleEndDeviceLoraPhy::Send(Ptr<Packet> packet,
 
     // Send the packet over the channel
     NS_LOG_INFO("Sending the packet in the channel");
-    m_channel->Send(this, packet, txPowerDbm, txParams, duration, frequencyMHz);
+    m_channel->Send(this, packet, txPowerDbm, txParams, duration, frequencyHz);
 
     // Schedule a call to signal the transmission end.
     Simulator::Schedule(duration, &SimpleEndDeviceLoraPhy::TxFinished, this, packet);
@@ -97,9 +97,9 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
                                      double rxPowerDbm,
                                      uint8_t sf,
                                      Time duration,
-                                     double frequencyMHz)
+                                     uint32_t frequencyHz)
 {
-    NS_LOG_FUNCTION(this << packet << rxPowerDbm << unsigned(sf) << duration << frequencyMHz);
+    NS_LOG_FUNCTION(this << packet << rxPowerDbm << unsigned(sf) << duration << frequencyHz);
 
     // Notify the LoraInterferenceHelper of the impinging signal, and remember
     // the event it creates. This will be used then to correctly handle the end
@@ -110,7 +110,7 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
     // still incoming.
 
     Ptr<LoraInterferenceHelper::Event> event;
-    event = m_interference.Add(duration, rxPowerDbm, sf, packet, frequencyMHz);
+    event = m_interference.Add(duration, rxPowerDbm, sf, packet, frequencyHz);
 
     // Switch on the current PHY state
     switch (m_state)
@@ -147,11 +147,10 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
 
         // Check frequency
         //////////////////
-        if (!IsOnFrequency(frequencyMHz))
+        if (!IsOnFrequency(frequencyHz))
         {
             NS_LOG_INFO("Packet lost because it's on frequency "
-                        << frequencyMHz << " MHz and we are listening at " << m_frequency
-                        << " MHz");
+                        << frequencyHz << " Hz and we are listening at " << m_frequencyHz << " Hz");
 
             // Fire the trace source for this event.
             if (m_device)

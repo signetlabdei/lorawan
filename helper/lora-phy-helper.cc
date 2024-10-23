@@ -77,18 +77,18 @@ LoraPhyHelper::Create(Ptr<Node> node, Ptr<NetDevice> device) const
 
         // For now, assume that the PHY will listen to the default EU channels
         // with this ReceivePath configuration:
-        // 3 ReceivePaths on 868.1
-        // 3 ReceivePaths on 868.3
-        // 2 ReceivePaths on 868.5
+        // 3 ReceivePaths on 868.1 MHz
+        // 3 ReceivePaths on 868.3 MHz
+        // 2 ReceivePaths on 868.5 MHz
 
         // We expect that MacHelper instances will overwrite this setting if the
         // device will operate in a different region
-        std::vector<double> frequencies;
-        frequencies.push_back(868.1);
-        frequencies.push_back(868.3);
-        frequencies.push_back(868.5);
+        std::vector<uint32_t> frequenciesHz;
+        frequenciesHz.push_back(868100000);
+        frequenciesHz.push_back(868300000);
+        frequenciesHz.push_back(868500000);
 
-        for (auto& f : frequencies)
+        for (auto& f : frequenciesHz)
         {
             DynamicCast<SimpleGatewayLoraPhy>(phy)->AddFrequency(f);
         }

@@ -283,12 +283,12 @@ class EndDeviceLorawanMac : public LorawanMac
      * Perform the actions that need to be taken when receiving a NewChannelReq command.
      *
      * \param chIndex The ChIndex field of the received NewChannelReq command.
-     * \param frequency The Frequency field of the received NewChannelReq command.
+     * \param frequencyHz The Frequency field [Hz] of the received NewChannelReq command.
      * \param minDataRate The MinDR field of the received NewChannelReq command.
      * \param maxDataRate The MaxDR field of the received NewChannelReq command.
      */
     void OnNewChannelReq(uint8_t chIndex,
-                         double frequency,
+                         uint32_t frequencyHz,
                          uint8_t minDataRate,
                          uint8_t maxDataRate);
 
@@ -299,20 +299,20 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Add a logical channel to the helper.
      *
-     * \param frequency The channel's center frequency.
+     * \param frequencyHz The channel's center frequency [Hz].
      */
-    void AddLogicalChannel(double frequency);
+    void AddLogicalChannel(uint32_t frequencyHz);
 
     /**
      * Set a new logical channel in the helper.
      *
      * \param chIndex The channel's new index.
-     * \param frequency The channel's center frequency.
+     * \param frequencyHz The channel's center frequency [Hz].
      * \param minDataRate The minimum data rate allowed on the channel.
      * \param maxDataRate The maximum data rate allowed on the channel.
      */
     void SetLogicalChannel(uint8_t chIndex,
-                           double frequency,
+                           uint32_t frequencyHz,
                            uint8_t minDataRate,
                            uint8_t maxDataRate);
 
@@ -326,13 +326,13 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Add a subband to the logical channel helper.
      *
-     * \param startFrequency The SubBand's lowest frequency.
-     * \param endFrequency The SubBand's highest frequency.
+     * \param startFrequencyHz The SubBand's lowest frequency [Hz].
+     * \param endFrequencyHz The SubBand's highest frequency [Hz].
      * \param dutyCycle The SubBand's duty cycle, in fraction form.
      * \param maxTxPowerDbm The maximum transmission power allowed on the SubBand.
      */
-    void AddSubBand(double startFrequency,
-                    double endFrequency,
+    void AddSubBand(uint32_t startFrequencyHz,
+                    uint32_t endFrequencyHz,
                     double dutyCycle,
                     double maxTxPowerDbm);
 

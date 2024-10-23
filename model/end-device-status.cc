@@ -74,12 +74,12 @@ EndDeviceStatus::GetFirstReceiveWindowSpreadingFactor() const
     return m_firstReceiveWindowSpreadingFactor;
 }
 
-double
+uint32_t
 EndDeviceStatus::GetFirstReceiveWindowFrequency() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    return m_firstReceiveWindowFrequency;
+    return m_firstReceiveWindowFrequencyHz;
 }
 
 uint8_t
@@ -90,11 +90,11 @@ EndDeviceStatus::GetSecondReceiveWindowSpreadingFactor() const
     return m_secondReceiveWindowSpreadingFactor;
 }
 
-double
+uint32_t
 EndDeviceStatus::GetSecondReceiveWindowFrequency() const
 {
     NS_LOG_FUNCTION_NOARGS();
-    return m_secondReceiveWindowFrequency;
+    return m_secondReceiveWindowFrequencyHz;
 }
 
 Ptr<Packet>
@@ -184,10 +184,10 @@ EndDeviceStatus::SetFirstReceiveWindowSpreadingFactor(uint8_t sf)
 }
 
 void
-EndDeviceStatus::SetFirstReceiveWindowFrequency(double frequency)
+EndDeviceStatus::SetFirstReceiveWindowFrequency(uint32_t frequencyHz)
 {
     NS_LOG_FUNCTION_NOARGS();
-    m_firstReceiveWindowFrequency = frequency;
+    m_firstReceiveWindowFrequencyHz = frequencyHz;
 }
 
 void
@@ -198,10 +198,10 @@ EndDeviceStatus::SetSecondReceiveWindowSpreadingFactor(uint8_t sf)
 }
 
 void
-EndDeviceStatus::SetSecondReceiveWindowFrequency(double frequency)
+EndDeviceStatus::SetSecondReceiveWindowFrequency(uint32_t frequencyHz)
 {
     NS_LOG_FUNCTION_NOARGS();
-    m_secondReceiveWindowFrequency = frequency;
+    m_secondReceiveWindowFrequencyHz = frequencyHz;
 }
 
 void
@@ -254,7 +254,7 @@ EndDeviceStatus::InsertReceivedPacket(Ptr<const Packet> receivedPacket, const Ad
     // Update Information on the received packet
     ReceivedPacketInfo info;
     info.sf = tag.GetSpreadingFactor();
-    info.frequency = tag.GetFrequency();
+    info.frequencyHz = tag.GetFrequency();
     info.packet = receivedPacket;
 
     double rcvPower = tag.GetReceivePower();

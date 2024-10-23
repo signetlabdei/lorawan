@@ -146,7 +146,7 @@ class EndDeviceLoraPhy : public LoraPhy
                       double rxPowerDbm,
                       uint8_t sf,
                       Time duration,
-                      double frequencyMHz) override = 0;
+                      uint32_t frequencyHz) override = 0;
 
     // Implementation of LoraPhy's pure virtual functions
     void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) override = 0;
@@ -154,11 +154,11 @@ class EndDeviceLoraPhy : public LoraPhy
     // Implementation of LoraPhy's pure virtual functions
     void Send(Ptr<Packet> packet,
               LoraTxParameters txParams,
-              double frequencyMHz,
+              uint32_t frequencyHz,
               double txPowerDbm) override = 0;
 
     // Implementation of LoraPhy's pure virtual functions
-    bool IsOnFrequency(double frequencyMHz) override;
+    bool IsOnFrequency(uint32_t frequencyHz) override;
 
     // Implementation of LoraPhy's pure virtual functions
     bool IsTransmitting() override;
@@ -169,9 +169,9 @@ class EndDeviceLoraPhy : public LoraPhy
      * Should a packet be transmitted on a frequency different than that the
      * EndDeviceLoraPhy is listening on, the packet will be discarded.
      *
-     * \param frequencyMHz The frequency [MHz] to listen to.
+     * \param frequencyHz The frequency [Hz] to listen to.
      */
-    void SetFrequency(double frequencyMHz);
+    void SetFrequency(uint32_t frequencyHz);
 
     /**
      * Set the Spreading Factor this end device will listen for.
@@ -263,7 +263,7 @@ class EndDeviceLoraPhy : public LoraPhy
     // static const double sensitivity[6]; //!< The sensitivity vector of this device to different
     // SFs
 
-    double m_frequency; //!< The frequency this device is listening on
+    uint32_t m_frequencyHz; //!< The frequency [Hz] this device is listening on
 
     uint8_t m_sf; //!< The Spreading Factor this device is listening for
 

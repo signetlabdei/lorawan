@@ -28,7 +28,7 @@ LogicalLoraChannel::GetTypeId()
 }
 
 LogicalLoraChannel::LogicalLoraChannel()
-    : m_frequency(0),
+    : m_frequencyHz(0),
       m_minDataRate(0),
       m_maxDataRate(5),
       m_enabledForUplink(true)
@@ -41,15 +41,17 @@ LogicalLoraChannel::~LogicalLoraChannel()
     NS_LOG_FUNCTION(this);
 }
 
-LogicalLoraChannel::LogicalLoraChannel(double frequency)
-    : m_frequency(frequency),
+LogicalLoraChannel::LogicalLoraChannel(uint32_t frequencyHz)
+    : m_frequencyHz(frequencyHz),
       m_enabledForUplink(true)
 {
     NS_LOG_FUNCTION(this);
 }
 
-LogicalLoraChannel::LogicalLoraChannel(double frequency, uint8_t minDataRate, uint8_t maxDataRate)
-    : m_frequency(frequency),
+LogicalLoraChannel::LogicalLoraChannel(uint32_t frequencyHz,
+                                       uint8_t minDataRate,
+                                       uint8_t maxDataRate)
+    : m_frequencyHz(frequencyHz),
       m_minDataRate(minDataRate),
       m_maxDataRate(maxDataRate),
       m_enabledForUplink(true)
@@ -57,10 +59,10 @@ LogicalLoraChannel::LogicalLoraChannel(double frequency, uint8_t minDataRate, ui
     NS_LOG_FUNCTION(this);
 }
 
-double
+uint32_t
 LogicalLoraChannel::GetFrequency() const
 {
-    return m_frequency;
+    return m_frequencyHz;
 }
 
 void
@@ -108,8 +110,8 @@ LogicalLoraChannel::IsEnabledForUplink() const
 bool
 operator==(const Ptr<LogicalLoraChannel>& first, const Ptr<LogicalLoraChannel>& second)
 {
-    double thisFreq = first->GetFrequency();
-    double otherFreq = second->GetFrequency();
+    uint32_t thisFreq = first->GetFrequency();
+    uint32_t otherFreq = second->GetFrequency();
 
     NS_LOG_DEBUG("Checking equality between logical lora channels: " << thisFreq << " "
                                                                      << otherFreq);

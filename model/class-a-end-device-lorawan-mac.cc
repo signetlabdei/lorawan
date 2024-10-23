@@ -352,10 +352,10 @@ ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow()
     DynamicCast<EndDeviceLoraPhy>(m_phy)->SwitchToStandby();
 
     // Switch to appropriate channel and data rate
-    NS_LOG_INFO("Using parameters: " << m_secondReceiveWindowFrequency << "Hz, DR"
+    NS_LOG_INFO("Using parameters: " << m_secondReceiveWindowFrequencyHz << " Hz, DR"
                                      << unsigned(m_secondReceiveWindowDataRate));
 
-    DynamicCast<EndDeviceLoraPhy>(m_phy)->SetFrequency(m_secondReceiveWindowFrequency);
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->SetFrequency(m_secondReceiveWindowFrequencyHz);
     DynamicCast<EndDeviceLoraPhy>(m_phy)->SetSpreadingFactor(
         GetSfFromDataRate(m_secondReceiveWindowDataRate));
 
@@ -506,15 +506,15 @@ ClassAEndDeviceLorawanMac::GetSecondReceiveWindowDataRate() const
 }
 
 void
-ClassAEndDeviceLorawanMac::SetSecondReceiveWindowFrequency(double frequencyMHz)
+ClassAEndDeviceLorawanMac::SetSecondReceiveWindowFrequency(uint32_t frequencyHz)
 {
-    m_secondReceiveWindowFrequency = frequencyMHz;
+    m_secondReceiveWindowFrequencyHz = frequencyHz;
 }
 
-double
+uint32_t
 ClassAEndDeviceLorawanMac::GetSecondReceiveWindowFrequency() const
 {
-    return m_secondReceiveWindowFrequency;
+    return m_secondReceiveWindowFrequencyHz;
 }
 
 /////////////////////////
@@ -531,7 +531,7 @@ ClassAEndDeviceLorawanMac::OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSe
 
     uint8_t rx1DrOffset = rxParamSetupReq->GetRx1DrOffset();
     uint8_t rx2DataRate = rxParamSetupReq->GetRx2DataRate();
-    double frequency = rxParamSetupReq->GetFrequency();
+    uint32_t frequency = rxParamSetupReq->GetFrequency();
 
     NS_LOG_FUNCTION(this << unsigned(rx1DrOffset) << unsigned(rx2DataRate) << frequency);
 
@@ -550,7 +550,7 @@ ClassAEndDeviceLorawanMac::OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSe
     // For now, don't check for validity of frequency
     m_secondReceiveWindowDataRate = rx2DataRate;
     m_rx1DrOffset = rx1DrOffset;
-    m_secondReceiveWindowFrequency = frequency;
+    m_secondReceiveWindowFrequencyHz = frequency;
 
     // Craft a RxParamSetupAns as response
     NS_LOG_INFO("Adding RxParamSetupAns reply");
