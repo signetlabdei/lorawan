@@ -83,7 +83,7 @@ LoraInterferenceHelper::Event::GetPacket() const
     return m_packet;
 }
 
-double
+uint32_t
 LoraInterferenceHelper::Event::GetFrequency() const
 {
     return m_frequencyHz;
