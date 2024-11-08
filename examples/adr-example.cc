@@ -73,7 +73,7 @@ main(int argc, char* argv[])
     double mobileNodeProbability = 0;
     double sideLengthMeters = 10000;
     int gatewayDistanceMeters = 5000;
-    double maxRandomLossDB = 10;
+    double maxRandomLossDb = 10;
     double minSpeedMetersPerSecond = 2;
     double maxSpeedMetersPerSecond = 16;
     std::string adrType = "ns3::AdrComponent";
@@ -98,7 +98,7 @@ main(int argc, char* argv[])
                  sideLengthMeters);
     cmd.AddValue("maxRandomLoss",
                  "Maximum amount (dB) of the random loss component",
-                 maxRandomLossDB);
+                 maxRandomLossDb);
     cmd.AddValue("gatewayDistance", "Distance (m) between gateways", gatewayDistanceMeters);
     cmd.AddValue("initializeSF", "Whether to initialize the SFs", initializeSF);
     cmd.AddValue("MinSpeed", "Minimum speed (m/s) for mobile devices", minSpeedMetersPerSecond);
@@ -143,7 +143,7 @@ main(int argc, char* argv[])
 
     Ptr<UniformRandomVariable> x = CreateObject<UniformRandomVariable>();
     x->SetAttribute("Min", DoubleValue(0.0));
-    x->SetAttribute("Max", DoubleValue(maxRandomLossDB));
+    x->SetAttribute("Max", DoubleValue(maxRandomLossDb));
 
     Ptr<RandomPropagationLossModel> randomLoss = CreateObject<RandomPropagationLossModel>();
     randomLoss->SetAttribute("Variable", PointerValue(x));
