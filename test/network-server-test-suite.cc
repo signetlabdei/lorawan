@@ -344,20 +344,20 @@ NetworkServerTestSuite::NetworkServerTestSuite()
 {
     LogComponentEnable("NetworkServerTestSuite", LOG_LEVEL_DEBUG);
 
-    LogComponentEnable("NetworkServer", LOG_LEVEL_ALL);
-    LogComponentEnable("NetworkStatus", LOG_LEVEL_ALL);
-    LogComponentEnable("NetworkScheduler", LOG_LEVEL_ALL);
-    LogComponentEnable("NetworkController", LOG_LEVEL_ALL);
-    LogComponentEnable("NetworkControllerComponent", LOG_LEVEL_ALL);
-    LogComponentEnable("LoraNetDevice", LOG_LEVEL_ALL);
-    LogComponentEnable("GatewayLorawanMac", LOG_LEVEL_ALL);
-    LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_ALL);
-    LogComponentEnable("EndDeviceLoraPhy", LOG_LEVEL_ALL);
-    LogComponentEnable("EndDeviceStatus", LOG_LEVEL_ALL);
-
-    LogComponentEnableAll(LOG_PREFIX_FUNC);
-    LogComponentEnableAll(LOG_PREFIX_NODE);
-    LogComponentEnableAll(LOG_PREFIX_TIME);
+    // Activate only at need, as these can create problems among test suites when running ./test.py
+    // LogComponentEnable("NetworkServer", LOG_LEVEL_ALL);
+    // LogComponentEnable("NetworkStatus", LOG_LEVEL_ALL);
+    // LogComponentEnable("NetworkScheduler", LOG_LEVEL_ALL);
+    // LogComponentEnable("NetworkController", LOG_LEVEL_ALL);
+    // LogComponentEnable("NetworkControllerComponent", LOG_LEVEL_ALL);
+    // LogComponentEnable("LoraNetDevice", LOG_LEVEL_ALL);
+    // LogComponentEnable("GatewayLorawanMac", LOG_LEVEL_ALL);
+    // LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_ALL);
+    // LogComponentEnable("EndDeviceLoraPhy", LOG_LEVEL_ALL);
+    // LogComponentEnable("EndDeviceStatus", LOG_LEVEL_ALL);
+    // LogComponentEnableAll(LOG_PREFIX_FUNC);
+    // LogComponentEnableAll(LOG_PREFIX_NODE);
+    // LogComponentEnableAll(LOG_PREFIX_TIME);
 
     // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
     AddTestCase(new UplinkPacketTest, Duration::QUICK);

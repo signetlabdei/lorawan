@@ -126,8 +126,8 @@ class NetworkStatusTestSuite : public TestSuite
 NetworkStatusTestSuite::NetworkStatusTestSuite()
     : TestSuite("network-status", Type::UNIT)
 {
-    LogComponentEnable("NetworkStatusTestSuite", LOG_LEVEL_DEBUG);
-    // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
+    // LogComponentEnable("NetworkStatusTestSuite", LOG_LEVEL_DEBUG);
+
     AddTestCase(new EndDeviceStatusTest, Duration::QUICK);
     AddTestCase(new NetworkStatusTest, Duration::QUICK);
 }
