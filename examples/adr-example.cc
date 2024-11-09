@@ -132,7 +132,7 @@ main(int argc, char* argv[])
 
     // Set the end devices to allow data rate control (i.e. adaptive data rate) from the network
     // server
-    Config::SetDefault("ns3::EndDeviceLorawanMac::DRControl", BooleanValue(true));
+    Config::SetDefault("ns3::EndDeviceLorawanMac::ADR", BooleanValue(true));
 
     // Create a simple wireless channel
     ///////////////////////////////////

@@ -114,18 +114,22 @@ class EndDeviceLorawanMac : public LorawanMac
     virtual void resetRetransmissionParameters();
 
     /**
-     * Enable data rate adaptation in the retransmitting procedure.
+     * Signals to the network server that this device will or may not comply with LinkADRReq
+     * settings (data rate, transmission power and number of retransmissions) received in downlink.
      *
-     * \param adapt If the data rate adaptation is enabled or not.
+     * \param adr The ADR bit.
      */
-    void SetDataRateAdaptation(bool adapt);
+    void SetUplinkAdrBit(bool adr);
 
     /**
-     * Get if data rate adaptation is enabled or not.
+     * Get the current value of the device's uplink ADR bit of the LoRaWAN FHDR.
      *
-     * \return True if the data rate adaptation is enabled, false if disabled.
+     * \return true The device will comply with data rate, transmission power and number of
+     * retransmissions settings received from the network server via LikADRReq.
+     * \return false Signals to the network server that the device may not comply with the data
+     * rate, transmission power and number of retransmissions settings received via LikADRReq.
      */
-    bool GetDataRateAdaptation() const;
+    bool GetUplinkAdrBit() const;
 
     /**
      * Set the max number of unacknowledged redundant transmissions of each packet. If,
@@ -441,10 +445,11 @@ class EndDeviceLorawanMac : public LorawanMac
      */
     Time GetNextTransmissionDelay();
 
-    /**
-     * Whether this device's data rate should be controlled by the network server.
-     */
-    bool m_controlDataRate;
+    bool m_adr; //!< Uplink ADR bit contained in the FCtrl field of the LoRaWAN FHDR.
+                //!< Controlled by the device, if set to false signals the network server
+                //!< that the device may not accept attempts to control the number of
+                //!< retransmissions, the data rate, or the TX power with downlink
+                //!< LinkADRReq commands.
 
     /**
      * The event of retransmitting a packet in a consecutive moment if an ACK is not received.

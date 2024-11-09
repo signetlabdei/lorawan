@@ -49,10 +49,11 @@ EndDeviceLorawanMac::GetTypeId()
                             MakeTraceSourceAccessor(&EndDeviceLorawanMac::m_dataRate),
                             "ns3::TracedValueCallback::uint8_t")
             .AddAttribute(
-                "DRControl",
-                "Whether to request the network server to control this device's data rate",
-                BooleanValue(),
-                MakeBooleanAccessor(&EndDeviceLorawanMac::m_controlDataRate),
+                "ADR",
+                "Ensure to the network server that this device will accept data rate, transmission "
+                "power and number of retransmissions configurations received via LinkADRReq.",
+                BooleanValue(true),
+                MakeBooleanAccessor(&EndDeviceLorawanMac::m_adr),
                 MakeBooleanChecker())
             .AddTraceSource("TxPower",
                             "Transmission power currently employed by this end device",
@@ -109,8 +110,7 @@ EndDeviceLorawanMac::EndDeviceLorawanMac()
       m_address(LoraDeviceAddress(0)),
       // LoraWAN default
       m_receiveWindowDurationInSymbols(8),
-      // LoraWAN default
-      m_controlDataRate(false),
+      m_adr(true),
       m_lastKnownLinkMargin(0),
       m_lastKnownGatewayCount(0),
       m_aggregatedDutyCycle(1),
@@ -453,7 +453,7 @@ EndDeviceLorawanMac::ApplyNecessaryOptions(LoraFrameHeader& frameHeader)
     frameHeader.SetAsUplink();
     frameHeader.SetFPort(1); // TODO Use an appropriate frame port based on the application
     frameHeader.SetAddress(m_address);
-    frameHeader.SetAdr(m_controlDataRate);
+    frameHeader.SetAdr(m_adr);
     frameHeader.SetAdrAckReq(false); // TODO Set ADRACKREQ if a member variable is true
 
     // FPending does not exist in uplink messages
@@ -612,16 +612,17 @@ EndDeviceLorawanMac::resetRetransmissionParameters()
 }
 
 void
-EndDeviceLorawanMac::SetDataRateAdaptation(bool adapt)
+EndDeviceLorawanMac::SetUplinkAdrBit(bool adr)
 {
-    NS_LOG_FUNCTION(this << adapt);
-    m_enableDRAdapt = adapt;
+    NS_LOG_FUNCTION(this << adr);
+    m_adr = adr;
 }
 
 bool
-EndDeviceLorawanMac::GetDataRateAdaptation() const
+EndDeviceLorawanMac::GetUplinkAdrBit() const
 {
-    return m_enableDRAdapt;
+    NS_LOG_FUNCTION(this);
+    return m_adr;
 }
 
 void
