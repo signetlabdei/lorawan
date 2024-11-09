@@ -264,14 +264,14 @@ LinkAdrReq::LinkAdrReq()
 
 LinkAdrReq::LinkAdrReq(uint8_t dataRate,
                        uint8_t txPower,
-                       uint16_t channelMask,
+                       uint16_t chMask,
                        uint8_t chMaskCntl,
-                       uint8_t nbRep)
+                       uint8_t nbTrans)
     : m_dataRate(dataRate),
       m_txPower(txPower),
-      m_channelMask(channelMask),
+      m_chMask(chMask),
       m_chMaskCntl(chMaskCntl),
-      m_nbRep(nbRep)
+      m_nbTrans(nbTrans)
 {
     NS_LOG_FUNCTION(this);
 
@@ -287,8 +287,8 @@ LinkAdrReq::Serialize(Buffer::Iterator& start) const
     // Write the CID
     start.WriteU8(GetCIDFromMacCommand(m_commandType));
     start.WriteU8(m_dataRate << 4 | (m_txPower & 0b1111));
-    start.WriteU16(m_channelMask);
-    start.WriteU8(m_chMaskCntl << 4 | (m_nbRep & 0b1111));
+    start.WriteU16(m_chMask);
+    start.WriteU8(m_chMaskCntl << 4 | (m_nbTrans & 0b1111));
 }
 
 uint8_t
@@ -301,10 +301,10 @@ LinkAdrReq::Deserialize(Buffer::Iterator& start)
     uint8_t firstByte = start.ReadU8();
     m_dataRate = firstByte >> 4;
     m_txPower = firstByte & 0b1111;
-    m_channelMask = start.ReadU16();
+    m_chMask = start.ReadU16();
     uint8_t fourthByte = start.ReadU8();
     m_chMaskCntl = fourthByte >> 4;
-    m_nbRep = fourthByte & 0b1111;
+    m_nbTrans = fourthByte & 0b1111;
 
     return m_serializedSize;
 }
@@ -317,13 +317,13 @@ LinkAdrReq::Print(std::ostream& os) const
     os << "LinkAdrReq" << std::endl;
     os << "dataRate: " << unsigned(m_dataRate) << std::endl;
     os << "txPower: " << unsigned(m_txPower) << std::endl;
-    os << "channelMask: " << std::bitset<16>(m_channelMask) << std::endl;
+    os << "chMask: " << std::bitset<16>(m_chMask) << std::endl;
     os << "chMaskCntl: " << unsigned(m_chMaskCntl) << std::endl;
-    os << "nbRep: " << unsigned(m_nbRep) << std::endl;
+    os << "nbTrans: " << unsigned(m_nbTrans) << std::endl;
 }
 
 uint8_t
-LinkAdrReq::GetDataRate()
+LinkAdrReq::GetDataRate() const
 {
     NS_LOG_FUNCTION(this);
 
@@ -331,37 +331,33 @@ LinkAdrReq::GetDataRate()
 }
 
 uint8_t
-LinkAdrReq::GetTxPower()
+LinkAdrReq::GetTxPower() const
 {
     NS_LOG_FUNCTION(this);
 
     return m_txPower;
 }
 
-std::list<int>
-LinkAdrReq::GetEnabledChannelsList()
+uint16_t
+LinkAdrReq::GetChMask() const
 {
     NS_LOG_FUNCTION(this);
 
-    std::list<int> channelIndices;
-    for (int i = 0; i < 16; i++)
-    {
-        if (m_channelMask & (0b1 << i)) // Take channel mask's i-th bit
-        {
-            NS_LOG_DEBUG("Adding channel index " << i);
-            channelIndices.push_back(i);
-        }
-    }
-
-    return channelIndices;
+    return m_chMask;
 }
 
-int
-LinkAdrReq::GetRepetitions()
+uint8_t
+LinkAdrReq::GetChMaskCtrl() const
+{
+    return m_chMaskCntl;
+}
+
+uint8_t
+LinkAdrReq::GetNbTrans() const
 {
     NS_LOG_FUNCTION(this);
 
-    return m_nbRep;
+    return m_nbTrans;
 }
 
 ////////////////
