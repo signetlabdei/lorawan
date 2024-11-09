@@ -219,15 +219,15 @@ class LinkAdrReq : public MacCommand
      *
      * \param dataRate The DataRate field to set.
      * \param txPower The TXPower field to set.
-     * \param channelMask The ChMask field to set.
+     * \param chMask The ChMask field to set.
      * \param chMaskCntl The ChMaskCntl field to set.
-     * \param nbRep The NbTrans field to set.
+     * \param nbTrans The NbTrans field to set.
      */
     LinkAdrReq(uint8_t dataRate,
                uint8_t txPower,
-               uint16_t channelMask,
+               uint16_t chMask,
                uint8_t chMaskCntl,
-               uint8_t nbRep);
+               uint8_t nbTrans);
 
     void Serialize(Buffer::Iterator& start) const override;
     uint8_t Deserialize(Buffer::Iterator& start) override;
@@ -238,7 +238,7 @@ class LinkAdrReq : public MacCommand
      *
      * \return An unsigned 8-bit integer containing the data rate.
      */
-    uint8_t GetDataRate();
+    uint8_t GetDataRate() const;
 
     /**
      * Get the transmission power prescribed by this MAC command.
@@ -249,31 +249,39 @@ class LinkAdrReq : public MacCommand
      *
      * \return The TX power, encoded as an unsigned 8-bit integer.
      */
-    uint8_t GetTxPower();
+    uint8_t GetTxPower() const;
 
     /**
-     * Get the list of enabled channels. This method takes the 16-bit channel mask
-     * and translates it to a list of integers that can be more easily parsed.
+     * Get the 16 bit mask of enabled channels.
      *
-     * \return The list of enabled channels.
+     * \return The 16 bit channel mask.
      */
-    std::list<int> GetEnabledChannelsList();
+    uint16_t GetChMask() const;
 
     /**
-     * Get the number of repetitions prescribed by this MAC command.
+     * Get the ChMaskCtrl field, used as an indicator of the 16-channel bank to apply the ChMask to.
      *
-     * \return The number of repetitions.
+     * The interpretation of this field is region-dependent.
+     *
+     * \return The ChMaskCtrl field.
      */
-    int GetRepetitions();
+    uint8_t GetChMaskCtrl() const;
+
+    /**
+     * Get the number of repeated transmissions prescribed by this MAC command.
+     *
+     * \return The number of repeated transmissions.
+     */
+    uint8_t GetNbTrans() const;
 
   private:
-    uint8_t m_dataRate;     //!< The DataRate field, a serializable parameter for setting the
-                            //!< spreading factor and bandwidth of end devices
-    uint8_t m_txPower;      //!< The TXPower field, a serializable parameter for setting the
-                            //!< transmission power of end devices
-    uint16_t m_channelMask; //!< The ChMask field
-    uint8_t m_chMaskCntl;   //!< The ChMaskCntl field
-    uint8_t m_nbRep;        //!< The NbTrans field
+    uint8_t m_dataRate;   //!< The DataRate field, a serializable parameter for setting the
+                          //!< spreading factor and bandwidth of end devices
+    uint8_t m_txPower;    //!< The TXPower field, a serializable parameter for setting the
+                          //!< transmission power of end devices
+    uint16_t m_chMask;    //!< The ChMask field
+    uint8_t m_chMaskCntl; //!< The ChMaskCntl field
+    uint8_t m_nbTrans;    //!< The NbTrans field
 };
 
 /**
