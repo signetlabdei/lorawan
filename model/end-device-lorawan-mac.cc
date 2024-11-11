@@ -63,13 +63,13 @@ EndDeviceLorawanMac::GetTypeId()
                             "Last known demodulation margin in "
                             "communications between this end device "
                             "and a gateway",
-                            MakeTraceSourceAccessor(&EndDeviceLorawanMac::m_lastKnownLinkMargin),
-                            "ns3::TracedValueCallback::Double")
+                            MakeTraceSourceAccessor(&EndDeviceLorawanMac::m_lastKnownLinkMarginDb),
+                            "ns3::TracedValueCallback::uint8_t")
             .AddTraceSource("LastKnownGatewayCount",
                             "Last known number of gateways able to "
                             "listen to this end device",
                             MakeTraceSourceAccessor(&EndDeviceLorawanMac::m_lastKnownGatewayCount),
-                            "ns3::TracedValueCallback::Int")
+                            "ns3::TracedValueCallback::uint8_t")
             .AddTraceSource("AggregatedDutyCycle",
                             "Aggregate duty cycle, in fraction form, "
                             "this end device must respect",
@@ -111,7 +111,7 @@ EndDeviceLorawanMac::EndDeviceLorawanMac()
       // LoraWAN default
       m_receiveWindowDurationInSymbols(8),
       m_adr(true),
-      m_lastKnownLinkMargin(0),
+      m_lastKnownLinkMarginDb(0),
       m_lastKnownGatewayCount(0),
       m_aggregatedDutyCycle(1),
       m_mType(LorawanMacHeader::CONFIRMED_DATA_UP),
@@ -677,7 +677,7 @@ EndDeviceLorawanMac::OnLinkCheckAns(uint8_t margin, uint8_t gwCnt)
 {
     NS_LOG_FUNCTION(this << unsigned(margin) << unsigned(gwCnt));
 
-    m_lastKnownLinkMargin = margin;
+    m_lastKnownLinkMarginDb = margin;
     m_lastKnownGatewayCount = gwCnt;
 }
 
@@ -895,6 +895,18 @@ EndDeviceLorawanMac::AddSubBand(double startFrequency,
     NS_LOG_FUNCTION_NOARGS();
 
     m_channelHelper->AddSubBand(startFrequency, endFrequency, dutyCycle, maxTxPowerDbm);
+}
+
+uint8_t
+EndDeviceLorawanMac::GetLastKnownLinkMarginDb() const
+{
+    return m_lastKnownLinkMarginDb;
+}
+
+uint8_t
+EndDeviceLorawanMac::GetLastKnownGatewayCount() const
+{
+    return m_lastKnownGatewayCount;
 }
 
 double

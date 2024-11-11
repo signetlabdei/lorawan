@@ -240,7 +240,7 @@ class LinkCheckTest : public TestCase
      * \param newValue The updated value.
      * \param oldValue The previous value.
      */
-    void LastKnownGatewayCount(int newValue, int oldValue);
+    void LastKnownGatewayCount(uint8_t newValue, uint8_t oldValue);
 
     /**
      * Send a packet containing a LinkCheckReq MAC command from the input end device.
@@ -254,7 +254,7 @@ class LinkCheckTest : public TestCase
     void DoRun() override;
     bool m_receivedPacketAtEd = false; //!< Set to true if a packet containing a LinkCheckAns MAC
                                        //!< command is received by the end device
-    int m_numberOfGatewaysThatReceivedPacket =
+    uint8_t m_numberOfGatewaysThatReceivedPacket =
         0; //!< Stores the number of gateways that received the last packet carrying a
            //!< LinkCheckReq MAC command
 };
@@ -272,7 +272,7 @@ LinkCheckTest::~LinkCheckTest()
 }
 
 void
-LinkCheckTest::LastKnownGatewayCount(int newValue, int oldValue)
+LinkCheckTest::LastKnownGatewayCount(uint8_t newValue, uint8_t oldValue)
 {
     NS_LOG_DEBUG("Updated gateway count");
     m_receivedPacketAtEd = true;
