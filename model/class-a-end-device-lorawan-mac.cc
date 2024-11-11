@@ -75,7 +75,7 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
     NS_LOG_DEBUG("PacketToSend: " << packetToSend);
 
     // Data rate adaptation as in LoRaWAN specification, V1.0.2 (2016)
-    if (m_enableDRAdapt && (m_dataRate > 0) && (m_retxParams.retxLeft < m_maxNumbTx) &&
+    if (m_enableDRAdapt && (m_dataRate > 0) && (m_retxParams.retxLeft < m_nbTrans) &&
         (m_retxParams.retxLeft % 2 == 0))
     {
         m_txPower = 14; // Reset transmission power
@@ -187,7 +187,7 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
             {
                 if (m_retxParams.retxLeft == 0)
                 {
-                    uint8_t txs = m_maxNumbTx - (m_retxParams.retxLeft);
+                    uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
                     m_requiredTxCallback(txs,
                                          false,
                                          m_retxParams.firstAttempt,
@@ -218,7 +218,7 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
         }
         else
         {
-            uint8_t txs = m_maxNumbTx - (m_retxParams.retxLeft);
+            uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
             m_requiredTxCallback(txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
             NS_LOG_DEBUG("Failure: no more retransmissions left. Used " << unsigned(txs)
                                                                         << " transmissions.");
@@ -249,7 +249,7 @@ ClassAEndDeviceLorawanMac::FailedReception(Ptr<const Packet> packet)
         }
         else
         {
-            uint8_t txs = m_maxNumbTx - (m_retxParams.retxLeft);
+            uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
             m_requiredTxCallback(txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
             NS_LOG_DEBUG("Failure: no more retransmissions left. Used " << unsigned(txs)
                                                                         << " transmissions.");
@@ -412,7 +412,7 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
         else if (m_retxParams.retxLeft == 0 &&
                  DynamicCast<EndDeviceLoraPhy>(m_phy)->GetState() != EndDeviceLoraPhy::RX)
         {
-            uint8_t txs = m_maxNumbTx - (m_retxParams.retxLeft);
+            uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
             m_requiredTxCallback(txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
             NS_LOG_DEBUG("Failure: no more retransmissions left. Used " << unsigned(txs)
                                                                         << " transmissions.");
@@ -428,7 +428,7 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
     }
     else
     {
-        uint8_t txs = m_maxNumbTx - (m_retxParams.retxLeft);
+        uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
         m_requiredTxCallback(txs, true, m_retxParams.firstAttempt, m_retxParams.packet);
         NS_LOG_INFO(
             "We have " << unsigned(m_retxParams.retxLeft)

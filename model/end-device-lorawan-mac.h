@@ -135,9 +135,9 @@ class EndDeviceLorawanMac : public LorawanMac
      * Set the max number of unacknowledged redundant transmissions of each packet. If,
      * after a transmission, any acknowledgement is received, no more are sent for that packet.
      *
-     * \param maxNumbTx The number of transmissions.
+     * \param nbTrans The number of transmissions.
      */
-    void SetMaxNumberOfTransmissions(uint8_t maxNumbTx);
+    void SetMaxNumberOfTransmissions(uint8_t nbTrans);
 
     /**
      * Get the max number of unacknowledged redundant transmissions of each packet. If,
@@ -383,8 +383,7 @@ class EndDeviceLorawanMac : public LorawanMac
 
     bool
         m_enableDRAdapt; //!< Enable data rate adaptation (ADR) during the retransmission procedure.
-    uint8_t
-        m_maxNumbTx; //!< Default number of unacknowledged redundant transmissions of each packet.
+    uint8_t m_nbTrans; //!< Default number of unacknowledged redundant transmissions of each packet.
     TracedValue<uint8_t> m_dataRate; //!< The data rate this device is using to transmit.
     TracedValue<double> m_txPower;   //!< The transmission power this device is using to transmit.
     uint8_t m_codingRate;            //!< The coding rate used by this device.
