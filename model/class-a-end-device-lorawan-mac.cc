@@ -554,7 +554,7 @@ ClassAEndDeviceLorawanMac::OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSe
 
     // Craft a RxParamSetupAns as response
     NS_LOG_INFO("Adding RxParamSetupAns reply");
-    m_macCommandList.emplace_back(CreateObject<RxParamSetupAns>(offsetOk, dataRateOk, true));
+    m_macCommandList.emplace_back(Create<RxParamSetupAns>(offsetOk, dataRateOk, true));
 }
 
 } /* namespace lorawan */

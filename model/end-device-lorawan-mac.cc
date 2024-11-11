@@ -790,7 +790,7 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
 
     // Craft a LinkAdrAns MAC command as a response
     ///////////////////////////////////////////////
-    m_macCommandList.emplace_back(CreateObject<LinkAdrAns>(txPowerOk, dataRateOk, channelMaskOk));
+    m_macCommandList.emplace_back(Create<LinkAdrAns>(txPowerOk, dataRateOk, channelMaskOk));
 }
 
 void
@@ -806,7 +806,7 @@ EndDeviceLorawanMac::OnDutyCycleReq(double dutyCycle)
 
     // Craft a DutyCycleAns as response
     NS_LOG_INFO("Adding DutyCycleAns reply");
-    m_macCommandList.emplace_back(CreateObject<DutyCycleAns>());
+    m_macCommandList.emplace_back(Create<DutyCycleAns>());
 }
 
 void
@@ -833,7 +833,7 @@ EndDeviceLorawanMac::OnDevStatusReq()
 
     // Craft a RxParamSetupAns as response
     NS_LOG_INFO("Adding DevStatusAns reply");
-    m_macCommandList.emplace_back(CreateObject<DevStatusAns>(battery, margin));
+    m_macCommandList.emplace_back(Create<DevStatusAns>(battery, margin));
 }
 
 void
@@ -853,7 +853,7 @@ EndDeviceLorawanMac::OnNewChannelReq(uint8_t chIndex,
     SetLogicalChannel(chIndex, frequency, minDataRate, maxDataRate);
 
     NS_LOG_INFO("Adding NewChannelAns reply");
-    m_macCommandList.emplace_back(CreateObject<NewChannelAns>(dataRateRangeOk, channelFrequencyOk));
+    m_macCommandList.emplace_back(Create<NewChannelAns>(dataRateRangeOk, channelFrequencyOk));
 }
 
 void
