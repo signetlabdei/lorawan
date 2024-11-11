@@ -78,7 +78,7 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
     if (m_enableDRAdapt && (m_dataRate > 0) && (m_retxParams.retxLeft < m_nbTrans) &&
         (m_retxParams.retxLeft % 2 == 0))
     {
-        m_txPower = 14; // Reset transmission power
+        m_txPowerDbm = 14; // Reset transmission power
         m_dataRate = m_dataRate - 1;
     }
 
@@ -97,7 +97,7 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
     Ptr<LogicalLoraChannel> txChannel = GetChannelForTx();
 
     NS_LOG_DEBUG("PacketToSend: " << packetToSend);
-    m_phy->Send(packetToSend, params, txChannel->GetFrequency(), m_txPower);
+    m_phy->Send(packetToSend, params, txChannel->GetFrequency(), m_txPowerDbm);
 
     //////////////////////////////////////////////
     // Register packet transmission for duty cycle

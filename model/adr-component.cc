@@ -110,22 +110,22 @@ AdrComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus>
             uint8_t spreadingFactor = status->GetFirstReceiveWindowSpreadingFactor();
 
             // Get the device transmission power (dBm)
-            uint8_t transmissionPower = status->GetMac()->GetTransmissionPower();
+            double transmissionPowerDbm = status->GetMac()->GetTransmissionPowerDbm();
 
             // New parameters for the end-device
             uint8_t newDataRate;
-            uint8_t newTxPower;
+            double newTxPowerDbm;
 
             // Adaptive Data Rate (ADR) Algorithm
-            AdrImplementation(&newDataRate, &newTxPower, status);
+            AdrImplementation(&newDataRate, &newTxPowerDbm, status);
 
             // Change the power back to the default if we don't want to change it
             if (!m_toggleTxPower)
             {
-                newTxPower = transmissionPower;
+                newTxPowerDbm = transmissionPowerDbm;
             }
 
-            if (newDataRate != SfToDr(spreadingFactor) || newTxPower != transmissionPower)
+            if (newDataRate != SfToDr(spreadingFactor) || newTxPowerDbm != transmissionPowerDbm)
             {
                 // Create a list with mandatory channel indexes
                 int channels[] = {0, 1, 2};
@@ -134,12 +134,11 @@ AdrComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus>
                 // Repetitions Setting
                 const int rep = 1;
 
-                NS_LOG_DEBUG("Sending LinkAdrReq with DR = " << (unsigned)newDataRate
-                                                             << " and TP = " << (unsigned)newTxPower
-                                                             << " dBm");
+                NS_LOG_DEBUG("Sending LinkAdrReq with DR = "
+                             << (unsigned)newDataRate << " and TP = " << newTxPowerDbm << "dBm");
 
                 status->m_reply.frameHeader.AddLinkAdrReq(newDataRate,
-                                                          GetTxPowerIndex(newTxPower),
+                                                          GetTxPowerIndex(newTxPowerDbm),
                                                           enabledChannels,
                                                           rep);
                 status->m_reply.frameHeader.SetAsDownlink();
@@ -167,7 +166,7 @@ AdrComponent::OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> netw
 
 void
 AdrComponent::AdrImplementation(uint8_t* newDataRate,
-                                uint8_t* newTxPower,
+                                double* newTxPower,
                                 Ptr<EndDeviceStatus> status)
 {
     // Compute the maximum or median SNR, based on the boolean value historyAveraging
@@ -197,7 +196,7 @@ AdrComponent::AdrImplementation(uint8_t* newDataRate,
     NS_LOG_DEBUG("Required SNR = " << req_SNR);
 
     // Get the device transmission power (dBm)
-    double transmissionPower = status->GetMac()->GetTransmissionPower();
+    double transmissionPower = status->GetMac()->GetTransmissionPowerDbm();
 
     NS_LOG_DEBUG("Transmission Power = " << transmissionPower);
 
@@ -429,41 +428,12 @@ AdrComponent::GetAverageSNR(EndDeviceStatus::ReceivedPacketList packetList, int 
     return average;
 }
 
-int
-AdrComponent::GetTxPowerIndex(int txPower)
+uint8_t
+AdrComponent::GetTxPowerIndex(double txPower)
 {
-    if (txPower >= 16)
-    {
-        return 0;
-    }
-    else if (txPower >= 14)
-    {
-        return 1;
-    }
-    else if (txPower >= 12)
-    {
-        return 2;
-    }
-    else if (txPower >= 10)
-    {
-        return 3;
-    }
-    else if (txPower >= 8)
-    {
-        return 4;
-    }
-    else if (txPower >= 6)
-    {
-        return 5;
-    }
-    else if (txPower >= 4)
-    {
-        return 6;
-    }
-    else
-    {
-        return 7;
-    }
+    NS_ASSERT_MSG(txPower <= 14 || txPower >= 0, "TxPower dBm value out of supported range");
+    NS_ASSERT_MSG(fmod(txPower, 2) == 0, "Invalid TxPower value");
+    return 7 - txPower / 2;
 }
 } // namespace lorawan
 } // namespace ns3
