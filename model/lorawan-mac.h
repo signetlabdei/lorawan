@@ -148,7 +148,7 @@ class LorawanMac : public Object
      *
      * \param txPower The 8-bit encoded txPower to convert.
      *
-     * \return The corresponding transmission power in dBm, or 0 if the encoded
+     * \return The corresponding transmission power in dBm ERP, or -1 if the encoded
      * power was not recognized as valid.
      */
     double GetDbmForTxPower(uint8_t txPower);
