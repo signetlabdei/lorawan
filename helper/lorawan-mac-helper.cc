@@ -132,10 +132,10 @@ LorawanMacHelper::ConfigureForAlohaRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) 
 
     ApplyCommonAlohaConfigurations(edMac);
 
-    /////////////////////////////////////////////////////
-    // TxPower -> Transmission power in dBm conversion //
-    /////////////////////////////////////////////////////
-    edMac->SetTxDbmForTxPower(std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
+    /////////////////////////////////////////////////////////
+    // TxPower -> Transmission power in dBm ERP conversion //
+    /////////////////////////////////////////////////////////
+    edMac->SetTxDbmForTxPower(std::vector<double>{14, 12, 10, 8, 6, 4, 2, 0});
 
     ////////////////////////////////////////////////////////////
     // Matrix to know which data rate the gateway will respond with //
@@ -229,10 +229,10 @@ LorawanMacHelper::ConfigureForEuRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) con
 
     ApplyCommonEuConfigurations(edMac);
 
-    /////////////////////////////////////////////////////
-    // TxPower -> Transmission power in dBm conversion //
-    /////////////////////////////////////////////////////
-    edMac->SetTxDbmForTxPower(std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
+    /////////////////////////////////////////////////////////
+    // TxPower -> Transmission power in dBm ERP conversion //
+    /////////////////////////////////////////////////////////
+    edMac->SetTxDbmForTxPower(std::vector<double>{14, 12, 10, 8, 6, 4, 2, 0});
 
     ////////////////////////////////////////////////////////////
     // Matrix to know which data rate the gateway will respond with //
@@ -346,10 +346,10 @@ LorawanMacHelper::ConfigureForSingleChannelRegion(Ptr<ClassAEndDeviceLorawanMac>
 
     ApplyCommonSingleChannelConfigurations(edMac);
 
-    /////////////////////////////////////////////////////
-    // TxPower -> Transmission power in dBm conversion //
-    /////////////////////////////////////////////////////
-    edMac->SetTxDbmForTxPower(std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
+    /////////////////////////////////////////////////////////
+    // TxPower -> Transmission power in dBm ERP conversion //
+    /////////////////////////////////////////////////////////
+    edMac->SetTxDbmForTxPower(std::vector<double>{14, 12, 10, 8, 6, 4, 2, 0});
 
     ////////////////////////////////////////////////////////////
     // Matrix to know which DataRate the gateway will respond with //
