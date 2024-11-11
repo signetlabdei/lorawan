@@ -76,9 +76,9 @@ EndDeviceLorawanMac::GetTypeId()
                             MakeTraceSourceAccessor(&EndDeviceLorawanMac::m_aggregatedDutyCycle),
                             "ns3::TracedValueCallback::Double")
             .AddAttribute("MaxTransmissions",
-                          "Maximum number of transmissions for a packet",
-                          IntegerValue(8),
-                          MakeIntegerAccessor(&EndDeviceLorawanMac::m_maxNumbTx),
+                          "Maximum number of transmissions for a packet (NbTrans)",
+                          IntegerValue(1),
+                          MakeIntegerAccessor(&EndDeviceLorawanMac::m_nbTrans),
                           MakeIntegerChecker<uint8_t>())
             .AddAttribute("EnableEDDataRateAdaptation",
                           "Whether the end device should up its data rate "
@@ -100,7 +100,7 @@ EndDeviceLorawanMac::GetTypeId()
 
 EndDeviceLorawanMac::EndDeviceLorawanMac()
     : m_enableDRAdapt(false),
-      m_maxNumbTx(8),
+      m_nbTrans(1),
       m_dataRate(0),
       m_txPower(14),
       m_codingRate(1),
@@ -129,7 +129,7 @@ EndDeviceLorawanMac::EndDeviceLorawanMac()
 
     // Initialize structure for retransmission parameters
     m_retxParams = EndDeviceLorawanMac::LoraRetxParameters();
-    m_retxParams.retxLeft = m_maxNumbTx;
+    m_retxParams.retxLeft = m_nbTrans;
 }
 
 EndDeviceLorawanMac::~EndDeviceLorawanMac()
@@ -232,12 +232,12 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
         if (m_retxParams.waitingAck)
         {
             // Call the callback to notify about the failure
-            uint8_t txs = m_maxNumbTx - (m_retxParams.retxLeft);
+            uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
             m_requiredTxCallback(txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
             NS_LOG_DEBUG(" Received new packet from the application layer: stopping retransmission "
                          "procedure. Used "
                          << unsigned(txs) << " transmissions out of a maximum of "
-                         << unsigned(m_maxNumbTx) << ".");
+                         << unsigned(m_nbTrans) << ".");
         }
 
         // Reset retransmission parameters
@@ -248,7 +248,7 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
         if (m_mType == LorawanMacHeader::CONFIRMED_DATA_UP)
         {
             m_retxParams.packet = packet->Copy();
-            m_retxParams.retxLeft = m_maxNumbTx;
+            m_retxParams.retxLeft = m_nbTrans;
             m_retxParams.waitingAck = true;
             m_retxParams.firstAttempt = Simulator::Now();
             m_retxParams.retxLeft =
@@ -339,7 +339,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
             NS_LOG_DEBUG("Reset retransmission variables to default values and cancel "
                          "retransmission if already scheduled.");
 
-            uint8_t txs = m_maxNumbTx - (m_retxParams.retxLeft);
+            uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
             m_requiredTxCallback(txs, true, m_retxParams.firstAttempt, m_retxParams.packet);
             NS_LOG_DEBUG("Received ACK packet after "
                          << unsigned(txs) << " transmissions: stopping retransmission procedure. ");
@@ -603,7 +603,7 @@ void
 EndDeviceLorawanMac::resetRetransmissionParameters()
 {
     m_retxParams.waitingAck = false;
-    m_retxParams.retxLeft = m_maxNumbTx;
+    m_retxParams.retxLeft = m_nbTrans;
     m_retxParams.packet = nullptr;
     m_retxParams.firstAttempt = Seconds(0);
 
@@ -626,18 +626,18 @@ EndDeviceLorawanMac::GetUplinkAdrBit() const
 }
 
 void
-EndDeviceLorawanMac::SetMaxNumberOfTransmissions(uint8_t maxNumbTx)
+EndDeviceLorawanMac::SetMaxNumberOfTransmissions(uint8_t nbTrans)
 {
-    NS_LOG_FUNCTION(this << unsigned(maxNumbTx));
-    m_maxNumbTx = maxNumbTx;
-    m_retxParams.retxLeft = maxNumbTx;
+    NS_LOG_FUNCTION(this << unsigned(nbTrans));
+    m_nbTrans = nbTrans;
+    m_retxParams.retxLeft = nbTrans;
 }
 
 uint8_t
 EndDeviceLorawanMac::GetMaxNumberOfTransmissions()
 {
     NS_LOG_FUNCTION(this);
-    return m_maxNumbTx;
+    return m_nbTrans;
 }
 
 void
