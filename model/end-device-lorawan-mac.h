@@ -267,13 +267,15 @@ class EndDeviceLorawanMac : public LorawanMac
      *
      * \param dataRate The data rate value of the command.
      * \param txPower The transmission power value of the command.
-     * \param enabledChannels A list of the enabled channels.
-     * \param repetitions The number of repetitions prescribed by the command.
+     * \param chMask Mask of enabled channels of the command.
+     * \param chMaskCtrl Indicator of the 16 channel bank to apply the chMask to.
+     * \param nbTrans The number of repetitions prescribed by the command.
      */
     void OnLinkAdrReq(uint8_t dataRate,
                       uint8_t txPower,
-                      std::list<int> enabledChannels,
-                      int repetitions);
+                      uint16_t chMask,
+                      uint8_t chMaskCtrl,
+                      uint8_t nbTrans);
 
     /**
      * Perform the actions that need to be taken when receiving a DutyCycleReq command.
