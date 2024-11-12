@@ -361,23 +361,23 @@ class DutyCycleReq : public MacCommand
     /**
      * Constructor providing initialization of all parameters.
      *
-     * \param dutyCycle The duty cycle as a 8-bit unsigned integer.
+     * \param maxDutyCycle The MaxDutyCycle field as a 8-bit unsigned integer.
      */
-    DutyCycleReq(uint8_t dutyCycle);
+    DutyCycleReq(uint8_t maxDutyCycle);
 
     void Serialize(Buffer::Iterator& start) const override;
     uint8_t Deserialize(Buffer::Iterator& start) override;
     void Print(std::ostream& os) const override;
 
     /**
-     * Get the maximum duty cycle prescribed by this Mac command, in fraction form.
+     * Get the maximum duty cycle prescribed by this Mac command, encoded in 4 bits.
      *
-     * \return The maximum duty cycle.
+     * \return The MaxDutyCycle field value.
      */
-    double GetMaximumAllowedDutyCycle() const;
+    uint8_t GetMaxDutyCycle() const;
 
   private:
-    uint8_t m_maxDCycle; //!< The MaxDutyCycle field
+    uint8_t m_maxDutyCycle; //!< The MaxDutyCycle field
 };
 
 /**

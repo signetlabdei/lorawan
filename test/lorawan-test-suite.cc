@@ -1801,9 +1801,27 @@ MacCommandTest::DoRun()
     NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
     laa = DynamicCast<LinkAdrAns>(answers.at(0));
     NS_TEST_ASSERT_MSG_NE(laa, nullptr, "LinkAdrAns was expected, cmd type cast failed");
-    NS_TEST_ASSERT_MSG_EQ(laa->GetChannelMaskAck(), false, "ChannelMaskAck expected to be false");
-    NS_TEST_ASSERT_MSG_EQ(laa->GetDataRateAck(), false, "DataRateAck expected to be false");
-    NS_TEST_ASSERT_MSG_EQ(laa->GetPowerAck(), false, "PowerAck expected to be false");
+    NS_TEST_EXPECT_MSG_EQ(laa->GetChannelMaskAck(), false, "ChannelMaskAck expected to be false");
+    NS_TEST_EXPECT_MSG_EQ(laa->GetDataRateAck(), false, "DataRateAck expected to be false");
+    NS_TEST_EXPECT_MSG_EQ(laa->GetPowerAck(), false, "PowerAck expected to be false");
+
+    Reset();
+    // DutyCycleReq: duty cycle to 100%
+    uint8_t maxDutyCycle = 0;
+    answers = RunMacCommand<DutyCycleReq>(maxDutyCycle);
+    NS_TEST_EXPECT_MSG_EQ(m_mac->GetAggregatedDutyCycle(), 1, "m_aggregatedDutyCycle != 1");
+    NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+    auto dca = DynamicCast<DutyCycleAns>(answers.at(0));
+    NS_TEST_ASSERT_MSG_NE(dca, nullptr, "DutyCycleAns was expected, cmd type cast failed");
+
+    Reset();
+    // DutyCycleReq: duty cycle to 12.5%
+    maxDutyCycle = 3;
+    answers = RunMacCommand<DutyCycleReq>(maxDutyCycle);
+    NS_TEST_EXPECT_MSG_EQ(m_mac->GetAggregatedDutyCycle(), 0.125, "m_aggregatedDutyCycle != 1");
+    NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+    dca = DynamicCast<DutyCycleAns>(answers.at(0));
+    NS_TEST_ASSERT_MSG_NE(dca, nullptr, "DutyCycleAns was expected, cmd type cast failed");
 }
 
 /**

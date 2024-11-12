@@ -383,7 +383,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
         case (DUTY_CYCLE_REQ): {
             NS_LOG_DEBUG("Detected a DutyCycleReq command.");
             auto dutyCycleReq = DynamicCast<DutyCycleReq>(c);
-            OnDutyCycleReq(dutyCycleReq->GetMaximumAllowedDutyCycle());
+            OnDutyCycleReq(dutyCycleReq->GetMaxDutyCycle());
             break;
         }
         case (RX_PARAM_SETUP_REQ): {
@@ -821,17 +821,11 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
 }
 
 void
-EndDeviceLorawanMac::OnDutyCycleReq(double dutyCycle)
+EndDeviceLorawanMac::OnDutyCycleReq(uint8_t maxDutyCycle)
 {
-    NS_LOG_FUNCTION(this << dutyCycle);
-
-    // Make sure we get a value that makes sense
-    NS_ASSERT(0 <= dutyCycle && dutyCycle < 1);
-
-    // Set the new duty cycle value
-    m_aggregatedDutyCycle = dutyCycle;
-
-    // Craft a DutyCycleAns as response
+    NS_LOG_FUNCTION(this << unsigned(maxDutyCycle));
+    NS_ASSERT_MSG(!(maxDutyCycle & 0xF0), "maxDutyCycle > 4 bits");
+    m_aggregatedDutyCycle = 1 / std::pow(2, maxDutyCycle);
     NS_LOG_INFO("Adding DutyCycleAns reply");
     m_macCommandList.emplace_back(Create<DutyCycleAns>());
 }

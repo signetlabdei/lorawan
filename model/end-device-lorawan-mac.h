@@ -280,10 +280,9 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Perform the actions that need to be taken when receiving a DutyCycleReq command.
      *
-     * \param dutyCycle The aggregate duty cycle prescribed by the command, in
-     * fraction form.
+     * \param maxDutyCycle The aggregate duty cycle encoded by the command.
      */
-    void OnDutyCycleReq(double dutyCycle);
+    void OnDutyCycleReq(uint8_t maxDutyCycle);
 
     /**
      * Perform the actions that need to be taken when receiving a RxParamSetupReq command.

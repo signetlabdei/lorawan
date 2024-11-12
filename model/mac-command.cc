@@ -457,11 +457,12 @@ DutyCycleReq::DutyCycleReq()
     m_serializedSize = 2;
 }
 
-DutyCycleReq::DutyCycleReq(uint8_t dutyCycle)
-    : m_maxDCycle(dutyCycle)
+DutyCycleReq::DutyCycleReq(uint8_t maxDutyCycle)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << unsigned(maxDutyCycle));
 
+    NS_ASSERT_MSG(!(maxDutyCycle & 0xF0), "maxDutyCycle > 4 bits");
+    m_maxDutyCycle = maxDutyCycle;
     m_commandType = DUTY_CYCLE_REQ;
     m_serializedSize = 2;
 }
@@ -473,7 +474,7 @@ DutyCycleReq::Serialize(Buffer::Iterator& start) const
 
     // Write the CID
     start.WriteU8(GetCIDFromMacCommand(m_commandType));
-    start.WriteU8(m_maxDCycle);
+    start.WriteU8(m_maxDutyCycle);
 }
 
 uint8_t
@@ -483,7 +484,7 @@ DutyCycleReq::Deserialize(Buffer::Iterator& start)
 
     // Consume the CID
     start.ReadU8();
-    m_maxDCycle = start.ReadU8();
+    m_maxDutyCycle = start.ReadU8();
 
     return m_serializedSize;
 }
@@ -494,28 +495,15 @@ DutyCycleReq::Print(std::ostream& os) const
     NS_LOG_FUNCTION_NOARGS();
 
     os << "DutyCycleReq(";
-    os << "maxDCycle=" << unsigned(m_maxDCycle);
-    os << ", fraction=" << GetMaximumAllowedDutyCycle();
+    os << "maxDutyCycle=" << unsigned(m_maxDutyCycle);
     os << ")";
 }
 
-double
-DutyCycleReq::GetMaximumAllowedDutyCycle() const
+uint8_t
+DutyCycleReq::GetMaxDutyCycle() const
 {
     NS_LOG_FUNCTION(this);
-
-    // Check if we need to turn off completely
-    if (m_maxDCycle == 255)
-    {
-        return 0;
-    }
-
-    if (m_maxDCycle == 0)
-    {
-        return 1;
-    }
-
-    return 1 / std::pow(2, double(m_maxDCycle));
+    return m_maxDutyCycle;
 }
 
 //////////////////
