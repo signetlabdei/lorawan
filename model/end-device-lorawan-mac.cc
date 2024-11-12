@@ -14,6 +14,7 @@
 #include "class-a-end-device-lorawan-mac.h"
 #include "end-device-lora-phy.h"
 
+#include "ns3/energy-source-container.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 
@@ -110,6 +111,8 @@ EndDeviceLorawanMac::EndDeviceLorawanMac()
       m_address(LoraDeviceAddress(0)),
       // LoraWAN default
       m_receiveWindowDurationInSymbols(8),
+      // Max initial value
+      m_lastRxSnr(32),
       m_adr(true),
       m_lastKnownLinkMarginDb(0),
       m_lastKnownGatewayCount(0),
@@ -836,8 +839,24 @@ EndDeviceLorawanMac::OnDevStatusReq()
 {
     NS_LOG_FUNCTION(this);
 
-    uint8_t battery = 10; // XXX Fake battery level
-    uint8_t margin = 10;  // XXX Fake margin
+    uint8_t battery = 255; // could not measure
+    if (m_device && m_device->GetNode())
+    {
+        if (auto sc = m_device->GetNode()->GetObject<energy::EnergySourceContainer>();
+            sc && sc->GetN() == 1)
+        {
+            battery = sc->Get(0)->GetEnergyFraction() * 253 + 1.5; // range 1-254
+        }
+    }
+    else
+    {
+        battery = 0; // external power source
+    }
+
+    int8_t snr = (m_lastRxSnr < 0) ? m_lastRxSnr - .5 : m_lastRxSnr + .5;
+    snr = (snr > 31) ? 31 : snr;
+    snr = (snr < -32) ? -32 : snr;
+    uint8_t margin = std::bitset<6>(snr).to_ulong();
 
     // Craft a RxParamSetupAns as response
     NS_LOG_INFO("Adding DevStatusAns reply");

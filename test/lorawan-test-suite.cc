@@ -1873,6 +1873,15 @@ MacCommandTest::DoRun()
     NS_TEST_EXPECT_MSG_EQ(rpsa->GetRx1DrOffsetAck(), false, "Rx1DrOffsetAck expected to be false");
     NS_TEST_EXPECT_MSG_EQ(rpsa->GetRx2DataRateAck(), false, "Rx2DataRateAck expected to be false");
     NS_TEST_EXPECT_MSG_EQ(rpsa->GetChannelAck(), false, "ChannelAck expected to be false");
+
+    Reset();
+    // DevStatusReq: get default values
+    answers = RunMacCommand<DevStatusReq>();
+    NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+    auto dsa = DynamicCast<DevStatusAns>(answers.at(0));
+    NS_TEST_ASSERT_MSG_NE(dsa, nullptr, "DevStatusAns was expected, cmd type cast failed");
+    NS_TEST_EXPECT_MSG_EQ(unsigned(dsa->GetBattery()), 0, "Battery expected to be 0 (ext power)");
+    NS_TEST_EXPECT_MSG_EQ(unsigned(dsa->GetMargin()), 31, "Margin expected to be 31 (default)");
 }
 
 /**
