@@ -298,14 +298,14 @@ class LoraFrameHeader : public Header
                           uint8_t maxDataRate);
 
     /**
-     * Return a list of pointers to all the MAC commands saved in this header.
+     * Return a vector of pointers to all the MAC commands saved in this header.
      *
-     * \return The list of pointers to MacCommand objects.
+     * \return The vector of pointers to MacCommand objects.
      */
-    std::list<Ptr<MacCommand>> GetCommands();
+    std::vector<Ptr<MacCommand>> GetCommands();
 
     /**
-     * Add a predefined command to the list in this frame header.
+     * Add a predefined command to the vector in this frame header.
      *
      * \param macCommand A pointer to the MacCommand object to add.
      */
@@ -324,9 +324,9 @@ class LoraFrameHeader : public Header
 
     uint16_t m_fCnt; //!< The FCnt field
 
-    Buffer m_fOpts;                           //!< The FOpts field
-    std::list<Ptr<MacCommand>> m_macCommands; //!< List containing all the MacCommand instances that
-                                              //!< are contained in this LoraFrameHeader
+    Buffer m_fOpts;                             //!< The FOpts field
+    std::vector<Ptr<MacCommand>> m_macCommands; //!< Vector containing all the MacCommand instances
+                                                //!< that are contained in this LoraFrameHeader
 
     bool m_isUplink; //!< Whether this frame header is uplink or not
 };
@@ -336,15 +336,13 @@ Ptr<T>
 LoraFrameHeader::GetMacCommand()
 {
     // Iterate on MAC commands and try casting
-    std::list<Ptr<MacCommand>>::const_iterator it;
-    for (it = m_macCommands.begin(); it != m_macCommands.end(); ++it)
+    for (const auto& cmd : m_macCommands)
     {
-        if (DynamicCast<T>(*it))
+        if (auto c = DynamicCast<T>(cmd); c)
         {
-            return DynamicCast<T>(*it);
+            return c;
         }
     }
-
     // If no command was found, return 0
     return nullptr;
 }
