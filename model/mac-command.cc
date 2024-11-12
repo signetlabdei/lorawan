@@ -148,7 +148,7 @@ LinkCheckReq::Print(std::ostream& os) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    os << "LinkCheckReq" << std::endl;
+    os << "LinkCheckReq()";
 }
 
 //////////////////
@@ -205,9 +205,10 @@ LinkCheckAns::Print(std::ostream& os) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    os << "LinkCheckAns" << std::endl;
-    os << "margin: " << unsigned(m_margin) << std::endl;
-    os << "gwCnt: " << unsigned(m_gwCnt) << std::endl;
+    os << "LinkCheckAns(";
+    os << "margin=" << unsigned(m_margin);
+    os << ", gwCnt=" << unsigned(m_gwCnt);
+    os << ")";
 }
 
 void
@@ -314,12 +315,13 @@ LinkAdrReq::Print(std::ostream& os) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    os << "LinkAdrReq" << std::endl;
-    os << "dataRate: " << unsigned(m_dataRate) << std::endl;
-    os << "txPower: " << unsigned(m_txPower) << std::endl;
-    os << "chMask: " << std::bitset<16>(m_chMask) << std::endl;
-    os << "chMaskCntl: " << unsigned(m_chMaskCntl) << std::endl;
-    os << "nbTrans: " << unsigned(m_nbTrans) << std::endl;
+    os << "LinkAdrReq(";
+    os << "dataRate=" << unsigned(m_dataRate);
+    os << ", txPower=" << unsigned(m_txPower);
+    os << ", chMask=" << std::bitset<16>(m_chMask);
+    os << ", chMaskCntl=" << unsigned(m_chMaskCntl);
+    os << ", nbTrans=" << unsigned(m_nbTrans);
+    os << ")";
 }
 
 uint8_t
@@ -418,7 +420,11 @@ LinkAdrAns::Print(std::ostream& os) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    os << "LinkAdrAns" << std::endl;
+    os << "LinkAdrAns(";
+    os << "powerAck=" << m_powerAck;
+    os << ", dataRateAck=" << m_dataRateAck;
+    os << ", channelMaskAck=" << m_channelMaskAck;
+    os << ")";
 }
 
 //////////////////
@@ -469,9 +475,10 @@ DutyCycleReq::Print(std::ostream& os) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    os << "DutyCycleReq" << std::endl;
-    os << "maxDCycle: " << unsigned(m_maxDCycle) << std::endl;
-    os << "maxDCycle (fraction): " << GetMaximumAllowedDutyCycle() << std::endl;
+    os << "DutyCycleReq(";
+    os << "maxDCycle=" << unsigned(m_maxDCycle);
+    os << ", fraction=" << GetMaximumAllowedDutyCycle();
+    os << ")";
 }
 
 double
@@ -529,7 +536,7 @@ DutyCycleAns::Print(std::ostream& os) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    os << "DutyCycleAns" << std::endl;
+    os << "DutyCycleAns()";
 }
 
 //////////////////
@@ -609,10 +616,11 @@ RxParamSetupReq::Print(std::ostream& os) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    os << "RxParamSetupReq" << std::endl;
-    os << "rx1DrOffset: " << unsigned(m_rx1DrOffset) << std::endl;
-    os << "rx2DataRate: " << unsigned(m_rx2DataRate) << std::endl;
-    os << "frequency: " << m_frequency << std::endl;
+    os << "RxParamSetupReq(";
+    os << "rx1DrOffset=" << unsigned(m_rx1DrOffset);
+    os << ", rx2DataRate=" << unsigned(m_rx2DataRate);
+    os << ", frequency=" << m_frequency;
+    os << ")";
 }
 
 uint8_t
@@ -696,10 +704,11 @@ RxParamSetupAns::Print(std::ostream& os) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    os << "RxParamSetupAns" << std::endl;
-    os << "m_rx1DrOffsetAck: " << m_rx1DrOffsetAck << std::endl;
-    os << "m_rx2DataRateAck: " << m_rx2DataRateAck << std::endl;
-    os << "m_channelAck: " << m_channelAck << std::endl;
+    os << "RxParamSetupAns(";
+    os << "m_rx1DrOffsetAck=" << m_rx1DrOffsetAck;
+    os << ", m_rx2DataRateAck=" << m_rx2DataRateAck;
+    os << ", m_channelAck=" << m_channelAck;
+    os << ")";
 }
 
 //////////////////
@@ -739,7 +748,7 @@ DevStatusReq::Print(std::ostream& os) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    os << "DevStatusReq" << std::endl;
+    os << "DevStatusReq()";
 }
 
 //////////////////
@@ -793,9 +802,10 @@ DevStatusAns::Print(std::ostream& os) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    os << "DevStatusAns" << std::endl;
-    os << "Battery: " << unsigned(m_battery) << std::endl;
-    os << "Margin: " << unsigned(m_margin) << std::endl;
+    os << "DevStatusAns(";
+    os << "Battery=" << unsigned(m_battery);
+    os << ", Margin=" << unsigned(m_margin);
+    os << ")";
 }
 
 uint8_t
@@ -882,7 +892,7 @@ NewChannelReq::Print(std::ostream& os) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    os << "NewChannelReq" << std::endl;
+    os << "NewChannelReq()";
 }
 
 uint8_t
@@ -970,9 +980,10 @@ NewChannelAns::Print(std::ostream& os) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    os << "NewChannelAns" << std::endl;
-    os << "DataRateRangeOk: " << m_dataRateRangeOk << std::endl;
-    os << "ChannelFrequencyOk: " << m_channelFrequencyOk << std::endl;
+    os << "NewChannelAns(";
+    os << "DataRateRangeOk=" << m_dataRateRangeOk;
+    os << ", ChannelFrequencyOk=" << m_channelFrequencyOk;
+    os << ")";
 }
 
 //////////////////////
@@ -1025,7 +1036,7 @@ RxTimingSetupReq::Print(std::ostream& os) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    os << "RxTimingSetupReq" << std::endl;
+    os << "RxTimingSetupReq()";
 }
 
 Time
@@ -1077,7 +1088,7 @@ RxTimingSetupAns::Print(std::ostream& os) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    os << "RxTimingSetupAns" << std::endl;
+    os << "RxTimingSetupAns()";
 }
 
 //////////////////
@@ -1117,7 +1128,7 @@ DlChannelAns::Print(std::ostream& os) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    os << "DlChannelAns" << std::endl;
+    os << "DlChannelAns()";
 }
 
 //////////////////
@@ -1157,7 +1168,7 @@ TxParamSetupReq::Print(std::ostream& os) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    os << "TxParamSetupReq" << std::endl;
+    os << "TxParamSetupReq()";
 }
 
 //////////////////
@@ -1197,7 +1208,7 @@ TxParamSetupAns::Print(std::ostream& os) const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    os << "TxParamSetupAns" << std::endl;
+    os << "TxParamSetupAns()";
 }
 
 } // namespace lorawan

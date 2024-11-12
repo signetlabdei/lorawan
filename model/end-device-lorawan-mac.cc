@@ -211,7 +211,8 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
         ApplyNecessaryOptions(frameHdr);
         packet->AddHeader(frameHdr);
 
-        NS_LOG_INFO("Added frame header of size " << frameHdr.GetSerializedSize() << " bytes.");
+        auto fhdrSize = frameHdr.GetSerializedSize();
+        NS_LOG_INFO("Added frame header of size " << fhdrSize << " bytes.");
 
         // Check that MACPayload length is below the allowed maximum
         if (packet->GetSize() > m_maxAppPayloadForDataRate.at(m_dataRate))
@@ -259,7 +260,8 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
             NS_LOG_DEBUG("It is a confirmed packet. Setting retransmission parameters and "
                          "decreasing the number of transmissions left.");
 
-            NS_LOG_INFO("Added MAC header of size " << macHdr.GetSerializedSize() << " bytes.");
+            auto mhdrSize = macHdr.GetSerializedSize();
+            NS_LOG_INFO("Added MAC header of size " << mhdrSize << " bytes.");
 
             // Sent a new packet
             NS_LOG_DEBUG("Copied packet: " << m_retxParams.packet);
@@ -291,7 +293,8 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
             ApplyNecessaryOptions(frameHdr);
             packet->AddHeader(frameHdr);
 
-            NS_LOG_INFO("Added frame header of size " << frameHdr.GetSerializedSize() << " bytes.");
+            auto fhdrSize = frameHdr.GetSerializedSize();
+            NS_LOG_INFO("Added frame header of size " << fhdrSize << " bytes.");
 
             // Add the Lorawan Mac header to the packet
             macHdr = LorawanMacHeader();
@@ -355,85 +358,53 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
         }
     }
 
-    std::list<Ptr<MacCommand>> commands = frameHeader.GetCommands();
-    std::list<Ptr<MacCommand>>::iterator it;
-    for (it = commands.begin(); it != commands.end(); it++)
+    for (const auto& c : frameHeader.GetCommands())
     {
         NS_LOG_DEBUG("Iterating over the MAC commands...");
-        enum MacCommandType type = (*it)->GetCommandType();
+        enum MacCommandType type = (c)->GetCommandType();
         switch (type)
         {
         case (LINK_CHECK_ANS): {
             NS_LOG_DEBUG("Detected a LinkCheckAns command.");
-
-            // Cast the command
-            Ptr<LinkCheckAns> linkCheckAns = DynamicCast<LinkCheckAns>(*it);
-
-            // Call the appropriate function to take action
+            auto linkCheckAns = DynamicCast<LinkCheckAns>(c);
             OnLinkCheckAns(linkCheckAns->GetMargin(), linkCheckAns->GetGwCnt());
-
             break;
         }
         case (LINK_ADR_REQ): {
             NS_LOG_DEBUG("Detected a LinkAdrReq command.");
-
-            // Cast the command
-            Ptr<LinkAdrReq> linkAdrReq = DynamicCast<LinkAdrReq>(*it);
-
-            // Call the appropriate function to take action
+            auto linkAdrReq = DynamicCast<LinkAdrReq>(c);
             OnLinkAdrReq(linkAdrReq->GetDataRate(),
                          linkAdrReq->GetTxPower(),
                          linkAdrReq->GetChMask(),
                          linkAdrReq->GetChMaskCtrl(),
                          linkAdrReq->GetNbTrans());
-
             break;
         }
         case (DUTY_CYCLE_REQ): {
             NS_LOG_DEBUG("Detected a DutyCycleReq command.");
-
-            // Cast the command
-            Ptr<DutyCycleReq> dutyCycleReq = DynamicCast<DutyCycleReq>(*it);
-
-            // Call the appropriate function to take action
+            auto dutyCycleReq = DynamicCast<DutyCycleReq>(c);
             OnDutyCycleReq(dutyCycleReq->GetMaximumAllowedDutyCycle());
-
             break;
         }
         case (RX_PARAM_SETUP_REQ): {
             NS_LOG_DEBUG("Detected a RxParamSetupReq command.");
-
-            // Cast the command
-            Ptr<RxParamSetupReq> rxParamSetupReq = DynamicCast<RxParamSetupReq>(*it);
-
-            // Call the appropriate function to take action
+            auto rxParamSetupReq = DynamicCast<RxParamSetupReq>(c);
             OnRxParamSetupReq(rxParamSetupReq);
-
             break;
         }
         case (DEV_STATUS_REQ): {
             NS_LOG_DEBUG("Detected a DevStatusReq command.");
-
-            // Cast the command
-            Ptr<DevStatusReq> devStatusReq = DynamicCast<DevStatusReq>(*it);
-
-            // Call the appropriate function to take action
+            auto devStatusReq = DynamicCast<DevStatusReq>(c);
             OnDevStatusReq();
-
             break;
         }
         case (NEW_CHANNEL_REQ): {
             NS_LOG_DEBUG("Detected a NewChannelReq command.");
-
-            // Cast the command
-            Ptr<NewChannelReq> newChannelReq = DynamicCast<NewChannelReq>(*it);
-
-            // Call the appropriate function to take action
+            auto newChannelReq = DynamicCast<NewChannelReq>(c);
             OnNewChannelReq(newChannelReq->GetChannelIndex(),
                             newChannelReq->GetFrequency(),
                             newChannelReq->GetMinDataRate(),
                             newChannelReq->GetMaxDataRate());
-
             break;
         }
         case (RX_TIMING_SETUP_REQ):
