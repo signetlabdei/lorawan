@@ -285,19 +285,14 @@ class EndDeviceLorawanMac : public LorawanMac
     void OnDutyCycleReq(uint8_t maxDutyCycle);
 
     /**
-     * Perform the actions that need to be taken when receiving a RxParamSetupReq command.
-     *
-     * \param rxParamSetupReq The Parameter Setup Request.
-     */
-    void OnRxParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq);
-
-    /**
      * Perform the actions that need to be taken when receiving a RxParamSetupReq
      * command based on the Device's Class Type.
      *
-     * \param rxParamSetupReq The Parameter Setup Request.
+     * \param rx1DrOffset The first reception window data rate offset to set.
+     * \param rx2DataRate The data rate to use for the second receive window.
+     * \param frequency The frequency [Hz] to use for the second receive window.
      */
-    virtual void OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq);
+    virtual void OnRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency) = 0;
 
     /**
      * Perform the actions that need to be taken when receiving a DevStatusReq command.

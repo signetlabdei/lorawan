@@ -563,18 +563,8 @@ RxParamSetupReq::RxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, doubl
       m_frequency(frequency)
 {
     NS_LOG_FUNCTION(this << unsigned(rx1DrOffset) << unsigned(rx2DataRate) << frequency);
-
-    if ((rx1DrOffset & 0b11111000) != 0)
-    {
-        NS_LOG_WARN(
-            "Warning: received an rx1DrOffset greater than 7. Actual value will be different.");
-    }
-    if ((rx2DataRate & 0b11110000) != 0)
-    {
-        NS_LOG_WARN(
-            "Warning: received a rx2DataRate greater than 15. Actual value will be different.");
-    }
-
+    NS_ASSERT_MSG(!(rx1DrOffset & 0xF8), "rx1DrOffset > 3 bits");
+    NS_ASSERT_MSG(!(rx2DataRate & 0xF0), "rx2DataRate > 4 bits");
     m_commandType = RX_PARAM_SETUP_REQ;
     m_serializedSize = 5;
 }
@@ -717,6 +707,24 @@ RxParamSetupAns::Print(std::ostream& os) const
     os << ", m_rx2DataRateAck=" << m_rx2DataRateAck;
     os << ", m_channelAck=" << m_channelAck;
     os << ")";
+}
+
+bool
+RxParamSetupAns::GetRx1DrOffsetAck() const
+{
+    return m_rx1DrOffsetAck;
+}
+
+bool
+RxParamSetupAns::GetRx2DataRateAck() const
+{
+    return m_rx2DataRateAck;
+}
+
+bool
+RxParamSetupAns::GetChannelAck() const
+{
+    return m_channelAck;
 }
 
 //////////////////

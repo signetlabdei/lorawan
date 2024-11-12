@@ -352,10 +352,10 @@ ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow()
     DynamicCast<EndDeviceLoraPhy>(m_phy)->SwitchToStandby();
 
     // Switch to appropriate channel and data rate
-    NS_LOG_INFO("Using parameters: " << m_secondReceiveWindowFrequency << "Hz, DR"
+    NS_LOG_INFO("Using parameters: " << m_secondReceiveWindowFrequencyMHz << "MHz, DR"
                                      << unsigned(m_secondReceiveWindowDataRate));
 
-    DynamicCast<EndDeviceLoraPhy>(m_phy)->SetFrequency(m_secondReceiveWindowFrequency);
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->SetFrequency(m_secondReceiveWindowFrequencyMHz);
     DynamicCast<EndDeviceLoraPhy>(m_phy)->SetSpreadingFactor(
         GetSfFromDataRate(m_secondReceiveWindowDataRate));
 
@@ -508,13 +508,13 @@ ClassAEndDeviceLorawanMac::GetSecondReceiveWindowDataRate() const
 void
 ClassAEndDeviceLorawanMac::SetSecondReceiveWindowFrequency(double frequencyMHz)
 {
-    m_secondReceiveWindowFrequency = frequencyMHz;
+    m_secondReceiveWindowFrequencyMHz = frequencyMHz;
 }
 
 double
 ClassAEndDeviceLorawanMac::GetSecondReceiveWindowFrequency() const
 {
-    return m_secondReceiveWindowFrequency;
+    return m_secondReceiveWindowFrequencyMHz;
 }
 
 /////////////////////////
@@ -522,39 +522,46 @@ ClassAEndDeviceLorawanMac::GetSecondReceiveWindowFrequency() const
 /////////////////////////
 
 void
-ClassAEndDeviceLorawanMac::OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq)
+ClassAEndDeviceLorawanMac::OnRxParamSetupReq(uint8_t rx1DrOffset,
+                                             uint8_t rx2DataRate,
+                                             double frequency)
 {
-    NS_LOG_FUNCTION(this << rxParamSetupReq);
-
-    bool offsetOk = true;
-    bool dataRateOk = true;
-
-    uint8_t rx1DrOffset = rxParamSetupReq->GetRx1DrOffset();
-    uint8_t rx2DataRate = rxParamSetupReq->GetRx2DataRate();
-    double frequency = rxParamSetupReq->GetFrequency();
-
     NS_LOG_FUNCTION(this << unsigned(rx1DrOffset) << unsigned(rx2DataRate) << frequency);
 
-    // Check that the desired offset is valid
-    if (!(0 <= rx1DrOffset && rx1DrOffset <= 5))
+    // Adapted from: github.com/Lora-net/SWL2001.git v4.3.1
+    // For the time being, this implementation is valid for the EU868 region
+
+    bool rx1DrOffsetAck = true;
+    bool rx2DataRateAck = true;
+    bool channelAck = true;
+
+    if (rx1DrOffset >= 6)
     {
-        offsetOk = false;
+        NS_LOG_WARN("Invalid rx1DrOffset");
+        rx1DrOffsetAck = false;
     }
 
-    // Check that the desired data rate is valid
-    if (GetSfFromDataRate(rx2DataRate) == 0 || GetBandwidthFromDataRate(rx2DataRate) == 0)
+    if (!GetSfFromDataRate(rx2DataRate) || !GetBandwidthFromDataRate(rx2DataRate))
     {
-        dataRateOk = false;
+        NS_LOG_WARN("Invalid rx2DataRate");
+        rx2DataRateAck = false;
     }
 
-    // For now, don't check for validity of frequency
-    m_secondReceiveWindowDataRate = rx2DataRate;
-    m_rx1DrOffset = rx1DrOffset;
-    m_secondReceiveWindowFrequency = frequency;
+    if (frequency > 870000000 || frequency < 863000000)
+    {
+        NS_LOG_WARN("Invalid rx2 frequency");
+        channelAck = false;
+    }
 
-    // Craft a RxParamSetupAns as response
-    NS_LOG_INFO("Adding RxParamSetupAns reply");
-    m_macCommandList.emplace_back(Create<RxParamSetupAns>(offsetOk, dataRateOk, true));
+    if (rx1DrOffsetAck && rx2DataRateAck && channelAck)
+    {
+        m_rx1DrOffset = rx1DrOffset;
+        m_secondReceiveWindowDataRate = rx2DataRate;
+        m_secondReceiveWindowFrequencyMHz = frequency / 1e6;
+    }
+
+    m_macCommandList.emplace_back(
+        Create<RxParamSetupAns>(rx1DrOffsetAck, rx2DataRateAck, channelAck));
 }
 
 } /* namespace lorawan */
