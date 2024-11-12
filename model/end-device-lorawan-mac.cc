@@ -94,8 +94,7 @@ EndDeviceLorawanMac::GetTypeId()
                           MakeEnumChecker(LorawanMacHeader::UNCONFIRMED_DATA_UP,
                                           "Unconfirmed",
                                           LorawanMacHeader::CONFIRMED_DATA_UP,
-                                          "Confirmed"))
-            .AddConstructor<EndDeviceLorawanMac>();
+                                          "Confirmed"));
     return tid;
 }
 
@@ -389,7 +388,9 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
         case (RX_PARAM_SETUP_REQ): {
             NS_LOG_DEBUG("Detected a RxParamSetupReq command.");
             auto rxParamSetupReq = DynamicCast<RxParamSetupReq>(c);
-            OnRxParamSetupReq(rxParamSetupReq);
+            OnRxParamSetupReq(rxParamSetupReq->GetRx1DrOffset(),
+                              rxParamSetupReq->GetRx2DataRate(),
+                              rxParamSetupReq->GetFrequency());
             break;
         }
         case (DEV_STATUS_REQ): {
@@ -828,20 +829,6 @@ EndDeviceLorawanMac::OnDutyCycleReq(uint8_t maxDutyCycle)
     m_aggregatedDutyCycle = 1 / std::pow(2, maxDutyCycle);
     NS_LOG_INFO("Adding DutyCycleAns reply");
     m_macCommandList.emplace_back(Create<DutyCycleAns>());
-}
-
-void
-EndDeviceLorawanMac::OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq)
-{
-}
-
-void
-EndDeviceLorawanMac::OnRxParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq)
-{
-    NS_LOG_FUNCTION(this << rxParamSetupReq);
-
-    // static_cast<ClassAEndDeviceLorawanMac*>(this)->OnRxClassParamSetupReq (rxParamSetupReq);
-    OnRxClassParamSetupReq(rxParamSetupReq);
 }
 
 void

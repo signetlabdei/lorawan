@@ -472,6 +472,31 @@ class RxParamSetupAns : public MacCommand
     uint8_t Deserialize(Buffer::Iterator& start) override;
     void Print(std::ostream& os) const override;
 
+    /**
+     * Get the Rx1DrOffsetAck field value of the RxParamSetupAns command.
+     *
+     * \return true RX1 data-rate offset was successfully set.
+     * \return false The uplink/downlink data rate offset for RX1 slot is not within the allowed
+     * range.
+     */
+    bool GetRx1DrOffsetAck() const;
+
+    /**
+     * Get the Rx2DataRateAck field value of the RxParamSetupAns command.
+     *
+     * \return true RX2 slot data rate was successfully set.
+     * \return false The data rate requested is unknown to the end-device.
+     */
+    bool GetRx2DataRateAck() const;
+
+    /**
+     * Get the ChannelAck field value of the RxParamSetupAns command.
+     *
+     * \return true RX2 slot channel was successfully set.
+     * \return false The frequency requested is not usable by the end-device.
+     */
+    bool GetChannelAck() const;
+
   private:
     bool m_rx1DrOffsetAck; //!< The RX1DROffsetACK field
     bool m_rx2DataRateAck; //!< The RX2DataRateACK field
