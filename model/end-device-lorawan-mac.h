@@ -434,6 +434,11 @@ class EndDeviceLorawanMac : public LorawanMac
      */
     Ptr<UniformRandomVariable> m_uniformRV;
 
+    /**
+     * Used to record the last reception SNR measurement to be included in the DevStatusAns.
+     */
+    double m_lastRxSnr;
+
     /////////////////
     //  Callbacks  //
     /////////////////

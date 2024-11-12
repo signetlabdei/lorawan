@@ -14,6 +14,7 @@
 
 #include "end-device-lora-phy.h"
 #include "end-device-lorawan-mac.h"
+#include "lora-tag.h"
 
 #include "ns3/log.h"
 
@@ -165,6 +166,11 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
             // If it exists, cancel the second receive window event
             // THIS WILL BE GetReceiveWindow()
             Simulator::Cancel(m_secondReceiveWindow);
+
+            LoraTag tag;
+            packet->PeekPacketTag(tag);
+            /// \see ns3::lorawan::AdrComponent::RxPowerToSNR
+            m_lastRxSnr = tag.GetReceivePower() + 174 - 10 * log10(125000) - 6;
 
             // Parse the MAC commands
             ParseCommands(fHdr);
