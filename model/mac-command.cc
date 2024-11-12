@@ -591,9 +591,10 @@ RxParamSetupReq::Serialize(Buffer::Iterator& start) const
     uint32_t encodedFrequency = m_frequency / 100;
     NS_LOG_DEBUG(unsigned(encodedFrequency));
     NS_LOG_DEBUG(std::bitset<32>(encodedFrequency));
-    start.WriteU8((encodedFrequency & 0xff0000) >> 16); // Most significant byte
-    start.WriteU8((encodedFrequency & 0xff00) >> 8);    // Middle byte
+    // Frequency is in little endian (lsb -> msb)
     start.WriteU8(encodedFrequency & 0xff);             // Least significant byte
+    start.WriteU8((encodedFrequency & 0xff00) >> 8);    // Middle byte
+    start.WriteU8((encodedFrequency & 0xff0000) >> 16); // Most significant byte
 }
 
 uint8_t
@@ -607,10 +608,11 @@ RxParamSetupReq::Deserialize(Buffer::Iterator& start)
     uint8_t firstByte = start.ReadU8();
     m_rx1DrOffset = (firstByte & 0b1110000) >> 4;
     m_rx2DataRate = firstByte & 0b1111;
-    uint32_t secondByte = start.ReadU8();
-    uint32_t thirdByte = start.ReadU8();
-    uint32_t fourthByte = start.ReadU8();
-    uint32_t encodedFrequency = (secondByte << 16) | (thirdByte << 8) | fourthByte;
+    uint32_t encodedFrequency = 0;
+    // Frequency is in little endian (lsb -> msb)
+    encodedFrequency += start.ReadU8();       // Least significant byte
+    encodedFrequency += start.ReadU8() << 8;  // Middle byte
+    encodedFrequency += start.ReadU8() << 16; // Most significant byte
     NS_LOG_DEBUG(std::bitset<32>(encodedFrequency));
     m_frequency = double(encodedFrequency) * 100;
 
@@ -867,9 +869,10 @@ NewChannelReq::Serialize(Buffer::Iterator& start) const
 
     start.WriteU8(m_chIndex);
     uint32_t encodedFrequency = m_frequency / 100;
-    start.WriteU8((encodedFrequency & 0xff0000) >> 16);
-    start.WriteU8((encodedFrequency & 0xff00) >> 8);
-    start.WriteU8(encodedFrequency & 0xff);
+    // Frequency is in little endian (lsb -> msb)
+    start.WriteU8(encodedFrequency & 0xff);             // Least significant byte
+    start.WriteU8((encodedFrequency & 0xff00) >> 8);    // Middle byte
+    start.WriteU8((encodedFrequency & 0xff0000) >> 16); // Most significant byte
     start.WriteU8((m_maxDataRate << 4) | (m_minDataRate & 0xf));
 }
 
@@ -883,8 +886,10 @@ NewChannelReq::Deserialize(Buffer::Iterator& start)
     // Read the data
     m_chIndex = start.ReadU8();
     uint32_t encodedFrequency = 0;
-    encodedFrequency |= uint32_t(start.ReadU16()) << 8;
-    encodedFrequency |= uint32_t(start.ReadU8());
+    // Frequency is in little endian (lsb -> msb)
+    encodedFrequency += start.ReadU8();       // Least significant byte
+    encodedFrequency += start.ReadU8() << 8;  // Middle byte
+    encodedFrequency += start.ReadU8() << 16; // Most significant byte
     m_frequency = double(encodedFrequency) * 100;
     uint8_t dataRateByte = start.ReadU8();
     m_maxDataRate = dataRateByte >> 4;
