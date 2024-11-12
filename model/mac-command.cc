@@ -427,6 +427,24 @@ LinkAdrAns::Print(std::ostream& os) const
     os << ")";
 }
 
+bool
+LinkAdrAns::GetPowerAck() const
+{
+    return m_powerAck;
+}
+
+bool
+LinkAdrAns::GetDataRateAck() const
+{
+    return m_dataRateAck;
+}
+
+bool
+LinkAdrAns::GetChannelMaskAck() const
+{
+    return m_channelMaskAck;
+}
+
 //////////////////
 // DutyCycleReq //
 //////////////////
