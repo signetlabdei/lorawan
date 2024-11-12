@@ -346,7 +346,7 @@ HeaderTest::DoRun()
     // Deserialization
     frameHdr.Deserialize(serialized);
 
-    Ptr<LinkCheckAns> command = DynamicCast<LinkCheckAns>(*frameHdr.GetCommands().begin());
+    Ptr<LinkCheckAns> command = DynamicCast<LinkCheckAns>(frameHdr.GetCommands().at(0));
     uint8_t margin = command->GetMargin();
     uint8_t gwCnt = command->GetGwCnt();
 
@@ -388,7 +388,7 @@ HeaderTest::DoRun()
     frameHdr1.SetAsDownlink();
 
     pkt->RemoveHeader(frameHdr1);
-    Ptr<LinkCheckAns> linkCheckAns = DynamicCast<LinkCheckAns>(*frameHdr1.GetCommands().begin());
+    Ptr<LinkCheckAns> linkCheckAns = DynamicCast<LinkCheckAns>(frameHdr1.GetCommands().at(0));
 
     NS_TEST_EXPECT_MSG_EQ((pkt->GetSize()),
                           10,
@@ -1605,6 +1605,210 @@ LorawanMacTest::DoRun()
 /**
  * \ingroup lorawan
  *
+ * It tests the functionalities of LoRaWAN MAC commands received by devices.
+ *
+ * This means testing that (i) settings in the downlink MAC commands are correctly applied/rejected
+ * by the device, and that (ii) the correct answer (if expected) is produced by the device.
+ */
+class MacCommandTest : public TestCase
+{
+  public:
+    MacCommandTest();           //!< Default constructor
+    ~MacCommandTest() override; //!< Destructor
+
+  private:
+    /**
+     * Have this class' MAC layer receive a downlink packet carrying the input MAC command. After,
+     * trigger a new empty uplink packet send that can then be used to examine the MAC command
+     * answers in the header.
+     *
+     * \tparam T  \explicit The type of MAC command to create.
+     * \tparam Ts \deduced Types of the constructor arguments.
+     * \param  [in] args MAC command constructor arguments.
+     * \return The list of MAC commands produced by the device as an answer.
+     */
+    template <typename T, typename... Ts>
+    std::vector<Ptr<MacCommand>> RunMacCommand(Ts&&... args);
+
+    /**
+     * This function resets the state of the MAC layer used for tests. Use it before each call of
+     * RunMacCommand. Otherwise, on consecutive calls the MAC layer will not send due to duty-cycle
+     * limitations.
+     */
+    void Reset();
+
+    void DoRun() override;
+
+    Ptr<ClassAEndDeviceLorawanMac> m_mac; //!< The end device's MAC layer used in tests.
+};
+
+MacCommandTest::MacCommandTest()
+    : TestCase("Test functionality of MAC commands when received by a device")
+{
+}
+
+MacCommandTest::~MacCommandTest()
+{
+    m_mac = nullptr;
+}
+
+template <typename T, typename... Ts>
+std::vector<Ptr<MacCommand>>
+MacCommandTest::RunMacCommand(Ts&&... args)
+{
+    Ptr<Packet> pkt;
+    LoraFrameHeader fhdr;
+    LorawanMacHeader mhdr;
+    // Prepare DL packet with input command
+    pkt = Create<Packet>(0);
+    fhdr.SetAsDownlink();
+    auto cmd = Create<T>(args...);
+    fhdr.AddCommand(cmd);
+    pkt->AddHeader(fhdr);
+    mhdr.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+    pkt->AddHeader(mhdr);
+    // Trigger MAC layer reception
+    DynamicCast<EndDeviceLoraPhy>(m_mac->GetPhy())
+        ->SwitchToStandby(); // usually done as we open Rx windows
+    m_mac->Receive(pkt);
+    // Trigger MAC layer send
+    pkt = Create<Packet>(0);
+    m_mac->Send(pkt);
+    // Retrieve uplink MAC commands
+    pkt->RemoveHeader(mhdr);
+    fhdr.SetAsUplink();
+    pkt->RemoveHeader(fhdr);
+    return fhdr.GetCommands();
+}
+
+void
+MacCommandTest::Reset()
+{
+    // Reset MAC state
+    LorawanMacHelper macHelper;
+    macHelper.SetRegion(LorawanMacHelper::EU);
+    macHelper.SetDeviceType(LorawanMacHelper::ED_A);
+    /// \todo Create should not require a node in input.
+    m_mac = DynamicCast<ClassAEndDeviceLorawanMac>(macHelper.Create(nullptr, nullptr));
+    NS_TEST_EXPECT_MSG_NE(m_mac, nullptr, "Failed to initialize MAC layer object.");
+    auto phy = CreateObject<SimpleEndDeviceLoraPhy>();
+    phy->SetChannel(CreateObject<LoraChannel>());
+    phy->SetMobility(CreateObject<ConstantPositionMobilityModel>());
+    m_mac->SetPhy(phy);
+}
+
+void
+MacCommandTest::DoRun()
+{
+    NS_LOG_DEBUG("MacCommandTest");
+
+    Reset();
+    // LinkCheckAns: get connectivity metrics of last uplink LinkCheckReq command
+    uint8_t margin = 20; // best reception margin [dB] from demodulation floor
+    uint8_t gwCnt = 3;   // number of gateways that received last uplink
+    auto answers = RunMacCommand<LinkCheckAns>(margin, gwCnt);
+    NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetLastKnownLinkMarginDb()),
+                          unsigned(margin),
+                          "m_lastKnownMarginDb differs from Margin field of LinkCheckAns");
+    NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetLastKnownGatewayCount()),
+                          unsigned(gwCnt),
+                          "m_lastKnownGatewayCount differs GwCnt field of LinkCheckAns");
+    NS_TEST_EXPECT_MSG_EQ(answers.size(),
+                          0,
+                          "Unexpected uplink MAC command answer(s) to LinkCheckAns");
+
+    Reset();
+    // LinkAdrReq: change data rate, TX power, redundancy, or channel mask
+    uint8_t dataRate = 5;
+    uint8_t txPower = 2;
+    uint16_t chMask = 0b101;
+    uint8_t chMaskCntl = 0;
+    uint8_t nbTrans = 13;
+    answers = RunMacCommand<LinkAdrReq>(dataRate, txPower, chMask, chMaskCntl, nbTrans);
+    NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
+                          unsigned(dataRate),
+                          "m_dataRate does not match DataRate field of LinkAdrReq");
+    NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
+                          10,
+                          "m_txPowerDbm does not match txPower field of LinkAdrReq");
+    NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
+                          13,
+                          "m_nbTrans does not match nbTrans field of LinkAdrReq");
+    auto channels = m_mac->GetLogicalLoraChannelHelper()->GetChannelList();
+    for (size_t i = 0; i < channels.size() && i < 16; i++)
+    {
+        bool actual = channels.at(i + 16 * chMaskCntl)->IsEnabledForUplink();
+        bool expected = (chMask & 0b1 << i);
+        NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state does not match chMask");
+    }
+    NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+    auto laa = DynamicCast<LinkAdrAns>(answers.at(0));
+    NS_TEST_ASSERT_MSG_NE(laa, nullptr, "LinkAdrAns was expected, cmd type cast failed");
+    NS_TEST_ASSERT_MSG_EQ(laa->GetChannelMaskAck(), true, "ChannelMaskAck expected to be true");
+    NS_TEST_ASSERT_MSG_EQ(laa->GetDataRateAck(), true, "DataRateAck expected to be true");
+    NS_TEST_ASSERT_MSG_EQ(laa->GetPowerAck(), true, "PowerAck expected to be true");
+
+    Reset();
+    // LinkAdrReq: ADR bit off, only change channel mask
+    chMask = 0b011;
+    m_mac->SetUplinkAdrBit(false);
+    answers = RunMacCommand<LinkAdrReq>(dataRate, txPower, chMask, chMaskCntl, nbTrans);
+    NS_TEST_EXPECT_MSG_NE(unsigned(m_mac->GetDataRate()),
+                          unsigned(dataRate),
+                          "m_dataRate expected to differ from DataRate field of LinkAdrReq");
+    NS_TEST_EXPECT_MSG_NE(m_mac->GetTransmissionPowerDbm(),
+                          10,
+                          "m_txPowerDbm expected to not match txPower field of LinkAdrReq");
+    NS_TEST_EXPECT_MSG_NE(unsigned(m_mac->GetMaxNumberOfTransmissions()),
+                          13,
+                          "m_nbTrans expected to differ from nbTrans field of LinkAdrReq");
+    channels = m_mac->GetLogicalLoraChannelHelper()->GetChannelList();
+    for (size_t i = 0; i < channels.size() && i < 16; i++)
+    {
+        bool actual = channels.at(i + 16 * chMaskCntl)->IsEnabledForUplink();
+        bool expected = (chMask & 0b1 << i);
+        NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state does not match chMask");
+    }
+    NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+    laa = DynamicCast<LinkAdrAns>(answers.at(0));
+    NS_TEST_ASSERT_MSG_NE(laa, nullptr, "LinkAdrAns was expected, cmd type cast failed");
+    NS_TEST_ASSERT_MSG_EQ(laa->GetChannelMaskAck(), true, "ChannelMaskAck expected to be true");
+    NS_TEST_ASSERT_MSG_EQ(laa->GetDataRateAck(), false, "DataRateAck expected to be false");
+    NS_TEST_ASSERT_MSG_EQ(laa->GetPowerAck(), false, "PowerAck expected to be false");
+
+    Reset();
+    // LinkAdrReq: invalid chMask, data rate and power
+    // WARNING: default values are manually set here
+    dataRate = 12;
+    txPower = 8;
+    chMask = 0b1100;
+    answers = RunMacCommand<LinkAdrReq>(dataRate, txPower, chMask, chMaskCntl, nbTrans);
+    NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
+                          0,
+                          "m_dataRate expected to be left to default value");
+    NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
+                          14,
+                          "m_txPowerDbm expected to be left to default value");
+    NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
+                          1,
+                          "m_nbTrans expected to be left to default value");
+    channels = m_mac->GetLogicalLoraChannelHelper()->GetChannelList();
+    for (size_t i = 0; i < channels.size() && i < 16; i++)
+    {
+        bool actual = channels.at(i + 16 * chMaskCntl)->IsEnabledForUplink();
+        NS_TEST_EXPECT_MSG_EQ(actual, true, "Channel " << i << " differs from default");
+    }
+    NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+    laa = DynamicCast<LinkAdrAns>(answers.at(0));
+    NS_TEST_ASSERT_MSG_NE(laa, nullptr, "LinkAdrAns was expected, cmd type cast failed");
+    NS_TEST_ASSERT_MSG_EQ(laa->GetChannelMaskAck(), false, "ChannelMaskAck expected to be false");
+    NS_TEST_ASSERT_MSG_EQ(laa->GetDataRateAck(), false, "DataRateAck expected to be false");
+    NS_TEST_ASSERT_MSG_EQ(laa->GetPowerAck(), false, "PowerAck expected to be false");
+}
+
+/**
+ * \ingroup lorawan
+ *
  * The TestSuite class names the TestSuite, identifies what type of TestSuite, and enables the
  * TestCases to be run. Typically, only the constructor for this class must be defined
  */
@@ -1618,6 +1822,17 @@ LorawanTestSuite::LorawanTestSuite()
     : TestSuite("lorawan", Type::UNIT)
 {
     // LogComponentEnable("LorawanTestSuite", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("LorawanMac", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("SimpleEndDeviceLoraPhy", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("EndDeviceLoraPhy", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("LoraPhy", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("LoraChannel", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("LoraFrameHeader", LOG_LEVEL_DEBUG);
+    // LogComponentEnableAll(LOG_PREFIX_FUNC);
+    // LogComponentEnableAll(LOG_PREFIX_NODE);
+    // LogComponentEnableAll(LOG_PREFIX_TIME);
 
     AddTestCase(new InterferenceTest, Duration::QUICK);
     AddTestCase(new AddressTest, Duration::QUICK);
@@ -1626,6 +1841,7 @@ LorawanTestSuite::LorawanTestSuite()
     AddTestCase(new LogicalLoraChannelTest, Duration::QUICK);
     AddTestCase(new TimeOnAirTest, Duration::QUICK);
     AddTestCase(new PhyConnectivityTest, Duration::QUICK);
+    AddTestCase(new MacCommandTest, Duration::QUICK);
 }
 
 // Do not forget to allocate an instance of this TestSuite
