@@ -309,6 +309,36 @@ class LinkAdrAns : public MacCommand
     uint8_t Deserialize(Buffer::Iterator& start) override;
     void Print(std::ostream& os) const override;
 
+    /**
+     * Get the PowerAck field value of the LinkAdrAns command.
+     *
+     * \return true The power level was successfully set.
+     * \return false The end-device is unable to operate at or below the requested power level. The
+     * command was discarded and the end-device state was not changed.
+     */
+    bool GetPowerAck() const;
+
+    /**
+     * Get the DataRateAck field value of the LinkAdrAns command.
+     *
+     * \return true The data rate was successfully set.
+     * \return false The data rate requested is unknown to the end-device or is not possible, given
+     * the channel mask provided (not supported by any of the enabled channels). The command was
+     * discarded, and the end-device state was not changed.
+     */
+    bool GetDataRateAck() const;
+
+    /**
+     * Get the ChannelMaskAck field value of the LinkAdrAns command.
+     *
+     * \return true The channel mask sent was successfully interpreted. All currently defined
+     * channel states were set according to the mask.
+     * \return false The channel mask enables a yet undefined channel or the channel mask required
+     * all channels to be disabled or the channel mask is incompatible with the resulting data rate
+     * or TX power. The command was discarded, and the end-device state was not changed.
+     */
+    bool GetChannelMaskAck() const;
+
   private:
     bool m_powerAck;       //!< The PowerACK field
     bool m_dataRateAck;    //!< The DataRateACK field
