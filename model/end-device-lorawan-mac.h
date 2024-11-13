@@ -290,9 +290,11 @@ class EndDeviceLorawanMac : public LorawanMac
      *
      * \param rx1DrOffset The first reception window data rate offset to set.
      * \param rx2DataRate The data rate to use for the second receive window.
-     * \param frequency The frequency [Hz] to use for the second receive window.
+     * \param frequencyHz The frequency [Hz] to use for the second receive window.
      */
-    virtual void OnRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency) = 0;
+    virtual void OnRxParamSetupReq(uint8_t rx1DrOffset,
+                                   uint8_t rx2DataRate,
+                                   double frequencyHz) = 0;
 
     /**
      * Perform the actions that need to be taken when receiving a DevStatusReq command.
@@ -303,12 +305,12 @@ class EndDeviceLorawanMac : public LorawanMac
      * Perform the actions that need to be taken when receiving a NewChannelReq command.
      *
      * \param chIndex The ChIndex field of the received NewChannelReq command.
-     * \param frequency The Frequency field of the received NewChannelReq command.
+     * \param frequencyHz The Frequency [Hz] field of the received NewChannelReq command.
      * \param minDataRate The MinDR field of the received NewChannelReq command.
      * \param maxDataRate The MaxDR field of the received NewChannelReq command.
      */
     void OnNewChannelReq(uint8_t chIndex,
-                         double frequency,
+                         double frequencyHz,
                          uint8_t minDataRate,
                          uint8_t maxDataRate);
 
@@ -319,20 +321,20 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Add a logical channel to the helper.
      *
-     * \param frequency The channel's center frequency.
+     * \param frequencyMHz The channel's center frequency [MHz].
      */
-    void AddLogicalChannel(double frequency);
+    void AddLogicalChannel(double frequencyMHz);
 
     /**
      * Set a new logical channel in the helper.
      *
      * \param chIndex The channel's new index.
-     * \param frequency The channel's center frequency.
+     * \param frequencyMHz The channel's center frequency [MHz].
      * \param minDataRate The minimum data rate allowed on the channel.
      * \param maxDataRate The maximum data rate allowed on the channel.
      */
     void SetLogicalChannel(uint8_t chIndex,
-                           double frequency,
+                           double frequencyMHz,
                            uint8_t minDataRate,
                            uint8_t maxDataRate);
 
@@ -346,13 +348,13 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Add a subband to the logical channel helper.
      *
-     * \param startFrequency The SubBand's lowest frequency.
-     * \param endFrequency The SubBand's highest frequency.
+     * \param startFrequencyMHz The SubBand's lowest frequency [MHz].
+     * \param endFrequencyMHz The SubBand's highest frequency [MHz].
      * \param dutyCycle The SubBand's duty cycle, in fraction form.
      * \param maxTxPowerDbm The maximum transmission power allowed on the SubBand.
      */
-    void AddSubBand(double startFrequency,
-                    double endFrequency,
+    void AddSubBand(double startFrequencyMHz,
+                    double endFrequencyMHz,
                     double dutyCycle,
                     double maxTxPowerDbm);
 

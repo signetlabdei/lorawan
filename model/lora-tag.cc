@@ -37,7 +37,7 @@ LoraTag::LoraTag(uint8_t sf, uint8_t destroyedBy)
       m_destroyedBy(destroyedBy),
       m_receivePower(0),
       m_dataRate(0),
-      m_frequency(0)
+      m_frequencyMHz(0)
 {
 }
 
@@ -60,7 +60,7 @@ LoraTag::Serialize(TagBuffer i) const
     i.WriteU8(m_destroyedBy);
     i.WriteDouble(m_receivePower);
     i.WriteU8(m_dataRate);
-    i.WriteDouble(m_frequency);
+    i.WriteDouble(m_frequencyMHz);
 }
 
 void
@@ -70,7 +70,7 @@ LoraTag::Deserialize(TagBuffer i)
     m_destroyedBy = i.ReadU8();
     m_receivePower = i.ReadDouble();
     m_dataRate = i.ReadU8();
-    m_frequency = i.ReadDouble();
+    m_frequencyMHz = i.ReadDouble();
 }
 
 void
@@ -116,15 +116,15 @@ LoraTag::SetReceivePower(double receivePower)
 }
 
 void
-LoraTag::SetFrequency(double frequency)
+LoraTag::SetFrequency(double frequencyMHz)
 {
-    m_frequency = frequency;
+    m_frequencyMHz = frequencyMHz;
 }
 
 double
 LoraTag::GetFrequency() const
 {
-    return m_frequency;
+    return m_frequencyMHz;
 }
 
 uint8_t

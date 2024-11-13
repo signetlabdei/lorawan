@@ -154,7 +154,7 @@ class EndDeviceStatus : public Object
         Ptr<const Packet> packet = nullptr; //!< The received packet
         GatewayList gwList;                 //!< List of gateways that received this packet
         uint8_t sf;                         //!< Spreading factor used to send this packet
-        double frequency;                   //!< Carrier frequency [MHz] used to send this packet
+        double frequencyMHz;                //!< Carrier frequency [MHz] used to send this packet
     };
 
     /**
@@ -230,9 +230,9 @@ class EndDeviceStatus : public Object
     /**
      * Set the first window frequency of this device.
      *
-     * \param frequency The frequency [MHz].
+     * \param frequencyMHz The frequency [MHz].
      */
-    void SetFirstReceiveWindowFrequency(double frequency);
+    void SetFirstReceiveWindowFrequency(double frequencyMHz);
 
     /**
      * Set the spreading factor this device is using in the second receive window.
@@ -244,9 +244,9 @@ class EndDeviceStatus : public Object
     /**
      * Set the second window frequency of this device.
      *
-     * \param frequency The frequency [MHz].
+     * \param frequencyMHz The frequency [MHz].
      */
-    void SetSecondReceiveWindowFrequency(double frequency);
+    void SetSecondReceiveWindowFrequency(double frequencyMHz);
 
     /**
      * Set the reply packet mac header.

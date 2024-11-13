@@ -108,7 +108,7 @@ class LoraInterferenceHelper
         /**
          * Get the frequency this event was on.
          *
-         * \return The carrier frequency as a double.
+         * \return The carrier frequency [MHz] as a double.
          */
         double GetFrequency() const;
 

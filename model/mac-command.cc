@@ -557,12 +557,13 @@ RxParamSetupReq::RxParamSetupReq()
     m_serializedSize = 5;
 }
 
-RxParamSetupReq::RxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency)
+RxParamSetupReq::RxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequencyHz)
     : m_rx1DrOffset(rx1DrOffset),
       m_rx2DataRate(rx2DataRate),
-      m_frequency(frequency)
+      m_frequencyHz(frequencyHz)
 {
-    NS_LOG_FUNCTION(this << unsigned(rx1DrOffset) << unsigned(rx2DataRate) << frequency);
+    NS_LOG_FUNCTION(this << unsigned(rx1DrOffset) << unsigned(rx2DataRate)
+                         << uint32_t(frequencyHz));
     NS_ASSERT_MSG(!(rx1DrOffset & 0xF8), "rx1DrOffset > 3 bits");
     NS_ASSERT_MSG(!(rx2DataRate & 0xF0), "rx2DataRate > 4 bits");
     m_commandType = RX_PARAM_SETUP_REQ;
@@ -578,7 +579,7 @@ RxParamSetupReq::Serialize(Buffer::Iterator& start) const
     start.WriteU8(GetCIDFromMacCommand(m_commandType));
     // Data serialization
     start.WriteU8((m_rx1DrOffset & 0b111) << 4 | (m_rx2DataRate & 0b1111));
-    uint32_t encodedFrequency = m_frequency / 100;
+    uint32_t encodedFrequency = m_frequencyHz / 100;
     NS_LOG_DEBUG(unsigned(encodedFrequency));
     NS_LOG_DEBUG(std::bitset<32>(encodedFrequency));
     // Frequency is in little endian (lsb -> msb)
@@ -604,7 +605,7 @@ RxParamSetupReq::Deserialize(Buffer::Iterator& start)
     encodedFrequency += start.ReadU8() << 8;  // Middle byte
     encodedFrequency += start.ReadU8() << 16; // Most significant byte
     NS_LOG_DEBUG(std::bitset<32>(encodedFrequency));
-    m_frequency = double(encodedFrequency) * 100;
+    m_frequencyHz = double(encodedFrequency) * 100;
 
     return m_serializedSize;
 }
@@ -617,7 +618,7 @@ RxParamSetupReq::Print(std::ostream& os) const
     os << "RxParamSetupReq(";
     os << "rx1DrOffset=" << unsigned(m_rx1DrOffset);
     os << ", rx2DataRate=" << unsigned(m_rx2DataRate);
-    os << ", frequency=" << m_frequency;
+    os << ", frequency=" << m_frequencyHz;
     os << ")";
 }
 
@@ -642,7 +643,7 @@ RxParamSetupReq::GetFrequency()
 {
     NS_LOG_FUNCTION(this);
 
-    return m_frequency;
+    return m_frequencyHz;
 }
 
 /////////////////////
@@ -853,11 +854,11 @@ NewChannelReq::NewChannelReq()
 }
 
 NewChannelReq::NewChannelReq(uint8_t chIndex,
-                             double frequency,
+                             double frequencyHz,
                              uint8_t minDataRate,
                              uint8_t maxDataRate)
     : m_chIndex(chIndex),
-      m_frequency(frequency),
+      m_frequencyHz(frequencyHz),
       m_minDataRate(minDataRate),
       m_maxDataRate(maxDataRate)
 {
@@ -876,7 +877,7 @@ NewChannelReq::Serialize(Buffer::Iterator& start) const
     start.WriteU8(GetCIDFromMacCommand(m_commandType));
 
     start.WriteU8(m_chIndex);
-    uint32_t encodedFrequency = m_frequency / 100;
+    uint32_t encodedFrequency = m_frequencyHz / 100;
     // Frequency is in little endian (lsb -> msb)
     start.WriteU8(encodedFrequency & 0xff);             // Least significant byte
     start.WriteU8((encodedFrequency & 0xff00) >> 8);    // Middle byte
@@ -898,7 +899,7 @@ NewChannelReq::Deserialize(Buffer::Iterator& start)
     encodedFrequency += start.ReadU8();       // Least significant byte
     encodedFrequency += start.ReadU8() << 8;  // Middle byte
     encodedFrequency += start.ReadU8() << 16; // Most significant byte
-    m_frequency = double(encodedFrequency) * 100;
+    m_frequencyHz = double(encodedFrequency) * 100;
     uint8_t dataRateByte = start.ReadU8();
     m_maxDataRate = dataRateByte >> 4;
     m_minDataRate = dataRateByte & 0xf;
@@ -927,7 +928,7 @@ NewChannelReq::GetFrequency() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    return m_frequency;
+    return m_frequencyHz;
 }
 
 uint8_t

@@ -150,7 +150,7 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
         if (!IsOnFrequency(frequencyMHz))
         {
             NS_LOG_INFO("Packet lost because it's on frequency "
-                        << frequencyMHz << " MHz and we are listening at " << m_frequency
+                        << frequencyMHz << " MHz and we are listening at " << m_frequencyMHz
                         << " MHz");
 
             // Fire the trace source for this event.

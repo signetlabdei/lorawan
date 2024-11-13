@@ -31,17 +31,17 @@ SubBand::SubBand()
     NS_LOG_FUNCTION(this);
 }
 
-SubBand::SubBand(double firstFrequency,
-                 double lastFrequency,
+SubBand::SubBand(double firstFrequencyMHz,
+                 double lastFrequencyMHz,
                  double dutyCycle,
                  double maxTxPowerDbm)
-    : m_firstFrequency(firstFrequency),
-      m_lastFrequency(lastFrequency),
+    : m_firstFrequencyMHz(firstFrequencyMHz),
+      m_lastFrequencyMHz(lastFrequencyMHz),
       m_dutyCycle(dutyCycle),
       m_nextTransmissionTime(Seconds(0)),
       m_maxTxPowerDbm(maxTxPowerDbm)
 {
-    NS_LOG_FUNCTION(this << firstFrequency << lastFrequency << dutyCycle << maxTxPowerDbm);
+    NS_LOG_FUNCTION(this << firstFrequencyMHz << lastFrequencyMHz << dutyCycle << maxTxPowerDbm);
 }
 
 SubBand::~SubBand()
@@ -52,7 +52,7 @@ SubBand::~SubBand()
 double
 SubBand::GetFirstFrequency() const
 {
-    return m_firstFrequency;
+    return m_firstFrequencyMHz;
 }
 
 double
@@ -62,16 +62,16 @@ SubBand::GetDutyCycle() const
 }
 
 bool
-SubBand::BelongsToSubBand(double frequency) const
+SubBand::BelongsToSubBand(double frequencyMHz) const
 {
-    return (frequency > m_firstFrequency) && (frequency < m_lastFrequency);
+    return (frequencyMHz > m_firstFrequencyMHz) && (frequencyMHz < m_lastFrequencyMHz);
 }
 
 bool
 SubBand::BelongsToSubBand(Ptr<LogicalLoraChannel> logicalChannel) const
 {
-    double frequency = logicalChannel->GetFrequency();
-    return BelongsToSubBand(frequency);
+    double frequencyMHz = logicalChannel->GetFrequency();
+    return BelongsToSubBand(frequencyMHz);
 }
 
 void

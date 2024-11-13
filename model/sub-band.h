@@ -42,12 +42,15 @@ class SubBand : public Object
     /**
      * Create a new SubBand by specifying all of its properties.
      *
-     * \param firstFrequency The SubBand's lowest frequency [MHz].
-     * \param lastFrequency The SubBand's highest frequency [MHz].
+     * \param firstFrequencyMHz The SubBand's lowest frequency [MHz].
+     * \param lastFrequencyMHz The SubBand's highest frequency [MHz].
      * \param dutyCycle The duty cycle (as a fraction) allowed on this SubBand.
      * \param maxTxPowerDbm The maximum transmission power [dBm] allowed on this SubBand.
      */
-    SubBand(double firstFrequency, double lastFrequency, double dutyCycle, double maxTxPowerDbm);
+    SubBand(double firstFrequencyMHz,
+            double lastFrequencyMHz,
+            double dutyCycle,
+            double maxTxPowerDbm);
 
     /**
      * Get the lowest frequency of the SubBand.
@@ -94,11 +97,11 @@ class SubBand : public Object
     /**
      * Return whether or not a frequency belongs to this SubBand.
      *
-     * \param frequency The frequency [MHz] we want to test against the current subband.
+     * \param frequencyMHz The frequency [MHz] we want to test against the current subband.
      * \return True if the frequency is between firstFrequency and lastFrequency,
      * false otherwise.
      */
-    bool BelongsToSubBand(double frequency) const;
+    bool BelongsToSubBand(double frequencyMHz) const;
 
     /**
      * Return whether or not a channel belongs to this SubBand.
@@ -124,8 +127,8 @@ class SubBand : public Object
     double GetMaxTxPowerDbm() const;
 
   private:
-    double m_firstFrequency;     //!< Starting frequency of the subband, in MHz
-    double m_lastFrequency;      //!< Ending frequency of the subband, in MHz
+    double m_firstFrequencyMHz;  //!< Starting frequency of the subband, in MHz
+    double m_lastFrequencyMHz;   //!< Ending frequency of the subband, in MHz
     double m_dutyCycle;          //!< The duty cycle that needs to be enforced on this subband
     Time m_nextTransmissionTime; //!< The next time a transmission will be allowed in this subband
     double m_maxTxPowerDbm; //!< The maximum transmission power that is admitted on this subband

@@ -501,12 +501,12 @@ EndDeviceLorawanMac::GetNextTransmissionDelay()
     {
         // Pointer to the current channel
         Ptr<LogicalLoraChannel> logicalChannel = *it;
-        double frequency = logicalChannel->GetFrequency();
+        double frequencyMHz = logicalChannel->GetFrequency();
 
         waitingTime = std::min(waitingTime, m_channelHelper->GetWaitingTime(logicalChannel));
 
         NS_LOG_DEBUG("Waiting time before the next transmission in channel with frequency "
-                     << frequency << " is = " << waitingTime.GetSeconds() << ".");
+                     << frequencyMHz << " is = " << waitingTime.GetSeconds() << ".");
     }
 
     waitingTime = GetNextClassTransmissionDelay(waitingTime);
@@ -531,9 +531,9 @@ EndDeviceLorawanMac::GetChannelForTx()
     {
         // Pointer to the current channel
         Ptr<LogicalLoraChannel> logicalChannel = *it;
-        double frequency = logicalChannel->GetFrequency();
+        double frequencyMHz = logicalChannel->GetFrequency();
 
-        NS_LOG_DEBUG("Frequency of the current channel: " << frequency);
+        NS_LOG_DEBUG("Frequency of the current channel: " << frequencyMHz);
 
         // Verify that we can send the packet
         Time waitingTime = m_channelHelper->GetWaitingTime(logicalChannel);
@@ -865,7 +865,7 @@ EndDeviceLorawanMac::OnDevStatusReq()
 
 void
 EndDeviceLorawanMac::OnNewChannelReq(uint8_t chIndex,
-                                     double frequency,
+                                     double frequencyHz,
                                      uint8_t minDataRate,
                                      uint8_t maxDataRate)
 {
@@ -877,18 +877,18 @@ EndDeviceLorawanMac::OnNewChannelReq(uint8_t chIndex,
     // TODO Return false if one of the checks above failed
     // TODO Create new channel in the LogicalLoraChannelHelper
 
-    SetLogicalChannel(chIndex, frequency, minDataRate, maxDataRate);
+    SetLogicalChannel(chIndex, frequencyHz, minDataRate, maxDataRate);
 
     NS_LOG_INFO("Adding NewChannelAns reply");
     m_macCommandList.emplace_back(Create<NewChannelAns>(dataRateRangeOk, channelFrequencyOk));
 }
 
 void
-EndDeviceLorawanMac::AddLogicalChannel(double frequency)
+EndDeviceLorawanMac::AddLogicalChannel(double frequencyMHz)
 {
-    NS_LOG_FUNCTION(this << frequency);
+    NS_LOG_FUNCTION(this << frequencyMHz);
 
-    m_channelHelper->AddChannel(frequency);
+    m_channelHelper->AddChannel(frequencyMHz);
 }
 
 void
@@ -901,27 +901,27 @@ EndDeviceLorawanMac::AddLogicalChannel(Ptr<LogicalLoraChannel> logicalChannel)
 
 void
 EndDeviceLorawanMac::SetLogicalChannel(uint8_t chIndex,
-                                       double frequency,
+                                       double frequencyMHz,
                                        uint8_t minDataRate,
                                        uint8_t maxDataRate)
 {
-    NS_LOG_FUNCTION(this << unsigned(chIndex) << frequency << unsigned(minDataRate)
+    NS_LOG_FUNCTION(this << unsigned(chIndex) << frequencyMHz << unsigned(minDataRate)
                          << unsigned(maxDataRate));
 
     m_channelHelper->SetChannel(
         chIndex,
-        CreateObject<LogicalLoraChannel>(frequency, minDataRate, maxDataRate));
+        CreateObject<LogicalLoraChannel>(frequencyMHz, minDataRate, maxDataRate));
 }
 
 void
-EndDeviceLorawanMac::AddSubBand(double startFrequency,
-                                double endFrequency,
+EndDeviceLorawanMac::AddSubBand(double startFrequencyMHz,
+                                double endFrequencyMHz,
                                 double dutyCycle,
                                 double maxTxPowerDbm)
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    m_channelHelper->AddSubBand(startFrequency, endFrequency, dutyCycle, maxTxPowerDbm);
+    m_channelHelper->AddSubBand(startFrequencyMHz, endFrequencyMHz, dutyCycle, maxTxPowerDbm);
 }
 
 uint8_t
