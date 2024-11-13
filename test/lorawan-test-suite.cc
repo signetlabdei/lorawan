@@ -1704,184 +1704,206 @@ MacCommandTest::DoRun()
 
     Reset();
     // LinkCheckAns: get connectivity metrics of last uplink LinkCheckReq command
-    uint8_t margin = 20; // best reception margin [dB] from demodulation floor
-    uint8_t gwCnt = 3;   // number of gateways that received last uplink
-    auto answers = RunMacCommand<LinkCheckAns>(margin, gwCnt);
-    NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetLastKnownLinkMarginDb()),
-                          unsigned(margin),
-                          "m_lastKnownMarginDb differs from Margin field of LinkCheckAns");
-    NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetLastKnownGatewayCount()),
-                          unsigned(gwCnt),
-                          "m_lastKnownGatewayCount differs GwCnt field of LinkCheckAns");
-    NS_TEST_EXPECT_MSG_EQ(answers.size(),
-                          0,
-                          "Unexpected uplink MAC command answer(s) to LinkCheckAns");
+    {
+        uint8_t margin = 20; // best reception margin [dB] from demodulation floor
+        uint8_t gwCnt = 3;   // number of gateways that received last uplink
+        auto answers = RunMacCommand<LinkCheckAns>(margin, gwCnt);
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetLastKnownLinkMarginDb()),
+                              unsigned(margin),
+                              "m_lastKnownMarginDb differs from Margin field of LinkCheckAns");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetLastKnownGatewayCount()),
+                              unsigned(gwCnt),
+                              "m_lastKnownGatewayCount differs GwCnt field of LinkCheckAns");
+        NS_TEST_EXPECT_MSG_EQ(answers.size(),
+                              0,
+                              "Unexpected uplink MAC command answer(s) to LinkCheckAns");
+    }
 
     Reset();
     // LinkAdrReq: change data rate, TX power, redundancy, or channel mask
-    uint8_t dataRate = 5;
-    uint8_t txPower = 2;
-    uint16_t chMask = 0b101;
-    uint8_t chMaskCntl = 0;
-    uint8_t nbTrans = 13;
-    answers = RunMacCommand<LinkAdrReq>(dataRate, txPower, chMask, chMaskCntl, nbTrans);
-    NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
-                          unsigned(dataRate),
-                          "m_dataRate does not match DataRate field of LinkAdrReq");
-    NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
-                          10,
-                          "m_txPowerDbm does not match txPower field of LinkAdrReq");
-    NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
-                          13,
-                          "m_nbTrans does not match nbTrans field of LinkAdrReq");
-    auto channels = m_mac->GetLogicalLoraChannelHelper()->GetChannelList();
-    for (size_t i = 0; i < channels.size() && i < 16; i++)
     {
-        bool actual = channels.at(i + 16 * chMaskCntl)->IsEnabledForUplink();
-        bool expected = (chMask & 0b1 << i);
-        NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state does not match chMask");
+        uint8_t dataRate = 5;
+        uint8_t txPower = 2;
+        uint16_t chMask = 0b101;
+        uint8_t chMaskCntl = 0;
+        uint8_t nbTrans = 13;
+        auto answers = RunMacCommand<LinkAdrReq>(dataRate, txPower, chMask, chMaskCntl, nbTrans);
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
+                              unsigned(dataRate),
+                              "m_dataRate does not match DataRate field of LinkAdrReq");
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
+                              14 - txPower * 2,
+                              "m_txPowerDbm does not match txPower field of LinkAdrReq");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
+                              unsigned(nbTrans),
+                              "m_nbTrans does not match nbTrans field of LinkAdrReq");
+        auto channels = m_mac->GetLogicalLoraChannelHelper()->GetChannelList();
+        for (size_t i = 0; i < channels.size() && i < 16; i++)
+        {
+            bool actual = channels.at(i + 16 * chMaskCntl)->IsEnabledForUplink();
+            bool expected = (chMask & 0b1 << i);
+            NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state != chMask");
+        }
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto laa = DynamicCast<LinkAdrAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(laa, nullptr, "LinkAdrAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetChannelMaskAck(), true, "ChannelMaskAck expected to be true");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetDataRateAck(), true, "DataRateAck expected to be true");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetPowerAck(), true, "PowerAck expected to be true");
     }
-    NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
-    auto laa = DynamicCast<LinkAdrAns>(answers.at(0));
-    NS_TEST_ASSERT_MSG_NE(laa, nullptr, "LinkAdrAns was expected, cmd type cast failed");
-    NS_TEST_EXPECT_MSG_EQ(laa->GetChannelMaskAck(), true, "ChannelMaskAck expected to be true");
-    NS_TEST_EXPECT_MSG_EQ(laa->GetDataRateAck(), true, "DataRateAck expected to be true");
-    NS_TEST_EXPECT_MSG_EQ(laa->GetPowerAck(), true, "PowerAck expected to be true");
 
     Reset();
     // LinkAdrReq: ADR bit off, only change channel mask
-    chMask = 0b011;
-    m_mac->SetUplinkAdrBit(false);
-    answers = RunMacCommand<LinkAdrReq>(dataRate, txPower, chMask, chMaskCntl, nbTrans);
-    NS_TEST_EXPECT_MSG_NE(unsigned(m_mac->GetDataRate()),
-                          unsigned(dataRate),
-                          "m_dataRate expected to differ from DataRate field of LinkAdrReq");
-    NS_TEST_EXPECT_MSG_NE(m_mac->GetTransmissionPowerDbm(),
-                          10,
-                          "m_txPowerDbm expected to not match txPower field of LinkAdrReq");
-    NS_TEST_EXPECT_MSG_NE(unsigned(m_mac->GetMaxNumberOfTransmissions()),
-                          13,
-                          "m_nbTrans expected to differ from nbTrans field of LinkAdrReq");
-    channels = m_mac->GetLogicalLoraChannelHelper()->GetChannelList();
-    for (size_t i = 0; i < channels.size() && i < 16; i++)
     {
-        bool actual = channels.at(i + 16 * chMaskCntl)->IsEnabledForUplink();
-        bool expected = (chMask & 0b1 << i);
-        NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state does not match chMask");
+        uint8_t dataRate = 5;
+        uint8_t txPower = 2;
+        uint16_t chMask = 0b010;
+        uint8_t chMaskCntl = 0;
+        uint8_t nbTrans = 13;
+        m_mac->SetUplinkAdrBit(false);
+        auto answers = RunMacCommand<LinkAdrReq>(dataRate, txPower, chMask, chMaskCntl, nbTrans);
+        NS_TEST_EXPECT_MSG_NE(unsigned(m_mac->GetDataRate()),
+                              unsigned(dataRate),
+                              "m_dataRate expected to differ from DataRate field of LinkAdrReq");
+        NS_TEST_EXPECT_MSG_NE(m_mac->GetTransmissionPowerDbm(),
+                              14 - txPower * 2,
+                              "m_txPowerDbm expected to not match txPower field of LinkAdrReq");
+        NS_TEST_EXPECT_MSG_NE(unsigned(m_mac->GetMaxNumberOfTransmissions()),
+                              unsigned(nbTrans),
+                              "m_nbTrans expected to differ from nbTrans field of LinkAdrReq");
+        auto channels = m_mac->GetLogicalLoraChannelHelper()->GetChannelList();
+        for (size_t i = 0; i < channels.size() && i < 16; i++)
+        {
+            bool actual = channels.at(i + 16 * chMaskCntl)->IsEnabledForUplink();
+            bool expected = (chMask & 0b1 << i);
+            NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state != chMask");
+        }
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto laa = DynamicCast<LinkAdrAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(laa, nullptr, "LinkAdrAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetChannelMaskAck(), true, "ChannelMaskAck expected to be true");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetDataRateAck(), false, "DataRateAck expected to be false");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetPowerAck(), false, "PowerAck expected to be false");
     }
-    NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
-    laa = DynamicCast<LinkAdrAns>(answers.at(0));
-    NS_TEST_ASSERT_MSG_NE(laa, nullptr, "LinkAdrAns was expected, cmd type cast failed");
-    NS_TEST_EXPECT_MSG_EQ(laa->GetChannelMaskAck(), true, "ChannelMaskAck expected to be true");
-    NS_TEST_EXPECT_MSG_EQ(laa->GetDataRateAck(), false, "DataRateAck expected to be false");
-    NS_TEST_EXPECT_MSG_EQ(laa->GetPowerAck(), false, "PowerAck expected to be false");
 
     Reset();
     // LinkAdrReq: invalid chMask, data rate and power
-    // WARNING: default values are manually set here
-    dataRate = 12;
-    txPower = 8;
-    chMask = 0b1100;
-    answers = RunMacCommand<LinkAdrReq>(dataRate, txPower, chMask, chMaskCntl, nbTrans);
-    NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
-                          0,
-                          "m_dataRate expected to be default value");
-    NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
-                          14,
-                          "m_txPowerDbm expected to be default value");
-    NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
-                          1,
-                          "m_nbTrans expected to be default value");
-    channels = m_mac->GetLogicalLoraChannelHelper()->GetChannelList();
-    for (size_t i = 0; i < channels.size() && i < 16; i++)
-    {
-        bool actual = channels.at(i + 16 * chMaskCntl)->IsEnabledForUplink();
-        NS_TEST_EXPECT_MSG_EQ(actual, true, "Channel " << i << " differs from default");
+    { // WARNING: default values are manually set here
+        uint8_t dataRate = 12;
+        uint8_t txPower = 8;
+        uint16_t chMask = 0b1100;
+        uint8_t chMaskCntl = 0;
+        uint8_t nbTrans = 0;
+        auto answers = RunMacCommand<LinkAdrReq>(dataRate, txPower, chMask, chMaskCntl, nbTrans);
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
+                              0,
+                              "m_dataRate expected to be default value");
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
+                              14,
+                              "m_txPowerDbm expected to be default value");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
+                              1,
+                              "m_nbTrans expected to be default value");
+        auto channels = m_mac->GetLogicalLoraChannelHelper()->GetChannelList();
+        for (size_t i = 0; i < channels.size() && i < 16; i++)
+        {
+            bool actual = channels.at(i + 16 * chMaskCntl)->IsEnabledForUplink();
+            NS_TEST_EXPECT_MSG_EQ(actual, true, "Channel " << i << " state != default true");
+        }
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto laa = DynamicCast<LinkAdrAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(laa, nullptr, "LinkAdrAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetChannelMaskAck(), false, "ChannelMaskAck != false");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetDataRateAck(), false, "DataRateAck expected to be false");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetPowerAck(), false, "PowerAck expected to be false");
     }
-    NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
-    laa = DynamicCast<LinkAdrAns>(answers.at(0));
-    NS_TEST_ASSERT_MSG_NE(laa, nullptr, "LinkAdrAns was expected, cmd type cast failed");
-    NS_TEST_EXPECT_MSG_EQ(laa->GetChannelMaskAck(), false, "ChannelMaskAck expected to be false");
-    NS_TEST_EXPECT_MSG_EQ(laa->GetDataRateAck(), false, "DataRateAck expected to be false");
-    NS_TEST_EXPECT_MSG_EQ(laa->GetPowerAck(), false, "PowerAck expected to be false");
 
     Reset();
     // DutyCycleReq: duty cycle to 100%
-    uint8_t maxDutyCycle = 0;
-    answers = RunMacCommand<DutyCycleReq>(maxDutyCycle);
-    NS_TEST_EXPECT_MSG_EQ(m_mac->GetAggregatedDutyCycle(),
-                          1 / std::pow(2, maxDutyCycle),
-                          "m_aggregatedDutyCycle != 1");
-    NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
-    auto dca = DynamicCast<DutyCycleAns>(answers.at(0));
-    NS_TEST_EXPECT_MSG_NE(dca, nullptr, "DutyCycleAns was expected, cmd type cast failed");
+    {
+        uint8_t maxDutyCycle = 0;
+        auto answers = RunMacCommand<DutyCycleReq>(maxDutyCycle);
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetAggregatedDutyCycle(),
+                              1 / std::pow(2, maxDutyCycle),
+                              "m_aggregatedDutyCycle != 1");
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto dca = DynamicCast<DutyCycleAns>(answers.at(0));
+        NS_TEST_EXPECT_MSG_NE(dca, nullptr, "DutyCycleAns was expected, cmd type cast failed");
+    }
 
     Reset();
     // DutyCycleReq: duty cycle to 12.5%
-    maxDutyCycle = 3;
-    answers = RunMacCommand<DutyCycleReq>(maxDutyCycle);
-    NS_TEST_EXPECT_MSG_EQ(m_mac->GetAggregatedDutyCycle(),
-                          1 / std::pow(2, maxDutyCycle),
-                          "m_aggregatedDutyCycle != 1");
-    NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
-    dca = DynamicCast<DutyCycleAns>(answers.at(0));
-    NS_TEST_EXPECT_MSG_NE(dca, nullptr, "DutyCycleAns was expected, cmd type cast failed");
+    {
+        uint8_t maxDutyCycle = 3;
+        auto answers = RunMacCommand<DutyCycleReq>(maxDutyCycle);
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetAggregatedDutyCycle(),
+                              1 / std::pow(2, maxDutyCycle),
+                              "m_aggregatedDutyCycle != 1");
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto dca = DynamicCast<DutyCycleAns>(answers.at(0));
+        NS_TEST_EXPECT_MSG_NE(dca, nullptr, "DutyCycleAns was expected, cmd type cast failed");
+    }
 
     Reset();
     // RxParamSetupReq: set rx1Dr, rx2Dr, frequency
-    uint8_t rx1DrOffset = 5;
-    uint8_t rx2DataRate = 5;
-    double frequency = 863500000;
-    m_mac->SetDataRate(5);
-    answers = RunMacCommand<RxParamSetupReq>(rx1DrOffset, rx2DataRate, frequency);
-    NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetFirstReceiveWindowDataRate()),
-                          0,
-                          "Rx1DataRate does not match rx1DrOffset from RxParamSetupReq");
-    NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetSecondReceiveWindowDataRate()),
-                          rx2DataRate,
-                          "Rx2DataRate does not match rx2DataRate from RxParamSetupReq");
-    NS_TEST_EXPECT_MSG_EQ(m_mac->GetSecondReceiveWindowFrequency(),
-                          frequency / 1e6,
-                          "Rx2 frequency does not match frequency from RxParamSetupReq");
-    NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
-    auto rpsa = DynamicCast<RxParamSetupAns>(answers.at(0));
-    NS_TEST_ASSERT_MSG_NE(rpsa, nullptr, "RxParamSetupAns was expected, cmd type cast failed");
-    NS_TEST_EXPECT_MSG_EQ(rpsa->GetRx1DrOffsetAck(), true, "Rx1DrOffsetAck expected to be true");
-    NS_TEST_EXPECT_MSG_EQ(rpsa->GetRx2DataRateAck(), true, "Rx2DataRateAck expected to be true");
-    NS_TEST_EXPECT_MSG_EQ(rpsa->GetChannelAck(), true, "ChannelAck expected to be true");
+    {
+        uint8_t rx1DrOffset = 5;
+        uint8_t rx2DataRate = 5;
+        double frequencyHz = 863500000;
+        m_mac->SetDataRate(5);
+        auto answers = RunMacCommand<RxParamSetupReq>(rx1DrOffset, rx2DataRate, frequencyHz);
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetFirstReceiveWindowDataRate()),
+                              5 - rx1DrOffset,
+                              "Rx1DataRate does not match rx1DrOffset from RxParamSetupReq");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetSecondReceiveWindowDataRate()),
+                              rx2DataRate,
+                              "Rx2DataRate does not match rx2DataRate from RxParamSetupReq");
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetSecondReceiveWindowFrequency(),
+                              frequencyHz / 1e6,
+                              "Rx2 frequency does not match frequency from RxParamSetupReq");
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto rpsa = DynamicCast<RxParamSetupAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(rpsa, nullptr, "RxParamSetupAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(rpsa->GetRx1DrOffsetAck(), true, "Rx1DrOffsetAck != true");
+        NS_TEST_EXPECT_MSG_EQ(rpsa->GetRx2DataRateAck(), true, "Rx2DataRateAck != true");
+        NS_TEST_EXPECT_MSG_EQ(rpsa->GetChannelAck(), true, "ChannelAck expected to be true");
+    }
 
     Reset();
     // RxParamSetupReq: invalid rx1Dr, rx2Dr, frequency
-    // WARNING: default values are manually set here
-    rx1DrOffset = 7;
-    rx2DataRate = 12;
-    frequency = 871000000;
-    m_mac->SetDataRate(5);
-    answers = RunMacCommand<RxParamSetupReq>(rx1DrOffset, rx2DataRate, frequency);
-    NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetFirstReceiveWindowDataRate()),
-                          5,
-                          "Rx1DataRate expected to be default value");
-    NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetSecondReceiveWindowDataRate()),
-                          0,
-                          "Rx2DataRate expected to be default value");
-    NS_TEST_EXPECT_MSG_EQ(m_mac->GetSecondReceiveWindowFrequency(),
-                          869.525,
-                          "Rx2 frequency expected to be default value");
-    NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
-    rpsa = DynamicCast<RxParamSetupAns>(answers.at(0));
-    NS_TEST_ASSERT_MSG_NE(rpsa, nullptr, "RxParamSetupAns was expected, cmd type cast failed");
-    NS_TEST_EXPECT_MSG_EQ(rpsa->GetRx1DrOffsetAck(), false, "Rx1DrOffsetAck expected to be false");
-    NS_TEST_EXPECT_MSG_EQ(rpsa->GetRx2DataRateAck(), false, "Rx2DataRateAck expected to be false");
-    NS_TEST_EXPECT_MSG_EQ(rpsa->GetChannelAck(), false, "ChannelAck expected to be false");
+    { // WARNING: default values are manually set here
+        uint8_t rx1DrOffset = 7;
+        uint8_t rx2DataRate = 12;
+        double frequencyHz = 871000000;
+        m_mac->SetDataRate(5);
+        auto answers = RunMacCommand<RxParamSetupReq>(rx1DrOffset, rx2DataRate, frequencyHz);
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetFirstReceiveWindowDataRate()),
+                              5,
+                              "Rx1DataRate expected to be default value");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetSecondReceiveWindowDataRate()),
+                              0,
+                              "Rx2DataRate expected to be default value");
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetSecondReceiveWindowFrequency(),
+                              869.525,
+                              "Rx2 frequency expected to be default value");
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto rpsa = DynamicCast<RxParamSetupAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(rpsa, nullptr, "RxParamSetupAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(rpsa->GetRx1DrOffsetAck(), false, "Rx1DrOffsetAck != false");
+        NS_TEST_EXPECT_MSG_EQ(rpsa->GetRx2DataRateAck(), false, "Rx2DataRateAck != false");
+        NS_TEST_EXPECT_MSG_EQ(rpsa->GetChannelAck(), false, "ChannelAck expected to be false");
+    }
 
     Reset();
     // DevStatusReq: get default values
-    answers = RunMacCommand<DevStatusReq>();
-    NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
-    auto dsa = DynamicCast<DevStatusAns>(answers.at(0));
-    NS_TEST_ASSERT_MSG_NE(dsa, nullptr, "DevStatusAns was expected, cmd type cast failed");
-    NS_TEST_EXPECT_MSG_EQ(unsigned(dsa->GetBattery()), 0, "Battery expected to be 0 (ext power)");
-    NS_TEST_EXPECT_MSG_EQ(unsigned(dsa->GetMargin()), 31, "Margin expected to be 31 (default)");
+    { // WARNING: default values are manually set here
+        auto answers = RunMacCommand<DevStatusReq>();
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto dsa = DynamicCast<DevStatusAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(dsa, nullptr, "DevStatusAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(dsa->GetBattery()), 0, "Battery != 0 (external power)");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(dsa->GetMargin()), 31, "Margin expected to be 31 (default)");
+    }
 }
 
 /**
