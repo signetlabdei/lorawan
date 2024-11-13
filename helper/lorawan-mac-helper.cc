@@ -63,7 +63,7 @@ LorawanMacHelper::SetRegion(enum LorawanMacHelper::Regions region)
 }
 
 Ptr<LorawanMac>
-LorawanMacHelper::Create(Ptr<Node> node, Ptr<NetDevice> device) const
+LorawanMacHelper::Install(Ptr<Node> node, Ptr<NetDevice> device) const
 {
     Ptr<LorawanMac> mac = m_mac.Create<LorawanMac>();
     mac->SetDevice(device);
@@ -200,13 +200,13 @@ LorawanMacHelper::ApplyCommonAlohaConfigurations(Ptr<LorawanMac> lorawanMac) con
     // SubBands //
     //////////////
 
-    auto channelHelper = ns3::Create<LogicalLoraChannelHelper>(1);
-    channelHelper->AddSubBand(ns3::Create<SubBand>(868, 868.6, 1, 14));
+    auto channelHelper = Create<LogicalLoraChannelHelper>(1);
+    channelHelper->AddSubBand(Create<SubBand>(868, 868.6, 1, 14));
 
     //////////////////////
     // Default channels //
     //////////////////////
-    Ptr<LogicalLoraChannel> lc1 = ns3::Create<LogicalLoraChannel>(868.1, 0, 5);
+    Ptr<LogicalLoraChannel> lc1 = Create<LogicalLoraChannel>(868.1, 0, 5);
     channelHelper->SetChannel(0, lc1);
 
     lorawanMac->SetLogicalLoraChannelHelper(channelHelper);
@@ -306,20 +306,20 @@ LorawanMacHelper::ApplyCommonEuConfigurations(Ptr<LorawanMac> lorawanMac) const
     // SubBands //
     //////////////
 
-    auto channelHelper = ns3::Create<LogicalLoraChannelHelper>(16);
-    channelHelper->AddSubBand(ns3::Create<SubBand>(863, 865, 0.001, 14));
-    channelHelper->AddSubBand(ns3::Create<SubBand>(865, 868, 0.01, 14));
-    channelHelper->AddSubBand(ns3::Create<SubBand>(868, 868.6, 0.01, 14));
-    channelHelper->AddSubBand(ns3::Create<SubBand>(868.7, 869.2, 0.001, 14));
-    channelHelper->AddSubBand(ns3::Create<SubBand>(869.4, 869.65, 0.1, 27));
-    channelHelper->AddSubBand(ns3::Create<SubBand>(869.7, 870, 0.01, 14));
+    auto channelHelper = Create<LogicalLoraChannelHelper>(16);
+    channelHelper->AddSubBand(Create<SubBand>(863, 865, 0.001, 14));
+    channelHelper->AddSubBand(Create<SubBand>(865, 868, 0.01, 14));
+    channelHelper->AddSubBand(Create<SubBand>(868, 868.6, 0.01, 14));
+    channelHelper->AddSubBand(Create<SubBand>(868.7, 869.2, 0.001, 14));
+    channelHelper->AddSubBand(Create<SubBand>(869.4, 869.65, 0.1, 27));
+    channelHelper->AddSubBand(Create<SubBand>(869.7, 870, 0.01, 14));
 
     //////////////////////
     // Default channels //
     //////////////////////
-    Ptr<LogicalLoraChannel> lc1 = ns3::Create<LogicalLoraChannel>(868.1, 0, 5);
-    Ptr<LogicalLoraChannel> lc2 = ns3::Create<LogicalLoraChannel>(868.3, 0, 5);
-    Ptr<LogicalLoraChannel> lc3 = ns3::Create<LogicalLoraChannel>(868.5, 0, 5);
+    Ptr<LogicalLoraChannel> lc1 = Create<LogicalLoraChannel>(868.1, 0, 5);
+    Ptr<LogicalLoraChannel> lc2 = Create<LogicalLoraChannel>(868.3, 0, 5);
+    Ptr<LogicalLoraChannel> lc3 = Create<LogicalLoraChannel>(868.5, 0, 5);
     channelHelper->SetChannel(0, lc1);
     channelHelper->SetChannel(1, lc2);
     channelHelper->SetChannel(2, lc3);
@@ -421,13 +421,13 @@ LorawanMacHelper::ApplyCommonSingleChannelConfigurations(Ptr<LorawanMac> lorawan
     // SubBands //
     //////////////
 
-    auto channelHelper = ns3::Create<LogicalLoraChannelHelper>(1);
-    channelHelper->AddSubBand(ns3::Create<SubBand>(868, 868.6, 0.01, 14));
+    auto channelHelper = Create<LogicalLoraChannelHelper>(1);
+    channelHelper->AddSubBand(Create<SubBand>(868, 868.6, 0.01, 14));
 
     //////////////////////
     // Default channels //
     //////////////////////
-    Ptr<LogicalLoraChannel> lc1 = ns3::Create<LogicalLoraChannel>(868.1, 0, 5);
+    Ptr<LogicalLoraChannel> lc1 = Create<LogicalLoraChannel>(868.1, 0, 5);
     channelHelper->SetChannel(0, lc1);
 
     lorawanMac->SetLogicalLoraChannelHelper(channelHelper);

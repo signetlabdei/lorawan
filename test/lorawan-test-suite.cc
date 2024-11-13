@@ -1679,7 +1679,7 @@ MacCommandTest::Reset()
     macHelper.SetRegion(LorawanMacHelper::EU);
     macHelper.SetDeviceType(LorawanMacHelper::ED_A);
     /// @todo Create should not require a node in input.
-    m_mac = DynamicCast<ClassAEndDeviceLorawanMac>(macHelper.Create(nullptr, nullptr));
+    m_mac = DynamicCast<ClassAEndDeviceLorawanMac>(macHelper.Install(nullptr, nullptr));
     NS_TEST_EXPECT_MSG_NE(m_mac, nullptr, "Failed to initialize MAC layer object.");
     auto phy = CreateObject<SimpleEndDeviceLoraPhy>();
     phy->SetChannel(CreateObject<LoraChannel>());
