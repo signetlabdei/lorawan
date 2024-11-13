@@ -819,8 +819,7 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
         }
     }
 
-    // Craft a LinkAdrAns MAC command as a response
-    ///////////////////////////////////////////////
+    NS_LOG_INFO("Adding LinkAdrAns reply");
     m_macCommandList.emplace_back(Create<LinkAdrAns>(powerAck, dataRateAck, channelMaskAck));
 }
 
@@ -853,12 +852,13 @@ EndDeviceLorawanMac::OnDevStatusReq()
         battery = 0; // external power source
     }
 
-    int8_t snr = (m_lastRxSnr < 0) ? m_lastRxSnr - .5 : m_lastRxSnr + .5;
-    snr = (snr > 31) ? 31 : snr;
-    snr = (snr < -32) ? -32 : snr;
+    // approximate to nearest integer
+    double snr = round(m_lastRxSnr);
+    // clamp value to boundaries
+    snr = snr < -32 ? -32 : snr > 31 ? 31 : snr;
+    // cast to 6-bit signed int and store in uint8_t
     uint8_t margin = std::bitset<6>(snr).to_ulong();
 
-    // Craft a RxParamSetupAns as response
     NS_LOG_INFO("Adding DevStatusAns reply");
     m_macCommandList.emplace_back(Create<DevStatusAns>(battery, margin));
 }

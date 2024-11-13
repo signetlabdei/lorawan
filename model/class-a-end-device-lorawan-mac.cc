@@ -566,6 +566,7 @@ ClassAEndDeviceLorawanMac::OnRxParamSetupReq(uint8_t rx1DrOffset,
         m_secondReceiveWindowFrequencyMHz = frequency / 1e6;
     }
 
+    NS_LOG_INFO("Adding RxParamSetupAns reply");
     m_macCommandList.emplace_back(
         Create<RxParamSetupAns>(rx1DrOffsetAck, rx2DataRateAck, channelAck));
 }
