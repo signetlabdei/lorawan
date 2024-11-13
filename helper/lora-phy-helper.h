@@ -80,7 +80,7 @@ class LoraPhyHelper
      * \param device The device within which this PHY will be created.
      * \return A newly-created PHY object.
      */
-    Ptr<LoraPhy> Create(Ptr<Node> node, Ptr<NetDevice> device) const;
+    Ptr<LoraPhy> Install(Ptr<Node> node, Ptr<NetDevice> device) const;
 
     /**
      * Set the maximum number of gateway receive paths.

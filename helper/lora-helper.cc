@@ -47,7 +47,7 @@ LoraHelper::Install(const LoraPhyHelper& phyHelper,
         Ptr<LoraNetDevice> device = CreateObject<LoraNetDevice>();
 
         // Create the PHY
-        Ptr<LoraPhy> phy = phyHelper.Create(node, device);
+        Ptr<LoraPhy> phy = phyHelper.Install(node, device);
         NS_ASSERT(phy);
         device->SetPhy(phy);
         NS_LOG_DEBUG("Done creating the PHY");
@@ -85,7 +85,7 @@ LoraHelper::Install(const LoraPhyHelper& phyHelper,
         }
 
         // Create the MAC
-        Ptr<LorawanMac> mac = macHelper.Create(node, device);
+        Ptr<LorawanMac> mac = macHelper.Install(node, device);
         NS_ASSERT(mac);
         mac->SetPhy(phy);
         NS_LOG_DEBUG("Done creating the MAC");

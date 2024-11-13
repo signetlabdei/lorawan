@@ -63,7 +63,7 @@ LorawanMacHelper::SetRegion(enum LorawanMacHelper::Regions region)
 }
 
 Ptr<LorawanMac>
-LorawanMacHelper::Create(Ptr<Node> node, Ptr<NetDevice> device) const
+LorawanMacHelper::Install(Ptr<Node> node, Ptr<NetDevice> device) const
 {
     Ptr<LorawanMac> mac = m_mac.Create<LorawanMac>();
     mac->SetDevice(device);
