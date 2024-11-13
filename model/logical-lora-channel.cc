@@ -19,8 +19,10 @@ namespace lorawan
 
 NS_LOG_COMPONENT_DEFINE("LogicalLoraChannel");
 
-LogicalLoraChannel::LogicalLoraChannel(double frequency, uint8_t minDataRate, uint8_t maxDataRate)
-    : m_frequency(frequency),
+LogicalLoraChannel::LogicalLoraChannel(double frequencyMHz,
+                                       uint8_t minDataRate,
+                                       uint8_t maxDataRate)
+    : m_frequencyMHz(frequencyMHz),
       m_minDataRate(minDataRate),
       m_maxDataRate(maxDataRate),
       m_enabledForUplink(true)
@@ -31,7 +33,7 @@ LogicalLoraChannel::LogicalLoraChannel(double frequency, uint8_t minDataRate, ui
 double
 LogicalLoraChannel::GetFrequency() const
 {
-    return m_frequency;
+    return m_frequencyMHz;
 }
 
 uint8_t

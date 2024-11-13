@@ -98,9 +98,9 @@ class LoraTag : public Tag
      * - It is used by the network server to signal to the gateway the frequency of a downlink
      * packet.
      *
-     * @param frequency The frequency value [MHz].
+     * @param frequencyMHz The frequency value [MHz].
      */
-    void SetFrequency(double frequency);
+    void SetFrequency(double frequencyMHz);
 
     /**
      * Get the frequency of the packet.
@@ -134,7 +134,7 @@ class LoraTag : public Tag
     uint8_t m_destroyedBy; //!< The Spreading Factor that destroyed the packet.
     double m_receivePower; //!< The reception power of this packet.
     uint8_t m_dataRate;    //!< The data rate that needs to be used to send this packet.
-    double m_frequency;    //!< The frequency of this packet
+    double m_frequencyMHz; //!< The frequency [MHz] of this packet
 };
 } // namespace lorawan
 } // namespace ns3

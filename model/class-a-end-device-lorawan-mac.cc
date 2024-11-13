@@ -530,9 +530,10 @@ ClassAEndDeviceLorawanMac::GetSecondReceiveWindowFrequency() const
 void
 ClassAEndDeviceLorawanMac::OnRxParamSetupReq(uint8_t rx1DrOffset,
                                              uint8_t rx2DataRate,
-                                             double frequency)
+                                             double frequencyHz)
 {
-    NS_LOG_FUNCTION(this << unsigned(rx1DrOffset) << unsigned(rx2DataRate) << frequency);
+    NS_LOG_FUNCTION(this << unsigned(rx1DrOffset) << unsigned(rx2DataRate)
+                         << uint32_t(frequencyHz));
 
     // Adapted from: github.com/Lora-net/SWL2001.git v4.3.1
     // For the time being, this implementation is valid for the EU868 region
@@ -553,7 +554,7 @@ ClassAEndDeviceLorawanMac::OnRxParamSetupReq(uint8_t rx1DrOffset,
         rx2DataRateAck = false;
     }
 
-    if (!m_channelHelper->IsFrequencyValid(frequency / 1e6))
+    if (!m_channelHelper->IsFrequencyValid(frequencyHz / 1e6))
     {
         NS_LOG_WARN("Invalid rx2 frequency");
         channelAck = false;
@@ -563,7 +564,7 @@ ClassAEndDeviceLorawanMac::OnRxParamSetupReq(uint8_t rx1DrOffset,
     {
         m_rx1DrOffset = rx1DrOffset;
         m_secondReceiveWindowDataRate = rx2DataRate;
-        m_secondReceiveWindowFrequencyMHz = frequency / 1e6;
+        m_secondReceiveWindowFrequencyMHz = frequencyHz / 1e6;
     }
 
     NS_LOG_INFO("Adding RxParamSetupAns reply");

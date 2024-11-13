@@ -157,7 +157,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     // MAC command methods //
     /////////////////////////
 
-    void OnRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency) override;
+    void OnRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequencyHz) override;
 
   private:
     Time m_receiveDelay1; //!< The interval between when a packet is done sending and when the first

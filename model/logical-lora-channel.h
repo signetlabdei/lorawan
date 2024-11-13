@@ -34,11 +34,11 @@ class LogicalLoraChannel : public SimpleRefCount<LogicalLoraChannel>
     /**
      * Constructor providing initialization of frequency and data rate limits.
      *
-     * @param frequency This channel's frequency [MHz].
+     * @param frequencyMHz This channel's frequency [MHz].
      * @param minDataRate This channel's minimum data rate.
      * @param maxDataRate This channel's maximum data rate.
      */
-    LogicalLoraChannel(double frequency, uint8_t minDataRate, uint8_t maxDataRate);
+    LogicalLoraChannel(double frequencyMHz, uint8_t minDataRate, uint8_t maxDataRate);
 
     /**
      * Get the frequency (MHz).
@@ -79,7 +79,7 @@ class LogicalLoraChannel : public SimpleRefCount<LogicalLoraChannel>
     bool IsEnabledForUplink() const;
 
   private:
-    double m_frequency;      //!< The central frequency of this channel, in MHz.
+    double m_frequencyMHz;   //!< The central frequency of this channel, in MHz.
     uint8_t m_minDataRate;   //!< The minimum data rate that is allowed on this channel.
     uint8_t m_maxDataRate;   //!< The maximum data rate that is allowed on this channel.
     bool m_enabledForUplink; //!< Whether this channel can be used for uplink or not.

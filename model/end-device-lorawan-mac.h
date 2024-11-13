@@ -282,9 +282,11 @@ class EndDeviceLorawanMac : public LorawanMac
      *
      * @param rx1DrOffset The first reception window data rate offset to set.
      * @param rx2DataRate The data rate to use for the second receive window.
-     * @param frequency The frequency [Hz] to use for the second receive window.
+     * @param frequencyHz The frequency [Hz] to use for the second receive window.
      */
-    virtual void OnRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency) = 0;
+    virtual void OnRxParamSetupReq(uint8_t rx1DrOffset,
+                                   uint8_t rx2DataRate,
+                                   double frequencyHz) = 0;
 
     /**
      * Perform the actions that need to be taken when receiving a DevStatusReq command.
@@ -295,12 +297,12 @@ class EndDeviceLorawanMac : public LorawanMac
      * Perform the actions that need to be taken when receiving a NewChannelReq command.
      *
      * @param chIndex The ChIndex field of the received NewChannelReq command.
-     * @param frequency The Frequency field of the received NewChannelReq command.
+     * @param frequencyHz The Frequency [Hz] field of the received NewChannelReq command.
      * @param minDataRate The MinDR field of the received NewChannelReq command.
      * @param maxDataRate The MaxDR field of the received NewChannelReq command.
      */
     void OnNewChannelReq(uint8_t chIndex,
-                         double frequency,
+                         double frequencyHz,
                          uint8_t minDataRate,
                          uint8_t maxDataRate);
 

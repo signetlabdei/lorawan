@@ -153,11 +153,11 @@ class LoraPhy : public Object
     /**
      * Whether this device is listening on the specified frequency or not.
      *
-     * @param frequency The frequency to query.
+     * @param frequencyMHz The frequency [MHz] to query.
      * @return True if the device is listening on that frequency, false
      * otherwise.
      */
-    virtual bool IsOnFrequency(double frequency) = 0;
+    virtual bool IsOnFrequency(double frequencyMHz) = 0;
 
     /**
      * Set the callback to call upon successful reception of a packet.

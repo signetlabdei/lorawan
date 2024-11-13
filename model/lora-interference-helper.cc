@@ -263,7 +263,7 @@ LoraInterferenceHelper::IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Ev
     // Gather information about the event
     double rxPowerDbm = event->GetRxPowerdBm();
     uint8_t sf = event->GetSpreadingFactor();
-    double frequency = event->GetFrequency();
+    double frequencyMHz = event->GetFrequency();
 
     // Handy information about the time frame when the packet was received
     Time now = Simulator::Now();
@@ -285,7 +285,7 @@ LoraInterferenceHelper::IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Ev
         // Only consider the current event if the channel is the same: we
         // assume there's no interchannel interference. Also skip the current
         // event if it's the same that we want to analyze.
-        if (!(interferer->GetFrequency() == frequency) || interferer == event)
+        if (!(interferer->GetFrequency() == frequencyMHz) || interferer == event)
         {
             NS_LOG_DEBUG("Different channel or same event");
             it++;

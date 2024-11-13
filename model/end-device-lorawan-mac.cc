@@ -860,11 +860,11 @@ EndDeviceLorawanMac::OnDevStatusReq()
 
 void
 EndDeviceLorawanMac::OnNewChannelReq(uint8_t chIndex,
-                                     double frequency,
+                                     double frequencyHz,
                                      uint8_t minDataRate,
                                      uint8_t maxDataRate)
 {
-    NS_LOG_FUNCTION(this << unsigned(chIndex) << uint32_t(frequency) << unsigned(minDataRate)
+    NS_LOG_FUNCTION(this << unsigned(chIndex) << uint32_t(frequencyHz) << unsigned(minDataRate)
                          << unsigned(maxDataRate));
 
     NS_ASSERT_MSG(!(minDataRate & 0xF0), "minDataRate field > 4 bits");
@@ -884,7 +884,7 @@ EndDeviceLorawanMac::OnNewChannelReq(uint8_t chIndex,
     }
 
     // Valid Frequency
-    if (frequency != 0 && !m_channelHelper->IsFrequencyValid(frequency / 1e6))
+    if (frequencyHz != 0 && !m_channelHelper->IsFrequencyValid(frequencyHz / 1e6))
     {
         NS_LOG_WARN("[WARNING] Invalid frequency");
         channelFrequencyOk = false;
@@ -911,10 +911,10 @@ EndDeviceLorawanMac::OnNewChannelReq(uint8_t chIndex,
 
     if (dataRateRangeOk && channelFrequencyOk)
     {
-        auto channel = Create<LogicalLoraChannel>(frequency / 1e6, minDataRate, maxDataRate);
-        (frequency == 0) ? channel->DisableForUplink() : channel->EnableForUplink();
+        auto channel = Create<LogicalLoraChannel>(frequencyHz / 1e6, minDataRate, maxDataRate);
+        (frequencyHz == 0) ? channel->DisableForUplink() : channel->EnableForUplink();
         m_channelHelper->SetChannel(chIndex, channel);
-        NS_LOG_DEBUG("MacTxFrequency[" << unsigned(chIndex) << "]=" << uint32_t(frequency)
+        NS_LOG_DEBUG("MacTxFrequency[" << unsigned(chIndex) << "]=" << uint32_t(frequencyHz)
                                        << ", DrMin=" << unsigned(minDataRate)
                                        << ", DrMax=" << unsigned(maxDataRate));
     }
