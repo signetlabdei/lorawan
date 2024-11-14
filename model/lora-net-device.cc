@@ -188,7 +188,7 @@ LoraNetDevice::IsLinkUp() const
 {
     NS_LOG_FUNCTION(this);
 
-    return m_phy != nullptr;
+    return (bool)(m_phy);
 }
 
 void
