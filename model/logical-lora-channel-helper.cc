@@ -91,7 +91,7 @@ LogicalLoraChannelHelper::GetSubBandFromFrequency(double frequency)
     std::list<Ptr<SubBand>>::iterator it;
     for (it = m_subBandList.begin(); it != m_subBandList.end(); it++)
     {
-        if ((*it)->BelongsToSubBand(frequency))
+        if ((*it)->Contains(frequency))
         {
             return *it;
         }
@@ -239,7 +239,7 @@ LogicalLoraChannelHelper::GetTxPowerForChannel(Ptr<LogicalLoraChannel> logicalCh
     for (it = m_subBandList.begin(); it != m_subBandList.end(); it++)
     {
         // Check whether this channel is in this SubBand
-        if ((*it)->BelongsToSubBand(logicalChannel->GetFrequency()))
+        if ((*it)->Contains(logicalChannel->GetFrequency()))
         {
             return (*it)->GetMaxTxPowerDbm();
         }
