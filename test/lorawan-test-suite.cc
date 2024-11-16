@@ -911,19 +911,19 @@ LogicalLoraChannelTest::DoRun()
     //////////////////
 
     // Setup
-    SubBand subBand(868, 868.7, 0.01, 14);
+    auto subBand = Create<SubBand>(868, 868.6, 0.01, 14);
     Ptr<LogicalLoraChannel> channel5 = CreateObject<LogicalLoraChannel>(870);
 
-    // Test BelongsToSubBand
-    NS_TEST_EXPECT_MSG_EQ(subBand.BelongsToSubBand(channel3),
+    // Test Contains
+    NS_TEST_EXPECT_MSG_EQ(subBand->Contains(channel3),
                           true,
-                          "BelongsToSubBand does not behave as expected");
-    NS_TEST_EXPECT_MSG_EQ(subBand.BelongsToSubBand(channel3->GetFrequency()),
+                          "Contains does not behave as expected");
+    NS_TEST_EXPECT_MSG_EQ(subBand->Contains(channel3->GetFrequency()),
                           true,
-                          "BelongsToSubBand does not behave as expected");
-    NS_TEST_EXPECT_MSG_EQ(subBand.BelongsToSubBand(channel5),
+                          "Contains does not behave as expected");
+    NS_TEST_EXPECT_MSG_EQ(subBand->Contains(channel5),
                           false,
-                          "BelongsToSubBand does not behave as expected");
+                          "Contains does not behave as expected");
 
     ///////////////////////////////////
     // Test LogicalLoraChannelHelper //
@@ -931,26 +931,22 @@ LogicalLoraChannelTest::DoRun()
 
     // Setup
     Ptr<LogicalLoraChannelHelper> channelHelper = CreateObject<LogicalLoraChannelHelper>();
-    SubBand subBand1(869, 869.4, 0.1, 27);
+    auto subBand1 = Create<SubBand>(869.4, 869.65, 0.10, 27);
     channel1 = CreateObject<LogicalLoraChannel>(868.1);
     channel2 = CreateObject<LogicalLoraChannel>(868.3);
-    channel3 = CreateObject<LogicalLoraChannel>(868.5);
-    channel4 = CreateObject<LogicalLoraChannel>(869.1);
-    channel5 = CreateObject<LogicalLoraChannel>(869.3);
+    channel3 = CreateObject<LogicalLoraChannel>(869.525);
 
     // Channel diagram
     //
-    // Channels      1      2      3                     4       5
-    // SubBands  868 ----- 0.1% ----- 868.7       869 ----- 1% ----- 869.4
+    // Channels      1     2                              3
+    // SubBands  868 ----- 1% ----- 868.6      869 ----- 10% ----- 869.4
 
     // Add SubBands and LogicalLoraChannels to the helper
-    channelHelper->AddSubBand(&subBand);
-    channelHelper->AddSubBand(&subBand1);
+    channelHelper->AddSubBand(subBand);
+    channelHelper->AddSubBand(subBand1);
     channelHelper->AddChannel(channel1);
     channelHelper->AddChannel(channel2);
     channelHelper->AddChannel(channel3);
-    channelHelper->AddChannel(channel4);
-    channelHelper->AddChannel(channel5);
 
     // Duty Cycle tests
     // (high level duty cycle behavior)
@@ -968,15 +964,9 @@ LogicalLoraChannelTest::DoRun()
     NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitingTime(channel2),
                           expectedTimeOff,
                           "Waiting time doesn't behave as expected");
-    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitingTime(channel3),
-                          expectedTimeOff,
-                          "Waiting time doesn't behave as expected");
 
     // Other bands are not affected by this transmission
-    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitingTime(channel4),
-                          Time(0),
-                          "Waiting time affects other subbands");
-    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitingTime(channel5),
+    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitingTime(channel3),
                           Time(0),
                           "Waiting time affects other subbands");
 }

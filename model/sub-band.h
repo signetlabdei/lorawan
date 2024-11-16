@@ -12,14 +12,12 @@
 #include "logical-lora-channel.h"
 
 #include "ns3/nstime.h"
-#include "ns3/object.h"
+#include "ns3/simple-ref-count.h"
 
 namespace ns3
 {
 namespace lorawan
 {
-
-class LogicalLoraChannel;
 
 /**
  * \ingroup lorawan
@@ -27,18 +25,9 @@ class LogicalLoraChannel;
  * Class representing a SubBand, i.e., a frequency band subject to some
  * regulations on duty cycle and transmission power.
  */
-class SubBand : public Object
+class SubBand : public SimpleRefCount<SubBand>
 {
   public:
-    /**
-     *  Register this type.
-     *  \return The object TypeId.
-     */
-    static TypeId GetTypeId();
-
-    SubBand();           //!< Default constructor
-    ~SubBand() override; //!< Destructor
-
     /**
      * Create a new SubBand by specifying all of its properties.
      *
@@ -59,12 +48,12 @@ class SubBand : public Object
      */
     double GetFirstFrequency() const;
 
-    ///**
-    // * Get the last frequency of the subband.
-    // *
-    // * \return The lowest frequency [MHz] of the SubBand.
-    // */
-    // double GetLastFrequency ();
+    /**
+     * Get the highest frequency of the SubBand.
+     *
+     * \return The highest frequency [MHz] of the SubBand.
+     */
+    double GetLastFrequency() const;
 
     /**
      * Get the duty cycle of the subband.
@@ -101,16 +90,16 @@ class SubBand : public Object
      * \return True if the frequency is between firstFrequency and lastFrequency,
      * false otherwise.
      */
-    bool BelongsToSubBand(double frequencyMHz) const;
+    bool Contains(double frequencyMHz) const;
 
     /**
      * Return whether or not a channel belongs to this SubBand.
      *
      * \param channel The channel we want to test against the current subband.
-     * \return True if the channel's center frequency is between firstFrequency
-     * and lastFrequency, false otherwise.
+     * \return Whether the channel's center frequency is between the first and last frequency of the
+     * sub-band, margins excluded.
      */
-    bool BelongsToSubBand(Ptr<LogicalLoraChannel> channel) const;
+    bool Contains(Ptr<const LogicalLoraChannel> channel) const;
 
     /**
      * Set the maximum transmission power that is allowed on this SubBand.

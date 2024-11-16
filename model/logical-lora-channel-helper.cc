@@ -91,7 +91,7 @@ LogicalLoraChannelHelper::GetSubBandFromFrequency(double frequencyMHz)
     std::list<Ptr<SubBand>>::iterator it;
     for (it = m_subBandList.begin(); it != m_subBandList.end(); it++)
     {
-        if ((*it)->BelongsToSubBand(frequencyMHz))
+        if (sb->Contains(frequencyMHz))
         {
             return *it;
         }

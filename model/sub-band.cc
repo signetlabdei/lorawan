@@ -8,28 +8,12 @@
 
 #include "sub-band.h"
 
-#include "ns3/log.h"
-
 namespace ns3
 {
 namespace lorawan
 {
 
 NS_LOG_COMPONENT_DEFINE("SubBand");
-
-NS_OBJECT_ENSURE_REGISTERED(SubBand);
-
-TypeId
-SubBand::GetTypeId()
-{
-    static TypeId tid = TypeId("ns3::SubBand").SetParent<Object>().SetGroupName("lorawan");
-    return tid;
-}
-
-SubBand::SubBand()
-{
-    NS_LOG_FUNCTION(this);
-}
 
 SubBand::SubBand(double firstFrequencyMHz,
                  double lastFrequencyMHz,
@@ -38,15 +22,10 @@ SubBand::SubBand(double firstFrequencyMHz,
     : m_firstFrequencyMHz(firstFrequencyMHz),
       m_lastFrequencyMHz(lastFrequencyMHz),
       m_dutyCycle(dutyCycle),
-      m_nextTransmissionTime(Seconds(0)),
+      m_nextTransmissionTime(Time(0)),
       m_maxTxPowerDbm(maxTxPowerDbm)
 {
     NS_LOG_FUNCTION(this << firstFrequencyMHz << lastFrequencyMHz << dutyCycle << maxTxPowerDbm);
-}
-
-SubBand::~SubBand()
-{
-    NS_LOG_FUNCTION(this);
 }
 
 double
@@ -56,22 +35,27 @@ SubBand::GetFirstFrequency() const
 }
 
 double
+SubBand::GetLastFrequency() const
+{
+    return m_lastFrequencyMHz;
+}
+
+double
 SubBand::GetDutyCycle() const
 {
     return m_dutyCycle;
 }
 
 bool
-SubBand::BelongsToSubBand(double frequencyMHz) const
+SubBand::Contains(double frequencyMHz) const
 {
     return (frequencyMHz > m_firstFrequencyMHz) && (frequencyMHz < m_lastFrequencyMHz);
 }
 
 bool
-SubBand::BelongsToSubBand(Ptr<LogicalLoraChannel> logicalChannel) const
+SubBand::Contains(Ptr<const LogicalLoraChannel> logicalChannel) const
 {
-    double frequencyMHz = logicalChannel->GetFrequency();
-    return BelongsToSubBand(frequencyMHz);
+    return Contains(logicalChannel->GetFrequency());
 }
 
 void
