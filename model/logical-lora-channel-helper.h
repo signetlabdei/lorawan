@@ -50,20 +50,20 @@ class LogicalLoraChannelHelper : public SimpleRefCount<LogicalLoraChannelHelper>
     /**
      * Get the time it is necessary to wait for before transmitting on a given channel.
      *
-     * \param channel A pointer to the channel we want to know the waiting time for.
-     * \return A Time instance containing the waiting time before transmission is allowed on the
+     * \param channel A pointer to the channel we want to know the wait time for.
+     * \return A Time instance containing the wait time before transmission is allowed on the
      * channel.
      */
-    Time GetWaitingTime(Ptr<LogicalLoraChannel> channel) const;
+    Time GetWaitTime(Ptr<LogicalLoraChannel> channel) const;
 
     /**
      * Get the time it is necessary to wait for before transmitting on a given channel.
      *
-     * \param frequencyMHz The channel frequency [MHz] we want to know the waiting time of for.
-     * \return A Time instance containing the waiting time before transmission is allowed on the
+     * \param frequencyMHz The channel frequency [MHz] we want to know the wait time of for.
+     * \return A Time instance containing the wait time before transmission is allowed on the
      * channel.
      */
-    Time GetWaitingTime(double frequencyMHz) const;
+    Time GetWaitTime(double frequencyMHz) const;
 
     /**
      * Register the transmission of a packet.

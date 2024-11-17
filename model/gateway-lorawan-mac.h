@@ -59,7 +59,7 @@ class GatewayLorawanMac : public LorawanMac
      * \param frequencyMHz The frequency value [MHz].
      * \return The next transmission time.
      */
-    Time GetWaitingTime(double frequencyMHz);
+    Time GetWaitTime(double frequencyMHz);
 
   private:
   protected:
