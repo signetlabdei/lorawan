@@ -895,10 +895,10 @@ LogicalLoraChannelTest::DoRun()
     /////////////////////////////
 
     // Setup
-    Ptr<LogicalLoraChannel> channel1 = CreateObject<LogicalLoraChannel>(868);
-    Ptr<LogicalLoraChannel> channel2 = CreateObject<LogicalLoraChannel>(868);
-    Ptr<LogicalLoraChannel> channel3 = CreateObject<LogicalLoraChannel>(868.1);
-    Ptr<LogicalLoraChannel> channel4 = CreateObject<LogicalLoraChannel>(868.001);
+    Ptr<LogicalLoraChannel> channel1 = Create<LogicalLoraChannel>(868, 0, 5);
+    Ptr<LogicalLoraChannel> channel2 = Create<LogicalLoraChannel>(868, 0, 5);
+    Ptr<LogicalLoraChannel> channel3 = Create<LogicalLoraChannel>(868.1, 0, 5);
+    Ptr<LogicalLoraChannel> channel4 = Create<LogicalLoraChannel>(868.001, 0, 5);
 
     // Equality between channels
     // Test the == and != operators
@@ -912,7 +912,7 @@ LogicalLoraChannelTest::DoRun()
 
     // Setup
     auto subBand = Create<SubBand>(868, 868.6, 0.01, 14);
-    Ptr<LogicalLoraChannel> channel5 = CreateObject<LogicalLoraChannel>(870);
+    Ptr<LogicalLoraChannel> channel5 = Create<LogicalLoraChannel>(870, 0, 5);
 
     // Test Contains
     NS_TEST_EXPECT_MSG_EQ(subBand->Contains(channel3),
@@ -932,9 +932,9 @@ LogicalLoraChannelTest::DoRun()
     // Setup
     Ptr<LogicalLoraChannelHelper> channelHelper = CreateObject<LogicalLoraChannelHelper>();
     auto subBand1 = Create<SubBand>(869.4, 869.65, 0.10, 27);
-    channel1 = CreateObject<LogicalLoraChannel>(868.1);
-    channel2 = CreateObject<LogicalLoraChannel>(868.3);
-    channel3 = CreateObject<LogicalLoraChannel>(869.525);
+    channel1 = Create<LogicalLoraChannel>(868.1, 0, 5);
+    channel2 = Create<LogicalLoraChannel>(868.3, 0, 5);
+    channel3 = Create<LogicalLoraChannel>(869.525, 0, 5);
 
     // Channel diagram
     //

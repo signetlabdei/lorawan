@@ -19,8 +19,6 @@ namespace ns3
 namespace lorawan
 {
 
-class LogicalLoraChannel;
-
 /**
  * \ingroup lorawan
  *

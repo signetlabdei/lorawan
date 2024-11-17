@@ -109,7 +109,7 @@ LogicalLoraChannelHelper::AddChannel(double frequency)
     NS_LOG_FUNCTION(this << frequency);
 
     // Create the new channel and increment the counter
-    Ptr<LogicalLoraChannel> channel = Create<LogicalLoraChannel>(frequency);
+    Ptr<LogicalLoraChannel> channel = Create<LogicalLoraChannel>(frequency, 0, 5);
 
     // Add it to the list
     m_channelList.push_back(channel);
