@@ -42,16 +42,14 @@ MacCommand::~MacCommand()
 enum MacCommandType
 MacCommand::GetCommandType() const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     return m_commandType;
 }
 
 uint8_t
 MacCommand::GetSerializedSize() const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     return m_serializedSize;
 }
 
@@ -59,7 +57,6 @@ uint8_t
 MacCommand::GetCIDFromMacCommand(enum MacCommandType commandType)
 {
     NS_LOG_FUNCTION_NOARGS();
-
     switch (commandType)
     {
     case (INVALID): {
@@ -111,43 +108,30 @@ MacCommand::GetCIDFromMacCommand(enum MacCommandType commandType)
 
 LinkCheckReq::LinkCheckReq()
 {
-    NS_LOG_FUNCTION_NOARGS();
+    NS_LOG_FUNCTION(this);
     m_commandType = LINK_CHECK_REQ;
     m_serializedSize = 1;
-}
-
-LinkCheckReq::~LinkCheckReq()
-{
-    NS_LOG_FUNCTION_NOARGS();
 }
 
 void
 LinkCheckReq::Serialize(Buffer::Iterator& start) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Write the CID and we're done
-    uint8_t cid = GetCIDFromMacCommand(m_commandType);
-    start.WriteU8(cid);
-    NS_LOG_DEBUG("Serialized LinkCheckReq: " << unsigned(cid));
+    NS_LOG_FUNCTION(this);
+    start.WriteU8(GetCIDFromMacCommand(m_commandType)); // Write the CID
 }
 
 uint8_t
 LinkCheckReq::Deserialize(Buffer::Iterator& start)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Read the CID
-    start.ReadU8();
-
+    NS_LOG_FUNCTION(this);
+    start.ReadU8(); // Consume the CID
     return m_serializedSize;
 }
 
 void
 LinkCheckReq::Print(std::ostream& os) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     os << "LinkCheckReq()";
 }
 
@@ -156,11 +140,8 @@ LinkCheckReq::Print(std::ostream& os) const
 //////////////////
 
 LinkCheckAns::LinkCheckAns()
-    : m_margin(0),
-      m_gwCnt(0)
 {
     NS_LOG_FUNCTION(this);
-
     m_commandType = LINK_CHECK_ANS;
     m_serializedSize = 3;
 }
@@ -170,7 +151,6 @@ LinkCheckAns::LinkCheckAns(uint8_t margin, uint8_t gwCnt)
       m_gwCnt(gwCnt)
 {
     NS_LOG_FUNCTION(this << unsigned(margin) << unsigned(gwCnt));
-
     m_commandType = LINK_CHECK_ANS;
     m_serializedSize = 3;
 }
@@ -178,23 +158,17 @@ LinkCheckAns::LinkCheckAns(uint8_t margin, uint8_t gwCnt)
 void
 LinkCheckAns::Serialize(Buffer::Iterator& start) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Write the CID
-    start.WriteU8(GetCIDFromMacCommand(m_commandType));
-    // Write the margin
-    start.WriteU8(m_margin);
-    // Write the gwCnt
-    start.WriteU8(m_gwCnt);
+    NS_LOG_FUNCTION(this);
+    start.WriteU8(GetCIDFromMacCommand(m_commandType)); // Write the CID
+    start.WriteU8(m_margin);                            // Write the margin
+    start.WriteU8(m_gwCnt);                             // Write the gwCnt
 }
 
 uint8_t
 LinkCheckAns::Deserialize(Buffer::Iterator& start)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Consume the CID
-    start.ReadU8();
+    NS_LOG_FUNCTION(this);
+    start.ReadU8(); // Consume the CID
     m_margin = start.ReadU8();
     m_gwCnt = start.ReadU8();
     return m_serializedSize;
@@ -203,36 +177,18 @@ LinkCheckAns::Deserialize(Buffer::Iterator& start)
 void
 LinkCheckAns::Print(std::ostream& os) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     os << "LinkCheckAns(";
-    os << "margin=" << unsigned(m_margin);
-    os << ", gwCnt=" << unsigned(m_gwCnt);
+    os << "Margin=" << unsigned(m_margin);
+    os << ", GwCnt=" << unsigned(m_gwCnt);
     os << ")";
-}
-
-void
-LinkCheckAns::SetMargin(uint8_t margin)
-{
-    NS_LOG_FUNCTION(this << unsigned(margin));
-
-    m_margin = margin;
 }
 
 uint8_t
 LinkCheckAns::GetMargin() const
 {
     NS_LOG_FUNCTION(this);
-
     return m_margin;
-}
-
-void
-LinkCheckAns::SetGwCnt(uint8_t gwCnt)
-{
-    NS_LOG_FUNCTION(this << unsigned(gwCnt));
-
-    m_gwCnt = gwCnt;
 }
 
 uint8_t
@@ -243,14 +199,6 @@ LinkCheckAns::GetGwCnt() const
     return m_gwCnt;
 }
 
-void
-LinkCheckAns::IncrementGwCnt()
-{
-    NS_LOG_FUNCTION(this);
-
-    m_gwCnt++;
-}
-
 ////////////////
 // LinkAdrReq //
 ////////////////
@@ -258,7 +206,6 @@ LinkCheckAns::IncrementGwCnt()
 LinkAdrReq::LinkAdrReq()
 {
     NS_LOG_FUNCTION(this);
-
     m_commandType = LINK_ADR_REQ;
     m_serializedSize = 5;
 }
@@ -275,7 +222,10 @@ LinkAdrReq::LinkAdrReq(uint8_t dataRate,
       m_nbTrans(nbTrans)
 {
     NS_LOG_FUNCTION(this);
-
+    NS_ASSERT_MSG(!(dataRate & 0xF0), "dataRate field > 4 bits");
+    NS_ASSERT_MSG(!(txPower & 0xF0), "txPower field > 4 bits");
+    NS_ASSERT_MSG(!(chMaskCntl & 0xF8), "chMaskCntl field > 3 bits");
+    NS_ASSERT_MSG(!(nbTrans & 0xF0), "nbTrans field > 4 bits");
     m_commandType = LINK_ADR_REQ;
     m_serializedSize = 5;
 }
@@ -283,10 +233,8 @@ LinkAdrReq::LinkAdrReq(uint8_t dataRate,
 void
 LinkAdrReq::Serialize(Buffer::Iterator& start) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Write the CID
-    start.WriteU8(GetCIDFromMacCommand(m_commandType));
+    NS_LOG_FUNCTION(this);
+    start.WriteU8(GetCIDFromMacCommand(m_commandType)); // Write the CID
     start.WriteU8(m_dataRate << 4 | (m_txPower & 0b1111));
     start.WriteU16(m_chMask);
     start.WriteU8(m_chMaskCntl << 4 | (m_nbTrans & 0b1111));
@@ -295,10 +243,8 @@ LinkAdrReq::Serialize(Buffer::Iterator& start) const
 uint8_t
 LinkAdrReq::Deserialize(Buffer::Iterator& start)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Consume the CID
-    start.ReadU8();
+    NS_LOG_FUNCTION(this);
+    start.ReadU8(); // Consume the CID
     uint8_t firstByte = start.ReadU8();
     m_dataRate = firstByte >> 4;
     m_txPower = firstByte & 0b1111;
@@ -306,21 +252,19 @@ LinkAdrReq::Deserialize(Buffer::Iterator& start)
     uint8_t fourthByte = start.ReadU8();
     m_chMaskCntl = fourthByte >> 4;
     m_nbTrans = fourthByte & 0b1111;
-
     return m_serializedSize;
 }
 
 void
 LinkAdrReq::Print(std::ostream& os) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     os << "LinkAdrReq(";
-    os << "dataRate=" << unsigned(m_dataRate);
-    os << ", txPower=" << unsigned(m_txPower);
-    os << ", chMask=" << std::bitset<16>(m_chMask);
-    os << ", chMaskCntl=" << unsigned(m_chMaskCntl);
-    os << ", nbTrans=" << unsigned(m_nbTrans);
+    os << "DataRate=" << unsigned(m_dataRate);
+    os << ", TXPower=" << unsigned(m_txPower);
+    os << ", ChMask=" << std::bitset<16>(m_chMask);
+    os << ", ChMaskCntl=" << unsigned(m_chMaskCntl);
+    os << ", NbTrans=" << unsigned(m_nbTrans);
     os << ")";
 }
 
@@ -328,7 +272,6 @@ uint8_t
 LinkAdrReq::GetDataRate() const
 {
     NS_LOG_FUNCTION(this);
-
     return m_dataRate;
 }
 
@@ -336,7 +279,6 @@ uint8_t
 LinkAdrReq::GetTxPower() const
 {
     NS_LOG_FUNCTION(this);
-
     return m_txPower;
 }
 
@@ -344,13 +286,13 @@ uint16_t
 LinkAdrReq::GetChMask() const
 {
     NS_LOG_FUNCTION(this);
-
     return m_chMask;
 }
 
 uint8_t
 LinkAdrReq::GetChMaskCtrl() const
 {
+    NS_LOG_FUNCTION(this);
     return m_chMaskCntl;
 }
 
@@ -358,7 +300,6 @@ uint8_t
 LinkAdrReq::GetNbTrans() const
 {
     NS_LOG_FUNCTION(this);
-
     return m_nbTrans;
 }
 
@@ -369,7 +310,6 @@ LinkAdrReq::GetNbTrans() const
 LinkAdrAns::LinkAdrAns()
 {
     NS_LOG_FUNCTION(this);
-
     m_commandType = LINK_ADR_ANS;
     m_serializedSize = 2;
 }
@@ -380,7 +320,6 @@ LinkAdrAns::LinkAdrAns(bool powerAck, bool dataRateAck, bool channelMaskAck)
       m_channelMaskAck(channelMaskAck)
 {
     NS_LOG_FUNCTION(this);
-
     m_commandType = LINK_ADR_ANS;
     m_serializedSize = 2;
 }
@@ -388,12 +327,8 @@ LinkAdrAns::LinkAdrAns(bool powerAck, bool dataRateAck, bool channelMaskAck)
 void
 LinkAdrAns::Serialize(Buffer::Iterator& start) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Write the CID
-    start.WriteU8(GetCIDFromMacCommand(m_commandType));
-    // We can assume that true will be converted to 1 and that false will be
-    // converted to 0 on any C++ compiler
+    NS_LOG_FUNCTION(this);
+    start.WriteU8(GetCIDFromMacCommand(m_commandType)); // Write the CID
     start.WriteU8((uint8_t(m_powerAck) << 2) | (uint8_t(m_dataRateAck) << 1) |
                   uint8_t(m_channelMaskAck));
 }
@@ -401,47 +336,44 @@ LinkAdrAns::Serialize(Buffer::Iterator& start) const
 uint8_t
 LinkAdrAns::Deserialize(Buffer::Iterator& start)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Consume the CID
-    start.ReadU8();
-
+    NS_LOG_FUNCTION(this);
+    start.ReadU8(); // Consume the CID
     uint8_t byte = start.ReadU8();
-
     m_powerAck = byte & 0b100;
     m_dataRateAck = byte & 0b10;
     m_channelMaskAck = byte & 0b1;
-
     return m_serializedSize;
 }
 
 void
 LinkAdrAns::Print(std::ostream& os) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     os << "LinkAdrAns(";
-    os << "powerAck=" << m_powerAck;
-    os << ", dataRateAck=" << m_dataRateAck;
-    os << ", channelMaskAck=" << m_channelMaskAck;
+    os << "PowerACK=" << m_powerAck;
+    os << ", DataRateACK=" << m_dataRateAck;
+    os << ", ChannelMaskACK=" << m_channelMaskAck;
     os << ")";
 }
 
 bool
 LinkAdrAns::GetPowerAck() const
 {
+    NS_LOG_FUNCTION(this);
     return m_powerAck;
 }
 
 bool
 LinkAdrAns::GetDataRateAck() const
 {
+    NS_LOG_FUNCTION(this);
     return m_dataRateAck;
 }
 
 bool
 LinkAdrAns::GetChannelMaskAck() const
 {
+    NS_LOG_FUNCTION(this);
     return m_channelMaskAck;
 }
 
@@ -452,7 +384,6 @@ LinkAdrAns::GetChannelMaskAck() const
 DutyCycleReq::DutyCycleReq()
 {
     NS_LOG_FUNCTION(this);
-
     m_commandType = DUTY_CYCLE_REQ;
     m_serializedSize = 2;
 }
@@ -460,7 +391,6 @@ DutyCycleReq::DutyCycleReq()
 DutyCycleReq::DutyCycleReq(uint8_t maxDutyCycle)
 {
     NS_LOG_FUNCTION(this << unsigned(maxDutyCycle));
-
     NS_ASSERT_MSG(!(maxDutyCycle & 0xF0), "maxDutyCycle > 4 bits");
     m_maxDutyCycle = maxDutyCycle;
     m_commandType = DUTY_CYCLE_REQ;
@@ -470,32 +400,26 @@ DutyCycleReq::DutyCycleReq(uint8_t maxDutyCycle)
 void
 DutyCycleReq::Serialize(Buffer::Iterator& start) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Write the CID
-    start.WriteU8(GetCIDFromMacCommand(m_commandType));
+    NS_LOG_FUNCTION(this);
+    start.WriteU8(GetCIDFromMacCommand(m_commandType)); // Write the CID
     start.WriteU8(m_maxDutyCycle);
 }
 
 uint8_t
 DutyCycleReq::Deserialize(Buffer::Iterator& start)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Consume the CID
-    start.ReadU8();
+    NS_LOG_FUNCTION(this);
+    start.ReadU8(); // Consume the CID
     m_maxDutyCycle = start.ReadU8();
-
     return m_serializedSize;
 }
 
 void
 DutyCycleReq::Print(std::ostream& os) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     os << "DutyCycleReq(";
-    os << "maxDutyCycle=" << unsigned(m_maxDutyCycle);
+    os << "MaxDutyCycle=" << unsigned(m_maxDutyCycle);
     os << ")";
 }
 
@@ -513,7 +437,6 @@ DutyCycleReq::GetMaxDutyCycle() const
 DutyCycleAns::DutyCycleAns()
 {
     NS_LOG_FUNCTION(this);
-
     m_commandType = DUTY_CYCLE_ANS;
     m_serializedSize = 1;
 }
@@ -521,38 +444,32 @@ DutyCycleAns::DutyCycleAns()
 void
 DutyCycleAns::Serialize(Buffer::Iterator& start) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Write the CID
-    start.WriteU8(GetCIDFromMacCommand(m_commandType));
+    NS_LOG_FUNCTION(this);
+    start.WriteU8(GetCIDFromMacCommand(m_commandType)); // Write the CID
 }
 
 uint8_t
 DutyCycleAns::Deserialize(Buffer::Iterator& start)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Consume the CID
-    start.ReadU8();
+    NS_LOG_FUNCTION(this);
+    start.ReadU8(); // Consume the CID
     return m_serializedSize;
 }
 
 void
 DutyCycleAns::Print(std::ostream& os) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     os << "DutyCycleAns()";
 }
 
-//////////////////
+/////////////////////
 // RxParamSetupReq //
-//////////////////
+/////////////////////
 
 RxParamSetupReq::RxParamSetupReq()
 {
     NS_LOG_FUNCTION(this);
-
     m_commandType = RX_PARAM_SETUP_REQ;
     m_serializedSize = 5;
 }
@@ -572,29 +489,21 @@ RxParamSetupReq::RxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, doubl
 void
 RxParamSetupReq::Serialize(Buffer::Iterator& start) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Write the CID
-    start.WriteU8(GetCIDFromMacCommand(m_commandType));
-    // Data serialization
+    NS_LOG_FUNCTION(this);
+    start.WriteU8(GetCIDFromMacCommand(m_commandType)); // Write the CID
     start.WriteU8((m_rx1DrOffset & 0b111) << 4 | (m_rx2DataRate & 0b1111));
     uint32_t encodedFrequency = m_frequency / 100;
-    NS_LOG_DEBUG(unsigned(encodedFrequency));
-    NS_LOG_DEBUG(std::bitset<32>(encodedFrequency));
     // Frequency is in little endian (lsb -> msb)
-    start.WriteU8(encodedFrequency & 0xff);             // Least significant byte
-    start.WriteU8((encodedFrequency & 0xff00) >> 8);    // Middle byte
-    start.WriteU8((encodedFrequency & 0xff0000) >> 16); // Most significant byte
+    start.WriteU8(encodedFrequency);       // Least significant byte
+    start.WriteU8(encodedFrequency >> 8);  // Middle byte
+    start.WriteU8(encodedFrequency >> 16); // Most significant byte
 }
 
 uint8_t
 RxParamSetupReq::Deserialize(Buffer::Iterator& start)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Consume the CID
-    start.ReadU8();
-    // Data serialization
+    NS_LOG_FUNCTION(this);
+    start.ReadU8(); // Consume the CID
     uint8_t firstByte = start.ReadU8();
     m_rx1DrOffset = (firstByte & 0b1110000) >> 4;
     m_rx2DataRate = firstByte & 0b1111;
@@ -603,21 +512,18 @@ RxParamSetupReq::Deserialize(Buffer::Iterator& start)
     encodedFrequency += start.ReadU8();       // Least significant byte
     encodedFrequency += start.ReadU8() << 8;  // Middle byte
     encodedFrequency += start.ReadU8() << 16; // Most significant byte
-    NS_LOG_DEBUG(std::bitset<32>(encodedFrequency));
-    m_frequency = double(encodedFrequency) * 100;
-
+    m_frequency = encodedFrequency * 100;
     return m_serializedSize;
 }
 
 void
 RxParamSetupReq::Print(std::ostream& os) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     os << "RxParamSetupReq(";
-    os << "rx1DrOffset=" << unsigned(m_rx1DrOffset);
-    os << ", rx2DataRate=" << unsigned(m_rx2DataRate);
-    os << ", frequency=" << m_frequency;
+    os << "RX1DROffset=" << unsigned(m_rx1DrOffset);
+    os << ", RX2DataRate=" << unsigned(m_rx2DataRate);
+    os << ", Frequency=" << uint32_t(m_frequency);
     os << ")";
 }
 
@@ -625,7 +531,6 @@ uint8_t
 RxParamSetupReq::GetRx1DrOffset()
 {
     NS_LOG_FUNCTION(this);
-
     return m_rx1DrOffset;
 }
 
@@ -633,7 +538,6 @@ uint8_t
 RxParamSetupReq::GetRx2DataRate()
 {
     NS_LOG_FUNCTION(this);
-
     return m_rx2DataRate;
 }
 
@@ -641,7 +545,6 @@ double
 RxParamSetupReq::GetFrequency()
 {
     NS_LOG_FUNCTION(this);
-
     return m_frequency;
 }
 
@@ -652,7 +555,6 @@ RxParamSetupReq::GetFrequency()
 RxParamSetupAns::RxParamSetupAns()
 {
     NS_LOG_FUNCTION(this);
-
     m_commandType = RX_PARAM_SETUP_ANS;
     m_serializedSize = 2;
 }
@@ -663,7 +565,6 @@ RxParamSetupAns::RxParamSetupAns(bool rx1DrOffsetAck, bool rx2DataRateAck, bool 
       m_channelAck(channelAck)
 {
     NS_LOG_FUNCTION(this << rx1DrOffsetAck << rx2DataRateAck << channelAck);
-
     m_commandType = RX_PARAM_SETUP_ANS;
     m_serializedSize = 2;
 }
@@ -671,11 +572,8 @@ RxParamSetupAns::RxParamSetupAns(bool rx1DrOffsetAck, bool rx2DataRateAck, bool 
 void
 RxParamSetupAns::Serialize(Buffer::Iterator& start) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Write the CID
-    start.WriteU8(GetCIDFromMacCommand(m_commandType));
-    // Data serialization
+    NS_LOG_FUNCTION(this);
+    start.WriteU8(GetCIDFromMacCommand(m_commandType)); // Write the CID
     start.WriteU8(uint8_t(m_rx1DrOffsetAck) << 2 | uint8_t(m_rx2DataRateAck) << 1 |
                   uint8_t(m_channelAck));
 }
@@ -683,47 +581,44 @@ RxParamSetupAns::Serialize(Buffer::Iterator& start) const
 uint8_t
 RxParamSetupAns::Deserialize(Buffer::Iterator& start)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Consume the CID
-    start.ReadU8();
-
+    NS_LOG_FUNCTION(this);
+    start.ReadU8(); // Consume the CID
     uint8_t byte = start.ReadU8();
-
     m_rx1DrOffsetAck = (byte & 0b100) >> 2;
     m_rx2DataRateAck = (byte & 0b10) >> 1;
     m_channelAck = byte & 0b1;
-
     return m_serializedSize;
 }
 
 void
 RxParamSetupAns::Print(std::ostream& os) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     os << "RxParamSetupAns(";
-    os << "m_rx1DrOffsetAck=" << m_rx1DrOffsetAck;
-    os << ", m_rx2DataRateAck=" << m_rx2DataRateAck;
-    os << ", m_channelAck=" << m_channelAck;
+    os << "RX1DROffsetACK=" << m_rx1DrOffsetAck;
+    os << ", RX2DataRateACK=" << m_rx2DataRateAck;
+    os << ", ChannelACK=" << m_channelAck;
     os << ")";
 }
 
 bool
 RxParamSetupAns::GetRx1DrOffsetAck() const
 {
+    NS_LOG_FUNCTION(this);
     return m_rx1DrOffsetAck;
 }
 
 bool
 RxParamSetupAns::GetRx2DataRateAck() const
 {
+    NS_LOG_FUNCTION(this);
     return m_rx2DataRateAck;
 }
 
 bool
 RxParamSetupAns::GetChannelAck() const
 {
+    NS_LOG_FUNCTION(this);
     return m_channelAck;
 }
 
@@ -734,7 +629,6 @@ RxParamSetupAns::GetChannelAck() const
 DevStatusReq::DevStatusReq()
 {
     NS_LOG_FUNCTION(this);
-
     m_commandType = DEV_STATUS_REQ;
     m_serializedSize = 1;
 }
@@ -742,28 +636,22 @@ DevStatusReq::DevStatusReq()
 void
 DevStatusReq::Serialize(Buffer::Iterator& start) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Write the CID
-    start.WriteU8(GetCIDFromMacCommand(m_commandType));
+    NS_LOG_FUNCTION(this);
+    start.WriteU8(GetCIDFromMacCommand(m_commandType)); // Write the CID
 }
 
 uint8_t
 DevStatusReq::Deserialize(Buffer::Iterator& start)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Consume the CID
-    start.ReadU8();
-
+    NS_LOG_FUNCTION(this);
+    start.ReadU8(); // Consume the CID
     return m_serializedSize;
 }
 
 void
 DevStatusReq::Print(std::ostream& os) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     os << "DevStatusReq()";
 }
 
@@ -774,7 +662,6 @@ DevStatusReq::Print(std::ostream& os) const
 DevStatusAns::DevStatusAns()
 {
     NS_LOG_FUNCTION(this);
-
     m_commandType = DEV_STATUS_ANS;
     m_serializedSize = 3;
 }
@@ -784,7 +671,7 @@ DevStatusAns::DevStatusAns(uint8_t battery, uint8_t margin)
       m_margin(margin)
 {
     NS_LOG_FUNCTION(this << unsigned(battery) << unsigned(margin));
-
+    NS_ASSERT_MSG(!(margin & 0xC0), "margin > 6 bits");
     m_commandType = DEV_STATUS_ANS;
     m_serializedSize = 3;
 }
@@ -792,10 +679,8 @@ DevStatusAns::DevStatusAns(uint8_t battery, uint8_t margin)
 void
 DevStatusAns::Serialize(Buffer::Iterator& start) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Write the CID
-    start.WriteU8(GetCIDFromMacCommand(m_commandType));
+    NS_LOG_FUNCTION(this);
+    start.WriteU8(GetCIDFromMacCommand(m_commandType)); // Write the CID
     start.WriteU8(m_battery);
     start.WriteU8(m_margin);
 }
@@ -803,21 +688,17 @@ DevStatusAns::Serialize(Buffer::Iterator& start) const
 uint8_t
 DevStatusAns::Deserialize(Buffer::Iterator& start)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Consume the CID
-    start.ReadU8();
+    NS_LOG_FUNCTION(this);
+    start.ReadU8(); // Consume the CID
     m_battery = start.ReadU8();
-    m_margin = start.ReadU8() & 0b111111;
-
+    m_margin = start.ReadU8();
     return m_serializedSize;
 }
 
 void
 DevStatusAns::Print(std::ostream& os) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     os << "DevStatusAns(";
     os << "Battery=" << unsigned(m_battery);
     os << ", Margin=" << unsigned(m_margin);
@@ -827,16 +708,14 @@ DevStatusAns::Print(std::ostream& os) const
 uint8_t
 DevStatusAns::GetBattery() const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     return m_battery;
 }
 
 uint8_t
 DevStatusAns::GetMargin() const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     return m_margin;
 }
 
@@ -847,7 +726,6 @@ DevStatusAns::GetMargin() const
 NewChannelReq::NewChannelReq()
 {
     NS_LOG_FUNCTION(this);
-
     m_commandType = NEW_CHANNEL_REQ;
     m_serializedSize = 6;
 }
@@ -862,7 +740,8 @@ NewChannelReq::NewChannelReq(uint8_t chIndex,
       m_maxDataRate(maxDataRate)
 {
     NS_LOG_FUNCTION(this);
-
+    NS_ASSERT_MSG(!(minDataRate & 0xF0), "minDataRate > 4 bits");
+    NS_ASSERT_MSG(!(maxDataRate & 0xF0), "maxDataRate > 4 bits");
     m_commandType = NEW_CHANNEL_REQ;
     m_serializedSize = 6;
 }
@@ -870,79 +749,72 @@ NewChannelReq::NewChannelReq(uint8_t chIndex,
 void
 NewChannelReq::Serialize(Buffer::Iterator& start) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Write the CID
-    start.WriteU8(GetCIDFromMacCommand(m_commandType));
-
+    NS_LOG_FUNCTION(this);
+    start.WriteU8(GetCIDFromMacCommand(m_commandType)); // Write the CID
     start.WriteU8(m_chIndex);
     uint32_t encodedFrequency = m_frequency / 100;
     // Frequency is in little endian (lsb -> msb)
-    start.WriteU8(encodedFrequency & 0xff);             // Least significant byte
-    start.WriteU8((encodedFrequency & 0xff00) >> 8);    // Middle byte
-    start.WriteU8((encodedFrequency & 0xff0000) >> 16); // Most significant byte
+    start.WriteU8(encodedFrequency);       // Least significant byte
+    start.WriteU8(encodedFrequency >> 8);  // Middle byte
+    start.WriteU8(encodedFrequency >> 16); // Most significant byte
     start.WriteU8((m_maxDataRate << 4) | (m_minDataRate & 0xf));
 }
 
 uint8_t
 NewChannelReq::Deserialize(Buffer::Iterator& start)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Consume the CID
-    start.ReadU8();
-    // Read the data
+    NS_LOG_FUNCTION(this);
+    start.ReadU8(); // Consume the CID
     m_chIndex = start.ReadU8();
     uint32_t encodedFrequency = 0;
     // Frequency is in little endian (lsb -> msb)
     encodedFrequency += start.ReadU8();       // Least significant byte
     encodedFrequency += start.ReadU8() << 8;  // Middle byte
     encodedFrequency += start.ReadU8() << 16; // Most significant byte
-    m_frequency = double(encodedFrequency) * 100;
+    m_frequency = encodedFrequency * 100;
     uint8_t dataRateByte = start.ReadU8();
     m_maxDataRate = dataRateByte >> 4;
     m_minDataRate = dataRateByte & 0xf;
-
     return m_serializedSize;
 }
 
 void
 NewChannelReq::Print(std::ostream& os) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    os << "NewChannelReq()";
+    NS_LOG_FUNCTION(this);
+    os << "NewChannelReq(";
+    os << "ChIndex=" << unsigned(m_chIndex);
+    os << ", Frequency=" << uint32_t(m_frequency);
+    os << ", MaxDR=" << unsigned(m_maxDataRate);
+    os << ", MinDR=" << unsigned(m_minDataRate);
+    os << ")";
 }
 
 uint8_t
 NewChannelReq::GetChannelIndex() const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     return m_chIndex;
 }
 
 double
 NewChannelReq::GetFrequency() const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     return m_frequency;
 }
 
 uint8_t
 NewChannelReq::GetMinDataRate() const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     return m_minDataRate;
 }
 
 uint8_t
 NewChannelReq::GetMaxDataRate() const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     return m_maxDataRate;
 }
 
@@ -953,7 +825,6 @@ NewChannelReq::GetMaxDataRate() const
 NewChannelAns::NewChannelAns()
 {
     NS_LOG_FUNCTION(this);
-
     m_commandType = NEW_CHANNEL_ANS;
     m_serializedSize = 2;
 }
@@ -963,7 +834,6 @@ NewChannelAns::NewChannelAns(bool dataRateRangeOk, bool channelFrequencyOk)
       m_channelFrequencyOk(channelFrequencyOk)
 {
     NS_LOG_FUNCTION(this);
-
     m_commandType = NEW_CHANNEL_ANS;
     m_serializedSize = 2;
 }
@@ -971,38 +841,44 @@ NewChannelAns::NewChannelAns(bool dataRateRangeOk, bool channelFrequencyOk)
 void
 NewChannelAns::Serialize(Buffer::Iterator& start) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Write the CID
-    start.WriteU8(GetCIDFromMacCommand(m_commandType));
-
+    NS_LOG_FUNCTION(this);
+    start.WriteU8(GetCIDFromMacCommand(m_commandType)); // Write the CID
     start.WriteU8((uint8_t(m_dataRateRangeOk) << 1) | uint8_t(m_channelFrequencyOk));
 }
 
 uint8_t
 NewChannelAns::Deserialize(Buffer::Iterator& start)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Consume the CID
-    start.ReadU8();
-    // Read the data
-    uint8_t byte = start.ReadU8();
+    NS_LOG_FUNCTION(this);
+    start.ReadU8();                // Consume the CID
+    uint8_t byte = start.ReadU8(); // Read the data
     m_dataRateRangeOk = (byte & 0b10) >> 1;
     m_channelFrequencyOk = (byte & 0b1);
-
     return m_serializedSize;
 }
 
 void
 NewChannelAns::Print(std::ostream& os) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     os << "NewChannelAns(";
     os << "DataRateRangeOk=" << m_dataRateRangeOk;
     os << ", ChannelFrequencyOk=" << m_channelFrequencyOk;
     os << ")";
+}
+
+bool
+NewChannelAns::GetDataRateRangeOk() const
+{
+    NS_LOG_FUNCTION(this);
+    return m_dataRateRangeOk;
+}
+
+bool
+NewChannelAns::GetChannelFrequencyOk() const
+{
+    NS_LOG_FUNCTION(this);
+    return m_channelFrequencyOk;
 }
 
 //////////////////////
@@ -1012,7 +888,6 @@ NewChannelAns::Print(std::ostream& os) const
 RxTimingSetupReq::RxTimingSetupReq()
 {
     NS_LOG_FUNCTION(this);
-
     m_commandType = RX_TIMING_SETUP_REQ;
     m_serializedSize = 2;
 }
@@ -1021,7 +896,7 @@ RxTimingSetupReq::RxTimingSetupReq(uint8_t delay)
     : m_delay(delay)
 {
     NS_LOG_FUNCTION(this);
-
+    NS_ASSERT_MSG(!(delay & 0xF0), "delay field > 4 bits");
     m_commandType = RX_TIMING_SETUP_REQ;
     m_serializedSize = 2;
 }
@@ -1029,32 +904,24 @@ RxTimingSetupReq::RxTimingSetupReq(uint8_t delay)
 void
 RxTimingSetupReq::Serialize(Buffer::Iterator& start) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Write the CID
-    start.WriteU8(GetCIDFromMacCommand(m_commandType));
-    // Write the data
-    start.WriteU8(m_delay & 0xf);
+    NS_LOG_FUNCTION(this);
+    start.WriteU8(GetCIDFromMacCommand(m_commandType)); // Write the CID
+    start.WriteU8(m_delay & 0xF);                       // Write the data
 }
 
 uint8_t
 RxTimingSetupReq::Deserialize(Buffer::Iterator& start)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Consume the CID
-    start.ReadU8();
-    // Read the data
-    m_delay = start.ReadU8() & 0xf;
-
+    NS_LOG_FUNCTION(this);
+    start.ReadU8();                 // Consume the CID
+    m_delay = start.ReadU8() & 0xF; // Read the data
     return m_serializedSize;
 }
 
 void
 RxTimingSetupReq::Print(std::ostream& os) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     os << "RxTimingSetupReq()";
 }
 
@@ -1062,12 +929,7 @@ Time
 RxTimingSetupReq::GetDelay()
 {
     NS_LOG_FUNCTION(this);
-
-    if (m_delay == 0)
-    {
-        return Seconds(1);
-    }
-    return Seconds(m_delay);
+    return Seconds((m_delay) ? m_delay : 0);
 }
 
 //////////////////
@@ -1077,7 +939,6 @@ RxTimingSetupReq::GetDelay()
 RxTimingSetupAns::RxTimingSetupAns()
 {
     NS_LOG_FUNCTION(this);
-
     m_commandType = DEV_STATUS_REQ;
     m_serializedSize = 1;
 }
@@ -1085,28 +946,22 @@ RxTimingSetupAns::RxTimingSetupAns()
 void
 RxTimingSetupAns::Serialize(Buffer::Iterator& start) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Write the CID
-    start.WriteU8(GetCIDFromMacCommand(m_commandType));
+    NS_LOG_FUNCTION(this);
+    start.WriteU8(GetCIDFromMacCommand(m_commandType)); // Write the CID
 }
 
 uint8_t
 RxTimingSetupAns::Deserialize(Buffer::Iterator& start)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Consume the CID
-    start.ReadU8();
-
+    NS_LOG_FUNCTION(this);
+    start.ReadU8(); // Consume the CID
     return m_serializedSize;
 }
 
 void
 RxTimingSetupAns::Print(std::ostream& os) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     os << "RxTimingSetupAns()";
 }
 
@@ -1117,7 +972,6 @@ RxTimingSetupAns::Print(std::ostream& os) const
 DlChannelAns::DlChannelAns()
 {
     NS_LOG_FUNCTION(this);
-
     m_commandType = DEV_STATUS_REQ;
     m_serializedSize = 1;
 }
@@ -1125,28 +979,22 @@ DlChannelAns::DlChannelAns()
 void
 DlChannelAns::Serialize(Buffer::Iterator& start) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Write the CID
-    start.WriteU8(GetCIDFromMacCommand(m_commandType));
+    NS_LOG_FUNCTION(this);
+    start.WriteU8(GetCIDFromMacCommand(m_commandType)); // Write the CID
 }
 
 uint8_t
 DlChannelAns::Deserialize(Buffer::Iterator& start)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Consume the CID
-    start.ReadU8();
-
+    NS_LOG_FUNCTION(this);
+    start.ReadU8(); // Consume the CID
     return m_serializedSize;
 }
 
 void
 DlChannelAns::Print(std::ostream& os) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     os << "DlChannelAns()";
 }
 
@@ -1157,7 +1005,6 @@ DlChannelAns::Print(std::ostream& os) const
 TxParamSetupReq::TxParamSetupReq()
 {
     NS_LOG_FUNCTION(this);
-
     m_commandType = DEV_STATUS_REQ;
     m_serializedSize = 1;
 }
@@ -1165,28 +1012,22 @@ TxParamSetupReq::TxParamSetupReq()
 void
 TxParamSetupReq::Serialize(Buffer::Iterator& start) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Write the CID
-    start.WriteU8(GetCIDFromMacCommand(m_commandType));
+    NS_LOG_FUNCTION(this);
+    start.WriteU8(GetCIDFromMacCommand(m_commandType)); // Write the CID
 }
 
 uint8_t
 TxParamSetupReq::Deserialize(Buffer::Iterator& start)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Consume the CID
-    start.ReadU8();
-
+    NS_LOG_FUNCTION(this);
+    start.ReadU8(); // Consume the CID
     return m_serializedSize;
 }
 
 void
 TxParamSetupReq::Print(std::ostream& os) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     os << "TxParamSetupReq()";
 }
 
@@ -1197,7 +1038,6 @@ TxParamSetupReq::Print(std::ostream& os) const
 TxParamSetupAns::TxParamSetupAns()
 {
     NS_LOG_FUNCTION(this);
-
     m_commandType = DEV_STATUS_REQ;
     m_serializedSize = 1;
 }
@@ -1205,28 +1045,22 @@ TxParamSetupAns::TxParamSetupAns()
 void
 TxParamSetupAns::Serialize(Buffer::Iterator& start) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Write the CID
-    start.WriteU8(GetCIDFromMacCommand(m_commandType));
+    NS_LOG_FUNCTION(this);
+    start.WriteU8(GetCIDFromMacCommand(m_commandType)); // Write the CID
 }
 
 uint8_t
 TxParamSetupAns::Deserialize(Buffer::Iterator& start)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // Consume the CID
-    start.ReadU8();
-
+    NS_LOG_FUNCTION(this);
+    start.ReadU8(); // Consume the CID
     return m_serializedSize;
 }
 
 void
 TxParamSetupAns::Print(std::ostream& os) const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
+    NS_LOG_FUNCTION(this);
     os << "TxParamSetupAns()";
 }
 
