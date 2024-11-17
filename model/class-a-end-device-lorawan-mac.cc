@@ -541,7 +541,7 @@ ClassAEndDeviceLorawanMac::OnRxParamSetupReq(uint8_t rx1DrOffset,
     bool rx2DataRateAck = true;
     bool channelAck = true;
 
-    if (rx1DrOffset >= 6)
+    if (rx1DrOffset >= m_replyDataRateMatrix.at(m_dataRate).size())
     {
         NS_LOG_WARN("Invalid rx1DrOffset");
         rx1DrOffsetAck = false;
