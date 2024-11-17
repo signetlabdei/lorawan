@@ -1971,6 +1971,70 @@ MacCommandTest::DoRun()
         NS_TEST_EXPECT_MSG_EQ(unsigned(dsa->GetBattery()), 0, "Battery expected == 0 (ext power)");
         NS_TEST_EXPECT_MSG_EQ(unsigned(dsa->GetMargin()), 31, "Margin expected to be 31 (default)");
     }
+
+    Reset();
+    // NewChannelReq: add a new channel
+    {
+        uint8_t chIndex = 4;
+        double frequencyHz = 865100000;
+        uint8_t minDataRate = 1;
+        uint8_t maxDataRate = 4;
+        auto answers = RunMacCommand<NewChannelReq>(chIndex, frequencyHz, minDataRate, maxDataRate);
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto c = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray().at(chIndex);
+        NS_TEST_ASSERT_MSG_NE(c, nullptr, "Channel at chIndex slot expected not to be nullptr");
+        NS_TEST_EXPECT_MSG_EQ(c->GetFrequency(),
+                              frequencyHz / 1e6,
+                              "Channel frequency expected to equal NewChannelReq frequency");
+        NS_TEST_EXPECT_MSG_EQ(c->GetMinimumDataRate(),
+                              unsigned(minDataRate),
+                              "Channel minDataRate expected to equal NewChannelReq minDataRate");
+        NS_TEST_EXPECT_MSG_EQ(c->GetMaximumDataRate(),
+                              unsigned(maxDataRate),
+                              "Channel maxDataRate expected to equal NewChannelReq maxDataRate");
+        auto nca = DynamicCast<NewChannelAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(nca, nullptr, "NewChannelAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(nca->GetDataRateRangeOk(), true, "DataRateRangeOk != true");
+        NS_TEST_EXPECT_MSG_EQ(nca->GetChannelFrequencyOk(), true, "ChannelFrequencyOk != true");
+    }
+
+    Reset();
+    // NewChannelReq: invalid new channel
+    { // WARNING: default values are manually set here
+        uint8_t chIndex = 1;
+        double frequencyHz = 862000000;
+        uint8_t minDataRate = 14;
+        uint8_t maxDataRate = 13;
+        auto answers = RunMacCommand<NewChannelReq>(chIndex, frequencyHz, minDataRate, maxDataRate);
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        double defaultFrequenciesMHz[3] = {868.1, 868.3, 868.5};
+        auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
+        for (size_t i = 0; i < channels.size(); i++)
+        {
+            auto c = channels.at(i);
+            if (i > 2)
+            {
+                NS_TEST_ASSERT_MSG_EQ(c, nullptr, "Channel " << i << "expected to be nullptr");
+                continue;
+            }
+            NS_TEST_EXPECT_MSG_EQ(c->GetFrequency(),
+                                  defaultFrequenciesMHz[i],
+                                  "Channel frequency expected to equal NewChannelReq frequency");
+            NS_TEST_EXPECT_MSG_EQ(unsigned(c->GetMinimumDataRate()),
+                                  0,
+                                  "Channel " << i << " minDataRate expected to be default");
+            NS_TEST_EXPECT_MSG_EQ(unsigned(c->GetMaximumDataRate()),
+                                  5,
+                                  "Channel " << i << " maxDataRate expected to be default");
+            NS_TEST_EXPECT_MSG_EQ(c->IsEnabledForUplink(),
+                                  true,
+                                  "Channel " << i << " state expected to be active by default");
+        }
+        auto nca = DynamicCast<NewChannelAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(nca, nullptr, "NewChannelAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(nca->GetDataRateRangeOk(), false, "DataRateRangeOk != false");
+        NS_TEST_EXPECT_MSG_EQ(nca->GetChannelFrequencyOk(), false, "ChannelFrequencyOk != false");
+    }
 }
 
 /**
