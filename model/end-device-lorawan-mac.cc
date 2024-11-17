@@ -864,17 +864,60 @@ EndDeviceLorawanMac::OnNewChannelReq(uint8_t chIndex,
                                      uint8_t minDataRate,
                                      uint8_t maxDataRate)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << unsigned(chIndex) << uint32_t(frequency) << unsigned(minDataRate)
+                         << unsigned(maxDataRate));
 
-    bool dataRateRangeOk = true;    // XXX Check whether the new data rate range is ok
-    bool channelFrequencyOk = true; // XXX Check whether the frequency is ok
+    NS_ASSERT_MSG(!(minDataRate & 0xF0), "minDataRate field > 4 bits");
+    NS_ASSERT_MSG(!(maxDataRate & 0xF0), "maxDataRate field > 4 bits");
 
-    // TODO Return false if one of the checks above failed
-    // TODO Create new channel in the LogicalLoraChannelHelper
+    // Adapted from: github.com/Lora-net/SWL2001.git v4.3.1
+    // For the time being, this implementation is valid for the EU868 region
 
-    m_channelHelper->SetChannel(
-        chIndex,
-        Create<LogicalLoraChannel>(frequency / 1e6, minDataRate, maxDataRate));
+    bool dataRateRangeOk = true;
+    bool channelFrequencyOk = true;
+
+    // Valid Channel Index
+    if (chIndex < 3 || chIndex > m_channelHelper->GetRawChannelArray().size() - 1)
+    {
+        NS_LOG_WARN("[WARNING] Invalid channel index");
+        dataRateRangeOk = channelFrequencyOk = false;
+    }
+
+    // Valid Frequency
+    if (frequency != 0 && !m_channelHelper->IsFrequencyValid(frequency / 1e6))
+    {
+        NS_LOG_WARN("[WARNING] Invalid frequency");
+        channelFrequencyOk = false;
+    }
+
+    // Valid DRMIN/MAX
+    if (!GetSfFromDataRate(minDataRate) || !GetBandwidthFromDataRate(minDataRate))
+    {
+        NS_LOG_WARN("[WARNING] Invalid DR min");
+        dataRateRangeOk = false;
+    }
+
+    if (!GetSfFromDataRate(maxDataRate) || !GetBandwidthFromDataRate(maxDataRate))
+    {
+        NS_LOG_WARN("[WARNING] Invalid DR max");
+        dataRateRangeOk = false;
+    }
+
+    if (maxDataRate < minDataRate)
+    {
+        NS_LOG_WARN("[WARNING] Invalid DR max < DR min");
+        dataRateRangeOk = false;
+    }
+
+    if (dataRateRangeOk && channelFrequencyOk)
+    {
+        auto channel = Create<LogicalLoraChannel>(frequency / 1e6, minDataRate, maxDataRate);
+        (frequency == 0) ? channel->DisableForUplink() : channel->EnableForUplink();
+        m_channelHelper->SetChannel(chIndex, channel);
+        NS_LOG_DEBUG("MacTxFrequency[" << unsigned(chIndex) << "]=" << uint32_t(frequency)
+                                       << ", DrMin=" << unsigned(minDataRate)
+                                       << ", DrMax=" << unsigned(maxDataRate));
+    }
 
     NS_LOG_INFO("Adding NewChannelAns reply");
     m_macCommandList.emplace_back(Create<NewChannelAns>(dataRateRangeOk, channelFrequencyOk));
