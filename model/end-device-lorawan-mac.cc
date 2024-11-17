@@ -751,7 +751,7 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
             {
                 for (size_t i = 0; i < channelList.size(); ++i)
                 {
-                    (chMask & 0b1 << i) ? channelList[i]->SetEnabledForUplink()
+                    (chMask & 0b1 << i) ? channelList[i]->EnableForUplink()
                                         : channelList[i]->DisableForUplink();
                 }
                 dataRateAck = powerAck = false; // only ack channel mask
@@ -801,7 +801,7 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
         {
             for (size_t i = 0; i < channelList.size(); ++i)
             {
-                (chMask & 0b1 << i) ? channelList[i]->SetEnabledForUplink()
+                (chMask & 0b1 << i) ? channelList[i]->EnableForUplink()
                                     : channelList[i]->DisableForUplink();
             }
             if (txPower != 0xF) // If value is 0xF, ignore config.
@@ -908,9 +908,8 @@ EndDeviceLorawanMac::SetLogicalChannel(uint8_t chIndex,
     NS_LOG_FUNCTION(this << unsigned(chIndex) << frequencyMHz << unsigned(minDataRate)
                          << unsigned(maxDataRate));
 
-    m_channelHelper->SetChannel(
-        chIndex,
-        CreateObject<LogicalLoraChannel>(frequencyMHz, minDataRate, maxDataRate));
+    m_channelHelper->SetChannel(chIndex,
+                                Create<LogicalLoraChannel>(frequencyMHz, minDataRate, maxDataRate));
 }
 
 void

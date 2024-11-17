@@ -9,16 +9,13 @@
 #ifndef LOGICAL_LORA_CHANNEL_H
 #define LOGICAL_LORA_CHANNEL_H
 
-#include "sub-band.h"
-
-#include "ns3/object.h"
+#include "ns3/ptr.h"
+#include "ns3/simple-ref-count.h"
 
 namespace ns3
 {
 namespace lorawan
 {
-
-class SubBand;
 
 /**
  * \ingroup lorawan
@@ -31,25 +28,9 @@ class SubBand;
  * Furthermore, a LogicalLoraChannel can be marked as enabled or disabled for
  * uplink transmission.
  */
-class LogicalLoraChannel : public Object
+class LogicalLoraChannel : public SimpleRefCount<LogicalLoraChannel>
 {
   public:
-    /**
-     *  Register this type.
-     *  \return The object TypeId.
-     */
-    static TypeId GetTypeId();
-
-    LogicalLoraChannel();           //!< Default constructor
-    ~LogicalLoraChannel() override; //!< Destructor
-
-    /**
-     * Construct a new LogicalLoraChannel object initializing the carrier frequency.
-     *
-     * \param frequencyMHz The carrier frequency [MHz].
-     */
-    LogicalLoraChannel(double frequencyMHz);
-
     /**
      * Constructor providing initialization of frequency and data rate limits.
      *
@@ -65,22 +46,6 @@ class LogicalLoraChannel : public Object
      * \return The center frequency of this channel.
      */
     double GetFrequency() const;
-
-    // void SetFrequency (double frequencyMHz);
-
-    /**
-     * Set the minimum data rate that is allowed on this channel.
-     *
-     * \param minDataRate The minimum data rate value.
-     */
-    void SetMinimumDataRate(uint8_t minDataRate);
-
-    /**
-     * Set the maximum data rate that is allowed on this channel.
-     *
-     * \param maxDataRate The maximum data rate value.
-     */
-    void SetMaximumDataRate(uint8_t maxDataRate);
 
     /**
      * Get the minimum data rate that is allowed on this channel.
@@ -99,7 +64,7 @@ class LogicalLoraChannel : public Object
     /**
      * Set this channel as enabled for uplink.
      */
-    void SetEnabledForUplink();
+    void EnableForUplink();
 
     /**
      * Set this channel as disabled for uplink.
