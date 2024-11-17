@@ -60,7 +60,7 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
     packet->AddPacketTag(tag);
 
     // Make sure we can transmit this packet
-    if (GetWaitingTime(frequencyMHz) > Time(0))
+    if (GetWaitTime(frequencyMHz) > Time(0))
     {
         // We cannot send now!
         NS_LOG_WARN("Trying to send a packet but Duty Cycle won't allow it. Aborting.");
@@ -138,11 +138,11 @@ GatewayLorawanMac::TxFinished(Ptr<const Packet> packet)
 }
 
 Time
-GatewayLorawanMac::GetWaitingTime(double frequencyMHz)
+GatewayLorawanMac::GetWaitTime(double frequencyMHz)
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    return m_channelHelper->GetWaitingTime(frequencyMHz);
+    return m_channelHelper->GetWaitTime(frequencyMHz);
 }
 } // namespace lorawan
 } // namespace ns3

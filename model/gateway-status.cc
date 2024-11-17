@@ -100,11 +100,11 @@ GatewayStatus::IsAvailableForTransmission(double frequencyMHz)
     }
 
     // Check that the gateway is not constrained by the duty cycle
-    Time waitingTime = m_gatewayMac->GetWaitingTime(frequencyMHz);
-    if (waitingTime > Seconds(0))
+    Time waitTime = m_gatewayMac->GetWaitTime(frequencyMHz);
+    if (waitTime.IsStrictlyPositive())
     {
         NS_LOG_INFO("Gateway cannot be used because of duty cycle");
-        NS_LOG_INFO("Waiting time at current gateway: " << waitingTime.GetSeconds() << " seconds");
+        NS_LOG_INFO("Wait time at current gateway: " << waitTime.As(Time::S));
 
         return false;
     }

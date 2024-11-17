@@ -473,10 +473,10 @@ EndDeviceLorawanMac::TxFinished(Ptr<const Packet> packet)
 }
 
 Time
-EndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitingTime)
+EndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitTime)
 {
     NS_LOG_FUNCTION_NOARGS();
-    return waitingTime;
+    return waitTime;
 }
 
 Time
@@ -490,7 +490,7 @@ EndDeviceLorawanMac::GetNextTransmissionDelay()
     {
         if (channel && channel->IsEnabledForUplink()) // Skip empty frequency channel slots
         {
-            auto curr = m_channelHelper->GetWaitingTime(channel);
+            auto curr = m_channelHelper->GetWaitTime(channel);
             if (curr < waitTime)
             {
                 waitTime = curr;
@@ -514,7 +514,7 @@ EndDeviceLorawanMac::GetChannelForTx()
         {
             uint8_t minDr = channel->GetMinimumDataRate();
             uint8_t maxDr = channel->GetMaximumDataRate();
-            Time waitTime = m_channelHelper->GetWaitingTime(channel);
+            Time waitTime = m_channelHelper->GetWaitTime(channel);
             NS_LOG_DEBUG("Enabled channel: frequency="
                          << channel->GetFrequency() << "MHz, minDr=" << unsigned(minDr)
                          << ", maxDr=" << unsigned(maxDr) << ", waitTime=" << waitTime.As(Time::S));

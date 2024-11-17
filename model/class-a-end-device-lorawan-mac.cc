@@ -18,8 +18,6 @@
 
 #include "ns3/log.h"
 
-#include <algorithm>
-
 namespace ns3
 {
 namespace lorawan
@@ -450,7 +448,7 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
 /////////////////////////
 
 Time
-ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitingTime)
+ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitTime)
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -471,8 +469,8 @@ ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitingTime)
                                      Seconds(m_receiveWindowDurationInSymbols * tSym);
 
             NS_LOG_DEBUG("Duration until endSecondRxWindow for new transmission:"
-                         << (endSecondRxWindow - Simulator::Now()).GetSeconds());
-            waitingTime = std::max(waitingTime, endSecondRxWindow - Simulator::Now());
+                         << (endSecondRxWindow - Now()).As(Time::S));
+            waitTime = Max(waitTime, endSecondRxWindow - Now());
         }
     }
     // This is a retransmitted packet, it can not be sent until the end of
@@ -482,15 +480,15 @@ ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitingTime)
         double ack_timeout = m_uniformRV->GetValue(1, 3);
         // Compute the duration until ACK_TIMEOUT (It may be a negative number, but it doesn't
         // matter.)
-        Time retransmitWaitingTime =
-            Time(m_secondReceiveWindow.GetTs()) - Simulator::Now() + Seconds(ack_timeout);
+        Time retransmitWaitTime =
+            Time(m_secondReceiveWindow.GetTs()) - Now() + Seconds(ack_timeout);
 
-        NS_LOG_DEBUG("ack_timeout:" << ack_timeout << " retransmitWaitingTime:"
-                                    << retransmitWaitingTime.GetSeconds());
-        waitingTime = std::max(waitingTime, retransmitWaitingTime);
+        NS_LOG_DEBUG("ack_timeout:" << ack_timeout
+                                    << " retransmitWaitTime:" << retransmitWaitTime.As(Time::S));
+        waitTime = Max(waitTime, retransmitWaitTime);
     }
 
-    return waitingTime;
+    return waitTime;
 }
 
 uint8_t

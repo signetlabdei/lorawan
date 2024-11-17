@@ -339,13 +339,13 @@ class EndDeviceLorawanMac : public LorawanMac
     LoraDeviceAddress m_address; //!< The address of this device.
 
     /**
-     * Find the minimum waiting time before the next possible transmission based
+     * Find the minimum wait time before the next possible transmission based
      * on end device's Class Type.
      *
-     * @param waitingTime Currently known minimum waiting time, possibly raised by this function.
-     * @return The updated minimum waiting time in Time format.
+     * @param waitTime Currently known minimum wait time, possibly raised by this function.
+     * @return The updated minimum wait time in Time format.
      */
-    virtual Time GetNextClassTransmissionDelay(Time waitingTime);
+    virtual Time GetNextClassTransmissionDelay(Time waitTime);
 
     /**
      * Find a suitable channel for transmission. The channel is chosen among the
@@ -401,7 +401,7 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Find the base minimum wait time before the next possible transmission.
      *
-     * @return The base minimum waiting time.
+     * @return The base minimum wait time.
      */
     Time GetNextTransmissionDelay();
 

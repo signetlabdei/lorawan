@@ -69,22 +69,22 @@ LogicalLoraChannelHelper::AddSubBand(Ptr<SubBand> subBand)
 }
 
 Time
-LogicalLoraChannelHelper::GetWaitingTime(Ptr<LogicalLoraChannel> channel) const
+LogicalLoraChannelHelper::GetWaitTime(Ptr<LogicalLoraChannel> channel) const
 {
     NS_LOG_FUNCTION(this << channel);
-    return GetWaitingTime(channel->GetFrequency());
+    return GetWaitTime(channel->GetFrequency());
 }
 
 Time
-LogicalLoraChannelHelper::GetWaitingTime(double frequencyMHz) const
+LogicalLoraChannelHelper::GetWaitTime(double frequencyMHz) const
 {
     NS_LOG_FUNCTION(this << frequencyMHz);
     auto subBand = GetSubBandFromFrequency(frequencyMHz);
     NS_ASSERT_MSG(subBand, "Input frequency is out-of-band");
-    Time waitingTime = subBand->GetNextTransmissionTime() - Now();
-    waitingTime = Max(waitingTime, Time(0)); // Handle negative values
-    NS_LOG_DEBUG("waitingTime=" << waitingTime.As(Time::S));
-    return waitingTime;
+    Time waitTime = subBand->GetNextTransmissionTime() - Now();
+    waitTime = Max(waitTime, Time(0)); // Handle negative values
+    NS_LOG_DEBUG("waitTime=" << waitTime.As(Time::S));
+    return waitTime;
 }
 
 void

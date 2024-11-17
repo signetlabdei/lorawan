@@ -955,20 +955,20 @@ LogicalLoraChannelTest::DoRun()
     channelHelper->AddEvent(Seconds(2), channel1);
     Time expectedTimeOff = Seconds(2 / 0.01);
 
-    // Waiting time is computed correctly
-    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitingTime(channel1),
+    // Wait time is computed correctly
+    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitTime(channel1),
                           expectedTimeOff,
-                          "Waiting time doesn't behave as expected");
+                          "Wait time doesn't behave as expected");
 
     // Duty Cycle involves the whole SubBand, not just a channel
-    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitingTime(channel2),
+    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitTime(channel2),
                           expectedTimeOff,
-                          "Waiting time doesn't behave as expected");
+                          "Wait time doesn't behave as expected");
 
     // Other bands are not affected by this transmission
-    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitingTime(channel3),
+    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitTime(channel3),
                           Time(0),
-                          "Waiting time affects other subbands");
+                          "Wait time affects other subbands");
 }
 
 /**
