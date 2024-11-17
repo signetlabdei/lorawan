@@ -125,8 +125,8 @@ class MacCommand : public Object
 class LinkCheckReq : public MacCommand
 {
   public:
-    LinkCheckReq();
-    ~LinkCheckReq() override; //!< Destructor
+    LinkCheckReq(); //!< Default constructor
+
     void Serialize(Buffer::Iterator& start) const override;
     uint8_t Deserialize(Buffer::Iterator& start) override;
     void Print(std::ostream& os) const override;
@@ -158,13 +158,6 @@ class LinkCheckAns : public MacCommand
     void Print(std::ostream& os) const override;
 
     /**
-     * Set the demodulation margin value.
-     *
-     * \param margin The demodulation margin to set.
-     */
-    void SetMargin(uint8_t margin);
-
-    /**
      * Get the demodulation margin value.
      *
      * \return The demodulation margin value.
@@ -172,23 +165,11 @@ class LinkCheckAns : public MacCommand
     uint8_t GetMargin() const;
 
     /**
-     * Set the gateway count value.
-     *
-     * \param gwCnt The count value to set.
-     */
-    void SetGwCnt(uint8_t gwCnt);
-
-    /**
      * Get the gateway count value.
      *
      * \return The gateway count value.
      */
     uint8_t GetGwCnt() const;
-
-    /**
-     * Increment this MacCommand's gwCnt value.
-     */
-    void IncrementGwCnt();
 
   private:
     uint8_t m_margin; //!< This MAC command's demodulation margin value.
@@ -207,7 +188,8 @@ class LinkCheckAns : public MacCommand
 class LinkAdrReq : public MacCommand
 {
   public:
-    LinkAdrReq();
+    LinkAdrReq(); //!< Default constructor
+
     /**
      * Constructor with given fields.
      *
@@ -357,7 +339,8 @@ class LinkAdrAns : public MacCommand
 class DutyCycleReq : public MacCommand
 {
   public:
-    DutyCycleReq();
+    DutyCycleReq(); //!< Default constructor
+
     /**
      * Constructor providing initialization of all parameters.
      *
@@ -408,7 +391,7 @@ class DutyCycleAns : public MacCommand
 class RxParamSetupReq : public MacCommand
 {
   public:
-    RxParamSetupReq();
+    RxParamSetupReq(); //!< Default constructor
 
     /**
      * Constructor providing initialization of all fields.
@@ -458,7 +441,8 @@ class RxParamSetupReq : public MacCommand
 class RxParamSetupAns : public MacCommand
 {
   public:
-    RxParamSetupAns();
+    RxParamSetupAns(); //!< Default constructor
+
     /**
      * Constructor with initialization of all parameters.
      *
@@ -507,11 +491,13 @@ class RxParamSetupAns : public MacCommand
  * \ingroup lorawan
  *
  * Implementation of the DevStatusReq LoRaWAN MAC command.
+ *
+ * This command holds no variables, and just consists in the CID.
  */
 class DevStatusReq : public MacCommand
 {
   public:
-    DevStatusReq();
+    DevStatusReq(); //!< Default constructor
 
     void Serialize(Buffer::Iterator& start) const override;
     uint8_t Deserialize(Buffer::Iterator& start) override;
@@ -570,7 +556,7 @@ class DevStatusAns : public MacCommand
 class NewChannelReq : public MacCommand
 {
   public:
-    NewChannelReq();
+    NewChannelReq(); //!< Default constructor
 
     /**
      * Constructor providing initialization of all parameters.
@@ -642,6 +628,23 @@ class NewChannelAns : public MacCommand
     uint8_t Deserialize(Buffer::Iterator& start) override;
     void Print(std::ostream& os) const override;
 
+    /**
+     * Get the DataRateRangOk field of the NewChannelAns command.
+     *
+     * \return true The data-rate range is compatible with the capabilities of the end-device.
+     * \return false The designated data-rate range exceeds the ones currently defined for this
+     * end-device.
+     */
+    bool GetDataRateRangeOk() const;
+
+    /**
+     * Get the ChannelFrequencyOk field of the NewChannelAns command.
+     *
+     * \return true The end-device is able to use this frequency.
+     * \return false The end-device cannot use this frequency.
+     */
+    bool GetChannelFrequencyOk() const;
+
   private:
     bool m_dataRateRangeOk;    //!< The Data-rate range ok field
     bool m_channelFrequencyOk; //!< The Channel frequency ok field
@@ -655,7 +658,7 @@ class NewChannelAns : public MacCommand
 class RxTimingSetupReq : public MacCommand
 {
   public:
-    RxTimingSetupReq();
+    RxTimingSetupReq(); //!< Default constructor
 
     /**
      * Constructor providing initialization of all parameters.
@@ -684,12 +687,31 @@ class RxTimingSetupReq : public MacCommand
  *
  * Implementation of the RxTimingSetupAns LoRaWAN MAC command.
  *
- * This MAC command has an empty payload.
+ * This command holds no variables, and just consists in the CID.
  */
 class RxTimingSetupAns : public MacCommand
 {
   public:
-    RxTimingSetupAns();
+    RxTimingSetupAns(); //!< Default constructor
+
+    void Serialize(Buffer::Iterator& start) const override;
+    uint8_t Deserialize(Buffer::Iterator& start) override;
+    void Print(std::ostream& os) const override;
+
+  private:
+};
+
+/**
+ * \ingroup lorawan
+ *
+ * Implementation of the TxParamSetupReq LoRaWAN MAC command.
+ *
+ * \todo implementation
+ */
+class TxParamSetupReq : public MacCommand
+{
+  public:
+    TxParamSetupReq(); //!< Default constructor
 
     void Serialize(Buffer::Iterator& start) const override;
     uint8_t Deserialize(Buffer::Iterator& start) override;
@@ -702,6 +724,8 @@ class RxTimingSetupAns : public MacCommand
  * \ingroup lorawan
  *
  * Implementation of the TxParamSetupAns LoRaWAN MAC command.
+ *
+ * This command holds no variables, and just consists in the CID.
  */
 class TxParamSetupAns : public MacCommand
 {
@@ -718,24 +742,9 @@ class TxParamSetupAns : public MacCommand
 /**
  * \ingroup lorawan
  *
- * Implementation of the TxParamSetupReq LoRaWAN MAC command.
- */
-class TxParamSetupReq : public MacCommand
-{
-  public:
-    TxParamSetupReq();
-
-    void Serialize(Buffer::Iterator& start) const override;
-    uint8_t Deserialize(Buffer::Iterator& start) override;
-    void Print(std::ostream& os) const override;
-
-  private:
-};
-
-/**
- * \ingroup lorawan
- *
  * Implementation of the DlChannelAns LoRaWAN MAC command.
+ *
+ * \todo implementation
  */
 class DlChannelAns : public MacCommand
 {
