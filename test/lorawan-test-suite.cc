@@ -1783,9 +1783,9 @@ MacCommandTest::DoRun()
     { // WARNING: default values are manually set here
         uint8_t dataRate = 12;
         uint8_t txPower = 8;
-        uint16_t chMask = 0b1100;
+        uint16_t chMask = 0b0;
         uint8_t chMaskCntl = 0;
-        uint8_t nbTrans = 0;
+        uint8_t nbTrans = 6;
         auto answers = RunMacCommand<LinkAdrReq>(dataRate, txPower, chMask, chMaskCntl, nbTrans);
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
                               0,
@@ -1810,6 +1810,79 @@ MacCommandTest::DoRun()
         NS_TEST_EXPECT_MSG_EQ(laa->GetChannelMaskAck(), false, "ChannelMaskAck != false");
         NS_TEST_EXPECT_MSG_EQ(laa->GetDataRateAck(), false, "DataRateAck expected to be false");
         NS_TEST_EXPECT_MSG_EQ(laa->GetPowerAck(), false, "PowerAck expected to be false");
+    }
+
+    Reset();
+    // LinkAdrReq: invalid chMask, valid data rate and power
+    { // WARNING: default values are manually set here
+        uint8_t dataRate = 1;
+        uint8_t txPower = 7;
+        uint16_t chMask = 0b1000; // enable only non-exisitng channel
+        uint8_t chMaskCntl = 0;
+        uint8_t nbTrans = 3;
+        auto answers = RunMacCommand<LinkAdrReq>(dataRate, txPower, chMask, chMaskCntl, nbTrans);
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
+                              0,
+                              "m_dataRate expected to be default value");
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
+                              14,
+                              "m_txPowerDbm expected to be default value");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
+                              1,
+                              "m_nbTrans expected to be default value");
+        auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
+        for (size_t i = 0; i < channels.size(); i++)
+        {
+            auto c = channels.at(i + 16 * chMaskCntl);
+            bool actual = (c) ? c->IsEnabledForUplink() : false;
+            bool expected = (uint16_t(0b111) & 0b1 << i);
+            NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state != default");
+        }
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto laa = DynamicCast<LinkAdrAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(laa, nullptr, "LinkAdrAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetChannelMaskAck(), false, "ChannelMaskAck != false");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetDataRateAck(), true, "DataRateAck expected to be true");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetPowerAck(), true, "PowerAck expected to be true");
+    }
+
+    Reset();
+    // LinkAdrReq: fringe parameter values
+    { // WARNING: default values are manually set here
+        uint8_t dataRate = 0xF;
+        uint8_t txPower = 0xF;  // 0x0F ignores config
+        uint16_t chMask = 0b0;  // should be ignored because chMaskCntl is 6
+        uint8_t chMaskCntl = 6; // all channels on
+        uint8_t nbTrans = 0;    // restore default 1
+        // Set device params to values different from default
+        m_mac->SetDataRate(3);
+        m_mac->SetTransmissionPowerDbm(12);
+        m_mac->SetMaxNumberOfTransmissions(15);
+        auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
+        channels.at(0)->DisableForUplink();
+        auto answers = RunMacCommand<LinkAdrReq>(dataRate, txPower, chMask, chMaskCntl, nbTrans);
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
+                              3,
+                              "m_dataRate expected to be default value");
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
+                              12,
+                              "m_txPowerDbm expected to be default value");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
+                              1,
+                              "m_nbTrans expected to be default value");
+        for (size_t i = 0; i < channels.size(); i++)
+        {
+            auto c = channels.at(i);
+            bool actual = (c) ? c->IsEnabledForUplink() : false;
+            bool expected = (uint16_t(0b111) & 0b1 << i);
+            NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state != default");
+        }
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto laa = DynamicCast<LinkAdrAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(laa, nullptr, "LinkAdrAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetChannelMaskAck(), true, "ChannelMaskAck != true");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetDataRateAck(), true, "DataRateAck expected to be true");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetPowerAck(), true, "PowerAck expected to be true");
     }
 
     Reset();
@@ -1847,10 +1920,10 @@ MacCommandTest::DoRun()
         m_mac->SetDataRate(5);
         auto answers = RunMacCommand<RxParamSetupReq>(rx1DrOffset, rx2DataRate, frequencyHz);
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetFirstReceiveWindowDataRate()),
-                              5 - rx1DrOffset,
+                              unsigned(5 - rx1DrOffset),
                               "Rx1DataRate does not match rx1DrOffset from RxParamSetupReq");
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetSecondReceiveWindowDataRate()),
-                              rx2DataRate,
+                              unsigned(rx2DataRate),
                               "Rx2DataRate does not match rx2DataRate from RxParamSetupReq");
         NS_TEST_EXPECT_MSG_EQ(m_mac->GetSecondReceiveWindowFrequency(),
                               frequencyHz / 1e6,
@@ -1866,7 +1939,7 @@ MacCommandTest::DoRun()
     Reset();
     // RxParamSetupReq: invalid rx1Dr, rx2Dr, frequency
     { // WARNING: default values are manually set here
-        uint8_t rx1DrOffset = 7;
+        uint8_t rx1DrOffset = 6;
         uint8_t rx2DataRate = 12;
         double frequencyHz = 871000000;
         m_mac->SetDataRate(5);
@@ -1895,7 +1968,7 @@ MacCommandTest::DoRun()
         NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
         auto dsa = DynamicCast<DevStatusAns>(answers.at(0));
         NS_TEST_ASSERT_MSG_NE(dsa, nullptr, "DevStatusAns was expected, cmd type cast failed");
-        NS_TEST_EXPECT_MSG_EQ(unsigned(dsa->GetBattery()), 0, "Battery != 0 (external power)");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(dsa->GetBattery()), 0, "Battery expected == 0 (ext power)");
         NS_TEST_EXPECT_MSG_EQ(unsigned(dsa->GetMargin()), 31, "Margin expected to be 31 (default)");
     }
 }
