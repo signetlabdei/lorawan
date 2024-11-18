@@ -202,7 +202,7 @@ std::ostream&
 operator<<(std::ostream& os, const LoraChannelParameters& params)
 {
     os << "(rxPowerDbm: " << params.rxPowerDbm << ", SF: " << unsigned(params.sf)
-       << ", durationSec: " << params.duration.GetSeconds()
+       << ", durationSec: " << params.duration.As(Time::S)
        << ", frequencyMHz: " << params.frequencyMHz << ")";
     return os;
 }

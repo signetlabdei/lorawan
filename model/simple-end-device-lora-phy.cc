@@ -216,8 +216,7 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
             SwitchToRx();
 
             // Schedule the end of the reception of the packet
-            NS_LOG_INFO("Scheduling reception of a packet. End in " << duration.GetSeconds()
-                                                                    << " seconds");
+            NS_LOG_INFO("Scheduling reception of a packet. End in " << duration.As(Time::S));
 
             Simulator::Schedule(duration, &LoraPhy::EndReceive, this, packet, event);
 

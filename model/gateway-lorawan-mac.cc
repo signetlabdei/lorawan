@@ -60,7 +60,7 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
     packet->AddPacketTag(tag);
 
     // Make sure we can transmit this packet
-    if (GetWaitTime(frequencyMHz) > Time(0))
+    if (GetWaitTime(frequencyMHz).IsStrictlyPositive())
     {
         // We cannot send now!
         NS_LOG_WARN("Trying to send a packet but Duty Cycle won't allow it. Aborting.");
@@ -79,7 +79,7 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
     // Get the duration
     Time duration = LoraPhy::GetOnAirTime(packet, params);
 
-    NS_LOG_DEBUG("Duration: " << duration.GetSeconds());
+    NS_LOG_DEBUG("Duration: " << duration.As(Time::S));
 
     // Find the channel with the desired frequency
     double sendingPower = m_channelHelper->GetTxPowerForChannel(frequencyMHz);

@@ -210,8 +210,8 @@ LoraRadioEnergyModel::ChangeState(int newState)
 {
     NS_LOG_FUNCTION(this << newState);
 
-    Time duration = Simulator::Now() - m_lastUpdateTime;
-    NS_ASSERT(duration.GetNanoSeconds() >= 0); // check if duration is valid
+    Time duration = Now() - m_lastUpdateTime;
+    NS_ASSERT(duration.IsPositive()); // check if duration is valid
 
     // energy to decrease = current * voltage * time
     double energyToDecrease = 0.0;
@@ -238,7 +238,7 @@ LoraRadioEnergyModel::ChangeState(int newState)
     m_totalEnergyConsumption += energyToDecrease;
 
     // update last update time stamp
-    m_lastUpdateTime = Simulator::Now();
+    m_lastUpdateTime = Now();
 
     m_nPendingChangeState++;
 
@@ -357,8 +357,8 @@ LoraRadioEnergyModel::SetLoraRadioState(const EndDeviceLoraPhy::State state)
         stateName = "SLEEP";
         break;
     }
-    NS_LOG_DEBUG("LoraRadioEnergyModel:Switching to state: "
-                 << stateName << " at time = " << Simulator::Now().GetSeconds() << " s");
+    NS_LOG_DEBUG("LoraRadioEnergyModel:Switching to state: " << stateName
+                                                             << " at time = " << Now().As(Time::S));
 }
 
 // -------------------------------------------------------------------------- //

@@ -33,7 +33,7 @@ PeriodicSender::GetTypeId()
                             .SetGroupName("lorawan")
                             .AddAttribute("Interval",
                                           "The interval between packet sends of this app",
-                                          TimeValue(Seconds(0)),
+                                          TimeValue(Time(0)),
                                           MakeTimeAccessor(&PeriodicSender::GetInterval,
                                                            &PeriodicSender::SetInterval),
                                           MakeTimeChecker());
@@ -134,8 +134,8 @@ PeriodicSender::StartApplication()
 
     // Schedule the next SendPacket event
     Simulator::Cancel(m_sendEvent);
-    NS_LOG_DEBUG("Starting up application with a first event with a " << m_initialDelay.GetSeconds()
-                                                                      << " seconds delay");
+    NS_LOG_DEBUG("Starting up application with a first event with a " << m_initialDelay.As(Time::S)
+                                                                      << " delay");
     m_sendEvent = Simulator::Schedule(m_initialDelay, &PeriodicSender::SendPacket, this);
     NS_LOG_DEBUG("Event Id: " << m_sendEvent.GetUid());
 }

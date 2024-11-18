@@ -258,7 +258,7 @@ main(int argc, char* argv[])
     appHelper.SetPacketSize(packetSize);
     ApplicationContainer appContainer = appHelper.Install(endDevices);
 
-    appContainer.Start(Seconds(0));
+    appContainer.Start(Time(0));
     appContainer.Stop(appStopTime);
 
     std::ofstream outputFile;

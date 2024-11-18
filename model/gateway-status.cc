@@ -41,7 +41,7 @@ GatewayStatus::GatewayStatus(Address address,
     : m_address(address),
       m_netDevice(netDevice),
       m_gatewayMac(gwMac),
-      m_nextTransmissionTime(Seconds(0))
+      m_nextTransmissionTime(Time(0))
 {
     NS_LOG_FUNCTION(this);
 }
@@ -86,7 +86,7 @@ GatewayStatus::IsAvailableForTransmission(double frequencyMHz)
     // We can't send multiple packets at once, see SX1301 V2.01 page 29
 
     // Check that the gateway was not already "booked"
-    if (m_nextTransmissionTime > Simulator::Now() - MilliSeconds(1))
+    if (m_nextTransmissionTime > Now() - MilliSeconds(1))
     {
         NS_LOG_INFO("This gateway is already booked for a transmission");
         return false;
