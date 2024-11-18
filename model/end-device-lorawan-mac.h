@@ -171,6 +171,13 @@ class EndDeviceLorawanMac : public LorawanMac
     double GetTransmissionPowerDbm();
 
     /**
+     * Set the transmission power of this end device.
+     *
+     * \param txPowerDbm The transmission ERP [dBm] value.
+     */
+    void SetTransmissionPowerDbm(double txPowerDbm);
+
+    /**
      * Set the network address of this device.
      *
      * \param address The address to set.
@@ -268,13 +275,13 @@ class EndDeviceLorawanMac : public LorawanMac
      * \param dataRate The data rate value of the command.
      * \param txPower The transmission power value of the command.
      * \param chMask Mask of enabled channels of the command.
-     * \param chMaskCtrl Indicator of the 16 channel bank to apply the chMask to.
+     * \param chMaskCntl Indicator of the 16 channel bank to apply the chMask to.
      * \param nbTrans The number of repetitions prescribed by the command.
      */
     void OnLinkAdrReq(uint8_t dataRate,
                       uint8_t txPower,
                       uint16_t chMask,
-                      uint8_t chMaskCtrl,
+                      uint8_t chMaskCntl,
                       uint8_t nbTrans);
 
     /**
@@ -313,36 +320,6 @@ class EndDeviceLorawanMac : public LorawanMac
                          double frequencyHz,
                          uint8_t minDataRate,
                          uint8_t maxDataRate);
-
-    ////////////////////////////////////
-    // Logical channel administration //
-    ////////////////////////////////////
-
-    /**
-     * Set a new logical channel in the helper.
-     *
-     * \param chIndex The channel's new index.
-     * \param frequencyMHz The channel's center frequency [MHz].
-     * \param minDataRate The minimum data rate allowed on the channel.
-     * \param maxDataRate The maximum data rate allowed on the channel.
-     */
-    void SetLogicalChannel(uint8_t chIndex,
-                           double frequencyMHz,
-                           uint8_t minDataRate,
-                           uint8_t maxDataRate);
-
-    /**
-     * Add a subband to the logical channel helper.
-     *
-     * \param startFrequencyMHz The SubBand's lowest frequency [MHz].
-     * \param endFrequencyMHz The SubBand's highest frequency [MHz].
-     * \param dutyCycle The SubBand's duty cycle, in fraction form.
-     * \param maxTxPowerDbm The maximum transmission power allowed on the SubBand.
-     */
-    void AddSubBand(double startFrequencyMHz,
-                    double endFrequencyMHz,
-                    double dutyCycle,
-                    double maxTxPowerDbm);
 
     /**
      * Add a MAC command to the list of those that will be sent out in the next
@@ -417,8 +394,7 @@ class EndDeviceLorawanMac : public LorawanMac
     struct LoraRetxParameters m_retxParams;
 
     /**
-     * An uniform random variable, used by the Shuffle method to randomly reorder
-     * the channel list.
+     * An uniform random variable, used to randomly pick from the channel list.
      */
     Ptr<UniformRandomVariable> m_uniformRV;
 
@@ -437,16 +413,6 @@ class EndDeviceLorawanMac : public LorawanMac
     TracedCallback<uint8_t, bool, Time, Ptr<Packet>> m_requiredTxCallback;
 
   private:
-    /**
-     * Randomly shuffle a Ptr<LogicalLoraChannel> vector.
-     *
-     * Used to pick a random channel on which to send the packet.
-     *
-     * \param vector The vector of pointers to logical LoRa channels.
-     * \return The shuffled vector.
-     */
-    std::vector<Ptr<LogicalLoraChannel>> Shuffle(std::vector<Ptr<LogicalLoraChannel>> vector);
-
     /**
      * Find the base minimum wait time before the next possible transmission.
      *
