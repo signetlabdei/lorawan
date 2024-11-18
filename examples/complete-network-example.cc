@@ -305,7 +305,7 @@ main(int argc, char* argv[])
                                                           DoubleValue(10));
     ApplicationContainer appContainer = appHelper.Install(endDevices);
 
-    appContainer.Start(Seconds(0));
+    appContainer.Start(Time(0));
     appContainer.Stop(appStopTime);
 
     /**************************
@@ -353,7 +353,7 @@ main(int argc, char* argv[])
     NS_LOG_INFO("Computing performance metrics...");
 
     LoraPacketTracker& tracker = helper.GetPacketTracker();
-    std::cout << tracker.CountMacPacketsGlobally(Seconds(0), appStopTime + Hours(1)) << std::endl;
+    std::cout << tracker.CountMacPacketsGlobally(Time(0), appStopTime + Hours(1)) << std::endl;
 
     return 0;
 }

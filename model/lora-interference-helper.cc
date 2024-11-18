@@ -30,7 +30,7 @@ LoraInterferenceHelper::Event::Event(Time duration,
                                      uint8_t spreadingFactor,
                                      Ptr<Packet> packet,
                                      double frequencyMHz)
-    : m_startTime(Simulator::Now()),
+    : m_startTime(Now()),
       m_endTime(m_startTime + duration),
       m_sf(spreadingFactor),
       m_rxPowerdBm(rxPowerdBm),
@@ -92,7 +92,7 @@ LoraInterferenceHelper::Event::GetFrequency() const
 void
 LoraInterferenceHelper::Event::Print(std::ostream& stream) const
 {
-    stream << "(" << m_startTime.GetSeconds() << " s - " << m_endTime.GetSeconds() << " s), SF"
+    stream << "(" << m_startTime.As(Time::S) << " - " << m_endTime.As(Time::S) << "), SF"
            << unsigned(m_sf) << ", " << m_rxPowerdBm << " dBm, " << m_frequencyMHz << " MHz";
 }
 
@@ -187,7 +187,7 @@ LoraInterferenceHelper::Add(Time duration,
                             Ptr<Packet> packet,
                             double frequencyMHz)
 {
-    NS_LOG_FUNCTION(this << duration.GetSeconds() << rxPower << unsigned(spreadingFactor) << packet
+    NS_LOG_FUNCTION(this << duration << rxPower << unsigned(spreadingFactor) << packet
                          << frequencyMHz);
 
     // Create an event based on the parameters
@@ -218,7 +218,7 @@ LoraInterferenceHelper::CleanOldEvents()
     // Cycle the events, and clean up if an event is old.
     for (auto it = m_events.begin(); it != m_events.end();)
     {
-        if ((*it)->GetEndTime() + oldEventThreshold < Simulator::Now())
+        if ((*it)->GetEndTime() + oldEventThreshold < Now())
         {
             it = m_events.erase(it);
         }
@@ -266,7 +266,7 @@ LoraInterferenceHelper::IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Ev
     double frequencyMHz = event->GetFrequency();
 
     // Handy information about the time frame when the packet was received
-    Time now = Simulator::Now();
+    Time now = Now();
     Time duration = event->GetDuration();
     Time packetStartTime = now - duration;
 
@@ -308,7 +308,7 @@ LoraInterferenceHelper::IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Ev
         // Compute the fraction of time the two events are overlapping
         Time overlap = GetOverlapTime(event, interferer);
 
-        NS_LOG_DEBUG("The two events overlap for " << overlap.GetSeconds() << " s.");
+        NS_LOG_DEBUG("The two events overlap for " << overlap.As(Time::S));
 
         // Compute the equivalent energy of the interference
         // Power [mW] = 10^(Power[dBm]/10)
@@ -387,7 +387,7 @@ LoraInterferenceHelper::GetOverlapTime(Ptr<LoraInterferenceHelper::Event> event1
     // Non-overlapping events
     if (e1 <= s2 || e2 <= s1)
     {
-        overlap = Seconds(0);
+        overlap = Time(0);
     }
     // event1 before event2
     else if (s1 < s2)

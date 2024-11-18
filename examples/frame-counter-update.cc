@@ -239,14 +239,14 @@ main(int argc, char* argv[])
 
     Time appStopTime = Seconds(simulationTimeSeconds);
     OneShotSenderHelper appHelper = OneShotSenderHelper();
-    appHelper.SetSendTime(Seconds(0));
+    appHelper.SetSendTime(Time(0));
     ApplicationContainer appContainer = appHelper.Install(endDevices);
     appHelper.SetSendTime(Seconds(100));
     appContainer.Add(appHelper.Install(endDevices));
     appHelper.SetSendTime(Seconds(200));
     appContainer.Add(appHelper.Install(endDevices));
 
-    appContainer.Start(Seconds(0));
+    appContainer.Start(Time(0));
     appContainer.Stop(appStopTime);
 
     Simulator::Schedule(Seconds(110), &ChangeEndDevicePosition, endDevices.Get(0), true);
@@ -298,7 +298,7 @@ main(int argc, char* argv[])
 
     LoraPacketTracker& tracker = helper.GetPacketTracker();
     NS_LOG_INFO("Printing total sent MAC-layer packets and successful MAC-layer packets");
-    std::cout << tracker.CountMacPacketsGlobally(Seconds(0), appStopTime + Hours(1)) << std::endl;
+    std::cout << tracker.CountMacPacketsGlobally(Time(0), appStopTime + Hours(1)) << std::endl;
 
     return 0;
 }

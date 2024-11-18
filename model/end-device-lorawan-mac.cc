@@ -152,7 +152,7 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
     // or because we are receiving, schedule a tx/retx later
 
     Time netxTxDelay = GetNextTransmissionDelay();
-    if (netxTxDelay != Seconds(0))
+    if (netxTxDelay.IsStrictlyPositive())
     {
         postponeTransmission(netxTxDelay, packet);
         return;
@@ -192,7 +192,7 @@ EndDeviceLorawanMac::postponeTransmission(Time netxTxDelay, Ptr<Packet> packet)
     m_nextTx = Simulator::Schedule(netxTxDelay, &EndDeviceLorawanMac::DoSend, this, packet);
     NS_LOG_WARN("Attempting to send, but the aggregate duty cycle won't allow it. Scheduling a tx "
                 "at a delay "
-                << netxTxDelay.GetSeconds() << ".");
+                << netxTxDelay.As(Time::S) << ".");
 }
 
 void
@@ -253,7 +253,7 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
             m_retxParams.packet = packet->Copy();
             m_retxParams.retxLeft = m_nbTrans;
             m_retxParams.waitingAck = true;
-            m_retxParams.firstAttempt = Simulator::Now();
+            m_retxParams.firstAttempt = Now();
             m_retxParams.retxLeft =
                 m_retxParams.retxLeft - 1; // decreasing the number of retransmissions
 
@@ -545,7 +545,7 @@ EndDeviceLorawanMac::resetRetransmissionParameters()
     m_retxParams.waitingAck = false;
     m_retxParams.retxLeft = m_nbTrans;
     m_retxParams.packet = nullptr;
-    m_retxParams.firstAttempt = Seconds(0);
+    m_retxParams.firstAttempt = Time(0);
 
     // Cancel next retransmissions, if any
     Simulator::Cancel(m_nextTx);

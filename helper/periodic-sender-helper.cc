@@ -77,7 +77,7 @@ PeriodicSenderHelper::InstallPriv(Ptr<Node> node) const
     Ptr<PeriodicSender> app = m_factory.Create<PeriodicSender>();
 
     Time interval;
-    if (m_period == Seconds(0))
+    if (m_period.IsZero())
     {
         double intervalProb = m_intervalProb->GetValue();
         NS_LOG_DEBUG("IntervalProb = " << intervalProb);
@@ -106,7 +106,7 @@ PeriodicSenderHelper::InstallPriv(Ptr<Node> node) const
     }
 
     app->SetInterval(interval);
-    NS_LOG_DEBUG("Created an application with interval = " << interval.GetHours() << " hours");
+    NS_LOG_DEBUG("Created an application with interval = " << interval.As(Time::H));
 
     app->SetInitialDelay(Seconds(m_initialDelay->GetValue(0, interval.GetSeconds())));
     app->SetPacketSize(m_pktSize);
