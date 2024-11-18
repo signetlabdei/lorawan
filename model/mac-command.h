@@ -241,13 +241,13 @@ class LinkAdrReq : public MacCommand
     uint16_t GetChMask() const;
 
     /**
-     * Get the ChMaskCtrl field, used as an indicator of the 16-channel bank to apply the ChMask to.
+     * Get the ChMaskCntl field, used as an indicator of the 16-channel bank to apply the ChMask to.
      *
      * The interpretation of this field is region-dependent.
      *
-     * \return The ChMaskCtrl field.
+     * \return The ChMaskCntl field.
      */
-    uint8_t GetChMaskCtrl() const;
+    uint8_t GetChMaskCntl() const;
 
     /**
      * Get the number of repeated transmissions prescribed by this MAC command.

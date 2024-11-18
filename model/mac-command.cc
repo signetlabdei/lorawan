@@ -290,7 +290,7 @@ LinkAdrReq::GetChMask() const
 }
 
 uint8_t
-LinkAdrReq::GetChMaskCtrl() const
+LinkAdrReq::GetChMaskCntl() const
 {
     NS_LOG_FUNCTION(this);
     return m_chMaskCntl;

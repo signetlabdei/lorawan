@@ -83,25 +83,10 @@ class EndDeviceLorawanMac : public LorawanMac
     // Receiving methods //
     ///////////////////////
 
-    /**
-     * Receive a packet.
-     *
-     * This method is typically registered as a callback in the underlying PHY
-     * layer so that it's called when a packet is going up the stack.
-     *
-     * \param packet The received packet.
-     */
     void Receive(Ptr<const Packet> packet) override;
 
     void FailedReception(Ptr<const Packet> packet) override;
 
-    /**
-     * Perform the actions that are required after a packet send.
-     *
-     * This function handles opening of the first receive window.
-     *
-     * \param packet The packet that has just been transmitted.
-     */
     void TxFinished(Ptr<const Packet> packet) override;
 
     /////////////////////////
@@ -169,6 +154,13 @@ class EndDeviceLorawanMac : public LorawanMac
      * \return The transmission power this device uses when transmitting.
      */
     virtual uint8_t GetTransmissionPower();
+
+    /**
+     * Set the transmission power of this end device.
+     *
+     * \param txPower The transmission ERP [dBm] value.
+     */
+    void SetTransmissionPower(uint8_t txPower);
 
     /**
      * Set the network address of this device.
@@ -268,13 +260,13 @@ class EndDeviceLorawanMac : public LorawanMac
      * \param dataRate The data rate value of the command.
      * \param txPower The transmission power value of the command.
      * \param chMask Mask of enabled channels of the command.
-     * \param chMaskCtrl Indicator of the 16 channel bank to apply the chMask to.
+     * \param chMaskCntl Indicator of the 16 channel bank to apply the chMask to.
      * \param nbTrans The number of repetitions prescribed by the command.
      */
     void OnLinkAdrReq(uint8_t dataRate,
                       uint8_t txPower,
                       uint16_t chMask,
-                      uint8_t chMaskCtrl,
+                      uint8_t chMaskCntl,
                       uint8_t nbTrans);
 
     /**
@@ -311,36 +303,6 @@ class EndDeviceLorawanMac : public LorawanMac
                          double frequency,
                          uint8_t minDataRate,
                          uint8_t maxDataRate);
-
-    ////////////////////////////////////
-    // Logical channel administration //
-    ////////////////////////////////////
-
-    /**
-     * Set a new logical channel in the helper.
-     *
-     * \param chIndex The channel's new index.
-     * \param frequency The channel's center frequency.
-     * \param minDataRate The minimum data rate allowed on the channel.
-     * \param maxDataRate The maximum data rate allowed on the channel.
-     */
-    void SetLogicalChannel(uint8_t chIndex,
-                           double frequency,
-                           uint8_t minDataRate,
-                           uint8_t maxDataRate);
-
-    /**
-     * Add a subband to the logical channel helper.
-     *
-     * \param startFrequency The SubBand's lowest frequency.
-     * \param endFrequency The SubBand's highest frequency.
-     * \param dutyCycle The SubBand's duty cycle, in fraction form.
-     * \param maxTxPowerDbm The maximum transmission power allowed on the SubBand.
-     */
-    void AddSubBand(double startFrequency,
-                    double endFrequency,
-                    double dutyCycle,
-                    double maxTxPowerDbm);
 
     /**
      * Add a MAC command to the list of those that will be sent out in the next
@@ -414,8 +376,7 @@ class EndDeviceLorawanMac : public LorawanMac
     struct LoraRetxParameters m_retxParams;
 
     /**
-     * An uniform random variable, used by the Shuffle method to randomly reorder
-     * the channel list.
+     * An uniform random variable, used to randomly pick from the channel list.
      */
     Ptr<UniformRandomVariable> m_uniformRV;
 
@@ -435,17 +396,7 @@ class EndDeviceLorawanMac : public LorawanMac
 
   private:
     /**
-     * Randomly shuffle a Ptr<LogicalLoraChannel> vector.
-     *
-     * Used to pick a random channel on which to send the packet.
-     *
-     * \param vector The vector of pointers to logical LoRa channels.
-     * \return The shuffled vector.
-     */
-    std::vector<Ptr<LogicalLoraChannel>> Shuffle(std::vector<Ptr<LogicalLoraChannel>> vector);
-
-    /**
-     * Find the base minimum waiting time before the next possible transmission.
+     * Find the base minimum wait time before the next possible transmission.
      *
      * \return The base minimum waiting time.
      */
