@@ -82,11 +82,10 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
     NS_LOG_DEBUG("Duration: " << duration.GetSeconds());
 
     // Find the channel with the desired frequency
-    double sendingPower =
-        m_channelHelper->GetTxPowerForChannel(Create<LogicalLoraChannel>(frequency, 0, 5));
+    double sendingPower = m_channelHelper->GetTxPowerForChannel(frequency);
 
     // Add the event to the channelHelper to keep track of duty cycle
-    m_channelHelper->AddEvent(duration, Create<LogicalLoraChannel>(frequency, 0, 5));
+    m_channelHelper->AddEvent(duration, frequency);
 
     // Send the packet to the PHY layer to send it on the channel
     m_phy->Send(packet, params, frequency, sendingPower);
@@ -143,7 +142,7 @@ GatewayLorawanMac::GetWaitingTime(double frequency)
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    return m_channelHelper->GetWaitingTime(Create<LogicalLoraChannel>(frequency, 0, 5));
+    return m_channelHelper->GetWaitingTime(frequency);
 }
 } // namespace lorawan
 } // namespace ns3

@@ -553,7 +553,7 @@ ClassAEndDeviceLorawanMac::OnRxParamSetupReq(uint8_t rx1DrOffset,
         rx2DataRateAck = false;
     }
 
-    if (frequency > 870000000 || frequency < 863000000)
+    if (!m_channelHelper->IsFrequencyValid(frequency / 1e6))
     {
         NS_LOG_WARN("Invalid rx2 frequency");
         channelAck = false;

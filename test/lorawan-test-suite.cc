@@ -930,7 +930,7 @@ LogicalLoraChannelTest::DoRun()
     ///////////////////////////////////
 
     // Setup
-    Ptr<LogicalLoraChannelHelper> channelHelper = CreateObject<LogicalLoraChannelHelper>();
+    auto channelHelper = Create<LogicalLoraChannelHelper>(16);
     auto subBand1 = Create<SubBand>(869.4, 869.65, 0.10, 27);
     channel1 = Create<LogicalLoraChannel>(868.1, 0, 5);
     channel2 = Create<LogicalLoraChannel>(868.3, 0, 5);
@@ -944,16 +944,16 @@ LogicalLoraChannelTest::DoRun()
     // Add SubBands and LogicalLoraChannels to the helper
     channelHelper->AddSubBand(subBand);
     channelHelper->AddSubBand(subBand1);
-    channelHelper->AddChannel(channel1);
-    channelHelper->AddChannel(channel2);
-    channelHelper->AddChannel(channel3);
+    channelHelper->SetChannel(0, channel1);
+    channelHelper->SetChannel(1, channel2);
+    channelHelper->SetChannel(2, channel3);
 
     // Duty Cycle tests
     // (high level duty cycle behavior)
     ///////////////////////////////////
 
     channelHelper->AddEvent(Seconds(2), channel1);
-    Time expectedTimeOff = Seconds(2 / 0.01 - 2);
+    Time expectedTimeOff = Seconds(2 / 0.01);
 
     // Waiting time is computed correctly
     NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitingTime(channel1),
@@ -1727,10 +1727,11 @@ MacCommandTest::DoRun()
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
                               unsigned(nbTrans),
                               "m_nbTrans does not match nbTrans field of LinkAdrReq");
-        auto channels = m_mac->GetLogicalLoraChannelHelper()->GetChannelList();
-        for (size_t i = 0; i < channels.size() && i < 16; i++)
+        auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
+        for (size_t i = 0; i < channels.size(); i++)
         {
-            bool actual = channels.at(i + 16 * chMaskCntl)->IsEnabledForUplink();
+            const auto& c = channels.at(i + 16 * chMaskCntl);
+            bool actual = (c) ? c->IsEnabledForUplink() : false;
             bool expected = (chMask & 0b1 << i);
             NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state != chMask");
         }
@@ -1761,10 +1762,11 @@ MacCommandTest::DoRun()
         NS_TEST_EXPECT_MSG_NE(unsigned(m_mac->GetMaxNumberOfTransmissions()),
                               unsigned(nbTrans),
                               "m_nbTrans expected to differ from nbTrans field of LinkAdrReq");
-        auto channels = m_mac->GetLogicalLoraChannelHelper()->GetChannelList();
-        for (size_t i = 0; i < channels.size() && i < 16; i++)
+        auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
+        for (size_t i = 0; i < channels.size(); i++)
         {
-            bool actual = channels.at(i + 16 * chMaskCntl)->IsEnabledForUplink();
+            const auto& c = channels.at(i + 16 * chMaskCntl);
+            bool actual = (c) ? c->IsEnabledForUplink() : false;
             bool expected = (chMask & 0b1 << i);
             NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state != chMask");
         }
@@ -1794,11 +1796,13 @@ MacCommandTest::DoRun()
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
                               1,
                               "m_nbTrans expected to be default value");
-        auto channels = m_mac->GetLogicalLoraChannelHelper()->GetChannelList();
-        for (size_t i = 0; i < channels.size() && i < 16; i++)
+        auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
+        for (size_t i = 0; i < channels.size(); i++)
         {
-            bool actual = channels.at(i + 16 * chMaskCntl)->IsEnabledForUplink();
-            NS_TEST_EXPECT_MSG_EQ(actual, true, "Channel " << i << " state != default true");
+            const auto& c = channels.at(i + 16 * chMaskCntl);
+            bool actual = (c) ? c->IsEnabledForUplink() : false;
+            bool expected = (uint16_t(0b111) & 0b1 << i);
+            NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state != default");
         }
         NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
         auto laa = DynamicCast<LinkAdrAns>(answers.at(0));
