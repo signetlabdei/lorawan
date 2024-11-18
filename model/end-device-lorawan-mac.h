@@ -319,13 +319,6 @@ class EndDeviceLorawanMac : public LorawanMac
     ////////////////////////////////////
 
     /**
-     * Add a logical channel to the helper.
-     *
-     * \param frequencyMHz The channel's center frequency [MHz].
-     */
-    void AddLogicalChannel(double frequencyMHz);
-
-    /**
      * Set a new logical channel in the helper.
      *
      * \param chIndex The channel's new index.
@@ -337,13 +330,6 @@ class EndDeviceLorawanMac : public LorawanMac
                            double frequencyMHz,
                            uint8_t minDataRate,
                            uint8_t maxDataRate);
-
-    /**
-     * Add a logical channel to the helper.
-     *
-     * \param logicalChannel The logical channel to add.
-     */
-    void AddLogicalChannel(Ptr<LogicalLoraChannel> logicalChannel);
 
     /**
      * Add a subband to the logical channel helper.

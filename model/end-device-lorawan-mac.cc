@@ -18,7 +18,6 @@
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 
-#include <algorithm>
 #include <bitset>
 
 namespace ns3
@@ -490,7 +489,7 @@ EndDeviceLorawanMac::GetNextTransmissionDelay()
     // Pick a random channel to transmit on
     std::vector<Ptr<LogicalLoraChannel>> logicalChannels;
     logicalChannels =
-        m_channelHelper->GetEnabledChannelList(); // Use a separate list to do the shuffle
+        m_channelHelper->GetRawChannelArray(); // Use a separate list to do the shuffle
     // logicalChannels = Shuffle (logicalChannels);
 
     Time waitingTime = Time::Max();
@@ -501,12 +500,15 @@ EndDeviceLorawanMac::GetNextTransmissionDelay()
     {
         // Pointer to the current channel
         Ptr<LogicalLoraChannel> logicalChannel = *it;
-        double frequencyMHz = logicalChannel->GetFrequency();
+        if (logicalChannel && logicalChannel->IsEnabledForUplink())
+        {
+            double frequencyMHz = logicalChannel->GetFrequency();
 
-        waitingTime = std::min(waitingTime, m_channelHelper->GetWaitingTime(logicalChannel));
+            waitingTime = std::min(waitingTime, m_channelHelper->GetWaitingTime(logicalChannel));
 
-        NS_LOG_DEBUG("Waiting time before the next transmission in channel with frequency "
-                     << frequencyMHz << " is = " << waitingTime.GetSeconds() << ".");
+            NS_LOG_DEBUG("Waiting time before the next transmission in channel with frequency "
+                         << frequencyMHz << " is = " << waitingTime.GetSeconds() << ".");
+        }
     }
 
     waitingTime = GetNextClassTransmissionDelay(waitingTime);
@@ -522,7 +524,7 @@ EndDeviceLorawanMac::GetChannelForTx()
     // Pick a random channel to transmit on
     std::vector<Ptr<LogicalLoraChannel>> logicalChannels;
     logicalChannels =
-        m_channelHelper->GetEnabledChannelList(); // Use a separate list to do the shuffle
+        m_channelHelper->GetRawChannelArray(); // Use a separate list to do the shuffle
     logicalChannels = Shuffle(logicalChannels);
 
     // Try every channel
@@ -531,24 +533,27 @@ EndDeviceLorawanMac::GetChannelForTx()
     {
         // Pointer to the current channel
         Ptr<LogicalLoraChannel> logicalChannel = *it;
-        double frequencyMHz = logicalChannel->GetFrequency();
-
-        NS_LOG_DEBUG("Frequency of the current channel: " << frequencyMHz);
-
-        // Verify that we can send the packet
-        Time waitingTime = m_channelHelper->GetWaitingTime(logicalChannel);
-
-        NS_LOG_DEBUG("Waiting time for current channel = " << waitingTime.GetSeconds());
-
-        // Send immediately if we can
-        if (waitingTime == Seconds(0))
+        if (logicalChannel && logicalChannel->IsEnabledForUplink())
         {
-            return *it;
-        }
-        else
-        {
-            NS_LOG_DEBUG("Packet cannot be immediately transmitted on "
-                         << "the current channel because of duty cycle limitations.");
+            double frequencyMHz = logicalChannel->GetFrequency();
+
+            NS_LOG_DEBUG("Frequency of the current channel: " << frequencyMHz);
+
+            // Verify that we can send the packet
+            Time waitingTime = m_channelHelper->GetWaitingTime(logicalChannel);
+
+            NS_LOG_DEBUG("Waiting time for current channel = " << waitingTime.GetSeconds());
+
+            // Send immediately if we can
+            if (waitingTime == Seconds(0))
+            {
+                return *it;
+            }
+            else
+            {
+                NS_LOG_DEBUG("Packet cannot be immediately transmitted on "
+                             << "the current channel because of duty cycle limitations.");
+            }
         }
     }
     return nullptr; // In this case, no suitable channel was found
@@ -676,7 +681,7 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
     NS_ASSERT_MSG(!(chMaskCtrl & 0xF8), "chMaskCtrl field > 3 bits");
     NS_ASSERT_MSG(!(nbTrans & 0xF0), "nbTrans field > 4 bits");
 
-    auto channelList = m_channelHelper->GetChannelList();
+    auto channels = m_channelHelper->GetRawChannelArray();
 
     bool channelMaskAck = true;
     bool dataRateAck = true;
@@ -691,9 +696,9 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
     // Channels 0 to 15
     case 0:
         // Check if all enabled channels have a valid frequency
-        for (uint8_t i = 0; i < 16; ++i)
+        for (size_t i = 0; i < channels.size(); ++i)
         {
-            if ((chMask & 0b1 << i) && i >= channelList.size())
+            if ((chMask & 0b1 << i) && !channels.at(i))
             {
                 NS_LOG_WARN("Invalid channel mask");
                 channelMaskAck = false;
@@ -704,9 +709,9 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
     // All channels ON independently of the ChMask field value
     case 6:
         chMask = 0b0;
-        for (uint8_t i = 0; i < 16; ++i)
+        for (size_t i = 0; i < channels.size(); ++i)
         {
-            if (i < channelList.size())
+            if (channels.at(i))
             {
                 chMask |= 0b1 << i;
             }
@@ -728,15 +733,15 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
     // Temporary channel mask is built and validated
     if (!m_adr) // ADR disabled, only consider channel mask conf.
     {
+        /// \remark Original code considers this to be mobile-mode
         if (channelMaskAck) // valid channel mask
         {
             bool compatible = false;
             // Look for enabled channel that supports current data rate.
-            // Note: Original code checks for DR0 because this is considered mobile-mode
-            for (uint8_t i = 0; i < 16; ++i)
+            for (size_t i = 0; i < channels.size(); ++i)
             {
-                if ((chMask & 0b1 << i) && m_dataRate >= channelList[i]->GetMinimumDataRate() &&
-                    m_dataRate <= channelList[i]->GetMaximumDataRate())
+                if ((chMask & 0b1 << i) && m_dataRate >= channels.at(i)->GetMinimumDataRate() &&
+                    m_dataRate <= channels.at(i)->GetMaximumDataRate())
                 { // Found compatible channel, break loop
                     compatible = true;
                     break;
@@ -749,10 +754,12 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
             }
             else // apply channel mask configuration
             {
-                for (size_t i = 0; i < channelList.size(); ++i)
+                for (size_t i = 0; i < channels.size(); ++i)
                 {
-                    (chMask & 0b1 << i) ? channelList[i]->EnableForUplink()
-                                        : channelList[i]->DisableForUplink();
+                    if (auto c = channels.at(i); c)
+                    {
+                        (chMask & 0b1 << i) ? c->EnableForUplink() : c->DisableForUplink();
+                    }
                 }
                 dataRateAck = powerAck = false; // only ack channel mask
             }
@@ -769,17 +776,31 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
         {
             bool compatible = false;
             // Look for enabled channel that supports config. data rate.
-            for (uint8_t i = 0; i < channelList.size() && i < 16; ++i)
+            for (size_t i = 0; i < channels.size(); ++i)
             {
-                if ((chMask & 0b1 << i) && dataRate >= channelList[i]->GetMinimumDataRate() &&
-                    dataRate <= channelList[i]->GetMaximumDataRate())
-                { // Found compatible channel, break loop
-                    compatible = true;
-                    break;
+                if (chMask & 0b1 << i) // all enabled by chMask, even if it was invalid
+                {
+                    if (auto c = channels.at(i); c) // exists
+                    {
+                        if (dataRate >= c->GetMinimumDataRate() &&
+                            dataRate <= c->GetMaximumDataRate())
+                        { // Found compatible channel, break loop
+                            compatible = true;
+                            break;
+                        }
+                    }
+                    else // manages invalid case, checks with defaults
+                    {
+                        if (GetSfFromDataRate(dataRate) && GetBandwidthFromDataRate(dataRate))
+                        { // Found compatible (invalid) channel, break loop
+                            compatible = true;
+                            break;
+                        }
+                    }
                 }
             }
             // Check if it is acceptable
-            if (!compatible || !GetSfFromDataRate(dataRate) || !GetBandwidthFromDataRate(dataRate))
+            if (!compatible)
             {
                 NS_LOG_WARN("Invalid data rate");
                 dataRateAck = false;
@@ -799,10 +820,12 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
         // If no error, apply configurations
         if (channelMaskAck && dataRateAck && powerAck)
         {
-            for (size_t i = 0; i < channelList.size(); ++i)
+            for (size_t i = 0; i < channels.size(); ++i)
             {
-                (chMask & 0b1 << i) ? channelList[i]->EnableForUplink()
-                                    : channelList[i]->DisableForUplink();
+                if (auto c = channels.at(i); c)
+                {
+                    (chMask & 0b1 << i) ? c->EnableForUplink() : c->DisableForUplink();
+                }
             }
             if (txPower != 0xF) // If value is 0xF, ignore config.
             {
@@ -884,22 +907,6 @@ EndDeviceLorawanMac::OnNewChannelReq(uint8_t chIndex,
 }
 
 void
-EndDeviceLorawanMac::AddLogicalChannel(double frequencyMHz)
-{
-    NS_LOG_FUNCTION(this << frequencyMHz);
-
-    m_channelHelper->AddChannel(frequencyMHz);
-}
-
-void
-EndDeviceLorawanMac::AddLogicalChannel(Ptr<LogicalLoraChannel> logicalChannel)
-{
-    NS_LOG_FUNCTION(this << logicalChannel);
-
-    m_channelHelper->AddChannel(logicalChannel);
-}
-
-void
 EndDeviceLorawanMac::SetLogicalChannel(uint8_t chIndex,
                                        double frequencyMHz,
                                        uint8_t minDataRate,
@@ -920,7 +927,8 @@ EndDeviceLorawanMac::AddSubBand(double startFrequencyMHz,
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    m_channelHelper->AddSubBand(startFrequencyMHz, endFrequencyMHz, dutyCycle, maxTxPowerDbm);
+    m_channelHelper->AddSubBand(
+        Create<SubBand>(startFrequencyMHz, endFrequencyMHz, dutyCycle, maxTxPowerDbm));
 }
 
 uint8_t
