@@ -1730,7 +1730,7 @@ MacCommandTest::DoRun()
         auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
         for (size_t i = 0; i < channels.size(); i++)
         {
-            auto c = channels.at(i + 16 * chMaskCntl);
+            const auto& c = channels.at(i + 16 * chMaskCntl);
             bool actual = (c) ? c->IsEnabledForUplink() : false;
             bool expected = (chMask & 0b1 << i);
             NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state != chMask");
@@ -1765,7 +1765,7 @@ MacCommandTest::DoRun()
         auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
         for (size_t i = 0; i < channels.size(); i++)
         {
-            auto c = channels.at(i + 16 * chMaskCntl);
+            const auto& c = channels.at(i + 16 * chMaskCntl);
             bool actual = (c) ? c->IsEnabledForUplink() : false;
             bool expected = (chMask & 0b1 << i);
             NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state != chMask");
@@ -1799,7 +1799,7 @@ MacCommandTest::DoRun()
         auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
         for (size_t i = 0; i < channels.size(); i++)
         {
-            auto c = channels.at(i + 16 * chMaskCntl);
+            const auto& c = channels.at(i + 16 * chMaskCntl);
             bool actual = (c) ? c->IsEnabledForUplink() : false;
             bool expected = (uint16_t(0b111) & 0b1 << i);
             NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state != default");
@@ -1833,7 +1833,7 @@ MacCommandTest::DoRun()
         auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
         for (size_t i = 0; i < channels.size(); i++)
         {
-            auto c = channels.at(i + 16 * chMaskCntl);
+            const auto& c = channels.at(i + 16 * chMaskCntl);
             bool actual = (c) ? c->IsEnabledForUplink() : false;
             bool expected = (uint16_t(0b111) & 0b1 << i);
             NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state != default");
@@ -1872,7 +1872,7 @@ MacCommandTest::DoRun()
                               "m_nbTrans expected to be default value");
         for (size_t i = 0; i < channels.size(); i++)
         {
-            auto c = channels.at(i);
+            const auto& c = channels.at(i);
             bool actual = (c) ? c->IsEnabledForUplink() : false;
             bool expected = (uint16_t(0b111) & 0b1 << i);
             NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state != default");
@@ -2011,7 +2011,7 @@ MacCommandTest::DoRun()
         auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
         for (size_t i = 0; i < channels.size(); i++)
         {
-            auto c = channels.at(i);
+            const auto& c = channels.at(i);
             if (i > 2)
             {
                 NS_TEST_ASSERT_MSG_EQ(c, nullptr, "Channel " << i << "expected to be nullptr");

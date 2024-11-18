@@ -752,7 +752,7 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
             {
                 if (chMask & 0b1 << i) // all enabled by chMask, even if it was invalid
                 {
-                    if (auto c = channels.at(i); c) // exists
+                    if (const auto& c = channels.at(i); c) // exists
                     {
                         if (dataRate >= c->GetMinimumDataRate() &&
                             dataRate <= c->GetMaximumDataRate())
