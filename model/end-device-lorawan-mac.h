@@ -83,25 +83,10 @@ class EndDeviceLorawanMac : public LorawanMac
     // Receiving methods //
     ///////////////////////
 
-    /**
-     * Receive a packet.
-     *
-     * This method is typically registered as a callback in the underlying PHY
-     * layer so that it's called when a packet is going up the stack.
-     *
-     * \param packet The received packet.
-     */
     void Receive(Ptr<const Packet> packet) override;
 
     void FailedReception(Ptr<const Packet> packet) override;
 
-    /**
-     * Perform the actions that are required after a packet send.
-     *
-     * This function handles opening of the first receive window.
-     *
-     * \param packet The packet that has just been transmitted.
-     */
     void TxFinished(Ptr<const Packet> packet) override;
 
     /////////////////////////
