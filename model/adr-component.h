@@ -65,10 +65,10 @@ class AdrComponent : public NetworkControllerComponent
      * https://doi.org/10.1109/NOMS.2018.8406255 .
      *
      * @param newDataRate [out] new data rate value selected for the end device.
-     * @param newTxPower [out] new tx power value selected for the end device.
+     * @param newTxPower [out] new tx power [dBm] value selected for the end device.
      * @param status State representation of the current end device.
      */
-    void AdrImplementation(uint8_t* newDataRate, uint8_t* newTxPower, Ptr<EndDeviceStatus> status);
+    void AdrImplementation(uint8_t* newDataRate, double* newTxPower, Ptr<EndDeviceStatus> status);
 
     /**
      * Convert spreading factor values [7:12] to respective data rate values [0:5].
@@ -152,7 +152,7 @@ class AdrComponent : public NetworkControllerComponent
      * @param txPower Transission ERP configuration [dBm].
      * @return TxPower parameter value as uint8_t.
      */
-    uint8_t GetTxPowerIndex(int txPower);
+    uint8_t GetTxPowerIndex(double txPower);
 
     enum CombiningMethod tpAveraging;      //!< TX power from gateways policy
     int historyRange;                      //!< Number of previous packets to consider

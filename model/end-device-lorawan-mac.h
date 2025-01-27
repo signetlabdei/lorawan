@@ -151,16 +151,16 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Get the transmission power this end device is set to use.
      *
-     * @return The transmission power this device uses when transmitting.
+     * @return The transmission ERP [dBm] this device uses when transmitting.
      */
-    virtual uint8_t GetTransmissionPower();
+    double GetTransmissionPowerDbm();
 
     /**
      * Set the transmission power of this end device.
      *
-     * @param txPower The transmission ERP [dBm] value.
+     * @param txPowerDbm The transmission ERP [dBm] value.
      */
-    void SetTransmissionPower(uint8_t txPower);
+    void SetTransmissionPowerDbm(double txPowerDbm);
 
     /**
      * Set the network address of this device.
@@ -329,8 +329,9 @@ class EndDeviceLorawanMac : public LorawanMac
         m_enableDRAdapt; //!< Enable data rate adaptation (ADR) during the retransmission procedure.
     uint8_t m_nbTrans; //!< Default number of unacknowledged redundant transmissions of each packet.
     TracedValue<uint8_t> m_dataRate; //!< The data rate this device is using to transmit.
-    TracedValue<double> m_txPower;   //!< The transmission power this device is using to transmit.
-    uint8_t m_codingRate;            //!< The coding rate used by this device.
+    TracedValue<double>
+        m_txPowerDbm;      //!< The transmission ERP [dBm] this device is currently using.
+    uint8_t m_codingRate;  //!< The coding rate used by this device.
     bool m_headerDisabled; //!< Whether or not the LoRa PHY header is disabled for communications by
                            //!< this device.
     LoraDeviceAddress m_address; //!< The address of this device.

@@ -1721,7 +1721,7 @@ MacCommandTest::DoRun()
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
                               unsigned(dataRate),
                               "m_dataRate does not match DataRate field of LinkAdrReq");
-        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPower(),
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
                               14 - txPower * 2,
                               "m_txPowerDbm does not match txPower field of LinkAdrReq");
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
@@ -1756,7 +1756,7 @@ MacCommandTest::DoRun()
         NS_TEST_EXPECT_MSG_NE(unsigned(m_mac->GetDataRate()),
                               unsigned(dataRate),
                               "m_dataRate expected to differ from DataRate field of LinkAdrReq");
-        NS_TEST_EXPECT_MSG_NE(m_mac->GetTransmissionPower(),
+        NS_TEST_EXPECT_MSG_NE(m_mac->GetTransmissionPowerDbm(),
                               14 - txPower * 2,
                               "m_txPowerDbm expected to not match txPower field of LinkAdrReq");
         NS_TEST_EXPECT_MSG_NE(unsigned(m_mac->GetMaxNumberOfTransmissions()),
@@ -1790,7 +1790,7 @@ MacCommandTest::DoRun()
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
                               0,
                               "m_dataRate expected to be default value");
-        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPower(),
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
                               14,
                               "m_txPowerDbm expected to be default value");
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
@@ -1824,7 +1824,7 @@ MacCommandTest::DoRun()
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
                               0,
                               "m_dataRate expected to be default value");
-        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPower(),
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
                               14,
                               "m_txPowerDbm expected to be default value");
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
@@ -1856,7 +1856,7 @@ MacCommandTest::DoRun()
         uint8_t nbTrans = 0;    // restore default 1
         // Set device params to values different from default
         m_mac->SetDataRate(3);
-        m_mac->SetTransmissionPower(12);
+        m_mac->SetTransmissionPowerDbm(12);
         m_mac->SetMaxNumberOfTransmissions(15);
         auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
         channels.at(0)->DisableForUplink();
@@ -1864,9 +1864,9 @@ MacCommandTest::DoRun()
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
                               3,
                               "m_dataRate expected to be default value");
-        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPower(),
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
                               12,
-                              "m_txPower expected to be default value");
+                              "m_txPowerDbm expected to be default value");
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
                               1,
                               "m_nbTrans expected to be default value");

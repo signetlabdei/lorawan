@@ -204,7 +204,7 @@ LoraHelper::DoPrintDeviceStatus(NodeContainer endDevices,
         Ptr<ClassAEndDeviceLorawanMac> mac =
             DynamicCast<ClassAEndDeviceLorawanMac>(loraNetDevice->GetMac());
         int dr = int(mac->GetDataRate());
-        double txPower = mac->GetTransmissionPower();
+        double txPower = mac->GetTransmissionPowerDbm();
         Vector pos = position->GetPosition();
         outputFile << currentTime.GetSeconds() << " " << object->GetId() << " " << pos.x << " "
                    << pos.y << " " << dr << " " << unsigned(txPower) << std::endl;

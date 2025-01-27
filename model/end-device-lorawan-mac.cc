@@ -57,8 +57,8 @@ EndDeviceLorawanMac::GetTypeId()
                 MakeBooleanAccessor(&EndDeviceLorawanMac::m_adr),
                 MakeBooleanChecker())
             .AddTraceSource("TxPower",
-                            "Transmission power currently employed by this end device",
-                            MakeTraceSourceAccessor(&EndDeviceLorawanMac::m_txPower),
+                            "Transmission ERP [dBm] currently employed by this end device",
+                            MakeTraceSourceAccessor(&EndDeviceLorawanMac::m_txPowerDbm),
                             "ns3::TracedValueCallback::Double")
             .AddTraceSource("LastKnownLinkMargin",
                             "Last known demodulation margin in "
@@ -102,7 +102,7 @@ EndDeviceLorawanMac::EndDeviceLorawanMac()
     : m_enableDRAdapt(false),
       m_nbTrans(1),
       m_dataRate(0),
-      m_txPower(14),
+      m_txPowerDbm(14),
       m_codingRate(1),
       // LoraWAN default
       m_headerDisabled(false),
@@ -177,7 +177,7 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
     // retransmissions
     {
         // Make sure we can transmit at the current power on this channel
-        NS_ASSERT_MSG(m_txPower <= m_channelHelper->GetTxPowerForChannel(txChannel),
+        NS_ASSERT_MSG(m_txPowerDbm <= m_channelHelper->GetTxPowerForChannel(txChannel),
                       " The selected power is too high to be supported by this channel.");
         DoSend(packet);
     }
@@ -597,17 +597,17 @@ EndDeviceLorawanMac::GetDataRate()
 }
 
 void
-EndDeviceLorawanMac::SetTransmissionPower(uint8_t txPower)
+EndDeviceLorawanMac::SetTransmissionPowerDbm(double txPowerDbm)
 {
-    NS_LOG_FUNCTION(this << txPower);
-    m_txPower = txPower;
+    NS_LOG_FUNCTION(this << txPowerDbm);
+    m_txPowerDbm = txPowerDbm;
 }
 
-uint8_t
-EndDeviceLorawanMac::GetTransmissionPower()
+double
+EndDeviceLorawanMac::GetTransmissionPowerDbm()
 {
     NS_LOG_FUNCTION(this);
-    return m_txPower;
+    return m_txPowerDbm;
 }
 
 void
@@ -801,7 +801,7 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
             }
             if (txPower != 0xF) // If value is 0xF, ignore config.
             {
-                m_txPower = GetDbmForTxPower(txPower);
+                m_txPowerDbm = GetDbmForTxPower(txPower);
             }
             m_nbTrans = (nbTrans == 0) ? 1 : nbTrans;
             if (dataRate != 0xF) // If value is 0xF, ignore config.
@@ -809,7 +809,7 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
                 m_dataRate = dataRate;
             }
             NS_LOG_DEBUG("MacTxDataRateAdr = " << unsigned(m_dataRate));
-            NS_LOG_DEBUG("MacTxPower = " << unsigned(m_txPower) << "dBm");
+            NS_LOG_DEBUG("MacTxPower = " << unsigned(m_txPowerDbm) << "dBm");
             NS_LOG_DEBUG("MacNbTrans = " << unsigned(m_nbTrans));
         }
     }
