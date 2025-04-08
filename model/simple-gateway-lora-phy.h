@@ -28,7 +28,7 @@ namespace lorawan
 class LoraChannel;
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Class modeling a Lora SX1301 chip.
  */
@@ -37,7 +37,7 @@ class SimpleGatewayLoraPhy : public GatewayLoraPhy
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 

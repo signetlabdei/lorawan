@@ -29,7 +29,7 @@ using namespace lorawan;
 NS_LOG_COMPONENT_DEFINE("NetworkServerTestSuite");
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It verifies that the NetworkServer application can receive packets sent in uplink by devices
  */
@@ -42,14 +42,14 @@ class UplinkPacketTest : public TestCase
     /**
      * Callback for tracing ReceivedPacket.
      *
-     * \param packet The packet received.
+     * @param packet The packet received.
      */
     void ReceivedPacket(Ptr<const Packet> packet);
 
     /**
      * Send a packet from the input end device.
      *
-     * \param endDevice A pointer to the end device Node.
+     * @param endDevice A pointer to the end device Node.
      */
     void SendPacket(Ptr<Node> endDevice);
 
@@ -116,7 +116,7 @@ UplinkPacketTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It verifies that devices requesting an acknowledgment receive a reply from the network server
  */
@@ -132,10 +132,10 @@ class DownlinkPacketTest : public TestCase
      * This trace sink is only used here to determine whether an ack was received by the end device
      * after sending a package requiring an acknowledgement.
      *
-     * \param requiredTransmissions Number of transmissions attempted during the process.
-     * \param success Whether the retransmission procedure was successful.
-     * \param time Timestamp of the initial transmission attempt.
-     * \param packet The packet being retransmitted.
+     * @param requiredTransmissions Number of transmissions attempted during the process.
+     * @param success Whether the retransmission procedure was successful.
+     * @param time Timestamp of the initial transmission attempt.
+     * @param packet The packet being retransmitted.
      */
     void ReceivedPacketAtEndDevice(uint8_t requiredTransmissions,
                                    bool success,
@@ -145,8 +145,8 @@ class DownlinkPacketTest : public TestCase
     /**
      * Send a packet from the input end device.
      *
-     * \param endDevice A pointer to the end device Node.
-     * \param requestAck Whether to require an acknowledgement from the server.
+     * @param endDevice A pointer to the end device Node.
+     * @param requestAck Whether to require an acknowledgement from the server.
      */
     void SendPacket(Ptr<Node> endDevice, bool requestAck);
 
@@ -223,7 +223,7 @@ DownlinkPacketTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It verifies that the NetworkServer application correctly responds to LinkCheck requests
  */
@@ -237,16 +237,16 @@ class LinkCheckTest : public TestCase
      * Trace changes in the last known gateway count variable (updated on reception of
      * LinkCheckAns MAC commands) of an end device.
      *
-     * \param newValue The updated value.
-     * \param oldValue The previous value.
+     * @param newValue The updated value.
+     * @param oldValue The previous value.
      */
     void LastKnownGatewayCount(uint8_t newValue, uint8_t oldValue);
 
     /**
      * Send a packet containing a LinkCheckReq MAC command from the input end device.
      *
-     * \param endDevice A pointer to the end device Node.
-     * \param requestAck Whether to require an acknowledgement from the server.
+     * @param endDevice A pointer to the end device Node.
+     * @param requestAck Whether to require an acknowledgement from the server.
      */
     void SendPacket(Ptr<Node> endDevice, bool requestAck);
 
@@ -328,7 +328,7 @@ LinkCheckTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * The TestSuite class names the TestSuite, identifies what type of TestSuite, and enables the
  * TestCases to be run. Typically, only the constructor for this class must be defined

@@ -400,7 +400,7 @@ LoraFrameHeader::AddLinkAdrReq(uint8_t dataRate,
         NS_ASSERT(chId < 16 && chId > -1);
         channelMask |= 0b1 << chId;
     }
-    /// \todo Implement chMaskCntl field
+    /// @todo Implement chMaskCntl field
     auto command = Create<LinkAdrReq>(dataRate, txPower, channelMask, 0, repetitions);
     m_macCommands.emplace_back(command);
     m_fOptsLen += command->GetSerializedSize();

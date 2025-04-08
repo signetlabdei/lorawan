@@ -26,7 +26,7 @@ namespace lorawan
 class LoraChannel;
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Class representing a simple LoRa transceiver, with an error model based
  * on receiver sensitivity and a SIR table.
@@ -36,7 +36,7 @@ class SimpleEndDeviceLoraPhy : public EndDeviceLoraPhy
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 

@@ -41,8 +41,8 @@ NS_LOG_COMPONENT_DEFINE("AdrExample");
 /**
  * Record a change in the data rate setting on an end device.
  *
- * \param oldDr The previous data rate value.
- * \param newDr The updated data rate value.
+ * @param oldDr The previous data rate value.
+ * @param newDr The updated data rate value.
  */
 void
 OnDataRateChange(uint8_t oldDr, uint8_t newDr)
@@ -53,8 +53,8 @@ OnDataRateChange(uint8_t oldDr, uint8_t newDr)
 /**
  * Record a change in the transmission power setting on an end device.
  *
- * \param oldTxPower The previous transmission power value.
- * \param newTxPower The updated transmission power value.
+ * @param oldTxPower The previous transmission power value.
+ * @param newTxPower The updated transmission power value.
  */
 void
 OnTxPowerChange(double oldTxPower, double newTxPower)

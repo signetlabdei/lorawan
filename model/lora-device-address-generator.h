@@ -19,7 +19,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * This class generates sequential LoraDeviceAddress instances.
  */
@@ -28,7 +28,7 @@ class LoraDeviceAddressGenerator : public Object
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -38,8 +38,8 @@ class LoraDeviceAddressGenerator : public Object
      *
      * The first call to NextAddress() or GetAddress() will return these values.
      *
-     * \param nwkId The first network id.
-     * \param nwkAddr The first address.
+     * @param nwkId The first network id.
+     * @param nwkAddr The first address.
      */
     LoraDeviceAddressGenerator(const uint8_t nwkId = 0, const uint32_t nwkAddr = 0);
 
@@ -49,7 +49,7 @@ class LoraDeviceAddressGenerator : public Object
      * This resets the address to the base address that was used for
      * initialization.
      *
-     * \return The LoraDeviceAddress address of the next network.
+     * @return The LoraDeviceAddress address of the next network.
      */
     LoraDeviceAddress NextNetwork();
 
@@ -61,7 +61,7 @@ class LoraDeviceAddressGenerator : public Object
      *
      * This keeps the nwkId constant, only incrementing nwkAddr.
      *
-     * \return The LoraDeviceAddress address.
+     * @return The LoraDeviceAddress address.
      */
     LoraDeviceAddress NextAddress();
 
@@ -72,7 +72,7 @@ class LoraDeviceAddressGenerator : public Object
      * Does not change the internal state; is just used to peek at the next
      * address that will be allocated upon a call to NextAddress.
      *
-     * \return The LoraDeviceAddress.
+     * @return The LoraDeviceAddress.
      */
     LoraDeviceAddress GetNextAddress();
 

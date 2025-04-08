@@ -484,7 +484,7 @@ EndDeviceLorawanMac::GetNextTransmissionDelay()
 {
     NS_LOG_FUNCTION(this);
     // Check duty cycle
-    /// \todo possibly move to LogicalChannelHelper
+    /// @todo possibly move to LogicalChannelHelper
     auto waitTime = Time::Max();
     for (const auto& channel : m_channelHelper->GetRawChannelArray())
     {
@@ -506,7 +506,7 @@ Ptr<LogicalLoraChannel>
 EndDeviceLorawanMac::GetChannelForTx()
 {
     NS_LOG_FUNCTION(this);
-    /// \todo possibly move to LogicalChannelHelper
+    /// @todo possibly move to LogicalChannelHelper
     std::vector<Ptr<LogicalLoraChannel>> candidates;
     for (const auto& channel : m_channelHelper->GetRawChannelArray())
     {
@@ -705,7 +705,7 @@ EndDeviceLorawanMac::OnLinkAdrReq(uint8_t dataRate,
     // Temporary channel mask is built and validated
     if (!m_adr) // ADR disabled, only consider channel mask conf.
     {
-        /// \remark Original code considers this to be mobile-mode
+        /// @remark Original code considers this to be mobile-mode
         if (channelMaskAck) // valid channel mask
         {
             bool compatible = false;

@@ -169,7 +169,7 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
 
             LoraTag tag;
             packet->PeekPacketTag(tag);
-            /// \see ns3::lorawan::AdrComponent::RxPowerToSNR
+            /// @see ns3::lorawan::AdrComponent::RxPowerToSNR
             m_lastRxSnr = tag.GetReceivePower() + 174 - 10 * log10(125000) - 6;
 
             // Parse the MAC commands

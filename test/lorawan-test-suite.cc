@@ -24,7 +24,7 @@ using namespace lorawan;
 NS_LOG_COMPONENT_DEFINE("LorawanTestSuite");
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests interference computations in a number of possible scenarios using the
  * LoraInterferenceHelper class
@@ -188,7 +188,7 @@ InterferenceTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests LoraDeviceAddress comparison operators overrides and generation of new addresses with
  * LoraDeviceAddressGenerator
@@ -272,7 +272,7 @@ AddressTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests serialization/deserialization of LoRaWAN headers (the LorawanMacHeader and
  * LoraFrameHeader classes) on packets
@@ -424,11 +424,11 @@ HeaderTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests a number of cases related to SimpleGatewayLoraPhy's parallel reception paths
  *
- * \todo The test is commented out. To be fixed.
+ * @todo The test is commented out. To be fixed.
  */
 class ReceivePathTest : public TestCase
 {
@@ -445,29 +445,29 @@ class ReceivePathTest : public TestCase
     /**
      * Callback for tracing OccupiedReceptionPaths.
      *
-     * \param oldValue The old value.
-     * \param newValue The new value.
+     * @param oldValue The old value.
+     * @param newValue The new value.
      */
     void OccupiedReceptionPaths(int oldValue, int newValue);
     /**
      * Callback for tracing LostPacketBecauseNoMoreReceivers.
      *
-     * \param packet The packet lost.
-     * \param node The receiver node id if any, 0 otherwise.
+     * @param packet The packet lost.
+     * @param node The receiver node id if any, 0 otherwise.
      */
     void NoMoreDemodulators(Ptr<const Packet> packet, uint32_t node);
     /**
      * Callback for tracing LostPacketBecauseInterference.
      *
-     * \param packet The packet lost.
-     * \param node The receiver node id if any, 0 otherwise.
+     * @param packet The packet lost.
+     * @param node The receiver node id if any, 0 otherwise.
      */
     void Interference(Ptr<const Packet> packet, uint32_t node);
     /**
      * Callback for tracing ReceivedPacket.
      *
-     * \param packet The packet received.
-     * \param node The receiver node id if any, 0 otherwise.
+     * @param packet The packet received.
+     * @param node The receiver node id if any, 0 otherwise.
      */
     void ReceivedPacket(Ptr<const Packet> packet, uint32_t node);
 
@@ -858,7 +858,7 @@ ReceivePathTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests functionality of the LogicalLoraChannel, SubBand and LogicalLoraChannelHelper classes
  */
@@ -972,7 +972,7 @@ LogicalLoraChannelTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests the correctness of the LoraPhy::GetOnAirTime calculator against a number of pre-sourced
  * time values of known scenarios
@@ -1085,7 +1085,7 @@ TimeOnAirTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests sending packets over a LoRa physical channel between multiple devices and the resulting
  * possible outcomes
@@ -1104,50 +1104,50 @@ class PhyConnectivityTest : public TestCase
     /**
      * Callback for tracing ReceivedPacket.
      *
-     * \param packet The packet received.
-     * \param node The receiver node id if any, 0 otherwise.
+     * @param packet The packet received.
+     * @param node The receiver node id if any, 0 otherwise.
      */
     void ReceivedPacket(Ptr<const Packet> packet, uint32_t node);
 
     /**
      * Callback for tracing LostPacketBecauseUnderSensitivity.
      *
-     * \param packet The packet lost.
-     * \param node The receiver node id if any, 0 otherwise.
+     * @param packet The packet lost.
+     * @param node The receiver node id if any, 0 otherwise.
      */
     void UnderSensitivity(Ptr<const Packet> packet, uint32_t node);
 
     /**
      * Callback for tracing LostPacketBecauseInterference.
      *
-     * \param packet The packet lost.
-     * \param node The receiver node id if any, 0 otherwise.
+     * @param packet The packet lost.
+     * @param node The receiver node id if any, 0 otherwise.
      */
     void Interference(Ptr<const Packet> packet, uint32_t node);
 
     /**
      * Callback for tracing LostPacketBecauseWrongFrequency.
      *
-     * \param packet The packet lost.
-     * \param node The receiver node id if any, 0 otherwise.
+     * @param packet The packet lost.
+     * @param node The receiver node id if any, 0 otherwise.
      */
     void WrongFrequency(Ptr<const Packet> packet, uint32_t node);
 
     /**
      * Callback for tracing LostPacketBecauseWrongSpreadingFactor.
      *
-     * \param packet The packet lost.
-     * \param node The receiver node id if any, 0 otherwise.
+     * @param packet The packet lost.
+     * @param node The receiver node id if any, 0 otherwise.
      */
     void WrongSf(Ptr<const Packet> packet, uint32_t node);
 
     /**
      * Compare two packets to check if they are equal.
      *
-     * \param packet1 A first packet.
-     * \param packet2 A second packet.
-     * \return True if their unique identifiers are equal,
-     * \return false otherwise.
+     * @param packet1 A first packet.
+     * @param packet2 A second packet.
+     * @return True if their unique identifiers are equal,
+     * @return false otherwise.
      */
     bool IsSamePacket(Ptr<Packet> packet1, Ptr<Packet> packet2);
 
@@ -1557,11 +1557,11 @@ PhyConnectivityTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests the functionalities of the MAC layer of LoRaWAN devices
  *
- * \todo Not implemented yet.
+ * @todo Not implemented yet.
  */
 class LorawanMacTest : public TestCase
 {
@@ -1593,7 +1593,7 @@ LorawanMacTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests the functionalities of LoRaWAN MAC commands received by devices.
  *
@@ -1612,10 +1612,10 @@ class MacCommandTest : public TestCase
      * trigger a new empty uplink packet send that can then be used to examine the MAC command
      * answers in the header.
      *
-     * \tparam T  \explicit The type of MAC command to create.
-     * \tparam Ts \deduced Types of the constructor arguments.
-     * \param  [in] args MAC command constructor arguments.
-     * \return The list of MAC commands produced by the device as an answer.
+     * @tparam T  \explicit The type of MAC command to create.
+     * @tparam Ts \deduced Types of the constructor arguments.
+     * @param  [in] args MAC command constructor arguments.
+     * @return The list of MAC commands produced by the device as an answer.
      */
     template <typename T, typename... Ts>
     std::vector<Ptr<MacCommand>> RunMacCommand(Ts&&... args);
@@ -1678,7 +1678,7 @@ MacCommandTest::Reset()
     LorawanMacHelper macHelper;
     macHelper.SetRegion(LorawanMacHelper::EU);
     macHelper.SetDeviceType(LorawanMacHelper::ED_A);
-    /// \todo Create should not require a node in input.
+    /// @todo Create should not require a node in input.
     m_mac = DynamicCast<ClassAEndDeviceLorawanMac>(macHelper.Create(nullptr, nullptr));
     NS_TEST_EXPECT_MSG_NE(m_mac, nullptr, "Failed to initialize MAC layer object.");
     auto phy = CreateObject<SimpleEndDeviceLoraPhy>();
@@ -2038,7 +2038,7 @@ MacCommandTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * The TestSuite class names the TestSuite, identifies what type of TestSuite, and enables the
  * TestCases to be run. Typically, only the constructor for this class must be defined

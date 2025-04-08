@@ -176,9 +176,9 @@ LinkCheckComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status,
                 maxRssi = gwRxData.rxPower;
             }
         }
-        /// \see ns3::lorawan::AdrComponent::RxPowerToSNR
+        /// @see ns3::lorawan::AdrComponent::RxPowerToSNR
         double maxSnr = maxRssi + 174 - 10 * log10(125000) - 6;
-        /// \todo make this a global PHY constant, manage unknown sf values
+        /// @todo make this a global PHY constant, manage unknown sf values
         double requiredSnr[] = {-20.0, -17.5, -15.0, -12.5, -10.0, -7.5, -5};
         double diff = maxSnr - requiredSnr[12 - info.sf];
         uint8_t margin = (diff < 0) ? 0 : (diff > 254) ? 254 : diff;

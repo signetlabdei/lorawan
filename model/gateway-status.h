@@ -21,7 +21,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * This class represents the network server's knowledge about a gateway in
  * the LoRaWAN network it is administering.
@@ -37,7 +37,7 @@ class GatewayStatus : public Object
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -47,7 +47,7 @@ class GatewayStatus : public Object
     /**
      * Construct a new GatewayStatus object with values.
      *
-     * \param address The Address of the P2PNetDevice of the gateway connected to the network
+     * @param address The Address of the P2PNetDevice of the gateway connected to the network
      * server. \param netDevice A pointer to the NetDevice through which to reach this gateway from
      * the server. \param gwMac A pointer to the MAC layer of the gateway.
      */
@@ -56,35 +56,35 @@ class GatewayStatus : public Object
     /**
      * Get this gateway's P2P link address.
      *
-     * \return The Address instance.
+     * @return The Address instance.
      */
     Address GetAddress();
 
     /**
      * Set this gateway's P2P link address.
      *
-     * \param address The Address instance.
+     * @param address The Address instance.
      */
     void SetAddress(Address address);
 
     /**
      * Get the NetDevice through which it's possible to contact this gateway from the server.
      *
-     * \return A pointer to the NetDevice.
+     * @return A pointer to the NetDevice.
      */
     Ptr<NetDevice> GetNetDevice();
 
     /**
      * Set the NetDevice through which it's possible to contact this gateway from the server.
      *
-     * \param netDevice A pointer to the NetDevice.
+     * @param netDevice A pointer to the NetDevice.
      */
     void SetNetDevice(Ptr<NetDevice> netDevice);
 
     /**
      * Get a pointer to this gateway's MAC instance.
      *
-     * \return A pointer to the MAC layer object.
+     * @return A pointer to the MAC layer object.
      */
     Ptr<GatewayLorawanMac> GetGatewayMac();
 
@@ -97,15 +97,15 @@ class GatewayStatus : public Object
      * Query whether or not this gateway is available for immediate transmission
      * on this frequency.
      *
-     * \param frequency The frequency at which the gateway's availability should be queried.
-     * \return True if the gateway's available, false otherwise.
+     * @param frequency The frequency at which the gateway's availability should be queried.
+     * @return True if the gateway's available, false otherwise.
      */
     bool IsAvailableForTransmission(double frequency);
 
     /**
      * Set the time of the next scheduled transmission for the gateway.
      *
-     * \param nextTransmissionTime The Time value.
+     * @param nextTransmissionTime The Time value.
      */
     void SetNextTransmissionTime(Time nextTransmissionTime);
     // Time GetNextTransmissionTime ();

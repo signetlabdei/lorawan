@@ -27,7 +27,7 @@ class NetworkStatus;
 ////////////////
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Generic class describing a component of the NetworkController.
  *
@@ -40,7 +40,7 @@ class NetworkControllerComponent : public Object
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -51,9 +51,9 @@ class NetworkControllerComponent : public Object
     /**
      * Function called as a new uplink packet is received by the NetworkServer application.
      *
-     * \param packet The newly received packet.
-     * \param status A pointer to the status of the end device that sent the packet.
-     * \param networkStatus A pointer to the NetworkStatus object.
+     * @param packet The newly received packet.
+     * @param status A pointer to the status of the end device that sent the packet.
+     * @param networkStatus A pointer to the NetworkStatus object.
      */
     virtual void OnReceivedPacket(Ptr<const Packet> packet,
                                   Ptr<EndDeviceStatus> status,
@@ -61,22 +61,22 @@ class NetworkControllerComponent : public Object
     /**
      * Function called as a downlink reply is about to leave the NetworkServer application.
      *
-     * \param status A pointer to the status of the end device which we are sending the reply to.
-     * \param networkStatus A pointer to the NetworkStatus object.
+     * @param status A pointer to the status of the end device which we are sending the reply to.
+     * @param networkStatus A pointer to the NetworkStatus object.
      */
     virtual void BeforeSendingReply(Ptr<EndDeviceStatus> status,
                                     Ptr<NetworkStatus> networkStatus) = 0;
     /**
      * Method that is called when a packet cannot be sent in the downlink.
      *
-     * \param status The EndDeviceStatus of the device to which it was impossible to send a reply.
-     * \param networkStatus A pointer to the NetworkStatus object.
+     * @param status The EndDeviceStatus of the device to which it was impossible to send a reply.
+     * @param networkStatus A pointer to the NetworkStatus object.
      */
     virtual void OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus> networkStatus) = 0;
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Network controller component for acknowledgments management.
  */
@@ -85,7 +85,7 @@ class ConfirmedMessagesComponent : public NetworkControllerComponent
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -96,9 +96,9 @@ class ConfirmedMessagesComponent : public NetworkControllerComponent
      * This method checks whether the received packet requires an acknowledgment
      * and sets up the appropriate reply in case it does.
      *
-     * \param packet The newly received packet.
-     * \param status A pointer to the EndDeviceStatus object of the sender.
-     * \param networkStatus A pointer to the NetworkStatus object.
+     * @param packet The newly received packet.
+     * @param status A pointer to the EndDeviceStatus object of the sender.
+     * @param networkStatus A pointer to the NetworkStatus object.
      */
     void OnReceivedPacket(Ptr<const Packet> packet,
                           Ptr<EndDeviceStatus> status,
@@ -110,7 +110,7 @@ class ConfirmedMessagesComponent : public NetworkControllerComponent
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Network controller component for LinkCheck commands management.
  */
@@ -119,7 +119,7 @@ class LinkCheckComponent : public NetworkControllerComponent
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -130,9 +130,9 @@ class LinkCheckComponent : public NetworkControllerComponent
      * This method checks whether the received packet requires an acknowledgment
      * and sets up the appropriate reply in case it does.
      *
-     * \param packet The newly received packet.
-     * \param status A pointer to the EndDeviceStatus object of the sender.
-     * \param networkStatus A pointer to the NetworkStatus object.
+     * @param packet The newly received packet.
+     * @param status A pointer to the EndDeviceStatus object of the sender.
+     * @param networkStatus A pointer to the NetworkStatus object.
      */
     void OnReceivedPacket(Ptr<const Packet> packet,
                           Ptr<EndDeviceStatus> status,

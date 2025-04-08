@@ -26,7 +26,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Class representing the MAC layer of a Class A LoRaWAN device.
  */
@@ -35,7 +35,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -49,7 +49,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /**
      * Add headers and send a packet with the sending function of the physical layer.
      *
-     * \param packet The packet to send.
+     * @param packet The packet to send.
      */
     void SendToPhy(Ptr<Packet> packet) override;
 
@@ -63,7 +63,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      * This method is typically registered as a callback in the underlying PHY
      * layer so that it's called when a packet is going up the stack.
      *
-     * \param packet The received packet.
+     * @param packet The received packet.
      */
     void Receive(Ptr<const Packet> packet) override;
 
@@ -71,7 +71,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      * Function called by lower layers to inform this layer that reception of a
      * packet we were locked on failed.
      *
-     * \param packet The packet we failed to receive.
+     * @param packet The packet we failed to receive.
      */
     void FailedReception(Ptr<const Packet> packet) override;
 
@@ -80,7 +80,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      *
      * This function handles opening of the first receive window.
      *
-     * \param packet The packet that has just been transmitted.
+     * @param packet The packet that has just been transmitted.
      */
     void TxFinished(Ptr<const Packet> packet) override;
 
@@ -112,44 +112,44 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      * Find the minimum waiting time before the next possible transmission based
      * on end device's Class Type.
      *
-     * \param waitingTime The minimum waiting time that has to be respected,
+     * @param waitingTime The minimum waiting time that has to be respected,
      * irrespective of the class (e.g., because of duty cycle limitations).
-     * \return The Time value.
+     * @return The Time value.
      */
     Time GetNextClassTransmissionDelay(Time waitingTime) override;
 
     /**
      * Get the data rate that will be used in the first receive window.
      *
-     * \return The data rate.
+     * @return The data rate.
      */
     uint8_t GetFirstReceiveWindowDataRate();
 
     /**
      * Set the data rate to be used in the second receive window.
      *
-     * \param dataRate The data rate.
+     * @param dataRate The data rate.
      */
     void SetSecondReceiveWindowDataRate(uint8_t dataRate);
 
     /**
      * Get the data rate that will be used in the second receive window.
      *
-     * \return The data rate.
+     * @return The data rate.
      */
     uint8_t GetSecondReceiveWindowDataRate() const;
 
     /**
      * Set the frequency that will be used for the second receive window.
      *
-     * \param frequencyMHz The Frequency.
+     * @param frequencyMHz The Frequency.
      */
     void SetSecondReceiveWindowFrequency(double frequencyMHz);
 
     /**
      * Get the frequency that is used for the second receive window.
      *
-     * \return The frequency, in MHz.
+     * @return The frequency, in MHz.
      */
     double GetSecondReceiveWindowFrequency() const;
 

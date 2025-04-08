@@ -26,7 +26,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Helps to create LoraNetDevice objects.
  *
@@ -42,10 +42,10 @@ class LoraHelper
     /**
      * Install LoraNetDevices on a list of nodes.
      *
-     * \param phyHelper The PHY helper to create PHY objects.
-     * \param macHelper The MAC helper to create MAC objects.
-     * \param c The set of nodes on which a lora device will be installed.
-     * \return A device container which contains all the devices created by this method.
+     * @param phyHelper The PHY helper to create PHY objects.
+     * @param macHelper The MAC helper to create MAC objects.
+     * @param c The set of nodes on which a lora device will be installed.
+     * @return A device container which contains all the devices created by this method.
      */
     virtual NetDeviceContainer Install(const LoraPhyHelper& phyHelper,
                                        const LorawanMacHelper& macHelper,
@@ -54,10 +54,10 @@ class LoraHelper
     /**
      * Install LoraNetDevice on a single node.
      *
-     * \param phyHelper The PHY helper to create PHY objects.
-     * \param macHelper The MAC helper to create MAC objects.
-     * \param node The node on which a lora device will be installed.
-     * \return A device container which contains all the devices created by this method.
+     * @param phyHelper The PHY helper to create PHY objects.
+     * @param macHelper The MAC helper to create MAC objects.
+     * @param node The node on which a lora device will be installed.
+     * @return A device container which contains all the devices created by this method.
      */
     virtual NetDeviceContainer Install(const LoraPhyHelper& phyHelper,
                                        const LorawanMacHelper& macHelper,
@@ -74,7 +74,7 @@ class LoraHelper
     /**
      * Periodically prints the simulation time to the standard output.
      *
-     * \param interval The time period of the interval.
+     * @param interval The time period of the interval.
      */
     void EnableSimulationTimePrinting(Time interval);
 
@@ -83,12 +83,12 @@ class LoraHelper
      *
      * For each input device print the current position, data rate and transmission power settings.
      *
-     * \param endDevices The devices to track.
-     * \param gateways The gateways in the network (this is only a placeholder parameter).
-     * \param filename The output filename.
-     * \param interval The time interval for printing.
+     * @param endDevices The devices to track.
+     * @param gateways The gateways in the network (this is only a placeholder parameter).
+     * @param filename The output filename.
+     * @param interval The time interval for printing.
      *
-     * \todo Remove unused parameter gateways.
+     * @todo Remove unused parameter gateways.
      */
     void EnablePeriodicDeviceStatusPrinting(NodeContainer endDevices,
                                             NodeContainer gateways,
@@ -101,9 +101,9 @@ class LoraHelper
      * For each input gateway print counters for totPacketsSent, receivedPackets, interferedPackets,
      * noMoreGwPackets, underSensitivityPackets and lostBecauseTxPackets.
      *
-     * \param gateways The gateways to track.
-     * \param filename The output filename.
-     * \param interval The time interval for printing.
+     * @param gateways The gateways to track.
+     * @param filename The output filename.
+     * @param interval The time interval for printing.
      */
     void EnablePeriodicPhyPerformancePrinting(NodeContainer gateways,
                                               std::string filename,
@@ -116,8 +116,8 @@ class LoraHelper
      * For each input gateway print counters for totPacketsSent, receivedPackets, interferedPackets,
      * noMoreGwPackets, underSensitivityPackets and lostBecauseTxPackets.
      *
-     * \param gateways The gateways to track.
-     * \param filename The output filename.
+     * @param gateways The gateways to track.
+     * @param filename The output filename.
      */
     void DoPrintPhyPerformance(NodeContainer gateways, std::string filename);
 
@@ -125,8 +125,8 @@ class LoraHelper
      * Periodically print global performance as the total number of send and received
      * packets.
      *
-     * \param filename The output filename.
-     * \param interval The time interval for printing.
+     * @param filename The output filename.
+     * @param interval The time interval for printing.
      */
     void EnablePeriodicGlobalPerformancePrinting(std::string filename, Time interval);
 
@@ -134,14 +134,14 @@ class LoraHelper
      * Print global performance as the total number of send and received packets since last
      * performance update.
      *
-     * \param filename The output filename.
+     * @param filename The output filename.
      */
     void DoPrintGlobalPerformance(std::string filename);
 
     /**
      * Get a reference to the Packet Tracker object.
      *
-     * \return the reference to the Packet Tracker object.
+     * @return the reference to the Packet Tracker object.
      */
     LoraPacketTracker& GetPacketTracker();
 
@@ -153,11 +153,11 @@ class LoraHelper
      *
      * For each input device print the current position, data rate and transmission power settings.
      *
-     * \param endDevices The devices to track.
-     * \param gateways The gateways in the network (this is only a placeholder parameter).
-     * \param filename The output filename.
+     * @param endDevices The devices to track.
+     * @param gateways The gateways in the network (this is only a placeholder parameter).
+     * @param filename The output filename.
      *
-     * \todo Remove unused parameter gateways.
+     * @todo Remove unused parameter gateways.
      */
     void DoPrintDeviceStatus(NodeContainer endDevices,
                              NodeContainer gateways,
@@ -168,7 +168,7 @@ class LoraHelper
      * Actually print the simulation time and re-schedule execution of this
      * function.
      *
-     * \param interval The delay for next printing.
+     * @param interval The delay for next printing.
      */
     void DoPrintSimulationTime(Time interval);
 

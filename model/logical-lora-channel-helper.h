@@ -24,7 +24,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * This class supports LorawanMac instances by managing a list of the logical
  * channels that the device is supposed to be using, and establishes their
@@ -40,7 +40,7 @@ class LogicalLoraChannelHelper : public SimpleRefCount<LogicalLoraChannelHelper>
     /**
      * Construct a LogicalLoraChannelHelper of a certain size.
      *
-     * \param size The maximum number of transmission channels that can be installed on this device
+     * @param size The maximum number of transmission channels that can be installed on this device
      * according to regional parameter specifications.
      */
     LogicalLoraChannelHelper(uint8_t size);
@@ -50,8 +50,8 @@ class LogicalLoraChannelHelper : public SimpleRefCount<LogicalLoraChannelHelper>
     /**
      * Get the time it is necessary to wait for before transmitting on a given channel.
      *
-     * \param channel A pointer to the channel we want to know the waiting time for.
-     * \return A Time instance containing the waiting time before transmission is allowed on the
+     * @param channel A pointer to the channel we want to know the waiting time for.
+     * @return A Time instance containing the waiting time before transmission is allowed on the
      * channel.
      */
     Time GetWaitingTime(Ptr<LogicalLoraChannel> channel) const;
@@ -59,8 +59,8 @@ class LogicalLoraChannelHelper : public SimpleRefCount<LogicalLoraChannelHelper>
     /**
      * Get the time it is necessary to wait for before transmitting on a given channel.
      *
-     * \param frequencyMHz The channel frequency [MHz] we want to know the waiting time of for.
-     * \return A Time instance containing the waiting time before transmission is allowed on the
+     * @param frequencyMHz The channel frequency [MHz] we want to know the waiting time of for.
+     * @return A Time instance containing the waiting time before transmission is allowed on the
      * channel.
      */
     Time GetWaitingTime(double frequencyMHz) const;
@@ -68,16 +68,16 @@ class LogicalLoraChannelHelper : public SimpleRefCount<LogicalLoraChannelHelper>
     /**
      * Register the transmission of a packet.
      *
-     * \param duration The duration of the transmission event.
-     * \param channel The channel the transmission was made on.
+     * @param duration The duration of the transmission event.
+     * @param channel The channel the transmission was made on.
      */
     void AddEvent(Time duration, Ptr<LogicalLoraChannel> channel);
 
     /**
      * Register the transmission of a packet.
      *
-     * \param duration The duration of the transmission event.
-     * \param frequencyMHz The carrier frequency the transmission was on.
+     * @param duration The duration of the transmission event.
+     * @param frequencyMHz The carrier frequency the transmission was on.
      */
     void AddEvent(Time duration, double frequencyMHz);
 
@@ -87,40 +87,40 @@ class LogicalLoraChannelHelper : public SimpleRefCount<LogicalLoraChannelHelper>
      * By specifications, devices are required to hold an indexed structure
      * of a certain size (region-dependent) for storing transmission channels.
      *
-     * \remark Empty index slots hold nullptr.
+     * @remark Empty index slots hold nullptr.
      *
-     * \return An indexed vector of pointers to LogicalLoraChannels.
+     * @return An indexed vector of pointers to LogicalLoraChannels.
      */
     std::vector<Ptr<LogicalLoraChannel>> GetRawChannelArray() const;
 
     /**
      * Set a new channel at a fixed index.
      *
-     * \param chIndex The index of the channel to substitute.
-     * \param channel A pointer to the channel to add to the list.
+     * @param chIndex The index of the channel to substitute.
+     * @param channel A pointer to the channel to add to the list.
      */
     void SetChannel(uint8_t chIndex, Ptr<LogicalLoraChannel> channel);
 
     /**
      * Add a new SubBand.
      *
-     * \param subBand A pointer to the SubBand that needs to be added.
+     * @param subBand A pointer to the SubBand that needs to be added.
      */
     void AddSubBand(Ptr<SubBand> subBand);
 
     /**
      * Returns the maximum transmission power [dBm] that is allowed on a channel.
      *
-     * \param channel The channel in question.
-     * \return The power in dBm.
+     * @param channel The channel in question.
+     * @return The power in dBm.
      */
     double GetTxPowerForChannel(Ptr<LogicalLoraChannel> channel) const;
 
     /**
      * Returns the maximum transmission power [dBm] that is allowed on a channel.
      *
-     * \param frequencyMHz The carrier frequency of the channel in question.
-     * \return The power in dBm.
+     * @param frequencyMHz The carrier frequency of the channel in question.
+     * @return The power in dBm.
      */
     double GetTxPowerForChannel(double frequencyMHz) const;
 
@@ -128,8 +128,8 @@ class LogicalLoraChannelHelper : public SimpleRefCount<LogicalLoraChannelHelper>
      * Check if a frequency is valid, that is, if it belongs to any of the sub-bands registered in
      * this class.
      *
-     * \param frequencyMHz The frequency [MHz] to be evaluated.
-     * \return Whether the input frequency belongs to any of the registered sub-bands.
+     * @param frequencyMHz The frequency [MHz] to be evaluated.
+     * @return Whether the input frequency belongs to any of the registered sub-bands.
      */
     bool IsFrequencyValid(double frequencyMHz) const;
 
@@ -137,8 +137,8 @@ class LogicalLoraChannelHelper : public SimpleRefCount<LogicalLoraChannelHelper>
     /**
      * Get the SubBand a frequency belongs to, also used to test validity of a frequency.
      *
-     * \param frequencyMHz The frequency [MHz] we want to check.
-     * \return The SubBand the frequency belongs to, nullptr if none.
+     * @param frequencyMHz The frequency [MHz] we want to check.
+     * @return The SubBand the frequency belongs to, nullptr if none.
      */
     Ptr<SubBand> GetSubBandFromFrequency(double frequencyMHz) const;
 

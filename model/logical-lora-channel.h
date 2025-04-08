@@ -18,7 +18,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * This class represents a logical LoRaWAN channel.
  *
@@ -34,30 +34,30 @@ class LogicalLoraChannel : public SimpleRefCount<LogicalLoraChannel>
     /**
      * Constructor providing initialization of frequency and data rate limits.
      *
-     * \param frequency This channel's frequency [MHz].
-     * \param minDataRate This channel's minimum data rate.
-     * \param maxDataRate This channel's maximum data rate.
+     * @param frequency This channel's frequency [MHz].
+     * @param minDataRate This channel's minimum data rate.
+     * @param maxDataRate This channel's maximum data rate.
      */
     LogicalLoraChannel(double frequency, uint8_t minDataRate, uint8_t maxDataRate);
 
     /**
      * Get the frequency (MHz).
      *
-     * \return The center frequency of this channel.
+     * @return The center frequency of this channel.
      */
     double GetFrequency() const;
 
     /**
      * Get the minimum data rate that is allowed on this channel.
      *
-     * \return The minimum data rate value.
+     * @return The minimum data rate value.
      */
     uint8_t GetMinimumDataRate() const;
 
     /**
      * Get the maximum data rate that is allowed on this channel.
      *
-     * \return The maximum data rate value.
+     * @return The maximum data rate value.
      */
     uint8_t GetMaximumDataRate() const;
 
@@ -74,7 +74,7 @@ class LogicalLoraChannel : public SimpleRefCount<LogicalLoraChannel>
     /**
      * Test whether this channel is marked as enabled for uplink.
      *
-     * \return True if the channel can be used for uplink, false otherwise.
+     * @return True if the channel can be used for uplink, false otherwise.
      */
     bool IsEnabledForUplink() const;
 

@@ -28,7 +28,7 @@ namespace lorawan
 class LoraChannel;
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Class modeling a Lora SX1301 chip.
  *
@@ -44,7 +44,7 @@ class GatewayLoraPhy : public LoraPhy
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -69,8 +69,8 @@ class GatewayLoraPhy : public LoraPhy
     /**
      * Check whether the GatewayLoraPhy is currently listening to the specified frequency.
      *
-     * \param frequencyMHz The value of the frequency [MHz].
-     * \return True if the frequency is among the one being listened to, false otherwise.
+     * @param frequencyMHz The value of the frequency [MHz].
+     * @return True if the frequency is among the one being listened to, false otherwise.
      */
     bool IsOnFrequency(double frequencyMHz) override;
 
@@ -89,7 +89,7 @@ class GatewayLoraPhy : public LoraPhy
     /**
      * Add a frequency to the list of frequencies we are listening to.
      *
-     * \param frequencyMHz The value of the frequency [MHz].
+     * @param frequencyMHz The value of the frequency [MHz].
      */
     void AddFrequency(double frequencyMHz);
 
@@ -100,7 +100,7 @@ class GatewayLoraPhy : public LoraPhy
     /**
      * Signals the end of a transmission by the GatewayLoraPhy.
      *
-     * \param packet A pointer to the Packet transmitted.
+     * @param packet A pointer to the Packet transmitted.
      */
     void TxFinished(Ptr<const Packet> packet) override;
 
@@ -123,7 +123,7 @@ class GatewayLoraPhy : public LoraPhy
         /**
          * Query whether this reception path is available to lock on a signal.
          *
-         * \return True if its current state is free, false if it's currently locked.
+         * @return True if its current state is free, false if it's currently locked.
          */
         bool IsAvailable() const;
 
@@ -139,21 +139,21 @@ class GatewayLoraPhy : public LoraPhy
          * Set this reception path as not available and lock it on the
          * provided event.
          *
-         * \param event The LoraInterferenceHelper Event to lock on.
+         * @param event The LoraInterferenceHelper Event to lock on.
          */
         void LockOnEvent(Ptr<LoraInterferenceHelper::Event> event);
 
         /**
          * Set the event this reception path is currently on.
          *
-         * \param event The event to lock this ReceptionPath on.
+         * @param event The event to lock this ReceptionPath on.
          */
         void SetEvent(Ptr<LoraInterferenceHelper::Event> event);
 
         /**
          * Get the event this reception path is currently on.
          *
-         * \return 0 if no event is currently being received, a pointer to
+         * @return 0 if no event is currently being received, a pointer to
          * the event otherwise.
          */
         Ptr<LoraInterferenceHelper::Event> GetEvent();
@@ -162,7 +162,7 @@ class GatewayLoraPhy : public LoraPhy
          * Get the EventId of the EndReceive call associated to this ReceptionPath's
          * packet.
          *
-         * \return The EventId instance.
+         * @return The EventId instance.
          */
         EventId GetEndReceive();
 
@@ -170,7 +170,7 @@ class GatewayLoraPhy : public LoraPhy
          * Set the EventId of the EndReceive call associated to this ReceptionPath's
          * packet.
          *
-         * \param endReceiveEventId The EventId instance.
+         * @param endReceiveEventId The EventId instance.
          */
         void SetEndReceive(EventId endReceiveEventId);
 

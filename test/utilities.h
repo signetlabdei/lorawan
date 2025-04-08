@@ -21,7 +21,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Stores the main elements of a simulated LoRaWAN network
  */

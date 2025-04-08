@@ -16,7 +16,7 @@ jobs:
       image: ubuntu:rolling
     strategy:
       matrix:
-        version: [14, 17]
+        version: [15, 17]
     timeout-minutes: 60
     steps:
       # The following step is required in all jobs that use this repo's actions
@@ -34,21 +34,6 @@ jobs:
         uses: ./.github/actions/checkout-in-ns3
       - name: "Check code style"
         run: python3 utils/check-style-clang-format.py --verbose src/lorawan
-
-  # Emacs line
-  emacs-line:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v4
-      - run: >
-          if ( egrep -rn --include="*.h" --include="*.cc" --include="*.c" --include="*.py" --include="*.rst" "c-file-style:|py-indent-offset:" ) ; then
-          echo "Found Emacs lines on the above C/C++, Python and RST files" ;
-          exit 1 ;
-          else
-          echo "No Emacs lines found on C/C++, Python and RST files" ;
-          exit 0 ;
-          fi
 
   # Spell checking
   spell-check:
@@ -90,3 +75,21 @@ jobs:
       - run: |
           ./ns3 configure --enable-modules=core
           ./ns3 build cmake-format-check
+
+  # Markdown linting
+  markdown-lint:
+    runs-on: ubuntu-latest
+    container:
+      image: ruby:slim
+    steps:
+      # The following step is required in all jobs that use this repo's actions
+      - name: "Retrieve actions from repository"
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions
+      - name: "Install required system packages"
+        run: apt update && DEBIAN_FRONTEND=noninteractive apt install -y wget
+      - name: "Checkout this repository as ns-3 module"
+        uses: ./.github/actions/checkout-in-ns3
+      - run: gem install mdl
+      - run: mdl -s .mdl_style.rb src/lorawan
