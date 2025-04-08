@@ -21,7 +21,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Packet sender application to send a single packet
  */
@@ -34,13 +34,13 @@ class OneShotSender : public Application
     /**
      * Construct a new OneShotSender object with provided send time.
      *
-     * \param sendTime The Time of sending.
+     * @param sendTime The Time of sending.
      */
     OneShotSender(Time sendTime);
 
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -52,7 +52,7 @@ class OneShotSender : public Application
     /**
      * Set the time at which this app will send a packet.
      *
-     * \param sendTime The Time of sending.
+     * @param sendTime The Time of sending.
      */
     void SetSendTime(Time sendTime);
 

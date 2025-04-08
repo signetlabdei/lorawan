@@ -21,7 +21,7 @@ namespace lorawan
 class SubBand;
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * This class represents a logical LoRaWAN channel.
  *
@@ -36,7 +36,7 @@ class LogicalLoraChannel : public Object
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -46,23 +46,23 @@ class LogicalLoraChannel : public Object
     /**
      * Construct a new LogicalLoraChannel object initializing the carrier frequency.
      *
-     * \param frequency The carrier frequency [MHz].
+     * @param frequency The carrier frequency [MHz].
      */
     LogicalLoraChannel(double frequency);
 
     /**
      * Constructor providing initialization of frequency and data rate limits.
      *
-     * \param frequency This channel's frequency [MHz].
-     * \param minDataRate This channel's minimum data rate.
-     * \param maxDataRate This channel's maximum data rate.
+     * @param frequency This channel's frequency [MHz].
+     * @param minDataRate This channel's minimum data rate.
+     * @param maxDataRate This channel's maximum data rate.
      */
     LogicalLoraChannel(double frequency, uint8_t minDataRate, uint8_t maxDataRate);
 
     /**
      * Get the frequency (MHz).
      *
-     * \return The center frequency of this channel.
+     * @return The center frequency of this channel.
      */
     double GetFrequency() const;
 
@@ -71,28 +71,28 @@ class LogicalLoraChannel : public Object
     /**
      * Set the minimum data rate that is allowed on this channel.
      *
-     * \param minDataRate The minimum data rate value.
+     * @param minDataRate The minimum data rate value.
      */
     void SetMinimumDataRate(uint8_t minDataRate);
 
     /**
      * Set the maximum data rate that is allowed on this channel.
      *
-     * \param maxDataRate The maximum data rate value.
+     * @param maxDataRate The maximum data rate value.
      */
     void SetMaximumDataRate(uint8_t maxDataRate);
 
     /**
      * Get the minimum data rate that is allowed on this channel.
      *
-     * \return The minimum data rate value.
+     * @return The minimum data rate value.
      */
     uint8_t GetMinimumDataRate() const;
 
     /**
      * Get the maximum data rate that is allowed on this channel.
      *
-     * \return The maximum data rate value.
+     * @return The maximum data rate value.
      */
     uint8_t GetMaximumDataRate() const;
 
@@ -109,7 +109,7 @@ class LogicalLoraChannel : public Object
     /**
      * Test whether this channel is marked as enabled for uplink.
      *
-     * \return True if the channel can be used for uplink, false otherwise.
+     * @return True if the channel can be used for uplink, false otherwise.
      */
     bool IsEnabledForUplink() const;
 

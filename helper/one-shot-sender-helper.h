@@ -26,7 +26,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * This class can be used to install OneShotSender applications on multiple nodes at once.
  */
@@ -39,8 +39,8 @@ class OneShotSenderHelper
     /**
      * Helper function used to set the underlying application attributes.
      *
-     * \param name The name of the application attribute to set.
-     * \param value The value of the application attribute to set.
+     * @param name The name of the application attribute to set.
+     * @param value The value of the application attribute to set.
      */
     void SetAttribute(std::string name, const AttributeValue& value);
 
@@ -48,8 +48,8 @@ class OneShotSenderHelper
      * Install a OneShotSender application on each node of the input container
      * configured with all the attributes set with SetAttribute or other functions of this class.
      *
-     * \param c NodeContainer of the set of nodes on which an OneShotSender will be installed.
-     * \return Container of Ptr to the applications installed.
+     * @param c NodeContainer of the set of nodes on which an OneShotSender will be installed.
+     * @return Container of Ptr to the applications installed.
      */
     ApplicationContainer Install(NodeContainer c) const;
 
@@ -57,17 +57,17 @@ class OneShotSenderHelper
      * Install a OneShotSender application on the input Node configured with all the attributes set
      * with SetAttribute or other functions of this class.
      *
-     * \param node The node on which a OneShotSender will be installed.
-     * \return Container of the Ptr to the application installed.
+     * @param node The node on which a OneShotSender will be installed.
+     * @return Container of the Ptr to the application installed.
      */
     ApplicationContainer Install(Ptr<Node> node) const;
 
     /**
      * Set the send time of the applications.
      *
-     * \param sendTime The Time to set.
+     * @param sendTime The Time to set.
      *
-     * \todo It does not make sense that all applications send at the exact same time.
+     * @todo It does not make sense that all applications send at the exact same time.
      */
     void SetSendTime(Time sendTime);
 
@@ -76,8 +76,8 @@ class OneShotSenderHelper
      * Install a OneShotSender application on the input Node configured with all the attributes set
      * with SetAttribute or other functions of this class.
      *
-     * \param node The node on which a OneShotSender will be installed.
-     * \return A pointer to the applications installed.
+     * @param node The node on which a OneShotSender will be installed.
+     * @return A pointer to the applications installed.
      */
     Ptr<Application> InstallPriv(Ptr<Node> node) const;
 

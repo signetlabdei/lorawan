@@ -45,7 +45,7 @@ enum MacCommandType
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * This base class is used to represent a general MAC command.
  *
@@ -58,7 +58,7 @@ class MacCommand : public Object
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -69,44 +69,44 @@ class MacCommand : public Object
      * Serialize the contents of this MAC command into a buffer, according to the
      * LoRaWAN standard.
      *
-     * \param start A pointer to the buffer into which to serialize the command.
+     * @param start A pointer to the buffer into which to serialize the command.
      */
     virtual void Serialize(Buffer::Iterator& start) const = 0;
 
     /**
      * Deserialize the buffer into a MAC command.
      *
-     * \param start A pointer to the buffer that contains the serialized command.
-     * \return The number of bytes that were consumed.
+     * @param start A pointer to the buffer that contains the serialized command.
+     * @return The number of bytes that were consumed.
      */
     virtual uint8_t Deserialize(Buffer::Iterator& start) = 0;
 
     /**
      * Print the contents of this MAC command in human-readable format.
      *
-     * \param os The std::ostream instance on which to print the MAC command.
+     * @param os The std::ostream instance on which to print the MAC command.
      */
     virtual void Print(std::ostream& os) const = 0;
 
     /**
      * Get serialized length of this MAC command.
      *
-     * \return The number of bytes the MAC command takes up.
+     * @return The number of bytes the MAC command takes up.
      */
     virtual uint8_t GetSerializedSize() const;
 
     /**
      * Get the commandType of this MAC command.
      *
-     * \return The type of MAC command this object represents.
+     * @return The type of MAC command this object represents.
      */
     virtual enum MacCommandType GetCommandType() const;
 
     /**
      * Get the CID that corresponds to a type of MAC command.
      *
-     * \param commandType The type of MAC command.
-     * \return The CID as a uint8_t type.
+     * @param commandType The type of MAC command.
+     * @return The CID as a uint8_t type.
      */
     static uint8_t GetCIDFromMacCommand(enum MacCommandType commandType);
 
@@ -116,7 +116,7 @@ class MacCommand : public Object
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Implementation of the LinkCheckReq LoRaWAN MAC command.
  *
@@ -133,7 +133,7 @@ class LinkCheckReq : public MacCommand
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Implementation of the LinkCheckAns LoRaWAN MAC command.
  *
@@ -148,8 +148,8 @@ class LinkCheckAns : public MacCommand
     /**
      * Constructor with given fields.
      *
-     * \param margin The demodulation margin to set.
-     * \param gwCnt The gateway count to set.
+     * @param margin The demodulation margin to set.
+     * @param gwCnt The gateway count to set.
      */
     LinkCheckAns(uint8_t margin, uint8_t gwCnt);
 
@@ -160,28 +160,28 @@ class LinkCheckAns : public MacCommand
     /**
      * Set the demodulation margin value.
      *
-     * \param margin The demodulation margin to set.
+     * @param margin The demodulation margin to set.
      */
     void SetMargin(uint8_t margin);
 
     /**
      * Get the demodulation margin value.
      *
-     * \return The demodulation margin value.
+     * @return The demodulation margin value.
      */
     uint8_t GetMargin() const;
 
     /**
      * Set the gateway count value.
      *
-     * \param gwCnt The count value to set.
+     * @param gwCnt The count value to set.
      */
     void SetGwCnt(uint8_t gwCnt);
 
     /**
      * Get the gateway count value.
      *
-     * \return The gateway count value.
+     * @return The gateway count value.
      */
     uint8_t GetGwCnt() const;
 
@@ -196,7 +196,7 @@ class LinkCheckAns : public MacCommand
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Implementation of the LinkAdrReq LoRaWAN MAC command.
  *
@@ -217,11 +217,11 @@ class LinkAdrReq : public MacCommand
      * Regional Parameters RP002-1.0.4] for more details on how the fields are used and which
      * physical values they stand for.
      *
-     * \param dataRate The DataRate field to set.
-     * \param txPower The TXPower field to set.
-     * \param channelMask The ChMask field to set.
-     * \param chMaskCntl The ChMaskCntl field to set.
-     * \param nbRep The NbTrans field to set.
+     * @param dataRate The DataRate field to set.
+     * @param txPower The TXPower field to set.
+     * @param channelMask The ChMask field to set.
+     * @param chMaskCntl The ChMaskCntl field to set.
+     * @param nbRep The NbTrans field to set.
      */
     LinkAdrReq(uint8_t dataRate,
                uint8_t txPower,
@@ -236,7 +236,7 @@ class LinkAdrReq : public MacCommand
     /**
      * Return the data rate prescribed by this MAC command.
      *
-     * \return An unsigned 8-bit integer containing the data rate.
+     * @return An unsigned 8-bit integer containing the data rate.
      */
     uint8_t GetDataRate();
 
@@ -247,7 +247,7 @@ class LinkAdrReq : public MacCommand
      * dBm when communicating it to the PHY, and the translation will vary based
      * on the region of the device.
      *
-     * \return The TX power, encoded as an unsigned 8-bit integer.
+     * @return The TX power, encoded as an unsigned 8-bit integer.
      */
     uint8_t GetTxPower();
 
@@ -255,14 +255,14 @@ class LinkAdrReq : public MacCommand
      * Get the list of enabled channels. This method takes the 16-bit channel mask
      * and translates it to a list of integers that can be more easily parsed.
      *
-     * \return The list of enabled channels.
+     * @return The list of enabled channels.
      */
     std::list<int> GetEnabledChannelsList();
 
     /**
      * Get the number of repetitions prescribed by this MAC command.
      *
-     * \return The number of repetitions.
+     * @return The number of repetitions.
      */
     int GetRepetitions();
 
@@ -277,7 +277,7 @@ class LinkAdrReq : public MacCommand
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Implementation of the LinkAdrAns LoRaWAN MAC command.
  *
@@ -291,9 +291,9 @@ class LinkAdrAns : public MacCommand
     /**
      * Constructor with given fields.
      *
-     * \param powerAck The PowerACK field to set.
-     * \param dataRateAck The DataRateACK field to set.
-     * \param channelMaskAck The ChannelMaskACK field to set.
+     * @param powerAck The PowerACK field to set.
+     * @param dataRateAck The DataRateACK field to set.
+     * @param channelMaskAck The ChannelMaskACK field to set.
      */
     LinkAdrAns(bool powerAck, bool dataRateAck, bool channelMaskAck);
 
@@ -308,7 +308,7 @@ class LinkAdrAns : public MacCommand
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Implementation of the DutyCycleReq LoRaWAN MAC command.
  *
@@ -323,7 +323,7 @@ class DutyCycleReq : public MacCommand
     /**
      * Constructor providing initialization of all parameters.
      *
-     * \param dutyCycle The duty cycle as a 8-bit unsigned integer.
+     * @param dutyCycle The duty cycle as a 8-bit unsigned integer.
      */
     DutyCycleReq(uint8_t dutyCycle);
 
@@ -334,7 +334,7 @@ class DutyCycleReq : public MacCommand
     /**
      * Get the maximum duty cycle prescribed by this Mac command, in fraction form.
      *
-     * \return The maximum duty cycle.
+     * @return The maximum duty cycle.
      */
     double GetMaximumAllowedDutyCycle() const;
 
@@ -343,7 +343,7 @@ class DutyCycleReq : public MacCommand
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Implementation of the DutyCycleAns LoRaWAN MAC command.
  *
@@ -360,11 +360,11 @@ class DutyCycleAns : public MacCommand
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Implementation of the RxParamSetupReq LoRaWAN MAC command.
  *
- * \todo The use of frequencies in Hz here will cause problems for users, as frequencies are in MHz
+ * @todo The use of frequencies in Hz here will cause problems for users, as frequencies are in MHz
  * in the rest of the module code. IMO it would be better to have freqs in Hz as uint32_t
  */
 class RxParamSetupReq : public MacCommand
@@ -375,9 +375,9 @@ class RxParamSetupReq : public MacCommand
     /**
      * Constructor providing initialization of all fields.
      *
-     * \param rx1DrOffset The data rate offset to use for the first receive window.
-     * \param rx2DataRate The data rate to use for the second receive window.
-     * \param frequency The frequency in Hz to use for the second receive window.
+     * @param rx1DrOffset The data rate offset to use for the first receive window.
+     * @param rx2DataRate The data rate to use for the second receive window.
+     * @param frequency The frequency in Hz to use for the second receive window.
      */
     RxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency);
 
@@ -388,21 +388,21 @@ class RxParamSetupReq : public MacCommand
     /**
      * Get this command's Rx1DrOffset parameter.
      *
-     * \return The Rx1DrOffset parameter.
+     * @return The Rx1DrOffset parameter.
      */
     uint8_t GetRx1DrOffset();
 
     /**
      * Get this command's Rx2DataRate parameter.
      *
-     * \return The Rx2DataRate parameter.
+     * @return The Rx2DataRate parameter.
      */
     uint8_t GetRx2DataRate();
 
     /**
      * Get this command's frequency.
      *
-     * \return The frequency parameter, in Hz.
+     * @return The frequency parameter, in Hz.
      */
     double GetFrequency();
 
@@ -413,7 +413,7 @@ class RxParamSetupReq : public MacCommand
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Implementation of the RxParamSetupAns LoRaWAN MAC command.
  */
@@ -424,9 +424,9 @@ class RxParamSetupAns : public MacCommand
     /**
      * Constructor with initialization of all parameters.
      *
-     * \param rx1DrOffsetAck Whether or not the offset was correctly set.
-     * \param rx2DataRateAck Whether or not the second slot data rate was correctly set.
-     * \param channelAck Whether or not the second slot frequency was correctly set.
+     * @param rx1DrOffsetAck Whether or not the offset was correctly set.
+     * @param rx2DataRateAck Whether or not the second slot data rate was correctly set.
+     * @param channelAck Whether or not the second slot frequency was correctly set.
      */
     RxParamSetupAns(bool rx1DrOffsetAck, bool rx2DataRateAck, bool channelAck);
 
@@ -441,7 +441,7 @@ class RxParamSetupAns : public MacCommand
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Implementation of the DevStatusReq LoRaWAN MAC command.
  */
@@ -456,7 +456,7 @@ class DevStatusReq : public MacCommand
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Implementation of the DevStatusAns LoRaWAN MAC command.
  */
@@ -468,8 +468,8 @@ class DevStatusAns : public MacCommand
     /**
      * Constructor with initialization of all parameters.
      *
-     * \param battery The battery level in [0, 255].
-     * \param margin The demodulation margin of the last received DevStatusReq packet.
+     * @param battery The battery level in [0, 255].
+     * @param margin The demodulation margin of the last received DevStatusReq packet.
      */
     DevStatusAns(uint8_t battery, uint8_t margin);
 
@@ -480,14 +480,14 @@ class DevStatusAns : public MacCommand
     /**
      * Get the battery information contained in this MAC command.
      *
-     * \return The battery level.
+     * @return The battery level.
      */
     uint8_t GetBattery() const;
 
     /**
      * Get the demodulation margin contained in this MAC command.
      *
-     * \return The margin.
+     * @return The margin.
      */
     uint8_t GetMargin() const;
 
@@ -497,11 +497,11 @@ class DevStatusAns : public MacCommand
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Implementation of the NewChannelReq LoRaWAN MAC command.
  *
- * \todo The use of frequencies in Hz here will cause problems for users, as frequencies are in
+ * @todo The use of frequencies in Hz here will cause problems for users, as frequencies are in
  * MHz in the rest of the module code. IMO it would be better to have freqs in Hz as uint32_t
  */
 class NewChannelReq : public MacCommand
@@ -512,10 +512,10 @@ class NewChannelReq : public MacCommand
     /**
      * Constructor providing initialization of all parameters.
      *
-     * \param chIndex The index of the channel this command wants to operate on.
-     * \param frequency The new frequency for this channel in Hz.
-     * \param minDataRate The minimum data rate allowed on this channel.
-     * \param maxDataRate The maximum data rate allowed on this channel.
+     * @param chIndex The index of the channel this command wants to operate on.
+     * @param frequency The new frequency for this channel in Hz.
+     * @param minDataRate The minimum data rate allowed on this channel.
+     * @param maxDataRate The maximum data rate allowed on this channel.
      */
     NewChannelReq(uint8_t chIndex, double frequency, uint8_t minDataRate, uint8_t maxDataRate);
 
@@ -526,25 +526,25 @@ class NewChannelReq : public MacCommand
     /**
      * Get the the ChIndex field contained in this MAC command.
      *
-     * \return The ChIndex field.
+     * @return The ChIndex field.
      */
     uint8_t GetChannelIndex() const;
     /**
      * Get the the Frequency field contained in this MAC command.
      *
-     * \return The Frequency field in Hz.
+     * @return The Frequency field in Hz.
      */
     double GetFrequency() const;
     /**
      * Get the the MinDR field contained in this MAC command.
      *
-     * \return The MinDR field.
+     * @return The MinDR field.
      */
     uint8_t GetMinDataRate() const;
     /**
      * Get the the MaxDR field contained in this MAC command.
      *
-     * \return The MaxDR field.
+     * @return The MaxDR field.
      */
     uint8_t GetMaxDataRate() const;
 
@@ -556,7 +556,7 @@ class NewChannelReq : public MacCommand
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Implementation of the NewChannelAns LoRaWAN MAC command.
  */
@@ -568,9 +568,9 @@ class NewChannelAns : public MacCommand
     /**
      * Constructor providing initialization of all parameters.
      *
-     * \param dataRateRangeOk Whether or not the requested data rate range was set
+     * @param dataRateRangeOk Whether or not the requested data rate range was set
      * correctly.
-     * \param channelFrequencyOk Whether or not the requested channel frequency
+     * @param channelFrequencyOk Whether or not the requested channel frequency
      * was set correctly.
      */
     NewChannelAns(bool dataRateRangeOk, bool channelFrequencyOk);
@@ -585,7 +585,7 @@ class NewChannelAns : public MacCommand
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Implementation of the RxTimingSetupReq LoRaWAN MAC command.
  */
@@ -597,7 +597,7 @@ class RxTimingSetupReq : public MacCommand
     /**
      * Constructor providing initialization of all parameters.
      *
-     * \param delay The delay encoded in this MAC command.
+     * @param delay The delay encoded in this MAC command.
      */
     RxTimingSetupReq(uint8_t delay);
 
@@ -608,7 +608,7 @@ class RxTimingSetupReq : public MacCommand
     /**
      * Get the first window delay as a Time instance.
      *
-     * \return The delay.
+     * @return The delay.
      */
     Time GetDelay();
 
@@ -617,7 +617,7 @@ class RxTimingSetupReq : public MacCommand
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Implementation of the RxTimingSetupAns LoRaWAN MAC command.
  *
@@ -636,7 +636,7 @@ class RxTimingSetupAns : public MacCommand
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Implementation of the TxParamSetupAns LoRaWAN MAC command.
  */
@@ -653,7 +653,7 @@ class TxParamSetupAns : public MacCommand
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Implementation of the TxParamSetupReq LoRaWAN MAC command.
  */
@@ -670,7 +670,7 @@ class TxParamSetupReq : public MacCommand
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Implementation of the DlChannelAns LoRaWAN MAC command.
  */

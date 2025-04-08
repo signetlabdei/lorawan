@@ -25,7 +25,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Helper class for configuring and installing the LorawanMac class on devices and gateways. The
  * user must set all parameters before calling Install on nodes.
@@ -64,38 +64,38 @@ class LorawanMacHelper
     /**
      * Set an attribute of the underlying MAC object.
      *
-     * \param name The name of the attribute to set.
-     * \param v The value of the attribute.
+     * @param name The name of the attribute to set.
+     * @param v The value of the attribute.
      */
     void Set(std::string name, const AttributeValue& v);
 
     /**
      * Set the address generator to use for creation of these nodes.
      *
-     * \param addrGen Pointer to the address generator object.
+     * @param addrGen Pointer to the address generator object.
      */
     void SetAddressGenerator(Ptr<LoraDeviceAddressGenerator> addrGen);
 
     /**
      * Set the kind of MAC this helper will create.
      *
-     * \param dt The device type (either gateway or end device).
+     * @param dt The device type (either gateway or end device).
      */
     void SetDeviceType(enum DeviceType dt);
 
     /**
      * Set the region in which the device is to operate.
      *
-     * \param region The region enum value.
+     * @param region The region enum value.
      */
     void SetRegion(enum Regions region);
 
     /**
      * Create the LorawanMac instance and connect it to a device.
      *
-     * \param node The node on which we wish to create a wifi MAC.
-     * \param device The device within which this MAC will be created.
-     * \return A newly-created LorawanMac object.
+     * @param node The node on which we wish to create a wifi MAC.
+     * @param device The device within which this MAC will be created.
+     * @return A newly-created LorawanMac object.
      */
     Ptr<LorawanMac> Create(Ptr<Node> node, Ptr<NetDevice> device) const;
 
@@ -128,10 +128,10 @@ class LorawanMacHelper
      * v[5] -> number of devices using DR0, in range of at least a gateway \n
      * v[6] -> number of devices using DR0, out of range                   \n
      *
-     * \param endDevices The end devices to configure.
-     * \param gateways The gateways to consider for RSSI measurements.
-     * \param channel The radio channel to consider for RSSI measurements.
-     * \return A vector containing the final number of devices per DR.
+     * @param endDevices The end devices to configure.
+     * @param gateways The gateways to consider for RSSI measurements.
+     * @param channel The radio channel to consider for RSSI measurements.
+     * @return A vector containing the final number of devices per DR.
      */
     static std::vector<int> SetSpreadingFactorsUp(NodeContainer endDevices,
                                                   NodeContainer gateways,
@@ -165,12 +165,12 @@ class LorawanMacHelper
      * v[5] -> number of devices using DR0 \n
      *
      *
-     * \param endDevices The end devices to configure.
-     * \param gateways The gateways in the network (this is only a placeholder parameter).
-     * \param distribution The distribution (probability mass function) of DR assignment.
-     * \return A vector containing the final number of devices per DR.
+     * @param endDevices The end devices to configure.
+     * @param gateways The gateways in the network (this is only a placeholder parameter).
+     * @param distribution The distribution (probability mass function) of DR assignment.
+     * @return A vector containing the final number of devices per DR.
      *
-     * \todo Remove unused parameter gateways.
+     * @todo Remove unused parameter gateways.
      */
     static std::vector<int> SetSpreadingFactorsGivenDistribution(NodeContainer endDevices,
                                                                  NodeContainer gateways,
@@ -180,14 +180,14 @@ class LorawanMacHelper
     /**
      * Perform region-specific configurations for the 868 MHz EU band.
      *
-     * \param edMac Pointer to the device MAC layer to configure.
+     * @param edMac Pointer to the device MAC layer to configure.
      */
     void ConfigureForEuRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) const;
 
     /**
      * Perform region-specific configurations for the 868 MHz EU band.
      *
-     * \param gwMac Pointer to the gateway MAC layer to configure.
+     * @param gwMac Pointer to the gateway MAC layer to configure.
      */
     void ConfigureForEuRegion(Ptr<GatewayLorawanMac> gwMac) const;
 
@@ -195,21 +195,21 @@ class LorawanMacHelper
      * Apply configurations that are common both for the GatewayLorawanMac and the
      * ClassAEndDeviceLorawanMac classes.
      *
-     * \param lorawanMac Pointer to the MAC layer to configure.
+     * @param lorawanMac Pointer to the MAC layer to configure.
      */
     void ApplyCommonEuConfigurations(Ptr<LorawanMac> lorawanMac) const;
 
     /**
      * Perform region-specific configurations for the SINGLECHANNEL band.
      *
-     * \param edMac Pointer to the device MAC layer to configure.
+     * @param edMac Pointer to the device MAC layer to configure.
      */
     void ConfigureForSingleChannelRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) const;
 
     /**
      * Perform region-specific configurations for the SINGLECHANNEL band.
      *
-     * \param gwMac Pointer to the gateway MAC layer to configure.
+     * @param gwMac Pointer to the gateway MAC layer to configure.
      */
     void ConfigureForSingleChannelRegion(Ptr<GatewayLorawanMac> gwMac) const;
 
@@ -217,21 +217,21 @@ class LorawanMacHelper
      * Apply configurations that are common both for the GatewayLorawanMac and the
      * ClassAEndDeviceLorawanMac classes.
      *
-     * \param lorawanMac Pointer to the MAC layer to configure.
+     * @param lorawanMac Pointer to the MAC layer to configure.
      */
     void ApplyCommonSingleChannelConfigurations(Ptr<LorawanMac> lorawanMac) const;
 
     /**
      * Perform region-specific configurations for the ALOHA band.
      *
-     * \param edMac Pointer to the device MAC layer to configure.
+     * @param edMac Pointer to the device MAC layer to configure.
      */
     void ConfigureForAlohaRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) const;
 
     /**
      * Perform region-specific configurations for the ALOHA band.
      *
-     * \param gwMac Pointer to the gateway MAC layer to configure.
+     * @param gwMac Pointer to the gateway MAC layer to configure.
      */
     void ConfigureForAlohaRegion(Ptr<GatewayLorawanMac> gwMac) const;
 
@@ -239,7 +239,7 @@ class LorawanMacHelper
      * Apply configurations that are common both for the GatewayLorawanMac and the
      * ClassAEndDeviceLorawanMac classes.
      *
-     * \param lorawanMac Pointer to the MAC layer to configure.
+     * @param lorawanMac Pointer to the MAC layer to configure.
      */
     void ApplyCommonAlohaConfigurations(Ptr<LorawanMac> lorawanMac) const;
 

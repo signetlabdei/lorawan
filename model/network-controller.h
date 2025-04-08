@@ -24,7 +24,7 @@ class NetworkStatus;
 class NetworkControllerComponent;
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * This class collects a series of components that deal with various aspects
  * of managing the network, and queries them for action when a new packet is
@@ -35,7 +35,7 @@ class NetworkController : public Object
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -45,21 +45,21 @@ class NetworkController : public Object
     /**
      * Construct a new NetworkController object providing the NetworkStatus.
      *
-     * \param networkStatus A pointer to the NetworkStatus object.
+     * @param networkStatus A pointer to the NetworkStatus object.
      */
     NetworkController(Ptr<NetworkStatus> networkStatus);
 
     /**
      * Add a new NetworkControllerComponent.
      *
-     * \param component A pointer to the NetworkControllerComponent object.
+     * @param component A pointer to the NetworkControllerComponent object.
      */
     void Install(Ptr<NetworkControllerComponent> component);
 
     /**
      * Method that is called by the NetworkServer application when a new packet is received.
      *
-     * \param packet The newly received packet.
+     * @param packet The newly received packet.
      */
     void OnNewPacket(Ptr<const Packet> packet);
 
@@ -67,7 +67,7 @@ class NetworkController : public Object
      * Method that is called by the NetworkScheduler just before sending a reply
      * to a certain end device.
      *
-     * \param endDeviceStatus A pointer to the EndDeviceStatus object.
+     * @param endDeviceStatus A pointer to the EndDeviceStatus object.
      */
     void BeforeSendingReply(Ptr<EndDeviceStatus> endDeviceStatus);
 

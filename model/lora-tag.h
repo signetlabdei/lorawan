@@ -17,7 +17,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Tag used to save various data about a packet, like its Spreading Factor and data about
  * interference.
@@ -27,7 +27,7 @@ class LoraTag : public Tag
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
     TypeId GetInstanceTypeId() const override;
@@ -35,8 +35,8 @@ class LoraTag : public Tag
     /**
      * Create a LoraTag with a given spreading factor and collision.
      *
-     * \param sf The Spreading Factor.
-     * \param destroyedBy The spreading factor this tag's packet was destroyed by.
+     * @param sf The Spreading Factor.
+     * @param destroyedBy The spreading factor this tag's packet was destroyed by.
      */
     LoraTag(uint8_t sf = 0, uint8_t destroyedBy = 0);
 
@@ -50,42 +50,42 @@ class LoraTag : public Tag
     /**
      * Read which Spreading Factor this packet was transmitted with.
      *
-     * \return This tag's packet's spreading factor.
+     * @return This tag's packet's spreading factor.
      */
     uint8_t GetSpreadingFactor() const;
 
     /**
      * Read which Spreading Factor this packet was destroyed by.
      *
-     * \return The spreading factor this packet was destroyed by.
+     * @return The spreading factor this packet was destroyed by.
      */
     uint8_t GetDestroyedBy() const;
 
     /**
      * Read the power this packet arrived with.
      *
-     * \return This tag's packet received power.
+     * @return This tag's packet received power.
      */
     double GetReceivePower() const;
 
     /**
      * Set which Spreading Factor this packet was transmitted with.
      *
-     * \param sf The Spreading Factor.
+     * @param sf The Spreading Factor.
      */
     void SetSpreadingFactor(uint8_t sf);
 
     /**
      * Set which Spreading Factor this packet was destroyed by.
      *
-     * \param sf The Spreading Factor.
+     * @param sf The Spreading Factor.
      */
     void SetDestroyedBy(uint8_t sf);
 
     /**
      * Set the power this packet was received with.
      *
-     * \param receivePower The power, in dBm.
+     * @param receivePower The power, in dBm.
      */
     void SetReceivePower(double receivePower);
 
@@ -98,7 +98,7 @@ class LoraTag : public Tag
      * - It is used by the network server to signal to the gateway the frequency of a downlink
      * packet.
      *
-     * \param frequency The frequency value [MHz].
+     * @param frequency The frequency value [MHz].
      */
     void SetFrequency(double frequency);
 
@@ -111,21 +111,21 @@ class LoraTag : public Tag
      * - It is used by the network server to signal to the gateway the frequency of a downlink
      * packet.
      *
-     * \return The frequency value [MHz].
+     * @return The frequency value [MHz].
      */
     double GetFrequency() const;
 
     /**
      * Get the data rate for this packet.
      *
-     * \return The data rate that needs to be employed for this packet.
+     * @return The data rate that needs to be employed for this packet.
      */
     uint8_t GetDataRate() const;
 
     /**
      * Set the data rate for this packet.
      *
-     * \param dataRate The data rate.
+     * @param dataRate The data rate.
      */
     void SetDataRate(uint8_t dataRate);
 

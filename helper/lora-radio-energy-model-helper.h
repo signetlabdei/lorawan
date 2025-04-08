@@ -18,7 +18,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Installs LoraRadioEnergyModel on devices.
  *
@@ -31,31 +31,31 @@ class LoraRadioEnergyModelHelper : public DeviceEnergyModelHelper
     ~LoraRadioEnergyModelHelper() override; //!< Destructor
 
     /**
-     * \param name The name of the attribute to set.
-     * \param v The value of the attribute.
+     * @param name The name of the attribute to set.
+     * @param v The value of the attribute.
      *
      * Sets an attribute of the underlying PHY object.
      */
     void Set(std::string name, const AttributeValue& v) override;
 
     /**
-     * \param name The name of the model to set.
-     * \param n0 The name of the attribute to set.
-     * \param v0 The value of the attribute to set.
-     * \param n1 The name of the attribute to set.
-     * \param v1 The value of the attribute to set.
-     * \param n2 The name of the attribute to set.
-     * \param v2 The value of the attribute to set.
-     * \param n3 The name of the attribute to set.
-     * \param v3 The value of the attribute to set.
-     * \param n4 The name of the attribute to set.
-     * \param v4 The value of the attribute to set.
-     * \param n5 The name of the attribute to set.
-     * \param v5 The value of the attribute to set.
-     * \param n6 The name of the attribute to set.
-     * \param v6 The value of the attribute to set.
-     * \param n7 The name of the attribute to set.
-     * \param v7 The value of the attribute to set.
+     * @param name The name of the model to set.
+     * @param n0 The name of the attribute to set.
+     * @param v0 The value of the attribute to set.
+     * @param n1 The name of the attribute to set.
+     * @param v1 The value of the attribute to set.
+     * @param n2 The name of the attribute to set.
+     * @param v2 The value of the attribute to set.
+     * @param n3 The name of the attribute to set.
+     * @param v3 The value of the attribute to set.
+     * @param n4 The name of the attribute to set.
+     * @param v4 The value of the attribute to set.
+     * @param n5 The name of the attribute to set.
+     * @param v5 The value of the attribute to set.
+     * @param n6 The name of the attribute to set.
+     * @param v6 The value of the attribute to set.
+     * @param n7 The name of the attribute to set.
+     * @param v7 The value of the attribute to set.
      *
      * Configure a Transmission Current model for this EnergySource.
      */
@@ -79,9 +79,9 @@ class LoraRadioEnergyModelHelper : public DeviceEnergyModelHelper
 
   private:
     /**
-     * \param device Pointer to the NetDevice to install DeviceEnergyModel.
-     * \param source Pointer to EnergySource to install.
-     * \return Ptr<DeviceEnergyModel>.
+     * @param device Pointer to the NetDevice to install DeviceEnergyModel.
+     * @param source Pointer to EnergySource to install.
+     * @return Ptr<DeviceEnergyModel>.
      *
      * Implements DeviceEnergyModel::Install.
      */

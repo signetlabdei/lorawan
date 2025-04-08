@@ -22,7 +22,7 @@ namespace lorawan
 class LogicalLoraChannel;
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Class representing a SubBand, i.e., a frequency band subject to some
  * regulations on duty cycle and transmission power.
@@ -32,7 +32,7 @@ class SubBand : public Object
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -42,17 +42,17 @@ class SubBand : public Object
     /**
      * Create a new SubBand by specifying all of its properties.
      *
-     * \param firstFrequency The SubBand's lowest frequency [MHz].
-     * \param lastFrequency The SubBand's highest frequency [MHz].
-     * \param dutyCycle The duty cycle (as a fraction) allowed on this SubBand.
-     * \param maxTxPowerDbm The maximum transmission power [dBm] allowed on this SubBand.
+     * @param firstFrequency The SubBand's lowest frequency [MHz].
+     * @param lastFrequency The SubBand's highest frequency [MHz].
+     * @param dutyCycle The duty cycle (as a fraction) allowed on this SubBand.
+     * @param maxTxPowerDbm The maximum transmission power [dBm] allowed on this SubBand.
      */
     SubBand(double firstFrequency, double lastFrequency, double dutyCycle, double maxTxPowerDbm);
 
     /**
      * Get the lowest frequency of the SubBand.
      *
-     * \return The lowest frequency [MHz] of the SubBand.
+     * @return The lowest frequency [MHz] of the SubBand.
      */
     double GetFirstFrequency() const;
 
@@ -66,7 +66,7 @@ class SubBand : public Object
     /**
      * Get the duty cycle of the subband.
      *
-     * \return The duty cycle (as a fraction) that needs to be enforced on this
+     * @return The duty cycle (as a fraction) that needs to be enforced on this
      * SubBand.
      */
     double GetDutyCycle() const;
@@ -77,7 +77,7 @@ class SubBand : public Object
      * This function is used by LogicalLoraChannelHelper, which computes the time
      * based on the SubBand's duty cycle and on the transmission duration.
      *
-     * \param nextTime The future time from which transmission should be allowed
+     * @param nextTime The future time from which transmission should be allowed
      * again.
      */
     void SetNextTransmissionTime(Time nextTime);
@@ -86,7 +86,7 @@ class SubBand : public Object
      * Returns the next time from which transmission on this subband will be
      * possible.
      *
-     * \return The next time at which transmission in this SubBand will be
+     * @return The next time at which transmission in this SubBand will be
      * allowed.
      */
     Time GetNextTransmissionTime();
@@ -94,8 +94,8 @@ class SubBand : public Object
     /**
      * Return whether or not a frequency belongs to this SubBand.
      *
-     * \param frequency The frequency [MHz] we want to test against the current subband.
-     * \return True if the frequency is between firstFrequency and lastFrequency,
+     * @param frequency The frequency [MHz] we want to test against the current subband.
+     * @return True if the frequency is between firstFrequency and lastFrequency,
      * false otherwise.
      */
     bool BelongsToSubBand(double frequency) const;
@@ -103,8 +103,8 @@ class SubBand : public Object
     /**
      * Return whether or not a channel belongs to this SubBand.
      *
-     * \param channel The channel we want to test against the current subband.
-     * \return True if the channel's center frequency is between firstFrequency
+     * @param channel The channel we want to test against the current subband.
+     * @return True if the channel's center frequency is between firstFrequency
      * and lastFrequency, false otherwise.
      */
     bool BelongsToSubBand(Ptr<LogicalLoraChannel> channel) const;
@@ -112,14 +112,14 @@ class SubBand : public Object
     /**
      * Set the maximum transmission power that is allowed on this SubBand.
      *
-     * \param maxTxPowerDbm The maximum transmission power [dBm] to set.
+     * @param maxTxPowerDbm The maximum transmission power [dBm] to set.
      */
     void SetMaxTxPowerDbm(double maxTxPowerDbm);
 
     /**
      * Return the maximum transmission power that is allowed on this SubBand.
      *
-     * \return The maximum transmission power, in dBm.
+     * @return The maximum transmission power, in dBm.
      */
     double GetMaxTxPowerDbm() const;
 
