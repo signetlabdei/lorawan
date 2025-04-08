@@ -61,8 +61,8 @@ auto packetsReceived = std::vector<int>(6, 0);
 /**
  * Record the beginning of a transmission by an end device.
  *
- * \param packet A pointer to the packet sent.
- * \param senderNodeId Node id of the sender end device.
+ * @param packet A pointer to the packet sent.
+ * @param senderNodeId Node id of the sender end device.
  */
 void
 OnTransmissionCallback(Ptr<const Packet> packet, uint32_t senderNodeId)
@@ -76,8 +76,8 @@ OnTransmissionCallback(Ptr<const Packet> packet, uint32_t senderNodeId)
 /**
  * Record the correct reception of a packet by a gateway.
  *
- * \param packet A pointer to the packet received.
- * \param receiverNodeId Node id of the receiver gateway.
+ * @param packet A pointer to the packet received.
+ * @param receiverNodeId Node id of the receiver gateway.
  */
 void
 OnPacketReceptionCallback(Ptr<const Packet> packet, uint32_t receiverNodeId)

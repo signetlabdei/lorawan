@@ -21,7 +21,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Implements a sender application generating packets following a periodic point process.
  */
@@ -33,35 +33,35 @@ class PeriodicSender : public Application
 
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
     /**
      * Set the sending interval.
      *
-     * \param interval The interval between two packet send instances.
+     * @param interval The interval between two packet send instances.
      */
     void SetInterval(Time interval);
 
     /**
      * Get the sending interval.
      *
-     * \return The interval between two packet sends.
+     * @return The interval between two packet sends.
      */
     Time GetInterval() const;
 
     /**
      * Set the initial delay of this application.
      *
-     * \param delay The initial delay value.
+     * @param delay The initial delay value.
      */
     void SetInitialDelay(Time delay);
 
     /**
      * Set packet size.
      *
-     * \param size The base packet size value in bytes.
+     * @param size The base packet size value in bytes.
      */
     void SetPacketSize(uint8_t size);
 
@@ -71,7 +71,7 @@ class PeriodicSender : public Application
      * On each call to SendPacket(), an integer number is picked from a random variable. That
      * integer number is then added to the base packet size to create the new packet.
      *
-     * \param rv The random variable used to extract the additional number of packet bytes.
+     * @param rv The random variable used to extract the additional number of packet bytes.
      * Extracted values can be negative, but if they are lower than the base packet size they
      * produce a runtime error. This check is left to the caller during definition of the random
      * variable.

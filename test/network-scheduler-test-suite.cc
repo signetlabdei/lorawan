@@ -19,7 +19,7 @@ using namespace lorawan;
 NS_LOG_COMPONENT_DEFINE("NetworkSchedulerTestSuite");
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests the correct functionality of the NetworkScheduler component class of the network server
  */
@@ -56,7 +56,7 @@ NetworkSchedulerTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * The TestSuite class names the TestSuite, identifies what type of TestSuite, and enables the
  * TestCases to be run. Typically, only the constructor for this class must be defined

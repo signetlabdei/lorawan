@@ -25,14 +25,14 @@ class LoraPhy;
 class LorawanMac;
 
 /**
- * \defgroup lorawan LoRaWAN Models
+ * @defgroup lorawan LoRaWAN Models
  *
  * This section documents the API of the ns-3 lorawan module. For a generic functional description,
  * please refer to the ns-3 manual.
  */
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Hold together all LoRa related objects.
  *
@@ -46,7 +46,7 @@ class LoraNetDevice : public NetDevice
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -56,42 +56,42 @@ class LoraNetDevice : public NetDevice
     /**
      * Set which LorawanMac instance is linked to this device.
      *
-     * \param mac The MAC layer to use.
+     * @param mac The MAC layer to use.
      */
     void SetMac(Ptr<LorawanMac> mac);
 
     /**
      * Set which LoraPhy instance is linked to this device.
      *
-     * \param phy The PHY layer to use.
+     * @param phy The PHY layer to use.
      */
     void SetPhy(Ptr<LoraPhy> phy);
 
     /**
      * Get the LorawanMac instance that is linked to this NetDevice.
      *
-     * \return The MAC we are currently using.
+     * @return The MAC we are currently using.
      */
     Ptr<LorawanMac> GetMac() const;
 
     /**
      * Get the LoraPhy instance that is linked to this NetDevice.
      *
-     * \return The PHY we are currently using.
+     * @return The PHY we are currently using.
      */
     Ptr<LoraPhy> GetPhy() const;
 
     /**
      * Send a packet through the LoRaWAN stack.
      *
-     * \param packet The packet to send.
+     * @param packet The packet to send.
      */
     void Send(Ptr<Packet> packet);
 
     /**
-     * \copydoc ns3::NetDevice::Send
+     * @copydoc ns3::NetDevice::Send
 
-     * \note This function is implemented to achieve compliance with the NetDevice
+     * @note This function is implemented to achieve compliance with the NetDevice
      * interface. Note that the dest and protocolNumber args are ignored.
      */
     bool Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber) override;
@@ -100,7 +100,7 @@ class LoraNetDevice : public NetDevice
      * Callback the Mac layer calls whenever a packet arrives and needs to be
      * forwarded up the stack.
      *
-     * \param packet The packet that was received.
+     * @param packet The packet that was received.
      */
     void Receive(Ptr<Packet> packet);
 
@@ -139,11 +139,11 @@ class LoraNetDevice : public NetDevice
      * Receive a packet from the lower layer and pass the
      * packet up the stack.
      *
-     * \param packet The packet we need to forward.
-     * \param from The from address.
-     * \param to The to address.
+     * @param packet The packet we need to forward.
+     * @param from The from address.
+     * @param to The to address.
      *
-     * \todo Not implemented, this is a placeholder for future implementation.
+     * @todo Not implemented, this is a placeholder for future implementation.
      */
     void ForwardUp(Ptr<Packet> packet, Mac48Address from, Mac48Address to);
 
@@ -151,7 +151,7 @@ class LoraNetDevice : public NetDevice
     /**
      * Return the LoraChannel this device is connected to.
      *
-     * \return A pointer to the LoraChannel object.
+     * @return A pointer to the LoraChannel object.
      */
     Ptr<LoraChannel> DoGetChannel() const;
 

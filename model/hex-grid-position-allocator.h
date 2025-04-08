@@ -15,7 +15,7 @@ namespace ns3
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Position allocator for hexagonal tiling.
  *
@@ -67,7 +67,7 @@ namespace ns3
  * the total number of tiles \f$n\f$ in a tiling of \f$r\f$ complete rings around a central tile
  * evaluates to \f$n=3r^{2}-3r+1\f$ providing a possible solution for question (ii).
  *
- * \todo Move this into the module .rst documentation
+ * @todo Move this into the module .rst documentation
  */
 class HexGridPositionAllocator : public PositionAllocator
 {
@@ -78,7 +78,7 @@ class HexGridPositionAllocator : public PositionAllocator
     /**
      * Construct a new HexGridPositionAllocator object with given radius.
      *
-     * \param radius The radius length of the circle inscribed in the hexagonal tiles.
+     * @param radius The radius length of the circle inscribed in the hexagonal tiles.
      */
     HexGridPositionAllocator(double radius);
 
@@ -88,21 +88,21 @@ class HexGridPositionAllocator : public PositionAllocator
 
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
     /**
      * Get the radius of the circle inscribed in the hexagonal tiles.
      *
-     * \return The radius length.
+     * @return The radius length.
      */
     double GetRadius() const;
 
     /**
      * Set the radius of the circle inscribed in the hexagonal tiles.
      *
-     * \param radius The radius length.
+     * @param radius The radius length.
      */
     void SetRadius(double radius);
 
@@ -110,8 +110,8 @@ class HexGridPositionAllocator : public PositionAllocator
     /**
      * This method adds to the given list of positions an outer ring of positions.
      *
-     * \param positions The list of position around which to create the new positions.
-     * \return The input list of position with an added outer ring.
+     * @param positions The list of position around which to create the new positions.
+     * @return The input list of position with an added outer ring.
      */
     std::vector<Vector> AddRing(std::vector<Vector> positions);
 

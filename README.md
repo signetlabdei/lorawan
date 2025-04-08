@@ -30,8 +30,8 @@ Otherwise please directly refer to the [prerequisites section of the ns-3 instal
 Then, you need to:
 
 1. Clone the main ns-3 codebase,
-2. Clone this repository inside the `src` directory therein, and
-3. Checkout the current ns-3 version supported by this module.
+1. Clone this repository inside the `src` directory therein, and
+1. Checkout the current ns-3 version supported by this module.
 
 To install this module at the latest commit, you can use the following all-in-one command:
 
@@ -54,7 +54,7 @@ Ns-3 adopts a development-oriented philosophy. Before you can run anything, you'
    ./ns3 build
    ```
 
-2. **Focus exclusively on the lorawan module:** To expedite the compilation process, as it can take more than 30/40 minutes on slow hardware, change the configuration as follows:
+1. **Focus exclusively on the lorawan module:** To expedite the compilation process, as it can take more than 30/40 minutes on slow hardware, change the configuration as follows:
 
    ```bash
    ./ns3 clean &&

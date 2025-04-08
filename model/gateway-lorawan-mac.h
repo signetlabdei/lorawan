@@ -18,7 +18,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Class representing the MAC layer of a LoRaWAN gateway.
  */
@@ -27,7 +27,7 @@ class GatewayLorawanMac : public LorawanMac
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -40,7 +40,7 @@ class GatewayLorawanMac : public LorawanMac
     /**
      * Check whether the underlying PHY layer of the gateway is currently transmitting.
      *
-     * \return True if it is transmitting, false otherwise.
+     * @return True if it is transmitting, false otherwise.
      */
     bool IsTransmitting();
 
@@ -56,8 +56,8 @@ class GatewayLorawanMac : public LorawanMac
     /**
      * Return the next time at which we will be able to transmit on the specified frequency.
      *
-     * \param frequency The frequency value [MHz].
-     * \return The next transmission time.
+     * @param frequency The frequency value [MHz].
+     * @return The next transmission time.
      */
     Time GetWaitingTime(double frequency);
 

@@ -39,7 +39,7 @@ namespace lorawan
 typedef std::list<std::pair<Ptr<PointToPointNetDevice>, Ptr<Node>>> P2PGwRegistration_t;
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * This class can install a NetworkServer application on a node.
  */
@@ -52,34 +52,34 @@ class NetworkServerHelper
     /**
      * Record an attribute to be set in each Application after it is is created.
      *
-     * \param name The name of the application attribute to set.
-     * \param value The value of the application attribute to set.
+     * @param name The name of the application attribute to set.
+     * @param value The value of the application attribute to set.
      */
     void SetAttribute(std::string name, const AttributeValue& value);
 
     /**
      * Create one lorawan network server application on the Node.
      *
-     * \param node The node on which to create the Application.
-     * \return The application created.
+     * @param node The node on which to create the Application.
+     * @return The application created.
      */
     ApplicationContainer Install(Ptr<Node> node);
 
     /**
      * Register gateways connected with point-to-point to this network server.
      *
-     * \remark For the moment, only P2P connections are supported.
+     * @remark For the moment, only P2P connections are supported.
      *
-     * \param registration The gateways registration data.
+     * @param registration The gateways registration data.
      *
-     * \see ns3::lorawan::P2PGwRegistration_t
+     * @see ns3::lorawan::P2PGwRegistration_t
      */
     void SetGatewaysP2P(const P2PGwRegistration_t& registration);
 
     /**
      * Set which end devices will be managed by this network server.
      *
-     * \param endDevices The end device nodes.
+     * @param endDevices The end device nodes.
      */
     void SetEndDevices(NodeContainer endDevices);
 
@@ -87,7 +87,7 @@ class NetworkServerHelper
      * Enable (true) or disable (false) the Adaptive Data Rate (ADR) component in the Network
      * Server created by this helper.
      *
-     * \param enableAdr Whether to enable ADR in the network server.
+     * @param enableAdr Whether to enable ADR in the network server.
      */
     void EnableAdr(bool enableAdr);
 
@@ -95,7 +95,7 @@ class NetworkServerHelper
      * Set the Adaptive Data Rate (ADR) implementation to use in the network server created
      * by this helper.
      *
-     * \param type The type of ADR implementation.
+     * @param type The type of ADR implementation.
      */
     void SetAdr(std::string type);
 
@@ -103,7 +103,7 @@ class NetworkServerHelper
     /**
      * Install the NetworkServerComponent objects onto the NetworkServer application.
      *
-     * \param netServer A pointer to the NetworkServer application.
+     * @param netServer A pointer to the NetworkServer application.
      */
     void InstallComponents(Ptr<NetworkServer> netServer);
 
@@ -114,8 +114,8 @@ class NetworkServerHelper
      * gateways to the Node with a PointToPoint link, registers gateways and devices in the
      * NetworkServer application, and installs the necessary NetworkServerComponent objects.
      *
-     * \param node A pointer to the Node.
-     * \return A pointer to the installed NetworkServer application.
+     * @param node A pointer to the Node.
+     * @return A pointer to the installed NetworkServer application.
      */
     Ptr<Application> InstallPriv(Ptr<Node> node);
 
