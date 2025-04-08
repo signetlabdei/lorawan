@@ -82,6 +82,11 @@ jobs:
     container:
       image: ruby:slim
     steps:
+      # The following step is required in all jobs that use this repo's actions
+      - name: "Retrieve actions from repository"
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions
       - name: "Checkout this repository as ns-3 module"
         uses: ./.github/actions/checkout-in-ns3
       - run: gem install mdl
