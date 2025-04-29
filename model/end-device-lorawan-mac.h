@@ -151,16 +151,16 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Get the transmission power this end device is set to use.
      *
-     * @return The transmission power this device uses when transmitting.
+     * @return The transmission ERP [dBm] this device uses when transmitting.
      */
-    virtual uint8_t GetTransmissionPower();
+    double GetTransmissionPowerDbm();
 
     /**
      * Set the transmission power of this end device.
      *
-     * @param txPower The transmission ERP [dBm] value.
+     * @param txPowerDbm The transmission ERP [dBm] value.
      */
-    void SetTransmissionPower(uint8_t txPower);
+    void SetTransmissionPowerDbm(double txPowerDbm);
 
     /**
      * Set the network address of this device.
@@ -282,9 +282,11 @@ class EndDeviceLorawanMac : public LorawanMac
      *
      * @param rx1DrOffset The first reception window data rate offset to set.
      * @param rx2DataRate The data rate to use for the second receive window.
-     * @param frequency The frequency [Hz] to use for the second receive window.
+     * @param frequencyHz The frequency [Hz] to use for the second receive window.
      */
-    virtual void OnRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency) = 0;
+    virtual void OnRxParamSetupReq(uint8_t rx1DrOffset,
+                                   uint8_t rx2DataRate,
+                                   double frequencyHz) = 0;
 
     /**
      * Perform the actions that need to be taken when receiving a DevStatusReq command.
@@ -295,12 +297,12 @@ class EndDeviceLorawanMac : public LorawanMac
      * Perform the actions that need to be taken when receiving a NewChannelReq command.
      *
      * @param chIndex The ChIndex field of the received NewChannelReq command.
-     * @param frequency The Frequency field of the received NewChannelReq command.
+     * @param frequencyHz The Frequency [Hz] field of the received NewChannelReq command.
      * @param minDataRate The MinDR field of the received NewChannelReq command.
      * @param maxDataRate The MaxDR field of the received NewChannelReq command.
      */
     void OnNewChannelReq(uint8_t chIndex,
-                         double frequency,
+                         double frequencyHz,
                          uint8_t minDataRate,
                          uint8_t maxDataRate);
 
@@ -329,20 +331,21 @@ class EndDeviceLorawanMac : public LorawanMac
         m_enableDRAdapt; //!< Enable data rate adaptation (ADR) during the retransmission procedure.
     uint8_t m_nbTrans; //!< Default number of unacknowledged redundant transmissions of each packet.
     TracedValue<uint8_t> m_dataRate; //!< The data rate this device is using to transmit.
-    TracedValue<double> m_txPower;   //!< The transmission power this device is using to transmit.
-    uint8_t m_codingRate;            //!< The coding rate used by this device.
+    TracedValue<double>
+        m_txPowerDbm;      //!< The transmission ERP [dBm] this device is currently using.
+    uint8_t m_codingRate;  //!< The coding rate used by this device.
     bool m_headerDisabled; //!< Whether or not the LoRa PHY header is disabled for communications by
                            //!< this device.
     LoraDeviceAddress m_address; //!< The address of this device.
 
     /**
-     * Find the minimum waiting time before the next possible transmission based
+     * Find the minimum wait time before the next possible transmission based
      * on end device's Class Type.
      *
-     * @param waitingTime Currently known minimum waiting time, possibly raised by this function.
-     * @return The updated minimum waiting time in Time format.
+     * @param waitTime Currently known minimum wait time, possibly raised by this function.
+     * @return The updated minimum wait time in Time format.
      */
-    virtual Time GetNextClassTransmissionDelay(Time waitingTime);
+    virtual Time GetNextClassTransmissionDelay(Time waitTime);
 
     /**
      * Find a suitable channel for transmission. The channel is chosen among the
@@ -398,7 +401,7 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Find the base minimum wait time before the next possible transmission.
      *
-     * @return The base minimum waiting time.
+     * @return The base minimum wait time.
      */
     Time GetNextTransmissionDelay();
 

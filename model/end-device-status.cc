@@ -184,10 +184,10 @@ EndDeviceStatus::SetFirstReceiveWindowSpreadingFactor(uint8_t sf)
 }
 
 void
-EndDeviceStatus::SetFirstReceiveWindowFrequency(double frequency)
+EndDeviceStatus::SetFirstReceiveWindowFrequency(double frequencyMHz)
 {
     NS_LOG_FUNCTION_NOARGS();
-    m_firstReceiveWindowFrequency = frequency;
+    m_firstReceiveWindowFrequency = frequencyMHz;
 }
 
 void
@@ -198,10 +198,10 @@ EndDeviceStatus::SetSecondReceiveWindowSpreadingFactor(uint8_t sf)
 }
 
 void
-EndDeviceStatus::SetSecondReceiveWindowFrequency(double frequency)
+EndDeviceStatus::SetSecondReceiveWindowFrequency(double frequencyMHz)
 {
     NS_LOG_FUNCTION_NOARGS();
-    m_secondReceiveWindowFrequency = frequency;
+    m_secondReceiveWindowFrequency = frequencyMHz;
 }
 
 void
@@ -254,7 +254,7 @@ EndDeviceStatus::InsertReceivedPacket(Ptr<const Packet> receivedPacket, const Ad
     // Update Information on the received packet
     ReceivedPacketInfo info;
     info.sf = tag.GetSpreadingFactor();
-    info.frequency = tag.GetFrequency();
+    info.frequencyMHz = tag.GetFrequency();
     info.packet = receivedPacket;
 
     double rcvPower = tag.GetReceivePower();
@@ -288,7 +288,7 @@ EndDeviceStatus::InsertReceivedPacket(Ptr<const Packet> receivedPacket, const Ad
             GatewayList& gwList = it->second.gwList;
 
             PacketInfoPerGw gwInfo;
-            gwInfo.receivedTime = Simulator::Now();
+            gwInfo.receivedTime = Now();
             gwInfo.rxPower = rcvPower;
             gwInfo.gwAddress = gwAddress;
             gwList.insert(std::pair<Address, PacketInfoPerGw>(gwAddress, gwInfo));
@@ -302,7 +302,7 @@ EndDeviceStatus::InsertReceivedPacket(Ptr<const Packet> receivedPacket, const Ad
     {
         NS_LOG_INFO("Packet was received for the first time");
         PacketInfoPerGw gwInfo;
-        gwInfo.receivedTime = Simulator::Now();
+        gwInfo.receivedTime = Now();
         gwInfo.rxPower = rcvPower;
         gwInfo.gwAddress = gwAddress;
         info.gwList.insert(std::pair<Address, PacketInfoPerGw>(gwAddress, gwInfo));

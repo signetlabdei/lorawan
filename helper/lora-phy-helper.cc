@@ -60,7 +60,7 @@ LoraPhyHelper::Set(std::string name, const AttributeValue& v)
 }
 
 Ptr<LoraPhy>
-LoraPhyHelper::Create(Ptr<Node> node, Ptr<NetDevice> device) const
+LoraPhyHelper::Install(Ptr<Node> node, Ptr<NetDevice> device) const
 {
     NS_LOG_FUNCTION(this << node->GetId() << device);
 

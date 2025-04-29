@@ -41,7 +41,7 @@ GatewayStatus::GatewayStatus(Address address,
     : m_address(address),
       m_netDevice(netDevice),
       m_gatewayMac(gwMac),
-      m_nextTransmissionTime(Seconds(0))
+      m_nextTransmissionTime(Time(0))
 {
     NS_LOG_FUNCTION(this);
 }
@@ -81,12 +81,12 @@ GatewayStatus::GetGatewayMac()
 }
 
 bool
-GatewayStatus::IsAvailableForTransmission(double frequency)
+GatewayStatus::IsAvailableForTransmission(double frequencyMHz)
 {
     // We can't send multiple packets at once, see SX1301 V2.01 page 29
 
     // Check that the gateway was not already "booked"
-    if (m_nextTransmissionTime > Simulator::Now() - MilliSeconds(1))
+    if (m_nextTransmissionTime > Now() - MilliSeconds(1))
     {
         NS_LOG_INFO("This gateway is already booked for a transmission");
         return false;
@@ -100,11 +100,11 @@ GatewayStatus::IsAvailableForTransmission(double frequency)
     }
 
     // Check that the gateway is not constrained by the duty cycle
-    Time waitingTime = m_gatewayMac->GetWaitingTime(frequency);
-    if (waitingTime > Seconds(0))
+    Time waitTime = m_gatewayMac->GetWaitTime(frequencyMHz);
+    if (waitTime.IsStrictlyPositive())
     {
         NS_LOG_INFO("Gateway cannot be used because of duty cycle");
-        NS_LOG_INFO("Waiting time at current gateway: " << waitingTime.GetSeconds() << " seconds");
+        NS_LOG_INFO("Wait time at current gateway: " << waitTime.As(Time::S));
 
         return false;
     }

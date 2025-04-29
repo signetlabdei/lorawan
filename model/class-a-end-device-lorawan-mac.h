@@ -109,14 +109,14 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /////////////////////////
 
     /**
-     * Find the minimum waiting time before the next possible transmission based
+     * Find the minimum wait time before the next possible transmission based
      * on end device's Class Type.
      *
-     * @param waitingTime The minimum waiting time that has to be respected,
+     * @param waitTime The minimum wait time that has to be respected,
      * irrespective of the class (e.g., because of duty cycle limitations).
      * @return The Time value.
      */
-    Time GetNextClassTransmissionDelay(Time waitingTime) override;
+    Time GetNextClassTransmissionDelay(Time waitTime) override;
 
     /**
      * Get the data rate that will be used in the first receive window.
@@ -157,7 +157,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     // MAC command methods //
     /////////////////////////
 
-    void OnRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency) override;
+    void OnRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequencyHz) override;
 
   private:
     Time m_receiveDelay1; //!< The interval between when a packet is done sending and when the first

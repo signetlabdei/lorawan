@@ -150,7 +150,7 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
         if (!IsOnFrequency(frequencyMHz))
         {
             NS_LOG_INFO("Packet lost because it's on frequency "
-                        << frequencyMHz << " MHz and we are listening at " << m_frequency
+                        << frequencyMHz << " MHz and we are listening at " << m_frequencyMHz
                         << " MHz");
 
             // Fire the trace source for this event.
@@ -216,8 +216,7 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
             SwitchToRx();
 
             // Schedule the end of the reception of the packet
-            NS_LOG_INFO("Scheduling reception of a packet. End in " << duration.GetSeconds()
-                                                                    << " seconds");
+            NS_LOG_INFO("Scheduling reception of a packet. End in " << duration.As(Time::S));
 
             Simulator::Schedule(duration, &LoraPhy::EndReceive, this, packet, event);
 

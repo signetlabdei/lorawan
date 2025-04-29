@@ -20,8 +20,8 @@ namespace lorawan
 NS_LOG_COMPONENT_DEFINE("LoraHelper");
 
 LoraHelper::LoraHelper()
-    : m_lastPhyPerformanceUpdate(Seconds(0)),
-      m_lastGlobalPerformanceUpdate(Seconds(0))
+    : m_lastPhyPerformanceUpdate(Time(0)),
+      m_lastGlobalPerformanceUpdate(Time(0))
 {
 }
 
@@ -47,7 +47,7 @@ LoraHelper::Install(const LoraPhyHelper& phyHelper,
         Ptr<LoraNetDevice> device = CreateObject<LoraNetDevice>();
 
         // Create the PHY
-        Ptr<LoraPhy> phy = phyHelper.Create(node, device);
+        Ptr<LoraPhy> phy = phyHelper.Install(node, device);
         NS_ASSERT(phy);
         device->SetPhy(phy);
         NS_LOG_DEBUG("Done creating the PHY");
@@ -85,7 +85,7 @@ LoraHelper::Install(const LoraPhyHelper& phyHelper,
         }
 
         // Create the MAC
-        Ptr<LorawanMac> mac = macHelper.Create(node, device);
+        Ptr<LorawanMac> mac = macHelper.Install(node, device);
         NS_ASSERT(mac);
         mac->SetPhy(phy);
         NS_LOG_DEBUG("Done creating the MAC");
@@ -151,7 +151,7 @@ void
 LoraHelper::EnableSimulationTimePrinting(Time interval)
 {
     m_oldtime = std::time(nullptr);
-    Simulator::Schedule(Seconds(0), &LoraHelper::DoPrintSimulationTime, this, interval);
+    Simulator::Schedule(Time(0), &LoraHelper::DoPrintSimulationTime, this, interval);
 }
 
 void
@@ -181,7 +181,7 @@ LoraHelper::DoPrintDeviceStatus(NodeContainer endDevices,
 {
     const char* c = filename.c_str();
     std::ofstream outputFile;
-    if (Simulator::Now() == Seconds(0))
+    if (Now().IsZero())
     {
         // Delete contents of the file as it is opened
         outputFile.open(c, std::ofstream::out | std::ofstream::trunc);
@@ -192,7 +192,7 @@ LoraHelper::DoPrintDeviceStatus(NodeContainer endDevices,
         outputFile.open(c, std::ofstream::out | std::ofstream::app);
     }
 
-    Time currentTime = Simulator::Now();
+    Time currentTime = Now();
     for (auto j = endDevices.Begin(); j != endDevices.End(); ++j)
     {
         Ptr<Node> object = *j;
@@ -204,9 +204,9 @@ LoraHelper::DoPrintDeviceStatus(NodeContainer endDevices,
         Ptr<ClassAEndDeviceLorawanMac> mac =
             DynamicCast<ClassAEndDeviceLorawanMac>(loraNetDevice->GetMac());
         int dr = int(mac->GetDataRate());
-        double txPower = mac->GetTransmissionPower();
+        double txPower = mac->GetTransmissionPowerDbm();
         Vector pos = position->GetPosition();
-        outputFile << currentTime.GetSeconds() << " " << object->GetId() << " " << pos.x << " "
+        outputFile << currentTime.As(Time::S) << " " << object->GetId() << " " << pos.x << " "
                    << pos.y << " " << dr << " " << unsigned(txPower) << std::endl;
     }
     // for (NodeContainer::Iterator j = gateways.Begin (); j != gateways.End (); ++j)
@@ -245,7 +245,7 @@ LoraHelper::DoPrintPhyPerformance(NodeContainer gateways, std::string filename)
 
     const char* c = filename.c_str();
     std::ofstream outputFile;
-    if (Simulator::Now() == Seconds(0))
+    if (Now().IsZero())
     {
         // Delete contents of the file as it is opened
         outputFile.open(c, std::ofstream::out | std::ofstream::trunc);
@@ -259,14 +259,14 @@ LoraHelper::DoPrintPhyPerformance(NodeContainer gateways, std::string filename)
     for (auto it = gateways.Begin(); it != gateways.End(); ++it)
     {
         int systemId = (*it)->GetId();
-        outputFile << Simulator::Now().GetSeconds() << " " << std::to_string(systemId) << " "
+        outputFile << Now().As(Time::S) << " " << std::to_string(systemId) << " "
                    << m_packetTracker->PrintPhyPacketsPerGw(m_lastPhyPerformanceUpdate,
-                                                            Simulator::Now(),
+                                                            Now(),
                                                             systemId)
                    << std::endl;
     }
 
-    m_lastPhyPerformanceUpdate = Simulator::Now();
+    m_lastPhyPerformanceUpdate = Now();
 
     outputFile.close();
 }
@@ -292,7 +292,7 @@ LoraHelper::DoPrintGlobalPerformance(std::string filename)
 
     const char* c = filename.c_str();
     std::ofstream outputFile;
-    if (Simulator::Now() == Seconds(0))
+    if (Now().IsZero())
     {
         // Delete contents of the file as it is opened
         outputFile.open(c, std::ofstream::out | std::ofstream::trunc);
@@ -303,12 +303,11 @@ LoraHelper::DoPrintGlobalPerformance(std::string filename)
         outputFile.open(c, std::ofstream::out | std::ofstream::app);
     }
 
-    outputFile << Simulator::Now().GetSeconds() << " "
-               << m_packetTracker->CountMacPacketsGlobally(m_lastGlobalPerformanceUpdate,
-                                                           Simulator::Now())
+    outputFile << Now().As(Time::S) << " "
+               << m_packetTracker->CountMacPacketsGlobally(m_lastGlobalPerformanceUpdate, Now())
                << std::endl;
 
-    m_lastGlobalPerformanceUpdate = Simulator::Now();
+    m_lastGlobalPerformanceUpdate = Now();
 
     outputFile.close();
 }
@@ -316,8 +315,8 @@ LoraHelper::DoPrintGlobalPerformance(std::string filename)
 void
 LoraHelper::DoPrintSimulationTime(Time interval)
 {
-    // NS_LOG_INFO ("Time: " << Simulator::Now().GetHours());
-    std::cout << "Simulated time: " << Simulator::Now().GetHours() << " hours" << std::endl;
+    // NS_LOG_INFO ("Time: " << Now().As(Time::H));
+    std::cout << "Simulated time: " << Now().As(Time::H) << std::endl;
     std::cout << "Real time from last call: " << std::time(nullptr) - m_oldtime << " seconds"
               << std::endl;
     m_oldtime = std::time(nullptr);

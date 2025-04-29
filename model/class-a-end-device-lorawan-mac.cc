@@ -18,8 +18,6 @@
 
 #include "ns3/log.h"
 
-#include <algorithm>
-
 namespace ns3
 {
 namespace lorawan
@@ -79,7 +77,7 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
     if (m_enableDRAdapt && (m_dataRate > 0) && (m_retxParams.retxLeft < m_nbTrans) &&
         (m_retxParams.retxLeft % 2 == 0))
     {
-        m_txPower = 14; // Reset transmission power
+        m_txPowerDbm = 14; // Reset transmission power
         m_dataRate = m_dataRate - 1;
     }
 
@@ -98,7 +96,7 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
     Ptr<LogicalLoraChannel> txChannel = GetChannelForTx();
 
     NS_LOG_DEBUG("PacketToSend: " << packetToSend);
-    m_phy->Send(packetToSend, params, txChannel->GetFrequency(), m_txPower);
+    m_phy->Send(packetToSend, params, txChannel->GetFrequency(), m_txPowerDbm);
 
     //////////////////////////////////////////////
     // Register packet transmission for duty cycle
@@ -450,7 +448,7 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
 /////////////////////////
 
 Time
-ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitingTime)
+ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitTime)
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -471,8 +469,8 @@ ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitingTime)
                                      Seconds(m_receiveWindowDurationInSymbols * tSym);
 
             NS_LOG_DEBUG("Duration until endSecondRxWindow for new transmission:"
-                         << (endSecondRxWindow - Simulator::Now()).GetSeconds());
-            waitingTime = std::max(waitingTime, endSecondRxWindow - Simulator::Now());
+                         << (endSecondRxWindow - Now()).As(Time::S));
+            waitTime = Max(waitTime, endSecondRxWindow - Now());
         }
     }
     // This is a retransmitted packet, it can not be sent until the end of
@@ -482,15 +480,15 @@ ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitingTime)
         double ack_timeout = m_uniformRV->GetValue(1, 3);
         // Compute the duration until ACK_TIMEOUT (It may be a negative number, but it doesn't
         // matter.)
-        Time retransmitWaitingTime =
-            Time(m_secondReceiveWindow.GetTs()) - Simulator::Now() + Seconds(ack_timeout);
+        Time retransmitWaitTime =
+            Time(m_secondReceiveWindow.GetTs()) - Now() + Seconds(ack_timeout);
 
-        NS_LOG_DEBUG("ack_timeout:" << ack_timeout << " retransmitWaitingTime:"
-                                    << retransmitWaitingTime.GetSeconds());
-        waitingTime = std::max(waitingTime, retransmitWaitingTime);
+        NS_LOG_DEBUG("ack_timeout:" << ack_timeout
+                                    << " retransmitWaitTime:" << retransmitWaitTime.As(Time::S));
+        waitTime = Max(waitTime, retransmitWaitTime);
     }
 
-    return waitingTime;
+    return waitTime;
 }
 
 uint8_t
@@ -530,9 +528,10 @@ ClassAEndDeviceLorawanMac::GetSecondReceiveWindowFrequency() const
 void
 ClassAEndDeviceLorawanMac::OnRxParamSetupReq(uint8_t rx1DrOffset,
                                              uint8_t rx2DataRate,
-                                             double frequency)
+                                             double frequencyHz)
 {
-    NS_LOG_FUNCTION(this << unsigned(rx1DrOffset) << unsigned(rx2DataRate) << frequency);
+    NS_LOG_FUNCTION(this << unsigned(rx1DrOffset) << unsigned(rx2DataRate)
+                         << uint32_t(frequencyHz));
 
     // Adapted from: github.com/Lora-net/SWL2001.git v4.3.1
     // For the time being, this implementation is valid for the EU868 region
@@ -553,7 +552,7 @@ ClassAEndDeviceLorawanMac::OnRxParamSetupReq(uint8_t rx1DrOffset,
         rx2DataRateAck = false;
     }
 
-    if (!m_channelHelper->IsFrequencyValid(frequency / 1e6))
+    if (!m_channelHelper->IsFrequencyValid(frequencyHz / 1e6))
     {
         NS_LOG_WARN("Invalid rx2 frequency");
         channelAck = false;
@@ -563,7 +562,7 @@ ClassAEndDeviceLorawanMac::OnRxParamSetupReq(uint8_t rx1DrOffset,
     {
         m_rx1DrOffset = rx1DrOffset;
         m_secondReceiveWindowDataRate = rx2DataRate;
-        m_secondReceiveWindowFrequencyMHz = frequency / 1e6;
+        m_secondReceiveWindowFrequencyMHz = frequencyHz / 1e6;
     }
 
     NS_LOG_INFO("Adding RxParamSetupAns reply");

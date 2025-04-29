@@ -59,36 +59,36 @@ InterferenceTest::DoRun()
 
     LoraInterferenceHelper interferenceHelper;
 
-    double frequency = 868.1;
-    double differentFrequency = 868.3;
+    double frequencyMHz = 868.1;
+    double differentFrequencyMHz = 868.3;
 
     Ptr<LoraInterferenceHelper::Event> event;
     Ptr<LoraInterferenceHelper::Event> event1;
 
     // Test overlap duration
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    event1 = interferenceHelper.Add(Seconds(1), 14, 12, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
+    event1 = interferenceHelper.Add(Seconds(1), 14, 12, nullptr, frequencyMHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.GetOverlapTime(event, event1),
                           Seconds(1),
                           "Overlap computation didn't give the expected result");
     interferenceHelper.ClearAllEvents();
 
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    event1 = interferenceHelper.Add(Seconds(1.5), 14, 12, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
+    event1 = interferenceHelper.Add(Seconds(1.5), 14, 12, nullptr, frequencyMHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.GetOverlapTime(event, event1),
                           Seconds(1.5),
                           "Overlap computation didn't give the expected result");
     interferenceHelper.ClearAllEvents();
 
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    event1 = interferenceHelper.Add(Seconds(3), 14, 12, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
+    event1 = interferenceHelper.Add(Seconds(3), 14, 12, nullptr, frequencyMHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.GetOverlapTime(event, event1),
                           Seconds(2),
                           "Overlap computation didn't give the expected result");
     interferenceHelper.ClearAllEvents();
 
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    event1 = interferenceHelper.Add(Seconds(2), 14, 12, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
+    event1 = interferenceHelper.Add(Seconds(2), 14, 12, nullptr, frequencyMHz);
     // Because of some strange behavior, this test would get stuck if we used the same syntax of the
     // previous ones. This works instead.
     bool retval = interferenceHelper.GetOverlapTime(event, event1) == Seconds(2);
@@ -96,32 +96,32 @@ InterferenceTest::DoRun()
     interferenceHelper.ClearAllEvents();
 
     // Perfect overlap, packet survives
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14, 12, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
+    interferenceHelper.Add(Seconds(2), 14, 12, nullptr, frequencyMHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
     interferenceHelper.ClearAllEvents();
 
     // Perfect overlap, packet survives
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 - 7, 7, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
+    interferenceHelper.Add(Seconds(2), 14 - 7, 7, nullptr, frequencyMHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
     interferenceHelper.ClearAllEvents();
 
     // Perfect overlap, packet destroyed
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 - 6, 7, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
+    interferenceHelper.Add(Seconds(2), 14 - 6, 7, nullptr, frequencyMHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           7,
                           "Packet was not destroyed by interference as expected");
     interferenceHelper.ClearAllEvents();
 
     // Partial overlap, packet survives
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(1), 14 - 6, 7, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
+    interferenceHelper.Add(Seconds(1), 14 - 6, 7, nullptr, frequencyMHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
@@ -130,8 +130,8 @@ InterferenceTest::DoRun()
     // Different frequencys
     // Packet would be destroyed if they were on the same frequency, but survives
     // since they are on different frequencies
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14, 7, nullptr, differentFrequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
+    interferenceHelper.Add(Seconds(2), 14, 7, nullptr, differentFrequencyMHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
@@ -140,8 +140,8 @@ InterferenceTest::DoRun()
     // Different SFs
     // Packet would be destroyed if they both were SF7, but survives thanks to spreading factor
     // semi-orthogonality
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyMHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
@@ -149,16 +149,16 @@ InterferenceTest::DoRun()
 
     // Spreading factor imperfect orthogonality
     // Different SFs are orthogonal only up to a point
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 17, 8, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
+    interferenceHelper.Add(Seconds(2), 14 + 17, 8, nullptr, frequencyMHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           8,
                           "Packet was not destroyed by interference as expected");
     interferenceHelper.ClearAllEvents();
 
     // If a more 'distant' spreading factor is used, isolation gets better
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 17, 10, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
+    interferenceHelper.Add(Seconds(2), 14 + 17, 10, nullptr, frequencyMHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet was destroyed by interference while it should have survived");
@@ -166,10 +166,10 @@ InterferenceTest::DoRun()
 
     // Cumulative interference
     // Same spreading factor interference is cumulative
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyMHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyMHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyMHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           8,
                           "Packet was not destroyed by interference as expected");
@@ -177,10 +177,10 @@ InterferenceTest::DoRun()
 
     // Cumulative interference
     // Interference is not cumulative between different SFs
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 9, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 10, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyMHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 9, nullptr, frequencyMHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 10, nullptr, frequencyMHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
@@ -955,20 +955,20 @@ LogicalLoraChannelTest::DoRun()
     channelHelper->AddEvent(Seconds(2), channel1);
     Time expectedTimeOff = Seconds(2 / 0.01);
 
-    // Waiting time is computed correctly
-    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitingTime(channel1),
+    // Wait time is computed correctly
+    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitTime(channel1),
                           expectedTimeOff,
-                          "Waiting time doesn't behave as expected");
+                          "Wait time doesn't behave as expected");
 
     // Duty Cycle involves the whole SubBand, not just a channel
-    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitingTime(channel2),
+    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitTime(channel2),
                           expectedTimeOff,
-                          "Waiting time doesn't behave as expected");
+                          "Wait time doesn't behave as expected");
 
     // Other bands are not affected by this transmission
-    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitingTime(channel3),
+    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitTime(channel3),
                           Time(0),
-                          "Waiting time affects other subbands");
+                          "Wait time affects other subbands");
 }
 
 /**
@@ -1679,7 +1679,7 @@ MacCommandTest::Reset()
     macHelper.SetRegion(LorawanMacHelper::EU);
     macHelper.SetDeviceType(LorawanMacHelper::ED_A);
     /// @todo Create should not require a node in input.
-    m_mac = DynamicCast<ClassAEndDeviceLorawanMac>(macHelper.Create(nullptr, nullptr));
+    m_mac = DynamicCast<ClassAEndDeviceLorawanMac>(macHelper.Install(nullptr, nullptr));
     NS_TEST_EXPECT_MSG_NE(m_mac, nullptr, "Failed to initialize MAC layer object.");
     auto phy = CreateObject<SimpleEndDeviceLoraPhy>();
     phy->SetChannel(CreateObject<LoraChannel>());
@@ -1721,7 +1721,7 @@ MacCommandTest::DoRun()
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
                               unsigned(dataRate),
                               "m_dataRate does not match DataRate field of LinkAdrReq");
-        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPower(),
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
                               14 - txPower * 2,
                               "m_txPowerDbm does not match txPower field of LinkAdrReq");
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
@@ -1756,7 +1756,7 @@ MacCommandTest::DoRun()
         NS_TEST_EXPECT_MSG_NE(unsigned(m_mac->GetDataRate()),
                               unsigned(dataRate),
                               "m_dataRate expected to differ from DataRate field of LinkAdrReq");
-        NS_TEST_EXPECT_MSG_NE(m_mac->GetTransmissionPower(),
+        NS_TEST_EXPECT_MSG_NE(m_mac->GetTransmissionPowerDbm(),
                               14 - txPower * 2,
                               "m_txPowerDbm expected to not match txPower field of LinkAdrReq");
         NS_TEST_EXPECT_MSG_NE(unsigned(m_mac->GetMaxNumberOfTransmissions()),
@@ -1790,7 +1790,7 @@ MacCommandTest::DoRun()
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
                               0,
                               "m_dataRate expected to be default value");
-        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPower(),
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
                               14,
                               "m_txPowerDbm expected to be default value");
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
@@ -1824,7 +1824,7 @@ MacCommandTest::DoRun()
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
                               0,
                               "m_dataRate expected to be default value");
-        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPower(),
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
                               14,
                               "m_txPowerDbm expected to be default value");
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
@@ -1856,7 +1856,7 @@ MacCommandTest::DoRun()
         uint8_t nbTrans = 0;    // restore default 1
         // Set device params to values different from default
         m_mac->SetDataRate(3);
-        m_mac->SetTransmissionPower(12);
+        m_mac->SetTransmissionPowerDbm(12);
         m_mac->SetMaxNumberOfTransmissions(15);
         auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
         channels.at(0)->DisableForUplink();
@@ -1864,9 +1864,9 @@ MacCommandTest::DoRun()
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
                               3,
                               "m_dataRate expected to be default value");
-        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPower(),
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
                               12,
-                              "m_txPower expected to be default value");
+                              "m_txPowerDbm expected to be default value");
         NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
                               1,
                               "m_nbTrans expected to be default value");

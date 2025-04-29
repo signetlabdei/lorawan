@@ -263,7 +263,7 @@ class EndDeviceLoraPhy : public LoraPhy
     // static const double sensitivity[6]; //!< The sensitivity vector of this device to different
     // SFs
 
-    double m_frequency; //!< The frequency this device is listening on
+    double m_frequencyMHz; //!< The frequency [MHz] this device is listening on
 
     uint8_t m_sf; //!< The Spreading Factor this device is listening for
 
