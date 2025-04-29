@@ -147,13 +147,12 @@ class AdrComponent : public NetworkControllerComponent
     double GetAverageSNR(EndDeviceStatus::ReceivedPacketList packetList, int historyRange);
 
     /**
-     * Get the LoRaWAN protocol TXPower configuration index from the Equivalent Isotropically
-     * Radiated Power (EIRP) in dBm.
+     * Get the LoRaWAN protocol TxPower parameter from the Equivalent Radiated Power (ERP) in dBm.
      *
-     * @param txPower Transission EIRP configuration.
-     * @return TXPower index as int.
+     * @param txPower Transission ERP configuration [dBm].
+     * @return TxPower parameter value as uint8_t.
      */
-    int GetTxPowerIndex(int txPower);
+    uint8_t GetTxPowerIndex(int txPower);
 
     enum CombiningMethod tpAveraging;      //!< TX power from gateways policy
     int historyRange;                      //!< Number of previous packets to consider

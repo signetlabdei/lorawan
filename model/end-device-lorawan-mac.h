@@ -83,25 +83,10 @@ class EndDeviceLorawanMac : public LorawanMac
     // Receiving methods //
     ///////////////////////
 
-    /**
-     * Receive a packet.
-     *
-     * This method is typically registered as a callback in the underlying PHY
-     * layer so that it's called when a packet is going up the stack.
-     *
-     * @param packet The received packet.
-     */
     void Receive(Ptr<const Packet> packet) override;
 
     void FailedReception(Ptr<const Packet> packet) override;
 
-    /**
-     * Perform the actions that are required after a packet send.
-     *
-     * This function handles opening of the first receive window.
-     *
-     * @param packet The packet that has just been transmitted.
-     */
     void TxFinished(Ptr<const Packet> packet) override;
 
     /////////////////////////
@@ -114,26 +99,30 @@ class EndDeviceLorawanMac : public LorawanMac
     virtual void resetRetransmissionParameters();
 
     /**
-     * Enable data rate adaptation in the retransmitting procedure.
+     * Signals to the network server that this device will or may not comply with LinkADRReq
+     * settings (data rate, transmission power and number of retransmissions) received in downlink.
      *
-     * @param adapt If the data rate adaptation is enabled or not.
+     * @param adr The ADR bit.
      */
-    void SetDataRateAdaptation(bool adapt);
+    void SetUplinkAdrBit(bool adr);
 
     /**
-     * Get if data rate adaptation is enabled or not.
+     * Get the current value of the device's uplink ADR bit of the LoRaWAN FHDR.
      *
-     * @return True if the data rate adaptation is enabled, false if disabled.
+     * @return true The device will comply with data rate, transmission power and number of
+     * retransmissions settings received from the network server via LikADRReq.
+     * @return false Signals to the network server that the device may not comply with the data
+     * rate, transmission power and number of retransmissions settings received via LikADRReq.
      */
-    bool GetDataRateAdaptation() const;
+    bool GetUplinkAdrBit() const;
 
     /**
      * Set the max number of unacknowledged redundant transmissions of each packet. If,
      * after a transmission, any acknowledgement is received, no more are sent for that packet.
      *
-     * @param maxNumbTx The number of transmissions.
+     * @param nbTrans The number of transmissions.
      */
-    void SetMaxNumberOfTransmissions(uint8_t maxNumbTx);
+    void SetMaxNumberOfTransmissions(uint8_t nbTrans);
 
     /**
      * Get the max number of unacknowledged redundant transmissions of each packet. If,
@@ -167,6 +156,13 @@ class EndDeviceLorawanMac : public LorawanMac
     virtual uint8_t GetTransmissionPower();
 
     /**
+     * Set the transmission power of this end device.
+     *
+     * @param txPower The transmission ERP [dBm] value.
+     */
+    void SetTransmissionPower(uint8_t txPower);
+
+    /**
      * Set the network address of this device.
      *
      * @param address The address to set.
@@ -183,6 +179,26 @@ class EndDeviceLorawanMac : public LorawanMac
     // void SetRx1DrOffset (uint8_t rx1DrOffset);
 
     // uint8_t GetRx1DrOffset ();
+
+    /**
+     * Get the last known link margin from the demodulation floor.
+     *
+     * This is intended for asynchronous polling by the Application layer of the device. For
+     * synchronous behavior provide a callback using the trace system.
+     *
+     * @return The last known link margin [dB]
+     */
+    uint8_t GetLastKnownLinkMarginDb() const;
+
+    /**
+     * Get the last known number of gateways concurrently receiving transmissions from the device.
+     *
+     * This is intended for asynchronous polling by the Application layer of the device. For
+     * synchronous behavior provide a callback using the trace system.
+     *
+     * @return The last known number of receiver gateways.
+     */
+    uint8_t GetLastKnownGatewayCount() const;
 
     /**
      * Get the aggregated duty cycle.
@@ -243,36 +259,32 @@ class EndDeviceLorawanMac : public LorawanMac
      *
      * @param dataRate The data rate value of the command.
      * @param txPower The transmission power value of the command.
-     * @param enabledChannels A list of the enabled channels.
-     * @param repetitions The number of repetitions prescribed by the command.
+     * @param chMask Mask of enabled channels of the command.
+     * @param chMaskCntl Indicator of the 16 channel bank to apply the chMask to.
+     * @param nbTrans The number of repetitions prescribed by the command.
      */
     void OnLinkAdrReq(uint8_t dataRate,
                       uint8_t txPower,
-                      std::list<int> enabledChannels,
-                      int repetitions);
+                      uint16_t chMask,
+                      uint8_t chMaskCntl,
+                      uint8_t nbTrans);
 
     /**
      * Perform the actions that need to be taken when receiving a DutyCycleReq command.
      *
-     * @param dutyCycle The aggregate duty cycle prescribed by the command, in
-     * fraction form.
+     * @param maxDutyCycle The aggregate duty cycle encoded by the command.
      */
-    void OnDutyCycleReq(double dutyCycle);
-
-    /**
-     * Perform the actions that need to be taken when receiving a RxParamSetupReq command.
-     *
-     * @param rxParamSetupReq The Parameter Setup Request.
-     */
-    void OnRxParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq);
+    void OnDutyCycleReq(uint8_t maxDutyCycle);
 
     /**
      * Perform the actions that need to be taken when receiving a RxParamSetupReq
      * command based on the Device's Class Type.
      *
-     * @param rxParamSetupReq The Parameter Setup Request.
+     * @param rx1DrOffset The first reception window data rate offset to set.
+     * @param rx2DataRate The data rate to use for the second receive window.
+     * @param frequency The frequency [Hz] to use for the second receive window.
      */
-    virtual void OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq);
+    virtual void OnRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency) = 0;
 
     /**
      * Perform the actions that need to be taken when receiving a DevStatusReq command.
@@ -291,50 +303,6 @@ class EndDeviceLorawanMac : public LorawanMac
                          double frequency,
                          uint8_t minDataRate,
                          uint8_t maxDataRate);
-
-    ////////////////////////////////////
-    // Logical channel administration //
-    ////////////////////////////////////
-
-    /**
-     * Add a logical channel to the helper.
-     *
-     * @param frequency The channel's center frequency.
-     */
-    void AddLogicalChannel(double frequency);
-
-    /**
-     * Set a new logical channel in the helper.
-     *
-     * @param chIndex The channel's new index.
-     * @param frequency The channel's center frequency.
-     * @param minDataRate The minimum data rate allowed on the channel.
-     * @param maxDataRate The maximum data rate allowed on the channel.
-     */
-    void SetLogicalChannel(uint8_t chIndex,
-                           double frequency,
-                           uint8_t minDataRate,
-                           uint8_t maxDataRate);
-
-    /**
-     * Add a logical channel to the helper.
-     *
-     * @param logicalChannel The logical channel to add.
-     */
-    void AddLogicalChannel(Ptr<LogicalLoraChannel> logicalChannel);
-
-    /**
-     * Add a subband to the logical channel helper.
-     *
-     * @param startFrequency The SubBand's lowest frequency.
-     * @param endFrequency The SubBand's highest frequency.
-     * @param dutyCycle The SubBand's duty cycle, in fraction form.
-     * @param maxTxPowerDbm The maximum transmission power allowed on the SubBand.
-     */
-    void AddSubBand(double startFrequency,
-                    double endFrequency,
-                    double dutyCycle,
-                    double maxTxPowerDbm);
 
     /**
      * Add a MAC command to the list of those that will be sent out in the next
@@ -359,8 +327,7 @@ class EndDeviceLorawanMac : public LorawanMac
 
     bool
         m_enableDRAdapt; //!< Enable data rate adaptation (ADR) during the retransmission procedure.
-    uint8_t
-        m_maxNumbTx; //!< Default number of unacknowledged redundant transmissions of each packet.
+    uint8_t m_nbTrans; //!< Default number of unacknowledged redundant transmissions of each packet.
     TracedValue<uint8_t> m_dataRate; //!< The data rate this device is using to transmit.
     TracedValue<double> m_txPower;   //!< The transmission power this device is using to transmit.
     uint8_t m_codingRate;            //!< The coding rate used by this device.
@@ -409,10 +376,14 @@ class EndDeviceLorawanMac : public LorawanMac
     struct LoraRetxParameters m_retxParams;
 
     /**
-     * An uniform random variable, used by the Shuffle method to randomly reorder
-     * the channel list.
+     * An uniform random variable, used to randomly pick from the channel list.
      */
     Ptr<UniformRandomVariable> m_uniformRV;
+
+    /**
+     * Used to record the last reception SNR measurement to be included in the DevStatusAns.
+     */
+    double m_lastRxSnr;
 
     /////////////////
     //  Callbacks  //
@@ -425,26 +396,17 @@ class EndDeviceLorawanMac : public LorawanMac
 
   private:
     /**
-     * Randomly shuffle a Ptr<LogicalLoraChannel> vector.
-     *
-     * Used to pick a random channel on which to send the packet.
-     *
-     * @param vector The vector of pointers to logical LoRa channels.
-     * @return The shuffled vector.
-     */
-    std::vector<Ptr<LogicalLoraChannel>> Shuffle(std::vector<Ptr<LogicalLoraChannel>> vector);
-
-    /**
-     * Find the base minimum waiting time before the next possible transmission.
+     * Find the base minimum wait time before the next possible transmission.
      *
      * @return The base minimum waiting time.
      */
     Time GetNextTransmissionDelay();
 
-    /**
-     * Whether this device's data rate should be controlled by the network server.
-     */
-    bool m_controlDataRate;
+    bool m_adr; //!< Uplink ADR bit contained in the FCtrl field of the LoRaWAN FHDR.
+                //!< Controlled by the device, if set to false signals the network server
+                //!< that the device may not accept attempts to control the number of
+                //!< retransmissions, the data rate, or the TX power with downlink
+                //!< LinkADRReq commands.
 
     /**
      * The event of retransmitting a packet in a consecutive moment if an ACK is not received.
@@ -464,12 +426,12 @@ class EndDeviceLorawanMac : public LorawanMac
     EventId m_nextRetx;
 
     /**
-     * The last known link margin.
+     * The last known link margin in dB from the demodulation floor.
      *
      * This value is obtained (and updated) when a LinkCheckAns Mac command is
      * received.
      */
-    TracedValue<double> m_lastKnownLinkMargin;
+    TracedValue<uint8_t> m_lastKnownLinkMarginDb;
 
     /**
      * The last known gateway count (i.e., gateways that are in communication
@@ -478,7 +440,7 @@ class EndDeviceLorawanMac : public LorawanMac
      * This value is obtained (and updated) when a LinkCheckAns Mac command is
      * received.
      */
-    TracedValue<int> m_lastKnownGatewayCount;
+    TracedValue<uint8_t> m_lastKnownGatewayCount;
 
     /**
      * The aggregated duty cycle this device needs to respect across all sub-bands.

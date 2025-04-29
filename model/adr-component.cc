@@ -429,41 +429,12 @@ AdrComponent::GetAverageSNR(EndDeviceStatus::ReceivedPacketList packetList, int 
     return average;
 }
 
-int
+uint8_t
 AdrComponent::GetTxPowerIndex(int txPower)
 {
-    if (txPower >= 16)
-    {
-        return 0;
-    }
-    else if (txPower >= 14)
-    {
-        return 1;
-    }
-    else if (txPower >= 12)
-    {
-        return 2;
-    }
-    else if (txPower >= 10)
-    {
-        return 3;
-    }
-    else if (txPower >= 8)
-    {
-        return 4;
-    }
-    else if (txPower >= 6)
-    {
-        return 5;
-    }
-    else if (txPower >= 4)
-    {
-        return 6;
-    }
-    else
-    {
-        return 7;
-    }
+    NS_ASSERT_MSG(txPower >= 0 && txPower <= 14, "TxPower dBm value out of supported range");
+    NS_ASSERT_MSG(fmod(txPower, 2) == 0, "Invalid TxPower value");
+    return 7 - txPower / 2;
 }
 } // namespace lorawan
 } // namespace ns3

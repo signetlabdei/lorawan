@@ -67,8 +67,21 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      */
     void Receive(Ptr<const Packet> packet) override;
 
+    /**
+     * Function called by lower layers to inform this layer that reception of a
+     * packet we were locked on failed.
+     *
+     * @param packet The packet we failed to receive.
+     */
     void FailedReception(Ptr<const Packet> packet) override;
 
+    /**
+     * Perform the actions that are required after a packet send.
+     *
+     * This function handles opening of the first receive window.
+     *
+     * @param packet The packet that has just been transmitted.
+     */
     void TxFinished(Ptr<const Packet> packet) override;
 
     /**
@@ -144,16 +157,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     // MAC command methods //
     /////////////////////////
 
-    /**
-     * Perform the actions that need to be taken when receiving a RxParamSetupReq
-     * command based on the Device's Class Type.
-     *
-     * @param rxParamSetupReq The Parameter Setup Request, which contains:
-     *                            - The offset to set.
-     *                            - The data rate to use for the second receive window.
-     *                            - The frequency to use for the second receive window.
-     */
-    void OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq) override;
+    void OnRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency) override;
 
   private:
     Time m_receiveDelay1; //!< The interval between when a packet is done sending and when the first
@@ -188,9 +192,9 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     EventId m_secondReceiveWindow;
 
     /**
-     * The frequency to listen on for the second receive window.
+     * The frequency [MHz] to listen on for the second receive window.
      */
-    double m_secondReceiveWindowFrequency;
+    double m_secondReceiveWindowFrequencyMHz;
 
     /**
      * The data rate to listen for during the second downlink transmission.

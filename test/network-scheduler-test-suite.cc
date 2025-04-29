@@ -70,8 +70,8 @@ class NetworkSchedulerTestSuite : public TestSuite
 NetworkSchedulerTestSuite::NetworkSchedulerTestSuite()
     : TestSuite("network-scheduler", Type::UNIT)
 {
-    LogComponentEnable("NetworkSchedulerTestSuite", LOG_LEVEL_DEBUG);
-    // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
+    // LogComponentEnable("NetworkSchedulerTestSuite", LOG_LEVEL_DEBUG);
+
     AddTestCase(new NetworkSchedulerTest, Duration::QUICK);
 }
 

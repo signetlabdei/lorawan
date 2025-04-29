@@ -125,8 +125,8 @@ class MacCommand : public Object
 class LinkCheckReq : public MacCommand
 {
   public:
-    LinkCheckReq();
-    ~LinkCheckReq() override; //!< Destructor
+    LinkCheckReq(); //!< Default constructor
+
     void Serialize(Buffer::Iterator& start) const override;
     uint8_t Deserialize(Buffer::Iterator& start) override;
     void Print(std::ostream& os) const override;
@@ -158,13 +158,6 @@ class LinkCheckAns : public MacCommand
     void Print(std::ostream& os) const override;
 
     /**
-     * Set the demodulation margin value.
-     *
-     * @param margin The demodulation margin to set.
-     */
-    void SetMargin(uint8_t margin);
-
-    /**
      * Get the demodulation margin value.
      *
      * @return The demodulation margin value.
@@ -172,23 +165,11 @@ class LinkCheckAns : public MacCommand
     uint8_t GetMargin() const;
 
     /**
-     * Set the gateway count value.
-     *
-     * @param gwCnt The count value to set.
-     */
-    void SetGwCnt(uint8_t gwCnt);
-
-    /**
      * Get the gateway count value.
      *
      * @return The gateway count value.
      */
     uint8_t GetGwCnt() const;
-
-    /**
-     * Increment this MacCommand's gwCnt value.
-     */
-    void IncrementGwCnt();
 
   private:
     uint8_t m_margin; //!< This MAC command's demodulation margin value.
@@ -207,7 +188,8 @@ class LinkCheckAns : public MacCommand
 class LinkAdrReq : public MacCommand
 {
   public:
-    LinkAdrReq();
+    LinkAdrReq(); //!< Default constructor
+
     /**
      * Constructor with given fields.
      *
@@ -219,15 +201,15 @@ class LinkAdrReq : public MacCommand
      *
      * @param dataRate The DataRate field to set.
      * @param txPower The TXPower field to set.
-     * @param channelMask The ChMask field to set.
+     * @param chMask The ChMask field to set.
      * @param chMaskCntl The ChMaskCntl field to set.
-     * @param nbRep The NbTrans field to set.
+     * @param nbTrans The NbTrans field to set.
      */
     LinkAdrReq(uint8_t dataRate,
                uint8_t txPower,
-               uint16_t channelMask,
+               uint16_t chMask,
                uint8_t chMaskCntl,
-               uint8_t nbRep);
+               uint8_t nbTrans);
 
     void Serialize(Buffer::Iterator& start) const override;
     uint8_t Deserialize(Buffer::Iterator& start) override;
@@ -238,7 +220,7 @@ class LinkAdrReq : public MacCommand
      *
      * @return An unsigned 8-bit integer containing the data rate.
      */
-    uint8_t GetDataRate();
+    uint8_t GetDataRate() const;
 
     /**
      * Get the transmission power prescribed by this MAC command.
@@ -249,31 +231,39 @@ class LinkAdrReq : public MacCommand
      *
      * @return The TX power, encoded as an unsigned 8-bit integer.
      */
-    uint8_t GetTxPower();
+    uint8_t GetTxPower() const;
 
     /**
-     * Get the list of enabled channels. This method takes the 16-bit channel mask
-     * and translates it to a list of integers that can be more easily parsed.
+     * Get the 16 bit mask of enabled channels.
      *
-     * @return The list of enabled channels.
+     * @return The 16 bit channel mask.
      */
-    std::list<int> GetEnabledChannelsList();
+    uint16_t GetChMask() const;
 
     /**
-     * Get the number of repetitions prescribed by this MAC command.
+     * Get the ChMaskCntl field, used as an indicator of the 16-channel bank to apply the ChMask to.
      *
-     * @return The number of repetitions.
+     * The interpretation of this field is region-dependent.
+     *
+     * @return The ChMaskCntl field.
      */
-    int GetRepetitions();
+    uint8_t GetChMaskCntl() const;
+
+    /**
+     * Get the number of repeated transmissions prescribed by this MAC command.
+     *
+     * @return The number of repeated transmissions.
+     */
+    uint8_t GetNbTrans() const;
 
   private:
-    uint8_t m_dataRate;     //!< The DataRate field, a serializable parameter for setting the
-                            //!< spreading factor and bandwidth of end devices
-    uint8_t m_txPower;      //!< The TXPower field, a serializable parameter for setting the
-                            //!< transmission power of end devices
-    uint16_t m_channelMask; //!< The ChMask field
-    uint8_t m_chMaskCntl;   //!< The ChMaskCntl field
-    uint8_t m_nbRep;        //!< The NbTrans field
+    uint8_t m_dataRate;   //!< The DataRate field, a serializable parameter for setting the
+                          //!< spreading factor and bandwidth of end devices
+    uint8_t m_txPower;    //!< The TXPower field, a serializable parameter for setting the
+                          //!< transmission power of end devices
+    uint16_t m_chMask;    //!< The ChMask field
+    uint8_t m_chMaskCntl; //!< The ChMaskCntl field
+    uint8_t m_nbTrans;    //!< The NbTrans field
 };
 
 /**
@@ -301,6 +291,36 @@ class LinkAdrAns : public MacCommand
     uint8_t Deserialize(Buffer::Iterator& start) override;
     void Print(std::ostream& os) const override;
 
+    /**
+     * Get the PowerAck field value of the LinkAdrAns command.
+     *
+     * @return true The power level was successfully set.
+     * @return false The end-device is unable to operate at or below the requested power level. The
+     * command was discarded and the end-device state was not changed.
+     */
+    bool GetPowerAck() const;
+
+    /**
+     * Get the DataRateAck field value of the LinkAdrAns command.
+     *
+     * @return true The data rate was successfully set.
+     * @return false The data rate requested is unknown to the end-device or is not possible, given
+     * the channel mask provided (not supported by any of the enabled channels). The command was
+     * discarded, and the end-device state was not changed.
+     */
+    bool GetDataRateAck() const;
+
+    /**
+     * Get the ChannelMaskAck field value of the LinkAdrAns command.
+     *
+     * @return true The channel mask sent was successfully interpreted. All currently defined
+     * channel states were set according to the mask.
+     * @return false The channel mask enables a yet undefined channel or the channel mask required
+     * all channels to be disabled or the channel mask is incompatible with the resulting data rate
+     * or TX power. The command was discarded, and the end-device state was not changed.
+     */
+    bool GetChannelMaskAck() const;
+
   private:
     bool m_powerAck;       //!< The PowerACK field
     bool m_dataRateAck;    //!< The DataRateACK field
@@ -319,27 +339,28 @@ class LinkAdrAns : public MacCommand
 class DutyCycleReq : public MacCommand
 {
   public:
-    DutyCycleReq();
+    DutyCycleReq(); //!< Default constructor
+
     /**
      * Constructor providing initialization of all parameters.
      *
-     * @param dutyCycle The duty cycle as a 8-bit unsigned integer.
+     * @param maxDutyCycle The MaxDutyCycle field as a 8-bit unsigned integer.
      */
-    DutyCycleReq(uint8_t dutyCycle);
+    DutyCycleReq(uint8_t maxDutyCycle);
 
     void Serialize(Buffer::Iterator& start) const override;
     uint8_t Deserialize(Buffer::Iterator& start) override;
     void Print(std::ostream& os) const override;
 
     /**
-     * Get the maximum duty cycle prescribed by this Mac command, in fraction form.
+     * Get the maximum duty cycle prescribed by this Mac command, encoded in 4 bits.
      *
-     * @return The maximum duty cycle.
+     * @return The MaxDutyCycle field value.
      */
-    double GetMaximumAllowedDutyCycle() const;
+    uint8_t GetMaxDutyCycle() const;
 
   private:
-    uint8_t m_maxDCycle; //!< The MaxDutyCycle field
+    uint8_t m_maxDutyCycle; //!< The MaxDutyCycle field
 };
 
 /**
@@ -370,7 +391,7 @@ class DutyCycleAns : public MacCommand
 class RxParamSetupReq : public MacCommand
 {
   public:
-    RxParamSetupReq();
+    RxParamSetupReq(); //!< Default constructor
 
     /**
      * Constructor providing initialization of all fields.
@@ -420,7 +441,8 @@ class RxParamSetupReq : public MacCommand
 class RxParamSetupAns : public MacCommand
 {
   public:
-    RxParamSetupAns();
+    RxParamSetupAns(); //!< Default constructor
+
     /**
      * Constructor with initialization of all parameters.
      *
@@ -434,6 +456,31 @@ class RxParamSetupAns : public MacCommand
     uint8_t Deserialize(Buffer::Iterator& start) override;
     void Print(std::ostream& os) const override;
 
+    /**
+     * Get the Rx1DrOffsetAck field value of the RxParamSetupAns command.
+     *
+     * @return true RX1 data-rate offset was successfully set.
+     * @return false The uplink/downlink data rate offset for RX1 slot is not within the allowed
+     * range.
+     */
+    bool GetRx1DrOffsetAck() const;
+
+    /**
+     * Get the Rx2DataRateAck field value of the RxParamSetupAns command.
+     *
+     * @return true RX2 slot data rate was successfully set.
+     * @return false The data rate requested is unknown to the end-device.
+     */
+    bool GetRx2DataRateAck() const;
+
+    /**
+     * Get the ChannelAck field value of the RxParamSetupAns command.
+     *
+     * @return true RX2 slot channel was successfully set.
+     * @return false The frequency requested is not usable by the end-device.
+     */
+    bool GetChannelAck() const;
+
   private:
     bool m_rx1DrOffsetAck; //!< The RX1DROffsetACK field
     bool m_rx2DataRateAck; //!< The RX2DataRateACK field
@@ -444,11 +491,13 @@ class RxParamSetupAns : public MacCommand
  * @ingroup lorawan
  *
  * Implementation of the DevStatusReq LoRaWAN MAC command.
+ *
+ * This command holds no variables, and just consists in the CID.
  */
 class DevStatusReq : public MacCommand
 {
   public:
-    DevStatusReq();
+    DevStatusReq(); //!< Default constructor
 
     void Serialize(Buffer::Iterator& start) const override;
     uint8_t Deserialize(Buffer::Iterator& start) override;
@@ -507,7 +556,7 @@ class DevStatusAns : public MacCommand
 class NewChannelReq : public MacCommand
 {
   public:
-    NewChannelReq();
+    NewChannelReq(); //!< Default constructor
 
     /**
      * Constructor providing initialization of all parameters.
@@ -579,6 +628,23 @@ class NewChannelAns : public MacCommand
     uint8_t Deserialize(Buffer::Iterator& start) override;
     void Print(std::ostream& os) const override;
 
+    /**
+     * Get the DataRateRangOk field of the NewChannelAns command.
+     *
+     * @return true The data-rate range is compatible with the capabilities of the end-device.
+     * @return false The designated data-rate range exceeds the ones currently defined for this
+     * end-device.
+     */
+    bool GetDataRateRangeOk() const;
+
+    /**
+     * Get the ChannelFrequencyOk field of the NewChannelAns command.
+     *
+     * @return true The end-device is able to use this frequency.
+     * @return false The end-device cannot use this frequency.
+     */
+    bool GetChannelFrequencyOk() const;
+
   private:
     bool m_dataRateRangeOk;    //!< The Data-rate range ok field
     bool m_channelFrequencyOk; //!< The Channel frequency ok field
@@ -592,7 +658,7 @@ class NewChannelAns : public MacCommand
 class RxTimingSetupReq : public MacCommand
 {
   public:
-    RxTimingSetupReq();
+    RxTimingSetupReq(); //!< Default constructor
 
     /**
      * Constructor providing initialization of all parameters.
@@ -621,12 +687,31 @@ class RxTimingSetupReq : public MacCommand
  *
  * Implementation of the RxTimingSetupAns LoRaWAN MAC command.
  *
- * This MAC command has an empty payload.
+ * This command holds no variables, and just consists in the CID.
  */
 class RxTimingSetupAns : public MacCommand
 {
   public:
-    RxTimingSetupAns();
+    RxTimingSetupAns(); //!< Default constructor
+
+    void Serialize(Buffer::Iterator& start) const override;
+    uint8_t Deserialize(Buffer::Iterator& start) override;
+    void Print(std::ostream& os) const override;
+
+  private:
+};
+
+/**
+ * @ingroup lorawan
+ *
+ * Implementation of the TxParamSetupReq LoRaWAN MAC command.
+ *
+ * @todo implementation
+ */
+class TxParamSetupReq : public MacCommand
+{
+  public:
+    TxParamSetupReq(); //!< Default constructor
 
     void Serialize(Buffer::Iterator& start) const override;
     uint8_t Deserialize(Buffer::Iterator& start) override;
@@ -639,6 +724,8 @@ class RxTimingSetupAns : public MacCommand
  * @ingroup lorawan
  *
  * Implementation of the TxParamSetupAns LoRaWAN MAC command.
+ *
+ * This command holds no variables, and just consists in the CID.
  */
 class TxParamSetupAns : public MacCommand
 {
@@ -655,24 +742,9 @@ class TxParamSetupAns : public MacCommand
 /**
  * @ingroup lorawan
  *
- * Implementation of the TxParamSetupReq LoRaWAN MAC command.
- */
-class TxParamSetupReq : public MacCommand
-{
-  public:
-    TxParamSetupReq();
-
-    void Serialize(Buffer::Iterator& start) const override;
-    uint8_t Deserialize(Buffer::Iterator& start) override;
-    void Print(std::ostream& os) const override;
-
-  private:
-};
-
-/**
- * @ingroup lorawan
- *
  * Implementation of the DlChannelAns LoRaWAN MAC command.
+ *
+ * @todo implementation
  */
 class DlChannelAns : public MacCommand
 {

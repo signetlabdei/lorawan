@@ -129,9 +129,9 @@ LorawanMac::GetDbmForTxPower(uint8_t txPower)
 {
     NS_LOG_FUNCTION(this << unsigned(txPower));
 
-    if (txPower > m_txDbmForTxPower.size())
+    if (txPower > m_txDbmForTxPower.size() - 1)
     {
-        return 0;
+        return -1;
     }
 
     return m_txDbmForTxPower.at(txPower);
