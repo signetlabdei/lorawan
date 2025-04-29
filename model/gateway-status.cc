@@ -81,7 +81,7 @@ GatewayStatus::GetGatewayMac()
 }
 
 bool
-GatewayStatus::IsAvailableForTransmission(double frequencyMHz)
+GatewayStatus::IsAvailableForTransmission(uint32_t frequencyHz)
 {
     // We can't send multiple packets at once, see SX1301 V2.01 page 29
 
@@ -100,7 +100,7 @@ GatewayStatus::IsAvailableForTransmission(double frequencyMHz)
     }
 
     // Check that the gateway is not constrained by the duty cycle
-    Time waitTime = m_gatewayMac->GetWaitTime(frequencyMHz);
+    Time waitTime = m_gatewayMac->GetWaitTime(frequencyHz);
     if (waitTime.IsStrictlyPositive())
     {
         NS_LOG_INFO("Gateway cannot be used because of duty cycle");

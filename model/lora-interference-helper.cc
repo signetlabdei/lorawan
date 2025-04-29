@@ -29,13 +29,13 @@ LoraInterferenceHelper::Event::Event(Time duration,
                                      double rxPowerdBm,
                                      uint8_t spreadingFactor,
                                      Ptr<Packet> packet,
-                                     double frequencyMHz)
+                                     uint32_t frequencyHz)
     : m_startTime(Now()),
       m_endTime(m_startTime + duration),
       m_sf(spreadingFactor),
       m_rxPowerdBm(rxPowerdBm),
       m_packet(packet),
-      m_frequencyMHz(frequencyMHz)
+      m_frequencyHz(frequencyHz)
 {
     // NS_LOG_FUNCTION_NOARGS ();
 }
@@ -83,17 +83,17 @@ LoraInterferenceHelper::Event::GetPacket() const
     return m_packet;
 }
 
-double
+uint32_t
 LoraInterferenceHelper::Event::GetFrequency() const
 {
-    return m_frequencyMHz;
+    return m_frequencyHz;
 }
 
 void
 LoraInterferenceHelper::Event::Print(std::ostream& stream) const
 {
     stream << "(" << m_startTime.As(Time::S) << " - " << m_endTime.As(Time::S) << "), SF"
-           << unsigned(m_sf) << ", " << m_rxPowerdBm << " dBm, " << m_frequencyMHz << " MHz";
+           << unsigned(m_sf) << ", " << m_rxPowerdBm << " dBm, " << m_frequencyHz << " Hz";
 }
 
 std::ostream&
@@ -185,10 +185,10 @@ LoraInterferenceHelper::Add(Time duration,
                             double rxPower,
                             uint8_t spreadingFactor,
                             Ptr<Packet> packet,
-                            double frequencyMHz)
+                            uint32_t frequencyHz)
 {
-    NS_LOG_FUNCTION(this << duration << rxPower << unsigned(spreadingFactor) << packet
-                         << frequencyMHz);
+    NS_LOG_FUNCTION(this << duration.As(Time::MS) << rxPower << unsigned(spreadingFactor) << packet
+                         << frequencyHz);
 
     // Create an event based on the parameters
     Ptr<LoraInterferenceHelper::Event> event =
@@ -196,7 +196,7 @@ LoraInterferenceHelper::Add(Time duration,
                                               rxPower,
                                               spreadingFactor,
                                               packet,
-                                              frequencyMHz);
+                                              frequencyHz);
 
     // Add the event to the list
     m_events.push_back(event);
@@ -263,7 +263,7 @@ LoraInterferenceHelper::IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Ev
     // Gather information about the event
     double rxPowerDbm = event->GetRxPowerdBm();
     uint8_t sf = event->GetSpreadingFactor();
-    double frequencyMHz = event->GetFrequency();
+    uint32_t frequencyHz = event->GetFrequency();
 
     // Handy information about the time frame when the packet was received
     Time now = Now();
@@ -285,7 +285,7 @@ LoraInterferenceHelper::IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Ev
         // Only consider the current event if the channel is the same: we
         // assume there's no interchannel interference. Also skip the current
         // event if it's the same that we want to analyze.
-        if (!(interferer->GetFrequency() == frequencyMHz) || interferer == event)
+        if (!(interferer->GetFrequency() == frequencyHz) || interferer == event)
         {
             NS_LOG_DEBUG("Different channel or same event");
             it++;

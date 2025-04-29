@@ -495,7 +495,7 @@ EndDeviceLorawanMac::GetNextTransmissionDelay()
             {
                 waitTime = curr;
             }
-            NS_LOG_DEBUG("frequency=" << channel->GetFrequency() << "MHz,"
+            NS_LOG_DEBUG("frequency=" << channel->GetFrequency() << "Hz,"
                                       << " waitTime=" << waitTime.As(Time::S));
         }
     }
@@ -516,7 +516,7 @@ EndDeviceLorawanMac::GetChannelForTx()
             uint8_t maxDr = channel->GetMaximumDataRate();
             Time waitTime = m_channelHelper->GetWaitTime(channel);
             NS_LOG_DEBUG("Enabled channel: frequency="
-                         << channel->GetFrequency() << "MHz, minDr=" << unsigned(minDr)
+                         << channel->GetFrequency() << " Hz, minDr=" << unsigned(minDr)
                          << ", maxDr=" << unsigned(maxDr) << ", waitTime=" << waitTime.As(Time::S));
             if (m_dataRate >= minDr && m_dataRate <= maxDr && waitTime.IsZero())
             {
@@ -531,7 +531,7 @@ EndDeviceLorawanMac::GetChannelForTx()
     }
     uint8_t i = m_uniformRV->GetInteger(0, candidates.size() - 1);
     auto channel = candidates.at(i);
-    NS_LOG_DEBUG("Selected channel with frequency=" << channel->GetFrequency() << "MHz");
+    NS_LOG_DEBUG("Selected channel with frequency=" << channel->GetFrequency() << " Hz");
     return channel;
 }
 
@@ -860,11 +860,11 @@ EndDeviceLorawanMac::OnDevStatusReq()
 
 void
 EndDeviceLorawanMac::OnNewChannelReq(uint8_t chIndex,
-                                     double frequencyHz,
+                                     uint32_t frequencyHz,
                                      uint8_t minDataRate,
                                      uint8_t maxDataRate)
 {
-    NS_LOG_FUNCTION(this << unsigned(chIndex) << uint32_t(frequencyHz) << unsigned(minDataRate)
+    NS_LOG_FUNCTION(this << unsigned(chIndex) << frequencyHz << unsigned(minDataRate)
                          << unsigned(maxDataRate));
 
     NS_ASSERT_MSG(!(minDataRate & 0xF0), "minDataRate field > 4 bits");
@@ -884,7 +884,7 @@ EndDeviceLorawanMac::OnNewChannelReq(uint8_t chIndex,
     }
 
     // Valid Frequency
-    if (frequencyHz != 0 && !m_channelHelper->IsFrequencyValid(frequencyHz / 1e6))
+    if (frequencyHz != 0 && !m_channelHelper->IsFrequencyValid(frequencyHz))
     {
         NS_LOG_WARN("[WARNING] Invalid frequency");
         channelFrequencyOk = false;
@@ -911,10 +911,10 @@ EndDeviceLorawanMac::OnNewChannelReq(uint8_t chIndex,
 
     if (dataRateRangeOk && channelFrequencyOk)
     {
-        auto channel = Create<LogicalLoraChannel>(frequencyHz / 1e6, minDataRate, maxDataRate);
+        auto channel = Create<LogicalLoraChannel>(frequencyHz, minDataRate, maxDataRate);
         (frequencyHz == 0) ? channel->DisableForUplink() : channel->EnableForUplink();
         m_channelHelper->SetChannel(chIndex, channel);
-        NS_LOG_DEBUG("MacTxFrequency[" << unsigned(chIndex) << "]=" << uint32_t(frequencyHz)
+        NS_LOG_DEBUG("MacTxFrequency[" << unsigned(chIndex) << "]=" << frequencyHz
                                        << ", DrMin=" << unsigned(minDataRate)
                                        << ", DrMax=" << unsigned(maxDataRate));
     }

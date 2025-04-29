@@ -142,16 +142,16 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /**
      * Set the frequency that will be used for the second receive window.
      *
-     * @param frequencyMHz The Frequency.
+     * @param frequencyHz The Frequency.
      */
-    void SetSecondReceiveWindowFrequency(double frequencyMHz);
+    void SetSecondReceiveWindowFrequency(uint32_t frequencyHz);
 
     /**
      * Get the frequency that is used for the second receive window.
      *
-     * @return The frequency, in MHz.
+     * @return The frequency, in Hz.
      */
-    double GetSecondReceiveWindowFrequency() const;
+    uint32_t GetSecondReceiveWindowFrequency() const;
 
     /////////////////////////
     // MAC command methods //
@@ -192,9 +192,9 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     EventId m_secondReceiveWindow;
 
     /**
-     * The frequency [MHz] to listen on for the second receive window.
+     * The frequency [Hz] to listen on for the second receive window.
      */
-    double m_secondReceiveWindowFrequencyMHz;
+    uint32_t m_secondReceiveWindowFrequencyHz;
 
     /**
      * The data rate to listen for during the second downlink transmission.

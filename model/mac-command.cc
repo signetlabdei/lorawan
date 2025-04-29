@@ -474,13 +474,12 @@ RxParamSetupReq::RxParamSetupReq()
     m_serializedSize = 5;
 }
 
-RxParamSetupReq::RxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequencyHz)
+RxParamSetupReq::RxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, uint32_t frequencyHz)
     : m_rx1DrOffset(rx1DrOffset),
       m_rx2DataRate(rx2DataRate),
       m_frequencyHz(frequencyHz)
 {
-    NS_LOG_FUNCTION(this << unsigned(rx1DrOffset) << unsigned(rx2DataRate)
-                         << uint32_t(frequencyHz));
+    NS_LOG_FUNCTION(this << unsigned(rx1DrOffset) << unsigned(rx2DataRate) << frequencyHz);
     NS_ASSERT_MSG(!(rx1DrOffset & 0xF8), "rx1DrOffset > 3 bits");
     NS_ASSERT_MSG(!(rx2DataRate & 0xF0), "rx2DataRate > 4 bits");
     m_commandType = RX_PARAM_SETUP_REQ;
@@ -524,7 +523,7 @@ RxParamSetupReq::Print(std::ostream& os) const
     os << "RxParamSetupReq(";
     os << "RX1DROffset=" << unsigned(m_rx1DrOffset);
     os << ", RX2DataRate=" << unsigned(m_rx2DataRate);
-    os << ", Frequency=" << uint32_t(m_frequencyHz);
+    os << ", Frequency=" << m_frequencyHz;
     os << ")";
 }
 
@@ -542,7 +541,7 @@ RxParamSetupReq::GetRx2DataRate()
     return m_rx2DataRate;
 }
 
-double
+uint32_t
 RxParamSetupReq::GetFrequency()
 {
     NS_LOG_FUNCTION(this);
@@ -732,7 +731,7 @@ NewChannelReq::NewChannelReq()
 }
 
 NewChannelReq::NewChannelReq(uint8_t chIndex,
-                             double frequencyHz,
+                             uint32_t frequencyHz,
                              uint8_t minDataRate,
                              uint8_t maxDataRate)
     : m_chIndex(chIndex),
@@ -798,7 +797,7 @@ NewChannelReq::GetChannelIndex() const
     return m_chIndex;
 }
 
-double
+uint32_t
 NewChannelReq::GetFrequency() const
 {
     NS_LOG_FUNCTION(this);

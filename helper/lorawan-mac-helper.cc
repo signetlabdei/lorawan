@@ -159,7 +159,7 @@ LorawanMacHelper::ConfigureForAlohaRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) 
     // Second receive window parameters //
     //////////////////////////////////////
     edMac->SetSecondReceiveWindowDataRate(0);
-    edMac->SetSecondReceiveWindowFrequency(869.525);
+    edMac->SetSecondReceiveWindowFrequency(869525000);
 }
 
 void
@@ -187,7 +187,7 @@ LorawanMacHelper::ConfigureForAlohaRegion(Ptr<GatewayLorawanMac> gwMac) const
             DynamicCast<GatewayLoraPhy>(gwPhy)->AddReceptionPath();
             receptionPaths++;
         }
-        gwPhy->AddFrequency(868.1);
+        gwPhy->AddFrequency(868100000);
     }
 }
 
@@ -201,12 +201,12 @@ LorawanMacHelper::ApplyCommonAlohaConfigurations(Ptr<LorawanMac> lorawanMac) con
     //////////////
 
     auto channelHelper = Create<LogicalLoraChannelHelper>(1);
-    channelHelper->AddSubBand(Create<SubBand>(868, 868.6, 1, 14));
+    channelHelper->AddSubBand(Create<SubBand>(868000000, 868600000, 1, 14));
 
     //////////////////////
     // Default channels //
     //////////////////////
-    Ptr<LogicalLoraChannel> lc1 = Create<LogicalLoraChannel>(868.1, 0, 5);
+    Ptr<LogicalLoraChannel> lc1 = Create<LogicalLoraChannel>(868100000, 0, 5);
     channelHelper->SetChannel(0, lc1);
 
     lorawanMac->SetLogicalLoraChannelHelper(channelHelper);
@@ -256,7 +256,7 @@ LorawanMacHelper::ConfigureForEuRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) con
     // Second receive window parameters //
     //////////////////////////////////////
     edMac->SetSecondReceiveWindowDataRate(0);
-    edMac->SetSecondReceiveWindowFrequency(869.525);
+    edMac->SetSecondReceiveWindowFrequency(869525000);
 }
 
 void
@@ -277,10 +277,10 @@ LorawanMacHelper::ConfigureForEuRegion(Ptr<GatewayLorawanMac> gwMac) const
         NS_LOG_DEBUG("Resetting reception paths");
         gwPhy->ResetReceptionPaths();
 
-        std::vector<double> frequencies;
-        frequencies.push_back(868.1);
-        frequencies.push_back(868.3);
-        frequencies.push_back(868.5);
+        std::vector<uint32_t> frequencies;
+        frequencies.push_back(868100000);
+        frequencies.push_back(868300000);
+        frequencies.push_back(868500000);
 
         for (auto& f : frequencies)
         {
@@ -307,19 +307,19 @@ LorawanMacHelper::ApplyCommonEuConfigurations(Ptr<LorawanMac> lorawanMac) const
     //////////////
 
     auto channelHelper = Create<LogicalLoraChannelHelper>(16);
-    channelHelper->AddSubBand(Create<SubBand>(863, 865, 0.001, 14));
-    channelHelper->AddSubBand(Create<SubBand>(865, 868, 0.01, 14));
-    channelHelper->AddSubBand(Create<SubBand>(868, 868.6, 0.01, 14));
-    channelHelper->AddSubBand(Create<SubBand>(868.7, 869.2, 0.001, 14));
-    channelHelper->AddSubBand(Create<SubBand>(869.4, 869.65, 0.1, 27));
-    channelHelper->AddSubBand(Create<SubBand>(869.7, 870, 0.01, 14));
+    channelHelper->AddSubBand(Create<SubBand>(863000000, 865000000, 0.001, 14));
+    channelHelper->AddSubBand(Create<SubBand>(865000000, 868000000, 0.01, 14));
+    channelHelper->AddSubBand(Create<SubBand>(868000000, 868600000, 0.01, 14));
+    channelHelper->AddSubBand(Create<SubBand>(868700000, 869200000, 0.001, 14));
+    channelHelper->AddSubBand(Create<SubBand>(869400000, 869650000, 0.1, 27));
+    channelHelper->AddSubBand(Create<SubBand>(869700000, 870000000, 0.01, 14));
 
     //////////////////////
     // Default channels //
     //////////////////////
-    Ptr<LogicalLoraChannel> lc1 = Create<LogicalLoraChannel>(868.1, 0, 5);
-    Ptr<LogicalLoraChannel> lc2 = Create<LogicalLoraChannel>(868.3, 0, 5);
-    Ptr<LogicalLoraChannel> lc3 = Create<LogicalLoraChannel>(868.5, 0, 5);
+    Ptr<LogicalLoraChannel> lc1 = Create<LogicalLoraChannel>(868100000, 0, 5);
+    Ptr<LogicalLoraChannel> lc2 = Create<LogicalLoraChannel>(868300000, 0, 5);
+    Ptr<LogicalLoraChannel> lc3 = Create<LogicalLoraChannel>(868500000, 0, 5);
     channelHelper->SetChannel(0, lc1);
     channelHelper->SetChannel(1, lc2);
     channelHelper->SetChannel(2, lc3);
@@ -373,7 +373,7 @@ LorawanMacHelper::ConfigureForSingleChannelRegion(Ptr<ClassAEndDeviceLorawanMac>
     // Second receive window parameters //
     //////////////////////////////////////
     edMac->SetSecondReceiveWindowDataRate(0);
-    edMac->SetSecondReceiveWindowFrequency(869.525);
+    edMac->SetSecondReceiveWindowFrequency(869525000);
 }
 
 void
@@ -394,8 +394,8 @@ LorawanMacHelper::ConfigureForSingleChannelRegion(Ptr<GatewayLorawanMac> gwMac) 
         NS_LOG_DEBUG("Resetting reception paths");
         gwPhy->ResetReceptionPaths();
 
-        std::vector<double> frequencies;
-        frequencies.push_back(868.1);
+        std::vector<uint32_t> frequencies;
+        frequencies.push_back(868100000);
 
         for (auto& f : frequencies)
         {
@@ -422,12 +422,12 @@ LorawanMacHelper::ApplyCommonSingleChannelConfigurations(Ptr<LorawanMac> lorawan
     //////////////
 
     auto channelHelper = Create<LogicalLoraChannelHelper>(1);
-    channelHelper->AddSubBand(Create<SubBand>(868, 868.6, 0.01, 14));
+    channelHelper->AddSubBand(Create<SubBand>(868000000, 868600000, 0.01, 14));
 
     //////////////////////
     // Default channels //
     //////////////////////
-    Ptr<LogicalLoraChannel> lc1 = Create<LogicalLoraChannel>(868.1, 0, 5);
+    Ptr<LogicalLoraChannel> lc1 = Create<LogicalLoraChannel>(868100000, 0, 5);
     channelHelper->SetChannel(0, lc1);
 
     lorawanMac->SetLogicalLoraChannelHelper(channelHelper);

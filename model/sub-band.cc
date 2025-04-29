@@ -15,29 +15,29 @@ namespace lorawan
 
 NS_LOG_COMPONENT_DEFINE("SubBand");
 
-SubBand::SubBand(double firstFrequencyMHz,
-                 double lastFrequencyMHz,
+SubBand::SubBand(uint32_t firstFrequencyHz,
+                 uint32_t lastFrequencyHz,
                  double dutyCycle,
                  double maxTxPowerDbm)
-    : m_firstFrequencyMHz(firstFrequencyMHz),
-      m_lastFrequencyMHz(lastFrequencyMHz),
+    : m_firstFrequencyHz(firstFrequencyHz),
+      m_lastFrequencyHz(lastFrequencyHz),
       m_dutyCycle(dutyCycle),
       m_nextTransmissionTime(Time(0)),
       m_maxTxPowerDbm(maxTxPowerDbm)
 {
-    NS_LOG_FUNCTION(this << firstFrequencyMHz << lastFrequencyMHz << dutyCycle << maxTxPowerDbm);
+    NS_LOG_FUNCTION(this << firstFrequencyHz << lastFrequencyHz << dutyCycle << maxTxPowerDbm);
 }
 
-double
+uint32_t
 SubBand::GetFirstFrequency() const
 {
-    return m_firstFrequencyMHz;
+    return m_firstFrequencyHz;
 }
 
-double
+uint32_t
 SubBand::GetLastFrequency() const
 {
-    return m_lastFrequencyMHz;
+    return m_lastFrequencyHz;
 }
 
 double
@@ -47,9 +47,9 @@ SubBand::GetDutyCycle() const
 }
 
 bool
-SubBand::Contains(double frequencyMHz) const
+SubBand::Contains(uint32_t frequencyHz) const
 {
-    return (frequencyMHz > m_firstFrequencyMHz) && (frequencyMHz < m_lastFrequencyMHz);
+    return (frequencyHz > m_firstFrequencyHz) && (frequencyHz < m_lastFrequencyHz);
 }
 
 bool

@@ -19,10 +19,10 @@ namespace lorawan
 
 NS_LOG_COMPONENT_DEFINE("LogicalLoraChannel");
 
-LogicalLoraChannel::LogicalLoraChannel(double frequencyMHz,
+LogicalLoraChannel::LogicalLoraChannel(uint32_t frequencyHz,
                                        uint8_t minDataRate,
                                        uint8_t maxDataRate)
-    : m_frequencyMHz(frequencyMHz),
+    : m_frequencyHz(frequencyHz),
       m_minDataRate(minDataRate),
       m_maxDataRate(maxDataRate),
       m_enabledForUplink(true)
@@ -30,10 +30,10 @@ LogicalLoraChannel::LogicalLoraChannel(double frequencyMHz,
     NS_LOG_FUNCTION(this);
 }
 
-double
+uint32_t
 LogicalLoraChannel::GetFrequency() const
 {
-    return m_frequencyMHz;
+    return m_frequencyHz;
 }
 
 uint8_t
@@ -69,8 +69,8 @@ LogicalLoraChannel::IsEnabledForUplink() const
 bool
 operator==(const Ptr<LogicalLoraChannel>& first, const Ptr<LogicalLoraChannel>& second)
 {
-    double thisFreq = first->GetFrequency();
-    double otherFreq = second->GetFrequency();
+    uint32_t thisFreq = first->GetFrequency();
+    uint32_t otherFreq = second->GetFrequency();
 
     NS_LOG_DEBUG("Checking equality between logical lora channels: " << thisFreq << " "
                                                                      << otherFreq);

@@ -38,17 +38,17 @@ LogicalLoraChannelHelper::GetRawChannelArray() const
 }
 
 Ptr<SubBand>
-LogicalLoraChannelHelper::GetSubBandFromFrequency(double frequencyMHz) const
+LogicalLoraChannelHelper::GetSubBandFromFrequency(uint32_t frequencyHz) const
 {
-    NS_LOG_FUNCTION(this << frequencyMHz);
+    NS_LOG_FUNCTION(this << frequencyHz);
     for (const auto& sb : m_subBandList)
     {
-        if (sb->Contains(frequencyMHz))
+        if (sb->Contains(frequencyHz))
         {
             return sb;
         }
     }
-    NS_LOG_ERROR("[ERROR] Requested frequency " << frequencyMHz << "MHz outside known sub-bands.");
+    NS_LOG_ERROR("[ERROR] Requested frequency " << frequencyHz << " Hz outside known sub-bands.");
     return nullptr; // If no SubBand is found, return nullptr
 }
 
@@ -76,10 +76,10 @@ LogicalLoraChannelHelper::GetWaitTime(Ptr<LogicalLoraChannel> channel) const
 }
 
 Time
-LogicalLoraChannelHelper::GetWaitTime(double frequencyMHz) const
+LogicalLoraChannelHelper::GetWaitTime(uint32_t frequencyHz) const
 {
-    NS_LOG_FUNCTION(this << frequencyMHz);
-    auto subBand = GetSubBandFromFrequency(frequencyMHz);
+    NS_LOG_FUNCTION(this << frequencyHz);
+    auto subBand = GetSubBandFromFrequency(frequencyHz);
     NS_ASSERT_MSG(subBand, "Input frequency is out-of-band");
     Time waitTime = subBand->GetNextTransmissionTime() - Now();
     waitTime = Max(waitTime, Time(0)); // Handle negative values
@@ -95,11 +95,11 @@ LogicalLoraChannelHelper::AddEvent(Time duration, Ptr<LogicalLoraChannel> channe
 }
 
 void
-LogicalLoraChannelHelper::AddEvent(Time duration, double frequencyMHz)
+LogicalLoraChannelHelper::AddEvent(Time duration, uint32_t frequencyHz)
 {
-    NS_LOG_FUNCTION(this << duration << frequencyMHz);
-    NS_LOG_DEBUG("frequency=" << frequencyMHz << "MHz, timeOnAir=" << duration.As(Time::S));
-    auto subBand = GetSubBandFromFrequency(frequencyMHz);
+    NS_LOG_FUNCTION(this << duration << frequencyHz);
+    NS_LOG_DEBUG("frequency=" << frequencyHz << " Hz, timeOnAir=" << duration.As(Time::S));
+    auto subBand = GetSubBandFromFrequency(frequencyHz);
     NS_ASSERT_MSG(subBand, "Input frequency is out-of-band");
     Time nextTxTime = Now() + duration / subBand->GetDutyCycle();
     subBand->SetNextTransmissionTime(nextTxTime);
@@ -114,18 +114,18 @@ LogicalLoraChannelHelper::GetTxPowerForChannel(Ptr<LogicalLoraChannel> channel) 
 }
 
 double
-LogicalLoraChannelHelper::GetTxPowerForChannel(double frequencyMHz) const
+LogicalLoraChannelHelper::GetTxPowerForChannel(uint32_t frequencyHz) const
 {
-    NS_LOG_FUNCTION(this << frequencyMHz);
-    auto subBand = GetSubBandFromFrequency(frequencyMHz);
+    NS_LOG_FUNCTION(this << frequencyHz);
+    auto subBand = GetSubBandFromFrequency(frequencyHz);
     NS_ASSERT_MSG(subBand, "Input frequency is out-of-band");
     return subBand->GetMaxTxPowerDbm();
 }
 
 bool
-LogicalLoraChannelHelper::IsFrequencyValid(double frequencyMHz) const
+LogicalLoraChannelHelper::IsFrequencyValid(uint32_t frequencyHz) const
 {
-    return (bool)(GetSubBandFromFrequency(frequencyMHz));
+    return (bool)(GetSubBandFromFrequency(frequencyHz));
 }
 
 } // namespace lorawan

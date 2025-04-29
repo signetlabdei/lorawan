@@ -434,10 +434,9 @@ LoraFrameHeader::AddDutyCycleAns()
 }
 
 void
-LoraFrameHeader::AddRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequencyHz)
+LoraFrameHeader::AddRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, uint32_t frequencyHz)
 {
-    NS_LOG_FUNCTION(this << unsigned(rx1DrOffset) << unsigned(rx2DataRate)
-                         << uint32_t(frequencyHz));
+    NS_LOG_FUNCTION(this << unsigned(rx1DrOffset) << unsigned(rx2DataRate) << frequencyHz);
     // Evaluate whether to eliminate this assert in case new offsets can be defined.
     NS_ASSERT(0 <= rx1DrOffset && rx1DrOffset <= 5);
     auto command = Create<RxParamSetupReq>(rx1DrOffset, rx2DataRate, frequencyHz);
@@ -465,11 +464,11 @@ LoraFrameHeader::AddDevStatusReq()
 
 void
 LoraFrameHeader::AddNewChannelReq(uint8_t chIndex,
-                                  double frequencyHz,
+                                  uint32_t frequencyHz,
                                   uint8_t minDataRate,
                                   uint8_t maxDataRate)
 {
-    NS_LOG_FUNCTION(this << unsigned(chIndex) << uint32_t(frequencyHz) << unsigned(minDataRate)
+    NS_LOG_FUNCTION(this << unsigned(chIndex) << frequencyHz << unsigned(minDataRate)
                          << unsigned(maxDataRate));
     auto command = Create<NewChannelReq>(chIndex, frequencyHz, minDataRate, maxDataRate);
     m_macCommands.emplace_back(command);

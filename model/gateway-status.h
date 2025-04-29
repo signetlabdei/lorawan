@@ -48,8 +48,8 @@ class GatewayStatus : public Object
      * Construct a new GatewayStatus object with values.
      *
      * @param address The Address of the P2PNetDevice of the gateway connected to the network
-     * server. \param netDevice A pointer to the NetDevice through which to reach this gateway from
-     * the server. \param gwMac A pointer to the MAC layer of the gateway.
+     * server. @param netDevice A pointer to the NetDevice through which to reach this gateway from
+     * the server. @param gwMac A pointer to the MAC layer of the gateway.
      */
     GatewayStatus(Address address, Ptr<NetDevice> netDevice, Ptr<GatewayLorawanMac> gwMac);
 
@@ -97,11 +97,10 @@ class GatewayStatus : public Object
      * Query whether or not this gateway is available for immediate transmission
      * on this frequency.
      *
-     * @param frequencyMHz The frequency [MHz] at which the gateway's availability should be
-     * queried.
+     * @param frequencyHz The frequency [Hz] at which the gateway's availability should be queried.
      * @return True if the gateway's available, false otherwise.
      */
-    bool IsAvailableForTransmission(double frequencyMHz);
+    bool IsAvailableForTransmission(uint32_t frequencyHz);
 
     /**
      * Set the time of the next scheduled transmission for the gateway.

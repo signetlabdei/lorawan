@@ -117,7 +117,7 @@ NetworkStatus::GetBestGatewayForDevice(LoraDeviceAddress deviceAddress, int wind
 {
     // Get the endDeviceStatus we are interested in
     Ptr<EndDeviceStatus> edStatus = m_endDeviceStatuses.at(deviceAddress);
-    double replyFrequency;
+    uint32_t replyFrequency;
     if (window == 1)
     {
         replyFrequency = edStatus->GetFirstReceiveWindowFrequency();

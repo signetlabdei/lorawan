@@ -59,11 +59,11 @@ class LogicalLoraChannelHelper : public SimpleRefCount<LogicalLoraChannelHelper>
     /**
      * Get the time it is necessary to wait for before transmitting on a given channel.
      *
-     * @param frequencyMHz The channel frequency [MHz] we want to know the wait time of for.
+     * @param frequencyHz The channel frequency [Hz] we want to know the wait time of for.
      * @return A Time instance containing the wait time before transmission is allowed on the
      * channel.
      */
-    Time GetWaitTime(double frequencyMHz) const;
+    Time GetWaitTime(uint32_t frequencyHz) const;
 
     /**
      * Register the transmission of a packet.
@@ -77,9 +77,9 @@ class LogicalLoraChannelHelper : public SimpleRefCount<LogicalLoraChannelHelper>
      * Register the transmission of a packet.
      *
      * @param duration The duration of the transmission event.
-     * @param frequencyMHz The carrier frequency the transmission was on.
+     * @param frequencyHz The carrier frequency [Hz] the transmission was on.
      */
-    void AddEvent(Time duration, double frequencyMHz);
+    void AddEvent(Time duration, uint32_t frequencyHz);
 
     /**
      * Get the frequency channel storage array of this device.
@@ -119,28 +119,28 @@ class LogicalLoraChannelHelper : public SimpleRefCount<LogicalLoraChannelHelper>
     /**
      * Returns the maximum transmission power [dBm] that is allowed on a channel.
      *
-     * @param frequencyMHz The carrier frequency of the channel in question.
+     * @param frequencyHz The carrier frequency [Hz] of the channel in question.
      * @return The power in dBm.
      */
-    double GetTxPowerForChannel(double frequencyMHz) const;
+    double GetTxPowerForChannel(uint32_t frequencyHz) const;
 
     /**
      * Check if a frequency is valid, that is, if it belongs to any of the sub-bands registered in
      * this class.
      *
-     * @param frequencyMHz The frequency [MHz] to be evaluated.
+     * @param frequencyHz The frequency [Hz] to be evaluated.
      * @return Whether the input frequency belongs to any of the registered sub-bands.
      */
-    bool IsFrequencyValid(double frequencyMHz) const;
+    bool IsFrequencyValid(uint32_t frequencyHz) const;
 
   private:
     /**
      * Get the SubBand a frequency belongs to, also used to test validity of a frequency.
      *
-     * @param frequencyMHz The frequency [MHz] we want to check.
+     * @param frequencyHz The frequency [Hz] we want to check.
      * @return The SubBand the frequency belongs to, nullptr if none.
      */
-    Ptr<SubBand> GetSubBandFromFrequency(double frequencyMHz) const;
+    Ptr<SubBand> GetSubBandFromFrequency(uint32_t frequencyHz) const;
 
     /**
      * A vector of the SubBands that are currently registered within this helper.

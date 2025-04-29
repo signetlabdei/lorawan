@@ -159,24 +159,24 @@ GatewayLoraPhy::IsTransmitting()
 }
 
 void
-GatewayLoraPhy::AddFrequency(double frequencyMHz)
+GatewayLoraPhy::AddFrequency(uint32_t frequencyHz)
 {
-    NS_LOG_FUNCTION(this << frequencyMHz);
+    NS_LOG_FUNCTION(this << frequencyHz);
 
-    m_frequencies.push_back(frequencyMHz);
+    m_frequenciesHz.push_back(frequencyHz);
 
-    NS_ASSERT(m_frequencies.size() <= 8);
+    NS_ASSERT(m_frequenciesHz.size() <= 8);
 }
 
 bool
-GatewayLoraPhy::IsOnFrequency(double frequencyMHz)
+GatewayLoraPhy::IsOnFrequency(uint32_t frequencyHz)
 {
-    NS_LOG_FUNCTION(this << frequencyMHz);
+    NS_LOG_FUNCTION(this << frequencyHz);
 
     // Look into our list of frequencies
-    for (auto& f : m_frequencies)
+    for (auto& f : m_frequenciesHz)
     {
-        if (f == frequencyMHz)
+        if (f == frequencyHz)
         {
             return true;
         }

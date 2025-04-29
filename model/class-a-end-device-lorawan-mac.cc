@@ -356,10 +356,10 @@ ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow()
     DynamicCast<EndDeviceLoraPhy>(m_phy)->SwitchToStandby();
 
     // Switch to appropriate channel and data rate
-    NS_LOG_INFO("Using parameters: " << m_secondReceiveWindowFrequencyMHz << "MHz, DR"
+    NS_LOG_INFO("Using parameters: " << m_secondReceiveWindowFrequencyHz << " Hz, DR"
                                      << unsigned(m_secondReceiveWindowDataRate));
 
-    DynamicCast<EndDeviceLoraPhy>(m_phy)->SetFrequency(m_secondReceiveWindowFrequencyMHz);
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->SetFrequency(m_secondReceiveWindowFrequencyHz);
     DynamicCast<EndDeviceLoraPhy>(m_phy)->SetSpreadingFactor(
         GetSfFromDataRate(m_secondReceiveWindowDataRate));
 
@@ -510,15 +510,15 @@ ClassAEndDeviceLorawanMac::GetSecondReceiveWindowDataRate() const
 }
 
 void
-ClassAEndDeviceLorawanMac::SetSecondReceiveWindowFrequency(double frequencyMHz)
+ClassAEndDeviceLorawanMac::SetSecondReceiveWindowFrequency(uint32_t frequencyHz)
 {
-    m_secondReceiveWindowFrequencyMHz = frequencyMHz;
+    m_secondReceiveWindowFrequencyHz = frequencyHz;
 }
 
-double
+uint32_t
 ClassAEndDeviceLorawanMac::GetSecondReceiveWindowFrequency() const
 {
-    return m_secondReceiveWindowFrequencyMHz;
+    return m_secondReceiveWindowFrequencyHz;
 }
 
 /////////////////////////
@@ -552,7 +552,7 @@ ClassAEndDeviceLorawanMac::OnRxParamSetupReq(uint8_t rx1DrOffset,
         rx2DataRateAck = false;
     }
 
-    if (!m_channelHelper->IsFrequencyValid(frequencyHz / 1e6))
+    if (!m_channelHelper->IsFrequencyValid(frequencyHz))
     {
         NS_LOG_WARN("Invalid rx2 frequency");
         channelAck = false;
@@ -562,7 +562,7 @@ ClassAEndDeviceLorawanMac::OnRxParamSetupReq(uint8_t rx1DrOffset,
     {
         m_rx1DrOffset = rx1DrOffset;
         m_secondReceiveWindowDataRate = rx2DataRate;
-        m_secondReceiveWindowFrequencyMHz = frequencyHz / 1e6;
+        m_secondReceiveWindowFrequencyHz = frequencyHz;
     }
 
     NS_LOG_INFO("Adding RxParamSetupAns reply");

@@ -302,7 +302,7 @@ class EndDeviceLorawanMac : public LorawanMac
      * @param maxDataRate The MaxDR field of the received NewChannelReq command.
      */
     void OnNewChannelReq(uint8_t chIndex,
-                         double frequencyHz,
+                         uint32_t frequencyHz,
                          uint8_t minDataRate,
                          uint8_t maxDataRate);
 

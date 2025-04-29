@@ -59,36 +59,36 @@ InterferenceTest::DoRun()
 
     LoraInterferenceHelper interferenceHelper;
 
-    double frequencyMHz = 868.1;
-    double differentFrequencyMHz = 868.3;
+    uint32_t frequencyHz = 868100000;
+    uint32_t differentFrequencyHz = 868300000;
 
     Ptr<LoraInterferenceHelper::Event> event;
     Ptr<LoraInterferenceHelper::Event> event1;
 
     // Test overlap duration
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
-    event1 = interferenceHelper.Add(Seconds(1), 14, 12, nullptr, frequencyMHz);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    event1 = interferenceHelper.Add(Seconds(1), 14, 12, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.GetOverlapTime(event, event1),
                           Seconds(1),
                           "Overlap computation didn't give the expected result");
     interferenceHelper.ClearAllEvents();
 
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
-    event1 = interferenceHelper.Add(Seconds(1.5), 14, 12, nullptr, frequencyMHz);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    event1 = interferenceHelper.Add(Seconds(1.5), 14, 12, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.GetOverlapTime(event, event1),
                           Seconds(1.5),
                           "Overlap computation didn't give the expected result");
     interferenceHelper.ClearAllEvents();
 
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
-    event1 = interferenceHelper.Add(Seconds(3), 14, 12, nullptr, frequencyMHz);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    event1 = interferenceHelper.Add(Seconds(3), 14, 12, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.GetOverlapTime(event, event1),
                           Seconds(2),
                           "Overlap computation didn't give the expected result");
     interferenceHelper.ClearAllEvents();
 
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
-    event1 = interferenceHelper.Add(Seconds(2), 14, 12, nullptr, frequencyMHz);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    event1 = interferenceHelper.Add(Seconds(2), 14, 12, nullptr, frequencyHz);
     // Because of some strange behavior, this test would get stuck if we used the same syntax of the
     // previous ones. This works instead.
     bool retval = interferenceHelper.GetOverlapTime(event, event1) == Seconds(2);
@@ -96,32 +96,32 @@ InterferenceTest::DoRun()
     interferenceHelper.ClearAllEvents();
 
     // Perfect overlap, packet survives
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
-    interferenceHelper.Add(Seconds(2), 14, 12, nullptr, frequencyMHz);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14, 12, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
     interferenceHelper.ClearAllEvents();
 
     // Perfect overlap, packet survives
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
-    interferenceHelper.Add(Seconds(2), 14 - 7, 7, nullptr, frequencyMHz);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 - 7, 7, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
     interferenceHelper.ClearAllEvents();
 
     // Perfect overlap, packet destroyed
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
-    interferenceHelper.Add(Seconds(2), 14 - 6, 7, nullptr, frequencyMHz);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 - 6, 7, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           7,
                           "Packet was not destroyed by interference as expected");
     interferenceHelper.ClearAllEvents();
 
     // Partial overlap, packet survives
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
-    interferenceHelper.Add(Seconds(1), 14 - 6, 7, nullptr, frequencyMHz);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(1), 14 - 6, 7, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
@@ -130,8 +130,8 @@ InterferenceTest::DoRun()
     // Different frequencys
     // Packet would be destroyed if they were on the same frequency, but survives
     // since they are on different frequencies
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
-    interferenceHelper.Add(Seconds(2), 14, 7, nullptr, differentFrequencyMHz);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14, 7, nullptr, differentFrequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
@@ -140,8 +140,8 @@ InterferenceTest::DoRun()
     // Different SFs
     // Packet would be destroyed if they both were SF7, but survives thanks to spreading factor
     // semi-orthogonality
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyMHz);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
@@ -149,16 +149,16 @@ InterferenceTest::DoRun()
 
     // Spreading factor imperfect orthogonality
     // Different SFs are orthogonal only up to a point
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
-    interferenceHelper.Add(Seconds(2), 14 + 17, 8, nullptr, frequencyMHz);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 + 17, 8, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           8,
                           "Packet was not destroyed by interference as expected");
     interferenceHelper.ClearAllEvents();
 
     // If a more 'distant' spreading factor is used, isolation gets better
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
-    interferenceHelper.Add(Seconds(2), 14 + 17, 10, nullptr, frequencyMHz);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 + 17, 10, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet was destroyed by interference while it should have survived");
@@ -166,10 +166,10 @@ InterferenceTest::DoRun()
 
     // Cumulative interference
     // Same spreading factor interference is cumulative
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyMHz);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyMHz);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyMHz);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           8,
                           "Packet was not destroyed by interference as expected");
@@ -177,10 +177,10 @@ InterferenceTest::DoRun()
 
     // Cumulative interference
     // Interference is not cumulative between different SFs
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyMHz);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyMHz);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 9, nullptr, frequencyMHz);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 10, nullptr, frequencyMHz);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 9, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 10, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
@@ -895,10 +895,10 @@ LogicalLoraChannelTest::DoRun()
     /////////////////////////////
 
     // Setup
-    Ptr<LogicalLoraChannel> channel1 = Create<LogicalLoraChannel>(868, 0, 5);
-    Ptr<LogicalLoraChannel> channel2 = Create<LogicalLoraChannel>(868, 0, 5);
-    Ptr<LogicalLoraChannel> channel3 = Create<LogicalLoraChannel>(868.1, 0, 5);
-    Ptr<LogicalLoraChannel> channel4 = Create<LogicalLoraChannel>(868.001, 0, 5);
+    Ptr<LogicalLoraChannel> channel1 = Create<LogicalLoraChannel>(868000000, 0, 5);
+    Ptr<LogicalLoraChannel> channel2 = Create<LogicalLoraChannel>(868000000, 0, 5);
+    Ptr<LogicalLoraChannel> channel3 = Create<LogicalLoraChannel>(868100000, 0, 5);
+    Ptr<LogicalLoraChannel> channel4 = Create<LogicalLoraChannel>(868001000, 0, 5);
 
     // Equality between channels
     // Test the == and != operators
@@ -911,8 +911,8 @@ LogicalLoraChannelTest::DoRun()
     //////////////////
 
     // Setup
-    auto subBand = Create<SubBand>(868, 868.6, 0.01, 14);
-    Ptr<LogicalLoraChannel> channel5 = Create<LogicalLoraChannel>(870, 0, 5);
+    auto subBand = Create<SubBand>(868000000, 868600000, 0.01, 14);
+    Ptr<LogicalLoraChannel> channel5 = Create<LogicalLoraChannel>(870000000, 0, 5);
 
     // Test Contains
     NS_TEST_EXPECT_MSG_EQ(subBand->Contains(channel3),
@@ -931,10 +931,10 @@ LogicalLoraChannelTest::DoRun()
 
     // Setup
     auto channelHelper = Create<LogicalLoraChannelHelper>(16);
-    auto subBand1 = Create<SubBand>(869.4, 869.65, 0.10, 27);
-    channel1 = Create<LogicalLoraChannel>(868.1, 0, 5);
-    channel2 = Create<LogicalLoraChannel>(868.3, 0, 5);
-    channel3 = Create<LogicalLoraChannel>(869.525, 0, 5);
+    auto subBand1 = Create<SubBand>(869400000, 869650000, 0.10, 27);
+    channel1 = Create<LogicalLoraChannel>(868100000, 0, 5);
+    channel2 = Create<LogicalLoraChannel>(868300000, 0, 5);
+    channel3 = Create<LogicalLoraChannel>(869525000, 0, 5);
 
     // Channel diagram
     //
@@ -1249,9 +1249,9 @@ PhyConnectivityTest::Reset()
     edPhy2 = CreateObject<SimpleEndDeviceLoraPhy>();
     edPhy3 = CreateObject<SimpleEndDeviceLoraPhy>();
 
-    edPhy1->SetFrequency(868.1);
-    edPhy2->SetFrequency(868.1);
-    edPhy3->SetFrequency(868.1);
+    edPhy1->SetFrequency(868100000);
+    edPhy2->SetFrequency(868100000);
+    edPhy3->SetFrequency(868100000);
 
     Ptr<ConstantPositionMobilityModel> mob1 = CreateObject<ConstantPositionMobilityModel>();
     Ptr<ConstantPositionMobilityModel> mob2 = CreateObject<ConstantPositionMobilityModel>();
@@ -1283,9 +1283,9 @@ PhyConnectivityTest::Reset()
     edPhy3->SetSpreadingFactor(12);
 
     // Listen on a specific frequency
-    edPhy1->SetFrequency(868.1);
-    edPhy2->SetFrequency(868.1);
-    edPhy3->SetFrequency(868.1);
+    edPhy1->SetFrequency(868100000);
+    edPhy2->SetFrequency(868100000);
+    edPhy3->SetFrequency(868100000);
 
     edPhy1->TraceConnectWithoutContext("ReceivedPacket",
                                        MakeCallback(&PhyConnectivityTest::ReceivedPacket, this));
@@ -1352,7 +1352,7 @@ PhyConnectivityTest::DoRun()
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1375,7 +1375,7 @@ PhyConnectivityTest::DoRun()
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1401,7 +1401,7 @@ PhyConnectivityTest::DoRun()
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1426,7 +1426,7 @@ PhyConnectivityTest::DoRun()
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1447,14 +1447,14 @@ PhyConnectivityTest::DoRun()
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
     Simulator::Schedule(Seconds(2),
                         &SimpleEndDeviceLoraPhy::Send,
                         edPhy3,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1474,7 +1474,7 @@ PhyConnectivityTest::DoRun()
                         edPhy1,
                         packet,
                         txParams,
-                        868.3,
+                        868300000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1495,7 +1495,7 @@ PhyConnectivityTest::DoRun()
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1518,7 +1518,7 @@ PhyConnectivityTest::DoRun()
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1541,7 +1541,7 @@ PhyConnectivityTest::DoRun()
                         edPhy1,
                         packet,
                         txParams,
-                        868.1,
+                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1926,7 +1926,7 @@ MacCommandTest::DoRun()
                               unsigned(rx2DataRate),
                               "Rx2DataRate does not match rx2DataRate from RxParamSetupReq");
         NS_TEST_EXPECT_MSG_EQ(m_mac->GetSecondReceiveWindowFrequency(),
-                              frequencyHz / 1e6,
+                              frequencyHz,
                               "Rx2 frequency does not match frequency from RxParamSetupReq");
         NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
         auto rpsa = DynamicCast<RxParamSetupAns>(answers.at(0));
@@ -1951,7 +1951,7 @@ MacCommandTest::DoRun()
                               0,
                               "Rx2DataRate expected to be default value");
         NS_TEST_EXPECT_MSG_EQ(m_mac->GetSecondReceiveWindowFrequency(),
-                              869.525,
+                              869525000,
                               "Rx2 frequency expected to be default value");
         NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
         auto rpsa = DynamicCast<RxParamSetupAns>(answers.at(0));
@@ -1984,7 +1984,7 @@ MacCommandTest::DoRun()
         auto c = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray().at(chIndex);
         NS_TEST_ASSERT_MSG_NE(c, nullptr, "Channel at chIndex slot expected not to be nullptr");
         NS_TEST_EXPECT_MSG_EQ(c->GetFrequency(),
-                              frequencyHz / 1e6,
+                              frequencyHz,
                               "Channel frequency expected to equal NewChannelReq frequency");
         NS_TEST_EXPECT_MSG_EQ(c->GetMinimumDataRate(),
                               unsigned(minDataRate),
@@ -2007,7 +2007,7 @@ MacCommandTest::DoRun()
         uint8_t maxDataRate = 13;
         auto answers = RunMacCommand<NewChannelReq>(chIndex, frequencyHz, minDataRate, maxDataRate);
         NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
-        double defaultFrequenciesMHz[3] = {868.1, 868.3, 868.5};
+        double defaultFrequenciesHz[3] = {868100000, 868300000, 868500000};
         auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
         for (size_t i = 0; i < channels.size(); i++)
         {
@@ -2018,7 +2018,7 @@ MacCommandTest::DoRun()
                 continue;
             }
             NS_TEST_EXPECT_MSG_EQ(c->GetFrequency(),
-                                  defaultFrequenciesMHz[i],
+                                  defaultFrequenciesHz[i],
                                   "Channel frequency expected to equal NewChannelReq frequency");
             NS_TEST_EXPECT_MSG_EQ(unsigned(c->GetMinimumDataRate()),
                                   0,

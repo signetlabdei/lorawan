@@ -230,8 +230,8 @@ class LoraFrameHeader : public Header
      *
      * @param dataRate The data rate at which the receiver should transmit.
      * @param txPower The power at which the receiver should transmit, encoded according to the
-     * LoRaWAN specification of the region. \param enabledChannels A list containing the indices of
-     * channels enabled by this command. \param repetitions The number of repetitions the receiver
+     * LoRaWAN specification of the region. @param enabledChannels A list containing the indices of
+     * channels enabled by this command. @param repetitions The number of repetitions the receiver
      * should send when transmitting.
      */
     void AddLinkAdrReq(uint8_t dataRate,
@@ -272,7 +272,7 @@ class LoraFrameHeader : public Header
      * @param rx2DataRate The requested data rate for the second receive window.
      * @param frequencyHz The frequency [Hz] at which to listen for the second receive window.
      */
-    void AddRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequencyHz);
+    void AddRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, uint32_t frequencyHz);
 
     /**
      * Add a RxParamSetupAns command.
@@ -293,7 +293,7 @@ class LoraFrameHeader : public Header
      * @param maxDataRate The MaxDR field.
      */
     void AddNewChannelReq(uint8_t chIndex,
-                          double frequencyHz,
+                          uint32_t frequencyHz,
                           uint8_t minDataRate,
                           uint8_t maxDataRate);
 
