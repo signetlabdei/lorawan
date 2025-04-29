@@ -8,6 +8,8 @@
 
 #include "logical-lora-channel.h"
 
+#include "sub-band.h"
+
 #include "ns3/log.h"
 
 namespace ns3
@@ -16,37 +18,6 @@ namespace lorawan
 {
 
 NS_LOG_COMPONENT_DEFINE("LogicalLoraChannel");
-
-NS_OBJECT_ENSURE_REGISTERED(LogicalLoraChannel);
-
-TypeId
-LogicalLoraChannel::GetTypeId()
-{
-    static TypeId tid =
-        TypeId("ns3::LogicalLoraChannel").SetParent<Object>().SetGroupName("lorawan");
-    return tid;
-}
-
-LogicalLoraChannel::LogicalLoraChannel()
-    : m_frequencyHz(0),
-      m_minDataRate(0),
-      m_maxDataRate(5),
-      m_enabledForUplink(true)
-{
-    NS_LOG_FUNCTION(this);
-}
-
-LogicalLoraChannel::~LogicalLoraChannel()
-{
-    NS_LOG_FUNCTION(this);
-}
-
-LogicalLoraChannel::LogicalLoraChannel(uint32_t frequencyHz)
-    : m_frequencyHz(frequencyHz),
-      m_enabledForUplink(true)
-{
-    NS_LOG_FUNCTION(this);
-}
 
 LogicalLoraChannel::LogicalLoraChannel(uint32_t frequencyHz,
                                        uint8_t minDataRate,
@@ -65,18 +36,6 @@ LogicalLoraChannel::GetFrequency() const
     return m_frequencyHz;
 }
 
-void
-LogicalLoraChannel::SetMinimumDataRate(uint8_t minDataRate)
-{
-    m_minDataRate = minDataRate;
-}
-
-void
-LogicalLoraChannel::SetMaximumDataRate(uint8_t maxDataRate)
-{
-    m_maxDataRate = maxDataRate;
-}
-
 uint8_t
 LogicalLoraChannel::GetMinimumDataRate() const
 {
@@ -90,7 +49,7 @@ LogicalLoraChannel::GetMaximumDataRate() const
 }
 
 void
-LogicalLoraChannel::SetEnabledForUplink()
+LogicalLoraChannel::EnableForUplink()
 {
     m_enabledForUplink = true;
 }
@@ -125,5 +84,6 @@ operator!=(const Ptr<LogicalLoraChannel>& first, const Ptr<LogicalLoraChannel>& 
 {
     return !(first == second);
 }
+
 } // namespace lorawan
 } // namespace ns3

@@ -28,7 +28,7 @@ namespace lorawan
 class LoraChannel;
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Receive notifications about PHY events.
  */
@@ -56,7 +56,7 @@ class EndDeviceLoraPhyListener
      * channel implicitly reverts to the idle state
      * unless they have received a cca busy report.
      *
-     * \param txPowerDbm The nominal tx power in dBm.
+     * @param txPowerDbm The nominal tx power in dBm.
      */
     virtual void NotifyTxStart(double txPowerDbm) = 0;
 
@@ -72,7 +72,7 @@ class EndDeviceLoraPhyListener
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Class representing a LoRa transceiver.
  *
@@ -134,7 +134,7 @@ class EndDeviceLoraPhy : public LoraPhy
 
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -169,7 +169,7 @@ class EndDeviceLoraPhy : public LoraPhy
      * Should a packet be transmitted on a frequency different than that the
      * EndDeviceLoraPhy is listening on, the packet will be discarded.
      *
-     * \param frequencyHz The frequency [Hz] to listen to.
+     * @param frequencyHz The frequency [Hz] to listen to.
      */
     void SetFrequency(uint32_t frequencyHz);
 
@@ -179,21 +179,21 @@ class EndDeviceLoraPhy : public LoraPhy
      * The EndDeviceLoraPhy object will not be able to lock on transmissions that
      * use a different spreading factor than the one it's listening for.
      *
-     * \param sf The spreading factor to listen for.
+     * @param sf The spreading factor to listen for.
      */
     void SetSpreadingFactor(uint8_t sf);
 
     /**
      * Get the Spreading Factor this end device is listening for.
      *
-     * \return The Spreading Factor we are listening for.
+     * @return The Spreading Factor we are listening for.
      */
     uint8_t GetSpreadingFactor() const;
 
     /**
      * Return the state this end device is currently in.
      *
-     * \return The state this EndDeviceLoraPhy is currently in.
+     * @return The state this EndDeviceLoraPhy is currently in.
      */
     EndDeviceLoraPhy::State GetState();
 
@@ -211,7 +211,7 @@ class EndDeviceLoraPhy : public LoraPhy
      * Add the input listener to the list of objects to be notified of PHY-level
      * events.
      *
-     * \param listener The new listener.
+     * @param listener The new listener.
      */
     void RegisterListener(EndDeviceLoraPhyListener* listener);
 
@@ -219,7 +219,7 @@ class EndDeviceLoraPhy : public LoraPhy
      * Remove the input listener from the list of objects to be notified of
      * PHY-level events.
      *
-     * \param listener The listener to be unregistered.
+     * @param listener The listener to be unregistered.
      */
     void UnregisterListener(EndDeviceLoraPhyListener* listener);
 
@@ -229,7 +229,7 @@ class EndDeviceLoraPhy : public LoraPhy
     /**
      * Signals the end of a transmission by the EndDeviceLoraPhy.
      *
-     * \param packet A pointer to the Packet transmitted.
+     * @param packet A pointer to the Packet transmitted.
      */
     void TxFinished(Ptr<const Packet> packet) override;
 
@@ -241,7 +241,7 @@ class EndDeviceLoraPhy : public LoraPhy
     /**
      * Switch to the TX state.
      *
-     * \param txPowerDbm The transmission power [dBm].
+     * @param txPowerDbm The transmission power [dBm].
      */
     void SwitchToTx(double txPowerDbm);
 

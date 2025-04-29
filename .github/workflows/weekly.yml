@@ -1,0 +1,70 @@
+name: "Weekly CI pipeline"
+run-name: "weekly"
+
+on:
+  schedule:
+    - cron: '0 8 * * 2'
+  workflow_dispatch:
+
+jobs:
+  formatting:
+    uses: ./.github/workflows/formatting.yml
+
+  compilation:
+    needs: formatting
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux
+    timeout-minutes: 720
+    strategy:
+      matrix:
+        include:
+          - compiler: clang++
+            mode: optimized
+            cxxflags: -stdlib=libc++
+            stage: test
+          - compiler: g++
+            mode: debug
+          - compiler: g++
+            mode: default
+            stage: test
+          - compiler: g++
+            mode: optimized
+            stage: test
+          - compiler: g++
+            mode: debug
+            extra_options: --disable-precompiled-headers
+          - compiler: clang++
+            mode: debug
+            extra_options: --disable-asserts --disable-logs
+    env:
+      COMPILER: ${{ matrix.compiler }}
+      MODE: ${{ matrix.mode }}
+      EXTRA_OPTIONS: ${{ matrix.extra_options }}
+      CXXFLAGS: ${{ matrix.cxxflags }}
+    steps:
+      # The following step is required in all jobs that use this repo's actions
+      - name: "Retrieve actions from repository"
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions
+      - name: "Install dependencies and checkout repo in ns-3"
+        uses: ./.github/actions/install-per-commit
+      - name: "Build ns-3"
+        uses: ./.github/actions/build
+      - if: matrix.stage == 'test'
+        name: "Test ns-3"
+        uses: ./.github/actions/test
+
+  linting:
+    needs: compilation
+    uses: ./.github/workflows/linting.yml
+
+  documentation:
+    needs: linting
+    uses: ./.github/workflows/test-doc.yml
+
+  analysis:
+    needs: documentation
+    uses: ./.github/workflows/analysis.yml
+    secrets: inherit

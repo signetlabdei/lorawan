@@ -52,15 +52,15 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
     LoraTag tag;
     packet->RemovePacketTag(tag);
     uint8_t dataRate = tag.GetDataRate();
-    uint32_t frequency = tag.GetFrequency();
+    uint32_t frequencyHz = tag.GetFrequency();
     NS_LOG_DEBUG("DR: " << unsigned(dataRate));
     NS_LOG_DEBUG("SF: " << unsigned(GetSfFromDataRate(dataRate)));
     NS_LOG_DEBUG("BW: " << GetBandwidthFromDataRate(dataRate));
-    NS_LOG_DEBUG("Freq: " << frequency << " Hz");
+    NS_LOG_DEBUG("Freq: " << frequencyHz << " Hz");
     packet->AddPacketTag(tag);
 
     // Make sure we can transmit this packet
-    if (m_channelHelper.GetWaitingTime(CreateObject<LogicalLoraChannel>(frequency)) > Time(0))
+    if (GetWaitTime(frequencyHz).IsStrictlyPositive())
     {
         // We cannot send now!
         NS_LOG_WARN("Trying to send a packet but Duty Cycle won't allow it. Aborting.");
@@ -79,17 +79,16 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
     // Get the duration
     Time duration = LoraPhy::GetOnAirTime(packet, params);
 
-    NS_LOG_DEBUG("Duration: " << duration.GetSeconds());
+    NS_LOG_DEBUG("Duration: " << duration.As(Time::S));
 
     // Find the channel with the desired frequency
-    double sendingPower =
-        m_channelHelper.GetTxPowerForChannel(CreateObject<LogicalLoraChannel>(frequency));
+    double sendingPower = m_channelHelper->GetTxPowerForChannel(frequencyHz);
 
     // Add the event to the channelHelper to keep track of duty cycle
-    m_channelHelper.AddEvent(duration, CreateObject<LogicalLoraChannel>(frequency));
+    m_channelHelper->AddEvent(duration, frequencyHz);
 
     // Send the packet to the PHY layer to send it on the channel
-    m_phy->Send(packet, params, frequency, sendingPower);
+    m_phy->Send(packet, params, frequencyHz, sendingPower);
 
     m_sentNewPacket(packet);
 }
@@ -139,11 +138,10 @@ GatewayLorawanMac::TxFinished(Ptr<const Packet> packet)
 }
 
 Time
-GatewayLorawanMac::GetWaitingTime(uint32_t frequencyHz)
+GatewayLorawanMac::GetWaitTime(uint32_t frequencyHz)
 {
     NS_LOG_FUNCTION_NOARGS();
-
-    return m_channelHelper.GetWaitingTime(CreateObject<LogicalLoraChannel>(frequencyHz));
+    return m_channelHelper->GetWaitTime(frequencyHz);
 }
 } // namespace lorawan
 } // namespace ns3

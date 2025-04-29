@@ -202,8 +202,8 @@ std::ostream&
 operator<<(std::ostream& os, const LoraChannelParameters& params)
 {
     os << "(rxPowerDbm: " << params.rxPowerDbm << ", SF: " << unsigned(params.sf)
-       << ", durationSec: " << params.duration.GetSeconds()
-       << ", frequencyHz: " << params.frequencyHz << ")";
+       << ", duration: " << params.duration.As(Time::MS) << ", frequencyHz: " << params.frequencyHz
+       << ")";
     return os;
 }
 } // namespace lorawan

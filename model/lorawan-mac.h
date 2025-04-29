@@ -25,7 +25,7 @@ namespace lorawan
 class LoraPhy;
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Class representing the LoRaWAN MAC layer.
  *
@@ -38,7 +38,7 @@ class LorawanMac : public Object
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -55,28 +55,28 @@ class LorawanMac : public Object
     /**
      * Set the underlying PHY layer.
      *
-     * \param phy The phy layer.
+     * @param phy The phy layer.
      */
     void SetPhy(Ptr<LoraPhy> phy);
 
     /**
      * Get the underlying PHY layer.
      *
-     * \return The PHY layer that this MAC is connected to.
+     * @return The PHY layer that this MAC is connected to.
      */
     Ptr<LoraPhy> GetPhy();
 
     /**
      * Send a packet.
      *
-     * \param packet The packet to send.
+     * @param packet The packet to send.
      */
     virtual void Send(Ptr<Packet> packet) = 0;
 
     /**
      * Receive a packet from the lower layer.
      *
-     * \param packet The received packet.
+     * @param packet The received packet.
      */
     virtual void Receive(Ptr<const Packet> packet) = 0;
 
@@ -84,51 +84,51 @@ class LorawanMac : public Object
      * Function called by lower layers to inform this layer that reception of a
      * packet we were locked on failed.
      *
-     * \param packet The packet we failed to receive.
+     * @param packet The packet we failed to receive.
      */
     virtual void FailedReception(Ptr<const Packet> packet) = 0;
 
     /**
      * Perform actions after sending a packet.
      *
-     * \param packet The packet that just finished transmission.
+     * @param packet The packet that just finished transmission.
      */
     virtual void TxFinished(Ptr<const Packet> packet) = 0;
 
     /**
      * Set the device this MAC layer is installed on.
      *
-     * \param device The NetDevice this MAC layer will refer to.
+     * @param device The NetDevice this MAC layer will refer to.
      */
     void SetDevice(Ptr<NetDevice> device);
 
     /**
      * Get the device this MAC layer is installed on.
      *
-     * \return The NetDevice this MAC layer will refer to.
+     * @return The NetDevice this MAC layer will refer to.
      */
     Ptr<NetDevice> GetDevice();
 
     /**
      * Get the logical lora channel helper associated with this MAC.
      *
-     * \return The instance of LogicalLoraChannelHelper that this MAC is using.
+     * @return A Ptr to the instance of LogicalLoraChannelHelper that this MAC is using.
      */
-    LogicalLoraChannelHelper GetLogicalLoraChannelHelper();
+    Ptr<LogicalLoraChannelHelper> GetLogicalLoraChannelHelper();
 
     /**
      * Set the LogicalLoraChannelHelper this MAC instance will use.
      *
-     * \param helper The instance of the helper to use.
+     * @param helper A Ptr to the instance of the helper to use.
      */
-    void SetLogicalLoraChannelHelper(LogicalLoraChannelHelper helper);
+    void SetLogicalLoraChannelHelper(Ptr<LogicalLoraChannelHelper> helper);
 
     /**
      * Get the spreading factor corresponding to a data rate, based on this MAC's region.
      *
-     * \param dataRate The data rate we need to convert to a Spreading Factor
+     * @param dataRate The data rate we need to convert to a Spreading Factor
      * value.
-     * \return The spreading factor that corresponds to a data rate in this MAC's region, or 0
+     * @return The spreading factor that corresponds to a data rate in this MAC's region, or 0
      * if the dataRate is not valid.
      */
     uint8_t GetSfFromDataRate(uint8_t dataRate);
@@ -136,8 +136,8 @@ class LorawanMac : public Object
     /**
      * Get the bandwidth corresponding to a data rate, based on this MAC's region.
      *
-     * \param dataRate The data rate we need to convert to a bandwidth value.
-     * \return The bandwidth that corresponds to the parameter data rate in this
+     * @param dataRate The data rate we need to convert to a bandwidth value.
+     * @return The bandwidth that corresponds to the parameter data rate in this
      * MAC's region, or 0 if the dataRate is not valid.
      */
     double GetBandwidthFromDataRate(uint8_t dataRate);
@@ -146,9 +146,9 @@ class LorawanMac : public Object
      * Get the transmission power in dBm that corresponds, in this region, to the
      * encoded 8-bit txPower.
      *
-     * \param txPower The 8-bit encoded txPower to convert.
+     * @param txPower The 8-bit encoded txPower to convert.
      *
-     * \return The corresponding transmission power in dBm, or 0 if the encoded
+     * @return The corresponding transmission power in dBm ERP, or -1 if the encoded
      * power was not recognized as valid.
      */
     double GetDbmForTxPower(uint8_t txPower);
@@ -156,7 +156,7 @@ class LorawanMac : public Object
     /**
      * Set the vector to use to check up correspondence between spreading factor and data rate.
      *
-     * \param sfForDataRate A vector that contains at position i the spreading factor that
+     * @param sfForDataRate A vector that contains at position i the spreading factor that
      * should correspond to data rate i.
      */
     void SetSfForDataRate(std::vector<uint8_t> sfForDataRate);
@@ -165,7 +165,7 @@ class LorawanMac : public Object
      * Set the vector to use to check up correspondence between bandwidth and
      * data rate.
      *
-     * \param bandwidthForDataRate A vector that contains at position i the
+     * @param bandwidthForDataRate A vector that contains at position i the
      * bandwidth that should correspond to data rate i in this MAC's region.
      */
     void SetBandwidthForDataRate(std::vector<double> bandwidthForDataRate);
@@ -173,7 +173,7 @@ class LorawanMac : public Object
     /**
      * Set the maximum App layer payload for a set data rate.
      *
-     * \param maxAppPayloadForDataRate A vector that contains at position i the
+     * @param maxAppPayloadForDataRate A vector that contains at position i the
      * maximum Application layer payload that should correspond to data rate i in this
      * MAC's region.
      */
@@ -183,7 +183,7 @@ class LorawanMac : public Object
      * Set the vector to use to check up which transmission power in Dbm
      * corresponds to a certain TxPower value in this MAC's region.
      *
-     * \param txDbmForTxPower A vector that contains at position i the
+     * @param txDbmForTxPower A vector that contains at position i the
      * transmission power in dBm that should correspond to a TXPOWER value of i in
      * this MAC's region.
      */
@@ -193,7 +193,7 @@ class LorawanMac : public Object
      * Set the matrix to use when deciding with which data rate to respond. Region
      * based.
      *
-     * \param replyDataRateMatrix A matrix containing the reply DataRates, based
+     * @param replyDataRateMatrix A matrix containing the reply DataRates, based
      * on the sending data rate and on the value of the RX1DROffset parameter.
      */
     void SetReplyDataRateMatrix(ReplyDataRateMatrix replyDataRateMatrix);
@@ -201,14 +201,14 @@ class LorawanMac : public Object
     /**
      * Set the number of PHY preamble symbols this MAC is set to use.
      *
-     * \param nPreambleSymbols The number of preamble symbols to use (typically 8).
+     * @param nPreambleSymbols The number of preamble symbols to use (typically 8).
      */
     void SetNPreambleSymbols(int nPreambleSymbols);
 
     /**
      * Get the number of PHY preamble symbols this MAC is set to use.
      *
-     * \return The number of preamble symbols to use (typically 8).
+     * @return The number of preamble symbols to use (typically 8).
      */
     int GetNPreambleSymbols() const;
 
@@ -243,7 +243,7 @@ class LorawanMac : public Object
     /**
      * The LogicalLoraChannelHelper instance that is assigned to this MAC.
      */
-    LogicalLoraChannelHelper m_channelHelper;
+    Ptr<LogicalLoraChannelHelper> m_channelHelper;
 
     /**
      * A vector holding the spreading factor each data rate corresponds to.

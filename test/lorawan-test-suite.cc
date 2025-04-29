@@ -24,7 +24,7 @@ using namespace lorawan;
 NS_LOG_COMPONENT_DEFINE("LorawanTestSuite");
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests interference computations in a number of possible scenarios using the
  * LoraInterferenceHelper class
@@ -59,36 +59,36 @@ InterferenceTest::DoRun()
 
     LoraInterferenceHelper interferenceHelper;
 
-    uint32_t frequency = 868100000;
-    uint32_t differentFrequency = 868300000;
+    uint32_t frequencyHz = 868100000;
+    uint32_t differentFrequencyHz = 868300000;
 
     Ptr<LoraInterferenceHelper::Event> event;
     Ptr<LoraInterferenceHelper::Event> event1;
 
     // Test overlap duration
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    event1 = interferenceHelper.Add(Seconds(1), 14, 12, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    event1 = interferenceHelper.Add(Seconds(1), 14, 12, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.GetOverlapTime(event, event1),
                           Seconds(1),
                           "Overlap computation didn't give the expected result");
     interferenceHelper.ClearAllEvents();
 
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    event1 = interferenceHelper.Add(Seconds(1.5), 14, 12, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    event1 = interferenceHelper.Add(Seconds(1.5), 14, 12, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.GetOverlapTime(event, event1),
                           Seconds(1.5),
                           "Overlap computation didn't give the expected result");
     interferenceHelper.ClearAllEvents();
 
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    event1 = interferenceHelper.Add(Seconds(3), 14, 12, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    event1 = interferenceHelper.Add(Seconds(3), 14, 12, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.GetOverlapTime(event, event1),
                           Seconds(2),
                           "Overlap computation didn't give the expected result");
     interferenceHelper.ClearAllEvents();
 
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    event1 = interferenceHelper.Add(Seconds(2), 14, 12, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    event1 = interferenceHelper.Add(Seconds(2), 14, 12, nullptr, frequencyHz);
     // Because of some strange behavior, this test would get stuck if we used the same syntax of the
     // previous ones. This works instead.
     bool retval = interferenceHelper.GetOverlapTime(event, event1) == Seconds(2);
@@ -96,32 +96,32 @@ InterferenceTest::DoRun()
     interferenceHelper.ClearAllEvents();
 
     // Perfect overlap, packet survives
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14, 12, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14, 12, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
     interferenceHelper.ClearAllEvents();
 
     // Perfect overlap, packet survives
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 - 7, 7, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 - 7, 7, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
     interferenceHelper.ClearAllEvents();
 
     // Perfect overlap, packet destroyed
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 - 6, 7, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 - 6, 7, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           7,
                           "Packet was not destroyed by interference as expected");
     interferenceHelper.ClearAllEvents();
 
     // Partial overlap, packet survives
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(1), 14 - 6, 7, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(1), 14 - 6, 7, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
@@ -130,8 +130,8 @@ InterferenceTest::DoRun()
     // Different frequencys
     // Packet would be destroyed if they were on the same frequency, but survives
     // since they are on different frequencies
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14, 7, nullptr, differentFrequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14, 7, nullptr, differentFrequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
@@ -140,8 +140,8 @@ InterferenceTest::DoRun()
     // Different SFs
     // Packet would be destroyed if they both were SF7, but survives thanks to spreading factor
     // semi-orthogonality
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
@@ -149,16 +149,16 @@ InterferenceTest::DoRun()
 
     // Spreading factor imperfect orthogonality
     // Different SFs are orthogonal only up to a point
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 17, 8, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 + 17, 8, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           8,
                           "Packet was not destroyed by interference as expected");
     interferenceHelper.ClearAllEvents();
 
     // If a more 'distant' spreading factor is used, isolation gets better
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 17, 10, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 + 17, 10, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet was destroyed by interference while it should have survived");
@@ -166,10 +166,10 @@ InterferenceTest::DoRun()
 
     // Cumulative interference
     // Same spreading factor interference is cumulative
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           8,
                           "Packet was not destroyed by interference as expected");
@@ -177,10 +177,10 @@ InterferenceTest::DoRun()
 
     // Cumulative interference
     // Interference is not cumulative between different SFs
-    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 9, nullptr, frequency);
-    interferenceHelper.Add(Seconds(2), 14 + 16, 10, nullptr, frequency);
+    event = interferenceHelper.Add(Seconds(2), 14, 7, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 8, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 9, nullptr, frequencyHz);
+    interferenceHelper.Add(Seconds(2), 14 + 16, 10, nullptr, frequencyHz);
     NS_TEST_EXPECT_MSG_EQ(interferenceHelper.IsDestroyedByInterference(event),
                           0,
                           "Packet did not survive interference as expected");
@@ -188,7 +188,7 @@ InterferenceTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests LoraDeviceAddress comparison operators overrides and generation of new addresses with
  * LoraDeviceAddressGenerator
@@ -272,7 +272,7 @@ AddressTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests serialization/deserialization of LoRaWAN headers (the LorawanMacHeader and
  * LoraFrameHeader classes) on packets
@@ -346,7 +346,7 @@ HeaderTest::DoRun()
     // Deserialization
     frameHdr.Deserialize(serialized);
 
-    Ptr<LinkCheckAns> command = DynamicCast<LinkCheckAns>(*frameHdr.GetCommands().begin());
+    Ptr<LinkCheckAns> command = DynamicCast<LinkCheckAns>(frameHdr.GetCommands().at(0));
     uint8_t margin = command->GetMargin();
     uint8_t gwCnt = command->GetGwCnt();
 
@@ -388,7 +388,7 @@ HeaderTest::DoRun()
     frameHdr1.SetAsDownlink();
 
     pkt->RemoveHeader(frameHdr1);
-    Ptr<LinkCheckAns> linkCheckAns = DynamicCast<LinkCheckAns>(*frameHdr1.GetCommands().begin());
+    Ptr<LinkCheckAns> linkCheckAns = DynamicCast<LinkCheckAns>(frameHdr1.GetCommands().at(0));
 
     NS_TEST_EXPECT_MSG_EQ((pkt->GetSize()),
                           10,
@@ -424,11 +424,11 @@ HeaderTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests a number of cases related to SimpleGatewayLoraPhy's parallel reception paths
  *
- * \todo The test is commented out. To be fixed.
+ * @todo The test is commented out. To be fixed.
  */
 class ReceivePathTest : public TestCase
 {
@@ -445,29 +445,29 @@ class ReceivePathTest : public TestCase
     /**
      * Callback for tracing OccupiedReceptionPaths.
      *
-     * \param oldValue The old value.
-     * \param newValue The new value.
+     * @param oldValue The old value.
+     * @param newValue The new value.
      */
     void OccupiedReceptionPaths(int oldValue, int newValue);
     /**
      * Callback for tracing LostPacketBecauseNoMoreReceivers.
      *
-     * \param packet The packet lost.
-     * \param node The receiver node id if any, 0 otherwise.
+     * @param packet The packet lost.
+     * @param node The receiver node id if any, 0 otherwise.
      */
     void NoMoreDemodulators(Ptr<const Packet> packet, uint32_t node);
     /**
      * Callback for tracing LostPacketBecauseInterference.
      *
-     * \param packet The packet lost.
-     * \param node The receiver node id if any, 0 otherwise.
+     * @param packet The packet lost.
+     * @param node The receiver node id if any, 0 otherwise.
      */
     void Interference(Ptr<const Packet> packet, uint32_t node);
     /**
      * Callback for tracing ReceivedPacket.
      *
-     * \param packet The packet received.
-     * \param node The receiver node id if any, 0 otherwise.
+     * @param packet The packet received.
+     * @param node The receiver node id if any, 0 otherwise.
      */
     void ReceivedPacket(Ptr<const Packet> packet, uint32_t node);
 
@@ -858,7 +858,7 @@ ReceivePathTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests functionality of the LogicalLoraChannel, SubBand and LogicalLoraChannelHelper classes
  */
@@ -895,10 +895,10 @@ LogicalLoraChannelTest::DoRun()
     /////////////////////////////
 
     // Setup
-    Ptr<LogicalLoraChannel> channel1 = CreateObject<LogicalLoraChannel>(868000000);
-    Ptr<LogicalLoraChannel> channel2 = CreateObject<LogicalLoraChannel>(868000000);
-    Ptr<LogicalLoraChannel> channel3 = CreateObject<LogicalLoraChannel>(868100000);
-    Ptr<LogicalLoraChannel> channel4 = CreateObject<LogicalLoraChannel>(868001000);
+    Ptr<LogicalLoraChannel> channel1 = Create<LogicalLoraChannel>(868000000, 0, 5);
+    Ptr<LogicalLoraChannel> channel2 = Create<LogicalLoraChannel>(868000000, 0, 5);
+    Ptr<LogicalLoraChannel> channel3 = Create<LogicalLoraChannel>(868100000, 0, 5);
+    Ptr<LogicalLoraChannel> channel4 = Create<LogicalLoraChannel>(868001000, 0, 5);
 
     // Equality between channels
     // Test the == and != operators
@@ -911,78 +911,68 @@ LogicalLoraChannelTest::DoRun()
     //////////////////
 
     // Setup
-    SubBand subBand(868000000, 868700000, 0.01, 14);
-    Ptr<LogicalLoraChannel> channel5 = CreateObject<LogicalLoraChannel>(870000000);
+    auto subBand = Create<SubBand>(868000000, 868600000, 0.01, 14);
+    Ptr<LogicalLoraChannel> channel5 = Create<LogicalLoraChannel>(870000000, 0, 5);
 
-    // Test BelongsToSubBand
-    NS_TEST_EXPECT_MSG_EQ(subBand.BelongsToSubBand(channel3),
+    // Test Contains
+    NS_TEST_EXPECT_MSG_EQ(subBand->Contains(channel3),
                           true,
-                          "BelongsToSubBand does not behave as expected");
-    NS_TEST_EXPECT_MSG_EQ(subBand.BelongsToSubBand(channel3->GetFrequency()),
+                          "Contains does not behave as expected");
+    NS_TEST_EXPECT_MSG_EQ(subBand->Contains(channel3->GetFrequency()),
                           true,
-                          "BelongsToSubBand does not behave as expected");
-    NS_TEST_EXPECT_MSG_EQ(subBand.BelongsToSubBand(channel5),
+                          "Contains does not behave as expected");
+    NS_TEST_EXPECT_MSG_EQ(subBand->Contains(channel5),
                           false,
-                          "BelongsToSubBand does not behave as expected");
+                          "Contains does not behave as expected");
 
     ///////////////////////////////////
     // Test LogicalLoraChannelHelper //
     ///////////////////////////////////
 
     // Setup
-    Ptr<LogicalLoraChannelHelper> channelHelper = CreateObject<LogicalLoraChannelHelper>();
-    SubBand subBand1(869000000, 869400000, 0.1, 27);
-    channel1 = CreateObject<LogicalLoraChannel>(868100000);
-    channel2 = CreateObject<LogicalLoraChannel>(868300000);
-    channel3 = CreateObject<LogicalLoraChannel>(868500000);
-    channel4 = CreateObject<LogicalLoraChannel>(869100000);
-    channel5 = CreateObject<LogicalLoraChannel>(869300000);
+    auto channelHelper = Create<LogicalLoraChannelHelper>(16);
+    auto subBand1 = Create<SubBand>(869400000, 869650000, 0.10, 27);
+    channel1 = Create<LogicalLoraChannel>(868100000, 0, 5);
+    channel2 = Create<LogicalLoraChannel>(868300000, 0, 5);
+    channel3 = Create<LogicalLoraChannel>(869525000, 0, 5);
 
     // Channel diagram
     //
-    // Channels      1      2      3                     4       5
-    // SubBands  868 ----- 0.1% ----- 868.7       869 ----- 1% ----- 869.4
+    // Channels      1     2                              3
+    // SubBands  868 ----- 1% ----- 868.6      869 ----- 10% ----- 869.4
 
     // Add SubBands and LogicalLoraChannels to the helper
-    channelHelper->AddSubBand(&subBand);
-    channelHelper->AddSubBand(&subBand1);
-    channelHelper->AddChannel(channel1);
-    channelHelper->AddChannel(channel2);
-    channelHelper->AddChannel(channel3);
-    channelHelper->AddChannel(channel4);
-    channelHelper->AddChannel(channel5);
+    channelHelper->AddSubBand(subBand);
+    channelHelper->AddSubBand(subBand1);
+    channelHelper->SetChannel(0, channel1);
+    channelHelper->SetChannel(1, channel2);
+    channelHelper->SetChannel(2, channel3);
 
     // Duty Cycle tests
     // (high level duty cycle behavior)
     ///////////////////////////////////
 
     channelHelper->AddEvent(Seconds(2), channel1);
-    Time expectedTimeOff = Seconds(2 / 0.01 - 2);
+    Time expectedTimeOff = Seconds(2 / 0.01);
 
-    // Waiting time is computed correctly
-    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitingTime(channel1),
+    // Wait time is computed correctly
+    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitTime(channel1),
                           expectedTimeOff,
-                          "Waiting time doesn't behave as expected");
+                          "Wait time doesn't behave as expected");
 
     // Duty Cycle involves the whole SubBand, not just a channel
-    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitingTime(channel2),
+    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitTime(channel2),
                           expectedTimeOff,
-                          "Waiting time doesn't behave as expected");
-    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitingTime(channel3),
-                          expectedTimeOff,
-                          "Waiting time doesn't behave as expected");
+                          "Wait time doesn't behave as expected");
 
     // Other bands are not affected by this transmission
-    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitingTime(channel4),
+    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitTime(channel3),
                           Time(0),
-                          "Waiting time affects other subbands");
-    NS_TEST_EXPECT_MSG_EQ(channelHelper->GetWaitingTime(channel5),
-                          Time(0),
-                          "Waiting time affects other subbands");
+                          "Wait time affects other subbands");
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests the correctness of the LoraPhy::GetOnAirTime calculator against a number of pre-sourced
  * time values of known scenarios
@@ -1095,7 +1085,7 @@ TimeOnAirTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests sending packets over a LoRa physical channel between multiple devices and the resulting
  * possible outcomes
@@ -1114,50 +1104,50 @@ class PhyConnectivityTest : public TestCase
     /**
      * Callback for tracing ReceivedPacket.
      *
-     * \param packet The packet received.
-     * \param node The receiver node id if any, 0 otherwise.
+     * @param packet The packet received.
+     * @param node The receiver node id if any, 0 otherwise.
      */
     void ReceivedPacket(Ptr<const Packet> packet, uint32_t node);
 
     /**
      * Callback for tracing LostPacketBecauseUnderSensitivity.
      *
-     * \param packet The packet lost.
-     * \param node The receiver node id if any, 0 otherwise.
+     * @param packet The packet lost.
+     * @param node The receiver node id if any, 0 otherwise.
      */
     void UnderSensitivity(Ptr<const Packet> packet, uint32_t node);
 
     /**
      * Callback for tracing LostPacketBecauseInterference.
      *
-     * \param packet The packet lost.
-     * \param node The receiver node id if any, 0 otherwise.
+     * @param packet The packet lost.
+     * @param node The receiver node id if any, 0 otherwise.
      */
     void Interference(Ptr<const Packet> packet, uint32_t node);
 
     /**
      * Callback for tracing LostPacketBecauseWrongFrequency.
      *
-     * \param packet The packet lost.
-     * \param node The receiver node id if any, 0 otherwise.
+     * @param packet The packet lost.
+     * @param node The receiver node id if any, 0 otherwise.
      */
     void WrongFrequency(Ptr<const Packet> packet, uint32_t node);
 
     /**
      * Callback for tracing LostPacketBecauseWrongSpreadingFactor.
      *
-     * \param packet The packet lost.
-     * \param node The receiver node id if any, 0 otherwise.
+     * @param packet The packet lost.
+     * @param node The receiver node id if any, 0 otherwise.
      */
     void WrongSf(Ptr<const Packet> packet, uint32_t node);
 
     /**
      * Compare two packets to check if they are equal.
      *
-     * \param packet1 A first packet.
-     * \param packet2 A second packet.
-     * \return True if their unique identifiers are equal,
-     * \return false otherwise.
+     * @param packet1 A first packet.
+     * @param packet2 A second packet.
+     * @return True if their unique identifiers are equal,
+     * @return false otherwise.
      */
     bool IsSamePacket(Ptr<Packet> packet1, Ptr<Packet> packet2);
 
@@ -1567,11 +1557,11 @@ PhyConnectivityTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests the functionalities of the MAC layer of LoRaWAN devices
  *
- * \todo Not implemented yet.
+ * @todo Not implemented yet.
  */
 class LorawanMacTest : public TestCase
 {
@@ -1603,7 +1593,452 @@ LorawanMacTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
+ *
+ * It tests the functionalities of LoRaWAN MAC commands received by devices.
+ *
+ * This means testing that (i) settings in the downlink MAC commands are correctly applied/rejected
+ * by the device, and that (ii) the correct answer (if expected) is produced by the device.
+ */
+class MacCommandTest : public TestCase
+{
+  public:
+    MacCommandTest();           //!< Default constructor
+    ~MacCommandTest() override; //!< Destructor
+
+  private:
+    /**
+     * Have this class' MAC layer receive a downlink packet carrying the input MAC command. After,
+     * trigger a new empty uplink packet send that can then be used to examine the MAC command
+     * answers in the header.
+     *
+     * @tparam T  \explicit The type of MAC command to create.
+     * @tparam Ts \deduced Types of the constructor arguments.
+     * @param  [in] args MAC command constructor arguments.
+     * @return The list of MAC commands produced by the device as an answer.
+     */
+    template <typename T, typename... Ts>
+    std::vector<Ptr<MacCommand>> RunMacCommand(Ts&&... args);
+
+    /**
+     * This function resets the state of the MAC layer used for tests. Use it before each call of
+     * RunMacCommand. Otherwise, on consecutive calls the MAC layer will not send due to duty-cycle
+     * limitations.
+     */
+    void Reset();
+
+    void DoRun() override;
+
+    Ptr<ClassAEndDeviceLorawanMac> m_mac; //!< The end device's MAC layer used in tests.
+};
+
+MacCommandTest::MacCommandTest()
+    : TestCase("Test functionality of MAC commands when received by a device")
+{
+}
+
+MacCommandTest::~MacCommandTest()
+{
+    m_mac = nullptr;
+}
+
+template <typename T, typename... Ts>
+std::vector<Ptr<MacCommand>>
+MacCommandTest::RunMacCommand(Ts&&... args)
+{
+    Ptr<Packet> pkt;
+    LoraFrameHeader fhdr;
+    LorawanMacHeader mhdr;
+    // Prepare DL packet with input command
+    pkt = Create<Packet>(0);
+    fhdr.SetAsDownlink();
+    auto cmd = Create<T>(args...);
+    fhdr.AddCommand(cmd);
+    pkt->AddHeader(fhdr);
+    mhdr.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+    pkt->AddHeader(mhdr);
+    // Trigger MAC layer reception
+    DynamicCast<EndDeviceLoraPhy>(m_mac->GetPhy())
+        ->SwitchToStandby(); // usually done as we open Rx windows
+    m_mac->Receive(pkt);
+    // Trigger MAC layer send
+    pkt = Create<Packet>(0);
+    m_mac->Send(pkt);
+    // Retrieve uplink MAC commands
+    pkt->RemoveHeader(mhdr);
+    fhdr.SetAsUplink();
+    pkt->RemoveHeader(fhdr);
+    return fhdr.GetCommands();
+}
+
+void
+MacCommandTest::Reset()
+{
+    // Reset MAC state
+    LorawanMacHelper macHelper;
+    macHelper.SetRegion(LorawanMacHelper::EU);
+    macHelper.SetDeviceType(LorawanMacHelper::ED_A);
+    /// @todo Create should not require a node in input.
+    m_mac = DynamicCast<ClassAEndDeviceLorawanMac>(macHelper.Install(nullptr, nullptr));
+    NS_TEST_EXPECT_MSG_NE(m_mac, nullptr, "Failed to initialize MAC layer object.");
+    auto phy = CreateObject<SimpleEndDeviceLoraPhy>();
+    phy->SetChannel(CreateObject<LoraChannel>());
+    phy->SetMobility(CreateObject<ConstantPositionMobilityModel>());
+    m_mac->SetPhy(phy);
+}
+
+void
+MacCommandTest::DoRun()
+{
+    NS_LOG_DEBUG("MacCommandTest");
+
+    Reset();
+    // LinkCheckAns: get connectivity metrics of last uplink LinkCheckReq command
+    {
+        uint8_t margin = 20; // best reception margin [dB] from demodulation floor
+        uint8_t gwCnt = 3;   // number of gateways that received last uplink
+        auto answers = RunMacCommand<LinkCheckAns>(margin, gwCnt);
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetLastKnownLinkMarginDb()),
+                              unsigned(margin),
+                              "m_lastKnownMarginDb differs from Margin field of LinkCheckAns");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetLastKnownGatewayCount()),
+                              unsigned(gwCnt),
+                              "m_lastKnownGatewayCount differs GwCnt field of LinkCheckAns");
+        NS_TEST_EXPECT_MSG_EQ(answers.size(),
+                              0,
+                              "Unexpected uplink MAC command answer(s) to LinkCheckAns");
+    }
+
+    Reset();
+    // LinkAdrReq: change data rate, TX power, redundancy, or channel mask
+    {
+        uint8_t dataRate = 5;
+        uint8_t txPower = 2;
+        uint16_t chMask = 0b101;
+        uint8_t chMaskCntl = 0;
+        uint8_t nbTrans = 13;
+        auto answers = RunMacCommand<LinkAdrReq>(dataRate, txPower, chMask, chMaskCntl, nbTrans);
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
+                              unsigned(dataRate),
+                              "m_dataRate does not match DataRate field of LinkAdrReq");
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
+                              14 - txPower * 2,
+                              "m_txPowerDbm does not match txPower field of LinkAdrReq");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
+                              unsigned(nbTrans),
+                              "m_nbTrans does not match nbTrans field of LinkAdrReq");
+        auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
+        for (size_t i = 0; i < channels.size(); i++)
+        {
+            const auto& c = channels.at(i + 16 * chMaskCntl);
+            bool actual = (c) ? c->IsEnabledForUplink() : false;
+            bool expected = (chMask & 0b1 << i);
+            NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state != chMask");
+        }
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto laa = DynamicCast<LinkAdrAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(laa, nullptr, "LinkAdrAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetChannelMaskAck(), true, "ChannelMaskAck expected to be true");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetDataRateAck(), true, "DataRateAck expected to be true");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetPowerAck(), true, "PowerAck expected to be true");
+    }
+
+    Reset();
+    // LinkAdrReq: ADR bit off, only change channel mask
+    {
+        uint8_t dataRate = 5;
+        uint8_t txPower = 2;
+        uint16_t chMask = 0b010;
+        uint8_t chMaskCntl = 0;
+        uint8_t nbTrans = 13;
+        m_mac->SetUplinkAdrBit(false);
+        auto answers = RunMacCommand<LinkAdrReq>(dataRate, txPower, chMask, chMaskCntl, nbTrans);
+        NS_TEST_EXPECT_MSG_NE(unsigned(m_mac->GetDataRate()),
+                              unsigned(dataRate),
+                              "m_dataRate expected to differ from DataRate field of LinkAdrReq");
+        NS_TEST_EXPECT_MSG_NE(m_mac->GetTransmissionPowerDbm(),
+                              14 - txPower * 2,
+                              "m_txPowerDbm expected to not match txPower field of LinkAdrReq");
+        NS_TEST_EXPECT_MSG_NE(unsigned(m_mac->GetMaxNumberOfTransmissions()),
+                              unsigned(nbTrans),
+                              "m_nbTrans expected to differ from nbTrans field of LinkAdrReq");
+        auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
+        for (size_t i = 0; i < channels.size(); i++)
+        {
+            const auto& c = channels.at(i + 16 * chMaskCntl);
+            bool actual = (c) ? c->IsEnabledForUplink() : false;
+            bool expected = (chMask & 0b1 << i);
+            NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state != chMask");
+        }
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto laa = DynamicCast<LinkAdrAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(laa, nullptr, "LinkAdrAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetChannelMaskAck(), true, "ChannelMaskAck expected to be true");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetDataRateAck(), false, "DataRateAck expected to be false");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetPowerAck(), false, "PowerAck expected to be false");
+    }
+
+    Reset();
+    // LinkAdrReq: invalid chMask, data rate and power
+    { // WARNING: default values are manually set here
+        uint8_t dataRate = 12;
+        uint8_t txPower = 8;
+        uint16_t chMask = 0b0;
+        uint8_t chMaskCntl = 0;
+        uint8_t nbTrans = 6;
+        auto answers = RunMacCommand<LinkAdrReq>(dataRate, txPower, chMask, chMaskCntl, nbTrans);
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
+                              0,
+                              "m_dataRate expected to be default value");
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
+                              14,
+                              "m_txPowerDbm expected to be default value");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
+                              1,
+                              "m_nbTrans expected to be default value");
+        auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
+        for (size_t i = 0; i < channels.size(); i++)
+        {
+            const auto& c = channels.at(i + 16 * chMaskCntl);
+            bool actual = (c) ? c->IsEnabledForUplink() : false;
+            bool expected = (uint16_t(0b111) & 0b1 << i);
+            NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state != default");
+        }
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto laa = DynamicCast<LinkAdrAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(laa, nullptr, "LinkAdrAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetChannelMaskAck(), false, "ChannelMaskAck != false");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetDataRateAck(), false, "DataRateAck expected to be false");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetPowerAck(), false, "PowerAck expected to be false");
+    }
+
+    Reset();
+    // LinkAdrReq: invalid chMask, valid data rate and power
+    { // WARNING: default values are manually set here
+        uint8_t dataRate = 1;
+        uint8_t txPower = 7;
+        uint16_t chMask = 0b1000; // enable only non-exisitng channel
+        uint8_t chMaskCntl = 0;
+        uint8_t nbTrans = 3;
+        auto answers = RunMacCommand<LinkAdrReq>(dataRate, txPower, chMask, chMaskCntl, nbTrans);
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
+                              0,
+                              "m_dataRate expected to be default value");
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
+                              14,
+                              "m_txPowerDbm expected to be default value");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
+                              1,
+                              "m_nbTrans expected to be default value");
+        auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
+        for (size_t i = 0; i < channels.size(); i++)
+        {
+            const auto& c = channels.at(i + 16 * chMaskCntl);
+            bool actual = (c) ? c->IsEnabledForUplink() : false;
+            bool expected = (uint16_t(0b111) & 0b1 << i);
+            NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state != default");
+        }
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto laa = DynamicCast<LinkAdrAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(laa, nullptr, "LinkAdrAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetChannelMaskAck(), false, "ChannelMaskAck != false");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetDataRateAck(), true, "DataRateAck expected to be true");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetPowerAck(), true, "PowerAck expected to be true");
+    }
+
+    Reset();
+    // LinkAdrReq: fringe parameter values
+    { // WARNING: default values are manually set here
+        uint8_t dataRate = 0xF;
+        uint8_t txPower = 0xF;  // 0x0F ignores config
+        uint16_t chMask = 0b0;  // should be ignored because chMaskCntl is 6
+        uint8_t chMaskCntl = 6; // all channels on
+        uint8_t nbTrans = 0;    // restore default 1
+        // Set device params to values different from default
+        m_mac->SetDataRate(3);
+        m_mac->SetTransmissionPowerDbm(12);
+        m_mac->SetMaxNumberOfTransmissions(15);
+        auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
+        channels.at(0)->DisableForUplink();
+        auto answers = RunMacCommand<LinkAdrReq>(dataRate, txPower, chMask, chMaskCntl, nbTrans);
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetDataRate()),
+                              3,
+                              "m_dataRate expected to be default value");
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
+                              12,
+                              "m_txPowerDbm expected to be default value");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetMaxNumberOfTransmissions()),
+                              1,
+                              "m_nbTrans expected to be default value");
+        for (size_t i = 0; i < channels.size(); i++)
+        {
+            const auto& c = channels.at(i);
+            bool actual = (c) ? c->IsEnabledForUplink() : false;
+            bool expected = (uint16_t(0b111) & 0b1 << i);
+            NS_TEST_EXPECT_MSG_EQ(actual, expected, "Channel " << i << " state != default");
+        }
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto laa = DynamicCast<LinkAdrAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(laa, nullptr, "LinkAdrAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetChannelMaskAck(), true, "ChannelMaskAck != true");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetDataRateAck(), true, "DataRateAck expected to be true");
+        NS_TEST_EXPECT_MSG_EQ(laa->GetPowerAck(), true, "PowerAck expected to be true");
+    }
+
+    Reset();
+    // DutyCycleReq: duty cycle to 100%
+    {
+        uint8_t maxDutyCycle = 0;
+        auto answers = RunMacCommand<DutyCycleReq>(maxDutyCycle);
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetAggregatedDutyCycle(),
+                              1 / std::pow(2, maxDutyCycle),
+                              "m_aggregatedDutyCycle != 1");
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto dca = DynamicCast<DutyCycleAns>(answers.at(0));
+        NS_TEST_EXPECT_MSG_NE(dca, nullptr, "DutyCycleAns was expected, cmd type cast failed");
+    }
+
+    Reset();
+    // DutyCycleReq: duty cycle to 12.5%
+    {
+        uint8_t maxDutyCycle = 3;
+        auto answers = RunMacCommand<DutyCycleReq>(maxDutyCycle);
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetAggregatedDutyCycle(),
+                              1 / std::pow(2, maxDutyCycle),
+                              "m_aggregatedDutyCycle != 1");
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto dca = DynamicCast<DutyCycleAns>(answers.at(0));
+        NS_TEST_EXPECT_MSG_NE(dca, nullptr, "DutyCycleAns was expected, cmd type cast failed");
+    }
+
+    Reset();
+    // RxParamSetupReq: set rx1Dr, rx2Dr, frequency
+    {
+        uint8_t rx1DrOffset = 5;
+        uint8_t rx2DataRate = 5;
+        double frequencyHz = 863500000;
+        m_mac->SetDataRate(5);
+        auto answers = RunMacCommand<RxParamSetupReq>(rx1DrOffset, rx2DataRate, frequencyHz);
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetFirstReceiveWindowDataRate()),
+                              unsigned(5 - rx1DrOffset),
+                              "Rx1DataRate does not match rx1DrOffset from RxParamSetupReq");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetSecondReceiveWindowDataRate()),
+                              unsigned(rx2DataRate),
+                              "Rx2DataRate does not match rx2DataRate from RxParamSetupReq");
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetSecondReceiveWindowFrequency(),
+                              frequencyHz,
+                              "Rx2 frequency does not match frequency from RxParamSetupReq");
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto rpsa = DynamicCast<RxParamSetupAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(rpsa, nullptr, "RxParamSetupAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(rpsa->GetRx1DrOffsetAck(), true, "Rx1DrOffsetAck != true");
+        NS_TEST_EXPECT_MSG_EQ(rpsa->GetRx2DataRateAck(), true, "Rx2DataRateAck != true");
+        NS_TEST_EXPECT_MSG_EQ(rpsa->GetChannelAck(), true, "ChannelAck expected to be true");
+    }
+
+    Reset();
+    // RxParamSetupReq: invalid rx1Dr, rx2Dr, frequency
+    { // WARNING: default values are manually set here
+        uint8_t rx1DrOffset = 6;
+        uint8_t rx2DataRate = 12;
+        double frequencyHz = 871000000;
+        m_mac->SetDataRate(5);
+        auto answers = RunMacCommand<RxParamSetupReq>(rx1DrOffset, rx2DataRate, frequencyHz);
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetFirstReceiveWindowDataRate()),
+                              5,
+                              "Rx1DataRate expected to be default value");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(m_mac->GetSecondReceiveWindowDataRate()),
+                              0,
+                              "Rx2DataRate expected to be default value");
+        NS_TEST_EXPECT_MSG_EQ(m_mac->GetSecondReceiveWindowFrequency(),
+                              869525000,
+                              "Rx2 frequency expected to be default value");
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto rpsa = DynamicCast<RxParamSetupAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(rpsa, nullptr, "RxParamSetupAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(rpsa->GetRx1DrOffsetAck(), false, "Rx1DrOffsetAck != false");
+        NS_TEST_EXPECT_MSG_EQ(rpsa->GetRx2DataRateAck(), false, "Rx2DataRateAck != false");
+        NS_TEST_EXPECT_MSG_EQ(rpsa->GetChannelAck(), false, "ChannelAck expected to be false");
+    }
+
+    Reset();
+    // DevStatusReq: get default values
+    { // WARNING: default values are manually set here
+        auto answers = RunMacCommand<DevStatusReq>();
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto dsa = DynamicCast<DevStatusAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(dsa, nullptr, "DevStatusAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(dsa->GetBattery()), 0, "Battery expected == 0 (ext power)");
+        NS_TEST_EXPECT_MSG_EQ(unsigned(dsa->GetMargin()), 31, "Margin expected to be 31 (default)");
+    }
+
+    Reset();
+    // NewChannelReq: add a new channel
+    {
+        uint8_t chIndex = 4;
+        double frequencyHz = 865100000;
+        uint8_t minDataRate = 1;
+        uint8_t maxDataRate = 4;
+        auto answers = RunMacCommand<NewChannelReq>(chIndex, frequencyHz, minDataRate, maxDataRate);
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        auto c = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray().at(chIndex);
+        NS_TEST_ASSERT_MSG_NE(c, nullptr, "Channel at chIndex slot expected not to be nullptr");
+        NS_TEST_EXPECT_MSG_EQ(c->GetFrequency(),
+                              frequencyHz,
+                              "Channel frequency expected to equal NewChannelReq frequency");
+        NS_TEST_EXPECT_MSG_EQ(c->GetMinimumDataRate(),
+                              unsigned(minDataRate),
+                              "Channel minDataRate expected to equal NewChannelReq minDataRate");
+        NS_TEST_EXPECT_MSG_EQ(c->GetMaximumDataRate(),
+                              unsigned(maxDataRate),
+                              "Channel maxDataRate expected to equal NewChannelReq maxDataRate");
+        auto nca = DynamicCast<NewChannelAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(nca, nullptr, "NewChannelAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(nca->GetDataRateRangeOk(), true, "DataRateRangeOk != true");
+        NS_TEST_EXPECT_MSG_EQ(nca->GetChannelFrequencyOk(), true, "ChannelFrequencyOk != true");
+    }
+
+    Reset();
+    // NewChannelReq: invalid new channel
+    { // WARNING: default values are manually set here
+        uint8_t chIndex = 1;
+        double frequencyHz = 862000000;
+        uint8_t minDataRate = 14;
+        uint8_t maxDataRate = 13;
+        auto answers = RunMacCommand<NewChannelReq>(chIndex, frequencyHz, minDataRate, maxDataRate);
+        NS_TEST_ASSERT_MSG_EQ(answers.size(), 1, "1 answer cmd was expected, found 0 or >1");
+        double defaultFrequenciesHz[3] = {868100000, 868300000, 868500000};
+        auto channels = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
+        for (size_t i = 0; i < channels.size(); i++)
+        {
+            const auto& c = channels.at(i);
+            if (i > 2)
+            {
+                NS_TEST_ASSERT_MSG_EQ(c, nullptr, "Channel " << i << "expected to be nullptr");
+                continue;
+            }
+            NS_TEST_EXPECT_MSG_EQ(c->GetFrequency(),
+                                  defaultFrequenciesHz[i],
+                                  "Channel frequency expected to equal NewChannelReq frequency");
+            NS_TEST_EXPECT_MSG_EQ(unsigned(c->GetMinimumDataRate()),
+                                  0,
+                                  "Channel " << i << " minDataRate expected to be default");
+            NS_TEST_EXPECT_MSG_EQ(unsigned(c->GetMaximumDataRate()),
+                                  5,
+                                  "Channel " << i << " maxDataRate expected to be default");
+            NS_TEST_EXPECT_MSG_EQ(c->IsEnabledForUplink(),
+                                  true,
+                                  "Channel " << i << " state expected to be active by default");
+        }
+        auto nca = DynamicCast<NewChannelAns>(answers.at(0));
+        NS_TEST_ASSERT_MSG_NE(nca, nullptr, "NewChannelAns was expected, cmd type cast failed");
+        NS_TEST_EXPECT_MSG_EQ(nca->GetDataRateRangeOk(), false, "DataRateRangeOk != false");
+        NS_TEST_EXPECT_MSG_EQ(nca->GetChannelFrequencyOk(), false, "ChannelFrequencyOk != false");
+    }
+}
+
+/**
+ * @ingroup lorawan
  *
  * The TestSuite class names the TestSuite, identifies what type of TestSuite, and enables the
  * TestCases to be run. Typically, only the constructor for this class must be defined
@@ -1617,8 +2052,19 @@ class LorawanTestSuite : public TestSuite
 LorawanTestSuite::LorawanTestSuite()
     : TestSuite("lorawan", Type::UNIT)
 {
-    LogComponentEnable("LorawanTestSuite", LOG_LEVEL_DEBUG);
-    // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
+    // LogComponentEnable("LorawanTestSuite", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("LorawanMac", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("SimpleEndDeviceLoraPhy", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("EndDeviceLoraPhy", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("LoraPhy", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("LoraChannel", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("LoraFrameHeader", LOG_LEVEL_DEBUG);
+    // LogComponentEnableAll(LOG_PREFIX_FUNC);
+    // LogComponentEnableAll(LOG_PREFIX_NODE);
+    // LogComponentEnableAll(LOG_PREFIX_TIME);
+
     AddTestCase(new InterferenceTest, Duration::QUICK);
     AddTestCase(new AddressTest, Duration::QUICK);
     AddTestCase(new HeaderTest, Duration::QUICK);
@@ -1626,6 +2072,7 @@ LorawanTestSuite::LorawanTestSuite()
     AddTestCase(new LogicalLoraChannelTest, Duration::QUICK);
     AddTestCase(new TimeOnAirTest, Duration::QUICK);
     AddTestCase(new PhyConnectivityTest, Duration::QUICK);
+    AddTestCase(new MacCommandTest, Duration::QUICK);
 }
 
 // Do not forget to allocate an instance of this TestSuite

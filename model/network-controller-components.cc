@@ -163,12 +163,30 @@ LinkCheckComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status,
     {
         status->m_reply.needsReply = true;
 
-        // Get the number of gateways that received the packet and the best
-        // margin
-        uint8_t gwCount = status->GetLastReceivedPacketInfo().gwList.size();
+        auto info = status->GetLastReceivedPacketInfo();
 
-        Ptr<LinkCheckAns> replyCommand = Create<LinkCheckAns>();
-        replyCommand->SetGwCnt(gwCount);
+        // Adapted from: github.com/chirpstack/chirpstack v4.9.0
+
+        // Get the best demodulation margin of the most recent LinkCheckReq command
+        double maxRssi = -1e3;
+        for (const auto& [_, gwRxData] : info.gwList)
+        {
+            if (gwRxData.rxPower > maxRssi)
+            {
+                maxRssi = gwRxData.rxPower;
+            }
+        }
+        /// @see ns3::lorawan::AdrComponent::RxPowerToSNR
+        double maxSnr = maxRssi + 174 - 10 * log10(125000) - 6;
+        /// @todo make this a global PHY constant, manage unknown sf values
+        double requiredSnr[] = {-20.0, -17.5, -15.0, -12.5, -10.0, -7.5, -5};
+        double diff = maxSnr - requiredSnr[12 - info.sf];
+        uint8_t margin = (diff < 0) ? 0 : (diff > 254) ? 254 : diff;
+
+        // Get the number of gateways that received the most recent LinkCheckReq command
+        uint8_t gwCount = info.gwList.size();
+
+        auto replyCommand = Create<LinkCheckAns>(margin, gwCount);
         status->m_reply.frameHeader.SetAsDownlink();
         status->m_reply.frameHeader.AddCommand(replyCommand);
         status->m_reply.macHeader.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);

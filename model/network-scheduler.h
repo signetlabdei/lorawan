@@ -28,18 +28,18 @@ class NetworkStatus;     // Forward declaration
 class NetworkController; // Forward declaration
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Network server component in charge of scheduling downling packets onto devices' reception windows
  *
- * \todo We should probably add getters and setters or remove default constructor
+ * @todo We should probably add getters and setters or remove default constructor
  */
 class NetworkScheduler : public Object
 {
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -50,8 +50,8 @@ class NetworkScheduler : public Object
      * Construct a new NetworkScheduler providing the NetworkStatus and the NetworkController
      * objects.
      *
-     * \param status A pointer to the NetworkStatus object.
-     * \param controller A pointer to the NetworkController object.
+     * @param status A pointer to the NetworkStatus object.
+     * @param controller A pointer to the NetworkController object.
      */
     NetworkScheduler(Ptr<NetworkStatus> status, Ptr<NetworkController> controller);
 
@@ -61,7 +61,7 @@ class NetworkScheduler : public Object
      *
      * This function schedules the OnReceiveWindowOpportunity events 1 and 2 seconds later.
      *
-     * \param packet A pointer to the new Packet instance.
+     * @param packet A pointer to the new Packet instance.
      */
     void OnReceivedPacket(Ptr<const Packet> packet);
 
@@ -69,8 +69,8 @@ class NetworkScheduler : public Object
      * Method that is scheduled after packet arrival in order to take action on
      * sender's receive windows openings.
      *
-     * \param deviceAddress The Address of the end device.
-     * \param window The reception window number (1 or 2).
+     * @param deviceAddress The Address of the end device.
+     * @param window The reception window number (1 or 2).
      */
     void OnReceiveWindowOpportunity(LoraDeviceAddress deviceAddress, int window);
 

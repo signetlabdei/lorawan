@@ -53,8 +53,8 @@ double simulationTimeSeconds = 3600; //!< Scenario duration (s) in simulated tim
 /**
  * Record a packet TX start by the PHY layer of an end device
  *
- * \param packet The packet being transmitted.
- * \param index Id of end device transmitting the packet.
+ * @param packet The packet being transmitted.
+ * @param index Id of end device transmitting the packet.
  */
 void
 OnPhySentPacket(Ptr<const Packet> packet, uint32_t index)
@@ -76,10 +76,10 @@ OnPhySentPacket(Ptr<const Packet> packet, uint32_t index)
 /**
  * Record the exit status of a MAC layer packet retransmission process of an end device
  *
- * \param transmissions Number of transmissions attempted during the process.
- * \param successful Whether the retransmission procedure was successful.
- * \param firstAttempt Timestamp of the initial transmission attempt.
- * \param packet The packet being retransmitted.
+ * @param transmissions Number of transmissions attempted during the process.
+ * @param successful Whether the retransmission procedure was successful.
+ * @param firstAttempt Timestamp of the initial transmission attempt.
+ * @param packet The packet being retransmitted.
  */
 void
 OnMacPacketOutcome(uint8_t transmissions, bool successful, Time firstAttempt, Ptr<Packet> packet)
@@ -97,8 +97,8 @@ OnMacPacketOutcome(uint8_t transmissions, bool successful, Time firstAttempt, Pt
 /**
  * Set the position of an end device as either in range or out of range.
  *
- * \param endDevice A pointer to the Node of the end device.
- * \param inRange Whether to set the end device in range or out of range.
+ * @param endDevice A pointer to the Node of the end device.
+ * @param inRange Whether to set the end device in range or out of range.
  */
 void
 ChangeEndDevicePosition(Ptr<Node> endDevice, bool inRange)
@@ -239,14 +239,14 @@ main(int argc, char* argv[])
 
     Time appStopTime = Seconds(simulationTimeSeconds);
     OneShotSenderHelper appHelper = OneShotSenderHelper();
-    appHelper.SetSendTime(Seconds(0));
+    appHelper.SetSendTime(Time(0));
     ApplicationContainer appContainer = appHelper.Install(endDevices);
     appHelper.SetSendTime(Seconds(100));
     appContainer.Add(appHelper.Install(endDevices));
     appHelper.SetSendTime(Seconds(200));
     appContainer.Add(appHelper.Install(endDevices));
 
-    appContainer.Start(Seconds(0));
+    appContainer.Start(Time(0));
     appContainer.Stop(appStopTime);
 
     Simulator::Schedule(Seconds(110), &ChangeEndDevicePosition, endDevices.Get(0), true);
@@ -298,7 +298,7 @@ main(int argc, char* argv[])
 
     LoraPacketTracker& tracker = helper.GetPacketTracker();
     NS_LOG_INFO("Printing total sent MAC-layer packets and successful MAC-layer packets");
-    std::cout << tracker.CountMacPacketsGlobally(Seconds(0), appStopTime + Hours(1)) << std::endl;
+    std::cout << tracker.CountMacPacketsGlobally(Time(0), appStopTime + Hours(1)) << std::endl;
 
     return 0;
 }

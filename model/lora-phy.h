@@ -29,7 +29,7 @@ namespace lorawan
 class LoraChannel;
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Structure to collect all parameters that are used to compute the duration of
  * a packet (excluding payload length).
@@ -51,7 +51,7 @@ struct LoraTxParameters
 std::ostream& operator<<(std::ostream& os, const LoraTxParameters& params);
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Base class for PHY layers implementing the LoRa modulation scheme.
  *
@@ -66,7 +66,7 @@ class LoraPhy : public Object
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -102,12 +102,12 @@ class LoraPhy : public Object
      *
      * This method is typically called by LoraChannel.
      *
-     * \param packet The packet that is arriving at this PHY layer.
-     * \param rxPowerDbm The power of the arriving packet (assumed to be constant for the whole
+     * @param packet The packet that is arriving at this PHY layer.
+     * @param rxPowerDbm The power of the arriving packet (assumed to be constant for the whole
      * reception).
-     * \param sf The Spreading Factor of the arriving packet.
-     * \param duration The on air time of this packet.
-     * \param frequencyHz The frequency this packet is being transmitted on.
+     * @param sf The Spreading Factor of the arriving packet.
+     * @param duration The on air time of this packet.
+     * @param frequencyHz The frequency this packet is being transmitted on.
      */
     virtual void StartReceive(Ptr<Packet> packet,
                               double rxPowerDbm,
@@ -123,8 +123,8 @@ class LoraPhy : public Object
      * able to identify the packet that is being received among all those that
      * were registered as interference by StartReceive.
      *
-     * \param packet The received packet.
-     * \param event The event that is tied to this packet in the
+     * @param packet The received packet.
+     * @param event The event that is tied to this packet in the
      * LoraInterferenceHelper.
      */
     virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) = 0;
@@ -132,10 +132,10 @@ class LoraPhy : public Object
     /**
      * Instruct the PHY to send a packet according to some parameters.
      *
-     * \param packet The packet to send.
-     * \param txParams The desired transmission parameters.
-     * \param frequencyHz The frequency on which to transmit.
-     * \param txPowerDbm The power in dBm with which to transmit the packet.
+     * @param packet The packet to send.
+     * @param txParams The desired transmission parameters.
+     * @param frequencyHz The frequency on which to transmit.
+     * @param txPowerDbm The power in dBm with which to transmit the packet.
      */
     virtual void Send(Ptr<Packet> packet,
                       LoraTxParameters txParams,
@@ -145,7 +145,7 @@ class LoraPhy : public Object
     /**
      * Whether this device is transmitting or not.
      *
-     * \return True if the device is currently transmitting a packet, false
+     * @return True if the device is currently transmitting a packet, false
      * otherwise.
      */
     virtual bool IsTransmitting() = 0;
@@ -153,8 +153,8 @@ class LoraPhy : public Object
     /**
      * Whether this device is listening on the specified frequency or not.
      *
-     * \param frequencyHz The frequency to query.
-     * \return True if the device is listening on that frequency, false
+     * @param frequencyHz The frequency [Hz] to query.
+     * @return True if the device is listening on that frequency, false
      * otherwise.
      */
     virtual bool IsOnFrequency(uint32_t frequencyHz) = 0;
@@ -165,7 +165,7 @@ class LoraPhy : public Object
      * This method is typically called by an upper MAC layer that wants to be
      * notified after the successful reception of a packet.
      *
-     * \param callback The RxOkCallback instance.
+     * @param callback The RxOkCallback instance.
      */
     void SetReceiveOkCallback(RxOkCallback callback);
 
@@ -176,7 +176,7 @@ class LoraPhy : public Object
      * This method is typically called by an upper MAC layer that wants to be
      * notified after the failed reception of a packet.
      *
-     * \param callback The RxFailedCallback instance.
+     * @param callback The RxFailedCallback instance.
      */
     void SetReceiveFailedCallback(RxFailedCallback callback);
 
@@ -186,21 +186,21 @@ class LoraPhy : public Object
      * This method is typically called by an upper MAC layer that wants to be
      * notified after the transmission of a packet.
      *
-     * \param callback The TxFinishedCallback instance.
+     * @param callback The TxFinishedCallback instance.
      */
     void SetTxFinishedCallback(TxFinishedCallback callback);
 
     /**
      * Get the mobility model associated to this PHY.
      *
-     * \return The MobilityModel associated to this PHY.
+     * @return The MobilityModel associated to this PHY.
      */
     Ptr<MobilityModel> GetMobility();
 
     /**
      * Set the mobility model associated to this PHY.
      *
-     * \param mobility The mobility model to associate to this PHY.
+     * @param mobility The mobility model to associate to this PHY.
      */
     void SetMobility(Ptr<MobilityModel> mobility);
 
@@ -209,36 +209,36 @@ class LoraPhy : public Object
      *
      * Typically, there is only one instance per simulation.
      *
-     * \param channel The LoraChannel instance this PHY will transmit on.
+     * @param channel The LoraChannel instance this PHY will transmit on.
      */
     void SetChannel(Ptr<LoraChannel> channel);
 
     /**
      * Get the channel instance associated to this PHY.
      *
-     * \return The LoraChannel instance this PHY transmits on.
+     * @return The LoraChannel instance this PHY transmits on.
      */
     Ptr<LoraChannel> GetChannel() const;
 
     /**
      * Get the NetDevice associated to this PHY.
      *
-     * \return The NetDevice associated to this PHY.
+     * @return The NetDevice associated to this PHY.
      */
     Ptr<NetDevice> GetDevice() const;
 
     /**
      * Set the NetDevice that owns this PHY.
      *
-     * \param device The NetDevice this PHY will reference as its owner.
+     * @param device The NetDevice this PHY will reference as its owner.
      */
     void SetDevice(Ptr<NetDevice> device);
 
     /**
      * Compute the symbol time from spreading factor and bandwidth.
      *
-     * \param txParams The parameters for transmission.
-     * \return TSym, the time required to send a LoRa modulation symbol.
+     * @param txParams The parameters for transmission.
+     * @return TSym, the time required to send a LoRa modulation symbol.
      */
     static Time GetTSym(LoraTxParameters txParams);
 
@@ -250,9 +250,9 @@ class LoraPhy : public Object
      * (obtained through a GetSize () call to account for the presence of Headers
      * and Trailers, too) also influences the packet transmit time.
      *
-     * \param packet The packet that needs to be transmitted.
-     * \param txParams The set of parameters that will be used for transmission.
-     * \return The time necessary to transmit the packet.
+     * @param packet The packet that needs to be transmitted.
+     * @param txParams The set of parameters that will be used for transmission.
+     * @return The time necessary to transmit the packet.
      */
     static Time GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams);
 
@@ -262,7 +262,7 @@ class LoraPhy : public Object
      *
      * Calls to this function are typically scheduled by the Send function.
      *
-     * \param packet A pointer to the packet that has been transmitted.
+     * @param packet A pointer to the packet that has been transmitted.
      */
     virtual void TxFinished(Ptr<const Packet> packet) = 0;
 

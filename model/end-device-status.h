@@ -27,7 +27,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * This class represents the network server's knowledge about an end device in
  * the LoRaWAN network it is administering.
@@ -93,35 +93,35 @@ class EndDeviceStatus : public Object
      * This is determined by looking at headers and payload of the Reply
      * structure: if they are empty, no reply should be needed.
      *
-     * \return A boolean value signaling if the end device needs a reply.
+     * @return A boolean value signaling if the end device needs a reply.
      */
     bool NeedsReply() const;
 
     /**
      * Get the reply packet.
      *
-     * \return A pointer to the packet reply (data + headers).
+     * @return A pointer to the packet reply (data + headers).
      */
     Ptr<Packet> GetCompleteReplyPacket();
 
     /**
      * Get the reply packet mac header.
      *
-     * \return The packet reply mac header.
+     * @return The packet reply mac header.
      */
     LorawanMacHeader GetReplyMacHeader() const;
 
     /**
      * Get the reply packet frame header.
      *
-     * \return The packet reply frame header.
+     * @return The packet reply frame header.
      */
     LoraFrameHeader GetReplyFrameHeader() const;
 
     /**
      * Get the data of the reply packet.
      *
-     * \return A pointer to the packet reply.
+     * @return A pointer to the packet reply.
      */
     Ptr<Packet> GetReplyPayload();
 
@@ -168,7 +168,7 @@ class EndDeviceStatus : public Object
 
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -178,8 +178,8 @@ class EndDeviceStatus : public Object
     /**
      * Constructor with initialization parameters.
      *
-     * \param endDeviceAddress Address of the end device.
-     * \param endDeviceMac Pointer to the MAC layer of the end device.
+     * @param endDeviceAddress Address of the end device.
+     * @param endDeviceMac Pointer to the MAC layer of the end device.
      */
     EndDeviceStatus(LoraDeviceAddress endDeviceAddress,
                     Ptr<ClassAEndDeviceLorawanMac> endDeviceMac);
@@ -187,14 +187,14 @@ class EndDeviceStatus : public Object
     /**
      * Get the spreading factor this device is using in the first receive window.
      *
-     * \return An unsigned 8-bit integer containing the spreading factor.
+     * @return An unsigned 8-bit integer containing the spreading factor.
      */
     uint8_t GetFirstReceiveWindowSpreadingFactor() const;
 
     /**
      * Get the first window frequency of this device.
      *
-     * \return The frequency [Hz].
+     * @return The frequency [Hz].
      */
     uint32_t GetFirstReceiveWindowFrequency() const;
 
@@ -202,77 +202,77 @@ class EndDeviceStatus : public Object
      * Get the spreading factor this device is using in the second
      * receive window.
      *
-     * \return An unsigned 8-bit integer containing the spreading factor.
+     * @return An unsigned 8-bit integer containing the spreading factor.
      */
     uint8_t GetSecondReceiveWindowSpreadingFactor() const;
 
     /**
      * Return the second window frequency of this device.
      *
-     * \return The frequency [Hz].
+     * @return The frequency [Hz].
      */
     uint32_t GetSecondReceiveWindowFrequency() const;
 
     /**
      * Get the received packet list.
      *
-     * \return The received packet list.
+     * @return The received packet list.
      */
     ReceivedPacketList GetReceivedPacketList() const;
 
     /**
      * Set the spreading factor this device is using in the first receive window.
      *
-     * \param sf The spreading factor.
+     * @param sf The spreading factor.
      */
     void SetFirstReceiveWindowSpreadingFactor(uint8_t sf);
 
     /**
      * Set the first window frequency of this device.
      *
-     * \param frequencyHz The frequency [Hz].
+     * @param frequencyHz The frequency [Hz].
      */
     void SetFirstReceiveWindowFrequency(uint32_t frequencyHz);
 
     /**
      * Set the spreading factor this device is using in the second receive window.
      *
-     * \param sf The spreading factor.
+     * @param sf The spreading factor.
      */
     void SetSecondReceiveWindowSpreadingFactor(uint8_t sf);
 
     /**
      * Set the second window frequency of this device.
      *
-     * \param frequencyHz The frequency [Hz].
+     * @param frequencyHz The frequency [Hz].
      */
     void SetSecondReceiveWindowFrequency(uint32_t frequencyHz);
 
     /**
      * Set the reply packet mac header.
      *
-     * \param macHeader The mac header (MHDR).
+     * @param macHeader The mac header (MHDR).
      */
     void SetReplyMacHeader(LorawanMacHeader macHeader);
 
     /**
      * Set the reply packet frame header.
      *
-     * \param frameHeader The frame header (FHDR + FPort).
+     * @param frameHeader The frame header (FHDR + FPort).
      */
     void SetReplyFrameHeader(LoraFrameHeader frameHeader);
 
     /**
      * Set the packet reply payload.
      *
-     * \param replyPayload Packet containing the FRMPayload.
+     * @param replyPayload Packet containing the FRMPayload.
      */
     void SetReplyPayload(Ptr<Packet> replyPayload);
 
     /**
      * Get the MAC layer of the end device.
      *
-     * \return A pointer to the MAC layer.
+     * @return A pointer to the MAC layer.
      */
     Ptr<ClassAEndDeviceLorawanMac> GetMac();
 
@@ -283,15 +283,15 @@ class EndDeviceStatus : public Object
     /**
      * Insert a received packet in the packet list.
      *
-     * \param receivedPacket The packet received.
-     * \param gwAddress The address of the receiver gateway.
+     * @param receivedPacket The packet received.
+     * @param gwAddress The address of the receiver gateway.
      */
     void InsertReceivedPacket(Ptr<const Packet> receivedPacket, const Address& gwAddress);
 
     /**
      * Return the last packet that was received from this device.
      *
-     * \return The last received packet.
+     * @return The last received packet.
      */
     Ptr<const Packet> GetLastPacketReceivedFromDevice();
 
@@ -299,7 +299,7 @@ class EndDeviceStatus : public Object
      * Return the information about the last packet that was received from the
      * device.
      *
-     * \return The information about the last received packet.
+     * @return The information about the last received packet.
      */
     EndDeviceStatus::ReceivedPacketInfo GetLastReceivedPacketInfo();
 
@@ -311,21 +311,21 @@ class EndDeviceStatus : public Object
     /**
      * Add MAC command to the frame header of next reply.
      *
-     * \param macCommand The MAC command.
+     * @param macCommand The MAC command.
      */
     void AddMACCommand(Ptr<MacCommand> macCommand);
 
     /**
      * Check if there is already a running reception window event scheduled for this end device.
      *
-     * \return True if a reception window event is already scheduled, false otherwise.
+     * @return True if a reception window event is already scheduled, false otherwise.
      */
     bool HasReceiveWindowOpportunityScheduled();
 
     /**
      * Store next scheduled reception window event.
      *
-     * \param event The event.
+     * @param event The event.
      */
     void SetReceiveWindowOpportunity(EventId event);
 
@@ -338,7 +338,7 @@ class EndDeviceStatus : public Object
      * Get the gateways which received the last packet from the end device. Gateways are mapped
      * to their measured reception power of the last packet, in ascending order.
      *
-     * \return The ordered map of reception power values and gateways.
+     * @return The ordered map of reception power values and gateways.
      */
     std::map<double, Address> GetPowerGatewayMap();
 
@@ -348,9 +348,9 @@ class EndDeviceStatus : public Object
     /**
      * Stream insertion operator.
      *
-     * \param os The stream.
-     * \param status The status.
-     * \return A reference to the stream.
+     * @param os The stream.
+     * @param status The status.
+     * @return A reference to the stream.
      */
     friend std::ostream& operator<<(std::ostream& os, const EndDeviceStatus& status);
 
@@ -364,7 +364,7 @@ class EndDeviceStatus : public Object
 
     ReceivedPacketList m_receivedPacketList; //!< List of received packets
 
-    /// \note Using this attribute is 'cheating', since we are assuming perfect
+    /// @note Using this attribute is 'cheating', since we are assuming perfect
     /// synchronization between the info at the device and at the network server
     Ptr<ClassAEndDeviceLorawanMac> m_mac; //!< Pointer to the MAC layer of this device
 };

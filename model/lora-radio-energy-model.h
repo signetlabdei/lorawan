@@ -24,7 +24,7 @@ namespace lorawan
 using namespace energy;
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Installable listener for LoRa physiscal layer state changes
  */
@@ -42,14 +42,14 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
     /**
      * Sets the change state callback. Used by helper class.
      *
-     * \param callback Change state callback.
+     * @param callback Change state callback.
      */
     void SetChangeStateCallback(DeviceEnergyModel::ChangeStateCallback callback);
 
     /**
      * Sets the update tx current callback.
      *
-     * \param callback Update tx current callback.
+     * @param callback Update tx current callback.
      */
     void SetUpdateTxCurrentCallback(UpdateTxCurrentCallback callback);
 
@@ -64,7 +64,7 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
      * Switches the LoraRadioEnergyModel to TX state and switches back to
      * STANDBY after TX duration.
      *
-     * \param txPowerDbm The nominal tx power in dBm.
+     * @param txPowerDbm The nominal tx power in dBm.
      *
      * Defined in ns3::LoraEndDevicePhyListener.
      */
@@ -100,7 +100,7 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * A LoRa radio energy model.
  *
@@ -134,7 +134,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
 
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -144,14 +144,14 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
     /**
      * Sets pointer to EnergySouce installed on node.
      *
-     * \param source Pointer to EnergySource installed on node.
+     * @param source Pointer to EnergySource installed on node.
      *
      * Implements DeviceEnergyModel::SetEnergySource.
      */
     void SetEnergySource(Ptr<EnergySource> source) override;
 
     /**
-     * \return Total energy consumption of the wifi device.
+     * @return Total energy consumption of the wifi device.
      *
      * Implements DeviceEnergyModel::GetTotalEnergyConsumption.
      */
@@ -161,73 +161,73 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
     /**
      * Gets idle current.
      *
-     * \return Idle current [A] of the lora device.
+     * @return Idle current [A] of the lora device.
      */
     double GetStandbyCurrentA() const;
     /**
      * Sets idle current.
      *
-     * \param idleCurrentA The idle current [A].
+     * @param idleCurrentA The idle current [A].
      */
     void SetStandbyCurrentA(double idleCurrentA);
     /**
      * Gets transmit current.
      *
-     * \return Transmit current [A] of the lora device.
+     * @return Transmit current [A] of the lora device.
      */
     double GetTxCurrentA() const;
     /**
      * Sets transmit current.
      *
-     * \param txCurrentA The transmit current [A].
+     * @param txCurrentA The transmit current [A].
      */
     void SetTxCurrentA(double txCurrentA);
     /**
      * Gets receive current.
      *
-     * \return Receive current [A] of the lora device.
+     * @return Receive current [A] of the lora device.
      */
     double GetRxCurrentA() const;
     /**
      * Sets receive current.
      *
-     * \param rxCurrentA The receive current [A].
+     * @param rxCurrentA The receive current [A].
      */
     void SetRxCurrentA(double rxCurrentA);
     /**
      * Gets sleep current.
      *
-     * \return Sleep current [A] of the lora device.
+     * @return Sleep current [A] of the lora device.
      */
     double GetSleepCurrentA() const;
     /**
      * Sets sleep current.
      *
-     * \param sleepCurrentA The sleep current [A].
+     * @param sleepCurrentA The sleep current [A].
      */
     void SetSleepCurrentA(double sleepCurrentA);
 
     /**
-     * \return Current state.
+     * @return Current state.
      */
     EndDeviceLoraPhy::State GetCurrentState() const;
 
     /**
-     * \param callback Callback function.
+     * @param callback Callback function.
      *
      * Sets callback for energy depletion handling.
      */
     void SetEnergyDepletionCallback(LoraRadioEnergyDepletionCallback callback);
 
     /**
-     * \param callback Callback function.
+     * @param callback Callback function.
      *
      * Sets callback for energy recharged handling.
      */
     void SetEnergyRechargedCallback(LoraRadioEnergyRechargedCallback callback);
 
     /**
-     * \param model The model used to compute the lora tx current.
+     * @param model The model used to compute the lora tx current.
      */
     // NOTICE VERY WELL: Current  Model linear or constant as possible choices
     void SetTxCurrentModel(Ptr<LoraTxCurrentModel> model);
@@ -236,7 +236,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
      * Calls the CalcTxCurrent method of the tx current model to
      *        compute the tx current based on such model.
      *
-     * \param txPowerDbm The nominal tx power in dBm.
+     * @param txPowerDbm The nominal tx power in dBm.
      */
     // NOTICE VERY WELL: Current  Model linear or constant as possible choices
     void SetTxCurrentFromModel(double txPowerDbm);
@@ -244,7 +244,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
     /**
      * Changes state of the LoraRadioEnergyMode.
      *
-     * \param newState New state the lora radio is in.
+     * @param newState New state the lora radio is in.
      *
      * Implements DeviceEnergyModel::ChangeState.
      */
@@ -272,7 +272,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
     void HandleEnergyRecharged() override;
 
     /**
-     * \return Pointer to the PHY listener.
+     * @return Pointer to the PHY listener.
      */
     LoraRadioEnergyModelPhyListener* GetPhyListener();
 
@@ -280,14 +280,14 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
     void DoDispose() override;
 
     /**
-     * \return Current draw of device, at current state.
+     * @return Current draw of device, at current state.
      *
      * Implements DeviceEnergyModel::GetCurrentA.
      */
     double DoGetCurrentA() const override;
 
     /**
-     * \param state New state the radio device is currently in.
+     * @param state New state the radio device is currently in.
      *
      * Sets current state. This function is private so that only the energy model
      * can change its own state.

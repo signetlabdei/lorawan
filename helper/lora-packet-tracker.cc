@@ -44,7 +44,7 @@ LoraPacketTracker::MacTransmissionCallback(Ptr<const Packet> packet)
 
         MacPacketStatus status;
         status.packet = packet;
-        status.sendTime = Simulator::Now();
+        status.sendTime = Now();
         status.senderId = Simulator::GetContext();
         status.receivedTime = Time::Max();
 
@@ -60,11 +60,11 @@ LoraPacketTracker::RequiredTransmissionsCallback(uint8_t reqTx,
 {
     NS_LOG_INFO("Finished retransmission attempts for a packet");
     NS_LOG_DEBUG("Packet: " << packet << "ReqTx " << unsigned(reqTx) << ", succ: " << success
-                            << ", firstAttempt: " << firstAttempt.GetSeconds());
+                            << ", firstAttempt: " << firstAttempt.As(Time::S));
 
     RetransmissionStatus entry;
     entry.firstAttempt = firstAttempt;
-    entry.finishTime = Simulator::Now();
+    entry.finishTime = Now();
     entry.reTxAttempts = reqTx;
     entry.successful = success;
 
@@ -84,7 +84,7 @@ LoraPacketTracker::MacGwReceptionCallback(Ptr<const Packet> packet)
         if (it != m_macPacketTracker.end())
         {
             (*it).second.receptionTimes.insert(
-                std::pair<int, Time>(Simulator::GetContext(), Simulator::Now()));
+                std::pair<int, Time>(Simulator::GetContext(), Now()));
         }
         else
         {
@@ -106,7 +106,7 @@ LoraPacketTracker::TransmissionCallback(Ptr<const Packet> packet, uint32_t edId)
         // Create a packetStatus
         PacketStatus status;
         status.packet = packet;
-        status.sendTime = Simulator::Now();
+        status.sendTime = Now();
         status.senderId = edId;
 
         m_packetTracker.insert(std::pair<Ptr<const Packet>, PacketStatus>(packet, status));

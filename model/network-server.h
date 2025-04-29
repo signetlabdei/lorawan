@@ -31,7 +31,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * The NetworkServer is an application standing on top of a node equipped with
  * links that connect it with the gateways.
@@ -44,7 +44,7 @@ class NetworkServer : public Application
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -67,7 +67,7 @@ class NetworkServer : public Application
      * This method will create a DeviceStatus object for each new node, and add
      * it to the list.
      *
-     * \param nodes The end device NodeContainer.
+     * @param nodes The end device NodeContainer.
      */
     void AddNodes(NodeContainer nodes);
 
@@ -77,7 +77,7 @@ class NetworkServer : public Application
      * This method will create a DeviceStatus object for the new node (if it
      * doesn't already exist).
      *
-     * \param node The end device Node.
+     * @param node The end device Node.
      */
     void AddNode(Ptr<Node> node);
 
@@ -87,15 +87,15 @@ class NetworkServer : public Application
      * Each gateway is identified by its Address in the network connecting it to the network
      * server.
      *
-     * \param gateway A pointer to the gateway Node.
-     * \param netDevice A pointer to the network server's NetDevice connected to the gateway.
+     * @param gateway A pointer to the gateway Node.
+     * @param netDevice A pointer to the network server's NetDevice connected to the gateway.
      */
     void AddGateway(Ptr<Node> gateway, Ptr<NetDevice> netDevice);
 
     /**
      * Add a NetworkControllerComponent to this NetworkServer application.
      *
-     * \param component A pointer to the NetworkControllerComponent object.
+     * @param component A pointer to the NetworkControllerComponent object.
      */
     void AddComponent(Ptr<NetworkControllerComponent> component);
 
@@ -104,7 +104,7 @@ class NetworkServer : public Application
      *
      * This function is meant to be provided to NetDevice objects as a ReceiveCallback.
      *
-     * \copydoc ns3::NetDevice::ReceiveCallback
+     * @copydoc ns3::NetDevice::ReceiveCallback
      */
     bool Receive(Ptr<NetDevice> device,
                  Ptr<const Packet> packet,
@@ -114,7 +114,7 @@ class NetworkServer : public Application
     /**
      * Get the NetworkStatus object of this NetworkServer application.
      *
-     * \return A pointer to the NetworkStatus object.
+     * @return A pointer to the NetworkStatus object.
      */
     Ptr<NetworkStatus> GetNetworkStatus();
 

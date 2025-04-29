@@ -26,7 +26,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Class representing the MAC layer of a Class A LoRaWAN device.
  */
@@ -35,7 +35,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -49,7 +49,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /**
      * Add headers and send a packet with the sending function of the physical layer.
      *
-     * \param packet The packet to send.
+     * @param packet The packet to send.
      */
     void SendToPhy(Ptr<Packet> packet) override;
 
@@ -63,12 +63,25 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      * This method is typically registered as a callback in the underlying PHY
      * layer so that it's called when a packet is going up the stack.
      *
-     * \param packet The received packet.
+     * @param packet The received packet.
      */
     void Receive(Ptr<const Packet> packet) override;
 
+    /**
+     * Function called by lower layers to inform this layer that reception of a
+     * packet we were locked on failed.
+     *
+     * @param packet The packet we failed to receive.
+     */
     void FailedReception(Ptr<const Packet> packet) override;
 
+    /**
+     * Perform the actions that are required after a packet send.
+     *
+     * This function handles opening of the first receive window.
+     *
+     * @param packet The packet that has just been transmitted.
+     */
     void TxFinished(Ptr<const Packet> packet) override;
 
     /**
@@ -96,47 +109,47 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /////////////////////////
 
     /**
-     * Find the minimum waiting time before the next possible transmission based
+     * Find the minimum wait time before the next possible transmission based
      * on end device's Class Type.
      *
-     * \param waitingTime The minimum waiting time that has to be respected,
+     * @param waitTime The minimum wait time that has to be respected,
      * irrespective of the class (e.g., because of duty cycle limitations).
-     * \return The Time value.
+     * @return The Time value.
      */
-    Time GetNextClassTransmissionDelay(Time waitingTime) override;
+    Time GetNextClassTransmissionDelay(Time waitTime) override;
 
     /**
      * Get the data rate that will be used in the first receive window.
      *
-     * \return The data rate.
+     * @return The data rate.
      */
     uint8_t GetFirstReceiveWindowDataRate();
 
     /**
      * Set the data rate to be used in the second receive window.
      *
-     * \param dataRate The data rate.
+     * @param dataRate The data rate.
      */
     void SetSecondReceiveWindowDataRate(uint8_t dataRate);
 
     /**
      * Get the data rate that will be used in the second receive window.
      *
-     * \return The data rate.
+     * @return The data rate.
      */
     uint8_t GetSecondReceiveWindowDataRate() const;
 
     /**
      * Set the frequency that will be used for the second receive window.
      *
-     * \param frequencyHz The Frequency.
+     * @param frequencyHz The Frequency.
      */
     void SetSecondReceiveWindowFrequency(uint32_t frequencyHz);
 
     /**
      * Get the frequency that is used for the second receive window.
      *
-     * \return The frequency, in Hz.
+     * @return The frequency, in Hz.
      */
     uint32_t GetSecondReceiveWindowFrequency() const;
 
@@ -144,16 +157,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     // MAC command methods //
     /////////////////////////
 
-    /**
-     * Perform the actions that need to be taken when receiving a RxParamSetupReq
-     * command based on the Device's Class Type.
-     *
-     * \param rxParamSetupReq The Parameter Setup Request, which contains:
-     *                            - The offset to set.
-     *                            - The data rate to use for the second receive window.
-     *                            - The frequency to use for the second receive window.
-     */
-    void OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq) override;
+    void OnRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequencyHz) override;
 
   private:
     Time m_receiveDelay1; //!< The interval between when a packet is done sending and when the first

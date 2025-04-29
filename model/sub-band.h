@@ -12,40 +12,29 @@
 #include "logical-lora-channel.h"
 
 #include "ns3/nstime.h"
-#include "ns3/object.h"
+#include "ns3/simple-ref-count.h"
 
 namespace ns3
 {
 namespace lorawan
 {
 
-class LogicalLoraChannel;
-
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Class representing a SubBand, i.e., a frequency band subject to some
  * regulations on duty cycle and transmission power.
  */
-class SubBand : public Object
+class SubBand : public SimpleRefCount<SubBand>
 {
   public:
     /**
-     *  Register this type.
-     *  \return The object TypeId.
-     */
-    static TypeId GetTypeId();
-
-    SubBand();           //!< Default constructor
-    ~SubBand() override; //!< Destructor
-
-    /**
      * Create a new SubBand by specifying all of its properties.
      *
-     * \param firstFrequencyHz The SubBand's lowest frequency [Hz].
-     * \param lastFrequencyHz The SubBand's highest frequency [Hz].
-     * \param dutyCycle The duty cycle (as a fraction) allowed on this SubBand.
-     * \param maxTxPowerDbm The maximum transmission power [dBm] allowed on this SubBand.
+     * @param firstFrequencyHz The SubBand's lowest frequency [Hz].
+     * @param lastFrequencyHz The SubBand's highest frequency [Hz].
+     * @param dutyCycle The duty cycle (as a fraction) allowed on this SubBand.
+     * @param maxTxPowerDbm The maximum transmission power [dBm] allowed on this SubBand.
      */
     SubBand(uint32_t firstFrequencyHz,
             uint32_t lastFrequencyHz,
@@ -55,21 +44,21 @@ class SubBand : public Object
     /**
      * Get the lowest frequency of the SubBand.
      *
-     * \return The lowest frequency [Hz] of the SubBand.
+     * @return The lowest frequency [Hz] of the SubBand.
      */
     uint32_t GetFirstFrequency() const;
 
-    ///**
-    // * Get the last frequency of the subband.
-    // *
-    // * \return The lowest frequency [Hz] of the SubBand.
-    // */
-    // uint32_t GetLastFrequency ();
+    /**
+     * Get the highest frequency of the SubBand.
+     *
+     * @return The highest frequency [Hz] of the SubBand.
+     */
+    uint32_t GetLastFrequency() const;
 
     /**
      * Get the duty cycle of the subband.
      *
-     * \return The duty cycle (as a fraction) that needs to be enforced on this
+     * @return The duty cycle (as a fraction) that needs to be enforced on this
      * SubBand.
      */
     double GetDutyCycle() const;
@@ -80,7 +69,7 @@ class SubBand : public Object
      * This function is used by LogicalLoraChannelHelper, which computes the time
      * based on the SubBand's duty cycle and on the transmission duration.
      *
-     * \param nextTime The future time from which transmission should be allowed
+     * @param nextTime The future time from which transmission should be allowed
      * again.
      */
     void SetNextTransmissionTime(Time nextTime);
@@ -89,7 +78,7 @@ class SubBand : public Object
      * Returns the next time from which transmission on this subband will be
      * possible.
      *
-     * \return The next time at which transmission in this SubBand will be
+     * @return The next time at which transmission in this SubBand will be
      * allowed.
      */
     Time GetNextTransmissionTime();
@@ -97,32 +86,32 @@ class SubBand : public Object
     /**
      * Return whether or not a frequency belongs to this SubBand.
      *
-     * \param frequencyHz The frequency [Hz] we want to test against the current subband.
-     * \return True if the frequency is between firstFrequencyHz and lastFrequencyHz,
+     * @param frequencyHz The frequency [Hz] we want to test against the current subband.
+     * @return True if the frequency is between firstFrequencyHz and lastFrequencyHz,
      * false otherwise.
      */
-    bool BelongsToSubBand(uint32_t frequencyHz) const;
+    bool Contains(uint32_t frequencyHz) const;
 
     /**
      * Return whether or not a channel belongs to this SubBand.
      *
-     * \param channel The channel we want to test against the current subband.
-     * \return True if the channel's center frequency is between firstFrequencyHz
-     * and lastFrequencyHz, false otherwise.
+     * @param channel The channel we want to test against the current subband.
+     * @return Whether the channel's center frequency is between the first and last frequency of the
+     * sub-band, margins excluded.
      */
-    bool BelongsToSubBand(Ptr<LogicalLoraChannel> channel) const;
+    bool Contains(Ptr<const LogicalLoraChannel> channel) const;
 
     /**
      * Set the maximum transmission power that is allowed on this SubBand.
      *
-     * \param maxTxPowerDbm The maximum transmission power [dBm] to set.
+     * @param maxTxPowerDbm The maximum transmission power [dBm] to set.
      */
     void SetMaxTxPowerDbm(double maxTxPowerDbm);
 
     /**
      * Return the maximum transmission power that is allowed on this SubBand.
      *
-     * \return The maximum transmission power, in dBm.
+     * @return The maximum transmission power, in dBm.
      */
     double GetMaxTxPowerDbm() const;
 

@@ -10,7 +10,7 @@ on:
 
 jobs:
   # Clang-tidy
-  clang-tidy-18:
+  clang-tidy-19:
     runs-on: ubuntu-latest
     container:
       image: ubuntu:rolling
@@ -28,7 +28,7 @@ jobs:
         run: >
           apt update && DEBIAN_FRONTEND=noninteractive apt install -y
           clang cmake
-          clang-tidy clang-tidy-18
+          clang-tidy clang-tidy-19
           git wget
       - name: "Checkout this repository as ns-3 module"
         uses: ./.github/actions/checkout-in-ns3
@@ -49,13 +49,13 @@ jobs:
         run: >
           if [[ $GITHUB_REF_NAME == $CI_DEFAULT_BRANCH ]] ; then
           echo "Running full clang-tidy" ;
-          run-clang-tidy-18 -p cmake-cache/ -quiet "src\/lorawan\/.+\.(cpp|cc|cxx|c|h|hpp)"
+          run-clang-tidy-19 -p cmake-cache/ -quiet "src\/lorawan\/.+\.(cpp|cc|cxx|c|h|hpp)"
           1> $CLANG_TIDY_OUTPUT
           2> /dev/null ;
           else
           echo "Running clang-tidy-diff" ;
           git -C src/lorawan/ diff -U0 upstream/$CI_DEFAULT_BRANCH --src-prefix=a/src/lorawan/ --dst-prefix=b/src/lorawan/ |
-          clang-tidy-diff-18.py -path cmake-cache/ -p1 -quiet -use-color -iregex "src\/lorawan\/.+\.(cpp|cc|cxx|c|h|hpp)"
+          clang-tidy-diff-19.py -path cmake-cache/ -p1 -quiet -use-color -iregex "src\/lorawan\/.+\.(cpp|cc|cxx|c|h|hpp)"
           1> $CLANG_TIDY_OUTPUT
           2> /dev/null || true ;
           fi

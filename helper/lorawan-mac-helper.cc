@@ -63,7 +63,7 @@ LorawanMacHelper::SetRegion(enum LorawanMacHelper::Regions region)
 }
 
 Ptr<LorawanMac>
-LorawanMacHelper::Create(Ptr<Node> node, Ptr<NetDevice> device) const
+LorawanMacHelper::Install(Ptr<Node> node, Ptr<NetDevice> device) const
 {
     Ptr<LorawanMac> mac = m_mac.Create<LorawanMac>();
     mac->SetDevice(device);
@@ -132,10 +132,10 @@ LorawanMacHelper::ConfigureForAlohaRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) 
 
     ApplyCommonAlohaConfigurations(edMac);
 
-    /////////////////////////////////////////////////////
-    // TxPower -> Transmission power in dBm conversion //
-    /////////////////////////////////////////////////////
-    edMac->SetTxDbmForTxPower(std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
+    /////////////////////////////////////////////////////////
+    // TxPower -> Transmission power in dBm ERP conversion //
+    /////////////////////////////////////////////////////////
+    edMac->SetTxDbmForTxPower(std::vector<double>{14, 12, 10, 8, 6, 4, 2, 0});
 
     ////////////////////////////////////////////////////////////
     // Matrix to know which data rate the gateway will respond with //
@@ -200,14 +200,14 @@ LorawanMacHelper::ApplyCommonAlohaConfigurations(Ptr<LorawanMac> lorawanMac) con
     // SubBands //
     //////////////
 
-    LogicalLoraChannelHelper channelHelper;
-    channelHelper.AddSubBand(868000000, 868600000, 1, 14);
+    auto channelHelper = Create<LogicalLoraChannelHelper>(1);
+    channelHelper->AddSubBand(Create<SubBand>(868000000, 868600000, 1, 14));
 
     //////////////////////
     // Default channels //
     //////////////////////
-    Ptr<LogicalLoraChannel> lc1 = CreateObject<LogicalLoraChannel>(868100000, 0, 5);
-    channelHelper.AddChannel(lc1);
+    Ptr<LogicalLoraChannel> lc1 = Create<LogicalLoraChannel>(868100000, 0, 5);
+    channelHelper->SetChannel(0, lc1);
 
     lorawanMac->SetLogicalLoraChannelHelper(channelHelper);
 
@@ -229,10 +229,10 @@ LorawanMacHelper::ConfigureForEuRegion(Ptr<ClassAEndDeviceLorawanMac> edMac) con
 
     ApplyCommonEuConfigurations(edMac);
 
-    /////////////////////////////////////////////////////
-    // TxPower -> Transmission power in dBm conversion //
-    /////////////////////////////////////////////////////
-    edMac->SetTxDbmForTxPower(std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
+    /////////////////////////////////////////////////////////
+    // TxPower -> Transmission power in dBm ERP conversion //
+    /////////////////////////////////////////////////////////
+    edMac->SetTxDbmForTxPower(std::vector<double>{14, 12, 10, 8, 6, 4, 2, 0});
 
     ////////////////////////////////////////////////////////////
     // Matrix to know which data rate the gateway will respond with //
@@ -306,20 +306,23 @@ LorawanMacHelper::ApplyCommonEuConfigurations(Ptr<LorawanMac> lorawanMac) const
     // SubBands //
     //////////////
 
-    LogicalLoraChannelHelper channelHelper;
-    channelHelper.AddSubBand(868000000, 868600000, 0.01, 14);
-    channelHelper.AddSubBand(868700000, 869200000, 0.001, 14);
-    channelHelper.AddSubBand(869400000, 869650000, 0.1, 27);
+    auto channelHelper = Create<LogicalLoraChannelHelper>(16);
+    channelHelper->AddSubBand(Create<SubBand>(863000000, 865000000, 0.001, 14));
+    channelHelper->AddSubBand(Create<SubBand>(865000000, 868000000, 0.01, 14));
+    channelHelper->AddSubBand(Create<SubBand>(868000000, 868600000, 0.01, 14));
+    channelHelper->AddSubBand(Create<SubBand>(868700000, 869200000, 0.001, 14));
+    channelHelper->AddSubBand(Create<SubBand>(869400000, 869650000, 0.1, 27));
+    channelHelper->AddSubBand(Create<SubBand>(869700000, 870000000, 0.01, 14));
 
     //////////////////////
     // Default channels //
     //////////////////////
-    Ptr<LogicalLoraChannel> lc1 = CreateObject<LogicalLoraChannel>(868100000, 0, 5);
-    Ptr<LogicalLoraChannel> lc2 = CreateObject<LogicalLoraChannel>(868300000, 0, 5);
-    Ptr<LogicalLoraChannel> lc3 = CreateObject<LogicalLoraChannel>(868500000, 0, 5);
-    channelHelper.AddChannel(lc1);
-    channelHelper.AddChannel(lc2);
-    channelHelper.AddChannel(lc3);
+    Ptr<LogicalLoraChannel> lc1 = Create<LogicalLoraChannel>(868100000, 0, 5);
+    Ptr<LogicalLoraChannel> lc2 = Create<LogicalLoraChannel>(868300000, 0, 5);
+    Ptr<LogicalLoraChannel> lc3 = Create<LogicalLoraChannel>(868500000, 0, 5);
+    channelHelper->SetChannel(0, lc1);
+    channelHelper->SetChannel(1, lc2);
+    channelHelper->SetChannel(2, lc3);
 
     lorawanMac->SetLogicalLoraChannelHelper(channelHelper);
 
@@ -343,10 +346,10 @@ LorawanMacHelper::ConfigureForSingleChannelRegion(Ptr<ClassAEndDeviceLorawanMac>
 
     ApplyCommonSingleChannelConfigurations(edMac);
 
-    /////////////////////////////////////////////////////
-    // TxPower -> Transmission power in dBm conversion //
-    /////////////////////////////////////////////////////
-    edMac->SetTxDbmForTxPower(std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
+    /////////////////////////////////////////////////////////
+    // TxPower -> Transmission power in dBm ERP conversion //
+    /////////////////////////////////////////////////////////
+    edMac->SetTxDbmForTxPower(std::vector<double>{14, 12, 10, 8, 6, 4, 2, 0});
 
     ////////////////////////////////////////////////////////////
     // Matrix to know which DataRate the gateway will respond with //
@@ -418,16 +421,14 @@ LorawanMacHelper::ApplyCommonSingleChannelConfigurations(Ptr<LorawanMac> lorawan
     // SubBands //
     //////////////
 
-    LogicalLoraChannelHelper channelHelper;
-    channelHelper.AddSubBand(868000000, 868600000, 0.01, 14);
-    channelHelper.AddSubBand(868700000, 869200000, 0.001, 14);
-    channelHelper.AddSubBand(869400000, 869650000, 0.1, 27);
+    auto channelHelper = Create<LogicalLoraChannelHelper>(1);
+    channelHelper->AddSubBand(Create<SubBand>(868000000, 868600000, 0.01, 14));
 
     //////////////////////
     // Default channels //
     //////////////////////
-    Ptr<LogicalLoraChannel> lc1 = CreateObject<LogicalLoraChannel>(868100000, 0, 5);
-    channelHelper.AddChannel(lc1);
+    Ptr<LogicalLoraChannel> lc1 = Create<LogicalLoraChannel>(868100000, 0, 5);
+    channelHelper->SetChannel(0, lc1);
 
     lorawanMac->SetLogicalLoraChannelHelper(channelHelper);
 

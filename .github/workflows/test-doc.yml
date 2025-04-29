@@ -33,7 +33,7 @@ jobs:
         run: ./ns3 build assemble-introspected-command-line
       - name: "Check documentation coverage and formatting"
         run: |
-          doc/doxygen.warnings.report.sh -i -m lorawan
+          doc/doxygen.warnings.report.sh -m lorawan
           python3 utils/check-style-clang-format.py --no-formatting --no-tabs doc/introspected-doxygen.h doc/introspected-command-line.h
           ./ns3 clean
           doxygen -v

@@ -84,14 +84,14 @@ LorawanMac::SetPhy(Ptr<LoraPhy> phy)
     m_phy->SetTxFinishedCallback(MakeCallback(&LorawanMac::TxFinished, this));
 }
 
-LogicalLoraChannelHelper
+Ptr<LogicalLoraChannelHelper>
 LorawanMac::GetLogicalLoraChannelHelper()
 {
     return m_channelHelper;
 }
 
 void
-LorawanMac::SetLogicalLoraChannelHelper(LogicalLoraChannelHelper helper)
+LorawanMac::SetLogicalLoraChannelHelper(Ptr<LogicalLoraChannelHelper> helper)
 {
     m_channelHelper = helper;
 }
@@ -129,9 +129,9 @@ LorawanMac::GetDbmForTxPower(uint8_t txPower)
 {
     NS_LOG_FUNCTION(this << unsigned(txPower));
 
-    if (txPower > m_txDbmForTxPower.size())
+    if (txPower > m_txDbmForTxPower.size() - 1)
     {
-        return 0;
+        return -1;
     }
 
     return m_txDbmForTxPower.at(txPower);

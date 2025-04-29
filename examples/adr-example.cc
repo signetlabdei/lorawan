@@ -41,8 +41,8 @@ NS_LOG_COMPONENT_DEFINE("AdrExample");
 /**
  * Record a change in the data rate setting on an end device.
  *
- * \param oldDr The previous data rate value.
- * \param newDr The updated data rate value.
+ * @param oldDr The previous data rate value.
+ * @param newDr The updated data rate value.
  */
 void
 OnDataRateChange(uint8_t oldDr, uint8_t newDr)
@@ -53,8 +53,8 @@ OnDataRateChange(uint8_t oldDr, uint8_t newDr)
 /**
  * Record a change in the transmission power setting on an end device.
  *
- * \param oldTxPower The previous transmission power value.
- * \param newTxPower The updated transmission power value.
+ * @param oldTxPower The previous transmission power value.
+ * @param newTxPower The updated transmission power value.
  */
 void
 OnTxPowerChange(double oldTxPower, double newTxPower)
@@ -73,7 +73,7 @@ main(int argc, char* argv[])
     double mobileNodeProbability = 0;
     double sideLengthMeters = 10000;
     int gatewayDistanceMeters = 5000;
-    double maxRandomLossDB = 10;
+    double maxRandomLossDb = 10;
     double minSpeedMetersPerSecond = 2;
     double maxSpeedMetersPerSecond = 16;
     std::string adrType = "ns3::AdrComponent";
@@ -98,7 +98,7 @@ main(int argc, char* argv[])
                  sideLengthMeters);
     cmd.AddValue("maxRandomLoss",
                  "Maximum amount (dB) of the random loss component",
-                 maxRandomLossDB);
+                 maxRandomLossDb);
     cmd.AddValue("gatewayDistance", "Distance (m) between gateways", gatewayDistanceMeters);
     cmd.AddValue("initializeSF", "Whether to initialize the SFs", initializeSF);
     cmd.AddValue("MinSpeed", "Minimum speed (m/s) for mobile devices", minSpeedMetersPerSecond);
@@ -132,7 +132,7 @@ main(int argc, char* argv[])
 
     // Set the end devices to allow data rate control (i.e. adaptive data rate) from the network
     // server
-    Config::SetDefault("ns3::EndDeviceLorawanMac::DRControl", BooleanValue(true));
+    Config::SetDefault("ns3::EndDeviceLorawanMac::ADR", BooleanValue(true));
 
     // Create a simple wireless channel
     ///////////////////////////////////
@@ -143,7 +143,7 @@ main(int argc, char* argv[])
 
     Ptr<UniformRandomVariable> x = CreateObject<UniformRandomVariable>();
     x->SetAttribute("Min", DoubleValue(0.0));
-    x->SetAttribute("Max", DoubleValue(maxRandomLossDB));
+    x->SetAttribute("Max", DoubleValue(maxRandomLossDb));
 
     Ptr<RandomPropagationLossModel> randomLoss = CreateObject<RandomPropagationLossModel>();
     randomLoss->SetAttribute("Variable", PointerValue(x));

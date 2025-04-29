@@ -20,7 +20,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Propagation loss model for spatially correlated shadowing in a city
  */
@@ -38,8 +38,8 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
         /**
          * Construct a new Position object with values.
          *
-         * \param x The x coordinate.
-         * \param y The y coordinate.
+         * @param x The x coordinate.
+         * @param y The y coordinate.
          */
         Position(double x, double y);
 
@@ -49,22 +49,22 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
         /**
          * Equality comparison operator
          *
-         * \param other Second Position to compare this instance to.
-         * \return True if the positions are equal.
+         * @param other Second Position to compare this instance to.
+         * @return True if the positions are equal.
          */
         bool operator==(const Position& other) const;
         /**
          * Less-then comparison operator
          *
-         * \param other Second Position to compare this instance to.
-         * \return True if either the x or y coordinate of first Position is less than the
+         * @param other Second Position to compare this instance to.
+         * @return True if either the x or y coordinate of first Position is less than the
          * respective one of the second Position
          */
         bool operator<(const Position& other) const;
     };
 
     /**
-     * \ingroup lorawan
+     * @ingroup lorawan
      *
      * This initializes the shadowing map with a grid of independent
      * shadowing values, one m_correlationDistance meters apart from the next
@@ -99,8 +99,8 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
          * If the position is not already in the map, add it by computing the
          * interpolation of neighboring shadowing values belonging to the grid.
          *
-         * \param position The Position instance.
-         * \return The loss as a double.
+         * @param position The Position instance.
+         * @return The loss as a double.
          */
         double GetLoss(CorrelatedShadowingPropagationLossModel::Position position);
 
@@ -133,7 +133,7 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
 
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 

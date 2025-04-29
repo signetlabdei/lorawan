@@ -26,7 +26,7 @@ namespace lorawan
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Class representing the MAC layer of a LoRaWAN device.
  */
@@ -35,7 +35,7 @@ class EndDeviceLorawanMac : public LorawanMac
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -51,7 +51,7 @@ class EndDeviceLorawanMac : public LorawanMac
      *
      * The MAC layer of the end device will take care of using the right parameters.
      *
-     * \param packet The packet to send.
+     * @param packet The packet to send.
      */
     void Send(Ptr<Packet> packet) override;
 
@@ -59,14 +59,14 @@ class EndDeviceLorawanMac : public LorawanMac
      * Checking if we are performing the transmission of a new packet or a retransmission, and call
      * SendToPhy function.
      *
-     * \param packet The packet to send.
+     * @param packet The packet to send.
      */
     virtual void DoSend(Ptr<Packet> packet);
 
     /**
      * Add headers and send a packet with the sending function of the physical layer.
      *
-     * \param packet The packet to send.
+     * @param packet The packet to send.
      */
     virtual void SendToPhy(Ptr<Packet> packet);
 
@@ -74,8 +74,8 @@ class EndDeviceLorawanMac : public LorawanMac
      * Postpone transmission to the specified time and delete previously scheduled transmissions if
      * present.
      *
-     * \param nextTxDelay Delay at which the transmission will be performed.
-     * \param packet The packet to delay the transmission of.
+     * @param nextTxDelay Delay at which the transmission will be performed.
+     * @param packet The packet to delay the transmission of.
      */
     virtual void postponeTransmission(Time nextTxDelay, Ptr<Packet> packet);
 
@@ -83,25 +83,10 @@ class EndDeviceLorawanMac : public LorawanMac
     // Receiving methods //
     ///////////////////////
 
-    /**
-     * Receive a packet.
-     *
-     * This method is typically registered as a callback in the underlying PHY
-     * layer so that it's called when a packet is going up the stack.
-     *
-     * \param packet The received packet.
-     */
     void Receive(Ptr<const Packet> packet) override;
 
     void FailedReception(Ptr<const Packet> packet) override;
 
-    /**
-     * Perform the actions that are required after a packet send.
-     *
-     * This function handles opening of the first receive window.
-     *
-     * \param packet The packet that has just been transmitted.
-     */
     void TxFinished(Ptr<const Packet> packet) override;
 
     /////////////////////////
@@ -114,32 +99,36 @@ class EndDeviceLorawanMac : public LorawanMac
     virtual void resetRetransmissionParameters();
 
     /**
-     * Enable data rate adaptation in the retransmitting procedure.
+     * Signals to the network server that this device will or may not comply with LinkADRReq
+     * settings (data rate, transmission power and number of retransmissions) received in downlink.
      *
-     * \param adapt If the data rate adaptation is enabled or not.
+     * @param adr The ADR bit.
      */
-    void SetDataRateAdaptation(bool adapt);
+    void SetUplinkAdrBit(bool adr);
 
     /**
-     * Get if data rate adaptation is enabled or not.
+     * Get the current value of the device's uplink ADR bit of the LoRaWAN FHDR.
      *
-     * \return True if the data rate adaptation is enabled, false if disabled.
+     * @return true The device will comply with data rate, transmission power and number of
+     * retransmissions settings received from the network server via LikADRReq.
+     * @return false Signals to the network server that the device may not comply with the data
+     * rate, transmission power and number of retransmissions settings received via LikADRReq.
      */
-    bool GetDataRateAdaptation() const;
+    bool GetUplinkAdrBit() const;
 
     /**
      * Set the max number of unacknowledged redundant transmissions of each packet. If,
      * after a transmission, any acknowledgement is received, no more are sent for that packet.
      *
-     * \param maxNumbTx The number of transmissions.
+     * @param nbTrans The number of transmissions.
      */
-    void SetMaxNumberOfTransmissions(uint8_t maxNumbTx);
+    void SetMaxNumberOfTransmissions(uint8_t nbTrans);
 
     /**
      * Get the max number of unacknowledged redundant transmissions of each packet. If,
      * after a transmission, any acknowledgement is received, no more are sent for that packet.
      *
-     * \return The number of transmissions as uint8_t.
+     * @return The number of transmissions as uint8_t.
      */
     uint8_t GetMaxNumberOfTransmissions();
 
@@ -148,35 +137,42 @@ class EndDeviceLorawanMac : public LorawanMac
      * Devices, this value is assumed to be fixed, and can be modified via MAC
      * commands issued by the gateway.
      *
-     * \param dataRate The dataRate to use when transmitting.
+     * @param dataRate The dataRate to use when transmitting.
      */
     void SetDataRate(uint8_t dataRate);
 
     /**
      * Get the data rate this end device is set to use.
      *
-     * \return The data rate this device uses when transmitting.
+     * @return The data rate this device uses when transmitting.
      */
     uint8_t GetDataRate();
 
     /**
      * Get the transmission power this end device is set to use.
      *
-     * \return The transmission power this device uses when transmitting.
+     * @return The transmission ERP [dBm] this device uses when transmitting.
      */
-    virtual uint8_t GetTransmissionPower();
+    double GetTransmissionPowerDbm();
+
+    /**
+     * Set the transmission power of this end device.
+     *
+     * @param txPowerDbm The transmission ERP [dBm] value.
+     */
+    void SetTransmissionPowerDbm(double txPowerDbm);
 
     /**
      * Set the network address of this device.
      *
-     * \param address The address to set.
+     * @param address The address to set.
      */
     void SetDeviceAddress(LoraDeviceAddress address);
 
     /**
      * Get the network address of this device.
      *
-     * \return This device's address.
+     * @return This device's address.
      */
     LoraDeviceAddress GetDeviceAddress();
 
@@ -185,9 +181,29 @@ class EndDeviceLorawanMac : public LorawanMac
     // uint8_t GetRx1DrOffset ();
 
     /**
+     * Get the last known link margin from the demodulation floor.
+     *
+     * This is intended for asynchronous polling by the Application layer of the device. For
+     * synchronous behavior provide a callback using the trace system.
+     *
+     * @return The last known link margin [dB]
+     */
+    uint8_t GetLastKnownLinkMarginDb() const;
+
+    /**
+     * Get the last known number of gateways concurrently receiving transmissions from the device.
+     *
+     * This is intended for asynchronous polling by the Application layer of the device. For
+     * synchronous behavior provide a callback using the trace system.
+     *
+     * @return The last known number of receiver gateways.
+     */
+    uint8_t GetLastKnownGatewayCount() const;
+
+    /**
      * Get the aggregated duty cycle.
      *
-     * \return A time instance containing the aggregated duty cycle in fractional form.
+     * @return A time instance containing the aggregated duty cycle in fractional form.
      */
     double GetAggregatedDutyCycle();
 
@@ -198,81 +214,79 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Add the necessary options and MAC commands to the LoraFrameHeader.
      *
-     * \param frameHeader The frame header on which to apply the options.
+     * @param frameHeader The frame header on which to apply the options.
      */
     void ApplyNecessaryOptions(LoraFrameHeader& frameHeader);
 
     /**
      * Add the necessary options and MAC commands to the LorawanMacHeader.
      *
-     * \param macHeader The mac header on which to apply the options.
+     * @param macHeader The mac header on which to apply the options.
      */
     void ApplyNecessaryOptions(LorawanMacHeader& macHeader);
 
     /**
      * Set the message type to send when the Send method is called.
      *
-     * \param mType The message type.
+     * @param mType The message type.
      */
     void SetMType(LorawanMacHeader::MType mType);
 
     /**
      * Get the message type to send when the Send method is called.
      *
-     * \return The message type.
+     * @return The message type.
      */
     LorawanMacHeader::MType GetMType();
 
     /**
      * Parse and take action on the commands contained on this FrameHeader.
      *
-     * \param frameHeader The frame header.
+     * @param frameHeader The frame header.
      */
     void ParseCommands(LoraFrameHeader frameHeader);
 
     /**
      * Perform the actions that need to be taken when receiving a LinkCheckAns command.
      *
-     * \param margin The margin value of the command.
-     * \param gwCnt The gateway count value of the command.
+     * @param margin The margin value of the command.
+     * @param gwCnt The gateway count value of the command.
      */
     void OnLinkCheckAns(uint8_t margin, uint8_t gwCnt);
 
     /**
      * Perform the actions that need to be taken when receiving a LinkAdrReq command.
      *
-     * \param dataRate The data rate value of the command.
-     * \param txPower The transmission power value of the command.
-     * \param enabledChannels A list of the enabled channels.
-     * \param repetitions The number of repetitions prescribed by the command.
+     * @param dataRate The data rate value of the command.
+     * @param txPower The transmission power value of the command.
+     * @param chMask Mask of enabled channels of the command.
+     * @param chMaskCntl Indicator of the 16 channel bank to apply the chMask to.
+     * @param nbTrans The number of repetitions prescribed by the command.
      */
     void OnLinkAdrReq(uint8_t dataRate,
                       uint8_t txPower,
-                      std::list<int> enabledChannels,
-                      int repetitions);
+                      uint16_t chMask,
+                      uint8_t chMaskCntl,
+                      uint8_t nbTrans);
 
     /**
      * Perform the actions that need to be taken when receiving a DutyCycleReq command.
      *
-     * \param dutyCycle The aggregate duty cycle prescribed by the command, in
-     * fraction form.
+     * @param maxDutyCycle The aggregate duty cycle encoded by the command.
      */
-    void OnDutyCycleReq(double dutyCycle);
-
-    /**
-     * Perform the actions that need to be taken when receiving a RxParamSetupReq command.
-     *
-     * \param rxParamSetupReq The Parameter Setup Request.
-     */
-    void OnRxParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq);
+    void OnDutyCycleReq(uint8_t maxDutyCycle);
 
     /**
      * Perform the actions that need to be taken when receiving a RxParamSetupReq
      * command based on the Device's Class Type.
      *
-     * \param rxParamSetupReq The Parameter Setup Request.
+     * @param rx1DrOffset The first reception window data rate offset to set.
+     * @param rx2DataRate The data rate to use for the second receive window.
+     * @param frequencyHz The frequency [Hz] to use for the second receive window.
      */
-    virtual void OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq);
+    virtual void OnRxParamSetupReq(uint8_t rx1DrOffset,
+                                   uint8_t rx2DataRate,
+                                   double frequencyHz) = 0;
 
     /**
      * Perform the actions that need to be taken when receiving a DevStatusReq command.
@@ -282,65 +296,21 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Perform the actions that need to be taken when receiving a NewChannelReq command.
      *
-     * \param chIndex The ChIndex field of the received NewChannelReq command.
-     * \param frequencyHz The Frequency field [Hz] of the received NewChannelReq command.
-     * \param minDataRate The MinDR field of the received NewChannelReq command.
-     * \param maxDataRate The MaxDR field of the received NewChannelReq command.
+     * @param chIndex The ChIndex field of the received NewChannelReq command.
+     * @param frequencyHz The Frequency [Hz] field of the received NewChannelReq command.
+     * @param minDataRate The MinDR field of the received NewChannelReq command.
+     * @param maxDataRate The MaxDR field of the received NewChannelReq command.
      */
     void OnNewChannelReq(uint8_t chIndex,
                          uint32_t frequencyHz,
                          uint8_t minDataRate,
                          uint8_t maxDataRate);
 
-    ////////////////////////////////////
-    // Logical channel administration //
-    ////////////////////////////////////
-
-    /**
-     * Add a logical channel to the helper.
-     *
-     * \param frequencyHz The channel's center frequency [Hz].
-     */
-    void AddLogicalChannel(uint32_t frequencyHz);
-
-    /**
-     * Set a new logical channel in the helper.
-     *
-     * \param chIndex The channel's new index.
-     * \param frequencyHz The channel's center frequency [Hz].
-     * \param minDataRate The minimum data rate allowed on the channel.
-     * \param maxDataRate The maximum data rate allowed on the channel.
-     */
-    void SetLogicalChannel(uint8_t chIndex,
-                           uint32_t frequencyHz,
-                           uint8_t minDataRate,
-                           uint8_t maxDataRate);
-
-    /**
-     * Add a logical channel to the helper.
-     *
-     * \param logicalChannel The logical channel to add.
-     */
-    void AddLogicalChannel(Ptr<LogicalLoraChannel> logicalChannel);
-
-    /**
-     * Add a subband to the logical channel helper.
-     *
-     * \param startFrequencyHz The SubBand's lowest frequency [Hz].
-     * \param endFrequencyHz The SubBand's highest frequency [Hz].
-     * \param dutyCycle The SubBand's duty cycle, in fraction form.
-     * \param maxTxPowerDbm The maximum transmission power allowed on the SubBand.
-     */
-    void AddSubBand(uint32_t startFrequencyHz,
-                    uint32_t endFrequencyHz,
-                    double dutyCycle,
-                    double maxTxPowerDbm);
-
     /**
      * Add a MAC command to the list of those that will be sent out in the next
      * packet.
      *
-     * \param macCommand A pointer to the MAC command.
+     * @param macCommand A pointer to the MAC command.
      */
     void AddMacCommand(Ptr<MacCommand> macCommand);
 
@@ -359,30 +329,30 @@ class EndDeviceLorawanMac : public LorawanMac
 
     bool
         m_enableDRAdapt; //!< Enable data rate adaptation (ADR) during the retransmission procedure.
-    uint8_t
-        m_maxNumbTx; //!< Default number of unacknowledged redundant transmissions of each packet.
+    uint8_t m_nbTrans; //!< Default number of unacknowledged redundant transmissions of each packet.
     TracedValue<uint8_t> m_dataRate; //!< The data rate this device is using to transmit.
-    TracedValue<double> m_txPower;   //!< The transmission power this device is using to transmit.
-    uint8_t m_codingRate;            //!< The coding rate used by this device.
+    TracedValue<double>
+        m_txPowerDbm;      //!< The transmission ERP [dBm] this device is currently using.
+    uint8_t m_codingRate;  //!< The coding rate used by this device.
     bool m_headerDisabled; //!< Whether or not the LoRa PHY header is disabled for communications by
                            //!< this device.
     LoraDeviceAddress m_address; //!< The address of this device.
 
     /**
-     * Find the minimum waiting time before the next possible transmission based
+     * Find the minimum wait time before the next possible transmission based
      * on end device's Class Type.
      *
-     * \param waitingTime Currently known minimum waiting time, possibly raised by this function.
-     * \return The updated minimum waiting time in Time format.
+     * @param waitTime Currently known minimum wait time, possibly raised by this function.
+     * @return The updated minimum wait time in Time format.
      */
-    virtual Time GetNextClassTransmissionDelay(Time waitingTime);
+    virtual Time GetNextClassTransmissionDelay(Time waitTime);
 
     /**
      * Find a suitable channel for transmission. The channel is chosen among the
      * ones that are available in the end device, based on their duty
      * cycle limitations.
      *
-     * \return A pointer to the channel.
+     * @return A pointer to the channel.
      */
     Ptr<LogicalLoraChannel> GetChannelForTx();
 
@@ -409,10 +379,14 @@ class EndDeviceLorawanMac : public LorawanMac
     struct LoraRetxParameters m_retxParams;
 
     /**
-     * An uniform random variable, used by the Shuffle method to randomly reorder
-     * the channel list.
+     * An uniform random variable, used to randomly pick from the channel list.
      */
     Ptr<UniformRandomVariable> m_uniformRV;
+
+    /**
+     * Used to record the last reception SNR measurement to be included in the DevStatusAns.
+     */
+    double m_lastRxSnr;
 
     /////////////////
     //  Callbacks  //
@@ -425,26 +399,17 @@ class EndDeviceLorawanMac : public LorawanMac
 
   private:
     /**
-     * Randomly shuffle a Ptr<LogicalLoraChannel> vector.
+     * Find the base minimum wait time before the next possible transmission.
      *
-     * Used to pick a random channel on which to send the packet.
-     *
-     * \param vector The vector of pointers to logical LoRa channels.
-     * \return The shuffled vector.
-     */
-    std::vector<Ptr<LogicalLoraChannel>> Shuffle(std::vector<Ptr<LogicalLoraChannel>> vector);
-
-    /**
-     * Find the base minimum waiting time before the next possible transmission.
-     *
-     * \return The base minimum waiting time.
+     * @return The base minimum wait time.
      */
     Time GetNextTransmissionDelay();
 
-    /**
-     * Whether this device's data rate should be controlled by the network server.
-     */
-    bool m_controlDataRate;
+    bool m_adr; //!< Uplink ADR bit contained in the FCtrl field of the LoRaWAN FHDR.
+                //!< Controlled by the device, if set to false signals the network server
+                //!< that the device may not accept attempts to control the number of
+                //!< retransmissions, the data rate, or the TX power with downlink
+                //!< LinkADRReq commands.
 
     /**
      * The event of retransmitting a packet in a consecutive moment if an ACK is not received.
@@ -464,12 +429,12 @@ class EndDeviceLorawanMac : public LorawanMac
     EventId m_nextRetx;
 
     /**
-     * The last known link margin.
+     * The last known link margin in dB from the demodulation floor.
      *
      * This value is obtained (and updated) when a LinkCheckAns Mac command is
      * received.
      */
-    TracedValue<double> m_lastKnownLinkMargin;
+    TracedValue<uint8_t> m_lastKnownLinkMarginDb;
 
     /**
      * The last known gateway count (i.e., gateways that are in communication
@@ -478,7 +443,7 @@ class EndDeviceLorawanMac : public LorawanMac
      * This value is obtained (and updated) when a LinkCheckAns Mac command is
      * received.
      */
-    TracedValue<int> m_lastKnownGatewayCount;
+    TracedValue<uint8_t> m_lastKnownGatewayCount;
 
     /**
      * The aggregated duty cycle this device needs to respect across all sub-bands.

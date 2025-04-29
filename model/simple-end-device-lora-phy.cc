@@ -215,8 +215,7 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
             SwitchToRx();
 
             // Schedule the end of the reception of the packet
-            NS_LOG_INFO("Scheduling reception of a packet. End in " << duration.GetSeconds()
-                                                                    << " seconds");
+            NS_LOG_INFO("Scheduling reception of a packet. End in " << duration.As(Time::S));
 
             Simulator::Schedule(duration, &LoraPhy::EndReceive, this, packet, event);
 
@@ -279,6 +278,11 @@ SimpleEndDeviceLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelpe
         // If there is one, perform the callback to inform the upper layer
         if (!m_rxOkCallback.IsNull())
         {
+            LoraTag tag;
+            packet->RemovePacketTag(tag);
+            tag.SetReceivePower(event->GetRxPowerdBm());
+            tag.SetFrequency(event->GetFrequency());
+            packet->AddPacketTag(tag);
             m_rxOkCallback(packet);
         }
     }

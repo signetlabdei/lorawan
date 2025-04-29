@@ -38,7 +38,7 @@ class LoraPhy;
 struct LoraTxParameters;
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * A struct that holds meaningful parameters for transmission on a
  * LoraChannel.
@@ -57,7 +57,7 @@ struct LoraChannelParameters
 std::ostream& operator<<(std::ostream& os, const LoraChannelParameters& params);
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * The class that delivers packets among PHY layers.
  *
@@ -72,7 +72,7 @@ class LoraChannel : public Channel
   public:
     /**
      *  Register this type.
-     *  \return The object TypeId.
+     *  @return The object TypeId.
      */
     static TypeId GetTypeId();
 
@@ -86,8 +86,8 @@ class LoraChannel : public Channel
     /**
      * Construct a LoraChannel with a loss and delay model.
      *
-     * \param loss The loss model to associate to this channel.
-     * \param delay The delay model to associate to this channel.
+     * @param loss The loss model to associate to this channel.
+     * @param delay The delay model to associate to this channel.
      */
     LoraChannel(Ptr<PropagationLossModel> loss, Ptr<PropagationDelayModel> delay);
 
@@ -97,7 +97,7 @@ class LoraChannel : public Channel
      * This method is needed so that the channel knows it has to notify this PHY
      * of incoming transmissions.
      *
-     * \param phy The physical layer to add.
+     * @param phy The physical layer to add.
      */
     void Add(Ptr<LoraPhy> phy);
 
@@ -108,7 +108,7 @@ class LoraChannel : public Channel
      * Removing unused PHY layers from the channel can improve performance, since
      * it is not necessary to notify them about each transmission.
      *
-     * \param phy The physical layer to remove.
+     * @param phy The physical layer to remove.
      */
     void Remove(Ptr<LoraPhy> phy);
 
@@ -120,14 +120,14 @@ class LoraChannel : public Channel
      * their StartReceive methods after a delay based on the channel's
      * PropagationDelayModel.
      *
-     * \param sender The phy that is sending this packet.
-     * \param packet The PHY layer packet that is being sent over the channel.
-     * \param txPowerDbm The power of the transmission.
-     * \param txParams The set of parameters that are used by the transmitter.
-     * \param duration The on-air duration of this packet.
-     * \param frequencyHz The frequency this transmission will happen at.
+     * @param sender The phy that is sending this packet.
+     * @param packet The PHY layer packet that is being sent over the channel.
+     * @param txPowerDbm The power of the transmission.
+     * @param txParams The set of parameters that are used by the transmitter.
+     * @param duration The on-air duration of this packet.
+     * @param frequencyHz The frequency this transmission will happen at.
      *
-     * \internal
+     * @internal
      *
      * When this method is called, the channel schedules an internal Receive call
      * that performs the actual call to the PHY's StartReceive function.
@@ -146,10 +146,10 @@ class LoraChannel : public Channel
      * transmission from one point to another using this Channel's
      * PropagationLossModel.
      *
-     * \param txPowerDbm The power the transmitter is using, in dBm.
-     * \param senderMobility The mobility model of the sender.
-     * \param receiverMobility The mobility model of the receiver.
-     * \return The received power in dBm.
+     * @param txPowerDbm The power the transmitter is using, in dBm.
+     * @param senderMobility The mobility model of the sender.
+     * @param receiverMobility The mobility model of the receiver.
+     * @return The received power in dBm.
      */
     double GetRxPower(double txPowerDbm,
                       Ptr<MobilityModel> senderMobility,
@@ -163,9 +163,9 @@ class LoraChannel : public Channel
      * It's here that the Receive method of the PHY is called to initiate packet
      * reception at the PHY.
      *
-     * \param i The index of the phy to start reception on.
-     * \param packet The packet the phy will receive.
-     * \param parameters The parameters that characterize this transmission.
+     * @param i The index of the phy to start reception on.
+     * @param packet The packet the phy will receive.
+     * @param parameters The parameters that characterize this transmission.
      */
     void Receive(uint32_t i, Ptr<Packet> packet, LoraChannelParameters parameters) const;
 

@@ -29,7 +29,7 @@ using namespace lorawan;
 NS_LOG_COMPONENT_DEFINE("NetworkStatusTestSuite");
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests the constructor of the EndDeviceStatus class
  */
@@ -66,7 +66,7 @@ EndDeviceStatusTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * It tests the function NetworkStatus::AddNode
  */
@@ -112,7 +112,7 @@ NetworkStatusTest::DoRun()
 }
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * The TestSuite class names the TestSuite, identifies what type of TestSuite, and enables the
  * TestCases to be run. Typically, only the constructor for this class must be defined
@@ -126,8 +126,8 @@ class NetworkStatusTestSuite : public TestSuite
 NetworkStatusTestSuite::NetworkStatusTestSuite()
     : TestSuite("network-status", Type::UNIT)
 {
-    LogComponentEnable("NetworkStatusTestSuite", LOG_LEVEL_DEBUG);
-    // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
+    // LogComponentEnable("NetworkStatusTestSuite", LOG_LEVEL_DEBUG);
+
     AddTestCase(new EndDeviceStatusTest, Duration::QUICK);
     AddTestCase(new NetworkStatusTest, Duration::QUICK);
 }
