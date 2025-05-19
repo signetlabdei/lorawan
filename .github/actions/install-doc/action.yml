@@ -10,7 +10,7 @@ runs:
       shell: bash
       run: >
         pacman-key --init && pacman -Syu --noconfirm
-        base-devel ninja cmake python ccache
+        base-devel ninja cmake python ccache libxml2-legacy
         graphviz imagemagick texlive-basic texlive-bin texlive-binextra texlive-latexextra
         texlive-fontutils texlive-fontsrecommended texlive-mathscience python-sphinx wget &&
         pacman --noconfirm -U https://archive.archlinux.org/packages/d/dia/dia-0.97.3-9-x86_64.pkg.tar.zst &&

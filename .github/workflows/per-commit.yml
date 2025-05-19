@@ -6,6 +6,8 @@ on:
     branches: [develop]
   pull_request:
     branches: [develop]
+  schedule:
+    - cron: '0 8 * * 2'
   workflow_dispatch:
 
 jobs:
@@ -36,9 +38,11 @@ jobs:
           - compiler: g++
             mode: debug
             extra_options: --disable-precompiled-headers
-          - compiler: clang++
-            mode: debug
-            extra_options: --disable-asserts --disable-logs
+          # See: https://gitlab.com/nsnam/ns-3-dev/-/merge_requests/2417
+          # Will be fixed in ns-3.45, to re-enable
+          # - compiler: clang++
+          #   mode: debug
+          #   extra_options: --disable-asserts --disable-logs
     env:
       COMPILER: ${{ matrix.compiler }}
       MODE: ${{ matrix.mode }}
@@ -72,7 +76,7 @@ jobs:
     secrets: inherit
 
   deploy-doc:
-    # do not run on PR events
+    # do not run on PR or weekly events
     if: github.event_name == 'push'
     needs: documentation
     uses: ./.github/workflows/deploy-doc.yml
