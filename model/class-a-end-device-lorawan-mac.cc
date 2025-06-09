@@ -73,14 +73,6 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
 
     NS_LOG_DEBUG("PacketToSend: " << packetToSend);
 
-    // Data rate adaptation as in LoRaWAN specification, V1.0.2 (2016)
-    if (m_enableDRAdapt && (m_dataRate > 0) && (m_retxParams.retxLeft < m_nbTrans) &&
-        (m_retxParams.retxLeft % 2 == 0))
-    {
-        m_txPowerDbm = 14; // Reset transmission power
-        m_dataRate = m_dataRate - 1;
-    }
-
     // Craft LoraTxParameters object
     LoraTxParameters params;
     params.sf = GetSfFromDataRate(m_dataRate);
@@ -164,6 +156,9 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
             // If it exists, cancel the second receive window event
             // THIS WILL BE GetReceiveWindow()
             Simulator::Cancel(m_secondReceiveWindow);
+
+            // Reset ADR backoff counter
+            m_adrAckCnt = 0;
 
             LoraTag tag;
             packet->PeekPacketTag(tag);

@@ -20,6 +20,9 @@
 
 #include <bitset>
 
+#define ADR_ACK_LIMIT 64
+#define ADR_ACK_DELAY 32
+
 namespace ns3
 {
 namespace lorawan
@@ -112,12 +115,14 @@ EndDeviceLorawanMac::EndDeviceLorawanMac()
       m_receiveWindowDurationInSymbols(8),
       // Max initial value
       m_lastRxSnr(32),
+      m_adrAckCnt(0),
       m_adr(true),
       m_lastKnownLinkMarginDb(0),
       m_lastKnownGatewayCount(0),
       m_aggregatedDutyCycle(1),
       m_mType(LorawanMacHeader::CONFIRMED_DATA_UP),
-      m_currentFCnt(0)
+      m_currentFCnt(0),
+      m_adrAckReq(false)
 {
     NS_LOG_FUNCTION(this);
 
@@ -199,121 +204,164 @@ void
 EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
 {
     NS_LOG_FUNCTION(this);
-    // Checking if this is the transmission of a new packet
-    if (packet != m_retxParams.packet)
+
+    bool retransmission = (packet == m_retxParams.packet);
+
+    if (retransmission)
     {
-        NS_LOG_DEBUG(
-            "Received a new packet from application. Resetting retransmission parameters.");
-        m_currentFCnt++;
-        NS_LOG_DEBUG("APP packet: " << packet << ".");
-
-        // Add the Lora Frame Header to the packet
-        LoraFrameHeader frameHdr;
-        ApplyNecessaryOptions(frameHdr);
-        packet->AddHeader(frameHdr);
-
-        auto fhdrSize = frameHdr.GetSerializedSize();
-        NS_LOG_INFO("Added frame header of size " << fhdrSize << " bytes.");
-
-        // Check that MACPayload length is below the allowed maximum
-        if (packet->GetSize() > m_maxAppPayloadForDataRate.at(m_dataRate))
-        {
-            NS_LOG_WARN("Attempting to send a packet larger than the maximum allowed"
-                        << " size at this Data Rate (DR" << unsigned(m_dataRate)
-                        << "). Transmission canceled.");
-            return;
-        }
-
-        // Add the Lora Mac header to the packet
+        // Fail if it is a retransmission already ACKed
+        /// TODO: UNCONFIRMED packets CAN be retransmitted, but behave slightly differently.
+        /// The current implementation only considers re-txs for CONFIRMED, change this
+        NS_ASSERT_MSG(m_retxParams.waitingAck, "Trying to retransmit a packet already ACKed.");
+        NS_LOG_DEBUG("Retransmitting an old packet.");
+        // Remove the headers
         LorawanMacHeader macHdr;
-        ApplyNecessaryOptions(macHdr);
-        packet->AddHeader(macHdr);
+        packet->RemoveHeader(macHdr);
+        LoraFrameHeader frameHdr;
+        packet->RemoveHeader(frameHdr);
+    }
 
-        // Reset MAC command list
-        m_macCommandList.clear();
-
-        if (m_retxParams.waitingAck)
+    // Evaluate ADR backoff as in LoRaWAN specification, V1.0.4 (2020)
+    // Adapted from: github.com/Lora-net/SWL2001.git v4.8.0
+    m_adrAckReq = (m_adrAckCnt >= ADR_ACK_LIMIT); // Set the ADRACKReq bit in frame header
+    if (m_adrAckCnt >= ADR_ACK_LIMIT + ADR_ACK_DELAY)
+    {
+        if (retransmission && m_dataRate > 0)
         {
-            // Call the callback to notify about the failure
-            uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
-            m_requiredTxCallback(txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
-            NS_LOG_DEBUG(" Received new packet from the application layer: stopping retransmission "
-                         "procedure. Used "
-                         << unsigned(txs) << " transmissions out of a maximum of "
-                         << unsigned(m_nbTrans) << ".");
-        }
-
-        // Reset retransmission parameters
-        resetRetransmissionParameters();
-
-        // If this is the first transmission of a confirmed packet, save parameters for the
-        // (possible) next retransmissions.
-        if (m_mType == LorawanMacHeader::CONFIRMED_DATA_UP)
-        {
-            m_retxParams.packet = packet->Copy();
-            m_retxParams.retxLeft = m_nbTrans;
-            m_retxParams.waitingAck = true;
-            m_retxParams.firstAttempt = Now();
-            m_retxParams.retxLeft =
-                m_retxParams.retxLeft - 1; // decreasing the number of retransmissions
-
-            NS_LOG_DEBUG("Message type is " << m_mType);
-            NS_LOG_DEBUG("It is a confirmed packet. Setting retransmission parameters and "
-                         "decreasing the number of transmissions left.");
-
-            auto mhdrSize = macHdr.GetSerializedSize();
-            NS_LOG_INFO("Added MAC header of size " << mhdrSize << " bytes.");
-
-            // Sent a new packet
-            NS_LOG_DEBUG("Copied packet: " << m_retxParams.packet);
-            m_sentNewPacket(m_retxParams.packet);
-
-            // static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (m_retxParams.packet);
-            SendToPhy(m_retxParams.packet);
+            if (IsPayloadSizeValid(packet->GetSerializedSize(), m_dataRate - 1))
+            {
+                ExecuteADRBackoff();
+                m_adrAckCnt = ADR_ACK_LIMIT;
+            }
         }
         else
         {
-            m_sentNewPacket(packet);
-            // static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (packet);
-            SendToPhy(packet);
+            ExecuteADRBackoff();
+            m_adrAckCnt = ADR_ACK_LIMIT;
         }
     }
-    // this is a retransmission
-    else
+
+    NS_ASSERT(m_adrAckCnt < 2400);
+
+    if (!retransmission) // this is a new packet
     {
+        // Check that MACPayload length is below the allowed maximum
+        // Note: for retransmissions, ADRBackoff must not lower the DR if it
+        // would break the following constraint
+        if (!IsPayloadSizeValid(packet->GetSerializedSize(), m_dataRate))
+        {
+            NS_LOG_WARN("Application payload exceeding maximum size. Transmission aborted.");
+            return;
+        }
+        // From here on out, the pkt transmission is assured
+        NS_LOG_DEBUG("New FRMPayload from application. Resetting retransmission parameters.");
+        NS_LOG_DEBUG(packet);
+        // Update frame counters if we are interrupting the retransmission process for last packet
+        if (m_retxParams.retxLeft > 0)
+        {
+            m_currentFCnt++;
+            m_adrAckCnt++;
+        }
+        // If needed, trace failed ACKnowledgement of previous packet
         if (m_retxParams.waitingAck)
         {
-            // Remove the headers
-            LorawanMacHeader macHdr;
-            LoraFrameHeader frameHdr;
-            packet->RemoveHeader(macHdr);
-            packet->RemoveHeader(frameHdr);
-
-            // Add the Lora Frame Header to the packet
-            frameHdr = LoraFrameHeader();
-            ApplyNecessaryOptions(frameHdr);
-            packet->AddHeader(frameHdr);
-
-            auto fhdrSize = frameHdr.GetSerializedSize();
-            NS_LOG_INFO("Added frame header of size " << fhdrSize << " bytes.");
-
-            // Add the Lorawan Mac header to the packet
-            macHdr = LorawanMacHeader();
-            ApplyNecessaryOptions(macHdr);
-            packet->AddHeader(macHdr);
-            m_retxParams.retxLeft =
-                m_retxParams.retxLeft - 1; // decreasing the number of retransmissions
-            NS_LOG_DEBUG("Retransmitting an old packet.");
-
-            // static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (m_retxParams.packet);
-            SendToPhy(m_retxParams.packet);
+            uint8_t txs = m_nbTrans - m_retxParams.retxLeft;
+            NS_LOG_WARN("Stopping retransmission procedure of previous packet. Used "
+                        << unsigned(txs) << " transmissions out of " << unsigned(m_nbTrans));
+            m_requiredTxCallback(txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
         }
+    }
+
+    // Add the Lora Frame Header to the packet
+    LoraFrameHeader frameHdr;
+    ApplyNecessaryOptions(frameHdr);
+    packet->AddHeader(frameHdr);
+    NS_LOG_INFO("Added frame header of size " << frameHdr.GetSerializedSize() << " bytes.");
+    // Add the Lora Mac header to the packet
+    LorawanMacHeader macHdr;
+    ApplyNecessaryOptions(macHdr);
+    packet->AddHeader(macHdr);
+    NS_LOG_INFO("Added MAC header of size " << macHdr.GetSerializedSize() << " bytes.");
+
+    if (!retransmission)
+    {
+        // Reset MAC command list
+        m_macCommandList.clear();
+        // Reset retransmission parameters
+        resetRetransmissionParameters();
+        // Save parameters for the (possible) next retransmissions.
+        m_retxParams.packet = packet->Copy();
+        m_retxParams.firstAttempt = Now();
+        if (m_mType == LorawanMacHeader::CONFIRMED_DATA_UP)
+        {
+            m_retxParams.waitingAck = true;
+        }
+        NS_LOG_DEBUG("Message type is " << m_mType);
+    }
+
+    // Send packet
+    SendToPhy(packet);
+    if (!retransmission)
+    {
+        m_sentNewPacket(packet); // Fire trace source
+    }
+
+    // Decrease the number of transmissions left
+    if (--m_retxParams.retxLeft == 0)
+    {
+        // Bump-up frame counters
+        m_currentFCnt++;
+        m_adrAckCnt++;
     }
 }
 
 void
 EndDeviceLorawanMac::SendToPhy(Ptr<Packet> packet)
 {
+}
+
+void
+EndDeviceLorawanMac::ExecuteADRBackoff()
+{
+    NS_LOG_FUNCTION(this);
+
+    // Adapted from: github.com/Lora-net/SWL2001.git v4.8.0
+    // For the time being, this implementation is valid for the EU868 region
+
+    if (m_txPowerDbm < 14)
+    {
+        m_txPowerDbm = 14; // Reset transmission power to default
+        return;
+    }
+
+    if (m_dataRate != 0)
+    {
+        m_dataRate--;
+        return;
+    }
+
+    // Set nbTrans to 1 and re-enable default channels
+    m_nbTrans = 1;
+    auto channels = m_channelHelper->GetRawChannelArray();
+    channels.at(0)->EnableForUplink();
+    channels.at(1)->EnableForUplink();
+    channels.at(2)->EnableForUplink();
+}
+
+bool
+EndDeviceLorawanMac::IsPayloadSizeValid(uint32_t appPayloadSize, uint8_t dataRate)
+{
+    uint32_t fOptsLen = 0;
+    for (const auto& c : m_macCommandList)
+    {
+        fOptsLen += c->GetSerializedSize();
+    }
+    NS_LOG_LOGIC("8+FOpts(" << fOptsLen << ")+FRMPayload(" << appPayloadSize
+                            << ")=" << 8 + fOptsLen + appPayloadSize
+                            << "B, max MACPayload=" << m_maxAppPayloadForDataRate.at(dataRate)
+                            << "B on DR" << unsigned(dataRate));
+    /// TODO: rename to to more appropriate maxMacPayloadForDataRate
+    return 8 + fOptsLen + appPayloadSize <= m_maxAppPayloadForDataRate.at(dataRate);
 }
 
 //////////////////////////
@@ -430,7 +478,7 @@ EndDeviceLorawanMac::ApplyNecessaryOptions(LoraFrameHeader& frameHeader)
     frameHeader.SetFPort(1); // TODO Use an appropriate frame port based on the application
     frameHeader.SetAddress(m_address);
     frameHeader.SetAdr(m_adr);
-    frameHeader.SetAdrAckReq(false); // TODO Set ADRACKREQ if a member variable is true
+    frameHeader.SetAdrAckReq(m_adrAckReq);
 
     // FPending does not exist in uplink messages
     frameHeader.SetFCnt(m_currentFCnt);

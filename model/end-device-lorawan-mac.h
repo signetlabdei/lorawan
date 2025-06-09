@@ -388,6 +388,10 @@ class EndDeviceLorawanMac : public LorawanMac
      */
     double m_lastRxSnr;
 
+    uint32_t m_adrAckCnt; //!< ADRACKCnt counter of the number of consecutive uplinks without
+                          //!< downlink reply from the server. Reset upon reception of any Class A
+                          //!< downlink destined to the device.
+
     /////////////////
     //  Callbacks  //
     /////////////////
@@ -404,6 +408,25 @@ class EndDeviceLorawanMac : public LorawanMac
      * @return The base minimum wait time.
      */
     Time GetNextTransmissionDelay();
+
+    /**
+     * Execute ADR backoff as in LoRaWAN specification, V1.0.4 (2020)
+     */
+    void ExecuteADRBackoff();
+
+    /**
+     * Check whether the size of the application payload is under the maximum allowed.
+     *
+     * From LoRaWAN L2 1.0.4 Specification (TS001-1.0.4), Section 4.3.2: "N is the number of octets
+     * of the application payload and SHALL be equal to or less than N ≤ M − 1 − (length of FHDR in
+     * octets), where M is the maximum MACPayload length. The valid ranges of both N and M are
+     * region-specific and defined in the “LoRaWAN Regional Parameters” [RP002] document."
+     *
+     * @param appPayloadSize Number of bytes of the application payload.
+     * @param dataRate Data rate to evaluate the max MACPayload for.
+     * @return Whether the payload size is valid.
+     */
+    bool IsPayloadSizeValid(uint32_t appPayloadSize, uint8_t dataRate);
 
     bool m_adr; //!< Uplink ADR bit contained in the FCtrl field of the LoRaWAN FHDR.
                 //!< Controlled by the device, if set to false signals the network server
@@ -459,6 +482,10 @@ class EndDeviceLorawanMac : public LorawanMac
      * current value of the device frame counter.
      */
     uint16_t m_currentFCnt;
+
+    bool m_adrAckReq; //!< ADRACKReq bit, set to 1 after ADR_ACK_LIMIT consecutive uplinks without
+                      //!< downlink messages received from the server. It requests the server to
+                      //!< send a downlink for keepalive purposes.
 };
 
 } // namespace lorawan
