@@ -42,18 +42,22 @@ jobs:
       image: python:latest
     timeout-minutes: 60
     env:
-      CI_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+      URL: https://github.com/signetlabdei/lorawan.git
     steps:
       - uses: actions/checkout@v4
       - run: pip install codespell
       # Get commit messages
+      - run: git config --global --add safe.directory $GITHUB_WORKSPACE
+      - run: >
+          echo "DEFAULT_BRANCH=$(
+            git remote show $URL | sed -n '/HEAD branch:/s/.*: //p'
+          )" >> $GITHUB_ENV
       - run: >
           if (git remote | grep -qw upstream) ; then
           git remote remove upstream ;
           fi
-      - run: git config --global --add safe.directory $GITHUB_WORKSPACE
-      - run: git remote add -t $CI_DEFAULT_BRANCH --no-tags -f upstream https://github.com/signetlabdei/lorawan.git
-      - run: git log --pretty=%B HEAD...upstream/$CI_DEFAULT_BRANCH ^upstream/$CI_DEFAULT_BRANCH > git_messages.txt
+      - run: git remote add -t $DEFAULT_BRANCH --no-tags -f upstream $URL
+      - run: git log --pretty=%B HEAD...upstream/$DEFAULT_BRANCH ^upstream/$DEFAULT_BRANCH > git_messages.txt
       # Check source code and commit messages
       - run: codespell -f -C0 --skip="./experiments" ./
 

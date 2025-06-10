@@ -17,7 +17,7 @@ jobs:
     timeout-minutes: 180
     env:
       CLANG_TIDY_OUTPUT: clang-tidy-output.log
-      CI_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+      URL: https://github.com/signetlabdei/lorawan.git
     steps:
       # The following step is required in all jobs that use this repo's actions
       - name: "Retrieve actions from repository"
@@ -38,23 +38,28 @@ jobs:
           --enable-clang-tidy
           --enable-examples --enable-tests --enable-asserts
           --enable-modules lorawan
+      - name: "Store default branch"
+        run: >
+          echo "DEFAULT_BRANCH=$(
+            git -C src/lorawan/ remote show $URL | sed -n '/HEAD branch:/s/.*: //p'
+          )" >> $GITHUB_ENV
       - name: "Prepare git environment"
         run: >
           if (git -C src/lorawan/ remote | grep -qw upstream) ; then
           git -C src/lorawan/ remote remove upstream ;
           fi &&
-          git -C src/lorawan/ remote add -t $CI_DEFAULT_BRANCH --no-tags -f upstream https://github.com/signetlabdei/lorawan.git
+          git -C src/lorawan/ remote add -t $DEFAULT_BRANCH --no-tags -f upstream $URL
       - name: "Running clang-tidy"
         shell: bash
         run: >
-          if [[ $GITHUB_REF_NAME == $CI_DEFAULT_BRANCH ]] ; then
+          if [[ $GITHUB_REF_NAME == $DEFAULT_BRANCH ]] ; then
           echo "Running full clang-tidy" ;
           run-clang-tidy-19 -p cmake-cache/ -quiet "src\/lorawan\/.+\.(cpp|cc|cxx|c|h|hpp)"
           1> $CLANG_TIDY_OUTPUT
           2> /dev/null ;
           else
           echo "Running clang-tidy-diff" ;
-          git -C src/lorawan/ diff -U0 upstream/$CI_DEFAULT_BRANCH --src-prefix=a/src/lorawan/ --dst-prefix=b/src/lorawan/ |
+          git -C src/lorawan/ diff -U0 upstream/$DEFAULT_BRANCH --src-prefix=a/src/lorawan/ --dst-prefix=b/src/lorawan/ |
           clang-tidy-diff-19.py -path cmake-cache/ -p1 -quiet -use-color -iregex "src\/lorawan\/.+\.(cpp|cc|cxx|c|h|hpp)"
           1> $CLANG_TIDY_OUTPUT
           2> /dev/null || true ;
