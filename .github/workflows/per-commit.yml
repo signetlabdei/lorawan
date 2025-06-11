@@ -38,11 +38,9 @@ jobs:
           - compiler: g++
             mode: debug
             extra_options: --disable-precompiled-headers
-          # See: https://gitlab.com/nsnam/ns-3-dev/-/merge_requests/2417
-          # Will be fixed in ns-3.45, to re-enable
-          # - compiler: clang++
-          #   mode: debug
-          #   extra_options: --disable-asserts --disable-logs
+          - compiler: clang++
+            mode: debug
+            extra_options: --disable-asserts --disable-logs
     env:
       COMPILER: ${{ matrix.compiler }}
       MODE: ${{ matrix.mode }}
