@@ -22,7 +22,7 @@ runs:
       shell: bash
       run: >
         if [[ "$MODE" != "debug" ]] && [[ -f build/tests-$BUILD_ID.txt ]];
-        then ./test.py -n;
+        then ./test.py -n --verbose-failed;
         if [[ $? == 0 ]];
         then `rm build/tests-$BUILD_ID.txt` || true;
         fi;
