@@ -27,7 +27,7 @@ namespace lorawan
 NS_LOG_COMPONENT_DEFINE("NetworkServerHelper");
 
 NetworkServerHelper::NetworkServerHelper()
-    : m_adrEnabled(false)
+    : m_adrEnabled(true)
 {
     m_factory.SetTypeId("ns3::NetworkServer");
     SetAdr("ns3::AdrComponent");
