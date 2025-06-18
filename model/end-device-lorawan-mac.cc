@@ -226,9 +226,9 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
     m_adrAckReq = (m_adrAckCnt >= ADR_ACK_LIMIT); // Set the ADRACKReq bit in frame header
     if (m_adrAckCnt >= ADR_ACK_LIMIT + ADR_ACK_DELAY)
     {
-        if (retransmission && m_dataRate > 0)
+        if (retransmission)
         {
-            if (IsPayloadSizeValid(packet->GetSerializedSize(), m_dataRate - 1))
+            if (m_dataRate == 0 || IsPayloadSizeValid(packet->GetSerializedSize(), m_dataRate - 1))
             {
                 ExecuteADRBackoff();
                 m_adrAckCnt = ADR_ACK_LIMIT;
@@ -246,8 +246,8 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
     if (!retransmission) // this is a new packet
     {
         // Check that MACPayload length is below the allowed maximum
-        // Note: for retransmissions, ADRBackoff must not lower the DR if it
-        // would break the following constraint
+        // Note: for retransmissions, this check can be skipped because ADRBackoff
+        // does not lower the DR if it would break the following constraint
         if (!IsPayloadSizeValid(packet->GetSerializedSize(), m_dataRate))
         {
             NS_LOG_WARN("Application payload exceeding maximum size. Transmission aborted.");
@@ -307,7 +307,8 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
     }
 
     // Decrease the number of transmissions left
-    if (--m_retxParams.retxLeft == 0)
+    m_retxParams.retxLeft--;
+    if (m_retxParams.retxLeft == 0)
     {
         // Bump-up frame counters
         m_currentFCnt++;
@@ -327,6 +328,11 @@ EndDeviceLorawanMac::ExecuteADRBackoff()
 
     // Adapted from: github.com/Lora-net/SWL2001.git v4.8.0
     // For the time being, this implementation is valid for the EU868 region
+
+    if (!m_adr)
+    {
+        return;
+    }
 
     if (m_txPowerDbm < 14)
     {
