@@ -85,7 +85,6 @@ main(int argc, char* argv[])
                  "ns3::AdrComponent::MultiplePacketsCombiningMethod");
     cmd.AddValue("HistoryRange", "ns3::AdrComponent::HistoryRange");
     cmd.AddValue("MType", "ns3::EndDeviceLorawanMac::MType");
-    cmd.AddValue("EDDRAdaptation", "ns3::EndDeviceLorawanMac::EnableEDDataRateAdaptation");
     cmd.AddValue("ChangeTransmissionPower", "ns3::AdrComponent::ChangeTransmissionPower");
     cmd.AddValue("AdrEnabled", "Whether to enable Adaptive Data Rate (ADR)", adrEnabled);
     cmd.AddValue("nDevices", "Number of devices to simulate", nDevices);

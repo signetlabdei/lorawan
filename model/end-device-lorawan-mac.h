@@ -327,8 +327,6 @@ class EndDeviceLorawanMac : public LorawanMac
         uint8_t retxLeft;             //!< Number of retransmission attempts left
     };
 
-    bool
-        m_enableDRAdapt; //!< Enable data rate adaptation (ADR) during the retransmission procedure.
     uint8_t m_nbTrans; //!< Default number of unacknowledged redundant transmissions of each packet.
     TracedValue<uint8_t> m_dataRate; //!< The data rate this device is using to transmit.
     TracedValue<double>

@@ -84,12 +84,6 @@ EndDeviceLorawanMac::GetTypeId()
                           IntegerValue(1),
                           MakeIntegerAccessor(&EndDeviceLorawanMac::m_nbTrans),
                           MakeIntegerChecker<uint8_t>())
-            .AddAttribute("EnableEDDataRateAdaptation",
-                          "Whether the end device should up its data rate "
-                          "in case it doesn't get a reply from the network server.",
-                          BooleanValue(false),
-                          MakeBooleanAccessor(&EndDeviceLorawanMac::m_enableDRAdapt),
-                          MakeBooleanChecker())
             .AddAttribute("MType",
                           "Specify type of message will be sent by this end device.",
                           EnumValue(LorawanMacHeader::UNCONFIRMED_DATA_UP),
@@ -102,8 +96,7 @@ EndDeviceLorawanMac::GetTypeId()
 }
 
 EndDeviceLorawanMac::EndDeviceLorawanMac()
-    : m_enableDRAdapt(false),
-      m_nbTrans(1),
+    : m_nbTrans(1),
       m_dataRate(0),
       m_txPowerDbm(14),
       m_codingRate(1),
