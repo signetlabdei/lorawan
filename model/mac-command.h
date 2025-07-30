@@ -11,7 +11,7 @@
 
 #include "ns3/buffer.h"
 #include "ns3/nstime.h"
-#include "ns3/object.h"
+#include "ns3/simple-ref-count.h"
 
 namespace ns3
 {
@@ -53,17 +53,11 @@ enum MacCommandType
  * common features are supposed to be defined in detail by child classes, based
  * on that MAC command's attributes and structure.
  */
-class MacCommand : public Object
+class MacCommand : public SimpleRefCount<MacCommand>
 {
   public:
-    /**
-     *  Register this type.
-     *  @return The object TypeId.
-     */
-    static TypeId GetTypeId();
-
-    MacCommand();           //!< Default constructor
-    ~MacCommand() override; //!< Destructor
+    MacCommand();          //!< Default constructor
+    virtual ~MacCommand(); //!< Destructor
 
     /**
      * Serialize the contents of this MAC command into a buffer, according to the

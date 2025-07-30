@@ -20,15 +20,6 @@ namespace lorawan
 
 NS_LOG_COMPONENT_DEFINE("MacCommand");
 
-NS_OBJECT_ENSURE_REGISTERED(MacCommand);
-
-TypeId
-MacCommand::GetTypeId()
-{
-    static TypeId tid = TypeId("ns3::MacCommand").SetParent<Object>().SetGroupName("lorawan");
-    return tid;
-}
-
 MacCommand::MacCommand()
 {
     NS_LOG_FUNCTION(this);
@@ -36,7 +27,6 @@ MacCommand::MacCommand()
 
 MacCommand::~MacCommand()
 {
-    NS_LOG_FUNCTION(this);
 }
 
 enum MacCommandType
