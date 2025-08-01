@@ -24,7 +24,7 @@ TypeId
 CorrelatedShadowingPropagationLossModel::GetTypeId()
 {
     static TypeId tid =
-        TypeId("ns3::CorrelatedShwodingPropagationLossModel")
+        TypeId("ns3::CorrelatedShadowingPropagationLossModel")
             .SetParent<PropagationLossModel>()
             .SetGroupName("Lora")
             .AddConstructor<CorrelatedShadowingPropagationLossModel>()
