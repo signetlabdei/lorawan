@@ -9,6 +9,7 @@
 #include "lora-helper.h"
 
 #include "ns3/log.h"
+#include "ns3/loratap-header.h"
 
 #include <fstream>
 
@@ -18,6 +19,21 @@ namespace lorawan
 {
 
 NS_LOG_COMPONENT_DEFINE("LoraHelper");
+
+/**
+ * @brief Write a packet in a PCAP file
+ * @param file the output file
+ * @param packet the packet
+ */
+static void
+PcapSniffLora(Ptr<PcapFileWrapper> file, Ptr<const Packet> packet, uint32_t)
+{
+    Ptr<Packet> p = packet->Copy();
+    LoraTag tag;
+    p->RemovePacketTag(tag);
+    p->AddHeader(LoraTapHeader(tag));
+    file->Write(Simulator::Now(), p);
+}
 
 LoraHelper::LoraHelper()
     : m_lastPhyPerformanceUpdate(Time(0)),
@@ -321,6 +337,47 @@ LoraHelper::DoPrintSimulationTime(Time interval)
               << std::endl;
     m_oldtime = std::time(nullptr);
     Simulator::Schedule(interval, &LoraHelper::DoPrintSimulationTime, this, interval);
+}
+
+void
+LoraHelper::EnablePcapInternal(std::string prefix,
+                               Ptr<NetDevice> netdev,
+                               bool promiscuous,
+                               bool explicitFilename)
+{
+    NS_LOG_FUNCTION(this << prefix << netdev << promiscuous << explicitFilename);
+
+    Ptr<LoraNetDevice> device = netdev->GetObject<LoraNetDevice>();
+
+    if (!device)
+    {
+        NS_LOG_INFO("LoraHelper::EnablePcapInternal: Cannot enable PCAP for "
+                    << netdev << ": not a LoraNetDev");
+        return;
+    }
+
+    PcapHelper pcapHelper;
+
+    std::string filename;
+    if (explicitFilename)
+    {
+        filename = prefix;
+    }
+    else
+    {
+        filename = pcapHelper.GetFilenameFromDevice(prefix, device);
+    }
+
+    Ptr<PcapFileWrapper> file =
+        pcapHelper.CreateFile(filename, std::ios::out, PcapHelper::DLT_LORATAP);
+
+    if (!promiscuous)
+    {
+        NS_LOG_WARN("LoraHelper::EnablePcapInternal: Tracing non-promiscuous is not supperted.");
+    }
+    device->GetPhy()->TraceConnectWithoutContext("ReceivedPacket",
+                                                 MakeBoundCallback(&PcapSniffLora, file));
+    device->GetPhy()->TraceConnectWithoutContext("StartSending", MakeBoundCallback(PcapSniffLora, file));
 }
 
 } // namespace lorawan

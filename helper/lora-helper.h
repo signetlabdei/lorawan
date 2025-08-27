@@ -17,6 +17,7 @@
 #include "ns3/net-device-container.h"
 #include "ns3/net-device.h"
 #include "ns3/node-container.h"
+#include "ns3/trace-helper.h"
 
 #include <ctime>
 
@@ -33,7 +34,7 @@ namespace lorawan
  * This class can help create a large set of similar LoraNetDevice objects and
  * configure a large set of their attributes during creation.
  */
-class LoraHelper
+class LoraHelper : public PcapHelperForDevice
 {
   public:
     LoraHelper();          //!< Default constructor
@@ -171,6 +172,22 @@ class LoraHelper
      * @param interval The delay for next printing.
      */
     void DoPrintSimulationTime(Time interval);
+
+    /**
+     * @brief Enable pcap output on the indicated net device.
+     *
+     * NetDevice-specific implementation mechanism for hooking the trace and
+     * writing to the trace file.
+     *
+     * @param prefix Filename prefix to use for pcap files.
+     * @param netdev Net device for which you want to enable tracing.
+     * @param promiscuous If true capture all possible packets available at the device.
+     * @param explicitFilename Treat the prefix as an explicit filename if true
+     */
+    void EnablePcapInternal(std::string prefix,
+                            Ptr<NetDevice> netdev,
+                            bool promiscuous,
+                            bool explicitFilename) override;
 
     Time m_lastPhyPerformanceUpdate;    //!< Timestamp of the last PHY performance update
     Time m_lastGlobalPerformanceUpdate; //!< Timestamp of the last global performance update
