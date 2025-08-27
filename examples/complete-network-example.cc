@@ -35,7 +35,6 @@
 #include "ns3/random-variable-stream.h"
 #include "ns3/simulator.h"
 
-#include <algorithm>
 #include <ctime>
 
 using namespace ns3;
@@ -44,19 +43,19 @@ using namespace lorawan;
 NS_LOG_COMPONENT_DEFINE("ComplexLorawanNetworkExample");
 
 // Network settings
-int nDevices = 200;                 //!< Number of end device nodes to create
-int nGateways = 1;                  //!< Number of gateway nodes to create
-double radiusMeters = 6400;         //!< Radius (m) of the deployment
-double simulationTimeSeconds = 600; //!< Scenario duration (s) in simulated time
+static int nDevices = 200;                 //!< Number of end device nodes to create
+static int nGateways = 1;                  //!< Number of gateway nodes to create
+static double radiusMeters = 6400;         //!< Radius (m) of the deployment
+static double simulationTimeSeconds = 600; //!< Scenario duration (s) in simulated time
 
 // Channel model
-bool realisticChannelModel = false; //!< Whether to use a more realistic channel model with
+static bool realisticChannelModel = false; //!< Whether to use a more realistic channel model with
                                     //!< Buildings and correlated shadowing
 
-int appPeriodSeconds = 600; //!< Duration (s) of the inter-transmission time of end devices
+static int appPeriodSeconds = 600; //!< Duration (s) of the inter-transmission time of end devices
 
 // Output control
-bool printBuildingInfo = true; //!< Whether to print building information
+static bool printBuildingInfo = true; //!< Whether to print building information
 
 int
 main(int argc, char* argv[])
