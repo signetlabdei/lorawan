@@ -25,6 +25,7 @@ set(source_files
     model/lora-device-address.cc
     model/lora-device-address-generator.cc
     model/lora-tag.cc
+    model/loratap-header.cc
     model/network-server.cc
     model/network-status.cc
     model/network-controller.cc
@@ -75,6 +76,7 @@ set(header_files
     model/lora-device-address.h
     model/lora-device-address-generator.h
     model/lora-tag.h
+    model/loratap-header.h
     model/network-server.h
     model/network-status.h
     model/network-controller.h
@@ -113,4 +115,5 @@ build_lib(
     test/network-status-test-suite.cc
     test/network-scheduler-test-suite.cc
     test/network-server-test-suite.cc
+    test/pcap-serialization-test-suite.cc
 )
