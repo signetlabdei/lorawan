@@ -50,12 +50,13 @@ static double simulationTimeSeconds = 600; //!< Scenario duration (s) in simulat
 
 // Channel model
 static bool realisticChannelModel = false; //!< Whether to use a more realistic channel model with
-                                    //!< Buildings and correlated shadowing
+                                           //!< Buildings and correlated shadowing
 
 static int appPeriodSeconds = 600; //!< Duration (s) of the inter-transmission time of end devices
 
 // Output control
 static bool printBuildingInfo = true; //!< Whether to print building information
+static bool pcapExport = false;       //!< Whether to dump PCAP files
 
 int
 main(int argc, char* argv[])
@@ -71,6 +72,7 @@ main(int argc, char* argv[])
                  "The period in seconds to be used by periodically transmitting applications",
                  appPeriodSeconds);
     cmd.AddValue("print", "Whether or not to print building information", printBuildingInfo);
+    cmd.AddValue("pcap", "Whether to export traffic as PCAP file", pcapExport);
     cmd.Parse(argc, argv);
 
     // Set up logging
@@ -334,6 +336,11 @@ main(int argc, char* argv[])
 
     // Create a forwarder for each gateway
     forHelper.Install(gateways);
+
+    if (pcapExport)
+    {
+        helper.EnablePcap("complete-network-example", gateways, true);
+    }
 
     ////////////////
     // Simulation //
