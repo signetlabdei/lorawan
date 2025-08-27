@@ -40,9 +40,11 @@ int
 main(int argc, char* argv[])
 {
     bool verbose = false;
+    bool pcapExport = false;
 
     CommandLine cmd(__FILE__);
     cmd.AddValue("verbose", "Whether to print output or not", verbose);
+    cmd.AddValue("pcap", "Whether to export traffic as PCAP file", pcapExport);
     cmd.Parse(argc, argv);
 
     // Logging
@@ -192,6 +194,11 @@ main(int argc, char* argv[])
     // Install the Forwarder application on the gateways
     ForwarderHelper forwarderHelper;
     forwarderHelper.Install(gateways);
+
+    if (pcapExport)
+    {
+        helper.EnablePcap("network-server-example", gateways, true);
+    }
 
     // Start simulation
     Simulator::Stop(Seconds(800));
