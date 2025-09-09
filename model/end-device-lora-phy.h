@@ -130,6 +130,7 @@ class EndDeviceLoraPhy : public LoraPhy
          * not possible.
          */
         RX
+        // NOTE: When extending/updating, please update operator<< accordingly.
     };
 
     /**
@@ -278,6 +279,11 @@ class EndDeviceLoraPhy : public LoraPhy
 
     Listeners m_listeners; //!< PHY listeners
 };
+
+/**
+ * Allow logging of EndDeviceLoraPhy::State like with any other data type.
+ */
+std::ostream& operator<<(std::ostream& os, const EndDeviceLoraPhy::State& state);
 
 } // namespace lorawan
 

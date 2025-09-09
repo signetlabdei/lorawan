@@ -206,5 +206,27 @@ EndDeviceLoraPhy::UnregisterListener(EndDeviceLoraPhyListener* listener)
     }
 }
 
+std::ostream&
+operator<<(std::ostream& os, const EndDeviceLoraPhy::State& state)
+{
+    static const char* map[] = {
+        "SLEEP",
+        "STANDBY",
+        "TX",
+        "RX",
+    };
+
+    if (static_cast<size_t>(state) >= std::size(map))
+    {
+        os << "<INVALID>";
+    }
+    else
+    {
+        os << map[static_cast<size_t>(state)];
+    }
+
+    return os;
+}
+
 } // namespace lorawan
 } // namespace ns3
