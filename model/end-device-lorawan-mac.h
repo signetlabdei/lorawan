@@ -96,7 +96,7 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Reset retransmission parameters contained in the structure LoraRetxParams.
      */
-    virtual void resetRetransmissionParameters();
+    virtual void ResetRetransmissionParameters();
 
     /**
      * Signals to the network server that this device will or may not comply with LinkADRReq

@@ -195,7 +195,7 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
                                  << unsigned(txs) << " transmissions.");
 
                     // Reset retransmission parameters
-                    resetRetransmissionParameters();
+                    ResetRetransmissionParameters();
                 }
                 else // Reschedule
                 {
@@ -223,7 +223,7 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
                                                                         << " transmissions.");
 
             // Reset retransmission parameters
-            resetRetransmissionParameters();
+            ResetRetransmissionParameters();
         }
     }
 
@@ -254,7 +254,7 @@ ClassAEndDeviceLorawanMac::FailedReception(Ptr<const Packet> packet)
                                                                         << " transmissions.");
 
             // Reset retransmission parameters
-            resetRetransmissionParameters();
+            ResetRetransmissionParameters();
         }
     }
 }
@@ -417,7 +417,7 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
                                                                         << " transmissions.");
 
             // Reset retransmission parameters
-            resetRetransmissionParameters();
+            ResetRetransmissionParameters();
         }
 
         else
@@ -434,7 +434,7 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
                        << " transmissions left. We were not transmitting confirmed messages.");
 
         // Reset retransmission parameters
-        resetRetransmissionParameters();
+        ResetRetransmissionParameters();
     }
 }
 

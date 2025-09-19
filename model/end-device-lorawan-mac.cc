@@ -281,7 +281,7 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
         // Reset MAC command list
         m_macCommandList.clear();
         // Reset retransmission parameters
-        resetRetransmissionParameters();
+        ResetRetransmissionParameters();
         // Save parameters for the (possible) next retransmissions.
         m_retxParams.packet = packet->Copy();
         m_retxParams.firstAttempt = Now();
@@ -397,7 +397,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
                          << unsigned(txs) << " transmissions: stopping retransmission procedure. ");
 
             // Reset retransmission parameters
-            resetRetransmissionParameters();
+            ResetRetransmissionParameters();
         }
         else
         {
@@ -587,7 +587,7 @@ EndDeviceLorawanMac::GetChannelForTx()
 /////////////////////////
 
 void
-EndDeviceLorawanMac::resetRetransmissionParameters()
+EndDeviceLorawanMac::ResetRetransmissionParameters()
 {
     m_retxParams.waitingAck = false;
     m_retxParams.retxLeft = m_nbTrans;
