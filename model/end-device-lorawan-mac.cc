@@ -221,7 +221,7 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
     {
         if (retransmission)
         {
-            if (m_dataRate == 0 || IsPayloadSizeValid(packet->GetSerializedSize(), m_dataRate - 1))
+            if (m_dataRate == 0 || IsPayloadSizeValid(packet->GetSize(), m_dataRate - 1))
             {
                 ExecuteADRBackoff();
                 m_adrAckCnt = ADR_ACK_LIMIT;
@@ -241,7 +241,7 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
         // Check that MACPayload length is below the allowed maximum
         // Note: for retransmissions, this check can be skipped because ADRBackoff
         // does not lower the DR if it would break the following constraint
-        if (!IsPayloadSizeValid(packet->GetSerializedSize(), m_dataRate))
+        if (!IsPayloadSizeValid(packet->GetSize(), m_dataRate))
         {
             NS_LOG_WARN("Application payload exceeding maximum size. Transmission aborted.");
             return;
