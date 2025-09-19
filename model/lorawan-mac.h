@@ -171,13 +171,13 @@ class LorawanMac : public Object
     void SetBandwidthForDataRate(std::vector<double> bandwidthForDataRate);
 
     /**
-     * Set the maximum App layer payload for a set data rate.
+     * Set the maximum LoRaWAN MACPayload size for a set data rate.
      *
-     * @param maxAppPayloadForDataRate A vector that contains at position i the
-     * maximum Application layer payload that should correspond to data rate i in this
-     * MAC's region.
+     * @param maxMacPayloadForDataRate A vector that contains at position i the
+     * maximum LoRaWAN MACPayload that should correspond to data rate i in this
+     * MAC's region. See, LoRaWAN RP002-1.0.4
      */
-    void SetMaxAppPayloadForDataRate(std::vector<uint32_t> maxAppPayloadForDataRate);
+    void SetMaxMacPayloadForDataRate(std::vector<uint32_t> maxMacPayloadForDataRate);
 
     /**
      * Set the vector to use to check up which transmission power in Dbm
@@ -256,10 +256,10 @@ class LorawanMac : public Object
     std::vector<double> m_bandwidthForDataRate;
 
     /**
-     * A vector holding the maximum app payload size that corresponds to a
-     * certain data rate.
+     * A vector holding the maximum MACPayload size that corresponds to a
+     * certain data rate. See, LoRaWAN RP002-1.0.4
      */
-    std::vector<uint32_t> m_maxAppPayloadForDataRate;
+    std::vector<uint32_t> m_maxMacPayloadForDataRate;
 
     /**
      * The number of symbols to use in the PHY preamble.

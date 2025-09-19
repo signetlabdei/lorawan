@@ -355,12 +355,12 @@ EndDeviceLorawanMac::IsPayloadSizeValid(uint32_t appPayloadSize, uint8_t dataRat
     {
         fOptsLen += c->GetSerializedSize();
     }
-    NS_LOG_LOGIC("8+FOpts(" << fOptsLen << ")+FRMPayload(" << appPayloadSize
-                            << ")=" << 8 + fOptsLen + appPayloadSize
-                            << "B, max MACPayload=" << m_maxAppPayloadForDataRate.at(dataRate)
-                            << "B on DR" << unsigned(dataRate));
-    /// TODO: rename to to more appropriate maxMacPayloadForDataRate
-    return 8 + fOptsLen + appPayloadSize <= m_maxAppPayloadForDataRate.at(dataRate);
+    /// TODO: FPort could be absent
+    NS_LOG_LOGIC("FHDR(7+FOpts(" << fOptsLen << "))+FPort(1)+FRMPayload(" << appPayloadSize
+                                 << ")=" << 7 + fOptsLen + 1 + appPayloadSize
+                                 << "B, max MACPayload=" << m_maxMacPayloadForDataRate.at(dataRate)
+                                 << "B on DR" << unsigned(dataRate));
+    return 7 + fOptsLen + 1 + appPayloadSize <= m_maxMacPayloadForDataRate.at(dataRate);
 }
 
 //////////////////////////
