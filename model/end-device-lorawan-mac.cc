@@ -244,7 +244,8 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
         }
     }
 
-    NS_ASSERT(m_adrAckCnt < 2400);
+    NS_ASSERT_MSG(m_adrAckCnt < 2400,
+                  "Device may be stuck in a tx abort loop: packet size too big after ADR backoff?");
 
     /// @warning This is influenced by ADR backoff on non-reTx
     if (!IsPayloadSizeValid(packet->GetSize(), m_dataRate))
