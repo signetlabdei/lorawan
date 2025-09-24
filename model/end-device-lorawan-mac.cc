@@ -199,16 +199,28 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
 
     if (retransmission)
     {
+        NS_LOG_DEBUG("Retransmitting an old packet.");
         // Fail if it is a retransmission already ACKed
         /// TODO: UNCONFIRMED packets CAN be retransmitted, but behave slightly differently.
         /// The current implementation only considers re-txs for CONFIRMED, change this
         NS_ASSERT_MSG(m_retxParams.waitingAck, "Trying to retransmit a packet already ACKed.");
-        NS_LOG_DEBUG("Retransmitting an old packet.");
         // Remove the headers
         LorawanMacHeader macHdr;
         packet->RemoveHeader(macHdr);
         LoraFrameHeader frameHdr;
         packet->RemoveHeader(frameHdr);
+    }
+    else // this is a new packet
+    {
+        NS_LOG_DEBUG("New FRMPayload from application: " << packet);
+        // If needed, trace failed ACKnowledgement of previous packet
+        if (m_retxParams.waitingAck)
+        {
+            uint8_t txs = m_nbTrans - m_retxParams.retxLeft;
+            NS_LOG_WARN("Stopping retransmission procedure of previous packet. Used "
+                        << unsigned(txs) << " transmissions out of " << unsigned(m_nbTrans));
+            m_requiredTxCallback(txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
+        }
     }
 
     // Evaluate ADR backoff as in LoRaWAN specification, V1.0.4 (2020)
@@ -218,6 +230,7 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
     {
         if (retransmission)
         {
+            // Preempt execution on reTx if breaking next DR payload size constraint
             if (m_dataRate == 0 || IsPayloadSizeValid(packet->GetSize(), m_dataRate - 1))
             {
                 ExecuteADRBackoff();
@@ -233,34 +246,16 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
 
     NS_ASSERT(m_adrAckCnt < 2400);
 
-    if (!retransmission) // this is a new packet
+    /// @warning This is influenced by ADR backoff on non-reTx
+    if (!IsPayloadSizeValid(packet->GetSize(), m_dataRate))
     {
-        // Check that MACPayload length is below the allowed maximum
-        // Note: for retransmissions, this check can be skipped because ADRBackoff
-        // does not lower the DR if it would break the following constraint
-        if (!IsPayloadSizeValid(packet->GetSize(), m_dataRate))
-        {
-            NS_LOG_WARN("Application payload exceeding maximum size. Transmission aborted.");
-            return;
-        }
-        // From here on out, the pkt transmission is assured
-        NS_LOG_DEBUG("New FRMPayload from application. Resetting retransmission parameters.");
-        NS_LOG_DEBUG(packet);
-        // Update frame counters if we are interrupting the retransmission process for last packet
-        if (m_retxParams.retxLeft > 0)
-        {
-            m_currentFCnt++;
-            m_adrAckCnt++;
-        }
-        // If needed, trace failed ACKnowledgement of previous packet
-        if (m_retxParams.waitingAck)
-        {
-            uint8_t txs = m_nbTrans - m_retxParams.retxLeft;
-            NS_LOG_WARN("Stopping retransmission procedure of previous packet. Used "
-                        << unsigned(txs) << " transmissions out of " << unsigned(m_nbTrans));
-            m_requiredTxCallback(txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
-        }
+        NS_LOG_WARN("Application payload exceeding maximum size. Transmission aborted.");
+        return;
     }
+
+    ///////////////////////////////////////////////////////
+    // From here on out, the pkt transmission is assured //
+    ///////////////////////////////////////////////////////
 
     // Add the Lora Frame Header to the packet
     LoraFrameHeader frameHdr;
@@ -275,31 +270,26 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
 
     if (!retransmission)
     {
+        NS_LOG_DEBUG("Resetting retransmission parameters.");
         // Reset MAC command list
+        /// TODO: Some commands should only be removed on ACK
         m_macCommandList.clear();
         // Reset retransmission parameters
         ResetRetransmissionParameters();
         // Save parameters for the (possible) next retransmissions.
         m_retxParams.packet = packet->Copy();
         m_retxParams.firstAttempt = Now();
-        if (m_mType == LorawanMacHeader::CONFIRMED_DATA_UP)
-        {
-            m_retxParams.waitingAck = true;
-        }
+        m_retxParams.waitingAck = (m_mType == LorawanMacHeader::CONFIRMED_DATA_UP);
         NS_LOG_DEBUG("Message type is " << m_mType);
     }
 
     // Send packet
     SendToPhy(packet);
+    // Decrease the number of transmissions left
+    m_retxParams.retxLeft--;
     if (!retransmission)
     {
         m_sentNewPacket(packet); // Fire trace source
-    }
-
-    // Decrease the number of transmissions left
-    m_retxParams.retxLeft--;
-    if (m_retxParams.retxLeft == 0)
-    {
         // Bump-up frame counters
         m_currentFCnt++;
         m_adrAckCnt++;
