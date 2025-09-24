@@ -146,37 +146,34 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
 {
     NS_LOG_FUNCTION(this << packet);
 
+    if (packet == m_retxParams.packet && m_retxParams.retxLeft == 0) // retransmission
+    {
+        NS_LOG_ERROR("Max number of transmission already achieved: packet not transmitted.");
+        return;
+    }
+
+    // Check if there is a channel suitable for TX (checks data rate etc.)
+    auto txChannel = GetChannelForTx();
+    if (!txChannel)
+    {
+        NS_LOG_ERROR("Suitable tx channel not found: packet not transmitted.");
+        return;
+    }
+
+    // Make sure we can transmit at the current power on this channel
+    NS_ASSERT_MSG(m_txPowerDbm <= m_channelHelper->GetTxPowerForChannel(txChannel),
+                  "The selected power is too high to be supported by this channel.");
+
     // If it is not possible to transmit now because of the duty cycle,
     // or because we are receiving, schedule a tx/retx later
-
     Time netxTxDelay = GetNextTransmissionDelay();
     if (netxTxDelay.IsStrictlyPositive())
     {
         postponeTransmission(netxTxDelay, packet);
-        return;
-    }
-
-    // Pick a channel on which to transmit the packet
-    Ptr<LogicalLoraChannel> txChannel = GetChannelForTx();
-
-    if (!(txChannel && m_retxParams.retxLeft > 0))
-    {
-        if (!txChannel)
-        {
-            m_cannotSendBecauseDutyCycle(packet);
-        }
-        else
-        {
-            NS_LOG_INFO("Max number of transmission achieved: packet not transmitted.");
-        }
+        m_cannotSendBecauseDutyCycle(packet);
     }
     else
-    // the transmitting channel is available and we have not run out the maximum number of
-    // retransmissions
     {
-        // Make sure we can transmit at the current power on this channel
-        NS_ASSERT_MSG(m_txPowerDbm <= m_channelHelper->GetTxPowerForChannel(txChannel),
-                      " The selected power is too high to be supported by this channel.");
         DoSend(packet);
     }
 }
