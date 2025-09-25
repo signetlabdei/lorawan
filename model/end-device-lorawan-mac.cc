@@ -198,8 +198,6 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
     {
         NS_LOG_DEBUG("Retransmitting an old packet.");
         // Fail if it is a retransmission already ACKed
-        /// TODO: UNCONFIRMED packets CAN be retransmitted, but behave slightly differently.
-        /// The current implementation only considers re-txs for CONFIRMED, change this
         NS_ASSERT_MSG(m_retxParams.waitingAck, "Trying to retransmit a packet already ACKed.");
         // Remove the headers
         LorawanMacHeader macHdr;

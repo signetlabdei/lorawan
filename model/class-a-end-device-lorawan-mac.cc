@@ -184,6 +184,8 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
             // longer have any retransmissions left, we declare failure.
             if (m_retxParams.waitingAck && m_secondReceiveWindow.IsExpired())
             {
+                /// TODO: UNCONFIRMED packets CAN be retransmitted, but behave slightly differently.
+                /// The current implementation only considers re-txs for CONFIRMED, change this
                 if (m_retxParams.retxLeft == 0)
                 {
                     uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
