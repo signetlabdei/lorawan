@@ -2166,7 +2166,7 @@ AdrBackoffTest::DoRun()
             llch->SetChannel(3, nonDefaultChannel);
         }
         // 7 total backoff steps: 1 tx power + 5 data rate + 1 nbtrans & channels
-        for (uint32_t fCnt = 0; fCnt < ADR_ACK_LIMIT + ADR_ACK_DELAY * 7 + 1; ++fCnt)
+        for (uint32_t fCnt = 0; fCnt <= ADR_ACK_LIMIT + ADR_ACK_DELAY * 7U; ++fCnt)
         {
             SendUplink(Minutes(20), fhdr);
             NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), fCnt, "Unexpected FCnt value in uplink FHDR");
@@ -2202,18 +2202,18 @@ AdrBackoffTest::DoRun()
         LoraFrameHeader fhdr;
         auto ADR_ACK_LIMIT = EndDeviceLorawanMac::ADR_ACK_LIMIT;
         // Trigger ADRACKReq
-        for (uint16_t fCnt = 0; fCnt < EndDeviceLorawanMac::ADR_ACK_LIMIT + 1; ++fCnt)
+        for (uint16_t fCnt = 0; fCnt <= ADR_ACK_LIMIT; ++fCnt)
         {
             SendUplink(Minutes(20), fhdr);
             NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), fCnt, "Unexpected FCnt value in uplink FHDR");
             NS_TEST_EXPECT_MSG_EQ(fhdr.GetAdrAckReq(),
-                                  fCnt >= EndDeviceLorawanMac::ADR_ACK_LIMIT,
+                                  fCnt >= ADR_ACK_LIMIT,
                                   "Unexpected ADRACKReq value in FHDR of uplink fCnt=" << fCnt);
         }
         ReceiveDownlink();
         SendUplink(Minutes(20), fhdr);
         NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(),
-                              EndDeviceLorawanMac::ADR_ACK_LIMIT + 1,
+                              ADR_ACK_LIMIT + 1,
                               "Unexpected FCnt value in uplink FHDR");
         NS_TEST_EXPECT_MSG_EQ(
             fhdr.GetAdrAckReq(),
