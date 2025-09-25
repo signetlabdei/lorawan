@@ -389,7 +389,7 @@ class EndDeviceLorawanMac : public LorawanMac
      */
     double m_lastRxSnr;
 
-    uint32_t m_adrAckCnt; //!< ADRACKCnt counter of the number of consecutive uplinks without
+    uint16_t m_adrAckCnt; //!< ADRACKCnt counter of the number of consecutive uplinks without
                           //!< downlink reply from the server. Reset upon reception of any Class A
                           //!< downlink destined to the device.
 
