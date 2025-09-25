@@ -3,7 +3,6 @@ set(base_examples
     network-server-example
     complete-network-example
     adr-example
-    adr-backoff-example
     lorawan-energy-model-example
     aloha-throughput
     parallel-reception-example
