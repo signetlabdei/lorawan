@@ -2052,7 +2052,7 @@ class AdrBackoffTest : public TestCase
   private:
     /**
      * Create and send an empty app payload unconfirmed frame through the MAC layer to increment
-     * of the FCnt and AdrAckCnt and eventually activate the ADR backoff procedure configurations of
+     * of the FCnt and ADRACKCnt and eventually activate the ADR backoff procedure configurations of
      * the MAC layer. The packet is sent after a delay (simulated time is fast-forwarded to the
      * event) such that the device does not incur any duty-cycle limitation. The sent packet FHDR is
      * returned as argument for validation purposes.
@@ -2172,7 +2172,7 @@ AdrBackoffTest::DoRun()
             NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), fCnt, "Unexpected FCnt value in uplink FHDR");
             NS_TEST_EXPECT_MSG_EQ(fhdr.GetAdrAckReq(),
                                   fCnt >= ADR_ACK_LIMIT,
-                                  "Unexpected AdrAckReq value in FHDR of uplink fCnt=" << fCnt);
+                                  "Unexpected ADRACKReq value in FHDR of uplink fCnt=" << fCnt);
             uint8_t step = (fCnt >= ADR_ACK_LIMIT) ? (fCnt - ADR_ACK_LIMIT) / ADR_ACK_DELAY : 0;
             NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
                                   (step > 0) ? 14 : 0,
@@ -2197,18 +2197,18 @@ AdrBackoffTest::DoRun()
     }
 
     Reset();
-    // AdrAckReq back to false after downlink
+    // ADRACKReq back to false after downlink
     {
         LoraFrameHeader fhdr;
         auto ADR_ACK_LIMIT = EndDeviceLorawanMac::ADR_ACK_LIMIT;
-        // Trigger AdrAckReq
+        // Trigger ADRACKReq
         for (uint16_t fCnt = 0; fCnt < EndDeviceLorawanMac::ADR_ACK_LIMIT + 1; ++fCnt)
         {
             SendUplink(Minutes(20), fhdr);
             NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), fCnt, "Unexpected FCnt value in uplink FHDR");
             NS_TEST_EXPECT_MSG_EQ(fhdr.GetAdrAckReq(),
                                   fCnt >= EndDeviceLorawanMac::ADR_ACK_LIMIT,
-                                  "Unexpected AdrAckReq value in FHDR of uplink fCnt=" << fCnt);
+                                  "Unexpected ADRACKReq value in FHDR of uplink fCnt=" << fCnt);
         }
         ReceiveDownlink();
         SendUplink(Minutes(20), fhdr);
@@ -2218,7 +2218,7 @@ AdrBackoffTest::DoRun()
         NS_TEST_EXPECT_MSG_EQ(
             fhdr.GetAdrAckReq(),
             false,
-            "Unexpected AdrAckReq value in FHDR of uplink fCnt=" << fhdr.GetFCnt());
+            "Unexpected ADRACKReq value in FHDR of uplink fCnt=" << fhdr.GetFCnt());
     }
 }
 
