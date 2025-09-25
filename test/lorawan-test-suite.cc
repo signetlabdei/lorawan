@@ -2040,6 +2040,191 @@ MacCommandTest::DoRun()
 /**
  * @ingroup lorawan
  *
+ * It tests the correct execution of the ADR backoff procedure of LoRaWAN devices.
+ * (See, LoRaWAN L2 1.0.4 Specifications (2020), Section 4.3.1.1)
+ */
+class AdrBackoffTest : public TestCase
+{
+  public:
+    AdrBackoffTest();           //!< Default constructor
+    ~AdrBackoffTest() override; //!< Destructor
+
+  private:
+    /**
+     * Create and send an empty app payload unconfirmed frame through the MAC layer to increment
+     * of the FCnt and AdrAckCnt and eventually activate the ADR backoff procedure configurations of
+     * the MAC layer. The packet is sent after a delay (simulated time is fast-forwarded to the
+     * event) such that the device does not incur any duty-cycle limitation. The sent packet FHDR is
+     * returned as argument for validation purposes.
+     *
+     * @param after Delay to schedule the packet after to avoid duty-cycle limitations
+     * @param fhdr [out] FHDR of the constructed frame passed to PHY by the MAC
+     */
+    void SendUplink(Time after, LoraFrameHeader& fhdr);
+
+    /**
+     * Create and receive an empty payload downlink destined for the LoRaWAN MAC. This is used to
+     * test resetting the ADR backoff procedure.
+     */
+    void ReceiveDownlink();
+
+    /**
+     * This function resets the simulation and device MAC layer, use before test sub-cases.
+     */
+    void Reset();
+
+    void DoRun() override;
+
+    Ptr<ClassAEndDeviceLorawanMac> m_mac; //!< The end device's MAC layer used in tests.
+};
+
+AdrBackoffTest::AdrBackoffTest()
+    : TestCase("Test the ADR backoff procedure of the LoRaWAN MAC protocol")
+{
+}
+
+AdrBackoffTest::~AdrBackoffTest()
+{
+    m_mac = nullptr;
+}
+
+void
+AdrBackoffTest::SendUplink(Time after, LoraFrameHeader& fhdr)
+{
+    Ptr<Packet> pkt;
+    LorawanMacHeader mhdr;
+    // Send packet through the MAC layer
+    pkt = Create<Packet>(0);
+    Simulator::Schedule(after, &ClassAEndDeviceLorawanMac::Send, m_mac, pkt);
+    Simulator::Run();
+    // Retrieve uplink FHDR
+    pkt->RemoveHeader(mhdr);
+    fhdr.SetAsUplink();
+    pkt->RemoveHeader(fhdr);
+    NS_LOG_LOGIC("FHDR: " << fhdr);
+}
+
+void
+AdrBackoffTest::ReceiveDownlink()
+{
+    Ptr<Packet> pkt;
+    LoraFrameHeader fhdr;
+    LorawanMacHeader mhdr;
+    // Prepare DL packet
+    pkt = Create<Packet>(0);
+    fhdr.SetAsDownlink();
+    pkt->AddHeader(fhdr);
+    mhdr.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+    pkt->AddHeader(mhdr);
+    // Trigger MAC layer reception
+    DynamicCast<EndDeviceLoraPhy>(m_mac->GetPhy())
+        ->SwitchToStandby(); // usually done as we open Rx windows
+    m_mac->Receive(pkt);
+}
+
+void
+AdrBackoffTest::Reset()
+{
+    Simulator::Destroy();
+    // Reset MAC state
+    LorawanMacHelper macHelper;
+    macHelper.SetRegion(LorawanMacHelper::EU);
+    macHelper.SetDeviceType(LorawanMacHelper::ED_A);
+    /// @todo Install should not require a node in input.
+    m_mac = DynamicCast<ClassAEndDeviceLorawanMac>(macHelper.Install(nullptr, nullptr));
+    NS_TEST_EXPECT_MSG_NE(m_mac, nullptr, "Failed to initialize MAC layer object.");
+    auto phy = CreateObject<SimpleEndDeviceLoraPhy>();
+    phy->SetChannel(CreateObject<LoraChannel>());
+    phy->SetMobility(CreateObject<ConstantPositionMobilityModel>());
+    m_mac->SetPhy(phy);
+}
+
+void
+AdrBackoffTest::DoRun()
+{
+    NS_LOG_DEBUG("AdrBackoffTest");
+
+    Reset();
+    // Full ADR Backoff procedure
+    {
+        LoraFrameHeader fhdr;
+        auto llch = m_mac->GetLogicalLoraChannelHelper();
+        auto ADR_ACK_LIMIT = EndDeviceLorawanMac::ADR_ACK_LIMIT;
+        auto ADR_ACK_DELAY = EndDeviceLorawanMac::ADR_ACK_DELAY;
+        // Custom config to force full ADR backoff
+        {
+            // Tx parameters to furthest settings from default
+            m_mac->SetDataRate(5);
+            m_mac->SetTransmissionPowerDbm(0);
+            m_mac->SetMaxNumberOfTransmissions(8);
+            auto chVec = llch->GetRawChannelArray();
+            chVec.at(0)->DisableForUplink();
+            chVec.at(1)->DisableForUplink();
+            chVec.at(2)->DisableForUplink();
+            // Provide additional non-default channel for uplinks
+            auto nonDefaultChannel = Create<LogicalLoraChannel>(869850000, 0, 5);
+            llch->SetChannel(3, nonDefaultChannel);
+        }
+        // 7 total backoff steps: 1 tx power + 5 data rate + 1 nbtrans & channels
+        for (uint32_t fCnt = 0; fCnt < ADR_ACK_LIMIT + ADR_ACK_DELAY * 7 + 1; ++fCnt)
+        {
+            SendUplink(Minutes(20), fhdr);
+            NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), fCnt, "Unexpected FCnt value in uplink FHDR");
+            NS_TEST_EXPECT_MSG_EQ(fhdr.GetAdrAckReq(),
+                                  fCnt >= ADR_ACK_LIMIT,
+                                  "Unexpected AdrAckReq value in FHDR of uplink fCnt=" << fCnt);
+            uint8_t step = (fCnt >= ADR_ACK_LIMIT) ? (fCnt - ADR_ACK_LIMIT) / ADR_ACK_DELAY : 0;
+            NS_TEST_EXPECT_MSG_EQ(m_mac->GetTransmissionPowerDbm(),
+                                  (step > 0) ? 14 : 0,
+                                  "Unexpected tx power on uplink fCnt=" << fCnt);
+            uint8_t expectedDr = (step == 0) ? 5 : (step < 7) ? 5 - (step - 1) : 0;
+            NS_TEST_EXPECT_MSG_EQ(m_mac->GetDataRate(),
+                                  expectedDr,
+                                  "Unexpected data rate on uplink fCnt=" << fCnt);
+            auto chVec = llch->GetRawChannelArray();
+            for (uint8_t i = 0; i < 3; ++i)
+            {
+                NS_TEST_EXPECT_MSG_EQ(chVec.at(i)->IsEnabledForUplink(),
+                                      step >= 7,
+                                      "Unexpected activation state of channel "
+                                          << unsigned(i) << " on uplink fCnt=" << fCnt);
+            }
+            NS_TEST_EXPECT_MSG_EQ(
+                chVec.at(3)->IsEnabledForUplink(),
+                true,
+                "Unexpected activation state of channel 3 on uplink fCnt=" << fCnt);
+        }
+    }
+
+    Reset();
+    // AdrAckReq back to false after downlink
+    {
+        LoraFrameHeader fhdr;
+        auto ADR_ACK_LIMIT = EndDeviceLorawanMac::ADR_ACK_LIMIT;
+        // Trigger AdrAckReq
+        for (uint16_t fCnt = 0; fCnt < EndDeviceLorawanMac::ADR_ACK_LIMIT + 1; ++fCnt)
+        {
+            SendUplink(Minutes(20), fhdr);
+            NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), fCnt, "Unexpected FCnt value in uplink FHDR");
+            NS_TEST_EXPECT_MSG_EQ(fhdr.GetAdrAckReq(),
+                                  fCnt >= EndDeviceLorawanMac::ADR_ACK_LIMIT,
+                                  "Unexpected AdrAckReq value in FHDR of uplink fCnt=" << fCnt);
+        }
+        ReceiveDownlink();
+        SendUplink(Minutes(20), fhdr);
+        NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(),
+                              EndDeviceLorawanMac::ADR_ACK_LIMIT + 1,
+                              "Unexpected FCnt value in uplink FHDR");
+        NS_TEST_EXPECT_MSG_EQ(
+            fhdr.GetAdrAckReq(),
+            false,
+            "Unexpected AdrAckReq value in FHDR of uplink fCnt=" << fhdr.GetFCnt());
+    }
+}
+
+/**
+ * @ingroup lorawan
+ *
  * The TestSuite class names the TestSuite, identifies what type of TestSuite, and enables the
  * TestCases to be run. Typically, only the constructor for this class must be defined
  */
@@ -2073,6 +2258,7 @@ LorawanTestSuite::LorawanTestSuite()
     AddTestCase(new TimeOnAirTest, Duration::QUICK);
     AddTestCase(new PhyConnectivityTest, Duration::QUICK);
     AddTestCase(new MacCommandTest, Duration::QUICK);
+    AddTestCase(new AdrBackoffTest, Duration::QUICK);
 }
 
 // Do not forget to allocate an instance of this TestSuite
