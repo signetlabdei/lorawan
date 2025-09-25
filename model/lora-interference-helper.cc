@@ -8,6 +8,8 @@
 
 #include "lora-interference-helper.h"
 
+#include "lora-utils.h"
+
 #include "ns3/enum.h"
 #include "ns3/log.h"
 
@@ -310,10 +312,7 @@ LoraInterferenceHelper::IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Ev
 
         NS_LOG_DEBUG("The two events overlap for " << overlap.As(Time::S));
 
-        // Compute the equivalent energy of the interference
-        // Power [mW] = 10^(Power[dBm]/10)
-        // Power [W] = Power [mW] / 1000
-        double interfererPowerW = pow(10, interfererPower / 10) / 1000;
+        double interfererPowerW = DbmToW(interfererPower);
         // Energy [J] = Time [s] * Power [W]
         double interferenceEnergy = overlap.GetSeconds() * interfererPowerW;
         cumulativeInterferenceEnergy.at(unsigned(interfererSf) - 7) += interferenceEnergy;
@@ -330,7 +329,7 @@ LoraInterferenceHelper::IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Ev
 
         // Use the computed cumulativeInterferenceEnergy to determine whether the
         // interference with this spreading factor destroys the packet
-        double signalPowerW = pow(10, rxPowerDbm / 10) / 1000;
+        double signalPowerW = DbmToW(rxPowerDbm);
         double signalEnergy = duration.GetSeconds() * signalPowerW;
         NS_LOG_DEBUG("Signal power in W: " << signalPowerW);
         NS_LOG_DEBUG("Signal energy: " << signalEnergy);

@@ -47,9 +47,9 @@ NetworkServer::GetTypeId()
 }
 
 NetworkServer::NetworkServer()
-    : m_status(Create<NetworkStatus>()),
-      m_controller(Create<NetworkController>(m_status)),
-      m_scheduler(Create<NetworkScheduler>(m_status, m_controller))
+    : m_status(CreateObject<NetworkStatus>()),
+      m_controller(CreateObject<NetworkController>(m_status)),
+      m_scheduler(CreateObject<NetworkScheduler>(m_status, m_controller))
 {
     NS_LOG_FUNCTION_NOARGS();
 }
@@ -97,7 +97,7 @@ NetworkServer::AddGateway(Ptr<Node> gateway, Ptr<NetDevice> netDevice)
     Address gatewayAddress = p2pNetDevice->GetAddress();
 
     // Create new gatewayStatus
-    Ptr<GatewayStatus> gwStatus = Create<GatewayStatus>(gatewayAddress, netDevice, gwMac);
+    Ptr<GatewayStatus> gwStatus = CreateObject<GatewayStatus>(gatewayAddress, netDevice, gwMac);
 
     m_status->AddGateway(gatewayAddress, gwStatus);
 }
