@@ -314,6 +314,9 @@ class EndDeviceLorawanMac : public LorawanMac
      */
     void AddMacCommand(Ptr<MacCommand> macCommand);
 
+    static constexpr uint16_t ADR_ACK_LIMIT = 64; //!< AdrAckCnt threshold for setting AdrAckReq
+    static constexpr uint16_t ADR_ACK_DELAY = 32; //!< AdrAckCnt threshold for ADR backoff action
+
   protected:
     /**
      * Structure representing the parameters that will be used in the

@@ -20,9 +20,6 @@
 
 #include <bitset>
 
-#define ADR_ACK_LIMIT 64
-#define ADR_ACK_DELAY 32
-
 namespace ns3
 {
 namespace lorawan
