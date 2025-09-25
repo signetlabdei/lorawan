@@ -101,6 +101,12 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Signals to the network server that this device will or may not comply with LinkADRReq
      * settings (data rate, transmission power and number of retransmissions) received in downlink.
+     * This also controls whether the local ADR backoff procedure can reset configurations in case
+     * of connectivity loss. A false value effectively allows for a fully static transmission
+     * parameters configuration.
+     *
+     * @note Setting this to false does not prevent the device from setting the ADRACKReq bit
+     * in its FHDR to request a keepalive downlink message from the server.
      *
      * @param adr The ADR bit.
      */
@@ -110,7 +116,7 @@ class EndDeviceLorawanMac : public LorawanMac
      * Get the current value of the device's uplink ADR bit of the LoRaWAN FHDR.
      *
      * @return true The device will comply with data rate, transmission power and number of
-     * retransmissions settings received from the network server via LikADRReq.
+     * retransmissions settings received from the network server via LinkADRReq.
      * @return false Signals to the network server that the device may not comply with the data
      * rate, transmission power and number of retransmissions settings received via LikADRReq.
      */
@@ -433,7 +439,8 @@ class EndDeviceLorawanMac : public LorawanMac
                 //!< Controlled by the device, if set to false signals the network server
                 //!< that the device may not accept attempts to control the number of
                 //!< retransmissions, the data rate, or the TX power with downlink
-                //!< LinkADRReq commands.
+                //!< LinkADRReq commands. This also allows the device's local ADR backoff
+                //!< procedure to reset configurations in case of connectivity loss.
 
     /**
      * The event of retransmitting a packet in a consecutive moment if an ACK is not received.

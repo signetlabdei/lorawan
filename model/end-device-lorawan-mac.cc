@@ -52,7 +52,9 @@ EndDeviceLorawanMac::GetTypeId()
             .AddAttribute(
                 "ADR",
                 "Ensure to the network server that this device will accept data rate, transmission "
-                "power and number of retransmissions configurations received via LinkADRReq.",
+                "power and number of retransmissions configurations received via LinkADRReq. This "
+                "also allows the device's local ADR backoff procedure to reset configurations in "
+                "case of connectivity loss.",
                 BooleanValue(true),
                 MakeBooleanAccessor(&EndDeviceLorawanMac::m_adr),
                 MakeBooleanChecker())
