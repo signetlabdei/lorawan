@@ -149,28 +149,6 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
     NS_ASSERT_MSG(packet != m_retxParams.packet || m_retxParams.retxLeft > 0,
                   "Max number of transmissions already achieved for this packet");
 
-    // Check if there is a channel suitable for TX (checks data rate etc.)
-    auto txChannel = GetChannelForTx();
-    if (!txChannel)
-    {
-        NS_LOG_ERROR("Suitable tx channel not found: packet not transmitted.");
-        return;
-    }
-
-    // Make sure we can transmit at the current power on this channel
-    NS_ASSERT_MSG(m_txPowerDbm <= m_channelHelper->GetTxPowerForChannel(txChannel),
-                  "The selected power is too high to be supported by this channel.");
-
-    // If it is not possible to transmit now because of the duty cycle,
-    // or because we are receiving, schedule a tx/retx later
-    Time netxTxDelay = GetNextTransmissionDelay();
-    if (netxTxDelay.IsStrictlyPositive())
-    {
-        PostponeTransmission(netxTxDelay, packet);
-        m_cannotSendBecauseDutyCycle(packet);
-        return;
-    }
-
     if (packet == m_retxParams.packet)
     {
         NS_LOG_DEBUG("Retransmitting an old packet.");
@@ -212,6 +190,27 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
     if (!IsPayloadSizeValid(packet->GetSize(), m_dataRate))
     {
         NS_LOG_ERROR("Application payload exceeding maximum size. Transmission aborted.");
+        return;
+    }
+
+    // Check if there is a channel suitable for TX (checks data rate etc.)
+    auto txChannel = GetChannelForTx();
+    if (!txChannel)
+    {
+        NS_LOG_ERROR("Suitable tx channel not found: packet not transmitted.");
+        return;
+    }
+
+    // Make sure we can transmit at the current power on this channel
+    NS_ASSERT_MSG(m_txPowerDbm <= m_channelHelper->GetTxPowerForChannel(txChannel),
+                  "The selected power is too high to be supported by this channel.");
+
+    // If it is not possible to transmit now because of the duty cycle,
+    // or because we are receiving, schedule a tx/retx later
+    if (auto netxTxDelay = GetNextTransmissionDelay(); netxTxDelay.IsStrictlyPositive())
+    {
+        PostponeTransmission(netxTxDelay, packet);
+        m_cannotSendBecauseDutyCycle(packet);
         return;
     }
 
