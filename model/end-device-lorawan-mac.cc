@@ -206,10 +206,12 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
     }
     NS_ASSERT(m_adrAckCnt < 2400);
 
-    /// @warning This is influenced by ADR backoff on non-reTx
+    // This check is influenced by ADR backoff. This is OK because (by LoRaWAN design) you either
+    // use ADR and constrain your max app payload according to the default initial DR0, or you
+    // disable ADR for a fixed data rate, with the possibility of using bigger payloads.
     if (!IsPayloadSizeValid(packet->GetSize(), m_dataRate))
     {
-        NS_LOG_WARN("Application payload exceeding maximum size. Transmission aborted.");
+        NS_LOG_ERROR("Application payload exceeding maximum size. Transmission aborted.");
         return;
     }
 
