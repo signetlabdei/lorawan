@@ -85,7 +85,7 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
 
     // Wake up PHY layer and directly send the packet
 
-    Ptr<LogicalLoraChannel> txChannel = GetChannelForTx();
+    Ptr<LogicalLoraChannel> txChannel = GetRandomChannelForTx();
 
     NS_LOG_DEBUG("PacketToSend: " << packetToSend);
     m_phy->Send(packetToSend, params, txChannel->GetFrequency(), m_txPowerDbm);

@@ -194,7 +194,7 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
     }
 
     // Check if there is a channel suitable for TX (checks data rate etc.)
-    auto txChannel = GetChannelForTx();
+    auto txChannel = GetRandomChannelForTx();
     if (!txChannel)
     {
         NS_LOG_ERROR("Suitable tx channel not found: packet not transmitted.");
@@ -518,7 +518,7 @@ EndDeviceLorawanMac::GetNextTransmissionDelay()
 }
 
 Ptr<LogicalLoraChannel>
-EndDeviceLorawanMac::GetChannelForTx()
+EndDeviceLorawanMac::GetRandomChannelForTx()
 {
     NS_LOG_FUNCTION(this);
     /// @todo possibly move to LogicalChannelHelper

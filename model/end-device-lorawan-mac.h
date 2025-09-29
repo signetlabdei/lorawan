@@ -355,13 +355,12 @@ class EndDeviceLorawanMac : public LorawanMac
     virtual Time GetNextClassTransmissionDelay(Time waitTime);
 
     /**
-     * Find a suitable channel for transmission. The channel is chosen among the
-     * ones that are available in the end device, based on their duty
-     * cycle limitations.
+     * Find a suitable channel for transmission. The channel is chosen randomly among the
+     * ones that are available in the end device, based on their duty cycle limitations.
      *
      * @return A pointer to the channel.
      */
-    Ptr<LogicalLoraChannel> GetChannelForTx();
+    Ptr<LogicalLoraChannel> GetRandomChannelForTx();
 
     /**
      * The duration of a receive window in number of symbols. This should be
