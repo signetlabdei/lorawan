@@ -145,11 +145,11 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
 {
     NS_LOG_FUNCTION(this << packet);
 
-    if (packet == m_retxParams.packet && m_retxParams.retxLeft == 0) // retransmission
-    {
-        NS_LOG_ERROR("Max number of transmission already achieved: packet not transmitted.");
-        return;
-    }
+    bool packetRetransmission = (packet == m_retxParams.packet);
+
+    // Retx are scheduled by Receive, FailedReception, CloseSecondReceiveWindow only if retxLeft > 0
+    NS_ASSERT_MSG(!packetRetransmission || m_retxParams.retxLeft > 0,
+                  "Max number of transmissions already achieved for this packet");
 
     // Check if there is a channel suitable for TX (checks data rate etc.)
     auto txChannel = GetChannelForTx();
@@ -170,11 +170,10 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
     {
         PostponeTransmission(netxTxDelay, packet);
         m_cannotSendBecauseDutyCycle(packet);
+        return;
     }
-    else
-    {
-        DoSend(packet);
-    }
+
+    DoSend(packet);
 }
 
 void
