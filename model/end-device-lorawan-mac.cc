@@ -193,20 +193,15 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
         return;
     }
 
-    // Check if there is a channel suitable for TX (checks data rate etc.)
-    auto txChannel = GetRandomChannelForTx();
-    if (!txChannel)
+    // Check if there is a channel suitable for TX (checks data rate & tx power etc.)
+    if (GetCompatibleTxChannels().empty())
     {
-        NS_LOG_ERROR("Suitable tx channel not found: packet not transmitted.");
+        NS_LOG_ERROR("No tx channel compatible with current DR/power. Transmission aborted.");
         return;
     }
 
-    // Make sure we can transmit at the current power on this channel
-    NS_ASSERT_MSG(m_txPowerDbm <= m_channelHelper->GetTxPowerForChannel(txChannel),
-                  "The selected power is too high to be supported by this channel.");
-
-    // If it is not possible to transmit now because of the duty cycle,
-    // or because we are receiving, schedule a tx/retx later
+    // If it is not possible to transmit now because of the duty cycle
+    // or because we are currently in the process of receiving, schedule a tx/retx later
     if (auto netxTxDelay = GetNextTransmissionDelay(); netxTxDelay.IsStrictlyPositive())
     {
         PostponeTransmission(netxTxDelay, packet);
@@ -494,24 +489,46 @@ EndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitTime)
     return waitTime;
 }
 
-Time
-EndDeviceLorawanMac::GetNextTransmissionDelay()
+std::vector<Ptr<LogicalLoraChannel>>
+EndDeviceLorawanMac::GetCompatibleTxChannels()
 {
     NS_LOG_FUNCTION(this);
-    // Check duty cycle
     /// @todo possibly move to LogicalChannelHelper
-    auto waitTime = Time::Max();
+    std::vector<Ptr<LogicalLoraChannel>> candidates;
     for (const auto& channel : m_channelHelper->GetRawChannelArray())
     {
         if (channel && channel->IsEnabledForUplink()) // Skip empty frequency channel slots
         {
-            auto curr = m_channelHelper->GetWaitTime(channel);
-            if (curr < waitTime)
+            uint8_t minDr = channel->GetMinimumDataRate();
+            uint8_t maxDr = channel->GetMaximumDataRate();
+            double maxTxPower = m_channelHelper->GetTxPowerForChannel(channel);
+            NS_LOG_DEBUG("Enabled channel: frequency=" << channel->GetFrequency()
+                                                       << "Hz, minDr=" << unsigned(minDr)
+                                                       << ", maxDr=" << unsigned(maxDr)
+                                                       << ", maxTxPower=" << maxTxPower << "dBm");
+            if (m_dataRate >= minDr && m_dataRate <= maxDr && m_txPowerDbm <= maxTxPower)
             {
-                waitTime = curr;
+                candidates.emplace_back(channel);
             }
-            NS_LOG_DEBUG("frequency=" << channel->GetFrequency() << "Hz,"
-                                      << " waitTime=" << waitTime.As(Time::S));
+        }
+    }
+    return candidates;
+}
+
+Time
+EndDeviceLorawanMac::GetNextTransmissionDelay()
+{
+    NS_LOG_FUNCTION(this);
+    // Check duty cycle of compatible channels
+    auto waitTime = Time::Max();
+    for (const auto& channel : GetCompatibleTxChannels())
+    {
+        auto curr = m_channelHelper->GetWaitTime(channel);
+        NS_LOG_DEBUG("frequency=" << channel->GetFrequency() << "Hz,"
+                                  << " waitTime=" << curr.As(Time::S));
+        if (curr < waitTime)
+        {
+            waitTime = curr;
         }
     }
     return GetNextClassTransmissionDelay(waitTime);
@@ -523,20 +540,11 @@ EndDeviceLorawanMac::GetRandomChannelForTx()
     NS_LOG_FUNCTION(this);
     /// @todo possibly move to LogicalChannelHelper
     std::vector<Ptr<LogicalLoraChannel>> candidates;
-    for (const auto& channel : m_channelHelper->GetRawChannelArray())
+    for (const auto& channel : GetCompatibleTxChannels())
     {
-        if (channel && channel->IsEnabledForUplink()) // Skip empty frequency channel slots
+        if (m_channelHelper->GetWaitTime(channel).IsZero())
         {
-            uint8_t minDr = channel->GetMinimumDataRate();
-            uint8_t maxDr = channel->GetMaximumDataRate();
-            Time waitTime = m_channelHelper->GetWaitTime(channel);
-            NS_LOG_DEBUG("Enabled channel: frequency="
-                         << channel->GetFrequency() << " Hz, minDr=" << unsigned(minDr)
-                         << ", maxDr=" << unsigned(maxDr) << ", waitTime=" << waitTime.As(Time::S));
-            if (m_dataRate >= minDr && m_dataRate <= maxDr && waitTime.IsZero())
-            {
-                candidates.emplace_back(channel);
-            }
+            candidates.emplace_back(channel);
         }
     }
     if (candidates.empty())
@@ -546,7 +554,7 @@ EndDeviceLorawanMac::GetRandomChannelForTx()
     }
     uint8_t i = m_uniformRV->GetInteger(0, candidates.size() - 1);
     auto channel = candidates.at(i);
-    NS_LOG_DEBUG("Selected channel with frequency=" << channel->GetFrequency() << " Hz");
+    NS_LOG_DEBUG("Selected channel with frequency=" << channel->GetFrequency() << "Hz");
     return channel;
 }
 

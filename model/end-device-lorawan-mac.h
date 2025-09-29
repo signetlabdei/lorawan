@@ -409,6 +409,14 @@ class EndDeviceLorawanMac : public LorawanMac
 
   private:
     /**
+     * Get the set of active transmission channels compatible with the current device data rate and
+     * transmission power.
+     *
+     * @return A (possibly empty) vector of compatible transmission channels.
+     */
+    std::vector<Ptr<LogicalLoraChannel>> GetCompatibleTxChannels();
+
+    /**
      * Find the base minimum wait time before the next possible transmission.
      *
      * @return The base minimum wait time.
