@@ -224,24 +224,11 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
     m_adrAckReq = (m_adrAckCnt >= ADR_ACK_LIMIT); // Set the ADRACKReq bit in frame header
     if (m_adrAckCnt >= ADR_ACK_LIMIT + ADR_ACK_DELAY)
     {
-        if (retransmission)
-        {
-            // Preempt execution on reTx if breaking next DR payload size constraint
-            if (m_dataRate == 0 || IsPayloadSizeValid(packet->GetSize(), m_dataRate - 1))
-            {
-                ExecuteADRBackoff();
-                m_adrAckCnt = ADR_ACK_LIMIT;
-            }
-        }
-        else
-        {
-            ExecuteADRBackoff();
-            m_adrAckCnt = ADR_ACK_LIMIT;
-        }
+        // Unreachable by retx: they do not increase ADRACKCnt
+        ExecuteADRBackoff();
+        m_adrAckCnt = ADR_ACK_LIMIT;
     }
-
-    NS_ASSERT_MSG(m_adrAckCnt < 2400,
-                  "Device may be stuck in a tx abort loop: packet size too big after ADR backoff?");
+    NS_ASSERT(m_adrAckCnt < 2400);
 
     /// @warning This is influenced by ADR backoff on non-reTx
     if (!IsPayloadSizeValid(packet->GetSize(), m_dataRate))
