@@ -77,7 +77,7 @@ class EndDeviceLorawanMac : public LorawanMac
      * @param nextTxDelay Delay at which the transmission will be performed.
      * @param packet The packet to delay the transmission of.
      */
-    virtual void postponeTransmission(Time nextTxDelay, Ptr<Packet> packet);
+    virtual void PostponeTransmission(Time nextTxDelay, Ptr<Packet> packet);
 
     ///////////////////////
     // Receiving methods //

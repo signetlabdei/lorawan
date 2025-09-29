@@ -168,7 +168,7 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
     Time netxTxDelay = GetNextTransmissionDelay();
     if (netxTxDelay.IsStrictlyPositive())
     {
-        postponeTransmission(netxTxDelay, packet);
+        PostponeTransmission(netxTxDelay, packet);
         m_cannotSendBecauseDutyCycle(packet);
     }
     else
@@ -178,7 +178,7 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
 }
 
 void
-EndDeviceLorawanMac::postponeTransmission(Time netxTxDelay, Ptr<Packet> packet)
+EndDeviceLorawanMac::PostponeTransmission(Time netxTxDelay, Ptr<Packet> packet)
 {
     NS_LOG_FUNCTION(this);
     // Delete previously scheduled transmissions if any.
