@@ -171,26 +171,6 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
         return;
     }
 
-    DoSend(packet);
-}
-
-void
-EndDeviceLorawanMac::PostponeTransmission(Time netxTxDelay, Ptr<Packet> packet)
-{
-    NS_LOG_FUNCTION(this);
-    // Delete previously scheduled transmissions if any.
-    Simulator::Cancel(m_nextTx);
-    m_nextTx = Simulator::Schedule(netxTxDelay, &EndDeviceLorawanMac::DoSend, this, packet);
-    NS_LOG_WARN("Attempting to send, but the aggregate duty cycle won't allow it. Scheduling a tx "
-                "at a delay "
-                << netxTxDelay.As(Time::S) << ".");
-}
-
-void
-EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
-{
-    NS_LOG_FUNCTION(this);
-
     if (packet == m_retxParams.packet)
     {
         NS_LOG_DEBUG("Retransmitting an old packet.");
@@ -236,6 +216,26 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
     ///////////////////////////////////////////////////////
     // From here on out, the pkt transmission is assured //
     ///////////////////////////////////////////////////////
+
+    DoSend(packet);
+}
+
+void
+EndDeviceLorawanMac::PostponeTransmission(Time netxTxDelay, Ptr<Packet> packet)
+{
+    NS_LOG_FUNCTION(this);
+    // Delete previously scheduled transmissions if any.
+    Simulator::Cancel(m_nextTx);
+    m_nextTx = Simulator::Schedule(netxTxDelay, &EndDeviceLorawanMac::DoSend, this, packet);
+    NS_LOG_WARN("Attempting to send, but the aggregate duty cycle won't allow it. Scheduling a tx "
+                "at a delay "
+                << netxTxDelay.As(Time::S) << ".");
+}
+
+void
+EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
+{
+    NS_LOG_FUNCTION(this);
 
     // Add the Lora Frame Header to the packet
     LoraFrameHeader frameHdr;
