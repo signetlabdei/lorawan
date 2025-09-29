@@ -145,10 +145,8 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
 {
     NS_LOG_FUNCTION(this << packet);
 
-    bool packetRetransmission = (packet == m_retxParams.packet);
-
     // Retx are scheduled by Receive, FailedReception, CloseSecondReceiveWindow only if retxLeft > 0
-    NS_ASSERT_MSG(!packetRetransmission || m_retxParams.retxLeft > 0,
+    NS_ASSERT_MSG(packet != m_retxParams.packet || m_retxParams.retxLeft > 0,
                   "Max number of transmissions already achieved for this packet");
 
     // Check if there is a channel suitable for TX (checks data rate etc.)
@@ -193,9 +191,7 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
 {
     NS_LOG_FUNCTION(this);
 
-    bool retransmission = (packet == m_retxParams.packet);
-
-    if (retransmission)
+    if (packet == m_retxParams.packet)
     {
         NS_LOG_DEBUG("Retransmitting an old packet.");
         // Fail if it is a retransmission already ACKed
@@ -252,7 +248,7 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
     packet->AddHeader(macHdr);
     NS_LOG_INFO("Added MAC header of size " << macHdr.GetSerializedSize() << " bytes.");
 
-    if (!retransmission)
+    if (packet != m_retxParams.packet)
     {
         NS_LOG_DEBUG("Resetting retransmission parameters.");
         // Reset MAC command list
@@ -271,7 +267,7 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
     SendToPhy(packet);
     // Decrease the number of transmissions left
     m_retxParams.retxLeft--;
-    if (!retransmission)
+    if (packet != m_retxParams.packet)
     {
         m_sentNewPacket(packet); // Fire trace source
         // Bump-up frame counters
