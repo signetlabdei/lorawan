@@ -96,6 +96,8 @@ LoraRadioEnergyModel::SetEnergySource(Ptr<EnergySource> source)
     NS_LOG_FUNCTION(this << source);
     NS_ASSERT(source);
     m_source = source;
+
+    ScheduleSwitchToOff(m_currentState);
 }
 
 double
@@ -205,37 +207,35 @@ LoraRadioEnergyModel::SetTxCurrentFromModel(double txPowerDbm)
     }
 }
 
+Time
+LoraRadioEnergyModel::GetMaximumTimeInState(EndDeviceLoraPhy::State state) const
+{
+    if(state == EndDeviceLoraPhy::OFF)
+    {
+        NS_FATAL_ERROR("Requested maximum remaining time for OFF state");
+    }
+    const auto remainingEnergy = m_source->GetRemainingEnergy();
+    const auto supplyVoltage = m_source->GetSupplyVoltage();
+    const auto current = GetStateA(state);
+    return Seconds(remainingEnergy / (current * supplyVoltage));
+}
+
 void
 LoraRadioEnergyModel::ChangeState(int newState)
 {
-    NS_LOG_FUNCTION(this << newState);
+    const EndDeviceLoraPhy::State newPhyState = (EndDeviceLoraPhy::State)newState;
+    NS_LOG_FUNCTION(this << newPhyState);
 
+    // new schedule switch to OFF when we change state
+    ScheduleSwitchToOff(newPhyState);
+    
     Time duration = Now() - m_lastUpdateTime;
     NS_ASSERT(duration.IsPositive()); // check if duration is valid
 
     // energy to decrease = current * voltage * time
-    double energyToDecrease = 0.0;
+    // double energyToDecrease = 0.0;
     double supplyVoltage = m_source->GetSupplyVoltage();
-    switch (m_currentState)
-    {
-    case EndDeviceLoraPhy::STANDBY:
-        energyToDecrease = duration.GetSeconds() * m_idleCurrentA * supplyVoltage;
-        break;
-    case EndDeviceLoraPhy::TX:
-        energyToDecrease = duration.GetSeconds() * m_txCurrentA * supplyVoltage;
-        break;
-    case EndDeviceLoraPhy::RX:
-        energyToDecrease = duration.GetSeconds() * m_rxCurrentA * supplyVoltage;
-        break;
-    case EndDeviceLoraPhy::SLEEP:
-        energyToDecrease = duration.GetSeconds() * m_sleepCurrentA * supplyVoltage;
-        break;
-    case EndDeviceLoraPhy::OFF:
-        energyToDecrease = 0.0;
-        break;
-    default:
-        NS_FATAL_ERROR("LoraRadioEnergyModel:Undefined radio state: " << m_currentState);
-    }
+    double energyToDecrease = duration.GetSeconds() * GetStateA(m_currentState) * supplyVoltage;
 
     // update total energy consumption
     m_totalEnergyConsumption += energyToDecrease;
@@ -258,7 +258,7 @@ LoraRadioEnergyModel::ChangeState(int newState)
     if (!m_isSupersededChangeState)
     {
         // update current state & last update time stamp
-        SetLoraRadioState((EndDeviceLoraPhy::State)newState);
+        SetLoraRadioState(newPhyState);
 
         // some debug message
         NS_LOG_DEBUG("LoraRadioEnergyModel:Total energy consumption is " << m_totalEnergyConsumption
@@ -287,6 +287,8 @@ LoraRadioEnergyModel::HandleEnergyChanged()
 {
     NS_LOG_FUNCTION(this);
     NS_LOG_DEBUG("LoraRadioEnergyModel:Energy changed!");
+
+    ScheduleSwitchToOff(m_currentState);
 }
 
 void
@@ -329,10 +331,10 @@ LoraRadioEnergyModel::DoDispose()
 }
 
 double
-LoraRadioEnergyModel::DoGetCurrentA() const
+LoraRadioEnergyModel::GetStateA(EndDeviceLoraPhy::State state) const
 {
     NS_LOG_FUNCTION(this);
-    switch (m_currentState)
+    switch (state)
     {
     case EndDeviceLoraPhy::STANDBY:
         return m_idleCurrentA;
@@ -345,8 +347,15 @@ LoraRadioEnergyModel::DoGetCurrentA() const
     case EndDeviceLoraPhy::OFF:
         return 0.0;
     default:
-        NS_FATAL_ERROR("LoraRadioEnergyModel:Undefined radio state:" << m_currentState);
+        NS_FATAL_ERROR("LoraRadioEnergyModel:Undefined radio state:" << state);
     }
+}
+
+double
+LoraRadioEnergyModel::DoGetCurrentA() const
+{
+    NS_LOG_FUNCTION(this);
+    return GetStateA(m_currentState);
 }
 
 void
@@ -375,6 +384,24 @@ LoraRadioEnergyModel::SetLoraRadioState(const EndDeviceLoraPhy::State state)
     }
     NS_LOG_DEBUG("LoraRadioEnergyModel:Switching to state: " << stateName
                                                              << " at time = " << Now().As(Time::S));
+}
+
+void
+LoraRadioEnergyModel::ScheduleSwitchToOff(EndDeviceLoraPhy::State state)
+{
+    NS_LOG_FUNCTION(this << state);
+
+    if (state == EndDeviceLoraPhy::OFF)
+    {
+        return;
+    }
+    m_switchToOffEvent.Cancel();
+    const auto durationToOff = GetMaximumTimeInState(state);
+    m_switchToOffEvent = Simulator::Schedule(
+        durationToOff,
+        &LoraRadioEnergyModel::ChangeState, 
+        this, 
+        static_cast<int>(EndDeviceLoraPhy::OFF));
 }
 
 // -------------------------------------------------------------------------- //
