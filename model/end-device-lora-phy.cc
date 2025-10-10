@@ -182,6 +182,20 @@ EndDeviceLoraPhy::SwitchToSleep()
     }
 }
 
+void
+EndDeviceLoraPhy::SwitchToOff()
+{
+    NS_LOG_FUNCTION_NOARGS();
+
+    m_state = OFF;
+
+    // Notify listeners of the state change
+    for (auto i = m_listeners.begin(); i != m_listeners.end(); i++)
+    {
+        (*i)->NotifyOff();
+    }
+}
+
 EndDeviceLoraPhy::State
 EndDeviceLoraPhy::GetState()
 {

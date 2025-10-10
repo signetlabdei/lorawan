@@ -222,6 +222,11 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
             // Fire the beginning of reception trace source
             m_phyRxBeginTrace(packet);
         }
+        break;
+    }
+    case OFF: {
+        NS_LOG_INFO("Dropping packet because device is in OFF state");
+        break;
     }
     }
 }

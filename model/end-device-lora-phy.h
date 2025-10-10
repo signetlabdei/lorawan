@@ -69,6 +69,11 @@ class EndDeviceLoraPhyListener
      * Notify listeners that we woke up.
      */
     virtual void NotifyStandby() = 0;
+
+    /**
+     * Notify listeners that we turned off
+     */
+    virtual void NotifyOff() = 0;
 };
 
 /**
@@ -129,7 +134,12 @@ class EndDeviceLoraPhy : public LoraPhy
          * While the device is locked on an incoming packet, transmission is
          * not possible.
          */
-        RX
+        RX,
+
+        /**
+         * The PHY layer is turned off.
+         */
+        OFF
     };
 
     /**
@@ -206,6 +216,11 @@ class EndDeviceLoraPhy : public LoraPhy
      * Switch to the SLEEP state.
      */
     void SwitchToSleep();
+
+    /**
+     * Switch to the OFF state.
+     */
+    void SwitchToOff();
 
     /**
      * Add the input listener to the list of objects to be notified of PHY-level

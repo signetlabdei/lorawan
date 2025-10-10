@@ -80,6 +80,11 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
      */
     void NotifyStandby() override;
 
+    /**
+     * Defined in ns3::LoraEndDevicePhyListener.
+     */
+    void NotifyOff() override;
+
   private:
     /**
      * A helper function that makes scheduling m_changeStateCallback possible.
@@ -258,7 +263,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
     void HandleEnergyDepletion() override;
 
     /**
-     * Handles energy recharged.
+     * Handles energy chagned.
      *
      * Implements DeviceEnergyModel::HandleEnergyChanged.
      */
@@ -275,6 +280,11 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
      * @return Pointer to the PHY listener.
      */
     LoraRadioEnergyModelPhyListener* GetPhyListener();
+
+    /**
+     * @return Callback for energy depletion handling.
+     */
+    LoraRadioEnergyDepletionCallback GetEnergyDepletionCallback() const;
 
   private:
     void DoDispose() override;
