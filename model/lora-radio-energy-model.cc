@@ -226,14 +226,13 @@ LoraRadioEnergyModel::ChangeState(int newState)
     const EndDeviceLoraPhy::State newPhyState = (EndDeviceLoraPhy::State)newState;
     NS_LOG_FUNCTION(this << newPhyState);
 
-    // new schedule switch to OFF when we change state
+    // renew schedule switch to OFF when we change state
     ScheduleSwitchToOff(newPhyState);
     
     Time duration = Now() - m_lastUpdateTime;
     NS_ASSERT(duration.IsPositive()); // check if duration is valid
 
     // energy to decrease = current * voltage * time
-    // double energyToDecrease = 0.0;
     double supplyVoltage = m_source->GetSupplyVoltage();
     double energyToDecrease = duration.GetSeconds() * GetStateA(m_currentState) * supplyVoltage;
 
