@@ -76,9 +76,16 @@ jobs:
       - run: pip install pyyaml cmake cmake-format ninja wget
       - name: "Checkout this repository as ns-3 module"
         uses: ./.github/actions/checkout-in-ns3
+      - run: ./ns3 configure --enable-modules=core
       - run: |
-          ./ns3 configure --enable-modules=core
-          ./ns3 build cmake-format-check
+          if (! ./ns3 build cmake-format-check) ; then
+            echo "Bad formatting detected in CMake files.";
+            echo "To fix the formatting issues, run the following command:";
+            echo "   $ ./ns3 build cmake-format";
+            echo "Note that it requires having cmake-format installed in your system.";
+            echo "You might need to run \"./ns3 configure\" after installing it.";
+            exit 1;
+          fi
 
   # Markdown linting
   markdown-lint:
