@@ -2040,6 +2040,88 @@ MacCommandTest::DoRun()
 /**
  * @ingroup lorawan
  *
+ * It tests that LoraTag correctly serializes and deserilizes
+ */
+class LoraTagTest : public TestCase
+{
+  public:
+    LoraTagTest();           //!< Default constructor
+    ~LoraTagTest() override; //!< Destructor
+
+  private:
+    void DoRun() override;
+};
+
+// Add some help text to this case to describe what it is intended to test
+LoraTagTest::LoraTagTest()
+    : TestCase("Verify that LoraTag works as expected")
+{
+}
+
+// Reminder that the test case should clean up after itself
+LoraTagTest::~LoraTagTest()
+{
+}
+
+void
+LoraTagTest::DoRun()
+{
+    const uint32_t freq = 868100000;
+    const uint8_t destroyedBy = 42;
+    const uint8_t dataRate = 3;
+    const double receivePower = -122;
+    const uint8_t spreadingFactor = 9;
+
+    // Test constants are correctly:
+    NS_TEST_EXPECT_MSG_EQ(LoraTag::SYNC_WORD_LORAWAN,
+                          0x34,
+                          "Sync word 0x34 is used in the public LoRaWAN");
+
+    // Check that default parameters make sense
+    LoraTag tag(spreadingFactor, destroyedBy);
+    NS_TEST_EXPECT_MSG_EQ(tag.GetSyncWord(),
+                          LoraTag::SYNC_WORD_LORAWAN,
+                          "Default sync word should be suitable to join the public LoRaWAN");
+    NS_TEST_EXPECT_MSG_EQ(tag.GetSpreadingFactor(),
+                          spreadingFactor,
+                          "Spreading factor not initialized correctly");
+    NS_TEST_EXPECT_MSG_EQ(tag.GetDestroyedBy(),
+                          destroyedBy,
+                          "DestroyedBy not initialized correctly");
+
+    tag.SetFrequency(freq);
+    tag.SetDataRate(dataRate);
+    tag.SetReceivePower(receivePower);
+    tag.SetSpreadingFactor(spreadingFactor);
+
+    Packet pkt;
+    pkt.AddPacketTag(tag);
+
+    LoraTag tag2;
+    NS_TEST_ASSERT_MSG_EQ(pkt.RemovePacketTag(tag2), true, "Failed to deserialized LoraTag");
+    NS_TEST_EXPECT_MSG_EQ(tag.GetFrequency(),
+                          freq,
+                          "Frequency not correctly serialized/deserialized");
+    NS_TEST_EXPECT_MSG_EQ(tag.GetDestroyedBy(),
+                          destroyedBy,
+                          "DestroyedBy not correctly serialized/deserialized");
+    NS_TEST_EXPECT_MSG_EQ(tag.GetDataRate(),
+                          dataRate,
+                          "DataRate not correctly serialized/deserialized");
+    NS_TEST_EXPECT_MSG_EQ(tag.GetReceivePower(),
+                          receivePower,
+                          "ReceivePower not correctly serialized/deserialized");
+    NS_TEST_EXPECT_MSG_EQ(tag.GetSpreadingFactor(),
+                          spreadingFactor,
+                          "SpreadingFactor not correctly serialized/deserialized");
+    NS_TEST_EXPECT_MSG_EQ(tag.GetSyncWord(),
+                          LoraTag::SYNC_WORD_LORAWAN,
+                          "SpreadingFactor not correctly serialized/deserialized");
+}
+
+/**
+ * @ingroup lorawan
+ *
  * The TestSuite class names the TestSuite, identifies what type of TestSuite, and enables the
  * TestCases to be run. Typically, only the constructor for this class must be defined
  */
@@ -2073,6 +2155,7 @@ LorawanTestSuite::LorawanTestSuite()
     AddTestCase(new TimeOnAirTest, Duration::QUICK);
     AddTestCase(new PhyConnectivityTest, Duration::QUICK);
     AddTestCase(new MacCommandTest, Duration::QUICK);
+    AddTestCase(new LoraTagTest, Duration::QUICK);
 }
 
 // Do not forget to allocate an instance of this TestSuite

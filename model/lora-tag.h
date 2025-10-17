@@ -25,6 +25,8 @@ namespace lorawan
 class LoraTag : public Tag
 {
   public:
+    static const uint8_t SYNC_WORD_LORAWAN; //!< The sync word used in public LoRaWAN
+
     /**
      *  Register this type.
      *  @return The object TypeId.
@@ -129,8 +131,23 @@ class LoraTag : public Tag
      */
     void SetDataRate(uint8_t dataRate);
 
+    /**
+     * Set the sync word of this packet.
+     *
+     * @param syncWord The sync word to set
+     */
+    void SetSyncWord(uint8_t syncWord);
+
+    /**
+     * Get the sync word of this packet.
+     *
+     * @return The sync word of this packet
+     */
+    uint8_t GetSyncWord() const;
+
   private:
     uint8_t m_sf;           //!< The Spreading Factor used by the packet.
+    uint8_t m_sync;         //!< The sync word of this packet.
     uint8_t m_destroyedBy;  //!< The Spreading Factor that destroyed the packet.
     double m_receivePower;  //!< The reception power of this packet.
     uint8_t m_dataRate;     //!< The data rate that needs to be used to send this packet.
