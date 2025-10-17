@@ -1018,7 +1018,7 @@ TimeOnAirTest::DoRun()
     LoraTxParameters txParams;
     txParams.sf = 7;
     txParams.headerDisabled = false;
-    txParams.codingRate = 1;
+    txParams.codingRate = LoraTxParameters::CODING_RATE_4_5;
     txParams.bandwidthHz = 125000;
     txParams.nPreamble = 8;
     txParams.crcEnabled = true;
@@ -1035,7 +1035,7 @@ TimeOnAirTest::DoRun()
     duration = LoraPhy::GetOnAirTime(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.072192, 0.0001, "Unexpected duration");
 
-    txParams.codingRate = 2;
+    txParams.codingRate = LoraTxParameters::CODING_RATE_4_6;
     duration = LoraPhy::GetOnAirTime(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.078336, 0.0001, "Unexpected duration");
 
@@ -1079,7 +1079,7 @@ TimeOnAirTest::DoRun()
     duration = LoraPhy::GetOnAirTime(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 2.629632, 0.0001, "Unexpected duration");
 
-    txParams.codingRate = 1;
+    txParams.codingRate = LoraTxParameters::CODING_RATE_4_5;
     duration = LoraPhy::GetOnAirTime(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 2.301952, 0.0001, "Unexpected duration");
 }
