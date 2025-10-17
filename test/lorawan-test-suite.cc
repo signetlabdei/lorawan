@@ -1142,6 +1142,14 @@ class PhyConnectivityTest : public TestCase
     void WrongSf(Ptr<const Packet> packet, uint32_t node);
 
     /**
+     * Callback for tracing LostPacketBecauseSyncWordMismatch.
+     *
+     * @param packet The packet lost.
+     * @param node The receiver node id if any, 0 otherwise.
+     */
+    void WrongSyncWord(Ptr<const Packet> packet, uint32_t node);
+
+    /**
      * Compare two packets to check if they are equal.
      *
      * @param packet1 A first packet.
@@ -1165,6 +1173,7 @@ class PhyConnectivityTest : public TestCase
     int m_interferenceCalls = 0;        //!< Counter for LostPacketBecauseInterference calls
     int m_wrongSfCalls = 0;             //!< Counter for LostPacketBecauseWrongSpreadingFactor calls
     int m_wrongFrequencyCalls = 0;      //!< Counter for LostPacketBecauseWrongFrequency calls
+    int m_wrongSyncWordCalls = 0;       //!< Counter for LostPacketBecauseSyncWordMismatch calls
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -1213,6 +1222,14 @@ PhyConnectivityTest::WrongSf(Ptr<const Packet> packet, uint32_t node)
 }
 
 void
+PhyConnectivityTest::WrongSyncWord(Ptr<const Packet> packet, uint32_t node)
+{
+    NS_LOG_FUNCTION(packet << node);
+
+    m_wrongSyncWordCalls++;
+}
+
+void
 PhyConnectivityTest::WrongFrequency(Ptr<const Packet> packet, uint32_t node)
 {
     NS_LOG_FUNCTION(packet << node);
@@ -1234,6 +1251,7 @@ PhyConnectivityTest::Reset()
     m_interferenceCalls = 0;
     m_wrongSfCalls = 0;
     m_wrongFrequencyCalls = 0;
+    m_wrongSyncWordCalls = 0;
 
     Ptr<LogDistancePropagationLossModel> loss = CreateObject<LogDistancePropagationLossModel>();
     loss->SetPathLossExponent(3.76);
@@ -1321,6 +1339,13 @@ PhyConnectivityTest::Reset()
                                        MakeCallback(&PhyConnectivityTest::WrongSf, this));
     edPhy3->TraceConnectWithoutContext("LostPacketBecauseWrongSpreadingFactor",
                                        MakeCallback(&PhyConnectivityTest::WrongSf, this));
+
+    edPhy1->TraceConnectWithoutContext("LostPacketBecauseSyncWordMismatch",
+                                       MakeCallback(&PhyConnectivityTest::WrongSyncWord, this));
+    edPhy2->TraceConnectWithoutContext("LostPacketBecauseSyncWordMismatch",
+                                       MakeCallback(&PhyConnectivityTest::WrongSyncWord, this));
+    edPhy3->TraceConnectWithoutContext("LostPacketBecauseSyncWordMismatch",
+                                       MakeCallback(&PhyConnectivityTest::WrongSyncWord, this));
 }
 
 // This method is the pure virtual method from class TestCase that every
@@ -1554,6 +1579,34 @@ PhyConnectivityTest::DoRun()
     NS_TEST_EXPECT_MSG_EQ(edPhy2->GetState(),
                           SimpleEndDeviceLoraPhy::STANDBY,
                           "State didn't switch to STANDBY as expected");
+
+    Reset();
+
+    // Not locking onto packet when sync word mismatches
+    ////////////////////////////////////////////////////
+
+    txParams.sf = 12;
+    edPhy3->SetSyncWord(0x42);
+    Simulator::Schedule(Seconds(2),
+                        &SimpleEndDeviceLoraPhy::Send,
+                        edPhy1,
+                        packet,
+                        txParams,
+                        868100000,
+                        14);
+
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
+
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacketCalls,
+                          1,
+                          "One PHY should have received the packet"); // One PHY
+
+    NS_TEST_EXPECT_MSG_EQ(
+        m_wrongSyncWordCalls,
+        1,
+        "One PHY should have lost the packet due to sync word mismatch"); // One PHY
 }
 
 /**
@@ -1817,7 +1870,7 @@ MacCommandTest::DoRun()
     { // WARNING: default values are manually set here
         uint8_t dataRate = 1;
         uint8_t txPower = 7;
-        uint16_t chMask = 0b1000; // enable only non-exisitng channel
+        uint16_t chMask = 0b1000; // enable only non-existing channel
         uint8_t chMaskCntl = 0;
         uint8_t nbTrans = 3;
         auto answers = RunMacCommand<LinkAdrReq>(dataRate, txPower, chMask, chMaskCntl, nbTrans);

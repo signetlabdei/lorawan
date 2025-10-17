@@ -72,11 +72,13 @@ SimpleEndDeviceLoraPhy::Send(Ptr<Packet> packet,
     LoraTag tag;
     packet->RemovePacketTag(tag);
     tag.SetSpreadingFactor(txParams.sf);
+    tag.SetSyncWord(GetSyncWord());
+    tag.SetFrequency(frequencyHz);
     packet->AddPacketTag(tag);
 
     // Send the packet over the channel
     NS_LOG_INFO("Sending the packet in the channel");
-    m_channel->Send(this, packet, txPowerDbm, txParams, duration, frequencyHz);
+    m_channel->Send(this, packet, txPowerDbm, txParams, duration, frequencyHz, GetSyncWord());
 
     // Schedule a call to signal the transmission end.
     Simulator::Schedule(duration, &SimpleEndDeviceLoraPhy::TxFinished, this, packet);
@@ -97,7 +99,8 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
                                      double rxPowerDbm,
                                      uint8_t sf,
                                      Time duration,
-                                     uint32_t frequencyHz)
+                                     uint32_t frequencyHz,
+                                     uint8_t syncWord)
 {
     NS_LOG_FUNCTION(this << packet << rxPowerDbm << unsigned(sf) << duration << frequencyHz);
 
@@ -203,6 +206,12 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
                 m_underSensitivity(packet, 0);
             }
 
+            canLockOnPacket = false;
+        }
+
+        if (syncWord != GetSyncWord())
+        {
+            m_wrongSyncWord(packet, m_device ? m_device->GetNode()->GetId() : 0);
             canLockOnPacket = false;
         }
 

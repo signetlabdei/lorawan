@@ -119,12 +119,14 @@ class LoraPhy : public Object
      * @param sf The Spreading Factor of the arriving packet.
      * @param duration The on air time of this packet.
      * @param frequencyHz The frequency this packet is being transmitted on.
+     * @param syncWord The sync word this packet was transmitted with
      */
     virtual void StartReceive(Ptr<Packet> packet,
                               double rxPowerDbm,
                               uint8_t sf,
                               Time duration,
-                              uint32_t frequencyHz) = 0;
+                              uint32_t frequencyHz,
+                              uint8_t syncWord) = 0;
 
     /**
      * Finish reception of a packet.
@@ -246,6 +248,20 @@ class LoraPhy : public Object
     void SetDevice(Ptr<NetDevice> device);
 
     /**
+     * Get the sync word this PHY is configured to use.
+     *
+     * @return The configured sync word
+     */
+    uint8_t GetSyncWord() const;
+
+    /**
+     * Configure the PHY to use the given sync word.
+     *
+     * @param syncWord The sync word to use.
+     */
+    void SetSyncWord(uint8_t syncWord);
+
+    /**
      * Compute the symbol time from spreading factor and bandwidth.
      *
      * @param txParams The parameters for transmission.
@@ -278,6 +294,13 @@ class LoraPhy : public Object
     virtual void TxFinished(Ptr<const Packet> packet) = 0;
 
     Ptr<MobilityModel> m_mobility; //!< The mobility model associated to this PHY.
+
+    /**
+     * The sync word is used in the preamble. All outgoing packets will use
+     * this sync word and the PHY will not sync with incoming packets with
+     * a different sync word.
+     */
+    uint8_t m_syncWord;
 
   protected:
     // Member objects
@@ -322,6 +345,12 @@ class LoraPhy : public Object
      * of interference.
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_interferedPacket;
+
+    /**
+     * The trace source fired when a packet cannot be correctly received because
+     * received packet uses a different sync word than the PHY is configured.
+     */
+    TracedCallback<Ptr<const Packet>, uint32_t> m_wrongSyncWord;
 
     // Callbacks
 
