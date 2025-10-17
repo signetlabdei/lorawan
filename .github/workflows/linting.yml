@@ -18,7 +18,7 @@ jobs:
     env:
       CLANG_TIDY_OUTPUT: clang-tidy-output.log
       FILES_CHANGED: git-diff-name-only.log
-      URL: https://github.com/signetlabdei/lorawan.git
+      URL: ${{ github.server_url }}/${{ github.repository }}
     steps:
       # The following step is required in all jobs that use this repo's actions
       - name: "Retrieve actions from repository"
