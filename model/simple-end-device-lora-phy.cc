@@ -56,7 +56,7 @@ SimpleEndDeviceLoraPhy::Send(Ptr<Packet> packet,
     NS_LOG_INFO("Current state: " << m_state);
 
     // We must be either in STANDBY or SLEEP mode to send a packet
-    if (m_state != STANDBY && m_state != SLEEP)
+    if (m_state != State::STANDBY && m_state != State::SLEEP)
     {
         NS_LOG_INFO("Cannot send because device is currently not in STANDBY or SLEEP mode");
         return;
@@ -118,21 +118,21 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
     // In the SLEEP, TX and RX cases we cannot receive the packet: we only add
     // it to the list of interferers and do not schedule an EndReceive event for
     // it.
-    case SLEEP: {
+    case State::SLEEP: {
         NS_LOG_INFO("Dropping packet because device is in SLEEP state");
         break;
     }
-    case TX: {
+    case State::TX: {
         NS_LOG_INFO("Dropping packet because device is in TX state");
         break;
     }
-    case RX: {
+    case State::RX: {
         NS_LOG_INFO("Dropping packet because device is already in RX state");
         break;
     }
     // If we are in STANDBY mode, we can potentially lock on the currently
     // incoming transmission
-    case STANDBY: {
+    case State::STANDBY: {
         // There are a series of properties the packet needs to respect in order
         // for us to be able to lock on it:
         // - It's on frequency we are listening on
