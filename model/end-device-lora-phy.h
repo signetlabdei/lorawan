@@ -102,7 +102,7 @@ class EndDeviceLoraPhy : public LoraPhy
      * demodulator which can either send, receive, stay idle or go in a deep
      * sleep state.
      */
-    enum State
+    enum class State
     {
         /**
          * The PHY layer is sleeping.
