@@ -209,23 +209,19 @@ EndDeviceLoraPhy::UnregisterListener(EndDeviceLoraPhyListener* listener)
 std::ostream&
 operator<<(std::ostream& os, const EndDeviceLoraPhy::State& state)
 {
-    static const char* map[] = {
-        "SLEEP",
-        "STANDBY",
-        "TX",
-        "RX",
-    };
-
-    if (static_cast<size_t>(state) >= std::size(map))
+    switch (state)
     {
-        os << "<INVALID>";
+    case EndDeviceLoraPhy::State::SLEEP:
+        return (os << "SLEEP");
+    case EndDeviceLoraPhy::State::STANDBY:
+        return (os << "STANDBY");
+    case EndDeviceLoraPhy::State::TX:
+        return (os << "TX");
+    case EndDeviceLoraPhy::State::RX:
+        return (os << "RX");
+    default:
+        NS_FATAL_ERROR("Invalid LoRa device PHY state");
     }
-    else
-    {
-        os << map[static_cast<size_t>(state)];
-    }
-
-    return os;
 }
 
 } // namespace lorawan

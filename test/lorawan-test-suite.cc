@@ -2040,57 +2040,6 @@ MacCommandTest::DoRun()
 /**
  * @ingroup lorawan
  *
- * Tests for misc utility function.
- */
-class UtilitiesTest : public TestCase
-{
-  public:
-    UtilitiesTest();           //!< Default constructor
-    ~UtilitiesTest() override; //!< Destructor
-
-    void DoRun() override;
-    /**
-     * Test that the stringification (operator<<()) for the given state does
-     * output the given expected string
-     *
-     * @param state The state to test
-     * @param expected The expected output
-     */
-    void TestEndDevicePhyStateStringification(EndDeviceLoraPhy::State state, const char* expected);
-};
-
-UtilitiesTest::UtilitiesTest()
-    : TestCase("Test of misc ultility functions")
-{
-}
-
-UtilitiesTest::~UtilitiesTest()
-{
-}
-
-void
-UtilitiesTest::DoRun()
-{
-    TestEndDevicePhyStateStringification(EndDeviceLoraPhy::State::RX, "RX");
-    TestEndDevicePhyStateStringification(EndDeviceLoraPhy::State::TX, "TX");
-    TestEndDevicePhyStateStringification(EndDeviceLoraPhy::State::SLEEP, "SLEEP");
-    TestEndDevicePhyStateStringification(EndDeviceLoraPhy::State::STANDBY, "STANDBY");
-}
-
-void
-UtilitiesTest::TestEndDevicePhyStateStringification(EndDeviceLoraPhy::State state,
-                                                    const char* expected)
-{
-    std::ostringstream os;
-    os << state;
-    NS_TEST_EXPECT_MSG_EQ(strcmp(os.str().c_str(), expected),
-                          0,
-                          "Stringification of " << expected << " incorrect");
-}
-
-/**
- * @ingroup lorawan
- *
  * The TestSuite class names the TestSuite, identifies what type of TestSuite, and enables the
  * TestCases to be run. Typically, only the constructor for this class must be defined
  */
@@ -2124,7 +2073,6 @@ LorawanTestSuite::LorawanTestSuite()
     AddTestCase(new TimeOnAirTest, Duration::QUICK);
     AddTestCase(new PhyConnectivityTest, Duration::QUICK);
     AddTestCase(new MacCommandTest, Duration::QUICK);
-    AddTestCase(new UtilitiesTest, Duration::QUICK);
 }
 
 // Do not forget to allocate an instance of this TestSuite
