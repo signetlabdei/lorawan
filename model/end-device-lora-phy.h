@@ -102,7 +102,7 @@ class EndDeviceLoraPhy : public LoraPhy
      * demodulator which can either send, receive, stay idle or go in a deep
      * sleep state.
      */
-    enum State
+    enum class State
     {
         /**
          * The PHY layer is sleeping.
@@ -130,6 +130,7 @@ class EndDeviceLoraPhy : public LoraPhy
          * not possible.
          */
         RX
+        // NOTE: When extending/updating, please update operator<< accordingly.
     };
 
     /**
@@ -279,7 +280,16 @@ class EndDeviceLoraPhy : public LoraPhy
     Listeners m_listeners; //!< PHY listeners
 };
 
-} // namespace lorawan
+/**
+ *  Overloaded operator to print the value of a EndDeviceLoraPhy::State.
+ *
+ *  @param os The output stream
+ *  @param state The enum value of the PHY state
+ *  @return The output stream with text value of the PHY state
+ */
+std::ostream& operator<<(std::ostream& os, const EndDeviceLoraPhy::State& state);
 
+} // namespace lorawan
 } // namespace ns3
+
 #endif /* END_DEVICE_LORA_PHY_H */
