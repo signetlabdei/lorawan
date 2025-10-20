@@ -210,7 +210,7 @@ LoraRadioEnergyModel::SetTxCurrentFromModel(double txPowerDbm)
 Time
 LoraRadioEnergyModel::GetMaximumTimeInState(EndDeviceLoraPhy::State state) const
 {
-    if(state == EndDeviceLoraPhy::OFF)
+    if (state == EndDeviceLoraPhy::OFF)
     {
         NS_FATAL_ERROR("Requested maximum remaining time for OFF state");
     }
@@ -228,7 +228,7 @@ LoraRadioEnergyModel::ChangeState(int newState)
 
     // renew schedule switch to OFF when we change state
     ScheduleSwitchToOff(newPhyState);
-    
+
     Time duration = Now() - m_lastUpdateTime;
     NS_ASSERT(duration.IsPositive()); // check if duration is valid
 
@@ -316,7 +316,6 @@ LoraRadioEnergyModel::GetEnergyDepletionCallback() const
     return m_energyDepletionCallback;
 }
 
-
 /*
  * Private functions start here.
  */
@@ -396,11 +395,10 @@ LoraRadioEnergyModel::ScheduleSwitchToOff(EndDeviceLoraPhy::State state)
     }
     m_switchToOffEvent.Cancel();
     const auto durationToOff = GetMaximumTimeInState(state);
-    m_switchToOffEvent = Simulator::Schedule(
-        durationToOff,
-        &LoraRadioEnergyModel::ChangeState, 
-        this, 
-        static_cast<int>(EndDeviceLoraPhy::OFF));
+    m_switchToOffEvent = Simulator::Schedule(durationToOff,
+                                             &LoraRadioEnergyModel::ChangeState,
+                                             this,
+                                             static_cast<int>(EndDeviceLoraPhy::OFF));
 }
 
 // -------------------------------------------------------------------------- //

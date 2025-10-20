@@ -1,5 +1,4 @@
 // Include headers of classes to test
-#include "ns3/log.h"
 #include "ns3/basic-energy-source-helper.h"
 #include "ns3/class-a-end-device-lorawan-mac.h"
 #include "ns3/constant-position-mobility-model.h"
@@ -7,6 +6,7 @@
 #include "ns3/file-helper.h"
 #include "ns3/gateway-lora-phy.h"
 #include "ns3/gateway-lorawan-mac.h"
+#include "ns3/log.h"
 #include "ns3/lora-helper.h"
 #include "ns3/lora-radio-energy-model-helper.h"
 #include "ns3/mobility-helper.h"
@@ -30,20 +30,20 @@ NS_LOG_COMPONENT_DEFINE("LoraRadioEnergyModelTestSuite");
  */
 class EnergyDepletionTest : public TestCase
 {
-public:
-  EnergyDepletionTest();
-  ~EnergyDepletionTest() override;
+  public:
+    EnergyDepletionTest();
+    ~EnergyDepletionTest() override;
 
-private:
-  void DepletionHandler();
-  void DoRun() override;
+  private:
+    void DepletionHandler();
+    void DoRun() override;
 
-  int m_depletionCount;
+    int m_depletionCount;
 };
 
 EnergyDepletionTest::EnergyDepletionTest()
-    : TestCase("Verify that the LoraRadioEnergyModel correctly depletes the energy")
-    , m_depletionCount(0)
+    : TestCase("Verify that the LoraRadioEnergyModel correctly depletes the energy"),
+      m_depletionCount(0)
 {
 }
 
@@ -54,7 +54,7 @@ EnergyDepletionTest::~EnergyDepletionTest()
 void
 EnergyDepletionTest::DepletionHandler()
 {
-  m_depletionCount++;
+    m_depletionCount++;
 }
 
 void
@@ -165,7 +165,7 @@ EnergyDepletionTest::DoRun()
     // set the depletion callback
     deviceEnergyModels.Get(0)->GetObject<LoraRadioEnergyModel>()->SetEnergyDepletionCallback(
         MakeCallback(&EnergyDepletionTest::DepletionHandler, this));
-    
+
     /****************
      *  Simulation  *
      ****************/
@@ -179,13 +179,12 @@ EnergyDepletionTest::DoRun()
     NS_TEST_ASSERT_MSG_EQ(m_depletionCount, 1, "Depletion callback not invoked");
 }
 
-
 // --------------------------------------------------------------------------- //
 
 class LoraRadioEnergyModelTestSuite : public TestSuite
 {
   public:
-    LoraRadioEnergyModelTestSuite();  //!< Default constructor
+    LoraRadioEnergyModelTestSuite(); //!< Default constructor
 };
 
 LoraRadioEnergyModelTestSuite::LoraRadioEnergyModelTestSuite()

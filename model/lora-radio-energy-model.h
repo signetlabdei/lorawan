@@ -270,7 +270,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
     void HandleEnergyDepletion() override;
 
     /**
-     * Handles energy chagned.
+     * Handles energy changed.
      *
      * Implements DeviceEnergyModel::HandleEnergyChanged.
      */
@@ -319,7 +319,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
 
     /**
      * @param state the LoRa state
-     * 
+     *
      * Schedules the switch to OFF state after the time the radio can stay in that state
      * based on the remaining energy.
      */
