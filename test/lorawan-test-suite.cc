@@ -1549,10 +1549,10 @@ PhyConnectivityTest::DoRun()
     Simulator::Destroy();
 
     NS_TEST_EXPECT_MSG_EQ(edPhy1->GetState(),
-                          SimpleEndDeviceLoraPhy::STANDBY,
+                          SimpleEndDeviceLoraPhy::State::STANDBY,
                           "State didn't switch to STANDBY as expected");
     NS_TEST_EXPECT_MSG_EQ(edPhy2->GetState(),
-                          SimpleEndDeviceLoraPhy::STANDBY,
+                          SimpleEndDeviceLoraPhy::State::STANDBY,
                           "State didn't switch to STANDBY as expected");
 }
 

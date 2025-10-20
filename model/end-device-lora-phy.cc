@@ -61,7 +61,7 @@ EndDeviceLoraPhy::GetTypeId()
 // Initialize the device with some common settings.
 // These will then be changed by helpers.
 EndDeviceLoraPhy::EndDeviceLoraPhy()
-    : m_state(SLEEP),
+    : m_state(State::SLEEP),
       m_frequencyHz(868100000),
       m_sf(7)
 {
@@ -91,7 +91,7 @@ EndDeviceLoraPhy::GetSpreadingFactor() const
 bool
 EndDeviceLoraPhy::IsTransmitting()
 {
-    return m_state == TX;
+    return m_state == State::TX;
 }
 
 bool
@@ -125,7 +125,7 @@ EndDeviceLoraPhy::SwitchToStandby()
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    m_state = STANDBY;
+    m_state = State::STANDBY;
 
     // Notify listeners of the state change
     for (auto i = m_listeners.begin(); i != m_listeners.end(); i++)
@@ -139,9 +139,9 @@ EndDeviceLoraPhy::SwitchToRx()
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    NS_ASSERT(m_state == STANDBY);
+    NS_ASSERT(m_state == State::STANDBY);
 
-    m_state = RX;
+    m_state = State::RX;
 
     // Notify listeners of the state change
     for (auto i = m_listeners.begin(); i != m_listeners.end(); i++)
@@ -155,9 +155,9 @@ EndDeviceLoraPhy::SwitchToTx(double txPowerDbm)
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    NS_ASSERT(m_state != RX);
+    NS_ASSERT(m_state != State::RX);
 
-    m_state = TX;
+    m_state = State::TX;
 
     // Notify listeners of the state change
     for (auto i = m_listeners.begin(); i != m_listeners.end(); i++)
@@ -171,9 +171,9 @@ EndDeviceLoraPhy::SwitchToSleep()
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    NS_ASSERT(m_state == STANDBY);
+    NS_ASSERT(m_state == State::STANDBY);
 
-    m_state = SLEEP;
+    m_state = State::SLEEP;
 
     // Notify listeners of the state change
     for (auto i = m_listeners.begin(); i != m_listeners.end(); i++)
@@ -217,6 +217,26 @@ EndDeviceLoraPhy::UnregisterListener(EndDeviceLoraPhyListener* listener)
     if (i != m_listeners.end())
     {
         m_listeners.erase(i);
+    }
+}
+
+std::ostream&
+operator<<(std::ostream& os, const EndDeviceLoraPhy::State& state)
+{
+    switch (state)
+    {
+    case EndDeviceLoraPhy::State::SLEEP:
+        return (os << "SLEEP");
+    case EndDeviceLoraPhy::State::STANDBY:
+        return (os << "STANDBY");
+    case EndDeviceLoraPhy::State::TX:
+        return (os << "TX");
+    case EndDeviceLoraPhy::State::RX:
+        return (os << "RX");
+    case EndDeviceLoraPhy::State::OFF:
+        return (os << "OFF");
+    default:
+        NS_FATAL_ERROR("Invalid LoRa device PHY state");
     }
 }
 

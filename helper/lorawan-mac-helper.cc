@@ -490,43 +490,42 @@ LorawanMacHelper::SetSpreadingFactorsUp(NodeContainer endDevices,
 
         // Get the end device sensitivity
         Ptr<EndDeviceLoraPhy> edPhy = DynamicCast<EndDeviceLoraPhy>(loraNetDevice->GetPhy());
-        const double* edSensitivity = EndDeviceLoraPhy::sensitivity;
 
-        if (rxPower > *edSensitivity)
+        if (rxPower > EndDeviceLoraPhy::sensitivity[0])
         {
             mac->SetDataRate(5);
-            sfQuantity[0] = sfQuantity[0] + 1;
+            sfQuantity[0]++;
         }
-        else if (rxPower > *(edSensitivity + 1))
+        else if (rxPower > EndDeviceLoraPhy::sensitivity[1])
         {
             mac->SetDataRate(4);
-            sfQuantity[1] = sfQuantity[1] + 1;
+            sfQuantity[1]++;
         }
-        else if (rxPower > *(edSensitivity + 2))
+        else if (rxPower > EndDeviceLoraPhy::sensitivity[2])
         {
             mac->SetDataRate(3);
-            sfQuantity[2] = sfQuantity[2] + 1;
+            sfQuantity[2]++;
         }
-        else if (rxPower > *(edSensitivity + 3))
+        else if (rxPower > EndDeviceLoraPhy::sensitivity[3])
         {
             mac->SetDataRate(2);
-            sfQuantity[3] = sfQuantity[3] + 1;
+            sfQuantity[3]++;
         }
-        else if (rxPower > *(edSensitivity + 4))
+        else if (rxPower > EndDeviceLoraPhy::sensitivity[4])
         {
             mac->SetDataRate(1);
-            sfQuantity[4] = sfQuantity[4] + 1;
+            sfQuantity[4]++;
         }
-        else if (rxPower > *(edSensitivity + 5))
+        else if (rxPower > EndDeviceLoraPhy::sensitivity[5])
         {
             mac->SetDataRate(0);
-            sfQuantity[5] = sfQuantity[5] + 1;
+            sfQuantity[5]++;
         }
         else // Device is out of range. Assign SF12.
         {
             // NS_LOG_DEBUG ("Device out of range");
             mac->SetDataRate(0);
-            sfQuantity[6] = sfQuantity[6] + 1;
+            sfQuantity[6]++;
             // NS_LOG_DEBUG ("sfQuantity[6] = " << sfQuantity[6]);
         }
 

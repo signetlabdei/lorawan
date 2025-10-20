@@ -70,7 +70,7 @@ LoraRadioEnergyModel::GetTypeId()
 LoraRadioEnergyModel::LoraRadioEnergyModel()
 {
     NS_LOG_FUNCTION(this);
-    m_currentState = EndDeviceLoraPhy::SLEEP; // initially STANDBY
+    m_currentState = EndDeviceLoraPhy::State::SLEEP;
     m_lastUpdateTime = Seconds(0.0);
     m_nPendingChangeState = 0;
     m_isSupersededChangeState = false;
@@ -210,7 +210,7 @@ LoraRadioEnergyModel::SetTxCurrentFromModel(double txPowerDbm)
 Time
 LoraRadioEnergyModel::GetMaximumTimeInState(EndDeviceLoraPhy::State state) const
 {
-    if (state == EndDeviceLoraPhy::OFF)
+    if (state == EndDeviceLoraPhy::State::OFF)
     {
         NS_FATAL_ERROR("Requested maximum remaining time for OFF state");
     }
@@ -223,7 +223,7 @@ LoraRadioEnergyModel::GetMaximumTimeInState(EndDeviceLoraPhy::State state) const
 void
 LoraRadioEnergyModel::ChangeState(int newState)
 {
-    const EndDeviceLoraPhy::State newPhyState = (EndDeviceLoraPhy::State)newState;
+    const auto newPhyState = EndDeviceLoraPhy::State(newState);
     NS_LOG_FUNCTION(this << newPhyState);
 
     // renew schedule switch to OFF when we change state
@@ -334,15 +334,15 @@ LoraRadioEnergyModel::GetStateA(EndDeviceLoraPhy::State state) const
     NS_LOG_FUNCTION(this);
     switch (state)
     {
-    case EndDeviceLoraPhy::STANDBY:
+    case EndDeviceLoraPhy::State::STANDBY:
         return m_idleCurrentA;
-    case EndDeviceLoraPhy::TX:
+    case EndDeviceLoraPhy::State::TX:
         return m_txCurrentA;
-    case EndDeviceLoraPhy::RX:
+    case EndDeviceLoraPhy::State::RX:
         return m_rxCurrentA;
-    case EndDeviceLoraPhy::SLEEP:
+    case EndDeviceLoraPhy::State::SLEEP:
         return m_sleepCurrentA;
-    case EndDeviceLoraPhy::OFF:
+    case EndDeviceLoraPhy::State::OFF:
         return 0.0;
     default:
         NS_FATAL_ERROR("LoraRadioEnergyModel:Undefined radio state:" << state);
@@ -361,27 +361,7 @@ LoraRadioEnergyModel::SetLoraRadioState(const EndDeviceLoraPhy::State state)
 {
     NS_LOG_FUNCTION(this << state);
     m_currentState = state;
-    std::string stateName;
-    switch (state)
-    {
-    case EndDeviceLoraPhy::STANDBY:
-        stateName = "STANDBY";
-        break;
-    case EndDeviceLoraPhy::TX:
-        stateName = "TX";
-        break;
-    case EndDeviceLoraPhy::RX:
-        stateName = "RX";
-        break;
-    case EndDeviceLoraPhy::SLEEP:
-        stateName = "SLEEP";
-        break;
-    case EndDeviceLoraPhy::OFF:
-        stateName = "OFF";
-        break;
-    }
-    NS_LOG_DEBUG("LoraRadioEnergyModel:Switching to state: " << stateName
-                                                             << " at time = " << Now().As(Time::S));
+    NS_LOG_DEBUG("Switching to state: " << state << " at time = " << Now().As(Time::S));
 }
 
 void
@@ -389,7 +369,7 @@ LoraRadioEnergyModel::ScheduleSwitchToOff(EndDeviceLoraPhy::State state)
 {
     NS_LOG_FUNCTION(this << state);
 
-    if (state == EndDeviceLoraPhy::OFF)
+    if (state == EndDeviceLoraPhy::State::OFF)
     {
         return;
     }
@@ -398,7 +378,7 @@ LoraRadioEnergyModel::ScheduleSwitchToOff(EndDeviceLoraPhy::State state)
     m_switchToOffEvent = Simulator::Schedule(durationToOff,
                                              &LoraRadioEnergyModel::ChangeState,
                                              this,
-                                             static_cast<int>(EndDeviceLoraPhy::OFF));
+                                             static_cast<int>(EndDeviceLoraPhy::State::OFF));
 }
 
 // -------------------------------------------------------------------------- //
@@ -440,7 +420,7 @@ LoraRadioEnergyModelPhyListener::NotifyRxStart()
     {
         NS_FATAL_ERROR("LoraRadioEnergyModelPhyListener:Change state callback not set!");
     }
-    m_changeStateCallback(EndDeviceLoraPhy::RX);
+    m_changeStateCallback(int(EndDeviceLoraPhy::State::RX));
 }
 
 void
@@ -456,7 +436,7 @@ LoraRadioEnergyModelPhyListener::NotifyTxStart(double txPowerDbm)
     {
         NS_FATAL_ERROR("LoraRadioEnergyModelPhyListener:Change state callback not set!");
     }
-    m_changeStateCallback(EndDeviceLoraPhy::TX);
+    m_changeStateCallback(int(EndDeviceLoraPhy::State::TX));
 }
 
 void
@@ -467,7 +447,7 @@ LoraRadioEnergyModelPhyListener::NotifySleep()
     {
         NS_FATAL_ERROR("LoraRadioEnergyModelPhyListener:Change state callback not set!");
     }
-    m_changeStateCallback(EndDeviceLoraPhy::SLEEP);
+    m_changeStateCallback(int(EndDeviceLoraPhy::State::SLEEP));
 }
 
 void
@@ -478,7 +458,7 @@ LoraRadioEnergyModelPhyListener::NotifyStandby()
     {
         NS_FATAL_ERROR("LoraRadioEnergyModelPhyListener:Change state callback not set!");
     }
-    m_changeStateCallback(EndDeviceLoraPhy::STANDBY);
+    m_changeStateCallback(int(EndDeviceLoraPhy::State::STANDBY));
 }
 
 void
@@ -489,7 +469,7 @@ LoraRadioEnergyModelPhyListener::NotifyOff()
     {
         NS_FATAL_ERROR("LoraRadioEnergyModelPhyListener:Change state callback not set!");
     }
-    m_changeStateCallback(EndDeviceLoraPhy::OFF);
+    m_changeStateCallback(EndDeviceLoraPhy::State::OFF);
 }
 
 /*
@@ -504,7 +484,7 @@ LoraRadioEnergyModelPhyListener::SwitchToStandby()
     {
         NS_FATAL_ERROR("LoraRadioEnergyModelPhyListener:Change state callback not set!");
     }
-    m_changeStateCallback(EndDeviceLoraPhy::STANDBY);
+    m_changeStateCallback(int(EndDeviceLoraPhy::State::STANDBY));
 }
 
 } // namespace lorawan
