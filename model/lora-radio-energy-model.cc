@@ -469,7 +469,7 @@ LoraRadioEnergyModelPhyListener::NotifyOff()
     {
         NS_FATAL_ERROR("LoraRadioEnergyModelPhyListener:Change state callback not set!");
     }
-    m_changeStateCallback(EndDeviceLoraPhy::State::OFF);
+    m_changeStateCallback(int(EndDeviceLoraPhy::State::OFF));
 }
 
 /*
