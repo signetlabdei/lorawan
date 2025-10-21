@@ -35,10 +35,11 @@ class EnergyDepletionTest : public TestCase
     ~EnergyDepletionTest() override;
 
   private:
+    /// Depletion handler function that counts the depletion
     void DepletionHandler();
     void DoRun() override;
 
-    int m_depletionCount;
+    int m_depletionCount; ///< depletion count
 };
 
 EnergyDepletionTest::EnergyDepletionTest()
@@ -180,7 +181,12 @@ EnergyDepletionTest::DoRun()
 }
 
 // --------------------------------------------------------------------------- //
-
+/**
+ * @ingroup lorawan
+ * @ingroup tests
+ *
+ * @brief Test Suite for the LoraRadioEnergyModel
+ */
 class LoraRadioEnergyModelTestSuite : public TestSuite
 {
   public:
