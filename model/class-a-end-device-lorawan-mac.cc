@@ -320,15 +320,15 @@ ClassAEndDeviceLorawanMac::CloseFirstReceiveWindow()
     // We should never be in TX or SLEEP mode at this point
     switch (phy->GetState())
     {
-    case EndDeviceLoraPhy::TX:
+    case EndDeviceLoraPhy::State::TX:
         NS_ABORT_MSG("PHY was in TX mode when attempting to close a receive window.");
         break;
-    case EndDeviceLoraPhy::RX:
+    case EndDeviceLoraPhy::State::RX:
         // PHY is receiving: let it finish. The Receive method will switch it back to SLEEP.
-    case EndDeviceLoraPhy::SLEEP:
+    case EndDeviceLoraPhy::State::SLEEP:
         // PHY has received, and the MAC's Receive already put the device to sleep
         break;
-    case EndDeviceLoraPhy::STANDBY:
+    case EndDeviceLoraPhy::State::STANDBY:
         // Turn PHY layer to SLEEP
         phy->SwitchToSleep();
         break;
@@ -342,7 +342,7 @@ ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow()
 
     // Check for receiver status: if it's locked on a packet, don't open this
     // window at all.
-    if (DynamicCast<EndDeviceLoraPhy>(m_phy)->GetState() == EndDeviceLoraPhy::RX)
+    if (DynamicCast<EndDeviceLoraPhy>(m_phy)->GetState() == EndDeviceLoraPhy::State::RX)
     {
         NS_LOG_INFO("Won't open second receive window since we are in RX mode.");
 
@@ -379,22 +379,22 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
 
     Ptr<EndDeviceLoraPhy> phy = DynamicCast<EndDeviceLoraPhy>(m_phy);
 
-    // NS_ASSERT (phy->m_state != EndDeviceLoraPhy::TX &&
-    // phy->m_state != EndDeviceLoraPhy::SLEEP);
+    // NS_ASSERT (phy->m_state != EndDeviceLoraPhy::State::TX &&
+    // phy->m_state != EndDeviceLoraPhy::State::SLEEP);
 
     // Check the Phy layer's state:
     // - RX -> We have received a preamble.
     // - STANDBY -> Nothing was detected.
     switch (phy->GetState())
     {
-    case EndDeviceLoraPhy::TX:
-    case EndDeviceLoraPhy::SLEEP:
+    case EndDeviceLoraPhy::State::TX:
+    case EndDeviceLoraPhy::State::SLEEP:
         break;
-    case EndDeviceLoraPhy::RX:
+    case EndDeviceLoraPhy::State::RX:
         // PHY is receiving: let it finish
         NS_LOG_DEBUG("PHY is receiving: Receive will handle the result.");
         return;
-    case EndDeviceLoraPhy::STANDBY:
+    case EndDeviceLoraPhy::State::STANDBY:
         // Turn PHY layer to sleep
         phy->SwitchToSleep();
         break;
@@ -411,7 +411,7 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
         }
 
         else if (m_retxParams.retxLeft == 0 &&
-                 DynamicCast<EndDeviceLoraPhy>(m_phy)->GetState() != EndDeviceLoraPhy::RX)
+                 DynamicCast<EndDeviceLoraPhy>(m_phy)->GetState() != EndDeviceLoraPhy::State::RX)
         {
             uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
             m_requiredTxCallback(txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
