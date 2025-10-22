@@ -49,6 +49,7 @@ struct LoraChannelParameters
     uint8_t sf;           //!< The Spreading Factor of this transmission.
     Time duration;        //!< The duration of the transmission.
     uint32_t frequencyHz; //!< The frequency [Hz] of this transmission.
+    uint32_t bandwidthHz; //!< The bandwidth [Hz] of this transmission.
 };
 
 /**

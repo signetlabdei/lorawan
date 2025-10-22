@@ -97,7 +97,8 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
                                      double rxPowerDbm,
                                      uint8_t sf,
                                      Time duration,
-                                     uint32_t frequencyHz)
+                                     uint32_t frequencyHz,
+                                     uint32_t bandwidthHz)
 {
     NS_LOG_FUNCTION(this << packet << rxPowerDbm << unsigned(sf) << duration << frequencyHz);
 
@@ -145,6 +146,8 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
         // Save needed sensitivity
         double sensitivity = EndDeviceLoraPhy::sensitivity[unsigned(sf) - 7];
 
+        uint32_t node_id = m_device ? m_device->GetNode()->GetId() : 0;
+
         // Check frequency
         //////////////////
         if (!IsOnFrequency(frequencyHz))
@@ -153,15 +156,19 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
                         << frequencyHz << " Hz and we are listening at " << m_frequencyHz << " Hz");
 
             // Fire the trace source for this event.
-            if (m_device)
-            {
-                m_wrongFrequency(packet, m_device->GetNode()->GetId());
-            }
-            else
-            {
-                m_wrongFrequency(packet, 0);
-            }
+            m_wrongFrequency(packet, node_id);
+            canLockOnPacket = false;
+        }
 
+        // Check bandwidth
+        //////////////////
+        if (!IsOnBandwidth(bandwidthHz))
+        {
+            NS_LOG_INFO("Packet lost because it's send using bandwidth "
+                        << bandwidthHz << " Hz and we are listening at " << m_bandwidthHz << " Hz");
+
+            // Fire the trace source for this event.
+            m_wrongBandwidth(packet, node_id);
             canLockOnPacket = false;
         }
 
@@ -173,15 +180,7 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
                         << unsigned(sf) << ", while we are listening for SF" << unsigned(m_sf));
 
             // Fire the trace source for this event.
-            if (m_device)
-            {
-                m_wrongSf(packet, m_device->GetNode()->GetId());
-            }
-            else
-            {
-                m_wrongSf(packet, 0);
-            }
-
+            m_wrongSf(packet, node_id);
             canLockOnPacket = false;
         }
 
@@ -194,15 +193,7 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
                         << " dBm");
 
             // Fire the trace source for this event.
-            if (m_device)
-            {
-                m_underSensitivity(packet, m_device->GetNode()->GetId());
-            }
-            else
-            {
-                m_underSensitivity(packet, 0);
-            }
-
+            m_underSensitivity(packet, node_id);
             canLockOnPacket = false;
         }
 

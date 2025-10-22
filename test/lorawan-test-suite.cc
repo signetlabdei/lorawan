@@ -1134,6 +1134,14 @@ class PhyConnectivityTest : public TestCase
     void WrongFrequency(Ptr<const Packet> packet, uint32_t node);
 
     /**
+     * Callback for tracing LostPacketBecauseWrongBandwidth.
+     *
+     * @param packet The packet lost.
+     * @param node The receiver node id if any, 0 otherwise.
+     */
+    void WrongBandwidth(Ptr<const Packet> packet, uint32_t node);
+
+    /**
      * Callback for tracing LostPacketBecauseWrongSpreadingFactor.
      *
      * @param packet The packet lost.
@@ -1165,6 +1173,7 @@ class PhyConnectivityTest : public TestCase
     int m_interferenceCalls = 0;        //!< Counter for LostPacketBecauseInterference calls
     int m_wrongSfCalls = 0;             //!< Counter for LostPacketBecauseWrongSpreadingFactor calls
     int m_wrongFrequencyCalls = 0;      //!< Counter for LostPacketBecauseWrongFrequency calls
+    int m_wrongBandwidthCalls = 0;      //!< Counter for LostPacketBecauseWrongBandwidth calls
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -1218,6 +1227,14 @@ PhyConnectivityTest::WrongFrequency(Ptr<const Packet> packet, uint32_t node)
     NS_LOG_FUNCTION(packet << node);
 
     m_wrongFrequencyCalls++;
+}
+
+void
+PhyConnectivityTest::WrongBandwidth(Ptr<const Packet> packet, uint32_t node)
+{
+    NS_LOG_FUNCTION(packet << node);
+
+    m_wrongBandwidthCalls++;
 }
 
 bool
@@ -1314,6 +1331,13 @@ PhyConnectivityTest::Reset()
                                        MakeCallback(&PhyConnectivityTest::WrongFrequency, this));
     edPhy3->TraceConnectWithoutContext("LostPacketBecauseWrongFrequency",
                                        MakeCallback(&PhyConnectivityTest::WrongFrequency, this));
+
+    edPhy1->TraceConnectWithoutContext("LostPacketBecauseWrongBandwidth",
+                                       MakeCallback(&PhyConnectivityTest::WrongBandwidth, this));
+    edPhy2->TraceConnectWithoutContext("LostPacketBecauseWrongBandwidth",
+                                       MakeCallback(&PhyConnectivityTest::WrongBandwidth, this));
+    edPhy3->TraceConnectWithoutContext("LostPacketBecauseWrongBandwidth",
+                                       MakeCallback(&PhyConnectivityTest::WrongBandwidth, this));
 
     edPhy1->TraceConnectWithoutContext("LostPacketBecauseWrongSpreadingFactor",
                                        MakeCallback(&PhyConnectivityTest::WrongSf, this));
@@ -1554,6 +1578,32 @@ PhyConnectivityTest::DoRun()
     NS_TEST_EXPECT_MSG_EQ(edPhy2->GetState(),
                           SimpleEndDeviceLoraPhy::State::STANDBY,
                           "State didn't switch to STANDBY as expected");
+
+    Reset();
+    txParams.sf = 12;
+    txParams.bandwidthHz = 250000;
+
+    edPhy2->SetBandwidth(250000);
+    Simulator::Schedule(Seconds(2),
+                        &SimpleEndDeviceLoraPhy::Send,
+                        edPhy1,
+                        packet,
+                        txParams,
+                        868100000,
+                        14);
+
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
+
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacketCalls,
+                          1,
+                          "Exactly one transceiver should have received the packet");
+
+    NS_TEST_EXPECT_MSG_EQ(m_wrongBandwidthCalls,
+                          1,
+                          "Exactly one transceiver should have lost the packet due to bandwidth "
+                          "mismatch");
 }
 
 /**

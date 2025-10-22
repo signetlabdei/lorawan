@@ -108,12 +108,14 @@ class LoraPhy : public Object
      * @param sf The Spreading Factor of the arriving packet.
      * @param duration The on air time of this packet.
      * @param frequencyHz The frequency this packet is being transmitted on.
+     * @param bandwidthHz The bandwidth this packet is being transmitted on.
      */
     virtual void StartReceive(Ptr<Packet> packet,
                               double rxPowerDbm,
                               uint8_t sf,
                               Time duration,
-                              uint32_t frequencyHz) = 0;
+                              uint32_t frequencyHz,
+                              uint32_t bandwidthHz) = 0;
 
     /**
      * Finish reception of a packet.

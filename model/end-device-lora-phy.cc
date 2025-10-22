@@ -45,6 +45,12 @@ EndDeviceLoraPhy::GetTypeId()
                             "the end device was listening on a different frequency",
                             MakeTraceSourceAccessor(&EndDeviceLoraPhy::m_wrongFrequency),
                             "ns3::Packet::TracedCallback")
+            .AddTraceSource("LostPacketBecauseWrongBandwidth",
+                            "Trace source indicating a packet could not "
+                            "be correctly decoded because the end device was "
+                            "listening on a different frequency",
+                            MakeTraceSourceAccessor(&EndDeviceLoraPhy::m_wrongBandwidth),
+                            "ns3::Packet::TracedCallback")
             .AddTraceSource("LostPacketBecauseWrongSpreadingFactor",
                             "Trace source indicating a packet "
                             "could not be correctly decoded because"
@@ -63,6 +69,7 @@ EndDeviceLoraPhy::GetTypeId()
 EndDeviceLoraPhy::EndDeviceLoraPhy()
     : m_state(State::SLEEP),
       m_frequencyHz(868100000),
+      m_bandwidthHz(125000),
       m_sf(7)
 {
 }
@@ -100,10 +107,28 @@ EndDeviceLoraPhy::IsOnFrequency(uint32_t frequencyHz)
     return m_frequencyHz == frequencyHz;
 }
 
+bool
+EndDeviceLoraPhy::IsOnBandwidth(uint32_t bandwidthHz) const
+{
+    return m_bandwidthHz == bandwidthHz;
+}
+
 void
 EndDeviceLoraPhy::SetFrequency(uint32_t frequencyHz)
 {
     m_frequencyHz = frequencyHz;
+}
+
+void
+EndDeviceLoraPhy::SetBandwidth(uint32_t bandwidthHz)
+{
+    m_bandwidthHz = bandwidthHz;
+}
+
+uint32_t
+EndDeviceLoraPhy::GetBandwidth() const
+{
+    return m_bandwidthHz;
 }
 
 void

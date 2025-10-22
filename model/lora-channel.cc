@@ -160,6 +160,7 @@ LoraChannel::Send(Ptr<LoraPhy> sender,
             parameters.sf = txParams.sf;
             parameters.duration = duration;
             parameters.frequencyHz = frequencyHz;
+            parameters.bandwidthHz = txParams.bandwidthHz;
 
             // Schedule the receive event
             NS_LOG_INFO("Scheduling reception of the packet");
@@ -187,7 +188,8 @@ LoraChannel::Receive(uint32_t i, Ptr<Packet> packet, LoraChannelParameters param
                                parameters.rxPowerDbm,
                                parameters.sf,
                                parameters.duration,
-                               parameters.frequencyHz);
+                               parameters.frequencyHz,
+                               parameters.bandwidthHz);
 }
 
 double
