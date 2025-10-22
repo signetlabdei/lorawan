@@ -18,6 +18,8 @@ namespace lorawan
 
 NS_OBJECT_ENSURE_REGISTERED(LoraTag);
 
+const uint8_t LoraTag::SYNC_WORD_LORAWAN = 0x34;
+
 TypeId
 LoraTag::GetTypeId()
 {
@@ -34,10 +36,10 @@ LoraTag::GetInstanceTypeId() const
 
 LoraTag::LoraTag(uint8_t sf, uint8_t destroyedBy)
     : m_sf(sf),
+      m_sync(SYNC_WORD_LORAWAN),
       m_destroyedBy(destroyedBy),
       m_receivePower(0),
-      m_dataRate(0),
-      m_frequencyHz(0)
+      m_dataRate(0)
 {
 }
 
@@ -48,15 +50,17 @@ LoraTag::~LoraTag()
 uint32_t
 LoraTag::GetSerializedSize() const
 {
-    // Each datum about a spreading factor is 1 byte + receivePower (the size of a double) +
-    // frequency (4 bytes)
-    return 3 + sizeof(double) + 4;
+    // 4 * uint8_t: (m_sf, m_sync, m_destroyedBy, m_dataRate)
+    // 1 * uint32_t: (m_frequencyHz)
+    // 1 * double: (m_receivePower)
+    return 4 * sizeof(uint8_t) + 1 * sizeof(uint32_t) + 1 * sizeof(double);
 }
 
 void
 LoraTag::Serialize(TagBuffer i) const
 {
     i.WriteU8(m_sf);
+    i.WriteU8(m_sync);
     i.WriteU8(m_destroyedBy);
     i.WriteDouble(m_receivePower);
     i.WriteU8(m_dataRate);
@@ -67,6 +71,7 @@ void
 LoraTag::Deserialize(TagBuffer i)
 {
     m_sf = i.ReadU8();
+    m_sync = i.ReadU8();
     m_destroyedBy = i.ReadU8();
     m_receivePower = i.ReadDouble();
     m_dataRate = i.ReadU8();
@@ -125,6 +130,18 @@ uint32_t
 LoraTag::GetFrequency() const
 {
     return m_frequencyHz;
+}
+
+void
+LoraTag::SetSyncWord(uint8_t syncWord)
+{
+    m_sync = syncWord;
+}
+
+uint8_t
+LoraTag::GetSyncWord() const
+{
+    return m_sync;
 }
 
 uint8_t

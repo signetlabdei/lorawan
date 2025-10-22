@@ -90,7 +90,7 @@ SimpleGatewayLoraPhy::Send(Ptr<Packet> packet,
     }
 
     // Send the packet in the channel
-    m_channel->Send(this, packet, txPowerDbm, txParams, duration, frequencyHz);
+    m_channel->Send(this, packet, txPowerDbm, txParams, duration, frequencyHz, GetSyncWord());
 
     Simulator::Schedule(duration, &SimpleGatewayLoraPhy::TxFinished, this, packet);
 
@@ -112,7 +112,8 @@ SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
                                    double rxPowerDbm,
                                    uint8_t sf,
                                    Time duration,
-                                   uint32_t frequencyHz)
+                                   uint32_t frequencyHz,
+                                   uint8_t syncWord)
 {
     NS_LOG_FUNCTION(this << packet << rxPowerDbm << duration << frequencyHz);
 
@@ -178,23 +179,32 @@ SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
                 // search for another ReceivePath
                 return;
             }
-            else // We have sufficient sensitivity to start receiving
+
+            if (syncWord != GetSyncWord())
             {
-                NS_LOG_INFO("Scheduling reception of a packet, occupying one demodulator");
-
-                // Block this resource
-                currentPath->LockOnEvent(event);
-                m_occupiedReceptionPaths++;
-
-                // Schedule the end of the reception of the packet
-                EventId endReceiveEventId =
-                    Simulator::Schedule(duration, &LoraPhy::EndReceive, this, packet, event);
-
-                currentPath->SetEndReceive(endReceiveEventId);
-
-                // Make sure we don't go on searching for other ReceivePaths
+                NS_LOG_INFO("Cannot lock on packet due to sync word mismatch");
+                m_wrongSyncWord(packet, m_device->GetNode()->GetId());
+                // The model matches the behavior of real hardware to only
+                // support one sync word at a time: Any other ReceivePath will
+                // also use the same sync word and fail to lock on.
                 return;
             }
+
+            // We have sufficient sensitivity to start receiving
+            NS_LOG_INFO("Scheduling reception of a packet, occupying one demodulator");
+
+            // Block this resource
+            currentPath->LockOnEvent(event);
+            m_occupiedReceptionPaths++;
+
+            // Schedule the end of the reception of the packet
+            EventId endReceiveEventId =
+                Simulator::Schedule(duration, &LoraPhy::EndReceive, this, packet, event);
+
+            currentPath->SetEndReceive(endReceiveEventId);
+
+            // Make sure we don't go on searching for other ReceivePaths
+            return;
         }
     }
     // If we get to this point, there are no demodulators we can use
@@ -276,6 +286,7 @@ SimpleGatewayLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper:
             packet->RemovePacketTag(tag);
             tag.SetReceivePower(event->GetRxPowerdBm());
             tag.SetFrequency(event->GetFrequency());
+            tag.SetSyncWord(GetSyncWord());
             packet->AddPacketTag(tag);
 
             m_rxOkCallback(packet);

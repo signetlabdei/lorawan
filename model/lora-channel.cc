@@ -104,7 +104,8 @@ LoraChannel::Send(Ptr<LoraPhy> sender,
                   double txPowerDbm,
                   LoraTxParameters txParams,
                   Time duration,
-                  uint32_t frequencyHz) const
+                  uint32_t frequencyHz,
+                  uint8_t syncWord) const
 {
     NS_LOG_FUNCTION(this << sender << packet << txPowerDbm << txParams << duration << frequencyHz);
 
@@ -160,6 +161,7 @@ LoraChannel::Send(Ptr<LoraPhy> sender,
             parameters.sf = txParams.sf;
             parameters.duration = duration;
             parameters.frequencyHz = frequencyHz;
+            parameters.syncWord = syncWord;
 
             // Schedule the receive event
             NS_LOG_INFO("Scheduling reception of the packet");
@@ -187,7 +189,8 @@ LoraChannel::Receive(uint32_t i, Ptr<Packet> packet, LoraChannelParameters param
                                parameters.rxPowerDbm,
                                parameters.sf,
                                parameters.duration,
-                               parameters.frequencyHz);
+                               parameters.frequencyHz,
+                               parameters.syncWord);
 }
 
 double
@@ -203,7 +206,7 @@ operator<<(std::ostream& os, const LoraChannelParameters& params)
 {
     os << "(rxPowerDbm: " << params.rxPowerDbm << ", SF: " << unsigned(params.sf)
        << ", duration: " << params.duration.As(Time::MS) << ", frequencyHz: " << params.frequencyHz
-       << ")";
+       << ", syncWord: " << params.syncWord << ")";
     return os;
 }
 } // namespace lorawan

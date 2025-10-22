@@ -61,11 +61,19 @@ LoraPhy::GetTypeId()
                             "could not be correctly received because"
                             "its received power is below the sensitivity of the receiver",
                             MakeTraceSourceAccessor(&LoraPhy::m_underSensitivity),
+                            "ns3::Packet::TracedCallback")
+            .AddTraceSource("LostPacketBecauseSyncWordMismatch",
+                            "Trace source indicating a packet "
+                            "could not be synced to because a mismatch "
+                            "in the sync word configured in the PHY and used "
+                            "in the packet",
+                            MakeTraceSourceAccessor(&LoraPhy::m_wrongSyncWord),
                             "ns3::Packet::TracedCallback");
     return tid;
 }
 
 LoraPhy::LoraPhy()
+    : m_syncWord(0x34)
 {
 }
 
@@ -85,6 +93,18 @@ LoraPhy::SetDevice(Ptr<NetDevice> device)
     NS_LOG_FUNCTION(this << device);
 
     m_device = device;
+}
+
+uint8_t
+LoraPhy::GetSyncWord() const
+{
+    return m_syncWord;
+}
+
+void
+LoraPhy::SetSyncWord(uint8_t syncWord)
+{
+    m_syncWord = syncWord;
 }
 
 Ptr<LoraChannel>

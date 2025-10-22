@@ -48,7 +48,8 @@ class SimpleGatewayLoraPhy : public GatewayLoraPhy
                       double rxPowerDbm,
                       uint8_t sf,
                       Time duration,
-                      uint32_t frequencyHz) override;
+                      uint32_t frequencyHz,
+                      uint8_t syncWord) override;
 
     void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) override;
 

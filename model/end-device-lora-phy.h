@@ -147,7 +147,8 @@ class EndDeviceLoraPhy : public LoraPhy
                       double rxPowerDbm,
                       uint8_t sf,
                       Time duration,
-                      uint32_t frequencyHz) override = 0;
+                      uint32_t frequencyHz,
+                      uint8_t syncWord) override = 0;
 
     // Implementation of LoraPhy's pure virtual functions
     void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) override = 0;
@@ -267,6 +268,8 @@ class EndDeviceLoraPhy : public LoraPhy
     uint32_t m_frequencyHz; //!< The frequency [Hz] this device is listening on
 
     uint8_t m_sf; //!< The Spreading Factor this device is listening for
+
+    uint8_t m_syncWord; //!< The sync word this device is using
 
     /**
      * typedef for a list of EndDeviceLoraPhyListener.

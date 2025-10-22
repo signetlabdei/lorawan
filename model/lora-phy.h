@@ -36,12 +36,23 @@ class LoraChannel;
  */
 struct LoraTxParameters
 {
-    uint8_t sf = 7;                //!< Spreading Factor
-    bool headerDisabled = false;   //!< Whether to use implicit header mode
-    uint8_t codingRate = 1;        //!< Code rate (obtained as 4/(codingRate+4))
-    uint32_t bandwidthHz = 125000; //!< Bandwidth in Hz
-    uint32_t nPreamble = 8;        //!< Number of preamble symbols
-    bool crcEnabled = true;        //!< Whether Cyclic Redundancy Check (CRC) is enabled
+    /**
+     * Enumeration of the LoRa coding rates supported
+     */
+    enum CodingRate
+    {
+        CODING_RATE_4_5 = 1, //!< Coding rate 4/5
+        CODING_RATE_4_6 = 2, //!< Coding rate 4/6
+        CODING_RATE_4_7 = 3, //!< Coding rate 4/7
+        CODING_RATE_4_8 = 4, //!< Coding rate 4/8
+    };
+
+    uint8_t sf = 7;                          //!< Spreading Factor
+    bool headerDisabled = false;             //!< Whether to use implicit header mode
+    CodingRate codingRate = CODING_RATE_4_5; //!< Code rate (obtained as 4/(codingRate+4))
+    uint32_t bandwidthHz = 125000;           //!< Bandwidth in Hz
+    uint32_t nPreamble = 8;                  //!< Number of preamble symbols
+    bool crcEnabled = true;                  //!< Whether Cyclic Redundancy Check (CRC) is enabled
     bool lowDataRateOptimizationEnabled = false; //!< Whether low data rate optimization is enabled
 };
 
@@ -108,12 +119,14 @@ class LoraPhy : public Object
      * @param sf The Spreading Factor of the arriving packet.
      * @param duration The on air time of this packet.
      * @param frequencyHz The frequency this packet is being transmitted on.
+     * @param syncWord The sync word this packet was transmitted with
      */
     virtual void StartReceive(Ptr<Packet> packet,
                               double rxPowerDbm,
                               uint8_t sf,
                               Time duration,
-                              uint32_t frequencyHz) = 0;
+                              uint32_t frequencyHz,
+                              uint8_t syncWord) = 0;
 
     /**
      * Finish reception of a packet.
@@ -235,6 +248,20 @@ class LoraPhy : public Object
     void SetDevice(Ptr<NetDevice> device);
 
     /**
+     * Get the sync word this PHY is configured to use.
+     *
+     * @return The configured sync word
+     */
+    uint8_t GetSyncWord() const;
+
+    /**
+     * Configure the PHY to use the given sync word.
+     *
+     * @param syncWord The sync word to use.
+     */
+    void SetSyncWord(uint8_t syncWord);
+
+    /**
      * Compute the symbol time from spreading factor and bandwidth.
      *
      * @param txParams The parameters for transmission.
@@ -267,6 +294,13 @@ class LoraPhy : public Object
     virtual void TxFinished(Ptr<const Packet> packet) = 0;
 
     Ptr<MobilityModel> m_mobility; //!< The mobility model associated to this PHY.
+
+    /**
+     * The sync word is used in the preamble. All outgoing packets will use
+     * this sync word and the PHY will not sync with incoming packets with
+     * a different sync word.
+     */
+    uint8_t m_syncWord;
 
   protected:
     // Member objects
@@ -311,6 +345,12 @@ class LoraPhy : public Object
      * of interference.
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_interferedPacket;
+
+    /**
+     * The trace source fired when a packet cannot be correctly received because
+     * received packet uses a different sync word than the PHY is configured.
+     */
+    TracedCallback<Ptr<const Packet>, uint32_t> m_wrongSyncWord;
 
     // Callbacks
 
