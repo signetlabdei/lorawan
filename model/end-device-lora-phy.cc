@@ -187,6 +187,9 @@ EndDeviceLoraPhy::SwitchToOff()
 {
     NS_LOG_FUNCTION_NOARGS();
 
+    // TODO: If in RX or TX, we need to stop those operations first.
+    // Maybe we can use a Tag to mark the packet to be incomplete.
+
     m_state = State::OFF;
 
     // Notify listeners of the state change
