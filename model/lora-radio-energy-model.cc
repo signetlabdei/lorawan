@@ -286,8 +286,6 @@ LoraRadioEnergyModel::HandleEnergyChanged()
 {
     NS_LOG_FUNCTION(this);
     NS_LOG_DEBUG("LoraRadioEnergyModel:Energy changed!");
-
-    ScheduleSwitchToOff(m_currentState);
 }
 
 void
@@ -375,6 +373,8 @@ LoraRadioEnergyModel::ScheduleSwitchToOff(EndDeviceLoraPhy::State state)
     }
     m_switchToOffEvent.Cancel();
     const auto durationToOff = GetMaximumTimeInState(state);
+    NS_LOG_DEBUG("Scheduling switch from " << state << " to OFF in " << durationToOff.GetSeconds()
+                                           << "s");
     m_switchToOffEvent = Simulator::Schedule(durationToOff,
                                              &LoraRadioEnergyModel::ChangeState,
                                              this,
