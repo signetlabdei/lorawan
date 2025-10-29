@@ -96,8 +96,6 @@ LoraRadioEnergyModel::SetEnergySource(Ptr<EnergySource> source)
     NS_LOG_FUNCTION(this << source);
     NS_ASSERT(source);
     m_source = source;
-
-    ScheduleSwitchToOff(m_currentState);
 }
 
 double
@@ -207,27 +205,11 @@ LoraRadioEnergyModel::SetTxCurrentFromModel(double txPowerDbm)
     }
 }
 
-Time
-LoraRadioEnergyModel::GetMaximumTimeInState(EndDeviceLoraPhy::State state) const
-{
-    if (state == EndDeviceLoraPhy::State::OFF)
-    {
-        NS_FATAL_ERROR("Requested maximum remaining time for OFF state");
-    }
-    const auto remainingEnergy = m_source->GetRemainingEnergy();
-    const auto supplyVoltage = m_source->GetSupplyVoltage();
-    const auto current = GetStateA(state);
-    return Seconds(remainingEnergy / (current * supplyVoltage));
-}
-
 void
 LoraRadioEnergyModel::ChangeState(int newState)
 {
     const auto newPhyState = EndDeviceLoraPhy::State(newState);
     NS_LOG_FUNCTION(this << newPhyState);
-
-    // renew schedule switch to OFF when we change state
-    ScheduleSwitchToOff(newPhyState);
 
     Time duration = Now() - m_lastUpdateTime;
     NS_ASSERT(duration.IsPositive()); // check if duration is valid
@@ -360,25 +342,6 @@ LoraRadioEnergyModel::SetLoraRadioState(const EndDeviceLoraPhy::State state)
     NS_LOG_FUNCTION(this << state);
     m_currentState = state;
     NS_LOG_DEBUG("Switching to state: " << state << " at time = " << Now().As(Time::S));
-}
-
-void
-LoraRadioEnergyModel::ScheduleSwitchToOff(EndDeviceLoraPhy::State state)
-{
-    NS_LOG_FUNCTION(this << state);
-
-    if (state == EndDeviceLoraPhy::State::OFF)
-    {
-        return;
-    }
-    m_switchToOffEvent.Cancel();
-    const auto durationToOff = GetMaximumTimeInState(state);
-    NS_LOG_DEBUG("Scheduling switch from " << state << " to OFF in " << durationToOff.GetSeconds()
-                                           << "s");
-    m_switchToOffEvent = Simulator::Schedule(durationToOff,
-                                             &LoraRadioEnergyModel::ChangeState,
-                                             this,
-                                             static_cast<int>(EndDeviceLoraPhy::State::OFF));
 }
 
 // -------------------------------------------------------------------------- //

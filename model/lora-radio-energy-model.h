@@ -247,13 +247,6 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
     void SetTxCurrentFromModel(double txPowerDbm);
 
     /**
-     * @param state the LoRa state
-     *
-     * @returns the time the radio can stay in that state based on the remaining energy.
-     */
-    Time GetMaximumTimeInState(EndDeviceLoraPhy::State state) const;
-
-    /**
      * Changes state of the LoraRadioEnergyMode.
      *
      * @param newState New state the lora radio is in.
@@ -316,14 +309,6 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
      * can change its own state.
      */
     void SetLoraRadioState(const EndDeviceLoraPhy::State state);
-
-    /**
-     * @param state the LoRa state
-     *
-     * Schedules the switch to OFF state after the time the radio can stay in that state
-     * based on the remaining energy.
-     */
-    void ScheduleSwitchToOff(EndDeviceLoraPhy::State state);
 
     Ptr<EnergySource> m_source; ///< energy source
 
