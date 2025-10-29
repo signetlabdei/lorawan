@@ -36,15 +36,14 @@ class EnergyDepletionTest : public TestCase
 
   private:
     /// Depletion handler function that counts the depletion
-    void DepletionHandler();
+    static void DepletionHandler(Ptr<EndDeviceLoraPhy> loraPhy);
     void DoRun() override;
 
-    int m_depletionCount; ///< depletion count
+    static int s_depletionCount; ///< depletion count
 };
 
 EnergyDepletionTest::EnergyDepletionTest()
-    : TestCase("Verify that the LoraRadioEnergyModel correctly depletes the energy"),
-      m_depletionCount(0)
+    : TestCase("Verify that the LoraRadioEnergyModel correctly depletes the energy")
 {
 }
 
@@ -52,15 +51,19 @@ EnergyDepletionTest::~EnergyDepletionTest()
 {
 }
 
+int EnergyDepletionTest::s_depletionCount = 0;
+
 void
-EnergyDepletionTest::DepletionHandler()
+EnergyDepletionTest::DepletionHandler(Ptr<EndDeviceLoraPhy> loraPhy)
 {
-    m_depletionCount++;
+    s_depletionCount++;
+    loraPhy->SwitchToOff();
 }
 
 void
 EnergyDepletionTest::DoRun()
 {
+    s_depletionCount = 0;
     /************************
      *  Create the channel  *
      ************************/
@@ -144,8 +147,10 @@ EnergyDepletionTest::DoRun()
     LoraRadioEnergyModelHelper radioEnergyHelper;
 
     // configure energy source
-    basicSourceHelper.Set("BasicEnergySourceInitialEnergyJ", DoubleValue(0.01)); // Energy in J
+    basicSourceHelper.Set("BasicEnergySourceInitialEnergyJ", DoubleValue(1)); // Energy in J
     basicSourceHelper.Set("BasicEnergySupplyVoltageV", DoubleValue(3.3));
+    basicSourceHelper.Set("BasicEnergyLowBatteryThreshold", DoubleValue(0.1)); // Not Completely
+    // drained, the default value is 0.1
 
     radioEnergyHelper.Set("StandbyCurrentA", DoubleValue(0.0014));
     radioEnergyHelper.Set("TxCurrentA", DoubleValue(0.028));
@@ -164,20 +169,22 @@ EnergyDepletionTest::DoRun()
         radioEnergyHelper.Install(endDevicesNetDevices, sources);
 
     // set the depletion callback
+    auto loraNetDevice = DynamicCast<LoraNetDevice>(endDevicesNetDevices.Get(0));
+    auto loraPhy = DynamicCast<EndDeviceLoraPhy>(loraNetDevice->GetPhy());
     deviceEnergyModels.Get(0)->GetObject<LoraRadioEnergyModel>()->SetEnergyDepletionCallback(
-        MakeCallback(&EnergyDepletionTest::DepletionHandler, this));
+        MakeBoundCallback(DepletionHandler, loraPhy));
 
     /****************
      *  Simulation  *
      ****************/
 
-    Simulator::Stop(Seconds(10));
+    Simulator::Stop(Seconds(1000));
 
     Simulator::Run();
 
     Simulator::Destroy();
 
-    NS_TEST_ASSERT_MSG_EQ(m_depletionCount, 1, "Depletion callback not invoked");
+    NS_TEST_ASSERT_MSG_EQ(s_depletionCount, 1, "Depletion callback not invoked");
 }
 
 // --------------------------------------------------------------------------- //
