@@ -125,6 +125,13 @@ EndDeviceLoraPhy::SwitchToStandby()
 {
     NS_LOG_FUNCTION_NOARGS();
 
+    // Can not switch to STANDBY from OFF
+    if (m_state == State::OFF)
+    {
+        NS_LOG_INFO("Cannot switch to STANDBY from OFF state");
+        return;
+    }
+
     m_state = State::STANDBY;
 
     // Notify listeners of the state change
@@ -157,6 +164,13 @@ EndDeviceLoraPhy::SwitchToTx(double txPowerDbm)
 
     NS_ASSERT(m_state != State::RX);
 
+    // Can not switch to TX from OFF
+    if (m_state == State::OFF)
+    {
+        NS_LOG_INFO("Cannot switch to STANDBY from OFF state");
+        return;
+    }
+
     m_state = State::TX;
 
     // Notify listeners of the state change
@@ -170,6 +184,15 @@ void
 EndDeviceLoraPhy::SwitchToSleep()
 {
     NS_LOG_FUNCTION_NOARGS();
+
+    // Can not switch to SLEEP from OFF
+    // MAC may call SwitchToSleep after TX, but at this time energy is depleted and the state is
+    // already OFF
+    if (m_state == State::OFF)
+    {
+        NS_LOG_INFO("Cannot switch to STANDBY from OFF state");
+        return;
+    }
 
     NS_ASSERT(m_state == State::STANDBY);
 
