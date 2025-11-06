@@ -168,7 +168,7 @@ LoraPhy::GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams)
     double tPreamble = (double(txParams.nPreamble) + 4.25) * tSym;
 
     // Payload size
-    uint32_t pl = packet->GetSize(); // Size in bytes
+    double pl = packet->GetSize(); // Size in bytes
     NS_LOG_DEBUG("Packet of size " << pl << " bytes");
 
     // This step is needed since the formula deals with double values.
