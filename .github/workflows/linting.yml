@@ -30,6 +30,7 @@ jobs:
           apt update && DEBIAN_FRONTEND=noninteractive apt install -y
           clang cmake
           clang-tidy clang-tidy-20
+          libboost-dev
           git wget
       - name: "Checkout this repository as ns-3 module"
         uses: ./.github/actions/checkout-in-ns3
