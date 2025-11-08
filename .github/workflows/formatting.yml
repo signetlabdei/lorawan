@@ -103,4 +103,4 @@ jobs:
       - name: "Checkout this repository as ns-3 module"
         uses: ./.github/actions/checkout-in-ns3
       - run: npm install -g markdownlint-cli
-      - run: markdownlint .
+      - run: markdownlint src/lorawan
