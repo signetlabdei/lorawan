@@ -77,7 +77,7 @@ class EndDeviceLorawanMac : public LorawanMac
      * @param nextTxDelay Delay at which the transmission will be performed.
      * @param packet The packet to delay the transmission of.
      */
-    virtual void postponeTransmission(Time nextTxDelay, Ptr<Packet> packet);
+    virtual void PostponeTransmission(Time nextTxDelay, Ptr<Packet> packet);
 
     ///////////////////////
     // Receiving methods //
@@ -96,11 +96,17 @@ class EndDeviceLorawanMac : public LorawanMac
     /**
      * Reset retransmission parameters contained in the structure LoraRetxParams.
      */
-    virtual void resetRetransmissionParameters();
+    virtual void ResetRetransmissionParameters();
 
     /**
      * Signals to the network server that this device will or may not comply with LinkADRReq
      * settings (data rate, transmission power and number of retransmissions) received in downlink.
+     * This also controls whether the local ADR backoff procedure can reset configurations in case
+     * of connectivity loss. A false value effectively allows for a fully static transmission
+     * parameters configuration.
+     *
+     * @note Setting this to false does not prevent the device from setting the ADRACKReq bit
+     * in its FHDR to request a keepalive downlink message from the server.
      *
      * @param adr The ADR bit.
      */
@@ -110,7 +116,7 @@ class EndDeviceLorawanMac : public LorawanMac
      * Get the current value of the device's uplink ADR bit of the LoRaWAN FHDR.
      *
      * @return true The device will comply with data rate, transmission power and number of
-     * retransmissions settings received from the network server via LikADRReq.
+     * retransmissions settings received from the network server via LinkADRReq.
      * @return false Signals to the network server that the device may not comply with the data
      * rate, transmission power and number of retransmissions settings received via LikADRReq.
      */
@@ -314,6 +320,9 @@ class EndDeviceLorawanMac : public LorawanMac
      */
     void AddMacCommand(Ptr<MacCommand> macCommand);
 
+    static constexpr uint16_t ADR_ACK_LIMIT = 64; //!< ADRACKCnt threshold for setting ADRACKReq
+    static constexpr uint16_t ADR_ACK_DELAY = 32; //!< ADRACKCnt threshold for ADR backoff action
+
   protected:
     /**
      * Structure representing the parameters that will be used in the
@@ -327,8 +336,6 @@ class EndDeviceLorawanMac : public LorawanMac
         uint8_t retxLeft;             //!< Number of retransmission attempts left
     };
 
-    bool
-        m_enableDRAdapt; //!< Enable data rate adaptation (ADR) during the retransmission procedure.
     uint8_t m_nbTrans; //!< Default number of unacknowledged redundant transmissions of each packet.
     TracedValue<uint8_t> m_dataRate; //!< The data rate this device is using to transmit.
     TracedValue<double>
@@ -348,13 +355,12 @@ class EndDeviceLorawanMac : public LorawanMac
     virtual Time GetNextClassTransmissionDelay(Time waitTime);
 
     /**
-     * Find a suitable channel for transmission. The channel is chosen among the
-     * ones that are available in the end device, based on their duty
-     * cycle limitations.
+     * Find a suitable channel for transmission. The channel is chosen randomly among the
+     * ones that are available in the end device, based on their duty cycle limitations.
      *
      * @return A pointer to the channel.
      */
-    Ptr<LogicalLoraChannel> GetChannelForTx();
+    Ptr<LogicalLoraChannel> GetRandomChannelForTx();
 
     /**
      * The duration of a receive window in number of symbols. This should be
@@ -388,6 +394,10 @@ class EndDeviceLorawanMac : public LorawanMac
      */
     double m_lastRxSnr;
 
+    uint16_t m_adrAckCnt; //!< ADRACKCnt counter of the number of consecutive uplinks without
+                          //!< downlink reply from the server. Reset upon reception of any Class A
+                          //!< downlink destined to the device.
+
     /////////////////
     //  Callbacks  //
     /////////////////
@@ -399,17 +409,45 @@ class EndDeviceLorawanMac : public LorawanMac
 
   private:
     /**
+     * Get the set of active transmission channels compatible with the current device data rate and
+     * transmission power.
+     *
+     * @return A (possibly empty) vector of compatible transmission channels.
+     */
+    std::vector<Ptr<LogicalLoraChannel>> GetCompatibleTxChannels();
+
+    /**
      * Find the base minimum wait time before the next possible transmission.
      *
      * @return The base minimum wait time.
      */
     Time GetNextTransmissionDelay();
 
+    /**
+     * Execute ADR backoff as in LoRaWAN specification, V1.0.4 (2020)
+     */
+    void ExecuteADRBackoff();
+
+    /**
+     * Check whether the size of the application payload is under the maximum allowed.
+     *
+     * From LoRaWAN L2 1.0.4 Specification (TS001-1.0.4), Section 4.3.2: "N is the number of octets
+     * of the application payload and SHALL be equal to or less than N ≤ M − 1 − (length of FHDR in
+     * octets), where M is the maximum MACPayload length. The valid ranges of both N and M are
+     * region-specific and defined in the “LoRaWAN Regional Parameters” [RP002] document."
+     *
+     * @param appPayloadSize Number of bytes of the application payload.
+     * @param dataRate Data rate to evaluate the max MACPayload for.
+     * @return Whether the payload size is valid.
+     */
+    bool IsPayloadSizeValid(uint32_t appPayloadSize, uint8_t dataRate);
+
     bool m_adr; //!< Uplink ADR bit contained in the FCtrl field of the LoRaWAN FHDR.
                 //!< Controlled by the device, if set to false signals the network server
                 //!< that the device may not accept attempts to control the number of
                 //!< retransmissions, the data rate, or the TX power with downlink
-                //!< LinkADRReq commands.
+                //!< LinkADRReq commands. This also allows the device's local ADR backoff
+                //!< procedure to reset configurations in case of connectivity loss.
 
     /**
      * The event of retransmitting a packet in a consecutive moment if an ACK is not received.
@@ -459,6 +497,10 @@ class EndDeviceLorawanMac : public LorawanMac
      * current value of the device frame counter.
      */
     uint16_t m_currentFCnt;
+
+    bool m_adrAckReq; //!< ADRACKReq bit, set to 1 after ADR_ACK_LIMIT consecutive uplinks without
+                      //!< downlink messages received from the server. It requests the server to
+                      //!< send a downlink for keepalive purposes.
 };
 
 } // namespace lorawan

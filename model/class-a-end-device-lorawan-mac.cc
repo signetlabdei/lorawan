@@ -73,14 +73,6 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
 
     NS_LOG_DEBUG("PacketToSend: " << packetToSend);
 
-    // Data rate adaptation as in LoRaWAN specification, V1.0.2 (2016)
-    if (m_enableDRAdapt && (m_dataRate > 0) && (m_retxParams.retxLeft < m_nbTrans) &&
-        (m_retxParams.retxLeft % 2 == 0))
-    {
-        m_txPowerDbm = 14; // Reset transmission power
-        m_dataRate = m_dataRate - 1;
-    }
-
     // Craft LoraTxParameters object
     LoraTxParameters params;
     params.sf = GetSfFromDataRate(m_dataRate);
@@ -93,7 +85,7 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
 
     // Wake up PHY layer and directly send the packet
 
-    Ptr<LogicalLoraChannel> txChannel = GetChannelForTx();
+    Ptr<LogicalLoraChannel> txChannel = GetRandomChannelForTx();
 
     NS_LOG_DEBUG("PacketToSend: " << packetToSend);
     m_phy->Send(packetToSend, params, txChannel->GetFrequency(), m_txPowerDbm);
@@ -165,6 +157,9 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
             // THIS WILL BE GetReceiveWindow()
             Simulator::Cancel(m_secondReceiveWindow);
 
+            // Reset ADR backoff counter
+            m_adrAckCnt = 0;
+
             LoraTag tag;
             packet->PeekPacketTag(tag);
             /// @see ns3::lorawan::AdrComponent::RxPowerToSNR
@@ -189,6 +184,8 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
             // longer have any retransmissions left, we declare failure.
             if (m_retxParams.waitingAck && m_secondReceiveWindow.IsExpired())
             {
+                /// TODO: UNCONFIRMED packets CAN be retransmitted, but behave slightly differently.
+                /// The current implementation only considers re-txs for CONFIRMED, change this
                 if (m_retxParams.retxLeft == 0)
                 {
                     uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
@@ -200,7 +197,7 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
                                  << unsigned(txs) << " transmissions.");
 
                     // Reset retransmission parameters
-                    resetRetransmissionParameters();
+                    ResetRetransmissionParameters();
                 }
                 else // Reschedule
                 {
@@ -228,7 +225,7 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
                                                                         << " transmissions.");
 
             // Reset retransmission parameters
-            resetRetransmissionParameters();
+            ResetRetransmissionParameters();
         }
     }
 
@@ -259,7 +256,7 @@ ClassAEndDeviceLorawanMac::FailedReception(Ptr<const Packet> packet)
                                                                         << " transmissions.");
 
             // Reset retransmission parameters
-            resetRetransmissionParameters();
+            ResetRetransmissionParameters();
         }
     }
 }
@@ -422,7 +419,7 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
                                                                         << " transmissions.");
 
             // Reset retransmission parameters
-            resetRetransmissionParameters();
+            ResetRetransmissionParameters();
         }
 
         else
@@ -439,7 +436,7 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
                        << " transmissions left. We were not transmitting confirmed messages.");
 
         // Reset retransmission parameters
-        resetRetransmissionParameters();
+        ResetRetransmissionParameters();
     }
 }
 

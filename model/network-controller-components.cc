@@ -91,6 +91,17 @@ ConfirmedMessagesComponent::OnReceivedPacket(Ptr<const Packet> packet,
         // window. Because of this, in this component's OnFailedReply method we
         // void the ack bits.
     }
+    else if (fHdr.GetAdrAckReq())
+    {
+        NS_LOG_INFO("Packet has ADRACKReq bit set");
+
+        // Configure reply
+        status->m_reply.frameHeader.SetAsDownlink();
+        status->m_reply.frameHeader.SetAck(false);
+        status->m_reply.frameHeader.SetAddress(fHdr.GetAddress());
+        status->m_reply.macHeader.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+        status->m_reply.needsReply = true;
+    }
 }
 
 void
