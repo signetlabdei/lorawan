@@ -21,6 +21,9 @@ jobs:
           sparse-checkout: .github/actions
       - name: "Install dependencies and checkout repo in ns-3"
         uses: ./.github/actions/install-doc
+      - run: |
+          pacman -Syu --noconfirm base-devel ninja cmake ccache
+          pacman --noconfirm -U https://archive.archlinux.org/packages/d/doxygen/doxygen-1.15.0-1-x86_64.pkg.tar.zst
       - name: "Build ns-3"
         env:
           BUILD_ID: per-commit-g++-debug
@@ -44,8 +47,8 @@ jobs:
     needs: build
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
-      pages: write      # to deploy to Pages
-      id-token: write   # to verify the deployment originates from an appropriate source
+      pages: write # to deploy to Pages
+      id-token: write # to verify the deployment originates from an appropriate source
     # Deploy to the github-pages environment
     environment:
       name: github-pages
