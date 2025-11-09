@@ -20,7 +20,8 @@ jobs:
           sparse-checkout: .github/actions
       - name: "Install dependencies and checkout repo in ns-3"
         uses: ./.github/actions/install-doc
-      - run: |
+      - name: "Install additional dependencies for Doxygen"
+        run: |
           pacman -Syu --noconfirm base-devel ninja cmake ccache
           pacman --noconfirm -U https://archive.archlinux.org/packages/d/doxygen/doxygen-1.15.0-1-x86_64.pkg.tar.zst
       - name: "Build ns-3"
