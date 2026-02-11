@@ -68,10 +68,12 @@ SimpleEndDeviceLoraPhy::Send(Ptr<Packet> packet,
     // We can send the packet: switch to the TX state
     SwitchToTx(txPowerDbm);
 
-    // Tag the packet with information about its Spreading Factor
+    // Tag the packet with information the transmission channel
     LoraTag tag;
     packet->RemovePacketTag(tag);
     tag.SetSpreadingFactor(txParams.sf);
+    tag.SetFrequency(frequencyHz);
+    tag.SetChannelBandwidth(txParams.bandwidthHz);
     packet->AddPacketTag(tag);
 
     // Send the packet over the channel

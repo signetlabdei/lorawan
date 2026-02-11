@@ -69,6 +69,19 @@ class LoraTag : public Tag
     double GetReceivePower() const;
 
     /**
+     * Set the signal to noise ratio [dB]
+     * @param snrDb The signal to noise ration in dB
+     */
+    void SetSignalToNoise(double snrDb);
+
+    /**
+     * Get the signal to noise ratio [dB] of this packet
+     *
+     * @return The signal to noise ratio in dB.
+     */
+    double GetSignalToNoise() const;
+
+    /**
      * Set which Spreading Factor this packet was transmitted with.
      *
      * @param sf The Spreading Factor.
@@ -116,6 +129,20 @@ class LoraTag : public Tag
     uint32_t GetFrequency() const;
 
     /**
+     * Set the bandwidth [Hz] of the channel the packet is send on.
+     *
+     * @param bandwidthHz The bandwidth [Hz] of the used channel.
+     */
+    void SetChannelBandwidth(uint32_t bandwidthHz);
+
+    /**
+     * Get the bandwidth [Hz] of the channel the packet is transmitted on.
+     *
+     * @return The bandwidth [Hz] of the channel the packet is transmitted on.
+     */
+    uint32_t GetChannelBandwidth() const;
+
+    /**
      * Get the data rate for this packet.
      *
      * @return The data rate that needs to be employed for this packet.
@@ -129,12 +156,25 @@ class LoraTag : public Tag
      */
     void SetDataRate(uint8_t dataRate);
 
+    /**
+     * Set the sync word of this packet.
+     */
+    void SetSyncWord(uint8_t syncWord);
+
+    /**
+     * Get the sync word of this packet.
+     */
+    uint8_t GetSyncWord() const;
+
   private:
     uint8_t m_sf;           //!< The Spreading Factor used by the packet.
+    uint8_t m_sync;         //!< The sync word of this packet.
     uint8_t m_destroyedBy;  //!< The Spreading Factor that destroyed the packet.
     double m_receivePower;  //!< The reception power of this packet.
     uint8_t m_dataRate;     //!< The data rate that needs to be used to send this packet.
     uint32_t m_frequencyHz; //!< The frequency [Hz] of this packet
+    uint32_t m_bandwidthHz; //!< The bandwidth [Hz] of the channel this packet is on.
+    double m_snrDb;         //!< The signal to noise ratio [dB] of this packet.
 };
 } // namespace lorawan
 } // namespace ns3
