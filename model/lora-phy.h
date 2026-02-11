@@ -57,6 +57,15 @@ struct LoraTxParameters
 };
 
 /**
+ * Allow logging of CodingRate like any other data type.
+ */
+std::ostream& operator<<(std::ostream& os, const LoraTxParameters::CodingRate& codingRate);
+/**
+ * Allow parsing of CodingRate from CommandLine.
+ */
+std::istream& operator>>(std::istream& is, LoraTxParameters::CodingRate& codingRate);
+
+/**
  * Allow logging of LoraTxParameters like with any other data type.
  */
 std::ostream& operator<<(std::ostream& os, const LoraTxParameters& params);
