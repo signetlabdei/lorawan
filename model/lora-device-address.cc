@@ -163,7 +163,7 @@ LoraDeviceAddress::GetType()
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    static uint8_t type = Address::Register();
+    static uint8_t type = Address::Register("LoraDeviceAddress", 4);
     return type;
 }
 
