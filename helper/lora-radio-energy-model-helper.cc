@@ -68,8 +68,8 @@ LoraRadioEnergyModelHelper::SetTxCurrentModel(std::string name,
  * Private function starts here.
  */
 
-Ptr<DeviceEnergyModel>
-LoraRadioEnergyModelHelper::DoInstall(Ptr<NetDevice> device, Ptr<EnergySource> source) const
+Ptr<energy::DeviceEnergyModel>
+LoraRadioEnergyModelHelper::DoInstall(Ptr<NetDevice> device, Ptr<energy::EnergySource> source) const
 {
     NS_ASSERT(device);
     NS_ASSERT(source);

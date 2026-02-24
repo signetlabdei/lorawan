@@ -34,6 +34,7 @@
 
 using namespace ns3;
 using namespace lorawan;
+using namespace energy;
 
 NS_LOG_COMPONENT_DEFINE("LoraEnergyModelExample");
 

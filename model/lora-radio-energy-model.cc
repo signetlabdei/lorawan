@@ -90,7 +90,7 @@ LoraRadioEnergyModel::~LoraRadioEnergyModel()
 }
 
 void
-LoraRadioEnergyModel::SetEnergySource(Ptr<EnergySource> source)
+LoraRadioEnergyModel::SetEnergySource(Ptr<energy::EnergySource> source)
 {
     NS_LOG_FUNCTION(this << source);
     NS_ASSERT(source);
@@ -359,7 +359,7 @@ LoraRadioEnergyModelPhyListener::~LoraRadioEnergyModelPhyListener()
 
 void
 LoraRadioEnergyModelPhyListener::SetChangeStateCallback(
-    DeviceEnergyModel::ChangeStateCallback callback)
+    energy::DeviceEnergyModel::ChangeStateCallback callback)
 {
     NS_LOG_FUNCTION(this << &callback);
     NS_ASSERT(!callback.IsNull());
