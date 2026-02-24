@@ -330,6 +330,72 @@ LinkCheckTest::DoRun()
 /**
  * @ingroup lorawan
  *
+ * It verifies that the NetworkServer application responds to uplinks with the ADRACKReq bit set
+ */
+class AdrAckReqTest : public TestCase
+{
+  public:
+    AdrAckReqTest();           //!< Default constructor
+    ~AdrAckReqTest() override; //!< Destructor
+
+  private:
+    void DoRun() override;
+
+    /**
+     * Callback for packet reception by the end device MAC layer
+     *
+     * @param packet The received packet
+     */
+    void OnReception(Ptr<const Packet> packet);
+
+    bool m_adrAckReceived = false; //!< Set to true if a downlink packet is received by the end
+                                   //!< device after setting the uplink ADRACKReq bit
+};
+
+AdrAckReqTest::AdrAckReqTest()
+    : TestCase("Verify that the NetworkServer responds to uplinks with the ADRACKReq bit set")
+{
+}
+
+AdrAckReqTest::~AdrAckReqTest()
+{
+}
+
+void
+AdrAckReqTest::OnReception(Ptr<const Packet> packet)
+{
+    m_adrAckReceived = true;
+}
+
+void
+AdrAckReqTest::DoRun()
+{
+    NS_LOG_DEBUG("AdrAckReqTest");
+    auto components = InitializeNetwork(1, 1);
+    auto ed = components.endDevices.Get(0);
+    auto netdev = DynamicCast<LoraNetDevice>(ed->GetDevice(0));
+    auto mac = DynamicCast<ClassAEndDeviceLorawanMac>(netdev->GetMac());
+    // Turn-off ADR downlinks from the server, ADRACKReq mechanism still works
+    mac->SetUplinkAdrBit(false);
+    auto cb = MakeCallback(&AdrAckReqTest::OnReception, this);
+    mac->TraceConnectWithoutContext("ReceivedPacket", cb);
+    // Trigger ADRACKReq bit set
+    for (uint16_t fCnt = 0; fCnt <= EndDeviceLorawanMac::ADR_ACK_LIMIT; ++fCnt)
+    {
+        Simulator::Schedule(Minutes(20),
+                            &NetDevice::Send,
+                            ed->GetDevice(0),
+                            Create<Packet>(20),
+                            Address(),
+                            0);
+        Simulator::Run();
+    }
+    NS_TEST_EXPECT_MSG_EQ(m_adrAckReceived, true, "No downlink received by the end device");
+}
+
+/**
+ * @ingroup lorawan
+ *
  * The TestSuite class names the TestSuite, identifies what type of TestSuite, and enables the
  * TestCases to be run. Typically, only the constructor for this class must be defined
  */
@@ -342,9 +408,8 @@ class NetworkServerTestSuite : public TestSuite
 NetworkServerTestSuite::NetworkServerTestSuite()
     : TestSuite("network-server", Type::UNIT)
 {
-    LogComponentEnable("NetworkServerTestSuite", LOG_LEVEL_DEBUG);
-
     // Activate only at need, as these can create problems among test suites when running ./test.py
+    // LogComponentEnable("NetworkServerTestSuite", LOG_LEVEL_DEBUG);
     // LogComponentEnable("NetworkServer", LOG_LEVEL_ALL);
     // LogComponentEnable("NetworkStatus", LOG_LEVEL_ALL);
     // LogComponentEnable("NetworkScheduler", LOG_LEVEL_ALL);
@@ -359,10 +424,10 @@ NetworkServerTestSuite::NetworkServerTestSuite()
     // LogComponentEnableAll(LOG_PREFIX_NODE);
     // LogComponentEnableAll(LOG_PREFIX_TIME);
 
-    // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
     AddTestCase(new UplinkPacketTest, Duration::QUICK);
     AddTestCase(new DownlinkPacketTest, Duration::QUICK);
     AddTestCase(new LinkCheckTest, Duration::QUICK);
+    AddTestCase(new AdrAckReqTest, Duration::QUICK);
 }
 
 // Do not forget to allocate an instance of this TestSuite

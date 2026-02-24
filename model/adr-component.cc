@@ -31,7 +31,7 @@ AdrComponent::GetTypeId()
             .SetParent<NetworkControllerComponent>()
             .AddAttribute("MultipleGwCombiningMethod",
                           "Whether to average the received power of gateways or to use the maximum",
-                          EnumValue(AdrComponent::AVERAGE),
+                          EnumValue(AdrComponent::MAXIMUM),
                           MakeEnumAccessor<CombiningMethod>(&AdrComponent::tpAveraging),
                           MakeEnumChecker(AdrComponent::AVERAGE,
                                           "avg",
@@ -41,7 +41,7 @@ AdrComponent::GetTypeId()
                                           "min"))
             .AddAttribute("MultiplePacketsCombiningMethod",
                           "Whether to average SNRs from multiple packets or to use the maximum",
-                          EnumValue(AdrComponent::AVERAGE),
+                          EnumValue(AdrComponent::MAXIMUM),
                           MakeEnumAccessor<CombiningMethod>(&AdrComponent::historyAveraging),
                           MakeEnumChecker(AdrComponent::AVERAGE,
                                           "avg",
@@ -51,7 +51,7 @@ AdrComponent::GetTypeId()
                                           "min"))
             .AddAttribute("HistoryRange",
                           "Number of packets to use for averaging",
-                          IntegerValue(4),
+                          IntegerValue(20),
                           MakeIntegerAccessor(&AdrComponent::historyRange),
                           MakeIntegerChecker<int>(0, 100))
             .AddAttribute("ChangeTransmissionPower",

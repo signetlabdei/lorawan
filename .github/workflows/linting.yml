@@ -10,7 +10,7 @@ on:
 
 jobs:
   # Clang-tidy
-  clang-tidy-19:
+  clang-tidy-21:
     runs-on: ubuntu-latest
     container:
       image: ubuntu:rolling
@@ -29,7 +29,8 @@ jobs:
         run: >
           apt update && DEBIAN_FRONTEND=noninteractive apt install -y
           clang cmake
-          clang-tidy clang-tidy-19
+          clang-tidy clang-tidy-21
+          libboost-dev
           git wget
       - name: "Checkout this repository as ns-3 module"
         uses: ./.github/actions/checkout-in-ns3
@@ -65,7 +66,7 @@ jobs:
       - name: "Run clang-tidy"
         shell: bash
         run: >
-          run-clang-tidy-19 -p cmake-cache/ -quiet $FILES_TO_CHECK
+          run-clang-tidy-21 -p cmake-cache/ -quiet $FILES_TO_CHECK
           1> $CLANG_TIDY_OUTPUT
           2> /dev/null
       - name: "Trim empty lines from output file"
