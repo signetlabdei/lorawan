@@ -70,7 +70,7 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
     LoraTxParameters params;
     params.sf = GetSfFromDataRate(dataRate);
     params.headerDisabled = false;
-    params.codingRate = 1;
+    params.codingRate = LoraTxParameters::CODING_RATE_4_5;
     params.bandwidthHz = GetBandwidthFromDataRate(dataRate);
     params.nPreamble = 8;
     params.crcEnabled = true;

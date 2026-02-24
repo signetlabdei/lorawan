@@ -339,8 +339,8 @@ class EndDeviceLorawanMac : public LorawanMac
     uint8_t m_nbTrans; //!< Default number of unacknowledged redundant transmissions of each packet.
     TracedValue<uint8_t> m_dataRate; //!< The data rate this device is using to transmit.
     TracedValue<double>
-        m_txPowerDbm;      //!< The transmission ERP [dBm] this device is currently using.
-    uint8_t m_codingRate;  //!< The coding rate used by this device.
+        m_txPowerDbm; //!< The transmission ERP [dBm] this device is currently using.
+    LoraTxParameters::CodingRate m_codingRate; //!< The coding rate used by this device.
     bool m_headerDisabled; //!< Whether or not the LoRa PHY header is disabled for communications by
                            //!< this device.
     LoraDeviceAddress m_address; //!< The address of this device.
