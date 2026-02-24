@@ -200,5 +200,6 @@ operator<<(std::ostream& os, const LoraChannelParameters& params)
        << ")";
     return os;
 }
+
 } // namespace lorawan
 } // namespace ns3

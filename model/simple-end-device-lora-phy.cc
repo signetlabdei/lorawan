@@ -284,5 +284,6 @@ SimpleEndDeviceLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelpe
         }
     }
 }
+
 } // namespace lorawan
 } // namespace ns3

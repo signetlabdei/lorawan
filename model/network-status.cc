@@ -227,5 +227,6 @@ NetworkStatus::CountEndDevices()
 
     return m_endDeviceStatuses.size();
 }
+
 } // namespace lorawan
 } // namespace ns3

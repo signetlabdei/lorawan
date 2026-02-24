@@ -130,5 +130,6 @@ LoraPhyHelper::SetGatewayTransmissionPriority(bool txPriority)
 {
     m_txPriority = txPriority;
 }
+
 } // namespace lorawan
 } // namespace ns3

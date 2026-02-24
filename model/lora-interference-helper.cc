@@ -412,6 +412,7 @@ LoraInterferenceHelper::GetOverlapTime(Ptr<LoraInterferenceHelper::Event> event1
 
     return overlap;
 }
+
 } // namespace lorawan
 } // namespace ns3
 

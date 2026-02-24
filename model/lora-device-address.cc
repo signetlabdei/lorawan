@@ -261,5 +261,6 @@ operator<<(std::ostream& os, const LoraDeviceAddress& address)
     os << address.Print();
     return os;
 }
+
 } // namespace lorawan
 } // namespace ns3

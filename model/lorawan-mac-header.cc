@@ -146,5 +146,6 @@ LorawanMacHeader::IsConfirmed() const
 
     return (m_mtype == CONFIRMED_DATA_DOWN) || (m_mtype == CONFIRMED_DATA_UP);
 }
+
 } // namespace lorawan
 } // namespace ns3

@@ -140,5 +140,7 @@ NetworkScheduler::OnReceiveWindowOpportunity(LoraDeviceAddress deviceAddress, in
         }
     }
 }
+
+} // namespace lorawan
 } // namespace lorawan
 } // namespace ns3

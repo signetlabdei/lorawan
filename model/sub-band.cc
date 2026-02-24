@@ -81,5 +81,6 @@ SubBand::GetMaxTxPowerDbm() const
 {
     return m_maxTxPowerDbm;
 }
+
 } // namespace lorawan
 } // namespace ns3

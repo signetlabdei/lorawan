@@ -62,5 +62,6 @@ LoraDeviceAddressGenerator::GetNextAddress()
 
     return LoraDeviceAddress(m_currentNwkId.Get(), m_currentNwkAddr.Get() + 1);
 }
+
 } // namespace lorawan
 } // namespace ns3

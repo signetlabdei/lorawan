@@ -176,5 +176,6 @@ LorawanMac::SetReplyDataRateMatrix(ReplyDataRateMatrix replyDataRateMatrix)
 {
     m_replyDataRateMatrix = replyDataRateMatrix;
 }
+
 } // namespace lorawan
 } // namespace ns3

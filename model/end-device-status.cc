@@ -406,5 +406,6 @@ operator<<(std::ostream& os, const EndDeviceStatus& status)
 
     return os;
 }
+
 } // namespace lorawan
 } // namespace ns3

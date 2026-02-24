@@ -177,5 +177,6 @@ GatewayLoraPhy::IsOnFrequency(uint32_t frequencyHz)
     }
     return false;
 }
+
 } // namespace lorawan
 } // namespace ns3

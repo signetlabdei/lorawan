@@ -75,5 +75,6 @@ OneShotSenderHelper::InstallPriv(Ptr<Node> node) const
 
     return app;
 }
+
 } // namespace lorawan
 } // namespace ns3

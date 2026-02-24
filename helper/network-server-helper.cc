@@ -130,5 +130,6 @@ NetworkServerHelper::InstallComponents(Ptr<NetworkServer> netServer)
         netServer->AddComponent(m_adrSupportFactory.Create<NetworkControllerComponent>());
     }
 }
+
 } // namespace lorawan
 } // namespace ns3

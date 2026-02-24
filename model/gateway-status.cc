@@ -119,5 +119,6 @@ GatewayStatus::SetNextTransmissionTime(Time nextTransmissionTime)
 {
     m_nextTransmissionTime = nextTransmissionTime;
 }
+
 } // namespace lorawan
 } // namespace ns3

@@ -284,5 +284,6 @@ CorrelatedShadowingPropagationLossModel::Position::operator<(
     }
     return this->y < other.y;
 }
+
 } // namespace lorawan
 } // namespace ns3

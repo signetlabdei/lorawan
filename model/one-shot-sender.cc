@@ -91,5 +91,6 @@ OneShotSender::StopApplication()
     NS_LOG_FUNCTION_NOARGS();
     Simulator::Cancel(m_sendEvent);
 }
+
 } // namespace lorawan
 } // namespace ns3

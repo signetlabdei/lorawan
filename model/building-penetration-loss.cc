@@ -217,5 +217,6 @@ BuildingPenetrationLoss::GetTor1(Ptr<MobilityModel> b) const
     }
     return m_uniformRV->GetValue(4, 10) * m_pMap.find(b)->second;
 }
+
 } // namespace lorawan
 } // namespace ns3

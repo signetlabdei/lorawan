@@ -213,5 +213,6 @@ LinkCheckComponent::OnFailedReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus
 {
     NS_LOG_FUNCTION(this->GetTypeId() << networkStatus);
 }
+
 } // namespace lorawan
 } // namespace ns3

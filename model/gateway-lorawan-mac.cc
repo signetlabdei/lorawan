@@ -141,5 +141,6 @@ GatewayLorawanMac::GetWaitTime(uint32_t frequencyHz)
     NS_LOG_FUNCTION_NOARGS();
     return m_channelHelper->GetWaitTime(frequencyHz);
 }
+
 } // namespace lorawan
 } // namespace ns3
