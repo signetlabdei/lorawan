@@ -94,6 +94,6 @@ class LoraRadioEnergyModelHelper : public DeviceEnergyModelHelper
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* LORA_RADIO_ENERGY_MODEL_HELPER_H */

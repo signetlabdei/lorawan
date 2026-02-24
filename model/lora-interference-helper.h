@@ -231,7 +231,8 @@ class LoraInterferenceHelper
  * @param event The event to be logged
  */
 std::ostream& operator<<(std::ostream& os, const LoraInterferenceHelper::Event& event);
-} // namespace lorawan
 
+} // namespace lorawan
 } // namespace ns3
+
 #endif /* LORA_INTERFERENCE_HELPER_H */

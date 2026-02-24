@@ -121,6 +121,8 @@ class SubBand : public SimpleRefCount<SubBand>
     Time m_nextTransmissionTime; //!< The next time a transmission will be allowed in this subband
     double m_maxTxPowerDbm; //!< The maximum transmission power that is admitted on this subband
 };
+
 } // namespace lorawan
 } // namespace ns3
+
 #endif /* SUB_BAND_H */

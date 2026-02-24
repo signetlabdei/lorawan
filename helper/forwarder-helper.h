@@ -76,6 +76,6 @@ class ForwarderHelper
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* FORWARDER_HELPER_H */

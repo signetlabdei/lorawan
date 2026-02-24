@@ -138,6 +138,6 @@ class NetworkStatus : public Object
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* NETWORK_STATUS_H */

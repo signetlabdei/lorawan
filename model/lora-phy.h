@@ -334,6 +334,6 @@ class LoraPhy : public Object
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* LORA_PHY_H */

@@ -136,6 +136,8 @@ class LoraTag : public Tag
     uint8_t m_dataRate;     //!< The data rate that needs to be used to send this packet.
     uint32_t m_frequencyHz; //!< The frequency [Hz] of this packet
 };
+
 } // namespace lorawan
 } // namespace ns3
-#endif
+
+#endif /* LORA_TAG_H */

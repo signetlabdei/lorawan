@@ -134,7 +134,8 @@ class LorawanMacHeader : public Header
      */
     uint8_t m_major;
 };
-} // namespace lorawan
 
+} // namespace lorawan
 } // namespace ns3
-#endif
+
+#endif /* LORAWAN_MAC_HEADER_H */

@@ -50,6 +50,6 @@ class SimpleGatewayLoraPhy : public GatewayLoraPhy
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* SIMPLE_GATEWAY_LORA_PHY_H */

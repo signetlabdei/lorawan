@@ -65,6 +65,6 @@ class GatewayLorawanMac : public LorawanMac
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* GATEWAY_LORAWAN_MAC_H */

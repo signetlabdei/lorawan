@@ -502,6 +502,6 @@ class EndDeviceLorawanMac : public LorawanMac
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* END_DEVICE_LORAWAN_MAC_H */

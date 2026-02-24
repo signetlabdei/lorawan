@@ -348,6 +348,6 @@ LoraFrameHeader::GetMacCommand()
 }
 
 } // namespace lorawan
-
 } // namespace ns3
-#endif
+
+#endif /* LORA_FRAME_HEADER_H */

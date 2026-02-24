@@ -744,7 +744,8 @@ class DlChannelAns : public MacCommand
 
   private:
 };
-} // namespace lorawan
 
+} // namespace lorawan
 } // namespace ns3
+
 #endif /* DEVICE_STATUS_H */

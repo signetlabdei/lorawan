@@ -278,4 +278,5 @@ std::ostream& operator<<(std::ostream& os, const LoraDeviceAddress& address);
 
 } // namespace lorawan
 } // namespace ns3
-#endif
+
+#endif /* LORA_DEVICE_ADDRESS_H */

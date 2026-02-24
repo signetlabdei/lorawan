@@ -48,6 +48,6 @@ double WToDbm(double w);
 double RatioToDb(double ratio);
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* LORA_UTILS_H */

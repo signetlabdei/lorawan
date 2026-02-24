@@ -71,6 +71,6 @@ class NetworkController : public Object
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* NETWORK_CONTROLLER_H */

@@ -112,6 +112,6 @@ class PeriodicSenderHelper
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* PERIODIC_SENDER_HELPER_H */

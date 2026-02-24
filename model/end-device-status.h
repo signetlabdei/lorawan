@@ -360,7 +360,8 @@ class EndDeviceStatus : public Object
     /// synchronization between the info at the device and at the network server
     Ptr<ClassAEndDeviceLorawanMac> m_mac; //!< Pointer to the MAC layer of this device
 };
-} // namespace lorawan
 
+} // namespace lorawan
 } // namespace ns3
+
 #endif /* DEVICE_STATUS_H */

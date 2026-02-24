@@ -54,6 +54,6 @@ class SimpleEndDeviceLoraPhy : public EndDeviceLoraPhy
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* SIMPLE_END_DEVICE_LORA_PHY_H */

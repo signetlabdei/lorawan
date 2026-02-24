@@ -325,6 +325,6 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* LORA_RADIO_ENERGY_MODEL_H */

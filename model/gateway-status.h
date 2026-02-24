@@ -116,7 +116,8 @@ class GatewayStatus : public Object
 
     Time m_nextTransmissionTime; //!< This gateway's next transmission time
 };
-} // namespace lorawan
 
+} // namespace lorawan
 } // namespace ns3
+
 #endif /* DEVICE_STATUS_H */

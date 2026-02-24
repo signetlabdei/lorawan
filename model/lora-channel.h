@@ -184,6 +184,6 @@ class LoraChannel : public Channel
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* LORA_CHANNEL_H */

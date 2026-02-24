@@ -81,6 +81,8 @@ class BuildingPenetrationLoss : public PropagationLossModel
      */
     mutable std::map<Ptr<MobilityModel>, int> m_wallLossMap;
 };
+
 } // namespace lorawan
 } // namespace ns3
-#endif
+
+#endif /* BUILDING_PENETRATION_LOSS_H */

@@ -87,6 +87,6 @@ class OneShotSenderHelper
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* ONE_SHOT_SENDER_HELPER_H */

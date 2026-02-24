@@ -107,6 +107,6 @@ class LoraPhyHelper
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* LORA_PHY_HELPER_H */

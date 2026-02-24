@@ -118,6 +118,6 @@ class NetworkServer : public Application
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* NETWORK_SERVER_H */

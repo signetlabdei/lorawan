@@ -166,6 +166,6 @@ class LoraNetDevice : public NetDevice
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* LORA_NET_DEVICE_H */

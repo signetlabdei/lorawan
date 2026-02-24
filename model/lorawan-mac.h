@@ -272,6 +272,6 @@ class LorawanMac : public Object
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* LORAWAN_MAC_H */

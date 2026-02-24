@@ -198,6 +198,6 @@ class GatewayLoraPhy : public LoraPhy
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* GATEWAY_LORA_PHY_H */

@@ -138,7 +138,8 @@ class LinkCheckComponent : public NetworkControllerComponent
 
   private:
 };
-} // namespace lorawan
 
+} // namespace lorawan
 } // namespace ns3
-#endif
+
+#endif /* NETWORK_CONTROLLER_COMPONENTS_H */

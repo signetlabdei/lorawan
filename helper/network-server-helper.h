@@ -129,6 +129,6 @@ class NetworkServerHelper
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* NETWORK_SERVER_HELPER_H */

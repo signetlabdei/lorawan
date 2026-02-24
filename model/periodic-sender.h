@@ -102,6 +102,6 @@ class PeriodicSender : public Application
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* SENDER_APPLICATION */

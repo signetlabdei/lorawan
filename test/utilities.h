@@ -49,7 +49,8 @@ GetMacLayerFromNode(Ptr<Node> n)
 }
 
 NetworkComponents InitializeNetwork(int nDevices, int nGateways);
-} // namespace lorawan
 
+} // namespace lorawan
 } // namespace ns3
-#endif
+
+#endif /* TEST_UTILITIES_H */

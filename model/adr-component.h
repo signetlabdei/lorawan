@@ -170,7 +170,8 @@ class AdrComponent : public NetworkControllerComponent
 
     bool m_toggleTxPower; //!< Whether to control transmission power of end devices or not
 };
+
 } // namespace lorawan
 } // namespace ns3
 
-#endif
+#endif /* ADR_COMPONENT_H */

@@ -184,6 +184,6 @@ class CorrelatedShadowingPropagationLossModel : public PropagationLossModel
 };
 
 } // namespace lorawan
-
 } // namespace ns3
-#endif
+
+#endif /* CORRELATED_SHADOWING_PROPAGATION_LOSS_MODEL_H */

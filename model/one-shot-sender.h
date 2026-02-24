@@ -71,6 +71,6 @@ class OneShotSender : public Application
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* ONE_SHOT_APPLICATION */

@@ -93,6 +93,6 @@ class Forwarder : public Application
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* FORWARDER */

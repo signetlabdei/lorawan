@@ -72,6 +72,6 @@ class NetworkScheduler : public Object
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* NETWORK_SCHEDULER_H */
