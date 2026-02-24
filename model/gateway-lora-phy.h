@@ -18,8 +18,6 @@ namespace ns3
 namespace lorawan
 {
 
-class LoraChannel;
-
 /**
  * @ingroup lorawan
  *

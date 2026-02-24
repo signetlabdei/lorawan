@@ -11,8 +11,6 @@
 
 namespace ns3
 {
-class MobilityModel;
-
 namespace lorawan
 {
 
