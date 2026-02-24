@@ -36,12 +36,23 @@ class LoraChannel;
  */
 struct LoraTxParameters
 {
-    uint8_t sf = 7;                //!< Spreading Factor
-    bool headerDisabled = false;   //!< Whether to use implicit header mode
-    uint8_t codingRate = 1;        //!< Code rate (obtained as 4/(codingRate+4))
-    uint32_t bandwidthHz = 125000; //!< Bandwidth in Hz
-    uint32_t nPreamble = 8;        //!< Number of preamble symbols
-    bool crcEnabled = true;        //!< Whether Cyclic Redundancy Check (CRC) is enabled
+    /**
+     * Enumeration of the LoRa coding rates supported
+     */
+    enum CodingRate
+    {
+        CODING_RATE_4_5 = 1, //!< Coding rate 4/5
+        CODING_RATE_4_6 = 2, //!< Coding rate 4/6
+        CODING_RATE_4_7 = 3, //!< Coding rate 4/7
+        CODING_RATE_4_8 = 4, //!< Coding rate 4/8
+    };
+
+    uint8_t sf = 7;                          //!< Spreading Factor
+    bool headerDisabled = false;             //!< Whether to use implicit header mode
+    CodingRate codingRate = CODING_RATE_4_5; //!< Code rate (obtained as 4/(codingRate+4))
+    uint32_t bandwidthHz = 125000;           //!< Bandwidth in Hz
+    uint32_t nPreamble = 8;                  //!< Number of preamble symbols
+    bool crcEnabled = true;                  //!< Whether Cyclic Redundancy Check (CRC) is enabled
     bool lowDataRateOptimizationEnabled = false; //!< Whether low data rate optimization is enabled
 };
 
