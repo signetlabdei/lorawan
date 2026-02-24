@@ -8,8 +8,7 @@
 
 #include "lora-phy-helper.h"
 
-#include "ns3/log.h"
-#include "ns3/sub-band.h"
+#include "ns3/simple-gateway-lora-phy.h"
 
 namespace ns3
 {

@@ -10,7 +10,6 @@
 #define LORA_RADIO_ENERGY_MODEL_HELPER_H
 
 #include "ns3/energy-model-helper.h"
-#include "ns3/lora-radio-energy-model.h"
 
 namespace ns3
 {

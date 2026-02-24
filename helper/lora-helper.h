@@ -15,7 +15,6 @@
 
 #include "ns3/lora-net-device.h"
 #include "ns3/net-device-container.h"
-#include "ns3/net-device.h"
 #include "ns3/node-container.h"
 
 #include <ctime>

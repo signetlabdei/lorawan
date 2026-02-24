@@ -11,17 +11,11 @@
 #ifndef NETWORK_SERVER_HELPER_H
 #define NETWORK_SERVER_HELPER_H
 
-#include "ns3/address.h"
 #include "ns3/application-container.h"
-#include "ns3/attribute.h"
-#include "ns3/net-device.h"
 #include "ns3/network-server.h"
 #include "ns3/node-container.h"
 #include "ns3/object-factory.h"
 #include "ns3/point-to-point-helper.h"
-
-#include <stdint.h>
-#include <string>
 
 namespace ns3
 {

@@ -11,14 +11,9 @@
 
 #include "ns3/class-a-end-device-lorawan-mac.h"
 #include "ns3/gateway-lorawan-mac.h"
-#include "ns3/lora-channel.h"
 #include "ns3/lora-device-address-generator.h"
-#include "ns3/lora-phy.h"
-#include "ns3/lorawan-mac.h"
-#include "ns3/net-device.h"
 #include "ns3/node-container.h"
 #include "ns3/object-factory.h"
-#include "ns3/random-variable-stream.h"
 
 namespace ns3
 {

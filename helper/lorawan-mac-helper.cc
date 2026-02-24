@@ -10,9 +10,7 @@
 
 #include "ns3/end-device-lora-phy.h"
 #include "ns3/gateway-lora-phy.h"
-#include "ns3/log.h"
 #include "ns3/lora-net-device.h"
-#include "ns3/random-variable-stream.h"
 
 namespace ns3
 {
