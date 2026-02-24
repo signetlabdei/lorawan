@@ -8,10 +8,6 @@
 
 #include "lora-frame-header.h"
 
-#include "ns3/log.h"
-
-#include <bitset>
-
 namespace ns3
 {
 namespace lorawan

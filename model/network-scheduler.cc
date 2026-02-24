@@ -8,9 +8,6 @@
 
 #include "network-scheduler.h"
 
-#include "lora-frame-header.h"
-#include "lorawan-mac-header.h"
-
 #include "ns3/simulator.h"
 
 namespace ns3

@@ -9,17 +9,6 @@
 
 #include "network-server.h"
 
-#include "class-a-end-device-lorawan-mac.h"
-#include "lora-frame-header.h"
-#include "lorawan-mac-header.h"
-#include "mac-command.h"
-#include "network-status.h"
-
-#include "ns3/net-device.h"
-#include "ns3/node-container.h"
-#include "ns3/packet.h"
-#include "ns3/point-to-point-net-device.h"
-
 namespace ns3
 {
 namespace lorawan

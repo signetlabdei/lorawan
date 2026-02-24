@@ -6,11 +6,7 @@
 
 #include "building-penetration-loss.h"
 
-#include "ns3/double.h"
-#include "ns3/log.h"
 #include "ns3/mobility-building-info.h"
-
-#include <cmath>
 
 namespace ns3
 {

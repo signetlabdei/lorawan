@@ -7,7 +7,6 @@
 #include "hex-grid-position-allocator.h"
 
 #include "ns3/double.h"
-#include "ns3/log.h"
 
 namespace ns3
 {

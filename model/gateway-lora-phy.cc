@@ -8,12 +8,6 @@
 
 #include "gateway-lora-phy.h"
 
-#include "lora-tag.h"
-
-#include "ns3/log-macros-enabled.h"
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-
 namespace ns3
 {
 namespace lorawan

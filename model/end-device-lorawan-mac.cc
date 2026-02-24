@@ -11,11 +11,7 @@
 
 #include "end-device-lorawan-mac.h"
 
-#include "class-a-end-device-lorawan-mac.h"
-#include "end-device-lora-phy.h"
-
 #include "ns3/energy-source-container.h"
-#include "ns3/log.h"
 #include "ns3/simulator.h"
 
 #include <bitset>

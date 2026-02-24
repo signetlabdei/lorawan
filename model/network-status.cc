@@ -11,12 +11,6 @@
 
 #include "lora-tag.h"
 
-#include "ns3/log.h"
-#include "ns3/net-device.h"
-#include "ns3/node-container.h"
-#include "ns3/packet.h"
-#include "ns3/pointer.h"
-
 namespace ns3
 {
 namespace lorawan

@@ -8,9 +8,6 @@
 
 #include "lora-net-device.h"
 
-#include "ns3/abort.h"
-#include "ns3/log.h"
-#include "ns3/node.h"
 #include "ns3/pointer.h"
 
 namespace ns3
