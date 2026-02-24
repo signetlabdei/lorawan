@@ -12,7 +12,6 @@
 #include "logical-lora-channel.h"
 
 #include "ns3/nstime.h"
-#include "ns3/simple-ref-count.h"
 
 namespace ns3
 {

@@ -9,23 +9,12 @@
 #ifndef NETWORK_SCHEDULER_H
 #define NETWORK_SCHEDULER_H
 
-#include "lora-device-address.h"
-#include "lora-frame-header.h"
-#include "lorawan-mac-header.h"
 #include "network-controller.h"
-#include "network-status.h"
-
-#include "ns3/core-module.h"
-#include "ns3/object.h"
-#include "ns3/packet.h"
 
 namespace ns3
 {
 namespace lorawan
 {
-
-class NetworkStatus;     // Forward declaration
-class NetworkController; // Forward declaration
 
 /**
  * @ingroup lorawan

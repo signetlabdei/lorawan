@@ -8,6 +8,8 @@
 
 #include "utilities.h"
 
+#include "ns3/string.h"
+
 namespace ns3
 {
 namespace lorawan

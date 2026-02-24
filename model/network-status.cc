@@ -9,9 +9,7 @@
 
 #include "network-status.h"
 
-#include "end-device-status.h"
-#include "gateway-status.h"
-#include "lora-device-address.h"
+#include "lora-tag.h"
 
 #include "ns3/log.h"
 #include "ns3/net-device.h"

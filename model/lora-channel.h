@@ -12,25 +12,14 @@
 #ifndef LORA_CHANNEL_H
 #define LORA_CHANNEL_H
 
-#include "logical-lora-channel.h"
-#include "lora-phy.h"
-
 #include "ns3/channel.h"
-#include "ns3/mobility-model.h"
-#include "ns3/net-device.h"
-#include "ns3/nstime.h"
 #include "ns3/packet.h"
 #include "ns3/propagation-delay-model.h"
 #include "ns3/propagation-loss-model.h"
-
-#include <vector>
+#include "ns3/traced-callback.h"
 
 namespace ns3
 {
-class NetDevice;
-class PropagationLossModel;
-class PropagationDelayModel;
-
 namespace lorawan
 {
 

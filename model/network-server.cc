@@ -10,7 +10,6 @@
 #include "network-server.h"
 
 #include "class-a-end-device-lorawan-mac.h"
-#include "lora-device-address.h"
 #include "lora-frame-header.h"
 #include "lorawan-mac-header.h"
 #include "mac-command.h"

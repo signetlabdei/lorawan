@@ -11,8 +11,6 @@
 
 #include "ns3/address.h"
 
-#include <string>
-
 namespace ns3
 {
 namespace lorawan

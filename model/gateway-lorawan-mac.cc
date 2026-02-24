@@ -10,6 +10,7 @@
 
 #include "lora-frame-header.h"
 #include "lora-net-device.h"
+#include "lora-tag.h"
 #include "lorawan-mac-header.h"
 
 #include "ns3/log.h"

@@ -12,12 +12,10 @@
 #ifndef END_DEVICE_LORAWAN_MAC_H
 #define END_DEVICE_LORAWAN_MAC_H
 
-#include "lora-device-address.h"
 #include "lora-frame-header.h"
 #include "lorawan-mac-header.h"
 #include "lorawan-mac.h"
 
-#include "ns3/random-variable-stream.h"
 #include "ns3/traced-value.h"
 
 namespace ns3

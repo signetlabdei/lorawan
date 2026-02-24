@@ -12,17 +12,10 @@
 #include "logical-lora-channel-helper.h"
 #include "lora-phy.h"
 
-#include "ns3/object.h"
-#include "ns3/packet.h"
-
-#include <array>
-
 namespace ns3
 {
 namespace lorawan
 {
-
-class LoraPhy;
 
 /**
  * @ingroup lorawan

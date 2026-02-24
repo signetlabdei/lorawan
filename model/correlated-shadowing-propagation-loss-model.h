@@ -7,15 +7,10 @@
 #ifndef CORRELATED_SHADOWING_PROPAGATION_LOSS_MODEL_H
 #define CORRELATED_SHADOWING_PROPAGATION_LOSS_MODEL_H
 
-#include "ns3/mobility-model.h"
 #include "ns3/propagation-loss-model.h"
-#include "ns3/random-variable-stream.h"
-#include "ns3/vector.h"
 
 namespace ns3
 {
-class MobilityModel;
-
 namespace lorawan
 {
 

@@ -11,16 +11,10 @@
 
 #include "network-status.h"
 
-#include "ns3/log.h"
-#include "ns3/object.h"
-#include "ns3/packet.h"
-
 namespace ns3
 {
 namespace lorawan
 {
-
-class NetworkStatus;
 
 ////////////////
 // Base class //

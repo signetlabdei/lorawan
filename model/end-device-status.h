@@ -11,15 +11,7 @@
 #define END_DEVICE_STATUS_H
 
 #include "class-a-end-device-lorawan-mac.h"
-#include "lora-device-address.h"
-#include "lora-frame-header.h"
 #include "lora-net-device.h"
-#include "lorawan-mac-header.h"
-
-#include "ns3/object.h"
-#include "ns3/pointer.h"
-
-#include <iostream>
 
 namespace ns3
 {

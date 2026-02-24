@@ -10,11 +10,6 @@
 #define ADR_COMPONENT_H
 
 #include "network-controller-components.h"
-#include "network-status.h"
-
-#include "ns3/log.h"
-#include "ns3/object.h"
-#include "ns3/packet.h"
 
 namespace ns3
 {

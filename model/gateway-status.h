@@ -11,10 +11,6 @@
 
 #include "gateway-lorawan-mac.h"
 
-#include "ns3/address.h"
-#include "ns3/net-device.h"
-#include "ns3/object.h"
-
 namespace ns3
 {
 namespace lorawan

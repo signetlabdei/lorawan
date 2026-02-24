@@ -16,6 +16,7 @@
 #include "ns3/simple-gateway-lora-phy.h"
 
 // An essential include is test.h
+#include "ns3/simulator.h"
 #include "ns3/test.h"
 
 using namespace ns3;

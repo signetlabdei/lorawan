@@ -11,13 +11,6 @@
 
 #include "end-device-lora-phy.h"
 
-#include "ns3/mobility-model.h"
-#include "ns3/net-device.h"
-#include "ns3/node.h"
-#include "ns3/nstime.h"
-#include "ns3/object.h"
-#include "ns3/traced-value.h"
-
 namespace ns3
 {
 namespace lorawan

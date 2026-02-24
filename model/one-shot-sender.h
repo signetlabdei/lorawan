@@ -12,8 +12,6 @@
 #include "lorawan-mac.h"
 
 #include "ns3/application.h"
-#include "ns3/attribute.h"
-#include "ns3/nstime.h"
 
 namespace ns3
 {

@@ -7,10 +7,7 @@
 #ifndef BUILDING_PENETRATION_LOSS_H
 #define BUILDING_PENETRATION_LOSS_H
 
-#include "ns3/mobility-model.h"
 #include "ns3/propagation-loss-model.h"
-#include "ns3/random-variable-stream.h"
-#include "ns3/vector.h"
 
 namespace ns3
 {

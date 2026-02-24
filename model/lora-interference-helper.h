@@ -9,16 +9,8 @@
 #ifndef LORA_INTERFERENCE_HELPER_H
 #define LORA_INTERFERENCE_HELPER_H
 
-#include "logical-lora-channel.h"
-
-#include "ns3/callback.h"
 #include "ns3/nstime.h"
-#include "ns3/object.h"
 #include "ns3/packet.h"
-#include "ns3/simulator.h"
-#include "ns3/traced-callback.h"
-
-#include <list>
 
 namespace ns3
 {

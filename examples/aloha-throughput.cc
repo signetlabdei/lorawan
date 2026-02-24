@@ -20,11 +20,11 @@
 #include "ns3/gateway-lora-phy.h"
 #include "ns3/gateway-lorawan-mac.h"
 #include "ns3/log.h"
-#include "ns3/lora-device-address.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/lora-helper.h"
 #include "ns3/lora-net-device.h"
 #include "ns3/lora-phy.h"
+#include "ns3/lora-tag.h"
 #include "ns3/lorawan-mac-header.h"
 #include "ns3/mobility-helper.h"
 #include "ns3/network-server-helper.h"
@@ -34,6 +34,7 @@
 #include "ns3/position-allocator.h"
 #include "ns3/random-variable-stream.h"
 #include "ns3/simulator.h"
+#include "ns3/string.h"
 
 #include <algorithm>
 #include <ctime>

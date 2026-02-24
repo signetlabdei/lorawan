@@ -1,4 +1,17 @@
+/*
+ * Copyright (c) 2017 University of Padova
+ *
+ * SPDX-License-Identifier: GPL-2.0-only
+ *
+ * Author: Davide Magrin <magrinda@dei.unipd.it>
+ */
+
 #include "network-scheduler.h"
+
+#include "lora-frame-header.h"
+#include "lorawan-mac-header.h"
+
+#include "ns3/simulator.h"
 
 namespace ns3
 {

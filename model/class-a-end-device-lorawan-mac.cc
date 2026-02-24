@@ -17,6 +17,7 @@
 #include "lora-tag.h"
 
 #include "ns3/log.h"
+#include "ns3/simulator.h"
 
 namespace ns3
 {
