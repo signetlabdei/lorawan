@@ -19,6 +19,7 @@
 #include "ns3/test.h"
 
 // Include headers of classes to test
+#include "ns3/class-a-end-device-lorawan-mac.h"
 #include "ns3/network-status.h"
 
 using namespace ns3;
