@@ -178,7 +178,7 @@ LoraPhy::GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams)
     double crc = txParams.crcEnabled ? 1 : 0;
 
     // num and den refer to numerator and denominator of the time on air formula
-    double num = 8 * pl - 4 * txParams.sf + 28 + 16 * crc - 20 * h;
+    double num = 8.0 * pl - 4 * txParams.sf + 28 + 16 * crc - 20 * h;
     double den = 4 * (txParams.sf - 2 * de);
     double payloadSymbNb =
         8 + std::max(std::ceil(num / den) * (txParams.codingRate + 4), double(0));
