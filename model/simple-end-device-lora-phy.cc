@@ -8,8 +8,10 @@
 
 #include "simple-end-device-lora-phy.h"
 
+#include "lora-channel.h"
 #include "lora-tag.h"
 
+#include "ns3/node.h"
 #include "ns3/simulator.h"
 
 namespace ns3
