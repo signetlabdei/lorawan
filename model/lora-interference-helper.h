@@ -129,12 +129,6 @@ class LoraInterferenceHelper
         ALOHA,
     };
 
-    /**
-     *  Register this type.
-     *  @return The object TypeId.
-     */
-    static TypeId GetTypeId();
-
     LoraInterferenceHelper();          //!< Default constructor
     virtual ~LoraInterferenceHelper(); //!< Destructor
 

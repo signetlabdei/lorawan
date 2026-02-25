@@ -136,8 +136,6 @@ std::vector<std::vector<double>> LoraInterferenceHelper::collisionSnirGoursaud =
 LoraInterferenceHelper::CollisionMatrix LoraInterferenceHelper::collisionMatrix =
     LoraInterferenceHelper::GOURSAUD;
 
-NS_OBJECT_ENSURE_REGISTERED(LoraInterferenceHelper);
-
 void
 LoraInterferenceHelper::SetCollisionMatrix(
     enum LoraInterferenceHelper::CollisionMatrix collisionMatrix)
@@ -153,15 +151,6 @@ LoraInterferenceHelper::SetCollisionMatrix(
         m_collisionSnir = LoraInterferenceHelper::collisionSnirGoursaud;
         break;
     }
-}
-
-TypeId
-LoraInterferenceHelper::GetTypeId()
-{
-    static TypeId tid =
-        TypeId("ns3::LoraInterferenceHelper").SetParent<Object>().SetGroupName("lorawan");
-
-    return tid;
 }
 
 LoraInterferenceHelper::LoraInterferenceHelper()
