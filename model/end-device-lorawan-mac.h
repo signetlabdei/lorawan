@@ -16,6 +16,7 @@
 #include "lorawan-mac-header.h"
 #include "lorawan-mac.h"
 
+#include "ns3/random-variable-stream.h"
 #include "ns3/traced-value.h"
 
 namespace ns3
