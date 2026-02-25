@@ -16,6 +16,7 @@
 #include "ns3/core-module.h"
 #include "ns3/lorawan-module.h"
 #include "ns3/mobility-helper.h"
+#include "ns3/point-to-point-helper.h"
 
 using namespace ns3;
 using namespace lorawan;

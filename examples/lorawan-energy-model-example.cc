@@ -12,10 +12,10 @@
  */
 
 #include "ns3/basic-energy-source-helper.h"
+#include "ns3/core-module.h"
 #include "ns3/file-helper.h"
 #include "ns3/lorawan-module.h"
 #include "ns3/mobility-helper.h"
-#include "ns3/names.h"
 
 using namespace ns3;
 using namespace lorawan;

@@ -11,6 +11,7 @@
  * packet to the gateway.
  */
 
+#include "ns3/core-module.h"
 #include "ns3/lorawan-module.h"
 #include "ns3/mobility-helper.h"
 
