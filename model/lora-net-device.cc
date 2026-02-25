@@ -8,6 +8,9 @@
 
 #include "lora-net-device.h"
 
+#include "lora-channel.h"
+
+#include "ns3/node.h"
 #include "ns3/pointer.h"
 
 namespace ns3
