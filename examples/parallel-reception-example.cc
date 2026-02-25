@@ -11,23 +11,8 @@
  * packet to the gateway.
  */
 
-#include "ns3/command-line.h"
-#include "ns3/constant-position-mobility-model.h"
-#include "ns3/end-device-lora-phy.h"
-#include "ns3/end-device-lorawan-mac.h"
-#include "ns3/gateway-lora-phy.h"
-#include "ns3/gateway-lorawan-mac.h"
-#include "ns3/log.h"
-#include "ns3/lora-helper.h"
-#include "ns3/lorawan-mac-helper.h"
+#include "ns3/lorawan-module.h"
 #include "ns3/mobility-helper.h"
-#include "ns3/node-container.h"
-#include "ns3/one-shot-sender-helper.h"
-#include "ns3/position-allocator.h"
-#include "ns3/simulator.h"
-
-#include <algorithm>
-#include <ctime>
 
 using namespace ns3;
 using namespace lorawan;

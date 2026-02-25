@@ -11,17 +11,15 @@
  * - NetworkServer
  */
 
-// Include headers of classes to test
 #include "utilities.h"
 
-#include "ns3/callback.h"
-#include "ns3/core-module.h"
-#include "ns3/log.h"
-#include "ns3/network-server-helper.h"
-#include "ns3/network-server.h"
-
 // An essential include is test.h
+#include "ns3/application.h"
+#include "ns3/simulator.h"
 #include "ns3/test.h"
+
+// Include headers of classes to test
+#include "ns3/class-a-end-device-lorawan-mac.h"
 
 using namespace ns3;
 using namespace lorawan;

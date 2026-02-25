@@ -12,35 +12,9 @@
  * network.
  */
 
-#include "ns3/building-allocator.h"
-#include "ns3/building-penetration-loss.h"
-#include "ns3/buildings-helper.h"
-#include "ns3/callback.h"
-#include "ns3/class-a-end-device-lorawan-mac.h"
-#include "ns3/command-line.h"
-#include "ns3/constant-position-mobility-model.h"
-#include "ns3/correlated-shadowing-propagation-loss-model.h"
-#include "ns3/double.h"
-#include "ns3/end-device-lora-phy.h"
-#include "ns3/forwarder-helper.h"
-#include "ns3/gateway-lora-phy.h"
-#include "ns3/gateway-lorawan-mac.h"
-#include "ns3/log.h"
-#include "ns3/lora-helper.h"
-#include "ns3/lorawan-mac-header.h"
+#include "ns3/core-module.h"
+#include "ns3/lorawan-module.h"
 #include "ns3/mobility-helper.h"
-#include "ns3/network-server-helper.h"
-#include "ns3/node-container.h"
-#include "ns3/one-shot-sender-helper.h"
-#include "ns3/periodic-sender-helper.h"
-#include "ns3/pointer.h"
-#include "ns3/position-allocator.h"
-#include "ns3/random-variable-stream.h"
-#include "ns3/simulator.h"
-#include "ns3/string.h"
-
-#include <algorithm>
-#include <ctime>
 
 using namespace ns3;
 using namespace lorawan;

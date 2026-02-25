@@ -9,11 +9,10 @@
 #ifndef TEST_UTILITIES_H
 #define TEST_UTILITIES_H
 
-#include "ns3/forwarder-helper.h"
-#include "ns3/lora-helper.h"
+#include "ns3/lora-channel.h"
+#include "ns3/lora-net-device.h"
 #include "ns3/mobility-helper.h"
-#include "ns3/network-server-helper.h"
-#include "ns3/position-allocator.h"
+#include "ns3/node-container.h"
 
 namespace ns3
 {

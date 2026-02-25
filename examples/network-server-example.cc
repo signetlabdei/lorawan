@@ -12,24 +12,9 @@
  * Two end devices are already configured to send unconfirmed and confirmed messages respectively.
  */
 
-#include "ns3/command-line.h"
 #include "ns3/core-module.h"
-#include "ns3/forwarder-helper.h"
-#include "ns3/gateway-lora-phy.h"
-#include "ns3/log.h"
-#include "ns3/lora-channel.h"
-#include "ns3/lora-device-address-generator.h"
-#include "ns3/lora-helper.h"
-#include "ns3/lora-phy-helper.h"
-#include "ns3/lorawan-mac-helper.h"
+#include "ns3/lorawan-module.h"
 #include "ns3/mobility-helper.h"
-#include "ns3/network-module.h"
-#include "ns3/network-server-helper.h"
-#include "ns3/one-shot-sender-helper.h"
-#include "ns3/periodic-sender-helper.h"
-#include "ns3/periodic-sender.h"
-#include "ns3/point-to-point-module.h"
-#include "ns3/string.h"
 
 using namespace ns3;
 using namespace lorawan;

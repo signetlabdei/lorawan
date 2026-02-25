@@ -8,6 +8,9 @@
 
 #include "utilities.h"
 
+#include "ns3/forwarder-helper.h"
+#include "ns3/lora-helper.h"
+#include "ns3/network-server-helper.h"
 #include "ns3/string.h"
 
 namespace ns3
