@@ -11,6 +11,9 @@
 
 #include "ns3/nstime.h"
 #include "ns3/packet.h"
+#include "ns3/simple-ref-count.h"
+
+#include <list>
 
 namespace ns3
 {

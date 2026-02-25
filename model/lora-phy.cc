@@ -8,6 +8,10 @@
 
 #include "lora-phy.h"
 
+#include "lora-channel.h"
+
+#include "ns3/node.h"
+
 namespace ns3
 {
 namespace lorawan

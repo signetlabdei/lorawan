@@ -9,16 +9,17 @@
 #ifndef LORA_PHY_H
 #define LORA_PHY_H
 
-#include "lora-channel.h"
 #include "lora-interference-helper.h"
 
 #include "ns3/mobility-model.h"
-#include "ns3/node.h"
+#include "ns3/net-device.h"
 
 namespace ns3
 {
 namespace lorawan
 {
+
+class LoraChannel;
 
 /**
  * @ingroup lorawan
