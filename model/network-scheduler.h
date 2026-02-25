@@ -9,12 +9,18 @@
 #ifndef NETWORK_SCHEDULER_H
 #define NETWORK_SCHEDULER_H
 
-#include "network-controller.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
+#include "ns3/traced-callback.h"
 
 namespace ns3
 {
 namespace lorawan
 {
+
+class NetworkController;
+class NetworkStatus;
+class LoraDeviceAddress;
 
 /**
  * @ingroup lorawan

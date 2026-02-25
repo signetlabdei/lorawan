@@ -9,6 +9,7 @@
 #ifndef ADR_COMPONENT_H
 #define ADR_COMPONENT_H
 
+#include "end-device-status.h"
 #include "network-controller-components.h"
 
 namespace ns3

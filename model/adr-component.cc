@@ -8,6 +8,8 @@
 
 #include "adr-component.h"
 
+#include "class-a-end-device-lorawan-mac.h"
+
 namespace ns3
 {
 namespace lorawan

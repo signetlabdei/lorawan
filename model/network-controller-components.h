@@ -9,12 +9,16 @@
 #ifndef NETWORK_CONTROLLER_COMPONENTS_H
 #define NETWORK_CONTROLLER_COMPONENTS_H
 
-#include "network-status.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
 
 namespace ns3
 {
 namespace lorawan
 {
+
+class NetworkStatus;
+class EndDeviceStatus;
 
 ////////////////
 // Base class //

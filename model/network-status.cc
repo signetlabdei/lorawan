@@ -9,6 +9,7 @@
 
 #include "network-status.h"
 
+#include "class-a-end-device-lorawan-mac.h"
 #include "lora-tag.h"
 
 namespace ns3

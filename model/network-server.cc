@@ -9,6 +9,14 @@
 
 #include "network-server.h"
 
+#include "class-a-end-device-lorawan-mac.h"
+#include "gateway-lorawan-mac.h"
+#include "lora-net-device.h"
+#include "network-controller-components.h"
+#include "network-controller.h"
+#include "network-scheduler.h"
+#include "network-status.h"
+
 namespace ns3
 {
 namespace lorawan

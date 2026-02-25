@@ -10,8 +10,6 @@
 #ifndef NETWORK_SERVER_H
 #define NETWORK_SERVER_H
 
-#include "network-scheduler.h"
-
 #include "ns3/application.h"
 #include "ns3/node-container.h"
 #include "ns3/point-to-point-net-device.h"
@@ -20,6 +18,11 @@ namespace ns3
 {
 namespace lorawan
 {
+
+class NetworkScheduler;
+class NetworkController;
+class NetworkControllerComponent;
+class NetworkStatus;
 
 /**
  * @ingroup lorawan

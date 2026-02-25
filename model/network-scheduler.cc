@@ -8,6 +8,9 @@
 
 #include "network-scheduler.h"
 
+#include "network-controller.h"
+#include "network-status.h"
+
 #include "ns3/simulator.h"
 
 namespace ns3

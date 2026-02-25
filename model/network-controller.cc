@@ -8,6 +8,9 @@
 
 #include "network-controller.h"
 
+#include "network-controller-components.h"
+#include "network-status.h"
+
 namespace ns3
 {
 namespace lorawan
