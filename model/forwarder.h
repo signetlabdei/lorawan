@@ -9,8 +9,6 @@
 #ifndef FORWARDER_H
 #define FORWARDER_H
 
-#include "lora-net-device.h"
-
 #include "ns3/application.h"
 #include "ns3/point-to-point-net-device.h"
 
@@ -18,6 +16,8 @@ namespace ns3
 {
 namespace lorawan
 {
+
+class LoraNetDevice;
 
 /**
  * @ingroup lorawan

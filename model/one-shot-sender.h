@@ -9,14 +9,14 @@
 #ifndef ONE_SHOT_SENDER_H
 #define ONE_SHOT_SENDER_H
 
-#include "lorawan-mac.h"
-
 #include "ns3/application.h"
 
 namespace ns3
 {
 namespace lorawan
 {
+
+class LorawanMac;
 
 /**
  * @ingroup lorawan

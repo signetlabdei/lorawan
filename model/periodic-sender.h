@@ -9,8 +9,6 @@
 #ifndef PERIODIC_SENDER_H
 #define PERIODIC_SENDER_H
 
-#include "lorawan-mac.h"
-
 #include "ns3/application.h"
 #include "ns3/random-variable-stream.h"
 
@@ -18,6 +16,8 @@ namespace ns3
 {
 namespace lorawan
 {
+
+class LorawanMac;
 
 /**
  * @ingroup lorawan

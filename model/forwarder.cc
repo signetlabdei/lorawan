@@ -8,6 +8,8 @@
 
 #include "forwarder.h"
 
+#include "lora-net-device.h"
+
 namespace ns3
 {
 namespace lorawan
