@@ -9,6 +9,8 @@
 #include "lora-net-device.h"
 
 #include "lora-channel.h"
+#include "lora-phy.h"
+#include "lorawan-mac.h"
 
 #include "ns3/node.h"
 #include "ns3/pointer.h"

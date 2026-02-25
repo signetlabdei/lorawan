@@ -9,8 +9,7 @@
 #ifndef LORA_NET_DEVICE_H
 #define LORA_NET_DEVICE_H
 
-#include "lora-phy.h"
-#include "lorawan-mac.h"
+#include "ns3/net-device.h"
 
 namespace ns3
 {
@@ -25,6 +24,8 @@ namespace lorawan
  */
 
 class LoraChannel;
+class LoraPhy;
+class LorawanMac;
 
 /**
  * @ingroup lorawan

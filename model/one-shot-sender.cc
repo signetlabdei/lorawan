@@ -9,6 +9,7 @@
 #include "one-shot-sender.h"
 
 #include "lora-net-device.h"
+#include "lorawan-mac.h"
 
 #include "ns3/simulator.h"
 
