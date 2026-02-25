@@ -9,6 +9,7 @@
 
 #include "end-device-status.h"
 
+#include "class-a-end-device-lorawan-mac.h"
 #include "lora-tag.h"
 
 #include "ns3/simulator.h"

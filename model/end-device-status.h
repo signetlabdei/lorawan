@@ -10,13 +10,20 @@
 #ifndef END_DEVICE_STATUS_H
 #define END_DEVICE_STATUS_H
 
-#include "class-a-end-device-lorawan-mac.h"
-#include "lora-net-device.h"
+#include "lora-frame-header.h"
+#include "lorawan-mac-header.h"
+
+#include "ns3/object.h"
+#include "ns3/packet.h"
+
+#include <map>
 
 namespace ns3
 {
 namespace lorawan
 {
+
+class ClassAEndDeviceLorawanMac;
 
 /**
  * @ingroup lorawan
