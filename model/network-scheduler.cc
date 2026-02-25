@@ -1,4 +1,17 @@
+/*
+ * Copyright (c) 2017 University of Padova
+ *
+ * SPDX-License-Identifier: GPL-2.0-only
+ *
+ * Author: Davide Magrin <magrinda@dei.unipd.it>
+ */
+
 #include "network-scheduler.h"
+
+#include "network-controller.h"
+#include "network-status.h"
+
+#include "ns3/simulator.h"
 
 namespace ns3
 {
@@ -130,5 +143,6 @@ NetworkScheduler::OnReceiveWindowOpportunity(LoraDeviceAddress deviceAddress, in
         }
     }
 }
+
 } // namespace lorawan
 } // namespace ns3

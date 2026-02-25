@@ -10,21 +10,20 @@
 #ifndef END_DEVICE_STATUS_H
 #define END_DEVICE_STATUS_H
 
-#include "class-a-end-device-lorawan-mac.h"
-#include "lora-device-address.h"
 #include "lora-frame-header.h"
-#include "lora-net-device.h"
 #include "lorawan-mac-header.h"
 
 #include "ns3/object.h"
-#include "ns3/pointer.h"
+#include "ns3/packet.h"
 
-#include <iostream>
+#include <map>
 
 namespace ns3
 {
 namespace lorawan
 {
+
+class ClassAEndDeviceLorawanMac;
 
 /**
  * @ingroup lorawan
@@ -368,7 +367,8 @@ class EndDeviceStatus : public Object
     /// synchronization between the info at the device and at the network server
     Ptr<ClassAEndDeviceLorawanMac> m_mac; //!< Pointer to the MAC layer of this device
 };
-} // namespace lorawan
 
+} // namespace lorawan
 } // namespace ns3
+
 #endif /* DEVICE_STATUS_H */

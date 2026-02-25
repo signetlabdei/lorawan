@@ -96,6 +96,6 @@ bool operator==(const Ptr<LogicalLoraChannel>& first, const Ptr<LogicalLoraChann
 bool operator!=(const Ptr<LogicalLoraChannel>& first, const Ptr<LogicalLoraChannel>& second);
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* LOGICAL_LORA_CHANNEL_H */

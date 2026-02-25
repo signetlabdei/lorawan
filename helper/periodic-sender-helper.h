@@ -9,16 +9,9 @@
 #ifndef PERIODIC_SENDER_HELPER_H
 #define PERIODIC_SENDER_HELPER_H
 
-#include "ns3/address.h"
 #include "ns3/application-container.h"
-#include "ns3/attribute.h"
-#include "ns3/net-device.h"
 #include "ns3/node-container.h"
 #include "ns3/object-factory.h"
-#include "ns3/periodic-sender.h"
-
-#include <stdint.h>
-#include <string>
 
 namespace ns3
 {
@@ -112,6 +105,6 @@ class PeriodicSenderHelper
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* PERIODIC_SENDER_HELPER_H */

@@ -346,7 +346,8 @@ LoraFrameHeader::GetMacCommand()
     // If no command was found, return 0
     return nullptr;
 }
-} // namespace lorawan
 
+} // namespace lorawan
 } // namespace ns3
-#endif
+
+#endif /* LORA_FRAME_HEADER_H */

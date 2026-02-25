@@ -8,12 +8,6 @@
 
 #include "gateway-lora-phy.h"
 
-#include "lora-tag.h"
-
-#include "ns3/log-macros-enabled.h"
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-
 namespace ns3
 {
 namespace lorawan
@@ -183,5 +177,6 @@ GatewayLoraPhy::IsOnFrequency(uint32_t frequencyHz)
     }
     return false;
 }
+
 } // namespace lorawan
 } // namespace ns3

@@ -8,6 +8,8 @@
 
 #include "sub-band.h"
 
+#include "logical-lora-channel.h"
+
 namespace ns3
 {
 namespace lorawan
@@ -81,5 +83,6 @@ SubBand::GetMaxTxPowerDbm() const
 {
     return m_maxTxPowerDbm;
 }
+
 } // namespace lorawan
 } // namespace ns3

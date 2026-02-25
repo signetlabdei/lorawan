@@ -9,16 +9,9 @@
 #ifndef ONE_SHOT_SENDER_HELPER_H
 #define ONE_SHOT_SENDER_HELPER_H
 
-#include "ns3/address.h"
 #include "ns3/application-container.h"
-#include "ns3/attribute.h"
-#include "ns3/net-device.h"
 #include "ns3/node-container.h"
 #include "ns3/object-factory.h"
-#include "ns3/one-shot-sender.h"
-
-#include <stdint.h>
-#include <string>
 
 namespace ns3
 {
@@ -87,6 +80,6 @@ class OneShotSenderHelper
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* ONE_SHOT_SENDER_HELPER_H */

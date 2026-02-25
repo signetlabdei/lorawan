@@ -8,7 +8,7 @@
 
 #include "lorawan-mac.h"
 
-#include "ns3/log.h"
+#include "lora-phy.h"
 
 namespace ns3
 {
@@ -178,5 +178,6 @@ LorawanMac::SetReplyDataRateMatrix(ReplyDataRateMatrix replyDataRateMatrix)
 {
     m_replyDataRateMatrix = replyDataRateMatrix;
 }
+
 } // namespace lorawan
 } // namespace ns3

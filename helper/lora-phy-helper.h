@@ -10,12 +10,8 @@
 #define LORA_PHY_HELPER_H
 
 #include "ns3/lora-channel.h"
-#include "ns3/lora-phy.h"
-#include "ns3/lorawan-mac.h"
-#include "ns3/net-device.h"
+#include "ns3/node.h"
 #include "ns3/object-factory.h"
-#include "ns3/simple-end-device-lora-phy.h"
-#include "ns3/simple-gateway-lora-phy.h"
 
 namespace ns3
 {
@@ -107,6 +103,6 @@ class LoraPhyHelper
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* LORA_PHY_HELPER_H */

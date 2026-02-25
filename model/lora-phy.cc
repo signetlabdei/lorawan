@@ -8,10 +8,9 @@
 
 #include "lora-phy.h"
 
-#include "ns3/log.h"
-#include "ns3/simulator.h"
+#include "lora-channel.h"
 
-#include <algorithm>
+#include "ns3/node.h"
 
 namespace ns3
 {
@@ -207,5 +206,6 @@ operator<<(std::ostream& os, const LoraTxParameters& params)
 
     return os;
 }
+
 } // namespace lorawan
 } // namespace ns3

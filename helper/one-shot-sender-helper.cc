@@ -8,12 +8,7 @@
 
 #include "one-shot-sender-helper.h"
 
-#include "ns3/double.h"
-#include "ns3/log.h"
 #include "ns3/one-shot-sender.h"
-#include "ns3/simulator.h"
-#include "ns3/string.h"
-#include "ns3/trace-source-accessor.h"
 
 namespace ns3
 {
@@ -75,5 +70,6 @@ OneShotSenderHelper::InstallPriv(Ptr<Node> node) const
 
     return app;
 }
+
 } // namespace lorawan
 } // namespace ns3

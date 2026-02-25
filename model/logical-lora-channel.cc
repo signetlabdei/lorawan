@@ -8,10 +8,6 @@
 
 #include "logical-lora-channel.h"
 
-#include "sub-band.h"
-
-#include "ns3/log.h"
-
 namespace ns3
 {
 namespace lorawan

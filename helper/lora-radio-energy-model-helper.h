@@ -10,7 +10,6 @@
 #define LORA_RADIO_ENERGY_MODEL_HELPER_H
 
 #include "ns3/energy-model-helper.h"
-#include "ns3/lora-radio-energy-model.h"
 
 namespace ns3
 {
@@ -85,8 +84,8 @@ class LoraRadioEnergyModelHelper : public DeviceEnergyModelHelper
      *
      * Implements DeviceEnergyModel::Install.
      */
-    Ptr<DeviceEnergyModel> DoInstall(Ptr<NetDevice> device,
-                                     Ptr<EnergySource> source) const override;
+    Ptr<energy::DeviceEnergyModel> DoInstall(Ptr<NetDevice> device,
+                                             Ptr<energy::EnergySource> source) const override;
 
   private:
     ObjectFactory m_radioEnergy;    ///< radio energy
@@ -94,6 +93,6 @@ class LoraRadioEnergyModelHelper : public DeviceEnergyModelHelper
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* LORA_RADIO_ENERGY_MODEL_HELPER_H */

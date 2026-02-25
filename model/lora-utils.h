@@ -9,9 +9,6 @@
 #ifndef LORA_UTILS_H
 #define LORA_UTILS_H
 
-#include "ns3/nstime.h"
-#include "ns3/uinteger.h"
-
 namespace ns3
 {
 namespace lorawan
@@ -51,6 +48,6 @@ double WToDbm(double w);
 double RatioToDb(double ratio);
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* LORA_UTILS_H */

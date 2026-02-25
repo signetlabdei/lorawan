@@ -80,6 +80,8 @@ class LoraDeviceAddressGenerator : public Object
     NwkID m_currentNwkId;     //!< The current Network Id value
     NwkAddr m_currentNwkAddr; //!< The current Network Address value
 };
+
 } // namespace lorawan
 } // namespace ns3
-#endif
+
+#endif /* LORA_DEVICE_ADDRESS_GENERATOR_H */

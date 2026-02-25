@@ -9,8 +9,6 @@
 #ifndef GATEWAY_STATUS_H
 #define GATEWAY_STATUS_H
 
-#include "gateway-lorawan-mac.h"
-
 #include "ns3/address.h"
 #include "ns3/net-device.h"
 #include "ns3/object.h"
@@ -19,6 +17,8 @@ namespace ns3
 {
 namespace lorawan
 {
+
+class GatewayLorawanMac;
 
 /**
  * @ingroup lorawan
@@ -120,7 +120,8 @@ class GatewayStatus : public Object
 
     Time m_nextTransmissionTime; //!< This gateway's next transmission time
 };
-} // namespace lorawan
 
+} // namespace lorawan
 } // namespace ns3
+
 #endif /* DEVICE_STATUS_H */

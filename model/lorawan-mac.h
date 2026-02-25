@@ -10,12 +10,11 @@
 #define LORAWAN_MAC_H
 
 #include "logical-lora-channel-helper.h"
-#include "lora-phy.h"
 
+#include "ns3/net-device.h"
 #include "ns3/object.h"
 #include "ns3/packet.h"
-
-#include <array>
+#include "ns3/traced-callback.h"
 
 namespace ns3
 {
@@ -279,6 +278,6 @@ class LorawanMac : public Object
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* LORAWAN_MAC_H */

@@ -8,8 +8,6 @@
 
 #include "lora-device-address-generator.h"
 
-#include "ns3/log.h"
-
 namespace ns3
 {
 namespace lorawan
@@ -64,5 +62,6 @@ LoraDeviceAddressGenerator::GetNextAddress()
 
     return LoraDeviceAddress(m_currentNwkId.Get(), m_currentNwkAddr.Get() + 1);
 }
+
 } // namespace lorawan
 } // namespace ns3

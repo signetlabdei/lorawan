@@ -9,9 +9,6 @@
 #ifndef NETWORK_CONTROLLER_COMPONENTS_H
 #define NETWORK_CONTROLLER_COMPONENTS_H
 
-#include "network-status.h"
-
-#include "ns3/log.h"
 #include "ns3/object.h"
 #include "ns3/packet.h"
 
@@ -21,6 +18,7 @@ namespace lorawan
 {
 
 class NetworkStatus;
+class EndDeviceStatus;
 
 ////////////////
 // Base class //
@@ -144,7 +142,8 @@ class LinkCheckComponent : public NetworkControllerComponent
 
   private:
 };
-} // namespace lorawan
 
+} // namespace lorawan
 } // namespace ns3
-#endif
+
+#endif /* NETWORK_CONTROLLER_COMPONENTS_H */

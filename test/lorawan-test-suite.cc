@@ -6,17 +6,13 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-// Include headers of classes to test
-#include "ns3/constant-position-mobility-model.h"
-#include "ns3/log.h"
-#include "ns3/lora-helper.h"
-#include "ns3/mobility-helper.h"
-#include "ns3/one-shot-sender-helper.h"
-#include "ns3/simple-end-device-lora-phy.h"
-#include "ns3/simple-gateway-lora-phy.h"
-
 // An essential include is test.h
+#include "ns3/constant-position-mobility-model.h"
+#include "ns3/simulator.h"
 #include "ns3/test.h"
+
+// Include headers of classes to test
+#include "ns3/lorawan-module.h"
 
 using namespace ns3;
 using namespace lorawan;
@@ -1018,7 +1014,7 @@ TimeOnAirTest::DoRun()
     LoraTxParameters txParams;
     txParams.sf = 7;
     txParams.headerDisabled = false;
-    txParams.codingRate = LoraTxParameters::CODING_RATE_4_5;
+    txParams.codingRate = CODING_RATE_4_5;
     txParams.bandwidthHz = 125000;
     txParams.nPreamble = 8;
     txParams.crcEnabled = true;
@@ -1035,7 +1031,7 @@ TimeOnAirTest::DoRun()
     duration = LoraPhy::GetOnAirTime(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.072192, 0.0001, "Unexpected duration");
 
-    txParams.codingRate = LoraTxParameters::CODING_RATE_4_6;
+    txParams.codingRate = CODING_RATE_4_6;
     duration = LoraPhy::GetOnAirTime(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.078336, 0.0001, "Unexpected duration");
 
@@ -1079,7 +1075,7 @@ TimeOnAirTest::DoRun()
     duration = LoraPhy::GetOnAirTime(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 2.629632, 0.0001, "Unexpected duration");
 
-    txParams.codingRate = LoraTxParameters::CODING_RATE_4_5;
+    txParams.codingRate = CODING_RATE_4_5;
     duration = LoraPhy::GetOnAirTime(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 2.301952, 0.0001, "Unexpected duration");
 }

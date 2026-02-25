@@ -9,8 +9,6 @@
 
 #include "ns3/position-allocator.h"
 
-#include <cmath>
-
 namespace ns3
 {
 

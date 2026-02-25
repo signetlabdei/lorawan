@@ -8,8 +8,6 @@
 
 #include "lorawan-mac-header.h"
 
-#include "ns3/log.h"
-
 #include <bitset>
 
 namespace ns3
@@ -148,5 +146,6 @@ LorawanMacHeader::IsConfirmed() const
 
     return (m_mtype == CONFIRMED_DATA_DOWN) || (m_mtype == CONFIRMED_DATA_UP);
 }
+
 } // namespace lorawan
 } // namespace ns3

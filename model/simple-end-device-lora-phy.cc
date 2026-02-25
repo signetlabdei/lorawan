@@ -8,12 +8,11 @@
 
 #include "simple-end-device-lora-phy.h"
 
+#include "lora-channel.h"
 #include "lora-tag.h"
 
-#include "ns3/log.h"
+#include "ns3/node.h"
 #include "ns3/simulator.h"
-
-#include <algorithm>
 
 namespace ns3
 {
@@ -287,5 +286,6 @@ SimpleEndDeviceLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelpe
         }
     }
 }
+
 } // namespace lorawan
 } // namespace ns3
