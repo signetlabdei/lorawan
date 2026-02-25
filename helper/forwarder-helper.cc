@@ -11,6 +11,7 @@
 #include "forwarder-helper.h"
 
 #include "ns3/forwarder.h"
+#include "ns3/lora-net-device.h"
 
 namespace ns3
 {

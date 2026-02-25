@@ -8,8 +8,10 @@
 
 #include "lorawan-mac-helper.h"
 
+#include "ns3/class-a-end-device-lorawan-mac.h"
 #include "ns3/end-device-lora-phy.h"
 #include "ns3/gateway-lora-phy.h"
+#include "ns3/gateway-lorawan-mac.h"
 #include "ns3/lora-net-device.h"
 
 namespace ns3

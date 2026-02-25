@@ -12,15 +12,16 @@
 #define NETWORK_SERVER_HELPER_H
 
 #include "ns3/application-container.h"
-#include "ns3/network-server.h"
 #include "ns3/node-container.h"
 #include "ns3/object-factory.h"
-#include "ns3/point-to-point-helper.h"
+#include "ns3/point-to-point-net-device.h"
 
 namespace ns3
 {
 namespace lorawan
 {
+
+class NetworkServer;
 
 /**
  * Store network server app registration details for gateway nodes having a P2P link with the

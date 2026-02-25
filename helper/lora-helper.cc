@@ -8,6 +8,9 @@
 
 #include "lora-helper.h"
 
+#include "ns3/class-a-end-device-lorawan-mac.h"
+#include "ns3/lora-net-device.h"
+#include "ns3/lora-phy.h"
 #include "ns3/simulator.h"
 
 #include <fstream>

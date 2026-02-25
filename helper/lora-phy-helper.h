@@ -10,7 +10,7 @@
 #define LORA_PHY_HELPER_H
 
 #include "ns3/lora-channel.h"
-#include "ns3/lora-phy.h"
+#include "ns3/node.h"
 #include "ns3/object-factory.h"
 
 namespace ns3
