@@ -9,14 +9,16 @@
 #ifndef SUB_BAND_H
 #define SUB_BAND_H
 
-#include "logical-lora-channel.h"
-
 #include "ns3/nstime.h"
+#include "ns3/ptr.h"
+#include "ns3/simple-ref-count.h"
 
 namespace ns3
 {
 namespace lorawan
 {
+
+class LogicalLoraChannel;
 
 /**
  * @ingroup lorawan
