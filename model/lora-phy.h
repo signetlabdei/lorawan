@@ -24,22 +24,24 @@ class LoraChannel;
 /**
  * @ingroup lorawan
  *
+ * Enumeration of the LoRa supported coding rates
+ */
+enum CodingRate : uint8_t
+{
+    CODING_RATE_4_5 = 1, //!< Coding rate 4/5
+    CODING_RATE_4_6 = 2, //!< Coding rate 4/6
+    CODING_RATE_4_7 = 3, //!< Coding rate 4/7
+    CODING_RATE_4_8 = 4, //!< Coding rate 4/8
+};
+
+/**
+ * @ingroup lorawan
+ *
  * Structure to collect all parameters that are used to compute the duration of
  * a packet (excluding payload length).
  */
 struct LoraTxParameters
 {
-    /**
-     * Enumeration of the LoRa coding rates supported
-     */
-    enum CodingRate
-    {
-        CODING_RATE_4_5 = 1, //!< Coding rate 4/5
-        CODING_RATE_4_6 = 2, //!< Coding rate 4/6
-        CODING_RATE_4_7 = 3, //!< Coding rate 4/7
-        CODING_RATE_4_8 = 4, //!< Coding rate 4/8
-    };
-
     uint8_t sf = 7;                          //!< Spreading Factor
     bool headerDisabled = false;             //!< Whether to use implicit header mode
     CodingRate codingRate = CODING_RATE_4_5; //!< Code rate (obtained as 4/(codingRate+4))
