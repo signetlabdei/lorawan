@@ -9,6 +9,7 @@
 #include "gateway-lorawan-mac.h"
 
 #include "lora-net-device.h"
+#include "lora-phy.h"
 #include "lora-tag.h"
 #include "lorawan-mac-header.h"
 

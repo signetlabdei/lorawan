@@ -10,12 +10,18 @@
 #define LORAWAN_MAC_H
 
 #include "logical-lora-channel-helper.h"
-#include "lora-phy.h"
+
+#include "ns3/net-device.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
+#include "ns3/traced-callback.h"
 
 namespace ns3
 {
 namespace lorawan
 {
+
+class LoraPhy;
 
 /**
  * @ingroup lorawan

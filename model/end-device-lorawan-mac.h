@@ -24,6 +24,8 @@ namespace ns3
 namespace lorawan
 {
 
+enum CodingRate : uint8_t;
+
 /**
  * @ingroup lorawan
  *

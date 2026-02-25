@@ -8,6 +8,8 @@
 
 #include "lorawan-mac.h"
 
+#include "lora-phy.h"
+
 namespace ns3
 {
 namespace lorawan

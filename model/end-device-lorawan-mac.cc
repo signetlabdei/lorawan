@@ -11,6 +11,8 @@
 
 #include "end-device-lorawan-mac.h"
 
+#include "lora-phy.h"
+
 #include "ns3/energy-source-container.h"
 #include "ns3/simulator.h"
 
