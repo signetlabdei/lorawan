@@ -11,19 +11,10 @@
 
 #include "end-device-lora-phy.h"
 
-#include "ns3/mobility-model.h"
-#include "ns3/net-device.h"
-#include "ns3/node.h"
-#include "ns3/nstime.h"
-#include "ns3/object.h"
-#include "ns3/traced-value.h"
-
 namespace ns3
 {
 namespace lorawan
 {
-
-class LoraChannel;
 
 /**
  * @ingroup lorawan
@@ -63,6 +54,6 @@ class SimpleEndDeviceLoraPhy : public EndDeviceLoraPhy
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* SIMPLE_END_DEVICE_LORA_PHY_H */

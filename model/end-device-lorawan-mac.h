@@ -12,7 +12,6 @@
 #ifndef END_DEVICE_LORAWAN_MAC_H
 #define END_DEVICE_LORAWAN_MAC_H
 
-#include "lora-device-address.h"
 #include "lora-frame-header.h"
 #include "lorawan-mac-header.h"
 #include "lorawan-mac.h"
@@ -24,6 +23,8 @@ namespace ns3
 {
 namespace lorawan
 {
+
+enum CodingRate : uint8_t;
 
 /**
  * @ingroup lorawan
@@ -339,8 +340,8 @@ class EndDeviceLorawanMac : public LorawanMac
     uint8_t m_nbTrans; //!< Default number of unacknowledged redundant transmissions of each packet.
     TracedValue<uint8_t> m_dataRate; //!< The data rate this device is using to transmit.
     TracedValue<double>
-        m_txPowerDbm; //!< The transmission ERP [dBm] this device is currently using.
-    LoraTxParameters::CodingRate m_codingRate; //!< The coding rate used by this device.
+        m_txPowerDbm;        //!< The transmission ERP [dBm] this device is currently using.
+    CodingRate m_codingRate; //!< The coding rate used by this device.
     bool m_headerDisabled; //!< Whether or not the LoRa PHY header is disabled for communications by
                            //!< this device.
     LoraDeviceAddress m_address; //!< The address of this device.
@@ -504,6 +505,6 @@ class EndDeviceLorawanMac : public LorawanMac
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* END_DEVICE_LORAWAN_MAC_H */

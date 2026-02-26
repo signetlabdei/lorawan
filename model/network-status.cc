@@ -9,15 +9,8 @@
 
 #include "network-status.h"
 
-#include "end-device-status.h"
-#include "gateway-status.h"
-#include "lora-device-address.h"
-
-#include "ns3/log.h"
-#include "ns3/net-device.h"
-#include "ns3/node-container.h"
-#include "ns3/packet.h"
-#include "ns3/pointer.h"
+#include "class-a-end-device-lorawan-mac.h"
+#include "lora-tag.h"
 
 namespace ns3
 {
@@ -235,5 +228,6 @@ NetworkStatus::CountEndDevices()
 
     return m_endDeviceStatuses.size();
 }
+
 } // namespace lorawan
 } // namespace ns3

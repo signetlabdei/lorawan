@@ -10,10 +10,7 @@
 
 #include "lora-utils.h"
 
-#include "ns3/enum.h"
-#include "ns3/log.h"
-
-#include <limits>
+#include "ns3/simulator.h"
 
 namespace ns3
 {
@@ -139,8 +136,6 @@ std::vector<std::vector<double>> LoraInterferenceHelper::collisionSnirGoursaud =
 LoraInterferenceHelper::CollisionMatrix LoraInterferenceHelper::collisionMatrix =
     LoraInterferenceHelper::GOURSAUD;
 
-NS_OBJECT_ENSURE_REGISTERED(LoraInterferenceHelper);
-
 void
 LoraInterferenceHelper::SetCollisionMatrix(
     enum LoraInterferenceHelper::CollisionMatrix collisionMatrix)
@@ -156,15 +151,6 @@ LoraInterferenceHelper::SetCollisionMatrix(
         m_collisionSnir = LoraInterferenceHelper::collisionSnirGoursaud;
         break;
     }
-}
-
-TypeId
-LoraInterferenceHelper::GetTypeId()
-{
-    static TypeId tid =
-        TypeId("ns3::LoraInterferenceHelper").SetParent<Object>().SetGroupName("lorawan");
-
-    return tid;
 }
 
 LoraInterferenceHelper::LoraInterferenceHelper()
@@ -415,52 +401,6 @@ LoraInterferenceHelper::GetOverlapTime(Ptr<LoraInterferenceHelper::Event> event1
 
     return overlap;
 }
+
 } // namespace lorawan
 } // namespace ns3
-
-/*
-  ----------------------------------------------------------------------------
-
-  // Event1 starts before Event2
-  if (s1 < s2)
-  {
-  // Non-overlapping events
-  if (e1 < s2)
-  {
-  overlap = Seconds (0);
-  }
-  // event1 contains event2
-  else if (e1 >= e2)
-  {
-  overlap = e2 - s2;
-  }
-  // Partially overlapping events
-  else
-  {
-  overlap = e1 - s2;
-  }
-  }
-  // Event2 starts before Event1
-  else
-  {
-  // Non-overlapping events
-  if (e2 < s1)
-  {
-  overlap = Seconds (0);
-  }
-  // event2 contains event1
-  else if (e2 >= e1)
-  {
-  overlap = e1 - s1;
-  }
-  // Partially overlapping events
-  else
-  {
-  overlap = e2 - s1;
-  }
-  }
-  return overlap;
-  }
-  }
-  }
-*/

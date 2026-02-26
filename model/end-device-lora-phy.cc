@@ -8,13 +8,6 @@
 
 #include "end-device-lora-phy.h"
 
-#include "lora-tag.h"
-
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-
-#include <algorithm>
-
 namespace ns3
 {
 namespace lorawan

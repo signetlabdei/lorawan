@@ -8,16 +8,11 @@
 
 #include "lora-channel.h"
 
-#include "end-device-lora-phy.h"
-#include "gateway-lora-phy.h"
+#include "lora-phy.h"
 
-#include "ns3/log.h"
-#include "ns3/object-factory.h"
-#include "ns3/packet.h"
+#include "ns3/node.h"
 #include "ns3/pointer.h"
 #include "ns3/simulator.h"
-
-#include <algorithm>
 
 namespace ns3
 {
@@ -206,5 +201,6 @@ operator<<(std::ostream& os, const LoraChannelParameters& params)
        << ")";
     return os;
 }
+
 } // namespace lorawan
 } // namespace ns3

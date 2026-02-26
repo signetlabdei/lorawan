@@ -10,13 +10,8 @@
 #ifndef NETWORK_STATUS_H
 #define NETWORK_STATUS_H
 
-#include "class-a-end-device-lorawan-mac.h"
 #include "end-device-status.h"
 #include "gateway-status.h"
-#include "lora-device-address.h"
-#include "network-scheduler.h"
-
-#include <iterator>
 
 namespace ns3
 {
@@ -143,6 +138,6 @@ class NetworkStatus : public Object
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* NETWORK_STATUS_H */

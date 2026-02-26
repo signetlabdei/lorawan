@@ -6,12 +6,11 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-// Include headers of classes to test
-#include "ns3/log.h"
-#include "ns3/network-scheduler.h"
-
 // An essential include is test.h
 #include "ns3/test.h"
+
+// Include headers of classes to test
+#include "ns3/network-scheduler.h"
 
 using namespace ns3;
 using namespace lorawan;

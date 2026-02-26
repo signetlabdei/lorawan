@@ -8,8 +8,6 @@
 
 #include "lora-device-address.h"
 
-#include "ns3/log.h"
-
 #include <bitset>
 
 namespace ns3
@@ -263,5 +261,6 @@ operator<<(std::ostream& os, const LoraDeviceAddress& address)
     os << address.Print();
     return os;
 }
+
 } // namespace lorawan
 } // namespace ns3

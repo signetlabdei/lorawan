@@ -11,21 +11,12 @@
 
 #include "lora-phy.h"
 
-#include "ns3/mobility-model.h"
-#include "ns3/net-device.h"
-#include "ns3/node.h"
-#include "ns3/nstime.h"
-#include "ns3/object.h"
 #include "ns3/traced-value.h"
-
-#include <list>
 
 namespace ns3
 {
 namespace lorawan
 {
-
-class LoraChannel;
 
 /**
  * @ingroup lorawan
@@ -207,6 +198,6 @@ class GatewayLoraPhy : public LoraPhy
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* GATEWAY_LORA_PHY_H */

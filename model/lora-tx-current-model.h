@@ -151,6 +151,6 @@ class ConstantLoraTxCurrentModel : public LoraTxCurrentModel
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* LORA_TX_CURRENT_MODEL_H */

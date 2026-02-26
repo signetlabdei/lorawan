@@ -11,7 +11,6 @@
 
 #include "ns3/buffer.h"
 #include "ns3/nstime.h"
-#include "ns3/simple-ref-count.h"
 
 namespace ns3
 {
@@ -745,7 +744,8 @@ class DlChannelAns : public MacCommand
 
   private:
 };
-} // namespace lorawan
 
+} // namespace lorawan
 } // namespace ns3
+
 #endif /* DEVICE_STATUS_H */

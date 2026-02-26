@@ -10,25 +10,19 @@
 #ifndef NETWORK_SERVER_H
 #define NETWORK_SERVER_H
 
-#include "class-a-end-device-lorawan-mac.h"
-#include "gateway-status.h"
-#include "lora-device-address.h"
-#include "network-controller.h"
-#include "network-scheduler.h"
-#include "network-status.h"
-
 #include "ns3/application.h"
-#include "ns3/log.h"
-#include "ns3/net-device.h"
 #include "ns3/node-container.h"
-#include "ns3/object.h"
-#include "ns3/packet.h"
 #include "ns3/point-to-point-net-device.h"
 
 namespace ns3
 {
 namespace lorawan
 {
+
+class NetworkScheduler;
+class NetworkController;
+class NetworkControllerComponent;
+class NetworkStatus;
 
 /**
  * @ingroup lorawan
@@ -127,6 +121,6 @@ class NetworkServer : public Application
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* NETWORK_SERVER_H */

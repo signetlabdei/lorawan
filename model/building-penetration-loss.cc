@@ -6,11 +6,7 @@
 
 #include "building-penetration-loss.h"
 
-#include "ns3/double.h"
-#include "ns3/log.h"
 #include "ns3/mobility-building-info.h"
-
-#include <cmath>
 
 namespace ns3
 {
@@ -221,5 +217,6 @@ BuildingPenetrationLoss::GetTor1(Ptr<MobilityModel> b) const
     }
     return m_uniformRV->GetValue(4, 10) * m_pMap.find(b)->second;
 }
+
 } // namespace lorawan
 } // namespace ns3

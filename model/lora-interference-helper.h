@@ -9,14 +9,9 @@
 #ifndef LORA_INTERFERENCE_HELPER_H
 #define LORA_INTERFERENCE_HELPER_H
 
-#include "logical-lora-channel.h"
-
-#include "ns3/callback.h"
 #include "ns3/nstime.h"
-#include "ns3/object.h"
 #include "ns3/packet.h"
-#include "ns3/simulator.h"
-#include "ns3/traced-callback.h"
+#include "ns3/simple-ref-count.h"
 
 #include <list>
 
@@ -137,12 +132,6 @@ class LoraInterferenceHelper
         ALOHA,
     };
 
-    /**
-     *  Register this type.
-     *  @return The object TypeId.
-     */
-    static TypeId GetTypeId();
-
     LoraInterferenceHelper();          //!< Default constructor
     virtual ~LoraInterferenceHelper(); //!< Destructor
 
@@ -239,7 +228,8 @@ class LoraInterferenceHelper
  * @param event The event to be logged
  */
 std::ostream& operator<<(std::ostream& os, const LoraInterferenceHelper::Event& event);
-} // namespace lorawan
 
+} // namespace lorawan
 } // namespace ns3
+
 #endif /* LORA_INTERFERENCE_HELPER_H */

@@ -7,15 +7,10 @@
 #ifndef BUILDING_PENETRATION_LOSS_H
 #define BUILDING_PENETRATION_LOSS_H
 
-#include "ns3/mobility-model.h"
 #include "ns3/propagation-loss-model.h"
-#include "ns3/random-variable-stream.h"
-#include "ns3/vector.h"
 
 namespace ns3
 {
-class MobilityModel;
-
 namespace lorawan
 {
 
@@ -86,6 +81,8 @@ class BuildingPenetrationLoss : public PropagationLossModel
      */
     mutable std::map<Ptr<MobilityModel>, int> m_wallLossMap;
 };
+
 } // namespace lorawan
 } // namespace ns3
-#endif
+
+#endif /* BUILDING_PENETRATION_LOSS_H */

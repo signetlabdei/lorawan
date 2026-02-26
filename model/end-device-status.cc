@@ -9,17 +9,10 @@
 
 #include "end-device-status.h"
 
-#include "lora-frame-header.h"
+#include "class-a-end-device-lorawan-mac.h"
 #include "lora-tag.h"
-#include "lorawan-mac-header.h"
 
-#include "ns3/command-line.h"
-#include "ns3/log.h"
-#include "ns3/packet.h"
-#include "ns3/pointer.h"
 #include "ns3/simulator.h"
-
-#include <algorithm>
 
 namespace ns3
 {
@@ -414,5 +407,6 @@ operator<<(std::ostream& os, const EndDeviceStatus& status)
 
     return os;
 }
+
 } // namespace lorawan
 } // namespace ns3

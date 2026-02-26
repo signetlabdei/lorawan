@@ -10,14 +10,8 @@
 
 #include "forwarder-helper.h"
 
-#include "ns3/double.h"
 #include "ns3/forwarder.h"
-#include "ns3/log.h"
 #include "ns3/lora-net-device.h"
-#include "ns3/random-variable-stream.h"
-#include "ns3/simulator.h"
-#include "ns3/string.h"
-#include "ns3/trace-source-accessor.h"
 
 namespace ns3
 {
@@ -93,5 +87,6 @@ ForwarderHelper::InstallPriv(Ptr<Node> node) const
 
     return app;
 }
+
 } // namespace lorawan
 } // namespace ns3

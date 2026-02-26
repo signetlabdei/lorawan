@@ -11,27 +11,11 @@
  * the Spreading Factors of the devices in the Network.
  */
 
-#include "ns3/command-line.h"
-#include "ns3/config.h"
 #include "ns3/core-module.h"
-#include "ns3/forwarder-helper.h"
-#include "ns3/gateway-lora-phy.h"
-#include "ns3/hex-grid-position-allocator.h"
-#include "ns3/log.h"
-#include "ns3/lora-channel.h"
-#include "ns3/lora-device-address-generator.h"
-#include "ns3/lora-helper.h"
-#include "ns3/lora-phy-helper.h"
-#include "ns3/lorawan-mac-helper.h"
+#include "ns3/lorawan-module.h"
 #include "ns3/mobility-helper.h"
-#include "ns3/network-module.h"
-#include "ns3/network-server-helper.h"
-#include "ns3/periodic-sender-helper.h"
-#include "ns3/periodic-sender.h"
-#include "ns3/point-to-point-module.h"
-#include "ns3/random-variable-stream.h"
+#include "ns3/point-to-point-helper.h"
 #include "ns3/rectangle.h"
-#include "ns3/string.h"
 
 using namespace ns3;
 using namespace lorawan;

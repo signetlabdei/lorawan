@@ -9,10 +9,6 @@
 #ifndef LORA_NET_DEVICE_H
 #define LORA_NET_DEVICE_H
 
-#include "lora-channel.h"
-#include "lora-phy.h"
-#include "lorawan-mac.h"
-
 #include "ns3/net-device.h"
 
 namespace ns3
@@ -20,16 +16,16 @@ namespace ns3
 namespace lorawan
 {
 
-class LoraChannel;
-class LoraPhy;
-class LorawanMac;
-
 /**
  * @defgroup lorawan LoRaWAN Models
  *
  * This section documents the API of the ns-3 lorawan module. For a generic functional description,
  * please refer to the ns-3 manual.
  */
+
+class LoraChannel;
+class LoraPhy;
+class LorawanMac;
 
 /**
  * @ingroup lorawan
@@ -174,6 +170,6 @@ class LoraNetDevice : public NetDevice
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* LORA_NET_DEVICE_H */

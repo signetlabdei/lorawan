@@ -12,12 +12,6 @@
 #include "logical-lora-channel.h"
 #include "sub-band.h"
 
-#include "ns3/nstime.h"
-#include "ns3/ptr.h"
-#include "ns3/simple-ref-count.h"
-
-#include <vector>
-
 namespace ns3
 {
 namespace lorawan

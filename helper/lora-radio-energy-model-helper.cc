@@ -8,9 +8,8 @@
 
 #include "lora-radio-energy-model-helper.h"
 
-#include "ns3/end-device-lora-phy.h"
 #include "ns3/lora-net-device.h"
-#include "ns3/lora-tx-current-model.h"
+#include "ns3/lora-radio-energy-model.h"
 
 namespace ns3
 {
@@ -68,8 +67,8 @@ LoraRadioEnergyModelHelper::SetTxCurrentModel(std::string name,
  * Private function starts here.
  */
 
-Ptr<DeviceEnergyModel>
-LoraRadioEnergyModelHelper::DoInstall(Ptr<NetDevice> device, Ptr<EnergySource> source) const
+Ptr<energy::DeviceEnergyModel>
+LoraRadioEnergyModelHelper::DoInstall(Ptr<NetDevice> device, Ptr<energy::EnergySource> source) const
 {
     NS_ASSERT(device);
     NS_ASSERT(source);

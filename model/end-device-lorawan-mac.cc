@@ -11,11 +11,9 @@
 
 #include "end-device-lorawan-mac.h"
 
-#include "class-a-end-device-lorawan-mac.h"
-#include "end-device-lora-phy.h"
+#include "lora-phy.h"
 
 #include "ns3/energy-source-container.h"
-#include "ns3/log.h"
 #include "ns3/simulator.h"
 
 #include <bitset>
@@ -98,7 +96,7 @@ EndDeviceLorawanMac::EndDeviceLorawanMac()
     : m_nbTrans(1),
       m_dataRate(0),
       m_txPowerDbm(14),
-      m_codingRate(LoraTxParameters::CODING_RATE_4_5),
+      m_codingRate(CODING_RATE_4_5),
       // LoraWAN default
       m_headerDisabled(false),
       // LoraWAN default

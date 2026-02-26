@@ -8,13 +8,10 @@
 
 #include "one-shot-sender.h"
 
-#include "class-a-end-device-lorawan-mac.h"
 #include "lora-net-device.h"
+#include "lorawan-mac.h"
 
-#include "ns3/double.h"
-#include "ns3/log.h"
-#include "ns3/pointer.h"
-#include "ns3/string.h"
+#include "ns3/simulator.h"
 
 namespace ns3
 {
@@ -95,5 +92,6 @@ OneShotSender::StopApplication()
     NS_LOG_FUNCTION_NOARGS();
     Simulator::Cancel(m_sendEvent);
 }
+
 } // namespace lorawan
 } // namespace ns3

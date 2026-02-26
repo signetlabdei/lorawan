@@ -9,12 +9,8 @@
 #ifndef ADR_COMPONENT_H
 #define ADR_COMPONENT_H
 
+#include "end-device-status.h"
 #include "network-controller-components.h"
-#include "network-status.h"
-
-#include "ns3/log.h"
-#include "ns3/object.h"
-#include "ns3/packet.h"
 
 namespace ns3
 {
@@ -175,7 +171,8 @@ class AdrComponent : public NetworkControllerComponent
 
     bool m_toggleTxPower; //!< Whether to control transmission power of end devices or not
 };
+
 } // namespace lorawan
 } // namespace ns3
 
-#endif
+#endif /* ADR_COMPONENT_H */

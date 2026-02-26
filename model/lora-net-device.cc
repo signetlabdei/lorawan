@@ -8,8 +8,10 @@
 
 #include "lora-net-device.h"
 
-#include "ns3/abort.h"
-#include "ns3/log.h"
+#include "lora-channel.h"
+#include "lora-phy.h"
+#include "lorawan-mac.h"
+
 #include "ns3/node.h"
 #include "ns3/pointer.h"
 

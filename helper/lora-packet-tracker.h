@@ -273,6 +273,8 @@ class LoraPacketTracker
     MacPacketData m_macPacketTracker;           //!< Packet map of MAC layer metrics
     RetransmissionData m_reTransmissionTracker; //!< Packet map of retransmission process metrics
 };
+
 } // namespace lorawan
 } // namespace ns3
-#endif
+
+#endif /* LORA_PACKET_TRACKER_H */

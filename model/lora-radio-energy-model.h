@@ -21,8 +21,6 @@ namespace ns3
 namespace lorawan
 {
 
-using namespace energy;
-
 /**
  * @ingroup lorawan
  *
@@ -44,7 +42,7 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
      *
      * @param callback Change state callback.
      */
-    void SetChangeStateCallback(DeviceEnergyModel::ChangeStateCallback callback);
+    void SetChangeStateCallback(energy::DeviceEnergyModel::ChangeStateCallback callback);
 
     /**
      * Sets the update tx current callback.
@@ -90,7 +88,7 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
      * Change state callback used to notify the LoraRadioEnergyModel of a state
      * change.
      */
-    DeviceEnergyModel::ChangeStateCallback m_changeStateCallback;
+    energy::DeviceEnergyModel::ChangeStateCallback m_changeStateCallback;
 
     /**
      * Callback used to update the tx current stored in LoraRadioEnergyModel based on
@@ -119,7 +117,7 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
  * object. The EnergySource object will query this model for the total current.
  * Then the EnergySource object uses the total current to calculate energy.
  */
-class LoraRadioEnergyModel : public DeviceEnergyModel
+class LoraRadioEnergyModel : public energy::DeviceEnergyModel
 {
   public:
     /**
@@ -146,14 +144,14 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
      *
      * @param source Pointer to EnergySource installed on node.
      *
-     * Implements DeviceEnergyModel::SetEnergySource.
+     * Implements energy::DeviceEnergyModel::SetEnergySource.
      */
-    void SetEnergySource(Ptr<EnergySource> source) override;
+    void SetEnergySource(Ptr<energy::EnergySource> source) override;
 
     /**
      * @return Total energy consumption of the wifi device.
      *
-     * Implements DeviceEnergyModel::GetTotalEnergyConsumption.
+     * Implements energy::DeviceEnergyModel::GetTotalEnergyConsumption.
      */
     double GetTotalEnergyConsumption() const override;
 
@@ -246,28 +244,28 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
      *
      * @param newState New state the lora radio is in.
      *
-     * Implements DeviceEnergyModel::ChangeState.
+     * Implements energy::DeviceEnergyModel::ChangeState.
      */
     void ChangeState(int newState) override;
 
     /**
      * Handles energy depletion.
      *
-     * Implements DeviceEnergyModel::HandleEnergyDepletion.
+     * Implements energy::DeviceEnergyModel::HandleEnergyDepletion.
      */
     void HandleEnergyDepletion() override;
 
     /**
      * Handles energy recharged.
      *
-     * Implements DeviceEnergyModel::HandleEnergyChanged.
+     * Implements energy::DeviceEnergyModel::HandleEnergyChanged.
      */
     void HandleEnergyChanged() override;
 
     /**
      * Handles energy recharged.
      *
-     * Implements DeviceEnergyModel::HandleEnergyRecharged.
+     * Implements energy::DeviceEnergyModel::HandleEnergyRecharged.
      */
     void HandleEnergyRecharged() override;
 
@@ -282,7 +280,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
     /**
      * @return Current draw of device, at current state.
      *
-     * Implements DeviceEnergyModel::GetCurrentA.
+     * Implements energy::DeviceEnergyModel::GetCurrentA.
      */
     double DoGetCurrentA() const override;
 
@@ -294,7 +292,7 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
      */
     void SetLoraRadioState(const EndDeviceLoraPhy::State state);
 
-    Ptr<EnergySource> m_source; ///< energy source
+    Ptr<energy::EnergySource> m_source; ///< energy source
 
     // Member variables for current draw in different radio modes.
     double m_txCurrentA;    ///< transmit current
@@ -325,6 +323,6 @@ class LoraRadioEnergyModel : public DeviceEnergyModel
 };
 
 } // namespace lorawan
-
 } // namespace ns3
+
 #endif /* LORA_RADIO_ENERGY_MODEL_H */

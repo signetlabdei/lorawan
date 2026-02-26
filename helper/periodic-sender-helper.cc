@@ -9,12 +9,7 @@
 #include "periodic-sender-helper.h"
 
 #include "ns3/double.h"
-#include "ns3/log.h"
 #include "ns3/periodic-sender.h"
-#include "ns3/random-variable-stream.h"
-#include "ns3/simulator.h"
-#include "ns3/string.h"
-#include "ns3/trace-source-accessor.h"
 
 namespace ns3
 {

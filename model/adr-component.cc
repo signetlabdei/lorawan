@@ -8,6 +8,8 @@
 
 #include "adr-component.h"
 
+#include "class-a-end-device-lorawan-mac.h"
+
 namespace ns3
 {
 namespace lorawan
@@ -435,5 +437,6 @@ AdrComponent::GetTxPowerIndex(double txPower)
     NS_ASSERT_MSG(fmod(txPower, 2) == 0, "Invalid TxPower value");
     return 7 - txPower / 2;
 }
+
 } // namespace lorawan
 } // namespace ns3

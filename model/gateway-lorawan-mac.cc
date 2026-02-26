@@ -8,11 +8,10 @@
 
 #include "gateway-lorawan-mac.h"
 
-#include "lora-frame-header.h"
 #include "lora-net-device.h"
+#include "lora-phy.h"
+#include "lora-tag.h"
 #include "lorawan-mac-header.h"
-
-#include "ns3/log.h"
 
 namespace ns3
 {
@@ -70,7 +69,7 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
     LoraTxParameters params;
     params.sf = GetSfFromDataRate(dataRate);
     params.headerDisabled = false;
-    params.codingRate = LoraTxParameters::CODING_RATE_4_5;
+    params.codingRate = CODING_RATE_4_5;
     params.bandwidthHz = GetBandwidthFromDataRate(dataRate);
     params.nPreamble = 8;
     params.crcEnabled = true;
@@ -143,5 +142,6 @@ GatewayLorawanMac::GetWaitTime(uint32_t frequencyHz)
     NS_LOG_FUNCTION_NOARGS();
     return m_channelHelper->GetWaitTime(frequencyHz);
 }
+
 } // namespace lorawan
 } // namespace ns3

@@ -6,37 +6,10 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#include "ns3/building-allocator.h"
-#include "ns3/building-penetration-loss.h"
-#include "ns3/buildings-helper.h"
-#include "ns3/callback.h"
-#include "ns3/command-line.h"
-#include "ns3/constant-position-mobility-model.h"
-#include "ns3/correlated-shadowing-propagation-loss-model.h"
-#include "ns3/double.h"
-#include "ns3/end-device-lora-phy.h"
-#include "ns3/end-device-lorawan-mac.h"
-#include "ns3/forwarder-helper.h"
-#include "ns3/gateway-lora-phy.h"
-#include "ns3/gateway-lorawan-mac.h"
-#include "ns3/log.h"
-#include "ns3/lora-device-address.h"
-#include "ns3/lora-frame-header.h"
-#include "ns3/lora-helper.h"
-#include "ns3/lora-net-device.h"
-#include "ns3/lora-phy.h"
-#include "ns3/lorawan-mac-header.h"
+#include "ns3/core-module.h"
+#include "ns3/lorawan-module.h"
 #include "ns3/mobility-helper.h"
-#include "ns3/network-server-helper.h"
-#include "ns3/node-container.h"
-#include "ns3/periodic-sender-helper.h"
-#include "ns3/pointer.h"
-#include "ns3/position-allocator.h"
-#include "ns3/random-variable-stream.h"
-#include "ns3/simulator.h"
-
-#include <algorithm>
-#include <ctime>
+#include "ns3/point-to-point-helper.h"
 
 using namespace ns3;
 using namespace lorawan;
@@ -269,7 +242,7 @@ main(int argc, char* argv[])
         LoraTxParameters txParams;
         txParams.sf = sf;
         txParams.headerDisabled = false;
-        txParams.codingRate = LoraTxParameters::CODING_RATE_4_5;
+        txParams.codingRate = CODING_RATE_4_5;
         txParams.bandwidthHz = 125000;
         txParams.nPreamble = 8;
         txParams.crcEnabled = true;
