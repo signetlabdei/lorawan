@@ -213,9 +213,10 @@ operator<<(std::ostream& os, const CodingRate& codingRate)
         return os << "4/7";
     case CodingRate::CR_4_8:
         return os << "4/8";
+    default:
+        NS_FATAL_ERROR("Unknown coding rate value");
+        return (os << "UNKNOWN");
     }
-
-    return os << "???";
 }
 
 std::istream&
@@ -223,32 +224,27 @@ operator>>(std::istream& is, CodingRate& codingRate)
 {
     std::string value;
     is >> value;
-
     if (value == "4/5")
     {
         codingRate = CodingRate::CR_4_5;
-        return is;
     }
-
-    if (value == "4/6")
+    else if (value == "4/6")
     {
         codingRate = CodingRate::CR_4_6;
-        return is;
     }
-
-    if (value == "4/7")
+    else if (value == "4/7")
     {
         codingRate = CodingRate::CR_4_7;
-        return is;
     }
-
-    if (value == "4/8")
+    else if (value == "4/8")
     {
         codingRate = CodingRate::CR_4_8;
-        return is;
     }
-
-    is.setstate(std::ios_base::failbit);
+    else
+    {
+        is.setstate(std::ios_base::failbit);
+    }
+    NS_ABORT_MSG_IF(is.bad(), "Failure to parse " << value);
     return is;
 }
 

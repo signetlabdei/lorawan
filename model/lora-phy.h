@@ -35,6 +35,16 @@ enum class CodingRate : uint8_t
 };
 
 /**
+ * Allow logging of CodingRate like any other data type.
+ */
+std::ostream& operator<<(std::ostream& os, const CodingRate& codingRate);
+
+/**
+ * Allow parsing of CodingRate from CommandLine.
+ */
+std::istream& operator>>(std::istream& is, CodingRate& codingRate);
+
+/**
  * @ingroup lorawan
  *
  * Structure to collect all parameters that are used to compute the duration of
@@ -50,15 +60,6 @@ struct LoraTxParameters
     bool crcEnabled = true; //!< Whether Cyclic Redundancy Check (CRC) is enabled
     bool lowDataRateOptimizationEnabled = false; //!< Whether low data rate optimization is enabled
 };
-
-/**
- * Allow logging of CodingRate like any other data type.
- */
-std::ostream& operator<<(std::ostream& os, const CodingRate& codingRate);
-/**
- * Allow parsing of CodingRate from CommandLine.
- */
-std::istream& operator>>(std::istream& is, CodingRate& codingRate);
 
 /**
  * Allow logging of LoraTxParameters like with any other data type.
