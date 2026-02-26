@@ -242,7 +242,7 @@ main(int argc, char* argv[])
         LoraTxParameters txParams;
         txParams.sf = sf;
         txParams.headerDisabled = false;
-        txParams.codingRate = CODING_RATE_4_5;
+        txParams.codingRate = CodingRate::CR_4_5;
         txParams.bandwidthHz = 125000;
         txParams.nPreamble = 8;
         txParams.crcEnabled = true;

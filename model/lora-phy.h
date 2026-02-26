@@ -26,13 +26,23 @@ class LoraChannel;
  *
  * Enumeration of the LoRa supported coding rates
  */
-enum CodingRate : uint8_t
+enum class CodingRate : uint8_t
 {
-    CODING_RATE_4_5 = 1, //!< Coding rate 4/5
-    CODING_RATE_4_6 = 2, //!< Coding rate 4/6
-    CODING_RATE_4_7 = 3, //!< Coding rate 4/7
-    CODING_RATE_4_8 = 4, //!< Coding rate 4/8
+    CR_4_5 = 1, //!< Coding rate 4/5
+    CR_4_6,     //!< Coding rate 4/6
+    CR_4_7,     //!< Coding rate 4/7
+    CR_4_8,     //!< Coding rate 4/8
 };
+
+/**
+ * Allow logging of CodingRate like any other data type.
+ */
+std::ostream& operator<<(std::ostream& os, const CodingRate& codingRate);
+
+/**
+ * Allow parsing of CodingRate from CommandLine.
+ */
+std::istream& operator>>(std::istream& is, CodingRate& codingRate);
 
 /**
  * @ingroup lorawan
@@ -42,12 +52,12 @@ enum CodingRate : uint8_t
  */
 struct LoraTxParameters
 {
-    uint8_t sf = 7;                          //!< Spreading Factor
-    bool headerDisabled = false;             //!< Whether to use implicit header mode
-    CodingRate codingRate = CODING_RATE_4_5; //!< Code rate (obtained as 4/(codingRate+4))
-    uint32_t bandwidthHz = 125000;           //!< Bandwidth in Hz
-    uint32_t nPreamble = 8;                  //!< Number of preamble symbols
-    bool crcEnabled = true;                  //!< Whether Cyclic Redundancy Check (CRC) is enabled
+    uint8_t sf = 7;                             //!< Spreading Factor
+    bool headerDisabled = false;                //!< Whether to use implicit header mode
+    CodingRate codingRate = CodingRate::CR_4_5; //!< Code rate (obtained as 4/(codingRate+4))
+    uint32_t bandwidthHz = 125000;              //!< Bandwidth in Hz
+    uint32_t nPreamble = 8;                     //!< Number of preamble symbols
+    bool crcEnabled = true; //!< Whether Cyclic Redundancy Check (CRC) is enabled
     bool lowDataRateOptimizationEnabled = false; //!< Whether low data rate optimization is enabled
 };
 
