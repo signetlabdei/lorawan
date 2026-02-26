@@ -96,7 +96,7 @@ EndDeviceLorawanMac::EndDeviceLorawanMac()
     : m_nbTrans(1),
       m_dataRate(0),
       m_txPowerDbm(14),
-      m_codingRate(CODING_RATE_4_5),
+      m_codingRate(CodingRate::CR_4_5),
       // LoraWAN default
       m_headerDisabled(false),
       // LoraWAN default

@@ -181,7 +181,7 @@ LoraPhy::GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams)
     double num = 8.0 * pl - 4 * txParams.sf + 28 + 16 * crc - 20 * h;
     double den = 4 * (txParams.sf - 2 * de);
     double payloadSymbNb =
-        8 + std::max(std::ceil(num / den) * (txParams.codingRate + 4), double(0));
+        8 + std::max(std::ceil(num / den) * (int(txParams.codingRate) + 4), double(0));
 
     // Time to transmit the payload
     double tPayload = payloadSymbNb * tSym;
@@ -201,13 +201,13 @@ operator<<(std::ostream& os, const CodingRate& codingRate)
 {
     switch (codingRate)
     {
-    case CodingRate::CODING_RATE_4_5:
+    case CodingRate::CR_4_5:
         return os << "4/5";
-    case CodingRate::CODING_RATE_4_6:
+    case CodingRate::CR_4_6:
         return os << "4/6";
-    case CodingRate::CODING_RATE_4_7:
+    case CodingRate::CR_4_7:
         return os << "4/7";
-    case CodingRate::CODING_RATE_4_8:
+    case CodingRate::CR_4_8:
         return os << "4/8";
     }
 
@@ -222,25 +222,25 @@ operator>>(std::istream& is, CodingRate& codingRate)
 
     if (value == "4/5")
     {
-        codingRate = CodingRate::CODING_RATE_4_5;
+        codingRate = CodingRate::CR_4_5;
         return is;
     }
 
     if (value == "4/6")
     {
-        codingRate = CodingRate::CODING_RATE_4_6;
+        codingRate = CodingRate::CR_4_6;
         return is;
     }
 
     if (value == "4/7")
     {
-        codingRate = CodingRate::CODING_RATE_4_7;
+        codingRate = CodingRate::CR_4_7;
         return is;
     }
 
     if (value == "4/8")
     {
-        codingRate = CodingRate::CODING_RATE_4_8;
+        codingRate = CodingRate::CR_4_8;
         return is;
     }
 
