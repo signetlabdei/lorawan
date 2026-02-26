@@ -99,16 +99,8 @@ LoraPhy::GetMobility()
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    // If there is a mobility model associated to this PHY, take the mobility from
-    // there
-    if (m_mobility)
-    {
-        return m_mobility;
-    }
-    else // Else, take it from the node
-    {
-        return m_device->GetNode()->GetObject<MobilityModel>();
-    }
+    // Return mobility model associated to this PHY, else, take it from the node
+    return (m_mobility) ? m_mobility : m_device->GetNode()->GetObject<MobilityModel>();
 }
 
 void
