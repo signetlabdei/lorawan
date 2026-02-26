@@ -164,24 +164,28 @@ LoraPhy::GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams)
     double tSym = GetTSym(txParams).GetSeconds();
 
     // Compute the preamble duration
-    double tPreamble = (double(txParams.nPreamble) + 4.25) * tSym;
+    auto nPreamble = static_cast<double>(txParams.nPreamble);
+    double tPreamble = (nPreamble + 4.25) * tSym;
 
     // Payload size
-    uint32_t pl = packet->GetSize(); // Size in bytes
-    NS_LOG_DEBUG("Packet of size " << pl << " bytes");
+    uint32_t payloadLen = packet->GetSize(); // Size in bytes
+    NS_LOG_DEBUG("Packet of size " << payloadLen << " bytes");
 
-    // This step is needed since the formula deals with double values.
+    // Safety casts since the formula deals with double values.
+    auto pl = static_cast<double>(payloadLen);
+    auto sf = static_cast<double>(txParams.sf);
+    auto cr = static_cast<double>(txParams.codingRate);
     // de = 1 when the low data rate optimization is enabled, 0 otherwise
     // h = 1 when header is implicit, 0 otherwise
-    double de = txParams.lowDataRateOptimizationEnabled ? 1 : 0;
-    double h = txParams.headerDisabled ? 1 : 0;
-    double crc = txParams.crcEnabled ? 1 : 0;
+    // crc = 1 when cyclic redundancy check is present, 0 otherwise
+    double de = txParams.lowDataRateOptimizationEnabled ? 1.0 : 0.0;
+    double h = txParams.headerDisabled ? 1.0 : 0.0;
+    double crc = txParams.crcEnabled ? 1.0 : 0.0;
 
     // num and den refer to numerator and denominator of the time on air formula
-    double num = 8.0 * pl - 4 * txParams.sf + 28 + 16 * crc - 20 * h;
-    double den = 4 * (txParams.sf - 2 * de);
-    double payloadSymbNb =
-        8 + std::max(std::ceil(num / den) * (int(txParams.codingRate) + 4), double(0));
+    double num = 8.0 * pl - 4.0 * sf + 28.0 + 16.0 * crc - 20.0 * h;
+    double den = 4.0 * (sf - 2.0 * de);
+    double payloadSymbNb = 8.0 + std::max(std::ceil(num / den) * (cr + 4.0), 0.0);
 
     // Time to transmit the payload
     double tPayload = payloadSymbNb * tSym;
