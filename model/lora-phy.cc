@@ -152,7 +152,7 @@ LoraPhy::GetTSym(LoraTxParameters txParams)
 }
 
 Time
-LoraPhy::GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams)
+LoraPhy::GetTimeOnAir(Ptr<Packet> packet, LoraTxParameters txParams)
 {
     NS_LOG_FUNCTION(packet << txParams);
 

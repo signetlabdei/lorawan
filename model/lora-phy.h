@@ -73,7 +73,7 @@ std::ostream& operator<<(std::ostream& os, const LoraTxParameters& params);
  *
  * This class features common callbacks and defines the interfaces that are used
  * to send and receive packets at the PHY layer. Furthermore, it features an
- * implementation of the GetOnAirTime function, used to compute the actual
+ * implementation of the GetTimeOnAir function, used to compute the actual
  * duration of a packet based on a series of parameters that are collected in
  * LoraTxParameters objects.
  */
@@ -270,7 +270,7 @@ class LoraPhy : public Object
      * @param txParams The set of parameters that will be used for transmission.
      * @return The time necessary to transmit the packet.
      */
-    static Time GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams);
+    static Time GetTimeOnAir(Ptr<Packet> packet, LoraTxParameters txParams);
 
   private:
     /**

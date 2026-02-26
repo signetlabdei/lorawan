@@ -69,7 +69,7 @@ class EndDeviceLoraPhyListener
  *
  * Class representing a LoRa transceiver.
  *
- * This class inherits some functionality by LoraPhy, like the GetOnAirTime
+ * This class inherits some functionality by LoraPhy, like the GetTimeOnAir
  * function, and extends it to represent the behavior of a LoRa chip, like the
  * SX1272.
  *

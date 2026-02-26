@@ -970,7 +970,7 @@ LogicalLoraChannelTest::DoRun()
 /**
  * @ingroup lorawan
  *
- * It tests the correctness of the LoraPhy::GetOnAirTime calculator against a number of pre-sourced
+ * It tests the correctness of the LoraPhy::GetTimeOnAir calculator against a number of pre-sourced
  * time values of known scenarios
  */
 class TimeOnAirTest : public TestCase
@@ -1020,63 +1020,63 @@ TimeOnAirTest::DoRun()
     txParams.crcEnabled = true;
     txParams.lowDataRateOptimizationEnabled = false;
 
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.041216, 0.0001, "Unexpected duration");
 
     txParams.sf = 8;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.072192, 0.0001, "Unexpected duration");
 
     txParams.headerDisabled = true;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.072192, 0.0001, "Unexpected duration");
 
     txParams.codingRate = CodingRate::CR_4_6;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.078336, 0.0001, "Unexpected duration");
 
     txParams.nPreamble = 10;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.082432, 0.0001, "Unexpected duration");
 
     txParams.lowDataRateOptimizationEnabled = true;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.082432, 0.0001, "Unexpected duration");
 
     txParams.sf = 10;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.280576, 0.0001, "Unexpected duration");
 
     txParams.bandwidthHz = 250000;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.14028, 0.0001, "Unexpected duration");
 
     txParams.bandwidthHz = 500000;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.070144, 0.0001, "Unexpected duration");
 
     txParams.headerDisabled = false;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.082432, 0.0001, "Unexpected duration");
 
     txParams.nPreamble = 8;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.078336, 0.0001, "Unexpected duration");
 
     txParams.sf = 12;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.264192, 0.0001, "Unexpected duration");
 
     packet = Create<Packet>(50);
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.657408, 0.0001, "Unexpected duration");
 
     txParams.bandwidthHz = 125000;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 2.629632, 0.0001, "Unexpected duration");
 
     txParams.codingRate = CodingRate::CR_4_5;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 2.301952, 0.0001, "Unexpected duration");
 }
 
