@@ -197,17 +197,17 @@ LoraPhy::GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams)
 }
 
 std::ostream&
-operator<<(std::ostream& os, const LoraTxParameters::CodingRate& codingRate)
+operator<<(std::ostream& os, const CodingRate& codingRate)
 {
     switch (codingRate)
     {
-    case LoraTxParameters::CodingRate::CODING_RATE_4_5:
+    case CodingRate::CODING_RATE_4_5:
         return os << "4/5";
-    case LoraTxParameters::CodingRate::CODING_RATE_4_6:
+    case CodingRate::CODING_RATE_4_6:
         return os << "4/6";
-    case LoraTxParameters::CodingRate::CODING_RATE_4_7:
+    case CodingRate::CODING_RATE_4_7:
         return os << "4/7";
-    case LoraTxParameters::CodingRate::CODING_RATE_4_8:
+    case CodingRate::CODING_RATE_4_8:
         return os << "4/8";
     }
 
@@ -215,32 +215,32 @@ operator<<(std::ostream& os, const LoraTxParameters::CodingRate& codingRate)
 }
 
 std::istream&
-operator>>(std::istream& is, LoraTxParameters::CodingRate& codingRate)
+operator>>(std::istream& is, CodingRate& codingRate)
 {
     std::string value;
     is >> value;
 
     if (value == "4/5")
     {
-        codingRate = LoraTxParameters::CodingRate::CODING_RATE_4_5;
+        codingRate = CodingRate::CODING_RATE_4_5;
         return is;
     }
 
     if (value == "4/6")
     {
-        codingRate = LoraTxParameters::CodingRate::CODING_RATE_4_6;
+        codingRate = CodingRate::CODING_RATE_4_6;
         return is;
     }
 
     if (value == "4/7")
     {
-        codingRate = LoraTxParameters::CodingRate::CODING_RATE_4_7;
+        codingRate = CodingRate::CODING_RATE_4_7;
         return is;
     }
 
     if (value == "4/8")
     {
-        codingRate = LoraTxParameters::CodingRate::CODING_RATE_4_8;
+        codingRate = CodingRate::CODING_RATE_4_8;
         return is;
     }
 
