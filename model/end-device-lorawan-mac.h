@@ -69,7 +69,7 @@ class EndDeviceLorawanMac : public LorawanMac
      *
      * @param packet The packet to send.
      */
-    virtual void SendToPhy(Ptr<Packet> packet);
+    virtual void SendToPhy(Ptr<Packet> packet) = 0;
 
     /**
      * Postpone transmission to the specified time and delete previously scheduled transmissions if
@@ -84,11 +84,11 @@ class EndDeviceLorawanMac : public LorawanMac
     // Receiving methods //
     ///////////////////////
 
-    void Receive(Ptr<const Packet> packet) override;
+    virtual void Receive(Ptr<const Packet> packet) = 0;
 
-    void FailedReception(Ptr<const Packet> packet) override;
+    virtual void FailedReception(Ptr<const Packet> packet) = 0;
 
-    void TxFinished(Ptr<const Packet> packet) override;
+    virtual void TxFinished(Ptr<const Packet> packet) = 0;
 
     /////////////////////////
     // Getters and Setters //
@@ -353,7 +353,7 @@ class EndDeviceLorawanMac : public LorawanMac
      * @param waitTime Currently known minimum wait time, possibly raised by this function.
      * @return The updated minimum wait time in Time format.
      */
-    virtual Time GetNextClassTransmissionDelay(Time waitTime);
+    virtual Time GetNextClassTransmissionDelay(Time waitTime) = 0;
 
     /**
      * Find a suitable channel for transmission. The channel is chosen randomly among the

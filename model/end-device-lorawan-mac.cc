@@ -271,11 +271,6 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
 }
 
 void
-EndDeviceLorawanMac::SendToPhy(Ptr<Packet> packet)
-{
-}
-
-void
 EndDeviceLorawanMac::ExecuteADRBackoff()
 {
     NS_LOG_FUNCTION(this);
@@ -327,16 +322,6 @@ EndDeviceLorawanMac::IsPayloadSizeValid(uint32_t appPayloadSize, uint8_t dataRat
 //////////////////////////
 //  Receiving methods   //
 //////////////////////////
-
-void
-EndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
-{
-}
-
-void
-EndDeviceLorawanMac::FailedReception(Ptr<const Packet> packet)
-{
-}
 
 void
 EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
@@ -473,18 +458,6 @@ LorawanMacHeader::MType
 EndDeviceLorawanMac::GetMType()
 {
     return m_mType;
-}
-
-void
-EndDeviceLorawanMac::TxFinished(Ptr<const Packet> packet)
-{
-}
-
-Time
-EndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitTime)
-{
-    NS_LOG_FUNCTION_NOARGS();
-    return waitTime;
 }
 
 std::vector<Ptr<LogicalLoraChannel>>
