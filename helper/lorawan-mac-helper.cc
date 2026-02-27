@@ -217,7 +217,7 @@ LorawanMacHelper::ApplyCommonAlohaConfigurations(Ptr<LorawanMac> lorawanMac) con
     ///////////////////////////////////////////////////////////
     lorawanMac->SetSfForDataRate(std::vector<uint8_t>{12, 11, 10, 9, 8, 7, 7});
     lorawanMac->SetBandwidthForDataRate(
-        std::vector<double>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
+        std::vector<uint32_t>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
     lorawanMac->SetMaxMacPayloadForDataRate(
         std::vector<uint32_t>{59, 59, 59, 123, 230, 230, 230, 230});
 }
@@ -332,7 +332,7 @@ LorawanMacHelper::ApplyCommonEuConfigurations(Ptr<LorawanMac> lorawanMac) const
     ///////////////////////////////////////////////////////////
     lorawanMac->SetSfForDataRate(std::vector<uint8_t>{12, 11, 10, 9, 8, 7, 7});
     lorawanMac->SetBandwidthForDataRate(
-        std::vector<double>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
+        std::vector<uint32_t>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
     lorawanMac->SetMaxMacPayloadForDataRate(
         std::vector<uint32_t>{59, 59, 59, 123, 230, 230, 230, 230});
 }
@@ -438,7 +438,7 @@ LorawanMacHelper::ApplyCommonSingleChannelConfigurations(Ptr<LorawanMac> lorawan
     ///////////////////////////////////////////////////////////
     lorawanMac->SetSfForDataRate(std::vector<uint8_t>{12, 11, 10, 9, 8, 7, 7});
     lorawanMac->SetBandwidthForDataRate(
-        std::vector<double>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
+        std::vector<uint32_t>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
     lorawanMac->SetMaxMacPayloadForDataRate(
         std::vector<uint32_t>{59, 59, 59, 123, 230, 230, 230, 230});
 }

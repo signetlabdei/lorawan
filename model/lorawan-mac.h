@@ -136,10 +136,10 @@ class LorawanMac : public Object
      * Get the bandwidth corresponding to a data rate, based on this MAC's region.
      *
      * @param dataRate The data rate we need to convert to a bandwidth value.
-     * @return The bandwidth that corresponds to the parameter data rate in this
+     * @return The bandwidth (Hz) that corresponds to the parameter data rate in this
      * MAC's region, or 0 if the dataRate is not valid.
      */
-    double GetBandwidthFromDataRate(uint8_t dataRate);
+    uint32_t GetBandwidthFromDataRate(uint8_t dataRate);
 
     /**
      * Get the transmission power in dBm that corresponds, in this region, to the
@@ -165,9 +165,9 @@ class LorawanMac : public Object
      * data rate.
      *
      * @param bandwidthForDataRate A vector that contains at position i the
-     * bandwidth that should correspond to data rate i in this MAC's region.
+     * bandwidth (Hz) that should correspond to data rate i in this MAC's region.
      */
-    void SetBandwidthForDataRate(std::vector<double> bandwidthForDataRate);
+    void SetBandwidthForDataRate(std::vector<uint32_t> bandwidthForDataRate);
 
     /**
      * Set the maximum LoRaWAN MACPayload size for a set data rate.
@@ -252,7 +252,7 @@ class LorawanMac : public Object
     /**
      * A vector holding the bandwidth each data rate corresponds to.
      */
-    std::vector<double> m_bandwidthForDataRate;
+    std::vector<uint32_t> m_bandwidthForDataRate;
 
     /**
      * A vector holding the maximum MACPayload size that corresponds to a

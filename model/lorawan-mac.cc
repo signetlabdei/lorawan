@@ -110,7 +110,7 @@ LorawanMac::GetSfFromDataRate(uint8_t dataRate)
     return m_sfForDataRate.at(dataRate);
 }
 
-double
+uint32_t
 LorawanMac::GetBandwidthFromDataRate(uint8_t dataRate)
 {
     NS_LOG_FUNCTION(this << unsigned(dataRate));
@@ -144,7 +144,7 @@ LorawanMac::SetSfForDataRate(std::vector<uint8_t> sfForDataRate)
 }
 
 void
-LorawanMac::SetBandwidthForDataRate(std::vector<double> bandwidthForDataRate)
+LorawanMac::SetBandwidthForDataRate(std::vector<uint32_t> bandwidthForDataRate)
 {
     m_bandwidthForDataRate = bandwidthForDataRate;
 }
