@@ -253,10 +253,11 @@ class LoraPhy : public Object
     /**
      * Compute the symbol time from spreading factor and bandwidth.
      *
-     * @param txParams The parameters for transmission.
+     * @param spreadingFactor The spreading factor.
+     * @param bandwidthHz The bandwidth in Hz.
      * @return TSym, the time required to send a LoRa modulation symbol.
      */
-    static Time GetTSym(LoraTxParameters txParams);
+    static Time GetTSym(uint8_t spreadingFactor, uint32_t bandwidthHz);
 
     /**
      * Compute the time that a packet with certain characteristics will take to be

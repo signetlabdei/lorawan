@@ -138,9 +138,11 @@ LoraPhy::SetTxFinishedCallback(TxFinishedCallback callback)
 }
 
 Time
-LoraPhy::GetTSym(LoraTxParameters txParams)
+LoraPhy::GetTSym(uint8_t spreadingFactor, uint32_t bandwidthHz)
 {
-    return Seconds(pow(2, int(txParams.sf)) / (txParams.bandwidthHz));
+    auto sf = static_cast<double>(spreadingFactor);
+    auto bw = static_cast<double>(bandwidthHz);
+    return Seconds(pow(2, sf) / bw);
 }
 
 Time
@@ -151,9 +153,8 @@ LoraPhy::GetTimeOnAir(Ptr<Packet> packet, LoraTxParameters txParams)
     // The contents of this function are based on [1].
     // [1] SX1272 LoRa modem designer's guide.
 
-    // Compute the symbol duration
-    // Bandwidth is in Hz
-    double tSym = GetTSym(txParams).GetSeconds();
+    // Compute the symbol duration in seconds
+    double tSym = GetTSym(txParams.sf, txParams.bandwidthHz).GetSeconds();
 
     // Compute the preamble duration
     auto nPreamble = static_cast<double>(txParams.nPreamble);

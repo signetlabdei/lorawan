@@ -246,7 +246,7 @@ main(int argc, char* argv[])
         txParams.bandwidthHz = 125000;
         txParams.nPreamble = 8;
         txParams.crcEnabled = true;
-        txParams.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(txParams) > MilliSeconds(16);
+        txParams.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(sf, 125000) > MilliSeconds(16);
         Ptr<Packet> pkt = Create<Packet>(packetSize);
 
         LoraFrameHeader frameHdr = LoraFrameHeader();

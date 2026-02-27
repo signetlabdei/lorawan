@@ -72,15 +72,18 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
 
     NS_LOG_DEBUG("PacketToSend: " << packetToSend);
 
+    auto sf = GetSfFromDataRate(m_dataRate);
+    auto bw = GetBandwidthFromDataRate(m_dataRate);
+
     // Craft LoraTxParameters object
     LoraTxParameters params;
-    params.sf = GetSfFromDataRate(m_dataRate);
+    params.sf = sf;
     params.headerDisabled = m_headerDisabled;
     params.codingRate = m_codingRate;
-    params.bandwidthHz = GetBandwidthFromDataRate(m_dataRate);
+    params.bandwidthHz = bw;
     params.nPreamble = m_nPreambleSymbols;
     params.crcEnabled = true;
-    params.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(params) > MilliSeconds(16);
+    params.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(sf, bw) > MilliSeconds(16);
 
     // Wake up PHY layer and directly send the packet
 
