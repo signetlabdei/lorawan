@@ -55,8 +55,8 @@ EndDeviceLoraPhy::GetTypeId()
 // These will then be changed by helpers.
 EndDeviceLoraPhy::EndDeviceLoraPhy()
     : m_state(State::SLEEP),
-      m_frequencyHz(868100000),
-      m_sf(7)
+      m_rxFrequencyHz(868100000),
+      m_rxSf(7)
 {
 }
 
@@ -70,15 +70,15 @@ EndDeviceLoraPhy::~EndDeviceLoraPhy()
 const double EndDeviceLoraPhy::sensitivity[6] = {-124, -127, -130, -133, -135, -137};
 
 void
-EndDeviceLoraPhy::SetSpreadingFactor(uint8_t sf)
+EndDeviceLoraPhy::SetRxSpreadingFactor(uint8_t sf)
 {
-    m_sf = sf;
+    m_rxSf = sf;
 }
 
 uint8_t
-EndDeviceLoraPhy::GetSpreadingFactor() const
+EndDeviceLoraPhy::GetRxSpreadingFactor() const
 {
-    return m_sf;
+    return m_rxSf;
 }
 
 bool
@@ -90,13 +90,13 @@ EndDeviceLoraPhy::IsTransmitting()
 bool
 EndDeviceLoraPhy::IsOnFrequency(uint32_t frequencyHz)
 {
-    return m_frequencyHz == frequencyHz;
+    return m_rxFrequencyHz == frequencyHz;
 }
 
 void
-EndDeviceLoraPhy::SetFrequency(uint32_t frequencyHz)
+EndDeviceLoraPhy::SetRxFrequency(uint32_t frequencyHz)
 {
-    m_frequencyHz = frequencyHz;
+    m_rxFrequencyHz = frequencyHz;
 }
 
 void

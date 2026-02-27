@@ -165,7 +165,7 @@ class EndDeviceLoraPhy : public LoraPhy
      *
      * @param frequencyHz The frequency [Hz] to listen to.
      */
-    void SetFrequency(uint32_t frequencyHz);
+    void SetRxFrequency(uint32_t frequencyHz);
 
     /**
      * Set the Spreading Factor this end device will listen for.
@@ -175,14 +175,14 @@ class EndDeviceLoraPhy : public LoraPhy
      *
      * @param sf The spreading factor to listen for.
      */
-    void SetSpreadingFactor(uint8_t sf);
+    void SetRxSpreadingFactor(uint8_t sf);
 
     /**
      * Get the Spreading Factor this end device is listening for.
      *
      * @return The Spreading Factor we are listening for.
      */
-    uint8_t GetSpreadingFactor() const;
+    uint8_t GetRxSpreadingFactor() const;
 
     /**
      * Return the state this end device is currently in.
@@ -254,12 +254,9 @@ class EndDeviceLoraPhy : public LoraPhy
 
     TracedValue<State> m_state; //!< The state this PHY is currently in.
 
-    // static const double sensitivity[6]; //!< The sensitivity vector of this device to different
-    // SFs
+    uint32_t m_rxFrequencyHz; //!< The frequency [Hz] this device is listening on
 
-    uint32_t m_frequencyHz; //!< The frequency [Hz] this device is listening on
-
-    uint8_t m_sf; //!< The Spreading Factor this device is listening for
+    uint8_t m_rxSf; //!< The Spreading Factor this device is listening for
 
     /**
      * typedef for a list of EndDeviceLoraPhyListener.

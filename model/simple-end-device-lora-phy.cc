@@ -143,7 +143,8 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
         if (!IsOnFrequency(frequencyHz))
         {
             NS_LOG_INFO("Packet lost because it's on frequency "
-                        << frequencyHz << " Hz and we are listening at " << m_frequencyHz << " Hz");
+                        << frequencyHz << " Hz and we are listening at " << m_rxFrequencyHz
+                        << " Hz");
 
             // Fire the trace source for this event.
             auto nodeId = (m_device) ? m_device->GetNode()->GetId() : 0;
@@ -154,10 +155,10 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
 
         // Check Spreading Factor
         /////////////////////////
-        if (sf != m_sf)
+        if (sf != m_rxSf)
         {
             NS_LOG_INFO("Packet lost because it's using SF"
-                        << unsigned(sf) << ", while we are listening for SF" << unsigned(m_sf));
+                        << unsigned(sf) << ", while we are listening for SF" << unsigned(m_rxSf));
 
             // Fire the trace source for this event.
             auto nodeId = (m_device) ? m_device->GetNode()->GetId() : 0;

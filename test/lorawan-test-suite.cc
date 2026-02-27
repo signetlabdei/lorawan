@@ -1245,9 +1245,9 @@ PhyConnectivityTest::Reset()
     edPhy2 = CreateObject<SimpleEndDeviceLoraPhy>();
     edPhy3 = CreateObject<SimpleEndDeviceLoraPhy>();
 
-    edPhy1->SetFrequency(868100000);
-    edPhy2->SetFrequency(868100000);
-    edPhy3->SetFrequency(868100000);
+    edPhy1->SetRxFrequency(868100000);
+    edPhy2->SetRxFrequency(868100000);
+    edPhy3->SetRxFrequency(868100000);
 
     Ptr<ConstantPositionMobilityModel> mob1 = CreateObject<ConstantPositionMobilityModel>();
     Ptr<ConstantPositionMobilityModel> mob2 = CreateObject<ConstantPositionMobilityModel>();
@@ -1274,14 +1274,14 @@ PhyConnectivityTest::Reset()
     edPhy3->SetChannel(channel);
 
     // Listen for a specific SpreadingFactor
-    edPhy1->SetSpreadingFactor(12);
-    edPhy2->SetSpreadingFactor(12);
-    edPhy3->SetSpreadingFactor(12);
+    edPhy1->SetRxSpreadingFactor(12);
+    edPhy2->SetRxSpreadingFactor(12);
+    edPhy3->SetRxSpreadingFactor(12);
 
     // Listen on a specific frequency
-    edPhy1->SetFrequency(868100000);
-    edPhy2->SetFrequency(868100000);
-    edPhy3->SetFrequency(868100000);
+    edPhy1->SetRxFrequency(868100000);
+    edPhy2->SetRxFrequency(868100000);
+    edPhy3->SetRxFrequency(868100000);
 
     edPhy1->TraceConnectWithoutContext("ReceivedPacket",
                                        MakeCallback(&PhyConnectivityTest::ReceivedPacket, this));
@@ -1388,7 +1388,7 @@ PhyConnectivityTest::DoRun()
     // Packet that arrives under sensitivity is received correctly if the spreading factor increases
 
     txParams.sf = 7;
-    edPhy2->SetSpreadingFactor(7);
+    edPhy2->SetRxSpreadingFactor(7);
     DynamicCast<ConstantPositionMobilityModel>(edPhy2->GetMobility())
         ->SetPosition(Vector(2990, 0, 0));
 
@@ -1413,7 +1413,7 @@ PhyConnectivityTest::DoRun()
 
     // Try again using a packet with higher spreading factor
     txParams.sf = 8;
-    edPhy2->SetSpreadingFactor(8);
+    edPhy2->SetRxSpreadingFactor(8);
     DynamicCast<ConstantPositionMobilityModel>(edPhy2->GetMobility())
         ->SetPosition(Vector(2990, 0, 0));
 

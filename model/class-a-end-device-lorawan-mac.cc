@@ -104,7 +104,7 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
     //////////////////////////////
 
     // Switch the PHY to the channel so that it will listen here for downlink
-    DynamicCast<EndDeviceLoraPhy>(m_phy)->SetFrequency(txChannel->GetFrequency());
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->SetRxFrequency(txChannel->GetFrequency());
 
     // Instruct the PHY on the right Spreading Factor to listen for during the window
     // create a SetReplyDataRate function?
@@ -113,7 +113,7 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
                                 << ", m_rx1DrOffset: " << unsigned(m_rx1DrOffset)
                                 << ", replyDataRate: " << unsigned(replyDataRate) << ".");
 
-    DynamicCast<EndDeviceLoraPhy>(m_phy)->SetSpreadingFactor(GetSfFromDataRate(replyDataRate));
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->SetRxSpreadingFactor(GetSfFromDataRate(replyDataRate));
 }
 
 //////////////////////////
@@ -355,8 +355,8 @@ ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow()
     NS_LOG_INFO("Using parameters: " << m_secondReceiveWindowFrequencyHz << " Hz, DR"
                                      << unsigned(m_secondReceiveWindowDataRate));
 
-    DynamicCast<EndDeviceLoraPhy>(m_phy)->SetFrequency(m_secondReceiveWindowFrequencyHz);
-    DynamicCast<EndDeviceLoraPhy>(m_phy)->SetSpreadingFactor(
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->SetRxFrequency(m_secondReceiveWindowFrequencyHz);
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->SetRxSpreadingFactor(
         GetSfFromDataRate(m_secondReceiveWindowDataRate));
 
     // Calculate the duration of a single symbol for the second receive window data rate
