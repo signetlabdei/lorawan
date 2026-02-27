@@ -258,16 +258,7 @@ class EndDeviceLoraPhy : public LoraPhy
 
     uint8_t m_rxSf; //!< The Spreading Factor this device is listening for
 
-    /**
-     * typedef for a list of EndDeviceLoraPhyListener.
-     */
-    typedef std::vector<EndDeviceLoraPhyListener*> Listeners;
-    /**
-     * typedef for a list of EndDeviceLoraPhyListener iterator.
-     */
-    typedef std::vector<EndDeviceLoraPhyListener*>::iterator ListenersI;
-
-    Listeners m_listeners; //!< PHY listeners
+    std::vector<EndDeviceLoraPhyListener*> m_listeners; //!< PHY listeners
 };
 
 /**
