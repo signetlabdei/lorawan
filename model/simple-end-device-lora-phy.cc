@@ -81,8 +81,7 @@ SimpleEndDeviceLoraPhy::Send(Ptr<Packet> packet,
     Simulator::Schedule(duration, &SimpleEndDeviceLoraPhy::TxFinished, this, packet);
 
     // Call the trace source
-    auto nodeId = (m_device) ? m_device->GetNode()->GetId() : 0;
-    m_startSending(packet, nodeId);
+    m_startSending(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
 }
 
 void
@@ -147,8 +146,7 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
                         << " Hz");
 
             // Fire the trace source for this event.
-            auto nodeId = (m_device) ? m_device->GetNode()->GetId() : 0;
-            m_wrongFrequency(packet, nodeId);
+            m_wrongFrequency(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
 
             canLockOnPacket = false;
         }
@@ -161,8 +159,7 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
                         << unsigned(sf) << ", while we are listening for SF" << unsigned(m_rxSf));
 
             // Fire the trace source for this event.
-            auto nodeId = (m_device) ? m_device->GetNode()->GetId() : 0;
-            m_wrongSf(packet, nodeId);
+            m_wrongSf(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
 
             canLockOnPacket = false;
         }
@@ -176,8 +173,7 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
                         << " dBm");
 
             // Fire the trace source for this event.
-            auto nodeId = (m_device) ? m_device->GetNode()->GetId() : 0;
-            m_underSensitivity(packet, nodeId);
+            m_underSensitivity(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
 
             canLockOnPacket = false;
         }
@@ -222,8 +218,7 @@ SimpleEndDeviceLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelpe
     {
         NS_LOG_INFO("Packet destroyed by interference");
 
-        auto nodeId = (m_device) ? m_device->GetNode()->GetId() : 0;
-        m_interferedPacket(packet, nodeId);
+        m_interferedPacket(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
 
         // If there is one, perform the callback to inform the upper layer of the
         // lost packet
@@ -236,8 +231,7 @@ SimpleEndDeviceLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelpe
     {
         NS_LOG_INFO("Packet received correctly");
 
-        auto nodeId = (m_device) ? m_device->GetNode()->GetId() : 0;
-        m_successfullyReceivedPacket(packet, nodeId);
+        m_successfullyReceivedPacket(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
 
         // If there is one, perform the callback to inform the upper layer
         if (!m_rxOkCallback.IsNull())

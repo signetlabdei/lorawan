@@ -71,15 +71,8 @@ SimpleGatewayLoraPhy::Send(Ptr<Packet> packet,
         {
             // Call the callback for reception interrupted by transmission
             // Fire the trace source
-            if (m_device)
-            {
-                m_noReceptionBecauseTransmitting(currentPath->GetEvent()->GetPacket(),
-                                                 m_device->GetNode()->GetId());
-            }
-            else
-            {
-                m_noReceptionBecauseTransmitting(currentPath->GetEvent()->GetPacket(), 0);
-            }
+            m_noReceptionBecauseTransmitting(currentPath->GetEvent()->GetPacket(),
+                                             (m_device) ? m_device->GetNode()->GetId() : 0);
 
             // Cancel the scheduled EndReceive call
             Simulator::Cancel(currentPath->GetEndReceive());
@@ -98,14 +91,7 @@ SimpleGatewayLoraPhy::Send(Ptr<Packet> packet,
     m_isTransmitting = true;
 
     // Fire the trace source
-    if (m_device)
-    {
-        m_startSending(packet, m_device->GetNode()->GetId());
-    }
-    else
-    {
-        m_startSending(packet, 0);
-    }
+    m_startSending(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
 }
 
 void
@@ -129,14 +115,7 @@ SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
         m_phyRxEndTrace(packet);
 
         // Fire the trace source
-        if (m_device)
-        {
-            m_noReceptionBecauseTransmitting(packet, m_device->GetNode()->GetId());
-        }
-        else
-        {
-            m_noReceptionBecauseTransmitting(packet, 0);
-        }
+        m_noReceptionBecauseTransmitting(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
 
         return;
     }
@@ -166,14 +145,7 @@ SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
                             << unsigned(sf) << " because under the sensitivity of " << sensitivity
                             << " dBm");
 
-                if (m_device)
-                {
-                    m_underSensitivity(packet, m_device->GetNode()->GetId());
-                }
-                else
-                {
-                    m_underSensitivity(packet, 0);
-                }
+                m_underSensitivity(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
 
                 // Since the packet is below sensitivity, it makes no sense to
                 // search for another ReceivePath
@@ -204,14 +176,7 @@ SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
                 << "Hz because no suitable demodulator was found");
 
     // Fire the trace source
-    if (m_device)
-    {
-        m_noMoreDemodulators(packet, m_device->GetNode()->GetId());
-    }
-    else
-    {
-        m_noMoreDemodulators(packet, 0);
-    }
+    m_noMoreDemodulators(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
 }
 
 void
@@ -240,14 +205,7 @@ SimpleGatewayLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper:
         packet->AddPacketTag(tag);
 
         // Fire the trace source
-        if (m_device)
-        {
-            m_interferedPacket(packet, m_device->GetNode()->GetId());
-        }
-        else
-        {
-            m_interferedPacket(packet, 0);
-        }
+        m_interferedPacket(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
     }
     else // Reception was correct
     {
@@ -255,14 +213,7 @@ SimpleGatewayLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper:
                                       << " received correctly");
 
         // Fire the trace source
-        if (m_device)
-        {
-            m_successfullyReceivedPacket(packet, m_device->GetNode()->GetId());
-        }
-        else
-        {
-            m_successfullyReceivedPacket(packet, 0);
-        }
+        m_successfullyReceivedPacket(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
 
         // Forward the packet to the upper layer
         if (!m_rxOkCallback.IsNull())
