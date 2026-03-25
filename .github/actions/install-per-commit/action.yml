@@ -9,7 +9,9 @@ runs:
     - name: "Install required system packages"
       shell: bash
       run: >
-        pacman-key --init && pacman -Syu --noconfirm
+        pacman-key --init &&
+        pacman -Sy archlinux-keyring --noconfirm &&
+        pacman -Syu --noconfirm
         base-devel gcc clang libc++ cmake ninja ccache
         python
         wget

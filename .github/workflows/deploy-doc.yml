@@ -24,7 +24,7 @@ jobs:
       - name: "Install additional dependencies for Doxygen"
         run: |
           pacman -Syu --noconfirm base-devel ninja cmake ccache
-          pacman --noconfirm -U https://archive.archlinux.org/packages/d/doxygen/doxygen-1.15.0-2-x86_64.pkg.tar.zst
+          pacman --noconfirm -U https://archive.archlinux.org/packages/d/doxygen/doxygen-1.16.1-3-x86_64.pkg.tar.zst
       - name: "Build ns-3"
         env:
           BUILD_ID: per-commit-g++-debug
