@@ -84,7 +84,7 @@ The module includes the following examples:
 * `adr-example`
 * `aloha-throughput`
 * `frame-counter-update`
-* `lora-energy-model-example`
+* `lorawan-energy-model-example`
 * `parallel-reception-example`
 
 Examples can be run via the `./ns3 run example-name` command (refer to `./ns3 run --help` for more options).
