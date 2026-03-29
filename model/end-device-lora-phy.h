@@ -140,7 +140,8 @@ class EndDeviceLoraPhy : public LoraPhy
                       double rxPowerDbm,
                       uint8_t sf,
                       Time duration,
-                      uint32_t frequencyHz) override = 0;
+                      uint32_t frequencyHz,
+                      uint32_t bandwidthHz) override = 0;
 
     // Implementation of LoraPhy's pure virtual functions
     void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) override = 0;
@@ -154,6 +155,15 @@ class EndDeviceLoraPhy : public LoraPhy
     // Implementation of LoraPhy's pure virtual functions
     bool IsOnFrequency(uint32_t frequencyHz) override;
 
+    /**
+     * Checks whether the PHY is tuned in the given bandwidth>
+     *
+     * @param bandwidthHz The bandwidth to check
+     * @retval true If this PHY is able to lock on the given bandwidth
+     * @retval false If the PHY is **NOT** able to lock on the given bandwidth
+     */
+    bool IsOnBandwidth(uint32_t bandwidthHz) const;
+
     // Implementation of LoraPhy's pure virtual functions
     bool IsTransmitting() override;
 
@@ -166,6 +176,24 @@ class EndDeviceLoraPhy : public LoraPhy
      * @param frequencyHz The frequency [Hz] to listen to.
      */
     void SetFrequency(uint32_t frequencyHz);
+
+    /**
+     * Set the channel bandwidth this end device will listen on.
+     *
+     * Should a packet be transmitted using a different bandwidth than this
+     * EndDeviceLoraPhy is listening on, the packet will be discarded even if
+     * the frequency matches.
+     *
+     * @param bandwidthHz The bandwidth [Hz] to listen to.
+     */
+    void SetBandwidth(uint32_t bandwidthHz);
+
+    /**
+     * Get the channel bandwidth this end device will listen on.
+     *
+     * @return The bandwidth [Hz] the PHY is listening to.
+     */
+    uint32_t GetBandwidth() const;
 
     /**
      * Set the Spreading Factor this end device will listen for.
@@ -252,12 +280,21 @@ class EndDeviceLoraPhy : public LoraPhy
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_wrongFrequency;
 
+    /**
+     * Trace source for when a packet is lost because it was transmitted on the
+     * same frequency different from the one this EndDeviceLoraPhy was configured to
+     * listen on.
+     */
+    TracedCallback<Ptr<const Packet>, uint32_t> m_wrongBandwidth;
+
     TracedValue<State> m_state; //!< The state this PHY is currently in.
 
     // static const double sensitivity[6]; //!< The sensitivity vector of this device to different
     // SFs
 
     uint32_t m_frequencyHz; //!< The frequency [Hz] this device is listening on
+
+    uint32_t m_bandwidthHz; //!< The channel bandwidth [Hz] this device is listening on
 
     uint8_t m_sf; //!< The Spreading Factor this device is listening for
 

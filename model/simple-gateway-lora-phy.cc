@@ -113,7 +113,8 @@ SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
                                    double rxPowerDbm,
                                    uint8_t sf,
                                    Time duration,
-                                   uint32_t frequencyHz)
+                                   uint32_t frequencyHz,
+                                   uint32_t bandwidthHz)
 {
     NS_LOG_FUNCTION(this << packet << rxPowerDbm << duration << frequencyHz);
 

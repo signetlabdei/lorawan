@@ -39,7 +39,8 @@ class SimpleEndDeviceLoraPhy : public EndDeviceLoraPhy
                       double rxPowerDbm,
                       uint8_t sf,
                       Time duration,
-                      uint32_t frequencyHz) override;
+                      uint32_t frequencyHz,
+                      uint32_t bandwidthHz) override;
 
     // Implementation of LoraPhy's pure virtual functions
     void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) override;
