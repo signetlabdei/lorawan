@@ -112,4 +112,5 @@ build_lib(
     test/network-status-test-suite.cc
     test/network-scheduler-test-suite.cc
     test/network-server-test-suite.cc
+    test/lora-radio-energy-model-test-suite.cc
 )

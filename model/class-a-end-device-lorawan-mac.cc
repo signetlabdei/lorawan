@@ -331,6 +331,9 @@ ClassAEndDeviceLorawanMac::CloseFirstReceiveWindow()
         // Turn PHY layer to SLEEP
         phy->SwitchToSleep();
         break;
+    case EndDeviceLoraPhy::State::OFF:
+        NS_LOG_INFO("PHY was in OFF mode when attempting to close a receive window.");
+        break;
     }
 }
 
@@ -396,6 +399,9 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
     case EndDeviceLoraPhy::State::STANDBY:
         // Turn PHY layer to sleep
         phy->SwitchToSleep();
+        break;
+    case EndDeviceLoraPhy::State::OFF:
+        NS_LOG_INFO("PHY was in OFF mode when attempting to close the 2nd receive window.");
         break;
     }
 

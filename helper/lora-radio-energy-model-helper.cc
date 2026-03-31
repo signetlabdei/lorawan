@@ -81,15 +81,23 @@ LoraRadioEnergyModelHelper::DoInstall(Ptr<NetDevice> device, Ptr<energy::EnergyS
     Ptr<Node> node = device->GetNode();
     Ptr<LoraRadioEnergyModel> model = m_radioEnergy.Create<LoraRadioEnergyModel>();
     NS_ASSERT(model);
-    // set energy source pointer
-    model->SetEnergySource(source);
 
     // set energy depletion callback
-    // if none is specified, make a callback to EndDeviceLoraPhy::SetSleepMode
+    // if none is specified, make a callback to EndDeviceLoraPhy::SwitchToOff
     Ptr<LoraNetDevice> loraDevice = DynamicCast<LoraNetDevice>(device);
     Ptr<EndDeviceLoraPhy> loraPhy = DynamicCast<EndDeviceLoraPhy>(loraDevice->GetPhy());
+    if (model->GetEnergyDepletionCallback().IsNull())
+    {
+        model->SetEnergyDepletionCallback(MakeCallback(&EndDeviceLoraPhy::SwitchToOff, loraPhy));
+    }
     // add model to device model list in energy source
     source->AppendDeviceEnergyModel(model);
+    // Set energy source pointer. This is done after setting the depletion callback and being
+    // appended to the source, since SetEnergySource will schedule SwitchToOff event, and then may
+    // trigger the callback.
+    model->SetEnergySource(source);
+    // Set node pointer in energy source
+    source->SetNode(node);
     // create and register energy model phy listener
     loraPhy->RegisterListener(model->GetPhyListener());
 

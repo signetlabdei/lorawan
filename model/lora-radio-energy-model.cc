@@ -207,31 +207,15 @@ LoraRadioEnergyModel::SetTxCurrentFromModel(double txPowerDbm)
 void
 LoraRadioEnergyModel::ChangeState(int newState)
 {
-    NS_LOG_FUNCTION(this << EndDeviceLoraPhy::State(newState));
+    const auto newPhyState = EndDeviceLoraPhy::State(newState);
+    NS_LOG_FUNCTION(this << newPhyState);
 
     Time duration = Now() - m_lastUpdateTime;
     NS_ASSERT(duration.IsPositive()); // check if duration is valid
 
     // energy to decrease = current * voltage * time
-    double energyToDecrease = 0.0;
     double supplyVoltage = m_source->GetSupplyVoltage();
-    switch (m_currentState)
-    {
-    case EndDeviceLoraPhy::State::STANDBY:
-        energyToDecrease = duration.GetSeconds() * m_idleCurrentA * supplyVoltage;
-        break;
-    case EndDeviceLoraPhy::State::TX:
-        energyToDecrease = duration.GetSeconds() * m_txCurrentA * supplyVoltage;
-        break;
-    case EndDeviceLoraPhy::State::RX:
-        energyToDecrease = duration.GetSeconds() * m_rxCurrentA * supplyVoltage;
-        break;
-    case EndDeviceLoraPhy::State::SLEEP:
-        energyToDecrease = duration.GetSeconds() * m_sleepCurrentA * supplyVoltage;
-        break;
-    default:
-        NS_FATAL_ERROR("LoraRadioEnergyModel:Undefined radio state: " << m_currentState);
-    }
+    double energyToDecrease = duration.GetSeconds() * GetStateA(m_currentState) * supplyVoltage;
 
     // update total energy consumption
     m_totalEnergyConsumption += energyToDecrease;
@@ -254,7 +238,7 @@ LoraRadioEnergyModel::ChangeState(int newState)
     if (!m_isSupersededChangeState)
     {
         // update current state & last update time stamp
-        SetLoraRadioState(EndDeviceLoraPhy::State(newState));
+        SetLoraRadioState(newPhyState);
 
         // some debug message
         NS_LOG_DEBUG("LoraRadioEnergyModel:Total energy consumption is " << m_totalEnergyConsumption
@@ -304,6 +288,13 @@ LoraRadioEnergyModel::GetPhyListener()
     return m_listener;
 }
 
+LoraRadioEnergyModel::LoraRadioEnergyDepletionCallback
+LoraRadioEnergyModel::GetEnergyDepletionCallback() const
+{
+    NS_LOG_FUNCTION(this);
+    return m_energyDepletionCallback;
+}
+
 /*
  * Private functions start here.
  */
@@ -317,10 +308,10 @@ LoraRadioEnergyModel::DoDispose()
 }
 
 double
-LoraRadioEnergyModel::DoGetCurrentA() const
+LoraRadioEnergyModel::GetStateA(EndDeviceLoraPhy::State state) const
 {
     NS_LOG_FUNCTION(this);
-    switch (m_currentState)
+    switch (state)
     {
     case EndDeviceLoraPhy::State::STANDBY:
         return m_idleCurrentA;
@@ -330,9 +321,18 @@ LoraRadioEnergyModel::DoGetCurrentA() const
         return m_rxCurrentA;
     case EndDeviceLoraPhy::State::SLEEP:
         return m_sleepCurrentA;
+    case EndDeviceLoraPhy::State::OFF:
+        return 0.0;
     default:
-        NS_FATAL_ERROR("LoraRadioEnergyModel:Undefined radio state:" << m_currentState);
+        NS_FATAL_ERROR("LoraRadioEnergyModel:Undefined radio state:" << state);
     }
+}
+
+double
+LoraRadioEnergyModel::DoGetCurrentA() const
+{
+    NS_LOG_FUNCTION(this);
+    return GetStateA(m_currentState);
 }
 
 void
@@ -340,7 +340,7 @@ LoraRadioEnergyModel::SetLoraRadioState(const EndDeviceLoraPhy::State state)
 {
     NS_LOG_FUNCTION(this << state);
     m_currentState = state;
-    NS_LOG_DEBUG("Switching to state: " << state);
+    NS_LOG_DEBUG("Switching to state: " << state << " at time = " << Now().As(Time::S));
 }
 
 // -------------------------------------------------------------------------- //
@@ -421,6 +421,17 @@ LoraRadioEnergyModelPhyListener::NotifyStandby()
         NS_FATAL_ERROR("LoraRadioEnergyModelPhyListener:Change state callback not set!");
     }
     m_changeStateCallback(int(EndDeviceLoraPhy::State::STANDBY));
+}
+
+void
+LoraRadioEnergyModelPhyListener::NotifyOff()
+{
+    NS_LOG_FUNCTION(this);
+    if (m_changeStateCallback.IsNull())
+    {
+        NS_FATAL_ERROR("LoraRadioEnergyModelPhyListener:Change state callback not set!");
+    }
+    m_changeStateCallback(int(EndDeviceLoraPhy::State::OFF));
 }
 
 /*

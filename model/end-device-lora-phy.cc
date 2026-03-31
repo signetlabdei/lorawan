@@ -118,6 +118,13 @@ EndDeviceLoraPhy::SwitchToStandby()
 {
     NS_LOG_FUNCTION_NOARGS();
 
+    // Can not switch to STANDBY from OFF
+    if (m_state == State::OFF)
+    {
+        NS_LOG_INFO("Cannot switch to STANDBY from OFF state");
+        return;
+    }
+
     m_state = State::STANDBY;
 
     // Notify listeners of the state change
@@ -150,6 +157,13 @@ EndDeviceLoraPhy::SwitchToTx(double txPowerDbm)
 
     NS_ASSERT(m_state != State::RX);
 
+    // Can not switch to TX from OFF
+    if (m_state == State::OFF)
+    {
+        NS_LOG_INFO("Cannot switch to STANDBY from OFF state");
+        return;
+    }
+
     m_state = State::TX;
 
     // Notify listeners of the state change
@@ -164,6 +178,15 @@ EndDeviceLoraPhy::SwitchToSleep()
 {
     NS_LOG_FUNCTION_NOARGS();
 
+    // Can not switch to SLEEP from OFF
+    // MAC may call SwitchToSleep after TX, but at this time energy is depleted and the state is
+    // already OFF
+    if (m_state == State::OFF)
+    {
+        NS_LOG_INFO("Cannot switch to STANDBY from OFF state");
+        return;
+    }
+
     NS_ASSERT(m_state == State::STANDBY);
 
     m_state = State::SLEEP;
@@ -172,6 +195,23 @@ EndDeviceLoraPhy::SwitchToSleep()
     for (auto i = m_listeners.begin(); i != m_listeners.end(); i++)
     {
         (*i)->NotifySleep();
+    }
+}
+
+void
+EndDeviceLoraPhy::SwitchToOff()
+{
+    NS_LOG_FUNCTION_NOARGS();
+
+    // TODO: If in RX or TX, we need to stop those operations first.
+    // Maybe we can use a Tag to mark the packet to be incomplete.
+
+    m_state = State::OFF;
+
+    // Notify listeners of the state change
+    for (auto i = m_listeners.begin(); i != m_listeners.end(); i++)
+    {
+        (*i)->NotifyOff();
     }
 }
 
@@ -212,6 +252,8 @@ operator<<(std::ostream& os, const EndDeviceLoraPhy::State& state)
         return (os << "TX");
     case EndDeviceLoraPhy::State::RX:
         return (os << "RX");
+    case EndDeviceLoraPhy::State::OFF:
+        return (os << "OFF");
     default:
         NS_FATAL_ERROR("Invalid LoRa device PHY state");
     }
