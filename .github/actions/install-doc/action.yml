@@ -9,7 +9,9 @@ runs:
     - name: "Install required system packages"
       shell: bash
       run: >
-        pacman-key --init && pacman -Syu --noconfirm
+        pacman-key --init &&
+        pacman -Sy archlinux-keyring --noconfirm &&
+        pacman -Syu --noconfirm
         python python-sphinx make libxml2-legacy
         graphviz imagemagick libx264
         texlive-basic texlive-bin texlive-binextra texlive-latexextra texlive-fontutils texlive-fontsrecommended texlive-mathscience
