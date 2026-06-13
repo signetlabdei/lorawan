@@ -160,8 +160,11 @@ SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
                 m_occupiedReceptionPaths++;
 
                 // Schedule the end of the reception of the packet
-                EventId endReceiveEventId =
-                    Simulator::Schedule(duration, &LoraPhy::EndReceive, this, packet, event);
+                EventId endReceiveEventId = Simulator::Schedule(duration,
+                                                                &SimpleGatewayLoraPhy::EndReceive,
+                                                                this,
+                                                                packet,
+                                                                event);
 
                 currentPath->SetEndReceive(endReceiveEventId);
 

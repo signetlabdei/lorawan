@@ -20,6 +20,7 @@ NS_OBJECT_ENSURE_REGISTERED(GatewayLoraPhy);
 /**************************************
  *    ReceptionPath implementation    *
  **************************************/
+
 GatewayLoraPhy::ReceptionPath::ReceptionPath()
     : m_available(true),
       m_event(nullptr),
@@ -112,17 +113,39 @@ GatewayLoraPhy::GetTypeId()
 GatewayLoraPhy::GatewayLoraPhy()
     : m_isTransmitting(false)
 {
-    NS_LOG_FUNCTION_NOARGS();
+    NS_LOG_FUNCTION(this);
 }
 
 GatewayLoraPhy::~GatewayLoraPhy()
 {
-    NS_LOG_FUNCTION_NOARGS();
+    NS_LOG_FUNCTION(this);
 }
 
 // Uplink sensitivity (Source: SX1301 datasheet)
 // {SF7, SF8, SF9, SF10, SF11, SF12}
 const double GatewayLoraPhy::sensitivity[6] = {-130.0, -132.5, -135.0, -137.5, -140.0, -142.5};
+
+bool
+GatewayLoraPhy::IsTransmitting() const
+{
+    NS_LOG_FUNCTION(this);
+    return m_isTransmitting;
+}
+
+bool
+GatewayLoraPhy::IsOnFrequency(uint32_t frequencyHz) const
+{
+    NS_LOG_FUNCTION(this << frequencyHz);
+    // Look into our list of frequencies
+    for (auto& f : m_frequenciesHz)
+    {
+        if (f == frequencyHz)
+        {
+            return true;
+        }
+    }
+    return false;
+}
 
 void
 GatewayLoraPhy::AddReceptionPath()
@@ -146,12 +169,6 @@ GatewayLoraPhy::TxFinished(Ptr<const Packet> packet)
     m_isTransmitting = false;
 }
 
-bool
-GatewayLoraPhy::IsTransmitting()
-{
-    return m_isTransmitting;
-}
-
 void
 GatewayLoraPhy::AddFrequency(uint32_t frequencyHz)
 {
@@ -160,22 +177,6 @@ GatewayLoraPhy::AddFrequency(uint32_t frequencyHz)
     m_frequenciesHz.push_back(frequencyHz);
 
     NS_ASSERT(m_frequenciesHz.size() <= 8);
-}
-
-bool
-GatewayLoraPhy::IsOnFrequency(uint32_t frequencyHz)
-{
-    NS_LOG_FUNCTION(this << frequencyHz);
-
-    // Look into our list of frequencies
-    for (auto& f : m_frequenciesHz)
-    {
-        if (f == frequencyHz)
-        {
-            return true;
-        }
-    }
-    return false;
 }
 
 } // namespace lorawan

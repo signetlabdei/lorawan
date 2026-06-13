@@ -81,15 +81,6 @@ class LoraPhy : public Object
 {
   public:
     /**
-     *  Register this type.
-     *  @return The object TypeId.
-     */
-    static TypeId GetTypeId();
-
-    LoraPhy();           //!< Default constructor
-    ~LoraPhy() override; //!< Destructor
-
-    /**
      * Type definition for a callback for when a packet is correctly received.
      *
      * This callback can be set by an upper layer that wishes to be informed of
@@ -114,6 +105,51 @@ class LoraPhy : public Object
     typedef Callback<void, Ptr<const Packet>> TxFinishedCallback;
 
     /**
+     * Compute the symbol time from spreading factor and bandwidth.
+     *
+     * @param spreadingFactor The spreading factor.
+     * @param bandwidthHz The bandwidth in Hz.
+     * @return TSym, the time required to send a LoRa modulation symbol.
+     */
+    static Time GetTSym(uint8_t spreadingFactor, uint32_t bandwidthHz);
+
+    /**
+     * Compute the time that a packet with certain characteristics will take to be
+     * transmitted.
+     *
+     * Besides from the ones saved in LoraTxParameters, the packet's payload
+     * (obtained through a GetSize () call to account for the presence of Headers
+     * and Trailers, too) also influences the packet transmit time.
+     *
+     * @param packet The packet that needs to be transmitted.
+     * @param txParams The set of parameters that will be used for transmission.
+     * @return The time necessary to transmit the packet.
+     */
+    static Time GetTimeOnAir(Ptr<Packet> packet, LoraTxParameters txParams);
+
+    /**
+     *  Register this type.
+     *  @return The object TypeId.
+     */
+    static TypeId GetTypeId();
+
+    LoraPhy();           //!< Default constructor
+    ~LoraPhy() override; //!< Destructor
+
+    /**
+     * Instruct the PHY to send a packet according to some parameters.
+     *
+     * @param packet The packet to send.
+     * @param txParams The desired transmission parameters.
+     * @param frequencyHz The frequency on which to transmit.
+     * @param txPowerDbm The power in dBm with which to transmit the packet.
+     */
+    virtual void Send(Ptr<Packet> packet,
+                      LoraTxParameters txParams,
+                      uint32_t frequencyHz,
+                      double txPowerDbm) = 0;
+
+    /**
      * Start receiving a packet.
      *
      * This method is typically called by LoraChannel.
@@ -132,39 +168,12 @@ class LoraPhy : public Object
                               uint32_t frequencyHz) = 0;
 
     /**
-     * Finish reception of a packet.
-     *
-     * This method is scheduled by StartReceive, based on the packet duration. By
-     * passing a LoraInterferenceHelper Event to this method, the class will be
-     * able to identify the packet that is being received among all those that
-     * were registered as interference by StartReceive.
-     *
-     * @param packet The received packet.
-     * @param event The event that is tied to this packet in the
-     * LoraInterferenceHelper.
-     */
-    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) = 0;
-
-    /**
-     * Instruct the PHY to send a packet according to some parameters.
-     *
-     * @param packet The packet to send.
-     * @param txParams The desired transmission parameters.
-     * @param frequencyHz The frequency on which to transmit.
-     * @param txPowerDbm The power in dBm with which to transmit the packet.
-     */
-    virtual void Send(Ptr<Packet> packet,
-                      LoraTxParameters txParams,
-                      uint32_t frequencyHz,
-                      double txPowerDbm) = 0;
-
-    /**
      * Whether this device is transmitting or not.
      *
      * @return True if the device is currently transmitting a packet, false
      * otherwise.
      */
-    virtual bool IsTransmitting() = 0;
+    virtual bool IsTransmitting() const = 0;
 
     /**
      * Whether this device is listening on the specified frequency or not.
@@ -173,7 +182,17 @@ class LoraPhy : public Object
      * @return True if the device is listening on that frequency, false
      * otherwise.
      */
-    virtual bool IsOnFrequency(uint32_t frequencyHz) = 0;
+    virtual bool IsOnFrequency(uint32_t frequencyHz) const = 0;
+
+    /**
+     * Set the callback to call after transmission of a packet.
+     *
+     * This method is typically called by an upper MAC layer that wants to be
+     * notified after the transmission of a packet.
+     *
+     * @param callback The TxFinishedCallback instance.
+     */
+    void SetTxFinishedCallback(TxFinishedCallback callback);
 
     /**
      * Set the callback to call upon successful reception of a packet.
@@ -195,16 +214,6 @@ class LoraPhy : public Object
      * @param callback The RxFailedCallback instance.
      */
     void SetReceiveFailedCallback(RxFailedCallback callback);
-
-    /**
-     * Set the callback to call after transmission of a packet.
-     *
-     * This method is typically called by an upper MAC layer that wants to be
-     * notified after the transmission of a packet.
-     *
-     * @param callback The TxFinishedCallback instance.
-     */
-    void SetTxFinishedCallback(TxFinishedCallback callback);
 
     /**
      * Get the mobility model associated to this PHY.
@@ -250,42 +259,24 @@ class LoraPhy : public Object
      */
     void SetDevice(Ptr<NetDevice> device);
 
-    /**
-     * Compute the symbol time from spreading factor and bandwidth.
-     *
-     * @param spreadingFactor The spreading factor.
-     * @param bandwidthHz The bandwidth in Hz.
-     * @return TSym, the time required to send a LoRa modulation symbol.
-     */
-    static Time GetTSym(uint8_t spreadingFactor, uint32_t bandwidthHz);
-
-    /**
-     * Compute the time that a packet with certain characteristics will take to be
-     * transmitted.
-     *
-     * Besides from the ones saved in LoraTxParameters, the packet's payload
-     * (obtained through a GetSize () call to account for the presence of Headers
-     * and Trailers, too) also influences the packet transmit time.
-     *
-     * @param packet The packet that needs to be transmitted.
-     * @param txParams The set of parameters that will be used for transmission.
-     * @return The time necessary to transmit the packet.
-     */
-    static Time GetTimeOnAir(Ptr<Packet> packet, LoraTxParameters txParams);
-
-  private:
-    /**
-     * Internal call when transmission of a packet finishes.
-     *
-     * Calls to this function are typically scheduled by the Send function.
-     *
-     * @param packet A pointer to the packet that has been transmitted.
-     */
-    virtual void TxFinished(Ptr<const Packet> packet) = 0;
-
-    Ptr<MobilityModel> m_mobility; //!< The mobility model associated to this PHY.
-
   protected:
+    // Callbacks
+
+    /**
+     * The callback to perform upon the end of a transmission.
+     */
+    TxFinishedCallback m_txFinishedCallback;
+
+    /**
+     * The callback to perform upon correct reception of a packet.
+     */
+    RxOkCallback m_rxOkCallback;
+
+    /**
+     * The callback to perform upon failed reception of a packet we were locked on.
+     */
+    RxFailedCallback m_rxFailedCallback;
+
     // Member objects
 
     Ptr<NetDevice> m_device; //!< The net device this PHY is attached to.
@@ -329,22 +320,30 @@ class LoraPhy : public Object
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_interferedPacket;
 
-    // Callbacks
+  private:
+    /**
+     * Internal call when transmission of a packet finishes.
+     *
+     * Calls to this function are typically scheduled by the Send function.
+     *
+     * @param packet A pointer to the packet that has been transmitted.
+     */
+    virtual void TxFinished(Ptr<const Packet> packet) = 0;
 
     /**
-     * The callback to perform upon correct reception of a packet.
+     * Finish reception of a packet.
+     *
+     * This method is scheduled by StartReceive, based on the packet duration. By
+     * passing a LoraInterferenceHelper Event to this method, the class will be
+     * able to identify the packet that is being received among all those that
+     * were registered as interference by StartReceive.
+     *
+     * @param packet The received packet.
+     * @param event The event tied to this packet in the LoraInterferenceHelper.
      */
-    RxOkCallback m_rxOkCallback;
+    virtual void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) = 0;
 
-    /**
-     * The callback to perform upon failed reception of a packet we were locked on.
-     */
-    RxFailedCallback m_rxFailedCallback;
-
-    /**
-     * The callback to perform upon the end of a transmission.
-     */
-    TxFinishedCallback m_txFinishedCallback;
+    Ptr<MobilityModel> m_mobility; //!< The mobility model associated to this PHY.
 };
 
 } // namespace lorawan

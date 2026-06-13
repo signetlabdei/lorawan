@@ -135,27 +135,24 @@ class EndDeviceLoraPhy : public LoraPhy
     EndDeviceLoraPhy();           //!< Default constructor
     ~EndDeviceLoraPhy() override; //!< Destructor
 
-    // Implementation of LoraPhy's pure virtual functions
+    // Forward LoraPhy's pure virtual function
+    void Send(Ptr<Packet> packet,
+              LoraTxParameters txParams,
+              uint32_t frequencyHz,
+              double txPowerDbm) override = 0;
+
+    // Forward LoraPhy's pure virtual function
     void StartReceive(Ptr<Packet> packet,
                       double rxPowerDbm,
                       uint8_t sf,
                       Time duration,
                       uint32_t frequencyHz) override = 0;
 
-    // Implementation of LoraPhy's pure virtual functions
-    void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) override = 0;
+    // Implementation of LoraPhy's pure virtual function
+    bool IsTransmitting() const override;
 
-    // Implementation of LoraPhy's pure virtual functions
-    void Send(Ptr<Packet> packet,
-              LoraTxParameters txParams,
-              uint32_t frequencyHz,
-              double txPowerDbm) override = 0;
-
-    // Implementation of LoraPhy's pure virtual functions
-    bool IsOnFrequency(uint32_t frequencyHz) override;
-
-    // Implementation of LoraPhy's pure virtual functions
-    bool IsTransmitting() override;
+    // Implementation of LoraPhy's pure virtual function
+    bool IsOnFrequency(uint32_t frequencyHz) const override;
 
     /**
      * Set the frequency this end device will listen on.
@@ -220,11 +217,7 @@ class EndDeviceLoraPhy : public LoraPhy
     static const double sensitivity[6]; //!< The sensitivity vector of this device to different SFs
 
   protected:
-    /**
-     * Signals the end of a transmission by the EndDeviceLoraPhy.
-     *
-     * @param packet A pointer to the Packet transmitted.
-     */
+    // Implementation of LoraPhy's pure virtual function
     void TxFinished(Ptr<const Packet> packet) override;
 
     /**
@@ -259,6 +252,10 @@ class EndDeviceLoraPhy : public LoraPhy
     uint8_t m_rxSf; //!< The Spreading Factor this device is listening for
 
     std::vector<EndDeviceLoraPhyListener*> m_listeners; //!< PHY listeners
+
+  private:
+    // Implementation of LoraPhy's pure virtual function
+    void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) override = 0;
 };
 
 /**

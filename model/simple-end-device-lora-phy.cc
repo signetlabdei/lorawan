@@ -189,7 +189,7 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
             // Schedule the end of the reception of the packet
             NS_LOG_INFO("Scheduling reception of a packet. End in " << duration.As(Time::S));
 
-            Simulator::Schedule(duration, &LoraPhy::EndReceive, this, packet, event);
+            Simulator::Schedule(duration, &SimpleEndDeviceLoraPhy::EndReceive, this, packet, event);
 
             // Fire the beginning of reception trace source
             m_phyRxBeginTrace(packet);

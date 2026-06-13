@@ -82,14 +82,16 @@ EndDeviceLoraPhy::GetRxSpreadingFactor() const
 }
 
 bool
-EndDeviceLoraPhy::IsTransmitting()
+EndDeviceLoraPhy::IsTransmitting() const
 {
+    NS_LOG_FUNCTION(this);
     return m_state == State::TX;
 }
 
 bool
-EndDeviceLoraPhy::IsOnFrequency(uint32_t frequencyHz)
+EndDeviceLoraPhy::IsOnFrequency(uint32_t frequencyHz) const
 {
+    NS_LOG_FUNCTION(this);
     return m_rxFrequencyHz == frequencyHz;
 }
 
