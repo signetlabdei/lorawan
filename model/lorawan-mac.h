@@ -44,6 +44,13 @@ class LorawanMac : public Object
     typedef Callback<void, Ptr<Packet>> ReceiveCallback;
 
     /**
+     * Matrix structure to store possible data rate value to be used by a LoRaWAN end device for
+     * listening during the RX1 receive window. It is a function of the uplink data rate and the
+     * RX1DROffset [0:5].
+     */
+    typedef std::array<std::array<uint8_t, 6>, 8> ReplyDataRateMatrix;
+
+    /**
      *  Register this type.
      *  @return The object TypeId.
      */
@@ -51,13 +58,6 @@ class LorawanMac : public Object
 
     LorawanMac();           //!< Default constructor
     ~LorawanMac() override; //!< Destructor
-
-    /**
-     * Matrix structure to store possible data rate value to be used by a LoRaWAN end device for
-     * listening during the RX1 receive window. It is a function of the uplink data rate and the
-     * RX1DROffset [0:5].
-     */
-    typedef std::array<std::array<uint8_t, 6>, 8> ReplyDataRateMatrix;
 
     /**
      * Set the underlying PHY layer.
@@ -71,7 +71,7 @@ class LorawanMac : public Object
      *
      * @return The PHY layer that this MAC is connected to.
      */
-    Ptr<LoraPhy> GetPhy();
+    Ptr<LoraPhy> GetPhy() const;
 
     /**
      * Send a packet.
@@ -123,14 +123,14 @@ class LorawanMac : public Object
      *
      * @return The NetDevice this MAC layer will refer to.
      */
-    Ptr<NetDevice> GetDevice();
+    Ptr<NetDevice> GetDevice() const;
 
     /**
      * Get the logical lora channel helper associated with this MAC.
      *
      * @return A Ptr to the instance of LogicalLoraChannelHelper that this MAC is using.
      */
-    Ptr<LogicalLoraChannelHelper> GetLogicalLoraChannelHelper();
+    Ptr<LogicalLoraChannelHelper> GetLogicalLoraChannelHelper() const;
 
     /**
      * Set the LogicalLoraChannelHelper this MAC instance will use.
@@ -147,7 +147,7 @@ class LorawanMac : public Object
      * @return The spreading factor that corresponds to a data rate in this MAC's region, or 0
      * if the dataRate is not valid.
      */
-    uint8_t GetSfFromDataRate(uint8_t dataRate);
+    uint8_t GetSfFromDataRate(uint8_t dataRate) const;
 
     /**
      * Get the bandwidth corresponding to a data rate, based on this MAC's region.
@@ -156,7 +156,7 @@ class LorawanMac : public Object
      * @return The bandwidth (Hz) that corresponds to the parameter data rate in this
      * MAC's region, or 0 if the dataRate is not valid.
      */
-    uint32_t GetBandwidthFromDataRate(uint8_t dataRate);
+    uint32_t GetBandwidthFromDataRate(uint8_t dataRate) const;
 
     /**
      * Get the transmission power in dBm that corresponds, in this region, to the
@@ -167,7 +167,7 @@ class LorawanMac : public Object
      * @return The corresponding transmission power in dBm ERP, or -1 if the encoded
      * power was not recognized as valid.
      */
-    double GetDbmForTxPower(uint8_t txPower);
+    double GetDbmForTxPower(uint8_t txPower) const;
 
     /**
      * Set the vector to use to check up correspondence between spreading factor and data rate.
