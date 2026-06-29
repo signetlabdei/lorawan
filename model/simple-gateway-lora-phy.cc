@@ -229,7 +229,7 @@ SimpleGatewayLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper:
             // quality.
             LoraTag tag;
             packet->RemovePacketTag(tag);
-            tag.SetReceivePower(event->GetRxPowerdBm());
+            tag.SetReceivePower(event->GetRxPowerDbm());
             tag.SetFrequency(event->GetFrequency());
             packet->AddPacketTag(tag);
 

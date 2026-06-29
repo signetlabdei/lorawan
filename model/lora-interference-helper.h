@@ -84,7 +84,7 @@ class LoraInterferenceHelper
          *
          * @return The power in dBm as a double.
          */
-        double GetRxPowerdBm() const;
+        double GetRxPowerDbm() const;
 
         /**
          * Get the spreading factor used by this signal.
@@ -118,7 +118,7 @@ class LoraInterferenceHelper
         Time m_startTime;       //!< The time this signal begins (at the device).
         Time m_endTime;         //!< The time this signal ends (at the device).
         uint8_t m_sf;           //!< The spreading factor of this signal.
-        double m_rxPowerdBm;    //!< The power of this event in dBm (at the device).
+        double m_rxPowerDbm;    //!< The power of this event in dBm (at the device).
         Ptr<Packet> m_packet;   //!< The packet this event was generated for.
         uint32_t m_frequencyHz; //!< The carrier frequency [Hz] this event was on.
     };

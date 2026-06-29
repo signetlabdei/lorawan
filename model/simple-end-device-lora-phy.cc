@@ -238,7 +238,7 @@ SimpleEndDeviceLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelpe
         {
             LoraTag tag;
             packet->RemovePacketTag(tag);
-            tag.SetReceivePower(event->GetRxPowerdBm());
+            tag.SetReceivePower(event->GetRxPowerDbm());
             tag.SetFrequency(event->GetFrequency());
             packet->AddPacketTag(tag);
             m_rxOkCallback(packet);
