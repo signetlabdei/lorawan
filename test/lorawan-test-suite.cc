@@ -305,7 +305,7 @@ HeaderTest::DoRun()
     // Test the LorawanMacHeader class //
     //////////////////////////////////
     LorawanMacHeader macHdr;
-    macHdr.SetMType(LorawanMacHeader::CONFIRMED_DATA_DOWN);
+    macHdr.SetFType(LorawanMacHeader::CONFIRMED_DATA_DOWN);
     macHdr.SetMajor(1);
 
     Buffer macBuf;
@@ -315,12 +315,12 @@ HeaderTest::DoRun()
 
     macHdr.Deserialize(macSerialized);
 
-    NS_TEST_EXPECT_MSG_EQ((macHdr.GetMType() == LorawanMacHeader::CONFIRMED_DATA_DOWN),
+    NS_TEST_EXPECT_MSG_EQ((macHdr.GetFType() == LorawanMacHeader::CONFIRMED_DATA_DOWN),
                           true,
-                          "MType changes in the serialization/deserialization process");
+                          "FType changes in the serialization/deserialization process");
     NS_TEST_EXPECT_MSG_EQ((macHdr.GetMajor() == 1),
                           true,
-                          "MType changes in the serialization/deserialization process");
+                          "FType changes in the serialization/deserialization process");
 
     ////////////////////////////////////
     // Test the LoraFrameHeader class //
@@ -391,8 +391,8 @@ HeaderTest::DoRun()
                           "Wrong size of packet + headers - macHeader - frameHeader");
 
     // Verify contents of removed MAC header
-    NS_TEST_EXPECT_MSG_EQ(macHdr1.GetMType(),
-                          macHdr.GetMType(),
+    NS_TEST_EXPECT_MSG_EQ(macHdr1.GetFType(),
+                          macHdr.GetFType(),
                           "Removed header contents don't match");
     NS_TEST_EXPECT_MSG_EQ(macHdr1.GetMajor(),
                           macHdr.GetMajor(),
@@ -1651,7 +1651,7 @@ MacCommandTest::RunMacCommand(Ts&&... args)
     auto cmd = Create<T>(args...);
     fhdr.AddCommand(cmd);
     pkt->AddHeader(fhdr);
-    mhdr.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+    mhdr.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
     pkt->AddHeader(mhdr);
     // Trigger MAC layer reception
     DynamicCast<EndDeviceLoraPhy>(m_mac->GetPhy())
@@ -2110,7 +2110,7 @@ AdrBackoffTest::ReceiveDownlink()
     pkt = Create<Packet>(0);
     fhdr.SetAsDownlink();
     pkt->AddHeader(fhdr);
-    mhdr.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+    mhdr.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
     pkt->AddHeader(mhdr);
     // Trigger MAC layer reception
     DynamicCast<EndDeviceLoraPhy>(m_mac->GetPhy())

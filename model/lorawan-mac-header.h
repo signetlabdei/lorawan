@@ -30,7 +30,7 @@ class LorawanMacHeader : public Header
      * The enum value corresponds to the value that will be written in the header
      * by the Serialize method.
      */
-    enum MType
+    enum FType
     {
         JOIN_REQUEST = 0,
         JOIN_ACCEPT = 1,
@@ -80,18 +80,18 @@ class LorawanMacHeader : public Header
     void Print(std::ostream& os) const override;
 
     /**
-     * Set the message type.
+     * Set the frame type.
      *
-     * @param mtype The message type of this header.
+     * @param fType The frame type of this header.
      */
-    void SetMType(enum MType mtype);
+    void SetFType(enum FType fType);
 
     /**
-     * Get the message type from the header.
+     * Get the frame type from the header.
      *
-     * @return The uint8_t corresponding to this header's message type.
+     * @return The uint8_t corresponding to this header's frame type.
      */
-    uint8_t GetMType() const;
+    FType GetFType() const;
 
     /**
      * Set the major version of this header.
@@ -119,21 +119,26 @@ class LorawanMacHeader : public Header
      * Check whether this header is for a confirmed message, i.e. a message asking from
      * reception acknowledgment from the received.
      *
-     * @return True is the message MType is of the confirmed variant, false otherwise.
+     * @return True is the message FType is of the confirmed variant, false otherwise.
      */
     bool IsConfirmed() const;
 
   private:
     /**
-     * The Message Type.
+     * The Frame Type.
      */
-    uint8_t m_mtype;
+    FType m_fType;
 
     /**
      * The major version this header is using.
      */
     uint8_t m_major;
 };
+
+/**
+ * Allow logging of FType like any other data type.
+ */
+std::ostream& operator<<(std::ostream& os, const LorawanMacHeader::FType& fType);
 
 } // namespace lorawan
 } // namespace ns3

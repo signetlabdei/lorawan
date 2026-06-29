@@ -117,7 +117,7 @@ EndDeviceStatus::GetCompleteReplyPacket()
     lastPacket->RemoveHeader(mHdr);
     lastPacket->RemoveHeader(fHdr);
     m_reply.frameHeader.SetFCnt(fHdr.GetFCnt());
-    m_reply.macHeader.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+    m_reply.macHeader.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
     replyPacket->AddHeader(m_reply.frameHeader);
     replyPacket->AddHeader(m_reply.macHeader);
 

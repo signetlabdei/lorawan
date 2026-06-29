@@ -81,13 +81,13 @@ EndDeviceLorawanMac::GetTypeId()
                           IntegerValue(1),
                           MakeIntegerAccessor(&EndDeviceLorawanMac::m_nbTrans),
                           MakeIntegerChecker<uint8_t>())
-            .AddAttribute("MType",
+            .AddAttribute("FType",
                           "Specify type of message will be sent by this end device.",
-                          EnumValue(LorawanMacHeader::UNCONFIRMED_DATA_UP),
-                          MakeEnumAccessor<LorawanMacHeader::MType>(&EndDeviceLorawanMac::m_mType),
-                          MakeEnumChecker(LorawanMacHeader::UNCONFIRMED_DATA_UP,
+                          EnumValue(LorawanMacHeader::FType::UNCONFIRMED_DATA_UP),
+                          MakeEnumAccessor<LorawanMacHeader::FType>(&EndDeviceLorawanMac::m_fType),
+                          MakeEnumChecker(LorawanMacHeader::FType::UNCONFIRMED_DATA_UP,
                                           "Unconfirmed",
-                                          LorawanMacHeader::CONFIRMED_DATA_UP,
+                                          LorawanMacHeader::FType::CONFIRMED_DATA_UP,
                                           "Confirmed"));
     return tid;
 }
@@ -110,7 +110,7 @@ EndDeviceLorawanMac::EndDeviceLorawanMac()
       m_lastKnownLinkMarginDb(0),
       m_lastKnownGatewayCount(0),
       m_aggregatedDutyCycle(1),
-      m_mType(LorawanMacHeader::CONFIRMED_DATA_UP),
+      m_fType(LorawanMacHeader::FType::CONFIRMED_DATA_UP),
       m_currentFCnt(0),
       m_adrAckReq(false)
 {
@@ -253,8 +253,8 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
         // Save parameters for the (possible) next retransmissions.
         m_retxParams.packet = packet->Copy();
         m_retxParams.firstAttempt = Now();
-        m_retxParams.waitingAck = (m_mType == LorawanMacHeader::CONFIRMED_DATA_UP);
-        NS_LOG_DEBUG("Message type is " << m_mType);
+        m_retxParams.waitingAck = (m_fType == LorawanMacHeader::FType::CONFIRMED_DATA_UP);
+        NS_LOG_DEBUG("Frame type is " << m_fType);
     }
 
     // Send packet
@@ -443,21 +443,21 @@ EndDeviceLorawanMac::ApplyNecessaryOptions(LorawanMacHeader& macHeader)
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    macHeader.SetMType(m_mType);
+    macHeader.SetFType(m_fType);
     macHeader.SetMajor(1);
 }
 
 void
-EndDeviceLorawanMac::SetMType(LorawanMacHeader::MType mType)
+EndDeviceLorawanMac::SetFType(LorawanMacHeader::FType fType)
 {
-    m_mType = mType;
-    NS_LOG_DEBUG("Message type is set to " << mType);
+    m_fType = fType;
+    NS_LOG_DEBUG("Message type is set to " << fType);
 }
 
-LorawanMacHeader::MType
-EndDeviceLorawanMac::GetMType()
+LorawanMacHeader::FType
+EndDeviceLorawanMac::GetFType()
 {
-    return m_mType;
+    return m_fType;
 }
 
 std::vector<Ptr<LogicalLoraChannel>>

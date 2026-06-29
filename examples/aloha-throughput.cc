@@ -259,7 +259,7 @@ main(int argc, char* argv[])
         pkt->AddHeader(frameHdr);
 
         LorawanMacHeader macHdr = LorawanMacHeader();
-        macHdr.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_UP);
+        macHdr.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_UP);
         macHdr.SetMajor(1);
         pkt->AddHeader(macHdr);
 

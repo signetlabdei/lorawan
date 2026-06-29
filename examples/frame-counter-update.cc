@@ -97,7 +97,7 @@ main(int argc, char* argv[])
     CommandLine cmd(__FILE__);
     cmd.AddValue("simulationTime", "The time (s) for which to simulate", simulationTimeSeconds);
     cmd.AddValue("MaxTransmissions", "ns3::EndDeviceLorawanMac::MaxTransmissions");
-    cmd.AddValue("MType", "ns3::EndDeviceLorawanMac::MType");
+    cmd.AddValue("FType", "ns3::EndDeviceLorawanMac::FType");
     cmd.Parse(argc, argv);
 
     // Set up logging

@@ -233,18 +233,18 @@ class EndDeviceLorawanMac : public LorawanMac
     void ApplyNecessaryOptions(LorawanMacHeader& macHeader);
 
     /**
-     * Set the message type to send when the Send method is called.
+     * Set the frame type to send when the Send method is called.
      *
-     * @param mType The message type.
+     * @param fType The frame type.
      */
-    void SetMType(LorawanMacHeader::MType mType);
+    void SetFType(LorawanMacHeader::FType fType);
 
     /**
-     * Get the message type to send when the Send method is called.
+     * Get the frame type to send when the Send method is called.
      *
-     * @return The message type.
+     * @return The frame type.
      */
-    LorawanMacHeader::MType GetMType();
+    LorawanMacHeader::FType GetFType();
 
     /**
      * Parse and take action on the commands contained on this FrameHeader.
@@ -490,9 +490,9 @@ class EndDeviceLorawanMac : public LorawanMac
     TracedValue<double> m_aggregatedDutyCycle;
 
     /**
-     * The message type to apply to packets sent with the Send method.
+     * The frame type to apply to packets sent with the Send method.
      */
-    LorawanMacHeader::MType m_mType;
+    LorawanMacHeader::FType m_fType;
 
     /**
      * current value of the device frame counter.
