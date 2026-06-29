@@ -81,7 +81,7 @@ EndDeviceLorawanMac::GetTypeId()
                           "Maximum number of transmissions for a packet (NbTrans)",
                           IntegerValue(1),
                           MakeIntegerAccessor(&EndDeviceLorawanMac::m_nbTrans),
-                          MakeIntegerChecker<uint8_t>())
+                          MakeIntegerChecker<uint8_t>(1, 15))
             .AddAttribute("FType",
                           "Specify type of message will be sent by this end device.",
                           EnumValue(LorawanMacHeader::FType::UNCONFIRMED_DATA_UP),
