@@ -135,7 +135,7 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
         bool canLockOnPacket = true;
 
         // Save needed sensitivity
-        double sensitivity = EndDeviceLoraPhy::sensitivity[unsigned(sf) - 7];
+        double sensitivity = EndDeviceLoraPhy::SENSITIVITY[unsigned(sf) - 7];
 
         // Check frequency
         //////////////////

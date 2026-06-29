@@ -42,6 +42,8 @@ class GatewayLoraPhy : public LoraPhy
     GatewayLoraPhy();           //!< Default constructor
     ~GatewayLoraPhy() override; //!< Destructor
 
+    static const double SENSITIVITY[6]; //!< The sensitivity vector of this gateway to different SFs
+
     // Forward LoraPhy's pure virtual function
     void Send(Ptr<Packet> packet,
               LoraTxParameters txParams,
@@ -86,9 +88,6 @@ class GatewayLoraPhy : public LoraPhy
      * @param frequencyHz The value of the frequency [Hz].
      */
     void AddFrequency(uint32_t frequencyHz);
-
-    static const double sensitivity[6]; //!< A vector containing the sensitivities required to
-                                        //!< correctly decode different spreading factors.
 
   protected:
     /**

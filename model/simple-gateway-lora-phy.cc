@@ -137,7 +137,7 @@ SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
         {
             // See whether the reception power is above or below the sensitivity
             // for that spreading factor
-            double sensitivity = SimpleGatewayLoraPhy::sensitivity[unsigned(sf) - 7];
+            double sensitivity = SimpleGatewayLoraPhy::SENSITIVITY[unsigned(sf) - 7];
 
             if (rxPowerDbm < sensitivity) // Packet arrived below sensitivity
             {

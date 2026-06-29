@@ -135,6 +135,8 @@ class EndDeviceLoraPhy : public LoraPhy
     EndDeviceLoraPhy();           //!< Default constructor
     ~EndDeviceLoraPhy() override; //!< Destructor
 
+    static const double SENSITIVITY[6]; //!< The sensitivity vector of this device to different SFs
+
     // Forward LoraPhy's pure virtual function
     void Send(Ptr<Packet> packet,
               LoraTxParameters txParams,
@@ -213,8 +215,6 @@ class EndDeviceLoraPhy : public LoraPhy
      * @param listener The listener to be unregistered.
      */
     void UnregisterListener(EndDeviceLoraPhyListener* listener);
-
-    static const double sensitivity[6]; //!< The sensitivity vector of this device to different SFs
 
   protected:
     // Implementation of LoraPhy's pure virtual function
