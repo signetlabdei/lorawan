@@ -50,19 +50,19 @@ OnPhySentPacket(Ptr<const Packet> packet, uint32_t index)
 }
 
 /**
- * Record the exit status of a MAC layer packet retransmission process of an end device
+ * Trace the outcome of MAC layer's confirmed packet retransmission and acknowledgement.
  *
- * @param transmissions Number of transmissions attempted during the process.
- * @param successful Whether the retransmission procedure was successful.
+ * @param txCount Number of transmissions attempted during the process.
+ * @param ack Whether the retransmission process led to acknowledgement.
  * @param firstAttempt Timestamp of the initial transmission attempt.
  * @param packet The packet being retransmitted.
  */
 void
-OnMacPacketOutcome(uint8_t transmissions, bool successful, Time firstAttempt, Ptr<Packet> packet)
+OnMacPacketOutcome(uint8_t txCount, bool ack, Time firstAttempt, Ptr<Packet> packet)
 {
-    if (successful)
+    if (ack)
     {
-        NS_LOG_INFO("Packet was successful");
+        NS_LOG_INFO("Packet was successfully acknowledged");
     }
     else
     {
@@ -191,7 +191,8 @@ main(int argc, char* argv[])
         Ptr<LoraPhy> phy = loraNetDevice->GetPhy();
         Ptr<EndDeviceLorawanMac> mac = DynamicCast<EndDeviceLorawanMac>(loraNetDevice->GetMac());
         phy->TraceConnectWithoutContext("StartSending", MakeCallback(&OnPhySentPacket));
-        mac->TraceConnectWithoutContext("RequiredTransmissions", MakeCallback(&OnMacPacketOutcome));
+        mac->TraceConnectWithoutContext("ConfirmedTransmissionOutcome",
+                                        MakeCallback(&OnMacPacketOutcome));
     }
 
     // Create the gateway nodes (allocate them uniformly on the disc)

@@ -103,8 +103,8 @@ LoraHelper::Install(const LoraPhyHelper& phyHelper,
                     MakeCallback(&LoraPacketTracker::MacTransmissionCallback, m_packetTracker));
 
                 mac->TraceConnectWithoutContext(
-                    "RequiredTransmissions",
-                    MakeCallback(&LoraPacketTracker::RequiredTransmissionsCallback,
+                    "ConfirmedTransmissionOutcome",
+                    MakeCallback(&LoraPacketTracker::MacConfirmedTransmissionOutcomeCallback,
                                  m_packetTracker));
             }
             else if (phyHelper.GetDeviceType() == TypeId::LookupByName("ns3::SimpleGatewayLoraPhy"))

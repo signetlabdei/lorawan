@@ -191,10 +191,10 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
                 if (m_retxParams.retxLeft == 0)
                 {
                     uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
-                    m_requiredTxCallback(txs,
-                                         false,
-                                         m_retxParams.firstAttempt,
-                                         m_retxParams.packet);
+                    m_confirmedTxOutcomeCallback(txs,
+                                                 false,
+                                                 m_retxParams.firstAttempt,
+                                                 m_retxParams.packet);
                     NS_LOG_DEBUG("Failure: no more retransmissions left. Used "
                                  << unsigned(txs) << " transmissions.");
 
@@ -222,7 +222,10 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
         else
         {
             uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
-            m_requiredTxCallback(txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
+            m_confirmedTxOutcomeCallback(txs,
+                                         false,
+                                         m_retxParams.firstAttempt,
+                                         m_retxParams.packet);
             NS_LOG_DEBUG("Failure: no more retransmissions left. Used " << unsigned(txs)
                                                                         << " transmissions.");
 
@@ -253,7 +256,10 @@ ClassAEndDeviceLorawanMac::FailedReception(Ptr<const Packet> packet)
         else
         {
             uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
-            m_requiredTxCallback(txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
+            m_confirmedTxOutcomeCallback(txs,
+                                         false,
+                                         m_retxParams.firstAttempt,
+                                         m_retxParams.packet);
             NS_LOG_DEBUG("Failure: no more retransmissions left. Used " << unsigned(txs)
                                                                         << " transmissions.");
 
@@ -416,7 +422,10 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
                  DynamicCast<EndDeviceLoraPhy>(m_phy)->GetState() != EndDeviceLoraPhy::State::RX)
         {
             uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
-            m_requiredTxCallback(txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
+            m_confirmedTxOutcomeCallback(txs,
+                                         false,
+                                         m_retxParams.firstAttempt,
+                                         m_retxParams.packet);
             NS_LOG_DEBUG("Failure: no more retransmissions left. Used " << unsigned(txs)
                                                                         << " transmissions.");
 
@@ -432,7 +441,7 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
     else
     {
         uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
-        m_requiredTxCallback(txs, true, m_retxParams.firstAttempt, m_retxParams.packet);
+        m_confirmedTxOutcomeCallback(txs, true, m_retxParams.firstAttempt, m_retxParams.packet);
         NS_LOG_INFO(
             "We have " << unsigned(m_retxParams.retxLeft)
                        << " transmissions left. We were not transmitting confirmed messages.");

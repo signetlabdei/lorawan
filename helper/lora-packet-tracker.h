@@ -72,7 +72,7 @@ struct RetransmissionStatus
     Time firstAttempt;    //!< Timestamp of the first transmission attempt
     Time finishTime;      //!< Timestamp of the conclusion of the retransmission process
     uint8_t reTxAttempts; //!< Number of transmissions attempted during the process
-    bool successful;      //!< Whether the retransmission procedure was successful
+    bool ack;             //!< Whether the retransmission process led to acknowledgement
 };
 
 typedef std::map<Ptr<const Packet>, MacPacketStatus> MacPacketData;
@@ -157,17 +157,17 @@ class LoraPacketTracker
      */
     void MacTransmissionCallback(Ptr<const Packet> packet);
     /**
-     * Trace the exit status of a MAC layer packet retransmission process of an end device.
+     * Trace the outcome of MAC layer's confirmed packet retransmission and acknowledgement.
      *
-     * @param reqTx Number of transmissions attempted during the process.
-     * @param success Whether the retransmission procedure was successful.
+     * @param txCount Number of transmissions attempted during the process.
+     * @param ack Whether the retransmission process led to acknowledgement.
      * @param firstAttempt Timestamp of the initial transmission attempt.
      * @param packet The packet being retransmitted.
      */
-    void RequiredTransmissionsCallback(uint8_t reqTx,
-                                       bool success,
-                                       Time firstAttempt,
-                                       Ptr<Packet> packet);
+    void MacConfirmedTransmissionOutcomeCallback(uint8_t txCount,
+                                                 bool ack,
+                                                 Time firstAttempt,
+                                                 Ptr<Packet> packet);
 
     // Packet reception by gateways
 

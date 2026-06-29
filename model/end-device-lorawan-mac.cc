@@ -34,10 +34,11 @@ EndDeviceLorawanMac::GetTypeId()
         TypeId("ns3::EndDeviceLorawanMac")
             .SetParent<LorawanMac>()
             .SetGroupName("lorawan")
-            .AddTraceSource("RequiredTransmissions",
-                            "Total number of transmissions required to deliver this packet",
-                            MakeTraceSourceAccessor(&EndDeviceLorawanMac::m_requiredTxCallback),
-                            "ns3::TracedValueCallback::uint8_t")
+            .AddTraceSource(
+                "ConfirmedTransmissionOutcome",
+                "Trace number of retransmissions for acknowledgement of confirmed packets",
+                MakeTraceSourceAccessor(&EndDeviceLorawanMac::m_confirmedTxOutcomeCallback),
+                "ns3::EndDeviceLorawanMac::ConfirmedTxOutcomeCallback")
             .AddAttribute("DataRate",
                           "Data rate currently employed by this end device",
                           UintegerValue(0),
@@ -167,7 +168,10 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
             uint8_t txs = m_nbTrans - m_retxParams.retxLeft;
             NS_LOG_WARN("Stopping retransmission procedure of previous packet. Used "
                         << unsigned(txs) << " transmissions out of " << unsigned(m_nbTrans));
-            m_requiredTxCallback(txs, false, m_retxParams.firstAttempt, m_retxParams.packet);
+            m_confirmedTxOutcomeCallback(txs,
+                                         false,
+                                         m_retxParams.firstAttempt,
+                                         m_retxParams.packet);
         }
     }
 
@@ -338,7 +342,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
                          "retransmission if already scheduled.");
 
             uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
-            m_requiredTxCallback(txs, true, m_retxParams.firstAttempt, m_retxParams.packet);
+            m_confirmedTxOutcomeCallback(txs, true, m_retxParams.firstAttempt, m_retxParams.packet);
             NS_LOG_DEBUG("Received ACK packet after "
                          << unsigned(txs) << " transmissions: stopping retransmission procedure. ");
 

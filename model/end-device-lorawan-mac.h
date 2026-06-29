@@ -404,9 +404,21 @@ class EndDeviceLorawanMac : public LorawanMac
     /////////////////
 
     /**
-     * The trace source fired when the transmission procedure is finished.
+     * TracedCallback signature for the (re)transmission and acknowledgement process outcome of
+     * confirmed uplink packets.
+     *
+     * @param [in] txCount Number of transmissions attempted during the process.
+     * @param [in] ack Whether the transmission process led to network acknowledgement.
+     * @param [in] firstAttempt Timestamp of the initial transmission attempt.
+     * @param [in] packet The packet being transmitted.
      */
-    TracedCallback<uint8_t, bool, Time, Ptr<Packet>> m_requiredTxCallback;
+    typedef void (*ConfirmedTxOutcomeCallback)(uint8_t txCount,
+                                               bool ack,
+                                               Time firstAttempt,
+                                               Ptr<Packet> packet);
+
+    /// Traced Callback: confirmed transmission process outcome event.
+    TracedCallback<uint8_t, bool, Time, Ptr<Packet>> m_confirmedTxOutcomeCallback;
 
   private:
     /**

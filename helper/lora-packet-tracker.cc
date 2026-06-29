@@ -49,20 +49,20 @@ LoraPacketTracker::MacTransmissionCallback(Ptr<const Packet> packet)
 }
 
 void
-LoraPacketTracker::RequiredTransmissionsCallback(uint8_t reqTx,
-                                                 bool success,
-                                                 Time firstAttempt,
-                                                 Ptr<Packet> packet)
+LoraPacketTracker::MacConfirmedTransmissionOutcomeCallback(uint8_t txCount,
+                                                           bool ack,
+                                                           Time firstAttempt,
+                                                           Ptr<Packet> packet)
 {
     NS_LOG_INFO("Finished retransmission attempts for a packet");
-    NS_LOG_DEBUG("Packet: " << packet << "ReqTx " << unsigned(reqTx) << ", succ: " << success
+    NS_LOG_DEBUG("Packet: " << packet << "txCount " << unsigned(txCount) << ", ack: " << ack
                             << ", firstAttempt: " << firstAttempt.As(Time::S));
 
     RetransmissionStatus entry;
     entry.firstAttempt = firstAttempt;
     entry.finishTime = Now();
-    entry.reTxAttempts = reqTx;
-    entry.successful = success;
+    entry.reTxAttempts = txCount;
+    entry.ack = ack;
 
     m_reTransmissionTracker.insert(std::pair<Ptr<Packet>, RetransmissionStatus>(packet, entry));
 }
@@ -341,8 +341,8 @@ LoraPacketTracker::CountMacPacketsGloballyCpsr(Time startTime, Time stopTime)
             sent++;
             NS_LOG_DEBUG("Found a packet");
             NS_LOG_DEBUG("Number of attempts: " << unsigned(it->second.reTxAttempts)
-                                                << ", successful: " << it->second.successful);
-            if (it->second.successful)
+                                                << ", acknowledgement: " << it->second.ack);
+            if (it->second.ack)
             {
                 received++;
             }
