@@ -36,6 +36,14 @@ class LorawanMac : public Object
 {
   public:
     /**
+     * This type defines the callback of a higher layer that a LorawanMac(-derived) object invokes
+     * to pass a packet up the stack.
+     *
+     * \param packet the packet that has been received.
+     */
+    typedef Callback<void, Ptr<Packet>> ReceiveCallback;
+
+    /**
      *  Register this type.
      *  @return The object TypeId.
      */
@@ -93,6 +101,15 @@ class LorawanMac : public Object
      * @param packet The packet that just finished transmission.
      */
     virtual void TxFinished(Ptr<const Packet> packet) = 0;
+
+    /**
+     * Set the callback to be used to notify higher layers when a packet has been
+     * received.
+     *
+     * @param cb callback to invoke whenever a packet has been received and must
+     *        be forwarded to the higher layers.
+     */
+    void SetReceiveCallback(ReceiveCallback cb);
 
     /**
      * Set the device this MAC layer is installed on.
@@ -212,6 +229,8 @@ class LorawanMac : public Object
     int GetNPreambleSymbols() const;
 
   protected:
+    ReceiveCallback m_receiveCallback; ///<! Callback to forward to upper layers
+
     /**
      * The trace source that is fired when a packet cannot be sent because of duty
      * cycle limitations.

@@ -115,10 +115,12 @@ GatewayLorawanMac::Receive(Ptr<const Packet> packet)
 
     if (macHdr.IsUplink())
     {
-        DynamicCast<LoraNetDevice>(m_device)->Receive(packetCopy);
-
         NS_LOG_DEBUG("Received packet: " << packet);
-
+        // Pass the packet up to the NetDevice
+        if (!m_receiveCallback.IsNull())
+        {
+            m_receiveCallback(packetCopy);
+        }
         m_receivedPacket(packet);
     }
     else

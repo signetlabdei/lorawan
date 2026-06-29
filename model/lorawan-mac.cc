@@ -55,6 +55,12 @@ LorawanMac::~LorawanMac()
 }
 
 void
+LorawanMac::SetReceiveCallback(ReceiveCallback cb)
+{
+    m_receiveCallback = cb;
+}
+
+void
 LorawanMac::SetDevice(Ptr<NetDevice> device)
 {
     m_device = device;

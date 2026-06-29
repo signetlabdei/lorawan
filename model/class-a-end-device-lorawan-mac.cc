@@ -170,8 +170,11 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
             // Parse the MAC commands
             ParseCommands(fHdr);
 
-            // TODO Pass the packet up to the NetDevice
-
+            // Pass the packet up to the NetDevice
+            if (!m_receiveCallback.IsNull())
+            {
+                m_receiveCallback(packetCopy);
+            }
             // Call the trace source
             m_receivedPacket(packet);
         }
