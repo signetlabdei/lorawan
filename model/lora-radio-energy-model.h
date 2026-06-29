@@ -11,7 +11,6 @@
 #define LORA_RADIO_ENERGY_MODEL_H
 
 #include "end-device-lora-phy.h"
-#include "lora-tx-current-model.h"
 
 #include "ns3/device-energy-model.h"
 #include "ns3/traced-value.h"
@@ -20,6 +19,8 @@ namespace ns3
 {
 namespace lorawan
 {
+
+class LoraTxCurrentModel;
 
 /**
  * @ingroup lorawan

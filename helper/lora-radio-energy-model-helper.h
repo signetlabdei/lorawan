@@ -38,43 +38,14 @@ class LoraRadioEnergyModelHelper : public DeviceEnergyModelHelper
     void Set(std::string name, const AttributeValue& v) override;
 
     /**
-     * @param name The name of the model to set.
-     * @param n0 The name of the attribute to set.
-     * @param v0 The value of the attribute to set.
-     * @param n1 The name of the attribute to set.
-     * @param v1 The value of the attribute to set.
-     * @param n2 The name of the attribute to set.
-     * @param v2 The value of the attribute to set.
-     * @param n3 The name of the attribute to set.
-     * @param v3 The value of the attribute to set.
-     * @param n4 The name of the attribute to set.
-     * @param v4 The value of the attribute to set.
-     * @param n5 The name of the attribute to set.
-     * @param v5 The value of the attribute to set.
-     * @param n6 The name of the attribute to set.
-     * @param v6 The value of the attribute to set.
-     * @param n7 The name of the attribute to set.
-     * @param v7 The value of the attribute to set.
+     * @tparam Ts \deduced Argument types
+     * @param name the name of the model to set
+     * @param [in] args Name and AttributeValue pairs to set.
      *
      * Configure a Transmission Current model for this EnergySource.
      */
-    void SetTxCurrentModel(std::string name,
-                           std::string n0 = "",
-                           const AttributeValue& v0 = EmptyAttributeValue(),
-                           std::string n1 = "",
-                           const AttributeValue& v1 = EmptyAttributeValue(),
-                           std::string n2 = "",
-                           const AttributeValue& v2 = EmptyAttributeValue(),
-                           std::string n3 = "",
-                           const AttributeValue& v3 = EmptyAttributeValue(),
-                           std::string n4 = "",
-                           const AttributeValue& v4 = EmptyAttributeValue(),
-                           std::string n5 = "",
-                           const AttributeValue& v5 = EmptyAttributeValue(),
-                           std::string n6 = "",
-                           const AttributeValue& v6 = EmptyAttributeValue(),
-                           std::string n7 = "",
-                           const AttributeValue& v7 = EmptyAttributeValue());
+    template <typename... Ts>
+    void SetTxCurrentModel(std::string name, Ts&&... args);
 
   private:
     /**
@@ -91,6 +62,13 @@ class LoraRadioEnergyModelHelper : public DeviceEnergyModelHelper
     ObjectFactory m_radioEnergy;    ///< radio energy
     ObjectFactory m_txCurrentModel; ///< transmit current model
 };
+
+template <typename... Ts>
+void
+LoraRadioEnergyModelHelper::SetTxCurrentModel(std::string name, Ts&&... args)
+{
+    m_txCurrentModel = ObjectFactory(name, std::forward<Ts>(args)...);
+}
 
 } // namespace lorawan
 } // namespace ns3

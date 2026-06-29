@@ -8,6 +8,8 @@
 
 #include "lora-radio-energy-model.h"
 
+#include "lora-tx-current-model.h"
+
 #include "ns3/energy-source.h"
 #include "ns3/pointer.h"
 #include "ns3/simulator.h"
