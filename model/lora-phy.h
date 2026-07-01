@@ -116,18 +116,17 @@ class LoraPhy : public Object
     static Time GetTSym(uint8_t spreadingFactor, uint32_t bandwidthHz);
 
     /**
-     * Compute the time that a packet with certain characteristics will take to be
-     * transmitted.
+     * Compute the total transmission time for a physical packet based on modulation parameters.
      *
-     * Besides from the ones saved in LoraTxParameters, the packet's payload
-     * (obtained through a GetSize () call to account for the presence of Headers
-     * and Trailers, too) also influences the packet transmit time.
+     * Besides from the ones saved in LoraTxParameters, the packet's payload (obtained through a
+     * Packet::GetSize() call to account for the presence of Headers and Trailers) also influences
+     * the packet transmit time.
      *
-     * @param packet The packet that needs to be transmitted.
+     * @param phyPayloadLen The total number of Bytes that need to be transmitted.
      * @param txParams The set of parameters that will be used for transmission.
-     * @return The time necessary to transmit the packet.
+     * @return The time needed to transmit the packet.
      */
-    static Time GetTimeOnAir(Ptr<Packet> packet, const LoraTxParameters& txParams);
+    static Time GetTimeOnAir(uint32_t phyPayloadLen, const LoraTxParameters& txParams);
 
     /**
      *  Register this type.

@@ -79,7 +79,7 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
     params.crcEnabled = true;
 
     // Get the duration
-    Time duration = LoraPhy::GetTimeOnAir(packet, params);
+    Time duration = LoraPhy::GetTimeOnAir(packet->GetSize(), params);
 
     NS_LOG_DEBUG("Duration: " << duration.As(Time::S));
 

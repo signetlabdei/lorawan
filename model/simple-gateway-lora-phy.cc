@@ -57,7 +57,7 @@ SimpleGatewayLoraPhy::Send(Ptr<Packet> packet,
     NS_LOG_FUNCTION(this << packet << frequencyHz << txPowerDbm);
 
     // Get the time a packet with these parameters will take to be transmitted
-    Time duration = GetTimeOnAir(packet, txParams);
+    Time duration = GetTimeOnAir(packet->GetSize(), txParams);
 
     NS_LOG_DEBUG("Duration of packet: " << duration << ", SF"
                                         << unsigned(txParams.spreadingFactor));

@@ -264,7 +264,7 @@ main(int argc, char* argv[])
         macHdr.SetMajor(1);
         pkt->AddHeader(macHdr);
 
-        outputFile << LoraPhy::GetTimeOnAir(pkt, txParams).GetMicroSeconds() << " ";
+        outputFile << LoraPhy::GetTimeOnAir(pkt->GetSize(), txParams).GetMicroSeconds() << " ";
     }
     outputFile.close();
 

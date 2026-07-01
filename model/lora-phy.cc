@@ -92,9 +92,9 @@ LoraPhy::GetTSym(uint8_t spreadingFactor, uint32_t bandwidthHz)
 }
 
 Time
-LoraPhy::GetTimeOnAir(Ptr<Packet> packet, const LoraTxParameters& txParams)
+LoraPhy::GetTimeOnAir(uint32_t phyPayloadLen, const LoraTxParameters& txParams)
 {
-    NS_LOG_FUNCTION(packet << txParams);
+    NS_LOG_FUNCTION(phyPayloadLen << txParams);
 
     // The contents of this function are based on [1].
     // [1] SX1272 LoRa modem designer's guide.
@@ -107,11 +107,10 @@ LoraPhy::GetTimeOnAir(Ptr<Packet> packet, const LoraTxParameters& txParams)
     double tPreamble = (nPreamble + 4.25) * tSym;
 
     // Payload size
-    uint32_t payloadLen = packet->GetSize(); // Size in bytes
-    NS_LOG_DEBUG("Packet of size " << payloadLen << " bytes");
+    NS_LOG_DEBUG("PHY Packet of size " << phyPayloadLen << " bytes");
 
     // Safety casts since the formula deals with double values.
-    auto pl = static_cast<double>(payloadLen);
+    auto pl = static_cast<double>(phyPayloadLen);
     auto sf = static_cast<double>(txParams.spreadingFactor);
     auto cr = static_cast<double>(txParams.codingRate);
     // de = 1 when the low data rate optimization is enabled, 0 otherwise

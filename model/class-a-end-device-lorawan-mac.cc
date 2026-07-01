@@ -97,7 +97,7 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
     //////////////////////////////////////////////
 
     // Compute packet duration
-    Time duration = LoraPhy::GetTimeOnAir(packetToSend, params);
+    Time duration = LoraPhy::GetTimeOnAir(packetToSend->GetSize(), params);
 
     // Register the sent packet into the DutyCycleHelper
     m_channelHelper->AddEvent(duration, txChannel);
