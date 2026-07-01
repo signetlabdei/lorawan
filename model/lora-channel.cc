@@ -173,7 +173,7 @@ LoraChannel::Send(Ptr<LoraPhy> sender,
 }
 
 void
-LoraChannel::Receive(uint32_t i, Ptr<Packet> packet, LoraChannelParameters parameters) const
+LoraChannel::Receive(uint32_t i, Ptr<Packet> packet, const LoraChannelParameters& parameters) const
 {
     NS_LOG_FUNCTION(this << i << packet << parameters);
 
@@ -194,11 +194,13 @@ LoraChannel::GetRxPower(double txPowerDbm,
 }
 
 std::ostream&
-operator<<(std::ostream& os, const LoraChannelParameters& params)
+operator<<(std::ostream& os, const LoraChannel::LoraChannelParameters& params)
 {
-    os << "(rxPowerDbm: " << params.rxPowerDbm << ", SF: " << unsigned(params.sf)
-       << ", duration: " << params.duration.As(Time::MS) << ", frequencyHz: " << params.frequencyHz
-       << ")";
+    os << "LoraChannelParameters("
+       << "rxPowerDbm=" << params.rxPowerDbm << ", "
+       << "sf=" << unsigned(params.sf) << ", "
+       << "duration=" << params.duration.As(Time::MS) << ", "
+       << "frequencyHz=" << params.frequencyHz << ")";
     return os;
 }
 

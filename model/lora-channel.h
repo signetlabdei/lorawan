@@ -29,25 +29,6 @@ struct LoraTxParameters;
 /**
  * @ingroup lorawan
  *
- * A struct that holds meaningful parameters for transmission on a
- * LoraChannel.
- */
-struct LoraChannelParameters
-{
-    double rxPowerDbm;    //!< The reception power.
-    uint8_t sf;           //!< The Spreading Factor of this transmission.
-    Time duration;        //!< The duration of the transmission.
-    uint32_t frequencyHz; //!< The frequency [Hz] of this transmission.
-};
-
-/**
- * Allow logging of LoraChannelParameters like with any other data type.
- */
-std::ostream& operator<<(std::ostream& os, const LoraChannelParameters& params);
-
-/**
- * @ingroup lorawan
- *
  * The class that delivers packets among PHY layers.
  *
  * This class is tasked with taking packets that PHY layers want to send and,
@@ -146,6 +127,17 @@ class LoraChannel : public Channel
 
   private:
     /**
+     * A struct that holds meaningful parameters for transmission on a LoraChannel.
+     */
+    struct LoraChannelParameters
+    {
+        double rxPowerDbm;    //!< The reception power.
+        uint8_t sf;           //!< The Spreading Factor of this transmission.
+        Time duration;        //!< The duration of the transmission.
+        uint32_t frequencyHz; //!< The frequency [Hz] of this transmission.
+    };
+
+    /**
      * Private method that is scheduled by LoraChannel's Send method to happen
      * after the channel delay, for each of the connected PHY layers.
      *
@@ -156,7 +148,12 @@ class LoraChannel : public Channel
      * @param packet The packet the phy will receive.
      * @param parameters The parameters that characterize this transmission.
      */
-    void Receive(uint32_t i, Ptr<Packet> packet, LoraChannelParameters parameters) const;
+    void Receive(uint32_t i, Ptr<Packet> packet, const LoraChannelParameters& parameters) const;
+
+    /**
+     * Allow logging of LoraChannelParameters like with any other data type.
+     */
+    friend std::ostream& operator<<(std::ostream& os, const LoraChannelParameters& params);
 
     /**
      * The vector containing the PHYs that are currently connected to the
