@@ -46,16 +46,16 @@ class GatewayLoraPhy : public LoraPhy
 
     // Forward LoraPhy's pure virtual function
     void Send(Ptr<Packet> packet,
-              const LoraTxParameters& txParams,
               uint32_t frequencyHz,
+              const LoraTxParameters& txParams,
               double txPowerDbm) override = 0;
 
     // Forward LoraPhy's pure virtual function
     void StartReceive(Ptr<Packet> packet,
+                      uint32_t frequencyHz,
+                      uint8_t spreadingFactor,
                       double rxPowerDbm,
-                      uint8_t sf,
-                      Time duration,
-                      uint32_t frequencyHz) override = 0;
+                      Time duration) override = 0;
 
     // Implementation of LoraPhy's pure virtual function
     bool IsTransmitting() const override;

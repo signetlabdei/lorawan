@@ -141,13 +141,13 @@ class LoraPhy : public Object
      * Instruct the PHY to send a packet according to some parameters.
      *
      * @param packet The packet to send.
-     * @param txParams The desired transmission parameters.
      * @param frequencyHz The frequency on which to transmit.
+     * @param txParams The desired transmission parameters.
      * @param txPowerDbm The power in dBm with which to transmit the packet.
      */
     virtual void Send(Ptr<Packet> packet,
-                      const LoraTxParameters& txParams,
                       uint32_t frequencyHz,
+                      const LoraTxParameters& txParams,
                       double txPowerDbm) = 0;
 
     /**
@@ -156,17 +156,17 @@ class LoraPhy : public Object
      * This method is typically called by LoraChannel.
      *
      * @param packet The packet that is arriving at this PHY layer.
+     * @param frequencyHz The frequency this packet is being transmitted on.
+     * @param spreadingFactor The Spreading Factor of the arriving packet.
      * @param rxPowerDbm The power of the arriving packet (assumed to be constant for the whole
      * reception).
-     * @param sf The Spreading Factor of the arriving packet.
      * @param duration The on air time of this packet.
-     * @param frequencyHz The frequency this packet is being transmitted on.
      */
     virtual void StartReceive(Ptr<Packet> packet,
+                              uint32_t frequencyHz,
+                              uint8_t spreadingFactor,
                               double rxPowerDbm,
-                              uint8_t sf,
-                              Time duration,
-                              uint32_t frequencyHz) = 0;
+                              Time duration) = 0;
 
     /**
      * Whether this device is transmitting or not.

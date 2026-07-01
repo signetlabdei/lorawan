@@ -179,10 +179,10 @@ LoraChannel::Receive(uint32_t i, Ptr<Packet> packet, const LoraChannelParameters
 
     // Call the appropriate PHY instance to let it begin reception
     m_phyList[i]->StartReceive(packet,
-                               parameters.rxPowerDbm,
+                               parameters.frequencyHz,
                                parameters.sf,
-                               parameters.duration,
-                               parameters.frequencyHz);
+                               parameters.rxPowerDbm,
+                               parameters.duration);
 }
 
 double

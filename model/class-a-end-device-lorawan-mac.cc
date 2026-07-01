@@ -90,7 +90,7 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
     Ptr<LogicalLoraChannel> txChannel = GetRandomChannelForTx();
 
     NS_LOG_DEBUG("PacketToSend: " << packetToSend);
-    m_phy->Send(packetToSend, params, txChannel->GetFrequency(), m_txPowerDbm);
+    m_phy->Send(packetToSend, txChannel->GetFrequency(), params, m_txPowerDbm);
 
     //////////////////////////////////////////////
     // Register packet transmission for duty cycle

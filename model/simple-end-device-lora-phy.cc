@@ -46,11 +46,11 @@ SimpleEndDeviceLoraPhy::~SimpleEndDeviceLoraPhy()
 
 void
 SimpleEndDeviceLoraPhy::Send(Ptr<Packet> packet,
-                             const LoraTxParameters& txParams,
                              uint32_t frequencyHz,
+                             const LoraTxParameters& txParams,
                              double txPowerDbm)
 {
-    NS_LOG_FUNCTION(this << packet << txParams << frequencyHz << txPowerDbm);
+    NS_LOG_FUNCTION(this << packet << frequencyHz << txParams << txPowerDbm);
 
     NS_LOG_INFO("Current state: " << m_state);
 
@@ -86,12 +86,13 @@ SimpleEndDeviceLoraPhy::Send(Ptr<Packet> packet,
 
 void
 SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
+                                     uint32_t frequencyHz,
+                                     uint8_t spreadingFactor,
                                      double rxPowerDbm,
-                                     uint8_t sf,
-                                     Time duration,
-                                     uint32_t frequencyHz)
+                                     Time duration)
 {
-    NS_LOG_FUNCTION(this << packet << rxPowerDbm << unsigned(sf) << duration << frequencyHz);
+    NS_LOG_FUNCTION(this << packet << frequencyHz << unsigned(spreadingFactor) << rxPowerDbm
+                         << duration);
 
     // Notify the LoraInterferenceHelper of the impinging signal, and remember
     // the event it creates. This will be used then to correctly handle the end
@@ -102,7 +103,7 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
     // still incoming.
 
     Ptr<LoraInterferenceHelper::Event> event;
-    event = m_interference.Add(duration, rxPowerDbm, sf, packet, frequencyHz);
+    event = m_interference.Add(duration, rxPowerDbm, spreadingFactor, packet, frequencyHz);
 
     // Switch on the current PHY state
     switch (m_state)
@@ -135,7 +136,7 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
         bool canLockOnPacket = true;
 
         // Save needed sensitivity
-        double sensitivity = EndDeviceLoraPhy::SENSITIVITY[unsigned(sf) - 7];
+        double sensitivity = EndDeviceLoraPhy::SENSITIVITY[unsigned(spreadingFactor) - 7];
 
         // Check frequency
         //////////////////
@@ -153,10 +154,11 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
 
         // Check Spreading Factor
         /////////////////////////
-        if (sf != m_rxSf)
+        if (spreadingFactor != m_rxSf)
         {
-            NS_LOG_INFO("Packet lost because it's using SF"
-                        << unsigned(sf) << ", while we are listening for SF" << unsigned(m_rxSf));
+            NS_LOG_INFO("Packet lost because it's using SF" << unsigned(spreadingFactor)
+                                                            << ", while we are listening for SF"
+                                                            << unsigned(m_rxSf));
 
             // Fire the trace source for this event.
             m_wrongSf(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
@@ -168,9 +170,9 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
         ////////////////////
         if (rxPowerDbm < sensitivity)
         {
-            NS_LOG_INFO("Dropping packet reception of packet with sf = "
-                        << unsigned(sf) << " because under the sensitivity of " << sensitivity
-                        << " dBm");
+            NS_LOG_INFO("Dropping packet reception of packet with SF"
+                        << unsigned(spreadingFactor) << " because under the sensitivity of "
+                        << sensitivity << " dBm");
 
             // Fire the trace source for this event.
             m_underSensitivity(packet, (m_device) ? m_device->GetNode()->GetId() : 0);

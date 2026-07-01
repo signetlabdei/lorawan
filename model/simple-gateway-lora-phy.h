@@ -35,16 +35,16 @@ class SimpleGatewayLoraPhy : public GatewayLoraPhy
 
     // Implementation of GatewayLoraPhy's pure virtual function
     void Send(Ptr<Packet> packet,
-              const LoraTxParameters& txParams,
               uint32_t frequencyHz,
+              const LoraTxParameters& txParams,
               double txPowerDbm) override;
 
     // Implementation of GatewayLoraPhy's pure virtual function
     void StartReceive(Ptr<Packet> packet,
+                      uint32_t frequencyHz,
+                      uint8_t spreadingFactor,
                       double rxPowerDbm,
-                      uint8_t sf,
-                      Time duration,
-                      uint32_t frequencyHz) override;
+                      Time duration) override;
 
   private:
     // Implementation of GatewayLoraPhy's pure virtual function

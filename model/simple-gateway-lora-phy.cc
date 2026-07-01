@@ -50,11 +50,11 @@ SimpleGatewayLoraPhy::~SimpleGatewayLoraPhy()
 
 void
 SimpleGatewayLoraPhy::Send(Ptr<Packet> packet,
-                           const LoraTxParameters& txParams,
                            uint32_t frequencyHz,
+                           const LoraTxParameters& txParams,
                            double txPowerDbm)
 {
-    NS_LOG_FUNCTION(this << packet << frequencyHz << txPowerDbm);
+    NS_LOG_FUNCTION(this << packet << frequencyHz << txParams << txPowerDbm);
 
     // Get the time a packet with these parameters will take to be transmitted
     Time duration = GetTimeOnAir(packet->GetSize(), txParams);
@@ -97,12 +97,13 @@ SimpleGatewayLoraPhy::Send(Ptr<Packet> packet,
 
 void
 SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
+                                   uint32_t frequencyHz,
+                                   uint8_t spreadingFactor,
                                    double rxPowerDbm,
-                                   uint8_t sf,
-                                   Time duration,
-                                   uint32_t frequencyHz)
+                                   Time duration)
 {
-    NS_LOG_FUNCTION(this << packet << rxPowerDbm << duration << frequencyHz);
+    NS_LOG_FUNCTION(this << packet << frequencyHz << unsigned(spreadingFactor) << rxPowerDbm
+                         << duration);
 
     // Fire the trace source
     m_phyRxBeginTrace(packet);
@@ -110,8 +111,8 @@ SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
     if (m_isTransmitting)
     {
         // If we get to this point, there are no demodulators we can use
-        NS_LOG_INFO("Dropping packet reception of packet with sf = "
-                    << unsigned(sf) << " because we are in TX mode");
+        NS_LOG_INFO("Dropping packet reception of packet with SF" << unsigned(spreadingFactor)
+                                                                  << " because we are in TX mode");
 
         m_phyRxEndTrace(packet);
 
@@ -123,7 +124,7 @@ SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
 
     // Add the event to the LoraInterferenceHelper
     Ptr<LoraInterferenceHelper::Event> event;
-    event = m_interference.Add(duration, rxPowerDbm, sf, packet, frequencyHz);
+    event = m_interference.Add(duration, rxPowerDbm, spreadingFactor, packet, frequencyHz);
 
     // Cycle over the receive paths to check availability to receive the packet
     std::list<Ptr<SimpleGatewayLoraPhy::ReceptionPath>>::iterator it;
@@ -138,13 +139,13 @@ SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
         {
             // See whether the reception power is above or below the sensitivity
             // for that spreading factor
-            double sensitivity = SimpleGatewayLoraPhy::SENSITIVITY[unsigned(sf) - 7];
+            double sensitivity = SimpleGatewayLoraPhy::SENSITIVITY[unsigned(spreadingFactor) - 7];
 
             if (rxPowerDbm < sensitivity) // Packet arrived below sensitivity
             {
-                NS_LOG_INFO("Dropping packet reception of packet with sf = "
-                            << unsigned(sf) << " because under the sensitivity of " << sensitivity
-                            << " dBm");
+                NS_LOG_INFO("Dropping packet reception of packet with SF"
+                            << unsigned(spreadingFactor) << " because under the sensitivity of "
+                            << sensitivity << " dBm");
 
                 m_underSensitivity(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
 
@@ -175,8 +176,8 @@ SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
         }
     }
     // If we get to this point, there are no demodulators we can use
-    NS_LOG_INFO("Dropping packet reception of packet with sf = "
-                << unsigned(sf) << " and frequency " << frequencyHz
+    NS_LOG_INFO("Dropping packet reception of packet with SF"
+                << unsigned(spreadingFactor) << " and frequency " << frequencyHz
                 << "Hz because no suitable demodulator was found");
 
     // Fire the trace source
