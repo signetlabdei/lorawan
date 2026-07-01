@@ -77,13 +77,13 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
 
     // Craft LoraTxParameters object
     LoraTxParameters params;
-    params.sf = sf;
-    params.headerDisabled = m_headerDisabled;
-    params.codingRate = m_codingRate;
+    params.spreadingFactor = sf;
     params.bandwidthHz = bw;
-    params.nPreamble = m_nPreambleSymbols;
+    params.codingRate = m_codingRate;
+    params.lowDataRateOptimize = LoraPhy::GetTSym(sf, bw) > MilliSeconds(16);
+    params.preambleLenSymb = m_nPreambleSymbols;
+    params.implicitHeader = m_headerDisabled;
     params.crcEnabled = true;
-    params.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(sf, bw) > MilliSeconds(16);
 
     // Wake up PHY layer and directly send the packet
 

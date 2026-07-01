@@ -70,13 +70,13 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
     auto bw = GetBandwidthFromDataRate(dataRate);
 
     LoraTxParameters params;
-    params.sf = sf;
-    params.headerDisabled = false;
-    params.codingRate = CodingRate::CR_4_5;
+    params.spreadingFactor = sf;
     params.bandwidthHz = bw;
-    params.nPreamble = 8;
+    params.codingRate = CodingRate::CR_4_5;
+    params.lowDataRateOptimize = LoraPhy::GetTSym(sf, bw) > MilliSeconds(16);
+    params.preambleLenSymb = 8;
+    params.implicitHeader = false;
     params.crcEnabled = true;
-    params.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(sf, bw) > MilliSeconds(16);
 
     // Get the duration
     Time duration = LoraPhy::GetTimeOnAir(packet, params);

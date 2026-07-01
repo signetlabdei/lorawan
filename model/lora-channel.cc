@@ -97,7 +97,7 @@ void
 LoraChannel::Send(Ptr<LoraPhy> sender,
                   Ptr<Packet> packet,
                   double txPowerDbm,
-                  LoraTxParameters txParams,
+                  const LoraTxParameters& txParams,
                   Time duration,
                   uint32_t frequencyHz) const
 {
@@ -152,7 +152,7 @@ LoraChannel::Send(Ptr<LoraPhy> sender,
             // Create the parameters object based on the calculations above
             LoraChannelParameters parameters;
             parameters.rxPowerDbm = rxPowerDbm;
-            parameters.sf = txParams.sf;
+            parameters.sf = txParams.spreadingFactor;
             parameters.duration = duration;
             parameters.frequencyHz = frequencyHz;
 

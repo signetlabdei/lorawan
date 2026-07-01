@@ -46,7 +46,7 @@ SimpleEndDeviceLoraPhy::~SimpleEndDeviceLoraPhy()
 
 void
 SimpleEndDeviceLoraPhy::Send(Ptr<Packet> packet,
-                             LoraTxParameters txParams,
+                             const LoraTxParameters& txParams,
                              uint32_t frequencyHz,
                              double txPowerDbm)
 {
@@ -70,7 +70,7 @@ SimpleEndDeviceLoraPhy::Send(Ptr<Packet> packet,
     // Tag the packet with information about its Spreading Factor
     LoraTag tag;
     packet->RemovePacketTag(tag);
-    tag.SetSpreadingFactor(txParams.sf);
+    tag.SetSpreadingFactor(txParams.spreadingFactor);
     packet->AddPacketTag(tag);
 
     // Send the packet over the channel

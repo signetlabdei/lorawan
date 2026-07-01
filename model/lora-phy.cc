@@ -68,11 +68,14 @@ operator>>(std::istream& is, CodingRate& codingRate)
 std::ostream&
 operator<<(std::ostream& os, const LoraTxParameters& params)
 {
-    os << "SF: " << unsigned(params.sf) << ", headerDisabled: " << params.headerDisabled
-       << ", codingRate: " << params.codingRate << ", bandwidthHz: " << params.bandwidthHz
-       << ", nPreamble: " << params.nPreamble << ", crcEnabled: " << params.crcEnabled
-       << ", lowDataRateOptimizationEnabled: " << params.lowDataRateOptimizationEnabled << ")";
-
+    os << "LoraTxParameters("
+       << "spreadingFactor=" << unsigned(params.spreadingFactor) << ", "
+       << "bandwidthHz=" << params.bandwidthHz << ", "
+       << "codingRate=" << params.codingRate << ", "
+       << "lowDataRateOptimize=" << params.lowDataRateOptimize << ", "
+       << "preambleLenSymb: " << params.preambleLenSymb << ", "
+       << "implicitHeader=" << params.implicitHeader << ", "
+       << "crcEnabled=" << params.crcEnabled << ")";
     return os;
 }
 
@@ -89,7 +92,7 @@ LoraPhy::GetTSym(uint8_t spreadingFactor, uint32_t bandwidthHz)
 }
 
 Time
-LoraPhy::GetTimeOnAir(Ptr<Packet> packet, LoraTxParameters txParams)
+LoraPhy::GetTimeOnAir(Ptr<Packet> packet, const LoraTxParameters& txParams)
 {
     NS_LOG_FUNCTION(packet << txParams);
 
@@ -97,10 +100,10 @@ LoraPhy::GetTimeOnAir(Ptr<Packet> packet, LoraTxParameters txParams)
     // [1] SX1272 LoRa modem designer's guide.
 
     // Compute the symbol duration in seconds
-    double tSym = GetTSym(txParams.sf, txParams.bandwidthHz).GetSeconds();
+    double tSym = GetTSym(txParams.spreadingFactor, txParams.bandwidthHz).GetSeconds();
 
     // Compute the preamble duration
-    auto nPreamble = static_cast<double>(txParams.nPreamble);
+    auto nPreamble = static_cast<double>(txParams.preambleLenSymb);
     double tPreamble = (nPreamble + 4.25) * tSym;
 
     // Payload size
@@ -109,13 +112,13 @@ LoraPhy::GetTimeOnAir(Ptr<Packet> packet, LoraTxParameters txParams)
 
     // Safety casts since the formula deals with double values.
     auto pl = static_cast<double>(payloadLen);
-    auto sf = static_cast<double>(txParams.sf);
+    auto sf = static_cast<double>(txParams.spreadingFactor);
     auto cr = static_cast<double>(txParams.codingRate);
     // de = 1 when the low data rate optimization is enabled, 0 otherwise
     // h = 1 when header is implicit, 0 otherwise
     // crc = 1 when cyclic redundancy check is present, 0 otherwise
-    double de = txParams.lowDataRateOptimizationEnabled ? 1.0 : 0.0;
-    double h = txParams.headerDisabled ? 1.0 : 0.0;
+    double de = txParams.lowDataRateOptimize ? 1.0 : 0.0;
+    double h = txParams.implicitHeader ? 1.0 : 0.0;
     double crc = txParams.crcEnabled ? 1.0 : 0.0;
 
     // num and den refer to numerator and denominator of the time on air formula

@@ -1005,29 +1005,25 @@ TimeOnAirTest::DoRun()
     Ptr<Packet> packet;
     Time duration;
 
-    // Available parameters:
-    // PayloadSize, SF, HeaderDisabled, CodingRate, Bandwidth, nPreambleSyms, crcEnabled,
-    // lowDROptimization
-
     // Starting parameters
     packet = Create<Packet>(10);
     LoraTxParameters txParams;
-    txParams.sf = 7;
-    txParams.headerDisabled = false;
+    txParams.spreadingFactor = 7;
+    txParams.bandwidthHz = 125'000;
     txParams.codingRate = CodingRate::CR_4_5;
-    txParams.bandwidthHz = 125000;
-    txParams.nPreamble = 8;
+    txParams.lowDataRateOptimize = false;
+    txParams.preambleLenSymb = 8;
+    txParams.implicitHeader = false;
     txParams.crcEnabled = true;
-    txParams.lowDataRateOptimizationEnabled = false;
 
     duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.041216, 0.0001, "Unexpected duration");
 
-    txParams.sf = 8;
+    txParams.spreadingFactor = 8;
     duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.072192, 0.0001, "Unexpected duration");
 
-    txParams.headerDisabled = true;
+    txParams.implicitHeader = true;
     duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.072192, 0.0001, "Unexpected duration");
 
@@ -1035,15 +1031,15 @@ TimeOnAirTest::DoRun()
     duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.078336, 0.0001, "Unexpected duration");
 
-    txParams.nPreamble = 10;
+    txParams.preambleLenSymb = 10;
     duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.082432, 0.0001, "Unexpected duration");
 
-    txParams.lowDataRateOptimizationEnabled = true;
+    txParams.lowDataRateOptimize = true;
     duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.082432, 0.0001, "Unexpected duration");
 
-    txParams.sf = 10;
+    txParams.spreadingFactor = 10;
     duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.280576, 0.0001, "Unexpected duration");
 
@@ -1055,15 +1051,15 @@ TimeOnAirTest::DoRun()
     duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.070144, 0.0001, "Unexpected duration");
 
-    txParams.headerDisabled = false;
+    txParams.implicitHeader = false;
     duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.082432, 0.0001, "Unexpected duration");
 
-    txParams.nPreamble = 8;
+    txParams.preambleLenSymb = 8;
     duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.078336, 0.0001, "Unexpected duration");
 
-    txParams.sf = 12;
+    txParams.spreadingFactor = 12;
     duration = LoraPhy::GetTimeOnAir(packet, txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.264192, 0.0001, "Unexpected duration");
 
@@ -1332,7 +1328,7 @@ PhyConnectivityTest::DoRun()
     Reset();
 
     LoraTxParameters txParams;
-    txParams.sf = 12;
+    txParams.spreadingFactor = 12;
 
     uint8_t buffer[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     Ptr<Packet> packet = Create<Packet>(buffer, 10);
@@ -1387,7 +1383,7 @@ PhyConnectivityTest::DoRun()
 
     // Packet that arrives under sensitivity is received correctly if the spreading factor increases
 
-    txParams.sf = 7;
+    txParams.spreadingFactor = 7;
     edPhy2->SetRxSpreadingFactor(7);
     DynamicCast<ConstantPositionMobilityModel>(edPhy2->GetMobility())
         ->SetPosition(Vector(2990, 0, 0));
@@ -1412,7 +1408,7 @@ PhyConnectivityTest::DoRun()
     Reset();
 
     // Try again using a packet with higher spreading factor
-    txParams.sf = 8;
+    txParams.spreadingFactor = 8;
     edPhy2->SetRxSpreadingFactor(8);
     DynamicCast<ConstantPositionMobilityModel>(edPhy2->GetMobility())
         ->SetPosition(Vector(2990, 0, 0));
@@ -1437,7 +1433,7 @@ PhyConnectivityTest::DoRun()
 
     // Packets can be destroyed by interference
 
-    txParams.sf = 12;
+    txParams.spreadingFactor = 12;
     Simulator::Schedule(Seconds(2),
                         &SimpleEndDeviceLoraPhy::Send,
                         edPhy1,
@@ -1485,7 +1481,7 @@ PhyConnectivityTest::DoRun()
 
     // Packets can be lost because the PHY is not listening for the right spreading factor
 
-    txParams.sf = 8; // Send with 8, listening for 12
+    txParams.spreadingFactor = 8; // Send with 8, listening for 12
     Simulator::Schedule(Seconds(2),
                         &SimpleEndDeviceLoraPhy::Send,
                         edPhy1,

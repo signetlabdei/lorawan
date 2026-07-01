@@ -52,13 +52,15 @@ std::istream& operator>>(std::istream& is, CodingRate& codingRate);
  */
 struct LoraTxParameters
 {
-    uint8_t sf = 7;                             //!< Spreading Factor
-    bool headerDisabled = false;                //!< Whether to use implicit header mode
-    CodingRate codingRate = CodingRate::CR_4_5; //!< Code rate (obtained as 4/(codingRate+4))
-    uint32_t bandwidthHz = 125000;              //!< Bandwidth in Hz
-    uint32_t nPreamble = 8;                     //!< Number of preamble symbols
-    bool crcEnabled = true; //!< Whether Cyclic Redundancy Check (CRC) is enabled
-    bool lowDataRateOptimizationEnabled = false; //!< Whether low data rate optimization is enabled
+    // Modulation parameters
+    uint8_t spreadingFactor = 7;                //!< Symbol Spreading Factor (SF)
+    uint32_t bandwidthHz = 125'000;             //!< Transmission bandwidth in Hz
+    CodingRate codingRate = CodingRate::CR_4_5; //!< Transmission coding rate
+    bool lowDataRateOptimize = false; //!< Low Data Rate Optimization (mandated for SF11 and SF12)
+    // PHY packet parameters
+    uint16_t preambleLenSymb = 8; //!< Number of symbols in the packet preamble
+    bool implicitHeader = false;  //!< Whether to use implicit header mode
+    bool crcEnabled = true;       //!< Whether Cyclic Redundancy Check (CRC) is enabled
 };
 
 /**
@@ -125,7 +127,7 @@ class LoraPhy : public Object
      * @param txParams The set of parameters that will be used for transmission.
      * @return The time necessary to transmit the packet.
      */
-    static Time GetTimeOnAir(Ptr<Packet> packet, LoraTxParameters txParams);
+    static Time GetTimeOnAir(Ptr<Packet> packet, const LoraTxParameters& txParams);
 
     /**
      *  Register this type.
@@ -145,7 +147,7 @@ class LoraPhy : public Object
      * @param txPowerDbm The power in dBm with which to transmit the packet.
      */
     virtual void Send(Ptr<Packet> packet,
-                      LoraTxParameters txParams,
+                      const LoraTxParameters& txParams,
                       uint32_t frequencyHz,
                       double txPowerDbm) = 0;
 

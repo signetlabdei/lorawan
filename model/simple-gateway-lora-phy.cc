@@ -50,7 +50,7 @@ SimpleGatewayLoraPhy::~SimpleGatewayLoraPhy()
 
 void
 SimpleGatewayLoraPhy::Send(Ptr<Packet> packet,
-                           LoraTxParameters txParams,
+                           const LoraTxParameters& txParams,
                            uint32_t frequencyHz,
                            double txPowerDbm)
 {
@@ -59,7 +59,8 @@ SimpleGatewayLoraPhy::Send(Ptr<Packet> packet,
     // Get the time a packet with these parameters will take to be transmitted
     Time duration = GetTimeOnAir(packet, txParams);
 
-    NS_LOG_DEBUG("Duration of packet: " << duration << ", SF" << unsigned(txParams.sf));
+    NS_LOG_DEBUG("Duration of packet: " << duration << ", SF"
+                                        << unsigned(txParams.spreadingFactor));
 
     // Interrupt all receive operations
     std::list<Ptr<SimpleGatewayLoraPhy::ReceptionPath>>::iterator it;

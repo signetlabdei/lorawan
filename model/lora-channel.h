@@ -105,7 +105,7 @@ class LoraChannel : public Channel
     void Send(Ptr<LoraPhy> sender,
               Ptr<Packet> packet,
               double txPowerDbm,
-              LoraTxParameters txParams,
+              const LoraTxParameters& txParams,
               Time duration,
               uint32_t frequencyHz) const;
 

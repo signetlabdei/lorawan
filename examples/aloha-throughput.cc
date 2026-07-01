@@ -240,13 +240,14 @@ main(int argc, char* argv[])
     for (uint8_t sf = 7; sf <= 12; sf++)
     {
         LoraTxParameters txParams;
-        txParams.sf = sf;
-        txParams.headerDisabled = false;
+        txParams.spreadingFactor = sf;
+        txParams.bandwidthHz = 125'000;
         txParams.codingRate = CodingRate::CR_4_5;
-        txParams.bandwidthHz = 125000;
-        txParams.nPreamble = 8;
+        txParams.lowDataRateOptimize = LoraPhy::GetTSym(sf, 125'000) > MilliSeconds(16);
+        txParams.preambleLenSymb = 8;
+        txParams.implicitHeader = false;
         txParams.crcEnabled = true;
-        txParams.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(sf, 125000) > MilliSeconds(16);
+
         Ptr<Packet> pkt = Create<Packet>(packetSize);
 
         LoraFrameHeader frameHdr = LoraFrameHeader();
