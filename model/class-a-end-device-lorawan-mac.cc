@@ -74,13 +74,15 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
 
     auto sf = GetSfFromDataRate(m_dataRate);
     auto bw = GetBandwidthFromDataRate(m_dataRate);
+    // see SX1272/73 Datasheet, Section 4.1.1.6, Rev. 4, Jan. 2019
+    auto ldro = bool((sf == 11 || sf == 12) && bw == 125'000);
 
     // Craft LoraTxParameters object
     LoraTxParameters params;
     params.spreadingFactor = sf;
     params.bandwidthHz = bw;
     params.codingRate = m_codingRate;
-    params.lowDataRateOptimize = LoraPhy::GetTSym(sf, bw) > MilliSeconds(16);
+    params.lowDataRateOptimize = ldro;
     params.preambleLenSymb = m_nPreambleSymbols;
     params.implicitHeader = m_headerDisabled;
     params.crcEnabled = true;

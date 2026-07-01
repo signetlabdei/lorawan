@@ -243,7 +243,7 @@ main(int argc, char* argv[])
         txParams.spreadingFactor = sf;
         txParams.bandwidthHz = 125'000;
         txParams.codingRate = CodingRate::CR_4_5;
-        txParams.lowDataRateOptimize = LoraPhy::GetTSym(sf, 125'000) > MilliSeconds(16);
+        txParams.lowDataRateOptimize = (sf == 11 || sf == 12);
         txParams.preambleLenSymb = 8;
         txParams.implicitHeader = false;
         txParams.crcEnabled = true;

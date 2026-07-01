@@ -68,12 +68,14 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
 
     auto sf = GetSfFromDataRate(dataRate);
     auto bw = GetBandwidthFromDataRate(dataRate);
+    // see SX1272/73 Datasheet, Section 4.1.1.6, Rev. 4, Jan. 2019
+    auto ldro = bool((sf == 11 || sf == 12) && bw == 125'000);
 
     LoraTxParameters params;
     params.spreadingFactor = sf;
     params.bandwidthHz = bw;
     params.codingRate = CodingRate::CR_4_5;
-    params.lowDataRateOptimize = LoraPhy::GetTSym(sf, bw) > MilliSeconds(16);
+    params.lowDataRateOptimize = ldro;
     params.preambleLenSymb = 8;
     params.implicitHeader = false;
     params.crcEnabled = true;
