@@ -22,9 +22,7 @@ NS_OBJECT_ENSURE_REGISTERED(GatewayLoraPhy);
  **************************************/
 
 GatewayLoraPhy::ReceptionPath::ReceptionPath()
-    : m_available(true),
-      m_event(nullptr),
-      m_endReceiveEventId(EventId())
+    : m_available(true)
 {
     NS_LOG_FUNCTION_NOARGS();
 }
@@ -43,16 +41,16 @@ GatewayLoraPhy::ReceptionPath::IsAvailable() const
 void
 GatewayLoraPhy::ReceptionPath::Free()
 {
+    m_endReceiveEventId.Cancel();
     m_available = true;
-    m_event = nullptr;
-    m_endReceiveEventId = EventId();
+    SetEvent(nullptr);
 }
 
 void
 GatewayLoraPhy::ReceptionPath::LockOnEvent(Ptr<LoraInterferenceHelper::Event> event)
 {
     m_available = false;
-    m_event = event;
+    SetEvent(event);
 }
 
 void
