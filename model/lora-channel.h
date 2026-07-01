@@ -90,24 +90,22 @@ class LoraChannel : public Channel
      * their StartReceive methods after a delay based on the channel's
      * PropagationDelayModel.
      *
-     * @param sender The phy that is sending this packet.
-     * @param packet The PHY layer packet that is being sent over the channel.
-     * @param txPowerDbm The power of the transmission.
-     * @param txParams The set of parameters that are used by the transmitter.
-     * @param duration The on-air duration of this packet.
+     * @param sender The PHY device that is sending this packet.
+     * @param packet The PHY packet that is being sent over the channel.
      * @param frequencyHz The frequency this transmission will happen at.
+     * @param txParams The set of parameters that are used by the transmitter.
+     * @param txPowerDbm The power of the transmission.
+     * @param duration The on-air duration of this packet.
      *
-     * @internal
-     *
-     * When this method is called, the channel schedules an internal Receive call
+     * @internal When this method is called, the channel schedules an internal Receive call
      * that performs the actual call to the PHY's StartReceive function.
      */
     void Send(Ptr<LoraPhy> sender,
               Ptr<Packet> packet,
-              double txPowerDbm,
+              uint32_t frequencyHz,
               const LoraTxParameters& txParams,
-              Time duration,
-              uint32_t frequencyHz) const;
+              double txPowerDbm,
+              Time duration) const;
 
     /**
      * Compute the received power when transmitting from a point to another one.
@@ -131,10 +129,10 @@ class LoraChannel : public Channel
      */
     struct LoraChannelParameters
     {
-        double rxPowerDbm;    //!< The reception power.
-        uint8_t sf;           //!< The Spreading Factor of this transmission.
-        Time duration;        //!< The duration of the transmission.
-        uint32_t frequencyHz; //!< The frequency [Hz] of this transmission.
+        uint32_t frequencyHz;    //!< The frequency [Hz] of this transmission.
+        uint8_t spreadingFactor; //!< The Spreading Factor of this transmission.
+        double rxPowerDbm;       //!< The average reception power.
+        Time duration;           //!< The duration of the transmission.
     };
 
     /**
@@ -144,11 +142,13 @@ class LoraChannel : public Channel
      * It's here that the Receive method of the PHY is called to initiate packet
      * reception at the PHY.
      *
-     * @param i The index of the phy to start reception on.
+     * @param receiver The phy to start reception on.
      * @param packet The packet the phy will receive.
      * @param parameters The parameters that characterize this transmission.
      */
-    void Receive(uint32_t i, Ptr<Packet> packet, const LoraChannelParameters& parameters) const;
+    void Receive(Ptr<LoraPhy> receiver,
+                 Ptr<Packet> packet,
+                 const LoraChannelParameters& parameters) const;
 
     /**
      * Allow logging of LoraChannelParameters like with any other data type.

@@ -75,7 +75,7 @@ SimpleEndDeviceLoraPhy::Send(Ptr<Packet> packet,
 
     // Send the packet over the channel
     NS_LOG_INFO("Sending the packet in the channel");
-    m_channel->Send(this, packet, txPowerDbm, txParams, duration, frequencyHz);
+    m_channel->Send(this, packet, frequencyHz, txParams, txPowerDbm, duration);
 
     // Schedule a call to signal the transmission end.
     Simulator::Schedule(duration, &SimpleEndDeviceLoraPhy::TxFinished, this, packet);

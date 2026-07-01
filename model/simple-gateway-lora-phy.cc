@@ -85,7 +85,7 @@ SimpleGatewayLoraPhy::Send(Ptr<Packet> packet,
     }
 
     // Send the packet in the channel
-    m_channel->Send(this, packet, txPowerDbm, txParams, duration, frequencyHz);
+    m_channel->Send(this, packet, frequencyHz, txParams, txPowerDbm, duration);
 
     Simulator::Schedule(duration, &SimpleGatewayLoraPhy::TxFinished, this, packet);
 
