@@ -140,12 +140,14 @@ class EndDeviceLoraPhy : public LoraPhy
     // Forward LoraPhy's pure virtual function
     void Send(Ptr<Packet> packet,
               uint32_t frequencyHz,
+              IQPolarity iqPolarity,
               const LoraTxParameters& txParams,
               double txPowerDbm) override = 0;
 
     // Forward LoraPhy's pure virtual function
     void StartReceive(Ptr<Packet> packet,
                       uint32_t frequencyHz,
+                      IQPolarity iqPolarity,
                       uint8_t spreadingFactor,
                       double rxPowerDbm,
                       Time duration) override = 0;
@@ -231,6 +233,12 @@ class EndDeviceLoraPhy : public LoraPhy
      * @param txPowerDbm The transmission power [dBm].
      */
     void SwitchToTx(double txPowerDbm);
+
+    /**
+     * Trace source for when a packet is lost because it was transmitted with a different I/Q
+     * polarity (uplink or downlink) from the one this EndDeviceLoraPhy was configured to listen on.
+     */
+    TracedCallback<Ptr<const Packet>, uint32_t> m_wrongPolarity;
 
     /**
      * Trace source for when a packet is lost because it was using a spreading factor different from

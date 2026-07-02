@@ -92,7 +92,7 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
     m_channelHelper->AddEvent(duration, frequencyHz);
 
     // Send the packet to the PHY layer to send it on the channel
-    m_phy->Send(packet, frequencyHz, params, sendingPower);
+    m_phy->Send(packet, frequencyHz, IQPolarity::DOWN, params, sendingPower);
 
     m_sentNewPacket(packet);
 }

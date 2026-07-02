@@ -1343,7 +1343,8 @@ PhyConnectivityTest::DoRun()
                         &SimpleEndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
-                        868100000,
+                        868'100'000,
+                        IQPolarity::DOWN,
                         txParams,
                         14);
 
@@ -1366,7 +1367,8 @@ PhyConnectivityTest::DoRun()
                         &SimpleEndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
-                        868100000,
+                        868'100'000,
+                        IQPolarity::DOWN,
                         txParams,
                         14);
 
@@ -1392,7 +1394,8 @@ PhyConnectivityTest::DoRun()
                         &SimpleEndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
-                        868100000,
+                        868'100'000,
+                        IQPolarity::DOWN,
                         txParams,
                         14);
 
@@ -1417,7 +1420,8 @@ PhyConnectivityTest::DoRun()
                         &SimpleEndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
-                        868100000,
+                        868'100'000,
+                        IQPolarity::DOWN,
                         txParams,
                         14);
 
@@ -1438,14 +1442,16 @@ PhyConnectivityTest::DoRun()
                         &SimpleEndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
-                        868100000,
+                        868'100'000,
+                        IQPolarity::DOWN,
                         txParams,
                         14);
     Simulator::Schedule(Seconds(2),
                         &SimpleEndDeviceLoraPhy::Send,
                         edPhy3,
                         packet,
-                        868100000,
+                        868'100'000,
+                        IQPolarity::DOWN,
                         txParams,
                         14);
 
@@ -1465,7 +1471,8 @@ PhyConnectivityTest::DoRun()
                         &SimpleEndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
-                        868300000,
+                        868'300'000,
+                        IQPolarity::DOWN,
                         txParams,
                         14);
 
@@ -1486,7 +1493,8 @@ PhyConnectivityTest::DoRun()
                         &SimpleEndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
-                        868100000,
+                        868'100'000,
+                        IQPolarity::DOWN,
                         txParams,
                         14);
 
@@ -1509,7 +1517,8 @@ PhyConnectivityTest::DoRun()
                         &SimpleEndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
-                        868100000,
+                        868'100'000,
+                        IQPolarity::DOWN,
                         txParams,
                         14);
 
@@ -1532,7 +1541,8 @@ PhyConnectivityTest::DoRun()
                         &SimpleEndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
-                        868100000,
+                        868'100'000,
+                        IQPolarity::DOWN,
                         txParams,
                         14);
 

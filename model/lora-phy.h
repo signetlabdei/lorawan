@@ -24,6 +24,25 @@ class LoraChannel;
 /**
  * @ingroup lorawan
  *
+ * I/Q Polarity of LoRa transmission symbols
+ *
+ * In LoRa, uplink symbols are often called upchirps and downlink symbols downchirps. They represent
+ * symbols of opposite I/Q polarity in the LoRa Chirp Spread Spectrum (CSS) modulation.
+ */
+enum class IQPolarity
+{
+    UP,  //!< Uplink / Upchirp / Normal polarity
+    DOWN //!< Downlink / Downchirp / Inverted polarity
+};
+
+/**
+ * Allow logging of IQPolarity like any other data type.
+ */
+std::ostream& operator<<(std::ostream& os, const IQPolarity& iqPolarity);
+
+/**
+ * @ingroup lorawan
+ *
  * Enumeration of the LoRa supported coding rates
  */
 enum class CodingRate : uint8_t
@@ -142,11 +161,13 @@ class LoraPhy : public Object
      *
      * @param packet The packet to send.
      * @param frequencyHz The frequency on which to transmit.
+     * @param iqPolarity The transmission's I/Q polarity (uplink or downlink).
      * @param txParams The desired transmission parameters.
      * @param txPowerDbm The power in dBm with which to transmit the packet.
      */
     virtual void Send(Ptr<Packet> packet,
                       uint32_t frequencyHz,
+                      IQPolarity iqPolarity,
                       const LoraTxParameters& txParams,
                       double txPowerDbm) = 0;
 
@@ -157,6 +178,7 @@ class LoraPhy : public Object
      *
      * @param packet The packet that is arriving at this PHY layer.
      * @param frequencyHz The frequency this packet is being transmitted on.
+     * @param iqPolarity The transmission's I/Q polarity (uplink or downlink).
      * @param spreadingFactor The Spreading Factor of the arriving packet.
      * @param rxPowerDbm The power of the arriving packet (assumed to be constant for the whole
      * reception).
@@ -164,6 +186,7 @@ class LoraPhy : public Object
      */
     virtual void StartReceive(Ptr<Packet> packet,
                               uint32_t frequencyHz,
+                              IQPolarity iqPolarity,
                               uint8_t spreadingFactor,
                               double rxPowerDbm,
                               Time duration) = 0;

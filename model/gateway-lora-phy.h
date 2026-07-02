@@ -47,12 +47,14 @@ class GatewayLoraPhy : public LoraPhy
     // Forward LoraPhy's pure virtual function
     void Send(Ptr<Packet> packet,
               uint32_t frequencyHz,
+              IQPolarity iqPolarity,
               const LoraTxParameters& txParams,
               double txPowerDbm) override = 0;
 
     // Forward LoraPhy's pure virtual function
     void StartReceive(Ptr<Packet> packet,
                       uint32_t frequencyHz,
+                      IQPolarity iqPolarity,
                       uint8_t spreadingFactor,
                       double rxPowerDbm,
                       Time duration) override = 0;

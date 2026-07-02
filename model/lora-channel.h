@@ -24,6 +24,7 @@ namespace lorawan
 {
 
 class LoraPhy;
+enum class IQPolarity;
 struct LoraTxParameters;
 
 /**
@@ -93,6 +94,7 @@ class LoraChannel : public Channel
      * @param sender The PHY device that is sending this packet.
      * @param packet The PHY packet that is being sent over the channel.
      * @param frequencyHz The frequency this transmission will happen at.
+     * @param iqPolarity The transmission's I/Q polarity (uplink or downlink).
      * @param txParams The set of parameters that are used by the transmitter.
      * @param txPowerDbm The power of the transmission.
      * @param duration The on-air duration of this packet.
@@ -103,6 +105,7 @@ class LoraChannel : public Channel
     void Send(Ptr<LoraPhy> sender,
               Ptr<Packet> packet,
               uint32_t frequencyHz,
+              IQPolarity iqPolarity,
               const LoraTxParameters& txParams,
               double txPowerDbm,
               Time duration) const;
@@ -130,6 +133,7 @@ class LoraChannel : public Channel
     struct LoraChannelParameters
     {
         uint32_t frequencyHz;    //!< The frequency [Hz] of this transmission.
+        IQPolarity iqPolarity;   //!< The transmission's I/Q polarity (uplink or downlink).
         uint8_t spreadingFactor; //!< The Spreading Factor of this transmission.
         double rxPowerDbm;       //!< The average reception power.
         Time duration;           //!< The duration of the transmission.

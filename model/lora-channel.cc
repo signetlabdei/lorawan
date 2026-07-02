@@ -97,11 +97,13 @@ void
 LoraChannel::Send(Ptr<LoraPhy> sender,
                   Ptr<Packet> packet,
                   uint32_t frequencyHz,
+                  IQPolarity iqPolarity,
                   const LoraTxParameters& txParams,
                   double txPowerDbm,
                   Time duration) const
 {
-    NS_LOG_FUNCTION(this << sender << packet << frequencyHz << txParams << txPowerDbm << duration);
+    NS_LOG_FUNCTION(this << sender << packet << frequencyHz << iqPolarity << txParams << txPowerDbm
+                         << duration);
 
     // Get the mobility model of the sender
     auto senderMobility = sender->GetMobility();
@@ -148,6 +150,7 @@ LoraChannel::Send(Ptr<LoraPhy> sender,
             // Create the parameters object based on the calculations above
             LoraChannelParameters parameters;
             parameters.frequencyHz = frequencyHz;
+            parameters.iqPolarity = iqPolarity;
             parameters.spreadingFactor = txParams.spreadingFactor;
             parameters.rxPowerDbm = rxPowerDbm;
             parameters.duration = duration;
@@ -184,6 +187,7 @@ LoraChannel::Receive(Ptr<LoraPhy> receiver,
     // Call the appropriate PHY instance to let it begin reception
     receiver->StartReceive(packet,
                            parameters.frequencyHz,
+                           parameters.iqPolarity,
                            parameters.spreadingFactor,
                            parameters.rxPowerDbm,
                            parameters.duration);
@@ -194,6 +198,7 @@ operator<<(std::ostream& os, const LoraChannel::LoraChannelParameters& params)
 {
     os << "LoraChannelParameters("
        << "frequencyHz=" << params.frequencyHz << " Hz, "
+       << "IQPolarity=" << params.iqPolarity << ", "
        << "spreadingFactor=" << unsigned(params.spreadingFactor) << ", "
        << "rxPowerDbm=" << params.rxPowerDbm << " dBm, "
        << "duration=" << params.duration.As(Time::MS) << ")";

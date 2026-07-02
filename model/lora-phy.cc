@@ -18,6 +18,21 @@ namespace lorawan
 {
 
 std::ostream&
+operator<<(std::ostream& os, const IQPolarity& iqPolarity)
+{
+    switch (iqPolarity)
+    {
+    case IQPolarity::UP:
+        return os << "UP";
+    case IQPolarity::DOWN:
+        return os << "DOWN";
+    default:
+        NS_FATAL_ERROR("Unknown I/Q polarity value");
+        return (os << "UNKNOWN");
+    }
+}
+
+std::ostream&
 operator<<(std::ostream& os, const CodingRate& codingRate)
 {
     switch (codingRate)

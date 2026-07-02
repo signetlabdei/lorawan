@@ -38,6 +38,12 @@ EndDeviceLoraPhy::GetTypeId()
                             "the end device was listening on a different frequency",
                             MakeTraceSourceAccessor(&EndDeviceLoraPhy::m_wrongFrequency),
                             "ns3::Packet::TracedCallback")
+            .AddTraceSource("LostPacketBecauseWrongPolarity",
+                            "Trace source indicating a packet "
+                            "could not be correctly decoded because"
+                            "the end device was expecting a different I/Q polarity",
+                            MakeTraceSourceAccessor(&EndDeviceLoraPhy::m_wrongPolarity),
+                            "ns3::Packet::TracedCallback")
             .AddTraceSource("LostPacketBecauseWrongSpreadingFactor",
                             "Trace source indicating a packet "
                             "could not be correctly decoded because"

@@ -47,10 +47,11 @@ SimpleEndDeviceLoraPhy::~SimpleEndDeviceLoraPhy()
 void
 SimpleEndDeviceLoraPhy::Send(Ptr<Packet> packet,
                              uint32_t frequencyHz,
+                             IQPolarity iqPolarity,
                              const LoraTxParameters& txParams,
                              double txPowerDbm)
 {
-    NS_LOG_FUNCTION(this << packet << frequencyHz << txParams << txPowerDbm);
+    NS_LOG_FUNCTION(this << packet << frequencyHz << iqPolarity << txParams << txPowerDbm);
 
     NS_LOG_INFO("Current state: " << m_state);
 
@@ -75,7 +76,7 @@ SimpleEndDeviceLoraPhy::Send(Ptr<Packet> packet,
 
     // Send the packet over the channel
     NS_LOG_INFO("Sending the packet in the channel");
-    m_channel->Send(this, packet, frequencyHz, txParams, txPowerDbm, duration);
+    m_channel->Send(this, packet, frequencyHz, iqPolarity, txParams, txPowerDbm, duration);
 
     // Schedule a call to signal the transmission end.
     Simulator::Schedule(duration, &SimpleEndDeviceLoraPhy::TxFinished, this, packet);
@@ -87,12 +88,13 @@ SimpleEndDeviceLoraPhy::Send(Ptr<Packet> packet,
 void
 SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
                                      uint32_t frequencyHz,
+                                     IQPolarity iqPolarity,
                                      uint8_t spreadingFactor,
                                      double rxPowerDbm,
                                      Time duration)
 {
-    NS_LOG_FUNCTION(this << packet << frequencyHz << unsigned(spreadingFactor) << rxPowerDbm
-                         << duration);
+    NS_LOG_FUNCTION(this << packet << frequencyHz << iqPolarity << unsigned(spreadingFactor)
+                         << rxPowerDbm << duration);
 
     // Notify the LoraInterferenceHelper of the impinging signal, and remember
     // the event it creates. This will be used then to correctly handle the end
@@ -148,6 +150,19 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
 
             // Fire the trace source for this event.
             m_wrongFrequency(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
+
+            canLockOnPacket = false;
+        }
+
+        // Check modulation I/Q polarity
+        ////////////////////////////////
+        if (iqPolarity != IQPolarity::DOWN)
+        {
+            NS_LOG_INFO("Packet ignored because it's "
+                        << iqPolarity << "LINK and we are listening for DOWNLINK transmissions");
+
+            // Fire the trace source for this event.
+            m_wrongPolarity(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
 
             canLockOnPacket = false;
         }

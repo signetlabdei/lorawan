@@ -51,10 +51,11 @@ SimpleGatewayLoraPhy::~SimpleGatewayLoraPhy()
 void
 SimpleGatewayLoraPhy::Send(Ptr<Packet> packet,
                            uint32_t frequencyHz,
+                           IQPolarity iqPolarity,
                            const LoraTxParameters& txParams,
                            double txPowerDbm)
 {
-    NS_LOG_FUNCTION(this << packet << frequencyHz << txParams << txPowerDbm);
+    NS_LOG_FUNCTION(this << packet << frequencyHz << iqPolarity << txParams << txPowerDbm);
 
     // Get the time a packet with these parameters will take to be transmitted
     Time duration = GetTimeOnAir(packet->GetSize(), txParams);
@@ -85,7 +86,7 @@ SimpleGatewayLoraPhy::Send(Ptr<Packet> packet,
     }
 
     // Send the packet in the channel
-    m_channel->Send(this, packet, frequencyHz, txParams, txPowerDbm, duration);
+    m_channel->Send(this, packet, frequencyHz, iqPolarity, txParams, txPowerDbm, duration);
 
     Simulator::Schedule(duration, &SimpleGatewayLoraPhy::TxFinished, this, packet);
 
@@ -98,12 +99,13 @@ SimpleGatewayLoraPhy::Send(Ptr<Packet> packet,
 void
 SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
                                    uint32_t frequencyHz,
+                                   IQPolarity iqPolarity,
                                    uint8_t spreadingFactor,
                                    double rxPowerDbm,
                                    Time duration)
 {
-    NS_LOG_FUNCTION(this << packet << frequencyHz << unsigned(spreadingFactor) << rxPowerDbm
-                         << duration);
+    NS_LOG_FUNCTION(this << packet << frequencyHz << iqPolarity << unsigned(spreadingFactor)
+                         << rxPowerDbm << duration);
 
     // Fire the trace source
     m_phyRxBeginTrace(packet);
@@ -119,6 +121,18 @@ SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
         // Fire the trace source
         m_noReceptionBecauseTransmitting(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
 
+        return;
+    }
+    // Check modulation I/Q polarity (gateway PHYs listen for uplinks by default)
+    else if (iqPolarity != IQPolarity::UP)
+    {
+        NS_LOG_INFO("Dropping packet reception of packet with SF"
+                    << unsigned(spreadingFactor)
+                    << " because we are not listening to uplink transmissions");
+
+        m_phyRxEndTrace(packet);
+
+        /// TODO: implement trace source
         return;
     }
 

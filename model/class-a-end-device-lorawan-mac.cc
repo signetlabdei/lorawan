@@ -92,7 +92,7 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
     Ptr<LogicalLoraChannel> txChannel = GetRandomChannelForTx();
 
     NS_LOG_DEBUG("PacketToSend: " << packetToSend);
-    m_phy->Send(packetToSend, txChannel->GetFrequency(), params, m_txPowerDbm);
+    m_phy->Send(packetToSend, txChannel->GetFrequency(), IQPolarity::UP, params, m_txPowerDbm);
 
     //////////////////////////////////////////////
     // Register packet transmission for duty cycle
@@ -135,107 +135,76 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
     // Remove the Mac Header to get some information
     LorawanMacHeader mHdr;
     packetCopy->RemoveHeader(mHdr);
+    NS_ASSERT_MSG(mHdr.IsUplink() == false, "Received uplink package, check PHY polarity");
+    NS_LOG_DEBUG("Downlink Mac Header: " << mHdr);
+    // Remove the Frame Header
+    LoraFrameHeader fHdr;
+    fHdr.SetAsDownlink();
+    packetCopy->RemoveHeader(fHdr);
+    NS_LOG_DEBUG("Downlink Frame Header: " << fHdr);
 
-    NS_LOG_DEBUG("Mac Header: " << mHdr);
+    // Determine whether this packet is for us
+    bool messageForUs = (m_address == fHdr.GetAddress());
 
-    // Only keep analyzing the packet if it's downlink
-    if (!mHdr.IsUplink())
+    if (messageForUs)
     {
-        NS_LOG_INFO("Found a downlink packet.");
+        NS_LOG_INFO("The message is for us!");
 
-        // Remove the Frame Header
-        LoraFrameHeader fHdr;
-        fHdr.SetAsDownlink();
-        packetCopy->RemoveHeader(fHdr);
+        // If it exists, cancel the second receive window event
+        // THIS WILL BE GetReceiveWindow()
+        Simulator::Cancel(m_secondReceiveWindow);
 
-        NS_LOG_DEBUG("Frame Header: " << fHdr);
+        // Reset ADR backoff counter
+        m_adrAckCnt = 0;
 
-        // Determine whether this packet is for us
-        bool messageForUs = (m_address == fHdr.GetAddress());
+        LoraTag tag;
+        packet->PeekPacketTag(tag);
+        /// @see ns3::lorawan::AdrComponent::RxPowerToSNR
+        m_lastRxSnr = tag.GetReceivePower() + 174 - 10 * log10(125000) - 6;
 
-        if (messageForUs)
+        // Parse the MAC commands
+        ParseCommands(fHdr);
+
+        // Pass the packet up to the NetDevice
+        if (!m_receiveCallback.IsNull())
         {
-            NS_LOG_INFO("The message is for us!");
-
-            // If it exists, cancel the second receive window event
-            // THIS WILL BE GetReceiveWindow()
-            Simulator::Cancel(m_secondReceiveWindow);
-
-            // Reset ADR backoff counter
-            m_adrAckCnt = 0;
-
-            LoraTag tag;
-            packet->PeekPacketTag(tag);
-            /// @see ns3::lorawan::AdrComponent::RxPowerToSNR
-            m_lastRxSnr = tag.GetReceivePower() + 174 - 10 * log10(125000) - 6;
-
-            // Parse the MAC commands
-            ParseCommands(fHdr);
-
-            // Pass the packet up to the NetDevice
-            if (!m_receiveCallback.IsNull())
-            {
-                m_receiveCallback(packetCopy);
-            }
-            // Call the trace source
-            m_receivedPacket(packet);
+            m_receiveCallback(packetCopy);
         }
-        else
-        {
-            NS_LOG_DEBUG("The message is intended for another recipient.");
-
-            // In this case, we are either receiving in the first receive window
-            // and finishing reception inside the second one, or receiving a
-            // packet in the second receive window and finding out, after the
-            // fact, that the packet is not for us. In either case, if we no
-            // longer have any retransmissions left, we declare failure.
-            if (m_retxParams.waitingAck && m_secondReceiveWindow.IsExpired())
-            {
-                /// TODO: UNCONFIRMED packets CAN be retransmitted, but behave slightly differently.
-                /// The current implementation only considers re-txs for CONFIRMED, change this
-                if (m_retxParams.retxLeft == 0)
-                {
-                    uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
-                    m_confirmedTxOutcomeCallback(txs,
-                                                 false,
-                                                 m_retxParams.firstAttempt,
-                                                 m_retxParams.packet);
-                    NS_LOG_DEBUG("Failure: no more retransmissions left. Used "
-                                 << unsigned(txs) << " transmissions.");
-
-                    // Reset retransmission parameters
-                    ResetRetransmissionParameters();
-                }
-                else // Reschedule
-                {
-                    this->Send(m_retxParams.packet);
-                    NS_LOG_INFO("We have " << unsigned(m_retxParams.retxLeft)
-                                           << " retransmissions left: rescheduling transmission.");
-                }
-            }
-        }
+        // Call the trace source
+        m_receivedPacket(packet);
     }
-    else if (m_retxParams.waitingAck && m_secondReceiveWindow.IsExpired())
+    else
     {
-        NS_LOG_INFO("The packet we are receiving is in uplink.");
-        if (m_retxParams.retxLeft > 0)
-        {
-            this->Send(m_retxParams.packet);
-            NS_LOG_INFO("We have " << unsigned(m_retxParams.retxLeft)
-                                   << " retransmissions left: rescheduling transmission.");
-        }
-        else
-        {
-            uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
-            m_confirmedTxOutcomeCallback(txs,
-                                         false,
-                                         m_retxParams.firstAttempt,
-                                         m_retxParams.packet);
-            NS_LOG_DEBUG("Failure: no more retransmissions left. Used " << unsigned(txs)
-                                                                        << " transmissions.");
+        NS_LOG_DEBUG("The message is intended for another recipient.");
 
-            // Reset retransmission parameters
-            ResetRetransmissionParameters();
+        // In this case, we are either receiving in the first receive window
+        // and finishing reception inside the second one, or receiving a
+        // packet in the second receive window and finding out, after the
+        // fact, that the packet is not for us. In either case, if we no
+        // longer have any retransmissions left, we declare failure.
+        if (m_retxParams.waitingAck && m_secondReceiveWindow.IsExpired())
+        {
+            /// TODO: UNCONFIRMED packets CAN be retransmitted, but behave slightly differently.
+            /// The current implementation only considers re-txs for CONFIRMED, change this
+            if (m_retxParams.retxLeft == 0)
+            {
+                uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
+                m_confirmedTxOutcomeCallback(txs,
+                                             false,
+                                             m_retxParams.firstAttempt,
+                                             m_retxParams.packet);
+                NS_LOG_DEBUG("Failure: no more retransmissions left. Used " << unsigned(txs)
+                                                                            << " transmissions.");
+
+                // Reset retransmission parameters
+                ResetRetransmissionParameters();
+            }
+            else // Reschedule
+            {
+                this->Send(m_retxParams.packet);
+                NS_LOG_INFO("We have " << unsigned(m_retxParams.retxLeft)
+                                       << " retransmissions left: rescheduling transmission.");
+            }
         }
     }
 
