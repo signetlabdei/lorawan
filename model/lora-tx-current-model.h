@@ -46,8 +46,12 @@ class LoraTxCurrentModel : public Object
 /**
  * @ingroup lorawan
  *
- * A linear model of the transmission current for a LoRa device, based on the
- * WiFi model.
+ * @brief A linear model of the transmission current for a LoRa device
+ *
+ * This model assumes that the transmit current is a linear function of the nominal transmit power
+ * used to send the frame. Adapted from LinearWifiTxCurrentModel, the default values are obtained by
+ * line interpolation of the (7dBm, 18mA) and (13dBm, 28mA) values for TX power (converted to Watt)
+ * and respective current found in the SX1272/73 Datasheet, Rev. 4, Jan. 2019.
  */
 class LinearLoraTxCurrentModel : public LoraTxCurrentModel
 {

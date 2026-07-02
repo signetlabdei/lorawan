@@ -90,6 +90,24 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
  * Energy calculation: For each transaction, this model notifies EnergySource
  * object. The EnergySource object will query this model for the total current.
  * Then the EnergySource object uses the total current to calculate energy.
+ *
+ * Default values for current are based on measurements reported in:
+ *
+ * Semtech Corp., "SX1272/73 Datasheet, Rev. 4, Jan. 2019"
+ *
+ * The default current values in Ampere are:
+ *
+ * \f$ I_{sleep} = 0.0000001 \f$
+ *
+ * \f$ I_{standby} = 0.0014 \f$
+ *
+ * \f$ I_{tx} = 0.028 \f$ (transmit at 13dBm)
+ *
+ * \f$ I_{rx} = 0.0108 \f$
+ *
+ * The dependence of the power consumption in transmission mode on the nominal
+ * transmit power can also be achieved through a LoRa TX current model.
+ *
  */
 class LoraRadioEnergyModel : public energy::DeviceEnergyModel
 {

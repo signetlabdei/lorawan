@@ -49,7 +49,7 @@ LinearLoraTxCurrentModel::GetTypeId()
             .AddConstructor<LinearLoraTxCurrentModel>()
             .AddAttribute("Eta",
                           "The efficiency of the power amplifier.",
-                          DoubleValue(0.10),
+                          DoubleValue(0.452750), // see class description
                           MakeDoubleAccessor(&LinearLoraTxCurrentModel::m_eta),
                           MakeDoubleChecker<double>())
             .AddAttribute("Voltage",
@@ -59,7 +59,7 @@ LinearLoraTxCurrentModel::GetTypeId()
                           MakeDoubleChecker<double>())
             .AddAttribute("BaseCurrent",
                           "The TX baseline current (in Ampere) at 0W output.",
-                          DoubleValue(0.0014), // idle mode = 1.4mA
+                          DoubleValue(0.014646), // see class description
                           MakeDoubleAccessor(&LinearLoraTxCurrentModel::m_baseCurrent),
                           MakeDoubleChecker<double>());
     return tid;

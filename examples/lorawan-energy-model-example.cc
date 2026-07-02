@@ -150,14 +150,19 @@ main(int argc, char* argv[])
     basicSourceHelper.Set("BasicEnergySourceInitialEnergyJ", DoubleValue(10000)); // Energy in J
     basicSourceHelper.Set("BasicEnergySupplyVoltageV", DoubleValue(3.3));
 
-    radioEnergyHelper.Set("StandbyCurrentA", DoubleValue(0.0014));
-    radioEnergyHelper.Set("TxCurrentA", DoubleValue(0.028));
-    radioEnergyHelper.Set("SleepCurrentA", DoubleValue(0.0000015));
-    radioEnergyHelper.Set("RxCurrentA", DoubleValue(0.0112));
+    // set states currents (see SX1272 datasheet)
+    radioEnergyHelper.Set("SleepCurrentA", DoubleValue(0.1e-6));   // 0.1uA
+    radioEnergyHelper.Set("StandbyCurrentA", DoubleValue(1.4e-3)); // 1.4mA
+    radioEnergyHelper.Set("RxCurrentA", DoubleValue(10.8e-3));     // 10.8mA
 
-    radioEnergyHelper.SetTxCurrentModel("ns3::ConstantLoraTxCurrentModel",
-                                        "TxCurrent",
-                                        DoubleValue(0.028));
+    // instead of a fixed tx current, use a dynamic current model based on the device tx power
+    radioEnergyHelper.SetTxCurrentModel("ns3::LinearLoraTxCurrentModel",
+                                        "Eta",
+                                        DoubleValue(0.452750),
+                                        "Voltage",
+                                        DoubleValue(3.3),
+                                        "BaseCurrent",
+                                        DoubleValue(0.014646));
 
     // install source on end devices' nodes
     EnergySourceContainer sources = basicSourceHelper.Install(endDevices);

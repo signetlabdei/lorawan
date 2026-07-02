@@ -122,25 +122,25 @@ LoraRadioEnergyModel::GetTypeId()
             .AddConstructor<LoraRadioEnergyModel>()
             .AddAttribute("SleepCurrentA",
                           "The radio Sleep current in Ampere.",
-                          DoubleValue(0.0000015), // sleep mode = 1.5microA
+                          DoubleValue(0.1e-6), // sleep mode = 0.1uA
                           MakeDoubleAccessor(&LoraRadioEnergyModel::SetSleepCurrentA,
                                              &LoraRadioEnergyModel::GetSleepCurrentA),
                           MakeDoubleChecker<double>())
             .AddAttribute("StandbyCurrentA",
                           "The default radio Standby current in Ampere.",
-                          DoubleValue(0.0014), // idle mode = 1.4mA
+                          DoubleValue(1.4e-3), // standby mode = 1.4mA
                           MakeDoubleAccessor(&LoraRadioEnergyModel::SetStandbyCurrentA,
                                              &LoraRadioEnergyModel::GetStandbyCurrentA),
                           MakeDoubleChecker<double>())
             .AddAttribute("TxCurrentA",
                           "The radio Tx current in Ampere.",
-                          DoubleValue(0.028), // transmit at 0dBm = 28mA
+                          DoubleValue(28e-3), // transmit at 13dBm = 28mA
                           MakeDoubleAccessor(&LoraRadioEnergyModel::SetTxCurrentA,
                                              &LoraRadioEnergyModel::GetTxCurrentA),
                           MakeDoubleChecker<double>())
             .AddAttribute("RxCurrentA",
                           "The radio Rx current in Ampere.",
-                          DoubleValue(0.0112), // receive mode = 11.2mA
+                          DoubleValue(10.8e-3), // receive mode = 10.8mA
                           MakeDoubleAccessor(&LoraRadioEnergyModel::SetRxCurrentA,
                                              &LoraRadioEnergyModel::GetRxCurrentA),
                           MakeDoubleChecker<double>())
