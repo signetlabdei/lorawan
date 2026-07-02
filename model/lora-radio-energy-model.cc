@@ -220,12 +220,13 @@ LoraRadioEnergyModel::ChangeState(int newState)
     switch (m_currentState)
     {
     case EndDeviceLoraPhy::State::STANDBY:
+    case EndDeviceLoraPhy::State::RX_ENABLED:
         energyToDecrease = duration.GetSeconds() * m_idleCurrentA * supplyVoltage;
         break;
     case EndDeviceLoraPhy::State::TX:
         energyToDecrease = duration.GetSeconds() * m_txCurrentA * supplyVoltage;
         break;
-    case EndDeviceLoraPhy::State::RX:
+    case EndDeviceLoraPhy::State::RX_ACTIVE:
         energyToDecrease = duration.GetSeconds() * m_rxCurrentA * supplyVoltage;
         break;
     case EndDeviceLoraPhy::State::SLEEP:
@@ -325,10 +326,11 @@ LoraRadioEnergyModel::DoGetCurrentA() const
     switch (m_currentState)
     {
     case EndDeviceLoraPhy::State::STANDBY:
+    case EndDeviceLoraPhy::State::RX_ENABLED:
         return m_idleCurrentA;
     case EndDeviceLoraPhy::State::TX:
         return m_txCurrentA;
-    case EndDeviceLoraPhy::State::RX:
+    case EndDeviceLoraPhy::State::RX_ACTIVE:
         return m_rxCurrentA;
     case EndDeviceLoraPhy::State::SLEEP:
         return m_sleepCurrentA;
@@ -384,7 +386,7 @@ LoraRadioEnergyModelPhyListener::NotifyRxStart()
     {
         NS_FATAL_ERROR("LoraRadioEnergyModelPhyListener:Change state callback not set!");
     }
-    m_changeStateCallback(int(EndDeviceLoraPhy::State::RX));
+    m_changeStateCallback(int(EndDeviceLoraPhy::State::RX_ACTIVE));
 }
 
 void

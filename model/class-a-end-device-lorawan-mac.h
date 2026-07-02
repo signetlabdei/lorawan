@@ -36,17 +36,6 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     ClassAEndDeviceLorawanMac();           //!< Default constructor
     ~ClassAEndDeviceLorawanMac() override; //!< Destructor
 
-    /////////////////////
-    // Sending methods //
-    /////////////////////
-
-    /**
-     * Add headers and send a packet with the sending function of the physical layer.
-     *
-     * @param packet The packet to send.
-     */
-    void SendToPhy(Ptr<Packet> packet) override;
-
     //////////////////////////
     //  Receiving methods   //
     //////////////////////////
@@ -77,26 +66,6 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      * @param packet The packet that has just been transmitted.
      */
     void TxFinished(Ptr<const Packet> packet) override;
-
-    /**
-     * Perform operations needed to open the first receive window.
-     */
-    void OpenFirstReceiveWindow();
-
-    /**
-     * Perform operations needed to open the second receive window.
-     */
-    void OpenSecondReceiveWindow();
-
-    /**
-     * Perform operations needed to close the first receive window.
-     */
-    void CloseFirstReceiveWindow();
-
-    /**
-     * Perform operations needed to close the second receive window.
-     */
-    void CloseSecondReceiveWindow();
 
     /////////////////////////
     // Getters and Setters //
@@ -153,7 +122,39 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
 
     void OnRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequencyHz) override;
 
+  protected:
+    /////////////////////
+    // Sending methods //
+    /////////////////////
+
+    /**
+     * Send a packet with the sending function of the physical layer.
+     *
+     * @param packet The packet to send.
+     */
+    void SendToPhy(Ptr<Packet> packet) override;
+
   private:
+    /**
+     * Perform operations needed to open the first receive window.
+     */
+    void OpenFirstReceiveWindow();
+
+    /**
+     * Perform operations needed to open the second receive window.
+     */
+    void OpenSecondReceiveWindow();
+
+    /**
+     * Perform operations needed to close the first receive window.
+     */
+    void CloseFirstReceiveWindow();
+
+    /**
+     * Perform operations needed to close the second receive window.
+     */
+    void CloseSecondReceiveWindow();
+
     Time m_receiveDelay1; //!< The interval between when a packet is done sending and when the first
                           //!< receive window is opened.
 
@@ -164,18 +165,9 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     Time m_receiveDelay2;
 
     /**
-     * The event of the closing the first receive window.
-     *
-     * This Event will be canceled if there's a successful reception of a packet.
+     * Whether the second reception window is currently open
      */
-    EventId m_closeFirstWindow;
-
-    /**
-     * The event of the closing the second receive window.
-     *
-     * This Event will be canceled if there's a successful reception of a packet.
-     */
-    EventId m_closeSecondWindow;
+    bool m_isSecondWindowOpen;
 
     /**
      * The event of the second receive window opening.
@@ -184,6 +176,13 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      * successful.
      */
     EventId m_secondReceiveWindow;
+
+    /**
+     * The frequency [Hz] to listen on for the first receive window.
+     *
+     * This value is set dynamically to the last uplink transmission frequency.
+     */
+    uint32_t m_firstReceiveWindowFrequencyHz;
 
     /**
      * The frequency [Hz] to listen on for the second receive window.
@@ -199,8 +198,9 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      * The RX1DROffset parameter value.
      */
     uint8_t m_rx1DrOffset;
+};
 
-}; /* ClassAEndDeviceLorawanMac */
 } /* namespace lorawan */
 } /* namespace ns3 */
+
 #endif /* CLASS_A_END_DEVICE_LORAWAN_MAC_H */

@@ -1241,10 +1241,6 @@ PhyConnectivityTest::Reset()
     edPhy2 = CreateObject<SimpleEndDeviceLoraPhy>();
     edPhy3 = CreateObject<SimpleEndDeviceLoraPhy>();
 
-    edPhy1->SetRxFrequency(868100000);
-    edPhy2->SetRxFrequency(868100000);
-    edPhy3->SetRxFrequency(868100000);
-
     Ptr<ConstantPositionMobilityModel> mob1 = CreateObject<ConstantPositionMobilityModel>();
     Ptr<ConstantPositionMobilityModel> mob2 = CreateObject<ConstantPositionMobilityModel>();
     Ptr<ConstantPositionMobilityModel> mob3 = CreateObject<ConstantPositionMobilityModel>();
@@ -1257,10 +1253,6 @@ PhyConnectivityTest::Reset()
     edPhy2->SetMobility(mob2);
     edPhy3->SetMobility(mob3);
 
-    edPhy1->SwitchToStandby();
-    edPhy2->SwitchToStandby();
-    edPhy3->SwitchToStandby();
-
     channel->Add(edPhy1);
     channel->Add(edPhy2);
     channel->Add(edPhy3);
@@ -1268,16 +1260,6 @@ PhyConnectivityTest::Reset()
     edPhy1->SetChannel(channel);
     edPhy2->SetChannel(channel);
     edPhy3->SetChannel(channel);
-
-    // Listen for a specific SpreadingFactor
-    edPhy1->SetRxSpreadingFactor(12);
-    edPhy2->SetRxSpreadingFactor(12);
-    edPhy3->SetRxSpreadingFactor(12);
-
-    // Listen on a specific frequency
-    edPhy1->SetRxFrequency(868100000);
-    edPhy2->SetRxFrequency(868100000);
-    edPhy3->SetRxFrequency(868100000);
 
     edPhy1->TraceConnectWithoutContext("ReceivedPacket",
                                        MakeCallback(&PhyConnectivityTest::ReceivedPacket, this));
@@ -1325,13 +1307,19 @@ PhyConnectivityTest::DoRun()
     // Setup
     ////////
 
-    Reset();
+    uint8_t buffer[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    Ptr<Packet> packet = Create<Packet>(buffer, 10);
 
     LoraTxParameters txParams;
     txParams.spreadingFactor = 12;
+    txParams.bandwidthHz = 125'000;
+    txParams.codingRate = CodingRate::CR_4_5;
+    txParams.lowDataRateOptimize = true;
+    txParams.preambleLenSymb = 8;
+    txParams.implicitHeader = false;
+    txParams.crcEnabled = true;
 
-    uint8_t buffer[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    Ptr<Packet> packet = Create<Packet>(buffer, 10);
+    Reset();
 
     // Testing
     //////////
@@ -1340,11 +1328,31 @@ PhyConnectivityTest::DoRun()
     /////////////////////////////
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::ReceiveSingle,
                         edPhy1,
+                        868'100'000,
+                        IQPolarity::UP,
+                        txParams.spreadingFactor,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2),
+                        &EndDeviceLoraPhy::ReceiveSingle,
+                        edPhy2,
+                        868'100'000,
+                        IQPolarity::UP,
+                        txParams.spreadingFactor,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
+                        &SimpleEndDeviceLoraPhy::Send,
+                        edPhy3,
                         packet,
                         868'100'000,
-                        IQPolarity::DOWN,
+                        IQPolarity::UP,
                         txParams,
                         14);
 
@@ -1361,14 +1369,24 @@ PhyConnectivityTest::DoRun()
 
     // Sleeping PHYs do not receive the packet
 
-    edPhy2->SwitchToSleep();
+    edPhy1->Sleep();
 
     Simulator::Schedule(Seconds(2),
+                        &EndDeviceLoraPhy::ReceiveSingle,
+                        edPhy2,
+                        868'100'000,
+                        IQPolarity::UP,
+                        txParams.spreadingFactor,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
                         &SimpleEndDeviceLoraPhy::Send,
-                        edPhy1,
+                        edPhy3,
                         packet,
                         868'100'000,
-                        IQPolarity::DOWN,
+                        IQPolarity::UP,
                         txParams,
                         14);
 
@@ -1379,23 +1397,33 @@ PhyConnectivityTest::DoRun()
     NS_TEST_EXPECT_MSG_EQ(
         m_receivedPacketCalls,
         1,
-        "Packet was received by a PHY in SLEEP mode"); // All PHYs in Standby except the sender
+        "Packet was received by a PHY in SLEEP mode"); // All PHYs in Rx except the sender
 
     Reset();
 
     // Packet that arrives under sensitivity is received correctly if the spreading factor increases
 
     txParams.spreadingFactor = 7;
-    edPhy2->SetRxSpreadingFactor(7);
-    DynamicCast<ConstantPositionMobilityModel>(edPhy2->GetMobility())
+
+    DynamicCast<ConstantPositionMobilityModel>(edPhy1->GetMobility())
         ->SetPosition(Vector(2990, 0, 0));
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::ReceiveSingle,
                         edPhy1,
+                        868'100'000,
+                        IQPolarity::UP,
+                        txParams.spreadingFactor,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
+                        &SimpleEndDeviceLoraPhy::Send,
+                        edPhy2,
                         packet,
                         868'100'000,
-                        IQPolarity::DOWN,
+                        IQPolarity::UP,
                         txParams,
                         14);
 
@@ -1412,16 +1440,26 @@ PhyConnectivityTest::DoRun()
 
     // Try again using a packet with higher spreading factor
     txParams.spreadingFactor = 8;
-    edPhy2->SetRxSpreadingFactor(8);
-    DynamicCast<ConstantPositionMobilityModel>(edPhy2->GetMobility())
+
+    DynamicCast<ConstantPositionMobilityModel>(edPhy1->GetMobility())
         ->SetPosition(Vector(2990, 0, 0));
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::ReceiveSingle,
                         edPhy1,
+                        868'100'000,
+                        IQPolarity::UP,
+                        txParams.spreadingFactor,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
+                        &SimpleEndDeviceLoraPhy::Send,
+                        edPhy2,
                         packet,
                         868'100'000,
-                        IQPolarity::DOWN,
+                        IQPolarity::UP,
                         txParams,
                         14);
 
@@ -1438,20 +1476,32 @@ PhyConnectivityTest::DoRun()
     // Packets can be destroyed by interference
 
     txParams.spreadingFactor = 12;
+
     Simulator::Schedule(Seconds(2),
+                        &EndDeviceLoraPhy::ReceiveSingle,
+                        edPhy2,
+                        868'100'000,
+                        IQPolarity::UP,
+                        txParams.spreadingFactor,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
                         &SimpleEndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
                         868'100'000,
-                        IQPolarity::DOWN,
+                        IQPolarity::UP,
                         txParams,
                         14);
-    Simulator::Schedule(Seconds(2),
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
                         &SimpleEndDeviceLoraPhy::Send,
                         edPhy3,
                         packet,
                         868'100'000,
-                        IQPolarity::DOWN,
+                        IQPolarity::UP,
                         txParams,
                         14);
 
@@ -1468,11 +1518,21 @@ PhyConnectivityTest::DoRun()
     // Packets can be lost because the PHY is not listening on the right frequency
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::ReceiveSingle,
                         edPhy1,
+                        868'100'000,
+                        IQPolarity::UP,
+                        txParams.spreadingFactor,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
+                        &SimpleEndDeviceLoraPhy::Send,
+                        edPhy2,
                         packet,
                         868'300'000,
-                        IQPolarity::DOWN,
+                        IQPolarity::UP,
                         txParams,
                         14);
 
@@ -1481,7 +1541,7 @@ PhyConnectivityTest::DoRun()
     Simulator::Destroy();
 
     NS_TEST_EXPECT_MSG_EQ(m_wrongFrequencyCalls,
-                          2,
+                          1,
                           "Packets were received even though PHY was on a different frequency");
 
     Reset();
@@ -1489,12 +1549,23 @@ PhyConnectivityTest::DoRun()
     // Packets can be lost because the PHY is not listening for the right spreading factor
 
     txParams.spreadingFactor = 8; // Send with 8, listening for 12
+
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::ReceiveSingle,
                         edPhy1,
+                        868'100'000,
+                        IQPolarity::UP,
+                        12,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
+                        &SimpleEndDeviceLoraPhy::Send,
+                        edPhy2,
                         packet,
                         868'100'000,
-                        IQPolarity::DOWN,
+                        IQPolarity::UP,
                         txParams,
                         14);
 
@@ -1504,7 +1575,7 @@ PhyConnectivityTest::DoRun()
 
     NS_TEST_EXPECT_MSG_EQ(
         m_wrongSfCalls,
-        2,
+        1,
         "Packets were received even though PHY was listening for a different spreading factor.");
 
     Reset();
@@ -1513,12 +1584,23 @@ PhyConnectivityTest::DoRun()
     /////////////////////
 
     // The very same packet arrives at the other PHY
+
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::ReceiveSingle,
                         edPhy1,
+                        868'100'000,
+                        IQPolarity::UP,
+                        txParams.spreadingFactor,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
+                        &SimpleEndDeviceLoraPhy::Send,
+                        edPhy2,
                         packet,
                         868'100'000,
-                        IQPolarity::DOWN,
+                        IQPolarity::UP,
                         txParams,
                         14);
 
@@ -1538,11 +1620,21 @@ PhyConnectivityTest::DoRun()
     // PHY switches to STANDBY after TX and RX
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::ReceiveSingle,
                         edPhy1,
+                        868'100'000,
+                        IQPolarity::UP,
+                        txParams.spreadingFactor,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
+                        &SimpleEndDeviceLoraPhy::Send,
+                        edPhy2,
                         packet,
                         868'100'000,
-                        IQPolarity::DOWN,
+                        IQPolarity::UP,
                         txParams,
                         14);
 
@@ -1660,8 +1752,6 @@ MacCommandTest::RunMacCommand(Ts&&... args)
     mhdr.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
     pkt->AddHeader(mhdr);
     // Trigger MAC layer reception
-    DynamicCast<EndDeviceLoraPhy>(m_mac->GetPhy())
-        ->SwitchToStandby(); // usually done as we open Rx windows
     m_mac->Receive(pkt);
     // Trigger MAC layer send
     pkt = Create<Packet>(0);
@@ -2065,10 +2155,18 @@ class AdrBackoffTest : public TestCase
     void SendUplink(Time after, LoraFrameHeader& fhdr);
 
     /**
-     * Create and receive an empty payload downlink destined for the LoRaWAN MAC. This is used to
-     * test resetting the ADR backoff procedure.
+     * Create and schedule the PHY reception of a downlink transmission configured for the LoRaWAN
+     * MAC first reception window. This is used to test resetting the ADR backoff procedure.
+     *
+     * @note This does not call Simulator::Run(), enabling preemptive scheduling, but must be
+     * manually timed to happen during the first reception window
+     *
+     * It constrains the device to a single uplink channel to force-out the first reception window
+     * frequency. The downlink spreading factor is taken from the current MAC configuration.
+     *
+     * @param after Delay to schedule the packet after (must target the first reception window)
      */
-    void ReceiveDownlink();
+    void ScheduleRx1Downlink(Time after);
 
     /**
      * This function resets the simulation and device MAC layer, use before test sub-cases.
@@ -2107,7 +2205,7 @@ AdrBackoffTest::SendUplink(Time after, LoraFrameHeader& fhdr)
 }
 
 void
-AdrBackoffTest::ReceiveDownlink()
+AdrBackoffTest::ScheduleRx1Downlink(Time after)
 {
     Ptr<Packet> pkt;
     LoraFrameHeader fhdr;
@@ -2118,10 +2216,21 @@ AdrBackoffTest::ReceiveDownlink()
     pkt->AddHeader(fhdr);
     mhdr.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
     pkt->AddHeader(mhdr);
-    // Trigger MAC layer reception
-    DynamicCast<EndDeviceLoraPhy>(m_mac->GetPhy())
-        ->SwitchToStandby(); // usually done as we open Rx windows
-    m_mac->Receive(pkt);
+    // Force the next RX1 window channel frequency
+    auto chVec = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
+    chVec.at(1)->DisableForUplink();
+    chVec.at(2)->DisableForUplink();
+    // Schedule MAC layer reception through PHY
+    auto phy = DynamicCast<SimpleEndDeviceLoraPhy>(m_mac->GetPhy());
+    Simulator::Schedule(after,
+                        &SimpleEndDeviceLoraPhy::StartReceive,
+                        phy,
+                        pkt,
+                        chVec.at(0)->GetFrequency(),
+                        IQPolarity::DOWN,
+                        12,
+                        -100,
+                        MilliSeconds(10));
 }
 
 void
@@ -2183,7 +2292,7 @@ AdrBackoffTest::DoRun()
             NS_TEST_EXPECT_MSG_EQ(m_mac->GetDataRate(),
                                   expectedDr,
                                   "Unexpected data rate on uplink fCnt=" << fCnt);
-            auto chVec = llch->GetRawChannelArray();
+            const auto chVec = llch->GetRawChannelArray();
             for (uint8_t i = 0; i < 3; ++i)
             {
                 NS_TEST_EXPECT_MSG_EQ(chVec.at(i)->IsEnabledForUplink(),
@@ -2204,7 +2313,7 @@ AdrBackoffTest::DoRun()
         LoraFrameHeader fhdr;
         auto ADR_ACK_LIMIT = EndDeviceLorawanMac::ADR_ACK_LIMIT;
         // Trigger ADRACKReq
-        for (uint16_t fCnt = 0; fCnt <= ADR_ACK_LIMIT; ++fCnt)
+        for (uint16_t fCnt = 0; fCnt <= ADR_ACK_LIMIT + 5; ++fCnt)
         {
             SendUplink(Minutes(20), fhdr);
             NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), fCnt, "Unexpected FCnt value in uplink FHDR");
@@ -2212,10 +2321,21 @@ AdrBackoffTest::DoRun()
                                   fCnt >= ADR_ACK_LIMIT,
                                   "Unexpected ADRACKReq value in FHDR of uplink fCnt=" << fCnt);
         }
-        ReceiveDownlink();
+        // Receive downlink for the next packet RX window
+        ScheduleRx1Downlink(Minutes(20) + Seconds(2));
+        // Trigger reception windows with new uplink
         SendUplink(Minutes(20), fhdr);
         NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(),
-                              ADR_ACK_LIMIT + 1,
+                              ADR_ACK_LIMIT + 5 + 1,
+                              "Unexpected FCnt value in uplink FHDR");
+        NS_TEST_EXPECT_MSG_EQ(
+            fhdr.GetAdrAckReq(),
+            true,
+            "Unexpected ADRACKReq value in FHDR of uplink fCnt=" << fhdr.GetFCnt());
+        // Next uplink should have ADRACKReq unset because a downlink was received
+        SendUplink(Minutes(20), fhdr);
+        NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(),
+                              ADR_ACK_LIMIT + 5 + 2,
                               "Unexpected FCnt value in uplink FHDR");
         NS_TEST_EXPECT_MSG_EQ(
             fhdr.GetAdrAckReq(),
