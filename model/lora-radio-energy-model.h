@@ -25,7 +25,8 @@ class LoraTxCurrentModel;
 /**
  * @ingroup lorawan
  *
- * Installable listener for LoRa physiscal layer state changes
+ * A EndDeviceLoraPhy listener class for notifying the LoraRadioEnergyModel of Lora radio
+ * state change.
  */
 class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
 {
@@ -39,52 +40,26 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
     ~LoraRadioEnergyModelPhyListener() override; //!< Destructor
 
     /**
-     * Sets the change state callback. Used by helper class.
+     * @brief Sets the change state callback. Used by helper class.
      *
      * @param callback Change state callback.
      */
     void SetChangeStateCallback(energy::DeviceEnergyModel::ChangeStateCallback callback);
 
     /**
-     * Sets the update tx current callback.
+     * @brief Sets the update tx current callback.
      *
      * @param callback Update tx current callback.
      */
     void SetUpdateTxCurrentCallback(UpdateTxCurrentCallback callback);
 
-    /**
-     * Switches the LoraRadioEnergyModel to RX state.
-     *
-     * Defined in ns3::LoraEndDevicePhyListener.
-     */
-    void NotifyRxStart() override;
-
-    /**
-     * Switches the LoraRadioEnergyModel to TX state and switches back to
-     * STANDBY after TX duration.
-     *
-     * @param txPowerDbm The nominal tx power in dBm.
-     *
-     * Defined in ns3::LoraEndDevicePhyListener.
-     */
-    void NotifyTxStart(double txPowerDbm) override;
-
-    /**
-     * Defined in ns3::LoraEndDevicePhyListener.
-     */
     void NotifySleep() override;
-
-    /**
-     * Defined in ns3::LoraEndDevicePhyListener.
-     */
     void NotifyStandby() override;
+    void NotifyTx(double txPowerDbm) override;
+    void NotifyRxEnabled() override;
+    void NotifyRxActive() override;
 
   private:
-    /**
-     * A helper function that makes scheduling m_changeStateCallback possible.
-     */
-    void SwitchToStandby();
-
     /**
      * Change state callback used to notify the LoraRadioEnergyModel of a state
      * change.
@@ -101,17 +76,15 @@ class LoraRadioEnergyModelPhyListener : public EndDeviceLoraPhyListener
 /**
  * @ingroup lorawan
  *
- * A LoRa radio energy model.
+ * @brief A LoRa radio energy model.
  *
- * 4 states are defined for the radio: TX, RX, STANDBY, SLEEP. Default state is
- * STANDBY.
+ * 4 energy states are defined for the radio: TX, RX, STANDBY, SLEEP. Default state is STANDBY.
  * The different types of transactions that are defined are:
- *  1. Tx: State goes from STANDBY to TX, radio is in TX state for TX_duration,
+ *  1. Tx: State goes from SLEEP/STANDBY to TX, radio is in TX state,
  *     then state goes from TX to STANDBY.
- *  2. Rx: State goes from STANDBY to RX, radio is in RX state for RX_duration,
+ *  2. Rx: State goes from SLEEP/STANDBY to RX, radio is in RX state,
  *     then state goes from RX to STANDBY.
- *  3. Go_to_Sleep: State goes from STANDBY to SLEEP.
- *  4. End_of_Sleep: State goes from SLEEP to STANDBY.
+ *  3. Sleep: State goes from STANDBY to SLEEP.
  * The class keeps track of what state the radio is currently in.
  *
  * Energy calculation: For each transaction, this model notifies EnergySource
@@ -137,11 +110,11 @@ class LoraRadioEnergyModel : public energy::DeviceEnergyModel
      */
     static TypeId GetTypeId();
 
-    LoraRadioEnergyModel();
+    LoraRadioEnergyModel();           //!< Default constructor
     ~LoraRadioEnergyModel() override; //!< Destructor
 
     /**
-     * Sets pointer to EnergySouce installed on node.
+     * @brief Sets pointer to EnergySource installed on node.
      *
      * @param source Pointer to EnergySource installed on node.
      *
@@ -158,49 +131,49 @@ class LoraRadioEnergyModel : public energy::DeviceEnergyModel
 
     // Setter & getters for state power consumption.
     /**
-     * Gets idle current.
+     * @brief Gets standby current.
      *
-     * @return Idle current [A] of the lora device.
+     * @return Standby current [A] of the lora device.
      */
     double GetStandbyCurrentA() const;
     /**
-     * Sets idle current.
+     * @brief Sets standby current.
      *
-     * @param idleCurrentA The idle current [A].
+     * @param standbyCurrentA The standby current [A].
      */
-    void SetStandbyCurrentA(double idleCurrentA);
+    void SetStandbyCurrentA(double standbyCurrentA);
     /**
-     * Gets transmit current.
+     * @brief Gets transmit current.
      *
      * @return Transmit current [A] of the lora device.
      */
     double GetTxCurrentA() const;
     /**
-     * Sets transmit current.
+     * @brief Sets transmit current.
      *
      * @param txCurrentA The transmit current [A].
      */
     void SetTxCurrentA(double txCurrentA);
     /**
-     * Gets receive current.
+     * @brief Gets receive current.
      *
      * @return Receive current [A] of the lora device.
      */
     double GetRxCurrentA() const;
     /**
-     * Sets receive current.
+     * @brief Sets receive current.
      *
      * @param rxCurrentA The receive current [A].
      */
     void SetRxCurrentA(double rxCurrentA);
     /**
-     * Gets sleep current.
+     * @brief Gets sleep current.
      *
      * @return Sleep current [A] of the lora device.
      */
     double GetSleepCurrentA() const;
     /**
-     * Sets sleep current.
+     * @brief Sets sleep current.
      *
      * @param sleepCurrentA The sleep current [A].
      */
@@ -226,22 +199,20 @@ class LoraRadioEnergyModel : public energy::DeviceEnergyModel
     void SetEnergyRechargedCallback(LoraRadioEnergyRechargedCallback callback);
 
     /**
-     * @param model The model used to compute the lora tx current.
+     * @param model The model used to compute the lora TX current.
      */
-    // NOTICE VERY WELL: Current  Model linear or constant as possible choices
     void SetTxCurrentModel(Ptr<LoraTxCurrentModel> model);
 
     /**
-     * Calls the CalcTxCurrent method of the tx current model to
+     * @brief Calls the CalcTxCurrent method of the tx current model to
      *        compute the tx current based on such model.
      *
      * @param txPowerDbm The nominal tx power in dBm.
      */
-    // NOTICE VERY WELL: Current  Model linear or constant as possible choices
     void SetTxCurrentFromModel(double txPowerDbm);
 
     /**
-     * Changes state of the LoraRadioEnergyMode.
+     * Changes state of the LoraRadioEnergyModel.
      *
      * @param newState New state the lora radio is in.
      *
@@ -259,24 +230,30 @@ class LoraRadioEnergyModel : public energy::DeviceEnergyModel
     /**
      * Handles energy recharged.
      *
-     * Implements energy::DeviceEnergyModel::HandleEnergyChanged.
-     */
-    void HandleEnergyChanged() override;
-
-    /**
-     * Handles energy recharged.
-     *
      * Implements energy::DeviceEnergyModel::HandleEnergyRecharged.
      */
     void HandleEnergyRecharged() override;
 
     /**
+     * Handles energy changed.
+     *
+     * Implements energy::DeviceEnergyModel::HandleEnergyChanged.
+     */
+    void HandleEnergyChanged() override;
+
+    /**
      * @return Pointer to the PHY listener.
      */
-    LoraRadioEnergyModelPhyListener* GetPhyListener();
+    std::shared_ptr<LoraRadioEnergyModelPhyListener> GetPhyListener();
 
   private:
     void DoDispose() override;
+
+    /**
+     * @param state the lora state
+     * @returns draw of device at given state.
+     */
+    double GetStateA(EndDeviceLoraPhy::State state) const;
 
     /**
      * @return Current draw of device, at current state.
@@ -293,14 +270,13 @@ class LoraRadioEnergyModel : public energy::DeviceEnergyModel
      */
     void SetLoraRadioState(const EndDeviceLoraPhy::State state);
 
-    Ptr<energy::EnergySource> m_source; ///< energy source
+    Ptr<energy::EnergySource> m_source; //!< energy source
 
     // Member variables for current draw in different radio modes.
-    double m_txCurrentA;    ///< transmit current
-    double m_rxCurrentA;    ///< receive current
-    double m_idleCurrentA;  ///< idle current
-    double m_sleepCurrentA; ///< sleep current
-    // NOTICE VERY WELL: Current  Model linear or constant as possible choices
+    double m_txCurrentA;                      //!< transmit current
+    double m_rxCurrentA;                      //!< receive current
+    double m_standbyCurrentA;                 //!< standby current
+    double m_sleepCurrentA;                   //!< sleep current
     Ptr<LoraTxCurrentModel> m_txCurrentModel; ///< current model
 
     /// This variable keeps track of the total energy consumed by this model.
@@ -310,8 +286,7 @@ class LoraRadioEnergyModel : public energy::DeviceEnergyModel
     EndDeviceLoraPhy::State m_currentState; ///< current state the radio is in
     Time m_lastUpdateTime;                  ///< time stamp of previous energy update
 
-    uint8_t m_nPendingChangeState;  ///< pending state change
-    bool m_isSupersededChangeState; ///< superseded change state
+    uint8_t m_nPendingChangeState; ///< pending state change
 
     /// Energy depletion callback
     LoraRadioEnergyDepletionCallback m_energyDepletionCallback;
@@ -320,7 +295,7 @@ class LoraRadioEnergyModel : public energy::DeviceEnergyModel
     LoraRadioEnergyRechargedCallback m_energyRechargedCallback;
 
     /// EndDeviceLoraPhy listener
-    LoraRadioEnergyModelPhyListener* m_listener;
+    std::shared_ptr<LoraRadioEnergyModelPhyListener> m_listener;
 };
 
 } // namespace lorawan

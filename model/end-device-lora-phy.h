@@ -23,45 +23,47 @@ namespace lorawan
 /**
  * @ingroup lorawan
  *
- * Receive notifications about PHY events.
+ * Receive notifications about PHY internal state changes.
+ *
+ * @see EndDeviceLoraPhy::State
  */
 class EndDeviceLoraPhyListener
 {
   public:
-    virtual ~EndDeviceLoraPhyListener(); //!< Destructor
+    /****************************************************************
+     *       This destructor is needed.
+     ****************************************************************/
+
+    virtual ~EndDeviceLoraPhyListener()
+    {
+    }
 
     /**
-     * We have received the first bit of a packet. We decided
-     * that we could synchronize on this packet. It does not mean
-     * we will be able to successfully receive completely the
-     * whole packet. It means that we will report a BUSY status until
-     * one of the following happens:
-     *   - NotifyRxEndOk
-     *   - NotifyRxEndError
-     *   - NotifyTxStart
-     */
-    virtual void NotifyRxStart() = 0;
-
-    /**
-     * We are about to send the first bit of the packet.
-     * We do not send any event to notify the end of
-     * transmission. Listeners should assume that the
-     * channel implicitly reverts to the idle state
-     * unless they have received a cca busy report.
-     *
-     * @param txPowerDbm The nominal tx power in dBm.
-     */
-    virtual void NotifyTxStart(double txPowerDbm) = 0;
-
-    /**
-     * Notify listeners that we went to sleep.
+     * Notify listeners that the device entered SLEEP state.
      */
     virtual void NotifySleep() = 0;
 
     /**
-     * Notify listeners that we woke up.
+     * Notify listeners that the device entered STANDBY state.
      */
     virtual void NotifyStandby() = 0;
+
+    /**
+     * Notify listeners that the device entered TX state.
+     *
+     * @param txPowerDbm The nominal tx output power in dBm.
+     */
+    virtual void NotifyTx(double txPowerDbm) = 0;
+
+    /**
+     * Notify listeners that the device entered RX_ENABLED state.
+     */
+    virtual void NotifyRxEnabled() = 0;
+
+    /**
+     * Notify listeners that the device entered RX_ACTIVE state.
+     */
+    virtual void NotifyRxActive() = 0;
 };
 
 /**
@@ -263,7 +265,7 @@ class EndDeviceLoraPhy : public LoraPhy
      *
      * @param listener The new listener.
      */
-    void RegisterListener(EndDeviceLoraPhyListener* listener);
+    void RegisterListener(const std::shared_ptr<EndDeviceLoraPhyListener>& listener);
 
     /**
      * Remove the input listener from the list of objects to be notified of
@@ -271,7 +273,7 @@ class EndDeviceLoraPhy : public LoraPhy
      *
      * @param listener The listener to be unregistered.
      */
-    void UnregisterListener(EndDeviceLoraPhyListener* listener);
+    void UnregisterListener(const std::shared_ptr<EndDeviceLoraPhyListener>& listener);
 
   protected:
     /**
@@ -384,6 +386,13 @@ class EndDeviceLoraPhy : public LoraPhy
     EndDeviceLoraRegisters m_regs; //!< High level model of LoRa chip registers
 
   private:
+    /**
+     * typedef for a list of EndDeviceLoraPhyListeners. We use weak pointers so that unregistering a
+     * listener is not necessary to delete a listener (reference count is not incremented by weak
+     * pointers).
+     */
+    typedef std::list<std::weak_ptr<EndDeviceLoraPhyListener>> Listeners;
+
     // Forward LoraPhy's pure virtual function
     void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) override = 0;
 
@@ -436,6 +445,17 @@ class EndDeviceLoraPhy : public LoraPhy
     void SwitchToRxActive();
 
     /**
+     * Notify all EndDeviceLoraPhyListener objects of the given PHY event.
+     *
+     * @tparam FUNC \deduced Member function type
+     * @tparam Ts \deduced Function argument types
+     * @param f the member function to invoke
+     * @param args arguments to pass to the member function
+     */
+    template <typename FUNC, typename... Ts>
+    void NotifyListeners(FUNC f, Ts&&... args);
+
+    /**
      * The callback to perform upon reception timeout. In reality, this is an hardware interrupt.
      */
     RxTimeoutCallback m_rxTimeoutCallback;
@@ -443,7 +463,7 @@ class EndDeviceLoraPhy : public LoraPhy
     TracedValue<State> m_state; //!< The state this PHY is currently in.
     EventId m_rxTimeoutEvent;   //!< Event for timed switch from RX_ENABLED to STANDBY
 
-    std::vector<EndDeviceLoraPhyListener*> m_listeners; //!< PHY listeners
+    Listeners m_listeners; //!< PHY state listeners
 };
 
 /**
@@ -454,6 +474,30 @@ class EndDeviceLoraPhy : public LoraPhy
  *  @return The output stream with text value of the PHY state
  */
 std::ostream& operator<<(std::ostream& os, const EndDeviceLoraPhy::State& state);
+
+template <typename FUNC, typename... Ts>
+void
+EndDeviceLoraPhy::NotifyListeners(FUNC f, Ts&&... args)
+{
+    // NS_LOG_FUNCTION(this); // why doesn't logging work? see wifi-phy-state-helper.h
+    // A notification to a PHY listener may involve the addition and/or removal of a PHY listener,
+    // thus modifying the list we are iterating over. This is dangerous, so ensure that we iterate
+    // over a copy of the list of PHY listeners. The copied list contains shared pointers to the PHY
+    // listeners to prevent them from being deleted.
+    std::list<std::shared_ptr<EndDeviceLoraPhyListener>> listeners;
+    std::transform(m_listeners.cbegin(),
+                   m_listeners.cend(),
+                   std::back_inserter(listeners),
+                   [](auto&& listener) { return listener.lock(); });
+
+    for (const auto& listener : listeners)
+    {
+        if (listener)
+        {
+            std::invoke(f, listener, std::forward<Ts>(args)...);
+        }
+    }
+}
 
 } // namespace lorawan
 } // namespace ns3

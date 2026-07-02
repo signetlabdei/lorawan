@@ -19,14 +19,6 @@ NS_LOG_COMPONENT_DEFINE("EndDeviceLoraPhy");
 
 NS_OBJECT_ENSURE_REGISTERED(EndDeviceLoraPhy);
 
-/**************************
- *  Listener destructor  *
- *************************/
-
-EndDeviceLoraPhyListener::~EndDeviceLoraPhyListener()
-{
-}
-
 TypeId
 EndDeviceLoraPhy::GetTypeId()
 {
@@ -142,19 +134,15 @@ EndDeviceLoraPhy::ReceiveSingle(uint32_t frequencyHz,
 }
 
 void
-EndDeviceLoraPhy::RegisterListener(EndDeviceLoraPhyListener* listener)
+EndDeviceLoraPhy::RegisterListener(const std::shared_ptr<EndDeviceLoraPhyListener>& listener)
 {
-    m_listeners.push_back(listener);
+    m_listeners.emplace_back(listener);
 }
 
 void
-EndDeviceLoraPhy::UnregisterListener(EndDeviceLoraPhyListener* listener)
+EndDeviceLoraPhy::UnregisterListener(const std::shared_ptr<EndDeviceLoraPhyListener>& listener)
 {
-    auto i = find(m_listeners.begin(), m_listeners.end(), listener);
-    if (i != m_listeners.end())
-    {
-        m_listeners.erase(i);
-    }
+    m_listeners.remove_if([&listener](auto&& weakPtr) { return weakPtr.lock() == listener; });
 }
 
 // protected
@@ -248,10 +236,7 @@ EndDeviceLoraPhy::SwitchToSleep()
     NS_ASSERT_MSG(m_state == State::STANDBY, "Cannot switch to SLEEP from m_state=" << m_state);
     m_state = State::SLEEP;
     // Notify listeners of the state change
-    for (auto& l : m_listeners)
-    {
-        l->NotifySleep();
-    }
+    NotifyListeners(&EndDeviceLoraPhyListener::NotifySleep);
 }
 
 void
@@ -261,10 +246,7 @@ EndDeviceLoraPhy::SwitchToStandBy()
     NS_ASSERT_MSG(m_state != State::SLEEP && m_state != State::STANDBY,
                   "Improper switch to STANDBY from m_state=" << m_state);
     m_state = State::STANDBY;
-    for (auto& l : m_listeners)
-    {
-        l->NotifyStandby();
-    }
+    NotifyListeners(&EndDeviceLoraPhyListener::NotifyStandby);
 }
 
 void
@@ -274,10 +256,7 @@ EndDeviceLoraPhy::SwitchToTx()
     NS_ASSERT_MSG(m_state == State::SLEEP || m_state == State::STANDBY,
                   "Cannot switch to TX from m_state=" << m_state);
     m_state = State::TX;
-    for (auto& l : m_listeners)
-    {
-        l->NotifyTxStart(m_regs.txPowerDbm);
-    }
+    NotifyListeners(&EndDeviceLoraPhyListener::NotifyTx, m_regs.txPowerDbm);
 }
 
 void
@@ -287,10 +266,7 @@ EndDeviceLoraPhy::SwitchToRxEnabled()
     NS_ASSERT_MSG(m_state == State::SLEEP || m_state == State::STANDBY,
                   "Cannot switch to RX_ENABLED from m_state=" << m_state);
     m_state = State::RX_ENABLED;
-    for (auto& l : m_listeners)
-    {
-        l->NotifyStandby();
-    }
+    NotifyListeners(&EndDeviceLoraPhyListener::NotifyRxEnabled);
 }
 
 void
@@ -300,10 +276,7 @@ EndDeviceLoraPhy::SwitchToRxActive()
     NS_ASSERT_MSG(m_state == State::RX_ENABLED,
                   "Cannot switch to RX_ACTIVE from m_state=" << m_state);
     m_state = State::RX_ACTIVE;
-    for (auto& l : m_listeners)
-    {
-        l->NotifyRxStart();
-    }
+    NotifyListeners(&EndDeviceLoraPhyListener::NotifyRxActive);
 }
 
 // external
