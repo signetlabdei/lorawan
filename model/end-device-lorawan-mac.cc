@@ -126,8 +126,8 @@ EndDeviceLorawanMac::EndDeviceLorawanMac()
     m_nextTx.Cancel();
 
     // Initialize structure for retransmission parameters
-    m_retxParams = EndDeviceLorawanMac::LoraRetxParameters();
-    m_retxParams.retxLeft = m_nbTrans;
+    m_txContext = EndDeviceLorawanMac::PacketTxContext();
+    m_txContext.nbTxLeft = m_nbTrans;
 }
 
 EndDeviceLorawanMac::~EndDeviceLorawanMac()
@@ -144,15 +144,15 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
 {
     NS_LOG_FUNCTION(this << packet);
 
-    // Retx are scheduled by Receive, FailedReception, CloseSecondReceiveWindow only if retxLeft > 0
-    NS_ASSERT_MSG(packet != m_retxParams.packet || m_retxParams.retxLeft > 0,
+    // Retx are scheduled by Receive, FailedReception, CloseSecondReceiveWindow only if nbTxLeft > 0
+    NS_ASSERT_MSG(packet != m_txContext.packet || m_txContext.nbTxLeft > 0,
                   "Max number of transmissions already achieved for this packet");
 
-    if (packet == m_retxParams.packet)
+    if (packet == m_txContext.packet)
     {
         NS_LOG_DEBUG("Retransmitting an old packet.");
         // Fail if it is a retransmission already ACKed
-        NS_ASSERT_MSG(m_retxParams.waitingAck, "Trying to retransmit a packet already ACKed.");
+        NS_ASSERT_MSG(m_txContext.needsAck, "Trying to retransmit a packet already ACKed.");
         // Remove the headers
         LorawanMacHeader macHdr;
         packet->RemoveHeader(macHdr);
@@ -163,15 +163,12 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
     {
         NS_LOG_DEBUG("New FRMPayload from application: " << packet);
         // If needed, trace failed ACKnowledgement of previous packet
-        if (m_retxParams.waitingAck)
+        if (m_txContext.needsAck)
         {
-            uint8_t txs = m_nbTrans - m_retxParams.retxLeft;
+            uint8_t txs = m_nbTrans - m_txContext.nbTxLeft;
             NS_LOG_WARN("Stopping retransmission procedure of previous packet. Used "
                         << unsigned(txs) << " transmissions out of " << unsigned(m_nbTrans));
-            m_confirmedTxOutcomeCallback(txs,
-                                         false,
-                                         m_retxParams.firstAttempt,
-                                         m_retxParams.packet);
+            m_confirmedTxOutcomeCallback(txs, false, m_txContext.firstAttempt, m_txContext.packet);
         }
     }
 
@@ -246,7 +243,7 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
     packet->AddHeader(macHdr);
     NS_LOG_INFO("Added MAC header of size " << macHdr.GetSerializedSize() << " bytes.");
 
-    if (packet != m_retxParams.packet)
+    if (packet != m_txContext.packet)
     {
         NS_LOG_DEBUG("Resetting retransmission parameters.");
         // Reset MAC command list
@@ -255,17 +252,17 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
         // Reset retransmission parameters
         ResetRetransmissionParameters();
         // Save parameters for the (possible) next retransmissions.
-        m_retxParams.packet = packet->Copy();
-        m_retxParams.firstAttempt = Now();
-        m_retxParams.waitingAck = (m_fType == LorawanMacHeader::FType::CONFIRMED_DATA_UP);
+        m_txContext.packet = packet->Copy();
+        m_txContext.firstAttempt = Now();
+        m_txContext.needsAck = (m_fType == LorawanMacHeader::FType::CONFIRMED_DATA_UP);
         NS_LOG_DEBUG("Frame type is " << m_fType);
     }
 
     // Send packet
     SendToPhy(packet);
     // Decrease the number of transmissions left
-    m_retxParams.retxLeft--;
-    if (packet != m_retxParams.packet)
+    m_txContext.nbTxLeft--;
+    if (packet != m_txContext.packet)
     {
         m_sentNewPacket(packet); // Fire trace source
         // Bump-up frame counters
@@ -333,7 +330,7 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
 {
     NS_LOG_FUNCTION(this << frameHeader);
 
-    if (m_retxParams.waitingAck)
+    if (m_txContext.needsAck)
     {
         if (frameHeader.GetAck())
         {
@@ -342,8 +339,8 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
             NS_LOG_DEBUG("Reset retransmission variables to default values and cancel "
                          "retransmission if already scheduled.");
 
-            uint8_t txs = m_nbTrans - (m_retxParams.retxLeft);
-            m_confirmedTxOutcomeCallback(txs, true, m_retxParams.firstAttempt, m_retxParams.packet);
+            uint8_t txs = m_nbTrans - (m_txContext.nbTxLeft);
+            m_confirmedTxOutcomeCallback(txs, true, m_txContext.firstAttempt, m_txContext.packet);
             NS_LOG_DEBUG("Received ACK packet after "
                          << unsigned(txs) << " transmissions: stopping retransmission procedure. ");
 
@@ -541,10 +538,10 @@ EndDeviceLorawanMac::GetRandomChannelForTx()
 void
 EndDeviceLorawanMac::ResetRetransmissionParameters()
 {
-    m_retxParams.waitingAck = false;
-    m_retxParams.retxLeft = m_nbTrans;
-    m_retxParams.packet = nullptr;
-    m_retxParams.firstAttempt = Time(0);
+    m_txContext.needsAck = false;
+    m_txContext.nbTxLeft = m_nbTrans;
+    m_txContext.packet = nullptr;
+    m_txContext.firstAttempt = Time(0);
 
     // Cancel next retransmissions, if any
     Simulator::Cancel(m_nextTx);
@@ -569,7 +566,7 @@ EndDeviceLorawanMac::SetMaxNumberOfTransmissions(uint8_t nbTrans)
 {
     NS_LOG_FUNCTION(this << unsigned(nbTrans));
     m_nbTrans = nbTrans;
-    m_retxParams.retxLeft = nbTrans;
+    m_txContext.nbTxLeft = nbTrans;
 }
 
 uint8_t

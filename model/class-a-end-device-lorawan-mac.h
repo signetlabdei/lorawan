@@ -155,49 +155,29 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      */
     void CloseSecondReceiveWindow();
 
+    EventId m_secondReceiveWindow; //!< The event of the second receive window opening, used
+                                   //!< to cancel the second window in case the first one is
+                                   //!< successful.
+
+    // Reception window parameters
+
     Time m_receiveDelay1; //!< The interval between when a packet is done sending and when the first
                           //!< receive window is opened.
+    uint32_t m_firstReceiveWindowFrequencyHz; //!< The frequency [Hz] to listen on for the first
+                                              //!< receive window. This value is set dynamically to
+                                              //!< the last uplink transmission frequency.
+    uint8_t m_rx1DrOffset;                    //!< The RX1DROffset parameter value.
 
-    /**
-     * The interval between when a packet is done sending and when the second
-     * receive window is opened.
-     */
-    Time m_receiveDelay2;
+    Time m_receiveDelay2; //!< The interval between when a packet is done sending and when the
+                          //!< second receive window is opened.
+    uint32_t m_secondReceiveWindowFrequencyHz; //!< The frequency [Hz] to listen on for the second
+                                               //!< receive window.
+    uint8_t m_secondReceiveWindowDataRate;     //!< The data rate to listen for during the second
+                                               //!< downlink transmission.
 
-    /**
-     * Whether the second reception window is currently open
-     */
-    bool m_isSecondWindowOpen;
+    // Rescheduling purposes
 
-    /**
-     * The event of the second receive window opening.
-     *
-     * This Event is used to cancel the second window in case the first one is
-     * successful.
-     */
-    EventId m_secondReceiveWindow;
-
-    /**
-     * The frequency [Hz] to listen on for the first receive window.
-     *
-     * This value is set dynamically to the last uplink transmission frequency.
-     */
-    uint32_t m_firstReceiveWindowFrequencyHz;
-
-    /**
-     * The frequency [Hz] to listen on for the second receive window.
-     */
-    uint32_t m_secondReceiveWindowFrequencyHz;
-
-    /**
-     * The data rate to listen for during the second downlink transmission.
-     */
-    uint8_t m_secondReceiveWindowDataRate;
-
-    /**
-     * The RX1DROffset parameter value.
-     */
-    uint8_t m_rx1DrOffset;
+    bool m_isSecondWindowOpen; //!< Whether the second reception window is currently open
 };
 
 } /* namespace lorawan */

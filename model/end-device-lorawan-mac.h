@@ -323,15 +323,14 @@ class EndDeviceLorawanMac : public LorawanMac
 
   protected:
     /**
-     * Structure representing the parameters that will be used in the
-     * retransmission procedure.
+     * Current packet transmission context tracking transmissions attempts mandated by the protocol
      */
-    struct LoraRetxParameters
+    struct PacketTxContext
     {
-        Time firstAttempt;            //!< Timestamp of the first transmission of the packet
-        Ptr<Packet> packet = nullptr; //!< A pointer to the packet being retransmitted
-        bool waitingAck = false;      //!< Whether the packet requires explicit acknowledgment
-        uint8_t retxLeft;             //!< Number of retransmission attempts left
+        Ptr<Packet> packet = nullptr; //!< A pointer to the packet being transmitted
+        Time firstAttempt = Time();   //!< Timestamp of the first transmission of the packet
+        bool needsAck = false;        //!< Whether the packet requires explicit acknowledgment
+        int8_t nbTxLeft = 0;          //!< Number of transmission attempts left for this packet
     };
 
     uint8_t m_nbTrans; //!< Default number of unacknowledged redundant transmissions of each packet.
@@ -378,9 +377,9 @@ class EndDeviceLorawanMac : public LorawanMac
     std::list<Ptr<MacCommand>> m_macCommandList;
 
     /**
-     * Structure containing the retransmission parameters for this device.
+     * Structure containing the current packet transmission context for this device.
      */
-    struct LoraRetxParameters m_retxParams;
+    PacketTxContext m_txContext;
 
     /**
      * An uniform random variable, used to randomly pick from the channel list.
