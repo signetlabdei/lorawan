@@ -71,6 +71,9 @@ class EndDeviceLorawanMac : public LorawanMac
      */
     virtual void SendToPhy(Ptr<Packet> packet) = 0;
 
+    // Forward LorawanMac's pure virtual function
+    void TxFinished(Ptr<const Packet> packet) override = 0;
+
     /**
      * Postpone transmission to the specified time and delete previously scheduled transmissions if
      * present.
@@ -84,11 +87,9 @@ class EndDeviceLorawanMac : public LorawanMac
     // Receiving methods //
     ///////////////////////
 
-    virtual void Receive(Ptr<const Packet> packet) = 0;
+    void Receive(Ptr<const Packet> packet) override = 0;
 
-    virtual void FailedReception(Ptr<const Packet> packet) = 0;
-
-    virtual void TxFinished(Ptr<const Packet> packet) = 0;
+    void FailedReception(Ptr<const Packet> packet) override = 0;
 
     /////////////////////////
     // Getters and Setters //
@@ -182,10 +183,6 @@ class EndDeviceLorawanMac : public LorawanMac
      * @return This device's address.
      */
     LoraDeviceAddress GetDeviceAddress();
-
-    // void SetRx1DrOffset (uint8_t rx1DrOffset);
-
-    // uint8_t GetRx1DrOffset ();
 
     /**
      * Get the last known link margin from the demodulation floor.
@@ -453,7 +450,7 @@ class EndDeviceLorawanMac : public LorawanMac
      * @param dataRate Data rate to evaluate the max MACPayload for.
      * @return Whether the payload size is valid.
      */
-    bool IsPayloadSizeValid(uint32_t appPayloadSize, uint8_t dataRate);
+    bool IsPayloadSizeValid(uint32_t appPayloadSize, uint8_t dataRate) const;
 
     bool m_adr; //!< Uplink ADR bit contained in the FCtrl field of the LoRaWAN FHDR.
                 //!< Controlled by the device, if set to false signals the network server
@@ -469,15 +466,6 @@ class EndDeviceLorawanMac : public LorawanMac
      * and if a newer packet is delivered from the application to be sent.
      */
     EventId m_nextTx;
-
-    /**
-     * The event of transmitting a packet in a consecutive moment, when the duty cycle let us
-     * transmit.
-     *
-     * This Event is used to cancel the transmission of this packet if a newer packet is delivered
-     * from the application to be sent.
-     */
-    EventId m_nextRetx;
 
     /**
      * The last known link margin in dB from the demodulation floor.

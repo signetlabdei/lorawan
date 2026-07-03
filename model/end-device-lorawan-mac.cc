@@ -308,19 +308,20 @@ EndDeviceLorawanMac::ExecuteADRBackoff()
 }
 
 bool
-EndDeviceLorawanMac::IsPayloadSizeValid(uint32_t appPayloadSize, uint8_t dataRate)
+EndDeviceLorawanMac::IsPayloadSizeValid(uint32_t appPayloadSize, uint8_t dataRate) const
 {
+    NS_LOG_FUNCTION(this << appPayloadSize << unsigned(dataRate));
     uint32_t fOptsLen = 0;
     for (const auto& c : m_macCommandList)
     {
         fOptsLen += c->GetSerializedSize();
     }
     /// TODO: FPort could be absent
-    NS_LOG_LOGIC("FHDR(7+FOpts(" << fOptsLen << "))+FPort(1)+FRMPayload(" << appPayloadSize
-                                 << ")=" << 7 + fOptsLen + 1 + appPayloadSize
-                                 << "B, max MACPayload=" << m_maxMacPayloadForDataRate.at(dataRate)
-                                 << "B on DR" << unsigned(dataRate));
-    return 7 + fOptsLen + 1 + appPayloadSize <= m_maxMacPayloadForDataRate.at(dataRate);
+    uint32_t macPayloadSize = 7 + fOptsLen + 1 + appPayloadSize;
+    uint32_t maxMacPayloadForDataRate = m_maxMacPayloadForDataRate.at(dataRate);
+    NS_LOG_DEBUG("macPayloadSize=" << macPayloadSize << "B, maxMacPayloadForDataRate="
+                                   << maxMacPayloadForDataRate << "B");
+    return macPayloadSize <= maxMacPayloadForDataRate;
 }
 
 //////////////////////////
