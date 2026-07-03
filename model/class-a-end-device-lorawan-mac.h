@@ -72,16 +72,6 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /////////////////////////
 
     /**
-     * Find the minimum wait time before the next possible transmission based
-     * on end device's Class Type.
-     *
-     * @param waitTime The minimum wait time that has to be respected,
-     * irrespective of the class (e.g., because of duty cycle limitations).
-     * @return The Time value.
-     */
-    Time GetNextClassTransmissionDelay(Time waitTime) override;
-
-    /**
      * Get the data rate that will be used in the first receive window.
      *
      * @return The data rate.
@@ -126,6 +116,16 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /////////////////////
     // Sending methods //
     /////////////////////
+
+    /**
+     * Compute a minimum wait time value based on the current busy state of the device.
+     *
+     * A Class A device is considered busy while it is in the process of sending and opening the 2
+     * protocol-mandated reception windows.
+     *
+     * @return The wait Time value.
+     */
+    Time GetNextClassTransmissionDelay() const override;
 
     /**
      * Send a packet with the sending function of the physical layer.

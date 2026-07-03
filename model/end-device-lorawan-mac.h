@@ -75,6 +75,15 @@ class EndDeviceLorawanMac : public LorawanMac
     void TxFinished(Ptr<const Packet> packet) override = 0;
 
     /**
+     * Evaluate whether this packet can be sent in the current device state
+     *
+     * @param [in] packet The packet to be evaluated
+     * @param [out] nextTxDelay Minimum delay for sending the packet
+     * @return Whether the packet can be sent in the current device state
+     */
+    bool ValidatePacketForSend(Ptr<const Packet> packet, Time& nextTxDelay) const;
+
+    /**
      * Postpone transmission to the specified time and delete previously scheduled transmissions if
      * present.
      *
@@ -344,12 +353,11 @@ class EndDeviceLorawanMac : public LorawanMac
 
     /**
      * Find the minimum wait time before the next possible transmission based
-     * on end device's Class Type.
+     * on end device's Class Type scheduled operations.
      *
-     * @param waitTime Currently known minimum wait time, possibly raised by this function.
-     * @return The updated minimum wait time in Time format.
+     * @return The wait Time before the next MAC send.
      */
-    virtual Time GetNextClassTransmissionDelay(Time waitTime) = 0;
+    virtual Time GetNextClassTransmissionDelay() const = 0;
 
     /**
      * Find a suitable channel for transmission. The channel is chosen randomly among the
@@ -418,24 +426,51 @@ class EndDeviceLorawanMac : public LorawanMac
 
   private:
     /**
-     * Get the set of active transmission channels compatible with the current device data rate and
-     * transmission power.
+     * Get the set of active transmission channels among the provided array which are compatible
+     * with the a certain data rate and transmission power.
      *
+     * @param txChannelArray Set of transmission channels to evaluate
+     * @param dataRate Data rate that the channels need to be compatible with
+     * @param txPowerDbm Transmission power [dBm] that the channels need to be compatible with
      * @return A (possibly empty) vector of compatible transmission channels.
      */
-    std::vector<Ptr<LogicalLoraChannel>> GetCompatibleTxChannels();
+    std::vector<Ptr<LogicalLoraChannel>> GetCompatibleTxChannels(
+        const std::vector<Ptr<LogicalLoraChannel>>& txChannelArray,
+        uint8_t dataRate,
+        double txPowerDbm) const;
 
     /**
-     * Find the base minimum wait time before the next possible transmission.
+     * Find the base minimum wait time before the next possible transmission based on channels legal
+     * duty cycle, server-imposed aggregated duty-cycle, and device class operation.
+     *
+     * @warning This function does not check whether the input channels are compatible with other
+     * device transmission parameters (data rate, output power), filtering is left to the caller
+     *
+     * @param [in] txChannelArray Array of channels to use for duty cycle evaluation
      *
      * @return The base minimum wait time.
      */
-    Time GetNextTransmissionDelay();
+    Time GetNextTransmissionDelay(const std::vector<Ptr<LogicalLoraChannel>>& txChannelArray) const;
 
     /**
      * Execute ADR backoff as in LoRaWAN specification, V1.0.4 (2020)
      */
     void ExecuteADRBackoff();
+
+    /**
+     * Apply ADR backoff as in LoRaWAN specification, V1.0.4 (2020) on the provided input
+     * parameters passed by reference. This is useful for testing whether a packet could be sent
+     * without changing the device state or interrupting any ongoing retransmission process.
+     *
+     * @param [in,out] txPowerDbm Output transmission power [dBm]
+     * @param [in,out] dataRate LoRaWAN MAC data rate
+     * @param [in,out] nbTrans Number of redundant packet transmissions
+     * @param [in,out] txChannelArray Array of channels for uplink transmission
+     */
+    static void DoExecuteADRBackoff(double& txPowerDbm,
+                                    uint8_t& dataRate,
+                                    uint8_t& nbTrans,
+                                    const std::vector<Ptr<LogicalLoraChannel>>& txChannelArray);
 
     /**
      * Check whether the size of the application payload is under the maximum allowed.

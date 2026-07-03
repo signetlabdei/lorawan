@@ -229,7 +229,7 @@ ClassAEndDeviceLorawanMac::FailedReception(Ptr<const Packet> packet)
     // Here is for sure closed, can be improved
     m_isSecondWindowOpen = false;
 
-    if (m_secondReceiveWindow.IsExpired() && m_retxParams.needsAck)
+    if (m_secondReceiveWindow.IsExpired() && m_txContext.needsAck)
     {
         if (m_txContext.nbTxLeft > 0)
         {
@@ -395,7 +395,7 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
 /////////////////////////
 
 Time
-ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitTime)
+ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
@@ -411,7 +411,7 @@ ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitTime)
             Time worstCaseEndReceive = Time(m_secondReceiveWindow.GetTs()) + Seconds(2.79);
             NS_LOG_DEBUG("Duration until worstCaseEndReceive for new transmission:"
                          << (worstCaseEndReceive - Now()).As(Time::S));
-            waitTime = Max(waitTime, worstCaseEndReceive - Now());
+            return worstCaseEndReceive - Now();
         }
     }
     // This is a retransmitted packet, it can not be sent until the end of
@@ -426,10 +426,10 @@ ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay(Time waitTime)
 
         NS_LOG_DEBUG("ack_timeout:" << ack_timeout
                                     << " retransmitWaitTime:" << retransmitWaitTime.As(Time::S));
-        waitTime = Max(waitTime, retransmitWaitTime);
+        return retransmitWaitTime;
     }
 
-    return waitTime;
+    return Time();
 }
 
 uint8_t

@@ -144,6 +144,98 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
 {
     NS_LOG_FUNCTION(this << packet);
 
+    // Check ability to send and compute delay without touching the internal device state
+    Time nextTxDelay;
+    if (ValidatePacketForSend(packet, nextTxDelay) == false)
+    {
+        NS_LOG_ERROR("Packet cannot be sent in the current device state, transmission aborted.");
+        return;
+    }
+
+    // We are sending this packet: overwrite any previously queued transmissions if any
+    m_nextTx.Cancel();
+
+    // If it is not possible to transmit now because of the duty cycle or because we are currently
+    // in the process of sending/receiving another packet, schedule a tx/retx later
+    if (nextTxDelay.IsStrictlyPositive())
+    {
+        NS_LOG_WARN("Attempting to send, but device is busy or duty cycle won't allow it. "
+                    "Rescheduling a tx in "
+                    << nextTxDelay.As(Time::S) << ".");
+        PostponeTransmission(nextTxDelay, packet);
+        m_cannotSendBecauseDutyCycle(packet);
+        return;
+    }
+
+    /////////////////////////////////////////////////////////////
+    // From here on out, immediate pkt transmission is assured //
+    /////////////////////////////////////////////////////////////
+
+    DoSend(packet);
+}
+
+bool
+EndDeviceLorawanMac::ValidatePacketForSend(Ptr<const Packet> packet, Time& nextTxDelay) const
+{
+    // Initialize output delay to max
+    nextTxDelay = Time::Max();
+
+    // Copy current tx parameters and simulate an update on them
+    auto tmpDataRate = m_dataRate.Get();
+    auto tmpTxPower = m_txPowerDbm.Get();
+    auto tmpNbTrans = m_nbTrans;
+    auto tmpTxChannels = m_channelHelper->GetRawChannelArray(); // shallow copy to get size
+    for (auto& c : tmpTxChannels)
+    {
+        c = c ? Copy(c) : c; // deep copy
+    }
+
+    // Evaluate ADR backoff on copied parameters
+    if (m_adr && packet != m_txContext.packet) // Is this a new packet?
+    {
+        // Is there an ongoing retransmission process that would be interrupted?
+        uint16_t tmpAdrAckCnt = m_adrAckCnt + (m_txContext.nbTxLeft > 0);
+        // Simulate ADR Backoff on temporary values
+        if (tmpAdrAckCnt >= ADR_ACK_LIMIT + ADR_ACK_DELAY)
+        {
+            DoExecuteADRBackoff(tmpTxPower, tmpDataRate, tmpNbTrans, tmpTxChannels);
+        }
+    }
+
+    // This check is influenced by ADR backoff. This is OK because (by LoRaWAN design) you
+    // either use ADR and constrain your max app payload according to the default initial DR0,
+    // or you disable ADR for a fixed data rate, with the possibility of using bigger payloads.
+    if (IsPayloadSizeValid(packet->GetSize(), tmpDataRate) == false)
+    {
+        NS_LOG_WARN("Application payload exceeding maximum size.");
+        return false;
+    }
+
+    // Check if there is a channel suitable for TX (checks data rate & tx power etc.)
+    if (tmpTxChannels = GetCompatibleTxChannels(tmpTxChannels, tmpDataRate, tmpTxPower);
+        tmpTxChannels.empty())
+    {
+        NS_LOG_WARN("No tx channel compatible with current DR/power.");
+        return false;
+    }
+
+    // Evaluate min send delay and return true
+    nextTxDelay = GetNextTransmissionDelay(tmpTxChannels);
+    return true;
+}
+
+void
+EndDeviceLorawanMac::PostponeTransmission(Time nextTxDelay, Ptr<Packet> packet)
+{
+    NS_LOG_FUNCTION(this << nextTxDelay << packet);
+    m_nextTx = Simulator::Schedule(nextTxDelay, &EndDeviceLorawanMac::Send, this, packet);
+}
+
+void
+EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
+{
+    NS_LOG_FUNCTION(this << packet);
+
     // Retx are scheduled by Receive, FailedReception, CloseSecondReceiveWindow only if nbTxLeft > 0
     NS_ASSERT_MSG(packet != m_txContext.packet || m_txContext.nbTxLeft > 0,
                   "Max number of transmissions already achieved for this packet");
@@ -182,55 +274,6 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
         m_adrAckCnt = ADR_ACK_LIMIT;
     }
     NS_ASSERT(m_adrAckCnt < 2400);
-
-    // This check is influenced by ADR backoff. This is OK because (by LoRaWAN design) you either
-    // use ADR and constrain your max app payload according to the default initial DR0, or you
-    // disable ADR for a fixed data rate, with the possibility of using bigger payloads.
-    if (!IsPayloadSizeValid(packet->GetSize(), m_dataRate))
-    {
-        NS_LOG_ERROR("Application payload exceeding maximum size. Transmission aborted.");
-        return;
-    }
-
-    // Check if there is a channel suitable for TX (checks data rate & tx power etc.)
-    if (GetCompatibleTxChannels().empty())
-    {
-        NS_LOG_ERROR("No tx channel compatible with current DR/power. Transmission aborted.");
-        return;
-    }
-
-    // If it is not possible to transmit now because of the duty cycle
-    // or because we are currently in the process of receiving, schedule a tx/retx later
-    if (auto netxTxDelay = GetNextTransmissionDelay(); netxTxDelay.IsStrictlyPositive())
-    {
-        PostponeTransmission(netxTxDelay, packet);
-        m_cannotSendBecauseDutyCycle(packet);
-        return;
-    }
-
-    ///////////////////////////////////////////////////////
-    // From here on out, the pkt transmission is assured //
-    ///////////////////////////////////////////////////////
-
-    DoSend(packet);
-}
-
-void
-EndDeviceLorawanMac::PostponeTransmission(Time netxTxDelay, Ptr<Packet> packet)
-{
-    NS_LOG_FUNCTION(this);
-    // Delete previously scheduled transmissions if any.
-    Simulator::Cancel(m_nextTx);
-    m_nextTx = Simulator::Schedule(netxTxDelay, &EndDeviceLorawanMac::DoSend, this, packet);
-    NS_LOG_WARN("Attempting to send, but the aggregate duty cycle won't allow it. Scheduling a tx "
-                "at a delay "
-                << netxTxDelay.As(Time::S) << ".");
-}
-
-void
-EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
-{
-    NS_LOG_FUNCTION(this);
 
     // Add the Lora Frame Header to the packet
     LoraFrameHeader frameHdr;
@@ -284,24 +327,40 @@ EndDeviceLorawanMac::ExecuteADRBackoff()
         return;
     }
 
-    if (m_txPowerDbm < 14)
+    // TracedValue are not easily passed by reference
+    double txPowerDbm = m_txPowerDbm.Get();
+    uint8_t dataRate = m_dataRate.Get();
+    DoExecuteADRBackoff(txPowerDbm, dataRate, m_nbTrans, m_channelHelper->GetRawChannelArray());
+    m_txPowerDbm = txPowerDbm;
+    m_dataRate = dataRate;
+}
+
+void
+EndDeviceLorawanMac::DoExecuteADRBackoff(double& txPowerDbm,
+                                         uint8_t& dataRate,
+                                         uint8_t& nbTrans,
+                                         const std::vector<Ptr<LogicalLoraChannel>>& txChannelArray)
+{
+    // Adapted from: github.com/Lora-net/SWL2001.git v4.8.0
+    // For the time being, this implementation is valid for the EU868 region
+
+    if (txPowerDbm < 14)
     {
-        m_txPowerDbm = 14; // Reset transmission power to default
+        txPowerDbm = 14; // Reset transmission power to default
         return;
     }
 
-    if (m_dataRate != 0)
+    if (dataRate != 0)
     {
-        m_dataRate--;
+        dataRate--;
         return;
     }
 
     // Set nbTrans to 1 and re-enable default channels
-    m_nbTrans = 1;
-    auto channels = m_channelHelper->GetRawChannelArray();
-    channels.at(0)->EnableForUplink();
-    channels.at(1)->EnableForUplink();
-    channels.at(2)->EnableForUplink();
+    nbTrans = 1;
+    txChannelArray.at(0)->EnableForUplink();
+    txChannelArray.at(1)->EnableForUplink();
+    txChannelArray.at(2)->EnableForUplink();
 }
 
 bool
@@ -419,8 +478,6 @@ EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
 void
 EndDeviceLorawanMac::ApplyNecessaryOptions(LoraFrameHeader& frameHeader)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
     frameHeader.SetAsUplink();
     frameHeader.SetFPort(1); // TODO Use an appropriate frame port based on the application
     frameHeader.SetAddress(m_address);
@@ -438,15 +495,17 @@ EndDeviceLorawanMac::ApplyNecessaryOptions(LoraFrameHeader& frameHeader)
 
         frameHeader.AddCommand(command);
     }
+
+    NS_LOG_DEBUG(frameHeader);
 }
 
 void
 EndDeviceLorawanMac::ApplyNecessaryOptions(LorawanMacHeader& macHeader)
 {
-    NS_LOG_FUNCTION_NOARGS();
-
     macHeader.SetFType(m_fType);
     macHeader.SetMajor(1);
+
+    NS_LOG_DEBUG(macHeader);
 }
 
 void
@@ -463,12 +522,15 @@ EndDeviceLorawanMac::GetFType()
 }
 
 std::vector<Ptr<LogicalLoraChannel>>
-EndDeviceLorawanMac::GetCompatibleTxChannels()
+EndDeviceLorawanMac::GetCompatibleTxChannels(
+    const std::vector<Ptr<LogicalLoraChannel>>& txChannelArray,
+    uint8_t dataRate,
+    double txPowerDbm) const
 {
     NS_LOG_FUNCTION(this);
     /// @todo possibly move to LogicalChannelHelper
     std::vector<Ptr<LogicalLoraChannel>> candidates;
-    for (const auto& channel : m_channelHelper->GetRawChannelArray())
+    for (const auto& channel : txChannelArray)
     {
         if (channel && channel->IsEnabledForUplink()) // Skip empty frequency channel slots
         {
@@ -479,7 +541,7 @@ EndDeviceLorawanMac::GetCompatibleTxChannels()
                                                        << "Hz, minDr=" << unsigned(minDr)
                                                        << ", maxDr=" << unsigned(maxDr)
                                                        << ", maxTxPower=" << maxTxPower << "dBm");
-            if (m_dataRate >= minDr && m_dataRate <= maxDr && m_txPowerDbm <= maxTxPower)
+            if (dataRate >= minDr && dataRate <= maxDr && txPowerDbm <= maxTxPower)
             {
                 candidates.emplace_back(channel);
             }
@@ -489,22 +551,27 @@ EndDeviceLorawanMac::GetCompatibleTxChannels()
 }
 
 Time
-EndDeviceLorawanMac::GetNextTransmissionDelay()
+EndDeviceLorawanMac::GetNextTransmissionDelay(
+    const std::vector<Ptr<LogicalLoraChannel>>& txChannelArray) const
 {
     NS_LOG_FUNCTION(this);
-    // Check duty cycle of compatible channels
+    // Check duty cycle on provided channels
     auto waitTime = Time::Max();
-    for (const auto& channel : GetCompatibleTxChannels())
+    for (const auto& c : txChannelArray)
     {
-        auto curr = m_channelHelper->GetWaitTime(channel);
-        NS_LOG_DEBUG("frequency=" << channel->GetFrequency() << "Hz,"
-                                  << " waitTime=" << curr.As(Time::S));
-        if (curr < waitTime)
-        {
-            waitTime = curr;
-        }
+        auto channelWait = m_channelHelper->GetWaitTime(c);
+        NS_LOG_LOGIC("frequency=" << c->GetFrequency() << "Hz, "
+                                  << "waitTime=" << channelWait.As(Time::S));
+        waitTime = Min(waitTime, channelWait);
     }
-    return GetNextClassTransmissionDelay(waitTime);
+    NS_LOG_DEBUG("Current minimum duty-cycle wait time is " << waitTime.As(Time::S));
+
+    /// TODO: Check aggregated duty cycle imposed by server
+
+    // Check if we need to postpone more (overridden function!)
+    waitTime = Max(waitTime, GetNextClassTransmissionDelay());
+
+    return waitTime;
 }
 
 Ptr<LogicalLoraChannel>
@@ -512,12 +579,14 @@ EndDeviceLorawanMac::GetRandomChannelForTx()
 {
     NS_LOG_FUNCTION(this);
     /// @todo possibly move to LogicalChannelHelper
+    auto channels = m_channelHelper->GetRawChannelArray();
+    auto compatible = GetCompatibleTxChannels(channels, m_dataRate, m_txPowerDbm);
     std::vector<Ptr<LogicalLoraChannel>> candidates;
-    for (const auto& channel : GetCompatibleTxChannels())
+    for (const auto& c : compatible)
     {
-        if (m_channelHelper->GetWaitTime(channel).IsZero())
+        if (m_channelHelper->GetWaitTime(c).IsZero())
         {
-            candidates.emplace_back(channel);
+            candidates.emplace_back(c);
         }
     }
     if (candidates.empty())
