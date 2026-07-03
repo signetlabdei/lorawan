@@ -494,10 +494,7 @@ class EndDeviceLorawanMac : public LorawanMac
      */
     LorawanMacHeader::FType m_fType;
 
-    /**
-     * current value of the device frame counter.
-     */
-    uint16_t m_currentFCnt;
+    uint16_t m_fCnt; //!< Current value of the uplink frame counter
 
     bool m_adrAckReq; //!< ADRACKReq bit, set to 1 after ADR_ACK_LIMIT consecutive uplinks without
                       //!< downlink messages received from the server. It requests the server to

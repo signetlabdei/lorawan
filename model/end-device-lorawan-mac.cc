@@ -112,7 +112,7 @@ EndDeviceLorawanMac::EndDeviceLorawanMac()
       m_lastKnownGatewayCount(0),
       m_aggregatedDutyCycle(1),
       m_fType(LorawanMacHeader::FType::CONFIRMED_DATA_UP),
-      m_currentFCnt(0),
+      m_fCnt(0),
       m_adrAckReq(false)
 {
     NS_LOG_FUNCTION(this);
@@ -269,7 +269,7 @@ EndDeviceLorawanMac::DoSend(Ptr<Packet> packet)
     {
         m_sentNewPacket(packet); // Fire trace source
         // Bump-up frame counters
-        m_currentFCnt++;
+        m_fCnt++;
         m_adrAckCnt++;
     }
 }
@@ -431,7 +431,7 @@ EndDeviceLorawanMac::ApplyNecessaryOptions(LoraFrameHeader& frameHeader)
     frameHeader.SetAdrAckReq(m_adrAckReq);
 
     // FPending does not exist in uplink messages
-    frameHeader.SetFCnt(m_currentFCnt);
+    frameHeader.SetFCnt(m_fCnt);
 
     // Add listed MAC commands
     for (const auto& command : m_macCommandList)
