@@ -37,14 +37,13 @@ ClassAEndDeviceLorawanMac::GetTypeId()
 }
 
 ClassAEndDeviceLorawanMac::ClassAEndDeviceLorawanMac()
-    : // LoraWAN default
+    : // LoraWAN defaults
       m_receiveDelay1(Seconds(1)),
       m_rx1DrOffset(0),
       m_receiveDelay2(Seconds(2)),
       m_isSecondWindowOpen(false)
 {
     NS_LOG_FUNCTION(this);
-
     // Void the RX2 event
     m_secondReceiveWindow = EventId();
     m_secondReceiveWindow.Cancel();
@@ -146,72 +145,45 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
     packetCopy->RemoveHeader(fHdr);
     NS_LOG_DEBUG("Downlink Frame Header: " << fHdr);
 
+    /// TODO: early packet filtering at PHY layer
+
     // Determine whether this packet is for us
-    bool messageForUs = (m_address == fHdr.GetAddress());
-
-    if (messageForUs)
-    {
-        NS_LOG_INFO("The message is for us!");
-
-        // If it exists, cancel the second receive window event
-        // THIS WILL BE GetReceiveWindow()
-        Simulator::Cancel(m_secondReceiveWindow);
-
-        // Reset ADR backoff counter
-        m_adrAckCnt = 0;
-
-        LoraTag tag;
-        packet->PeekPacketTag(tag);
-        /// @see ns3::lorawan::AdrComponent::RxPowerToSNR
-        m_lastRxSnr = tag.GetReceivePower() + 174 - 10 * log10(125000) - 6;
-
-        // Parse the MAC commands
-        ParseCommands(fHdr);
-
-        // Pass the packet up to the NetDevice
-        if (!m_receiveCallback.IsNull())
-        {
-            m_receiveCallback(packetCopy);
-        }
-        // Call the trace source
-        m_receivedPacket(packet);
-    }
-    else
+    if (m_address != fHdr.GetAddress())
     {
         NS_LOG_DEBUG("The message is intended for another recipient.");
-
-        // In this case, we are either receiving in the first receive window
-        // and finishing reception inside the second one, or receiving a
-        // packet in the second receive window and finding out, after the
-        // fact, that the packet is not for us. In either case, if we no
-        // longer have any retransmissions left, we declare failure.
-        if (m_txContext.needsAck && m_secondReceiveWindow.IsExpired())
-        {
-            /// TODO: UNCONFIRMED packets CAN be retransmitted, but behave slightly differently.
-            /// The current implementation only considers re-txs for CONFIRMED, change this
-            if (m_txContext.nbTxLeft == 0)
-            {
-                uint8_t txs = m_nbTrans - (m_txContext.nbTxLeft);
-                m_confirmedTxOutcomeCallback(txs,
-                                             false,
-                                             m_txContext.firstAttempt,
-                                             m_txContext.packet);
-                NS_LOG_DEBUG("Failure: no more retransmissions left. Used " << unsigned(txs)
-                                                                            << " transmissions.");
-
-                // Reset retransmission parameters
-                ResetRetransmissionParameters();
-            }
-            else // Reschedule
-            {
-                this->Send(m_txContext.packet);
-                NS_LOG_INFO("We have " << unsigned(m_txContext.nbTxLeft)
-                                       << " retransmissions left: rescheduling transmission.");
-            }
-        }
+        FailedReception(packet);
+        return;
     }
 
+    // Set PHY to sleep
     DynamicCast<EndDeviceLoraPhy>(m_phy)->Sleep();
+
+    NS_LOG_INFO("The message is for us!");
+    // If it exists, cancel the second receive window event
+    m_secondReceiveWindow.Cancel();
+    // Reset ADR backoff counter
+    m_adrAckCnt = 0;
+    // Clear commands that are re-sent until downlink (DlChannelAns and RxTimingSetupAns)
+    m_macCommandList.clear();
+
+    // Link quality metadata
+    LoraTag tag;
+    packet->PeekPacketTag(tag);
+    /// @see ns3::lorawan::AdrComponent::RxPowerToSNR
+    m_lastRxSnr = tag.GetReceivePower() + 174 - 10 * log10(125000) - 6;
+
+    // Parse the MAC commands
+    ParseCommands(fHdr);
+    // Manage acknowledgement and retransmission
+    ManageRetransmissions(fHdr.GetAck() ? ACK : RECV);
+
+    // Pass the packet up to the NetDevice
+    if (!m_receiveCallback.IsNull())
+    {
+        m_receiveCallback(packetCopy);
+    }
+    // Call the trace source
+    m_receivedPacket(packet);
 }
 
 void
@@ -229,24 +201,10 @@ ClassAEndDeviceLorawanMac::FailedReception(Ptr<const Packet> packet)
     // Here is for sure closed, can be improved
     m_isSecondWindowOpen = false;
 
-    if (m_secondReceiveWindow.IsExpired() && m_txContext.needsAck)
+    // Nothing valid was received; if we are past the 2nd RX window, we can reschedule
+    if (m_secondReceiveWindow.IsExpired())
     {
-        if (m_txContext.nbTxLeft > 0)
-        {
-            this->Send(m_txContext.packet);
-            NS_LOG_INFO("We have " << unsigned(m_txContext.nbTxLeft)
-                                   << " retransmissions left: rescheduling transmission.");
-        }
-        else
-        {
-            uint8_t txs = m_nbTrans - (m_txContext.nbTxLeft);
-            m_confirmedTxOutcomeCallback(txs, false, m_txContext.firstAttempt, m_txContext.packet);
-            NS_LOG_DEBUG("Failure: no more retransmissions left. Used " << unsigned(txs)
-                                                                        << " transmissions.");
-
-            // Reset retransmission parameters
-            ResetRetransmissionParameters();
-        }
+        ManageRetransmissions(FAIL);
     }
 }
 
@@ -350,43 +308,71 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
                   "Unexpected PHY state on RX2 closure: phyState=" << phyState);
     DynamicCast<EndDeviceLoraPhy>(m_phy)->Sleep();
 
-    if (m_txContext.needsAck)
+    // We are here if no reception happened
+    ManageRetransmissions(NONE);
+}
+
+void
+ClassAEndDeviceLorawanMac::ManageRetransmissions(RxOutcome outcome)
+{
+    NS_LOG_FUNCTION(this << outcome);
+
+    bool recv = (outcome == RECV || outcome == ACK); // We received something
+    bool needsAck = m_txContext.needsAck;            // We were waiting for acknowledgement
+    bool gotAck = (outcome == ACK);                  // We got acknowledgement
+    bool canReTx = (m_txContext.nbTxLeft > 0 && !m_nextTx.IsPending()); // We can retransmit
+    NS_LOG_DEBUG("recv=" << recv << ", needsAck=" << needsAck << ", gotAck=" << gotAck
+                         << ", canReTx=" << canReTx);
+
+    // Condition to schedule retransmission:
+    // either we did not receive or we weren't acknowledged + we can retransmit
+    if ((!recv || (needsAck && !gotAck)) && canReTx)
     {
-        NS_LOG_DEBUG("No reception initiated by PHY: rescheduling transmission.");
-        if (m_txContext.nbTxLeft > 0)
+        if (outcome == RECV)
         {
-            NS_LOG_INFO("We have " << unsigned(m_txContext.nbTxLeft)
-                                   << " retransmissions left: rescheduling transmission.");
-            this->Send(m_txContext.packet);
+            NS_LOG_DEBUG("Received packet without ACK: rescheduling transmission.");
         }
-
-        else if (m_txContext.nbTxLeft == 0 && DynamicCast<EndDeviceLoraPhy>(m_phy)->GetState() !=
-                                                  EndDeviceLoraPhy::State::RX_ACTIVE)
+        else if (outcome == FAIL)
         {
-            uint8_t txs = m_nbTrans - (m_txContext.nbTxLeft);
-            m_confirmedTxOutcomeCallback(txs, false, m_txContext.firstAttempt, m_txContext.packet);
-            NS_LOG_DEBUG("Failure: no more retransmissions left. Used " << unsigned(txs)
-                                                                        << " transmissions.");
-
-            // Reset retransmission parameters
-            ResetRetransmissionParameters();
+            NS_LOG_DEBUG("Reception failed: rescheduling transmission.");
         }
-
-        else
+        else if (outcome == NONE)
         {
-            NS_ABORT_MSG("The number of retransmissions left is negative ! ");
+            NS_LOG_DEBUG("No reception initiated by PHY: rescheduling transmission.");
         }
+        NS_LOG_INFO("We have " << unsigned(m_txContext.nbTxLeft) << " retransmissions left.");
+        double retransmitTimeout = m_uniformRV->GetValue(1, 3);
+        PostponeTransmission(Seconds(retransmitTimeout), m_txContext.packet);
+        return;
     }
-    else
-    {
-        uint8_t txs = m_nbTrans - (m_txContext.nbTxLeft);
-        m_confirmedTxOutcomeCallback(txs, true, m_txContext.firstAttempt, m_txContext.packet);
-        NS_LOG_INFO(
-            "We have " << unsigned(m_txContext.nbTxLeft)
-                       << " transmissions left. We were not transmitting confirmed messages.");
 
-        // Reset retransmission parameters
-        ResetRetransmissionParameters();
+    // Tracing: end of re-transmission process
+    uint8_t txs = m_nbTrans - m_txContext.nbTxLeft;
+    // Acknowledgement success of confirmed txs
+    if (recv && needsAck && gotAck)
+    {
+        m_confirmedTxOutcomeCallback(txs, true, m_txContext.firstAttempt, m_txContext.packet);
+        NS_LOG_DEBUG("Received ACK packet after "
+                     << unsigned(txs) << " transmissions: stopping retransmission process");
+    }
+    // Acknowledgement failure of confirmed txs
+    // (either exhausted all reTxs or new pkt scheduled while busy)
+    else if (needsAck && !gotAck && !canReTx)
+    {
+        m_confirmedTxOutcomeCallback(txs, false, m_txContext.firstAttempt, m_txContext.packet);
+        NS_LOG_DEBUG("Ack failure: no more retransmission opportunities. Used "
+                     << unsigned(txs) << " transmissions.");
+    }
+
+    // Exhaust remaining re-transmissions
+    m_txContext.nbTxLeft = 0;
+
+    // Update uplink frame counter
+    m_fCnt++;
+    // Update ADRACKCnt only if nothing was received
+    if (!recv)
+    {
+        m_adrAckCnt++;
     }
 }
 
@@ -413,20 +399,6 @@ ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay() const
                          << (worstCaseEndReceive - Now()).As(Time::S));
             return worstCaseEndReceive - Now();
         }
-    }
-    // This is a retransmitted packet, it can not be sent until the end of
-    // ACK_TIMEOUT (this timer starts when the second receive window was open)
-    else
-    {
-        double ack_timeout = m_uniformRV->GetValue(1, 3);
-        // Compute the duration until ACK_TIMEOUT (It may be a negative number, but it doesn't
-        // matter.)
-        Time retransmitWaitTime =
-            Time(m_secondReceiveWindow.GetTs()) - Now() + Seconds(ack_timeout);
-
-        NS_LOG_DEBUG("ack_timeout:" << ack_timeout
-                                    << " retransmitWaitTime:" << retransmitWaitTime.As(Time::S));
-        return retransmitWaitTime;
     }
 
     return Time();

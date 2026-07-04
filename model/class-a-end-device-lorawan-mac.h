@@ -135,6 +135,14 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     void SendToPhy(Ptr<Packet> packet) override;
 
   private:
+    enum RxOutcome
+    {
+        ACK,
+        RECV,
+        FAIL,
+        NONE
+    };
+
     /**
      * Perform operations needed to open the first receive window.
      */
@@ -154,6 +162,13 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      * Perform operations needed to close the second receive window.
      */
     void CloseSecondReceiveWindow();
+
+    /**
+     * Decide whether we can retransmit based on reception outcome.
+     *
+     * \param outcome Outcome of the reception.
+     */
+    void ManageRetransmissions(RxOutcome outcome);
 
     EventId m_secondReceiveWindow; //!< The event of the second receive window opening, used
                                    //!< to cancel the second window in case the first one is

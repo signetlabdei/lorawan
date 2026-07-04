@@ -105,11 +105,6 @@ class EndDeviceLorawanMac : public LorawanMac
     /////////////////////////
 
     /**
-     * Reset retransmission parameters contained in the structure LoraRetxParams.
-     */
-    virtual void ResetRetransmissionParameters();
-
-    /**
      * Signals to the network server that this device will or may not comply with LinkADRReq
      * settings (data rate, transmission power and number of retransmissions) received in downlink.
      * This also controls whether the local ADR backoff procedure can reset configurations in case
@@ -368,6 +363,21 @@ class EndDeviceLorawanMac : public LorawanMac
     Ptr<LogicalLoraChannel> GetRandomChannelForTx();
 
     /**
+     * @brief The event of transmitting a packet at a later moment if needed.
+     *
+     * This Event tracks whether there is a transmission scheduled in the future:
+     * - A packet needs to be retransmitted according to the LoRaWAN MAC protocol
+     * - The application layer wants to send but the device is currently busy
+     * - Duty cycle restrictions apply (either legal or imposed by the network)
+     *
+     * The Event is used to cancel such transmissions in case the application layer
+     * wants to send a new packet, also interrupting any ongoing retransmission process.
+     *
+     * De-facto, this acts as a size-1 queue of packets to be sent.
+     */
+    EventId m_nextTx;
+
+    /**
      * The duration of a receive window in number of symbols. This should be
      * converted to time based or the reception parameter used.
      *
@@ -398,6 +408,8 @@ class EndDeviceLorawanMac : public LorawanMac
      * Used to record the last reception SNR measurement to be included in the DevStatusAns.
      */
     double m_lastRxSnr;
+
+    uint16_t m_fCnt; //!< Current value of the uplink frame counter
 
     uint16_t m_adrAckCnt; //!< ADRACKCnt counter of the number of consecutive uplinks without
                           //!< downlink reply from the server. Reset upon reception of any Class A
@@ -494,14 +506,6 @@ class EndDeviceLorawanMac : public LorawanMac
                 //!< procedure to reset configurations in case of connectivity loss.
 
     /**
-     * The event of retransmitting a packet in a consecutive moment if an ACK is not received.
-     *
-     * This Event is used to cancel the retransmission if the ACK is found in ParseCommand function
-     * and if a newer packet is delivered from the application to be sent.
-     */
-    EventId m_nextTx;
-
-    /**
      * The last known link margin in dB from the demodulation floor.
      *
      * This value is obtained (and updated) when a LinkCheckAns Mac command is
@@ -527,8 +531,6 @@ class EndDeviceLorawanMac : public LorawanMac
      * The frame type to apply to packets sent with the Send method.
      */
     LorawanMacHeader::FType m_fType;
-
-    uint16_t m_fCnt; //!< Current value of the uplink frame counter
 
     bool m_adrAckReq; //!< ADRACKReq bit, set to 1 after ADR_ACK_LIMIT consecutive uplinks without
                       //!< downlink messages received from the server. It requests the server to
