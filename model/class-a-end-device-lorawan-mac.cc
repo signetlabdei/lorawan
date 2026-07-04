@@ -41,7 +41,7 @@ ClassAEndDeviceLorawanMac::ClassAEndDeviceLorawanMac()
       m_receiveDelay1(Seconds(1)),
       m_rx1DrOffset(0),
       m_receiveDelay2(Seconds(2)),
-      m_isSecondWindowOpen(false)
+      m_busy(false)
 {
     NS_LOG_FUNCTION(this);
     // Void the RX2 event
@@ -62,6 +62,10 @@ void
 ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
 {
     NS_LOG_DEBUG("PacketToSend: " << packetToSend);
+
+    // Lock the MAC layer during the TX -> RX1 -> RX2 process
+    NS_ASSERT_MSG(!m_busy, "Trying to send while device is already marked busy");
+    m_busy = true;
 
     /////////////////////////
     // Prepare TX parameters
@@ -128,9 +132,6 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
     NS_ASSERT_MSG(phyState == EndDeviceLoraPhy::State::STANDBY,
                   "Unexpected PHY state on RX end: phyState=" << phyState);
 
-    // Here is for sure closed, can be improved
-    m_isSecondWindowOpen = false;
-
     // Work on a copy of the packet
     Ptr<Packet> packetCopy = packet->Copy();
 
@@ -161,6 +162,8 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
     NS_LOG_INFO("The message is for us!");
     // If it exists, cancel the second receive window event
     m_secondReceiveWindow.Cancel();
+    // Open the context to new transmissions
+    m_busy = false;
     // Reset ADR backoff counter
     m_adrAckCnt = 0;
     // Clear commands that are re-sent until downlink (DlChannelAns and RxTimingSetupAns)
@@ -198,13 +201,12 @@ ClassAEndDeviceLorawanMac::FailedReception(Ptr<const Packet> packet)
     // Switch to sleep after a failed reception
     DynamicCast<EndDeviceLoraPhy>(m_phy)->Sleep();
 
-    // Here is for sure closed, can be improved
-    m_isSecondWindowOpen = false;
-
     // Nothing valid was received; if we are past the 2nd RX window, we can reschedule
     if (m_secondReceiveWindow.IsExpired())
     {
         ManageRetransmissions(FAIL);
+        // Open the context to new transmissions
+        m_busy = false;
     }
 }
 
@@ -293,14 +295,12 @@ ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow()
         GetBandwidthFromDataRate(m_secondReceiveWindowDataRate),
         m_receiveWindowDurationInSymbols,
         MakeCallback(&ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow, this));
-    m_isSecondWindowOpen = true;
 }
 
 void
 ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
 {
     NS_LOG_FUNCTION(this);
-    m_isSecondWindowOpen = false;
     // We should always be in STANDBY mode at this point, as this function is meant to be
     // invoked as a callback by the PHY on reception timeout
     auto phyState = DynamicCast<EndDeviceLoraPhy>(m_phy)->GetState();
@@ -310,6 +310,8 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow()
 
     // We are here if no reception happened
     ManageRetransmissions(NONE);
+    // Open the context to new transmissions
+    m_busy = false;
 }
 
 void
@@ -383,24 +385,12 @@ ClassAEndDeviceLorawanMac::ManageRetransmissions(RxOutcome outcome)
 Time
 ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay() const
 {
-    NS_LOG_FUNCTION_NOARGS();
-
-    // This is a new packet from APP; it can not be sent until the end of the
-    // second receive window (if the second receive window has not closed yet)
-    if (!m_txContext.needsAck)
+    NS_LOG_FUNCTION(this);
+    if (m_busy) // device is in the process of sending and opening RX windows
     {
-        if (!m_secondReceiveWindow.IsExpired() || m_isSecondWindowOpen)
-        {
-            NS_LOG_WARN(
-                "Attempting to send when there are receive windows: Transmission postponed.");
-            // Compute the worst case (SF12, 64B) reception end in the second receive window
-            Time worstCaseEndReceive = Time(m_secondReceiveWindow.GetTs()) + Seconds(2.79);
-            NS_LOG_DEBUG("Duration until worstCaseEndReceive for new transmission:"
-                         << (worstCaseEndReceive - Now()).As(Time::S));
-            return worstCaseEndReceive - Now();
-        }
+        NS_LOG_WARN("Attempting to send when device is still busy, postponed by 5s.");
+        return Seconds(5);
     }
-
     return Time();
 }
 

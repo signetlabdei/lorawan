@@ -118,9 +118,9 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /////////////////////
 
     /**
-     * Compute a minimum wait time value based on the current busy state of the device.
+     * Evaluate wait time value based on the current busy state of the device.
      *
-     * A Class A device is considered busy while it is in the process of sending and opening the 2
+     * A Class A device is considered busy while in the process of sending followed by opening the 2
      * protocol-mandated reception windows.
      *
      * @return The wait Time value.
@@ -192,7 +192,8 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
 
     // Rescheduling purposes
 
-    bool m_isSecondWindowOpen; //!< Whether the second reception window is currently open
+    bool m_busy; //!< Whether the MAC layer is currently busy with in the LoRaWAN Class A process of
+                 //!< transmitting an uplink packet and then opening two reception windows.
 };
 
 } /* namespace lorawan */
