@@ -380,7 +380,7 @@ EndDeviceLorawanMac::IsPayloadSizeValid(uint32_t appPayloadSize, uint8_t dataRat
 //////////////////////////
 
 void
-EndDeviceLorawanMac::ParseCommands(LoraFrameHeader frameHeader)
+EndDeviceLorawanMac::ApplyMACCommands(LoraFrameHeader frameHeader)
 {
     NS_LOG_FUNCTION(this << frameHeader);
     // Parse and apply downlink MAC commands, queue answers

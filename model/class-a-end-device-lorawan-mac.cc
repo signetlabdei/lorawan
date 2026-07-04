@@ -173,7 +173,7 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
     m_lastRxSnr = tag.GetReceivePower() + 174 - 10 * log10(125000) - 6;
 
     // Parse the MAC commands
-    ParseCommands(fHdr);
+    ApplyMACCommands(fHdr);
     // Manage acknowledgement and retransmission
     ManageRetransmissions(fHdr.GetAck() ? ACK : RECV);
 

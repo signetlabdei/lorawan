@@ -252,7 +252,7 @@ class EndDeviceLorawanMac : public LorawanMac
      *
      * @param frameHeader The frame header.
      */
-    void ParseCommands(LoraFrameHeader frameHeader);
+    void ApplyMACCommands(LoraFrameHeader frameHeader);
 
     /**
      * Perform the actions that need to be taken when receiving a LinkCheckAns command.
