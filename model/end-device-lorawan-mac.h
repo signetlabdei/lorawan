@@ -199,6 +199,13 @@ class EndDeviceLorawanMac : public LorawanMac
      */
     LorawanMacHeader::FType GetFType();
 
+    /**
+     * Get the current value of the LoRaWAN uplink frame counter (FCnt) of this device
+     *
+     * @return This device's current uplink frame counter (FCnt)
+     */
+    uint16_t GetUplinkFrameCounter() const;
+
   protected:
     /**
      * Current packet transmission context tracking transmissions attempts mandated by the protocol

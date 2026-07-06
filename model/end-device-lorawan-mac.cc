@@ -324,6 +324,13 @@ EndDeviceLorawanMac::GetFType()
     return m_fType;
 }
 
+uint16_t
+EndDeviceLorawanMac::GetUplinkFrameCounter() const
+{
+    NS_LOG_FUNCTION(this);
+    return m_fCnt;
+}
+
 void
 EndDeviceLorawanMac::PostponeTransmission(Time nextTxDelay, Ptr<Packet> packet)
 {
