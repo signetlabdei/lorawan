@@ -341,7 +341,7 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
     // Remove the Mac Header to get some information
     LorawanMacHeader mHdr;
     packetCopy->RemoveHeader(mHdr);
-    NS_ASSERT_MSG(mHdr.IsUplink() == false, "Received uplink package, check PHY polarity");
+    NS_ASSERT_MSG(!mHdr.IsUplink(), "Received uplink package, check PHY polarity");
     NS_LOG_DEBUG("Downlink Mac Header: " << mHdr);
     // Remove the Frame Header
     LoraFrameHeader fHdr;

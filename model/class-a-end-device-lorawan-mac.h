@@ -110,7 +110,7 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     /**
      * Decide whether we can retransmit based on reception outcome.
      *
-     * \param outcome Outcome of the reception.
+     * @param outcome Outcome of the reception.
      */
     void ManageRetransmissions(RxOutcome outcome);
 

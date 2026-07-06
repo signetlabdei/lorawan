@@ -39,7 +39,7 @@ class LorawanMac : public Object
      * This type defines the callback of a higher layer that a LorawanMac(-derived) object invokes
      * to pass a packet up the stack.
      *
-     * \param packet the packet that has been received.
+     * @param packet the packet that has been received.
      */
     typedef Callback<void, Ptr<Packet>> ReceiveCallback;
 

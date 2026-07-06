@@ -131,7 +131,7 @@ EndDeviceLorawanMac::Send(Ptr<Packet> packet)
 
     // Check ability to send and compute delay without touching the internal device state
     Time nextTxDelay;
-    if (ValidatePacketForSend(packet, nextTxDelay) == false)
+    if (!ValidatePacketForSend(packet, nextTxDelay))
     {
         NS_LOG_ERROR("Packet cannot be sent in the current device state, transmission aborted.");
         return;
@@ -190,7 +190,7 @@ EndDeviceLorawanMac::ValidatePacketForSend(Ptr<const Packet> packet, Time& nextT
     // This check is influenced by ADR backoff. This is OK because (by LoRaWAN design) you
     // either use ADR and constrain your max app payload according to the default initial DR0,
     // or you disable ADR for a fixed data rate, with the possibility of using bigger payloads.
-    if (IsPayloadSizeValid(packet->GetSize(), tmpDataRate) == false)
+    if (!IsPayloadSizeValid(packet->GetSize(), tmpDataRate))
     {
         NS_LOG_WARN("Application payload exceeding maximum size.");
         return false;

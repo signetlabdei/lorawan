@@ -60,7 +60,7 @@ SimpleGatewayLoraPhy::Send(Ptr<Packet> packet,
     // Interrupt all receive operations
     for (auto& rxPath : m_receptionPaths)
     {
-        if (rxPath->IsAvailable() == false) // Reception path is occupied
+        if (!rxPath->IsAvailable()) // Reception path is occupied
         {
             // Fire the trace source
             m_noReceptionBecauseTransmitting(rxPath->GetEvent()->GetPacket(),
@@ -108,7 +108,7 @@ SimpleGatewayLoraPhy::StartReceive(Ptr<Packet> packet,
         return;
     }
     // Check whether the gateway is configured to listen for the channel of the transmission
-    else if (IsOnFrequency(frequencyHz) == false)
+    else if (!IsOnFrequency(frequencyHz))
     {
         // Unknown frequency
         NS_LOG_INFO("Dropping packet reception of packet with SF"
