@@ -2651,11 +2651,8 @@ class RetransmissionTest : public TestCase
   private:
     /**
      * Create and send an empty app payload unconfirmed frame through the MAC layer NbTrans times.
-     * The packet is sent after a delay (simulated time is fast-forwarded to the event) such that
-     * the device does not incur any duty-cycle limitation. The sent packet FHDR is returned as
-     * argument for validation purposes.
+     * The sent packet FHDR is returned as argument for validation purposes.
      *
-     * @param after Delay to schedule the packet after to avoid duty-cycle limitations
      * @param fhdr [out] FHDR of the constructed frame passed to PHY by the MAC
      */
     void SendUplink(LoraFrameHeader& fhdr);
@@ -2729,8 +2726,8 @@ class RetransmissionTest : public TestCase
     int m_phyStartSendingCalls = 0;   //!< Counter for PhyStartSending calls
     int m_phyReceivedPacketCalls = 0; //!< Counter for PhyReceivedPacket calls
 
-    uint8_t m_numTransmissions = 0;   //<! Number of confirmed packet transmissions
-    bool m_successfullyAcked = false; //<! Acknowledgement of confirmed packet
+    uint8_t m_numTransmissions = 0;   //!< Number of confirmed packet transmissions
+    bool m_successfullyAcked = false; //!< Acknowledgement of confirmed packet
 };
 
 RetransmissionTest::RetransmissionTest()

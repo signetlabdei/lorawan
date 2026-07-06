@@ -135,7 +135,10 @@ class DownlinkPacketTest : public TestCase
      * @param firstAttempt Timestamp of the initial transmission attempt.
      * @param packet The packet being retransmitted.
      */
-    void ReceivedPacketAtEndDevice(uint8_t txCount, bool ack, Time time, Ptr<Packet> packet);
+    void ReceivedPacketAtEndDevice(uint8_t txCount,
+                                   bool ack,
+                                   Time firstAttempt,
+                                   Ptr<Packet> packet);
 
     /**
      * Send a packet from the input end device.
@@ -166,7 +169,7 @@ DownlinkPacketTest::~DownlinkPacketTest()
 void
 DownlinkPacketTest::ReceivedPacketAtEndDevice(uint8_t txCount,
                                               bool ack,
-                                              Time time,
+                                              Time firstAttempt,
                                               Ptr<Packet> packet)
 {
     NS_LOG_DEBUG("Received a packet at the end device");
