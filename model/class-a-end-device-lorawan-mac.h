@@ -36,41 +36,6 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
     ClassAEndDeviceLorawanMac();           //!< Default constructor
     ~ClassAEndDeviceLorawanMac() override; //!< Destructor
 
-    //////////////////////////
-    //  Receiving methods   //
-    //////////////////////////
-
-    /**
-     * Receive a packet.
-     *
-     * This method is typically registered as a callback in the underlying PHY
-     * layer so that it's called when a packet is going up the stack.
-     *
-     * @param packet The received packet.
-     */
-    void Receive(Ptr<const Packet> packet) override;
-
-    /**
-     * Function called by lower layers to inform this layer that reception of a
-     * packet we were locked on failed.
-     *
-     * @param packet The packet we failed to receive.
-     */
-    void FailedReception(Ptr<const Packet> packet) override;
-
-    /**
-     * Perform the actions that are required after a packet send.
-     *
-     * This function handles opening of the first receive window.
-     *
-     * @param packet The packet that has just been transmitted.
-     */
-    void TxFinished(Ptr<const Packet> packet) override;
-
-    /////////////////////////
-    // Getters and Setters //
-    /////////////////////////
-
     /**
      * Get the data rate that will be used in the first receive window.
      *
@@ -106,42 +71,21 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      */
     uint32_t GetSecondReceiveWindowFrequency() const;
 
-    /////////////////////////
-    // MAC command methods //
-    /////////////////////////
-
-    void OnRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequencyHz) override;
-
-  protected:
-    /////////////////////
-    // Sending methods //
-    /////////////////////
-
-    /**
-     * Evaluate wait time value based on the current busy state of the device.
-     *
-     * A Class A device is considered busy while in the process of sending followed by opening the 2
-     * protocol-mandated reception windows.
-     *
-     * @return The wait Time value.
-     */
-    Time GetNextClassTransmissionDelay() const override;
-
-    /**
-     * Send a packet with the sending function of the physical layer.
-     *
-     * @param packet The packet to send.
-     */
-    void SendToPhy(Ptr<Packet> packet) override;
-
   private:
+    /**
+     * Set of possible outcomes of a reception window
+     */
     enum RxOutcome
     {
-        ACK,
-        RECV,
-        FAIL,
-        NONE
+        ACK,  //!< Correctly received a network acknowledgement
+        RECV, //!< Correctly received a downlink packet (no ACK)
+        FAIL, //!< Reception initiated but failed
+        NONE  //!< Reception window timed out
     };
+
+    Time GetNextClassTransmissionDelay() const override;
+    void SendToPhy(Ptr<Packet> packet) override;
+    void TxFinished(Ptr<const Packet> packet) override;
 
     /**
      * Perform operations needed to open the first receive window.
@@ -169,6 +113,10 @@ class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
      * \param outcome Outcome of the reception.
      */
     void ManageRetransmissions(RxOutcome outcome);
+
+    void Receive(Ptr<const Packet> packet) override;
+    void FailedReception(Ptr<const Packet> packet) override;
+    void OnRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequencyHz) override;
 
     EventId m_secondReceiveWindow; //!< The event of the second receive window opening, used
                                    //!< to cancel the second window in case the first one is

@@ -1752,7 +1752,7 @@ MacCommandTest::RunMacCommand(Ts&&... args)
     mhdr.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
     pkt->AddHeader(mhdr);
     // Trigger MAC layer reception
-    m_mac->Receive(pkt);
+    DynamicCast<LorawanMac>(m_mac)->Receive(pkt);
     // Trigger MAC layer send
     pkt = Create<Packet>(0);
     m_mac->Send(pkt);

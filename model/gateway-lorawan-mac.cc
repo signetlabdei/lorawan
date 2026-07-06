@@ -103,6 +103,19 @@ GatewayLorawanMac::IsTransmitting()
     return m_phy->IsTransmitting();
 }
 
+Time
+GatewayLorawanMac::GetWaitTime(uint32_t frequencyHz)
+{
+    NS_LOG_FUNCTION_NOARGS();
+    return m_channelHelper->GetWaitTime(frequencyHz);
+}
+
+void
+GatewayLorawanMac::TxFinished(Ptr<const Packet> packet)
+{
+    NS_LOG_FUNCTION(this << packet);
+}
+
 void
 GatewayLorawanMac::Receive(Ptr<const Packet> packet)
 {
@@ -135,19 +148,6 @@ void
 GatewayLorawanMac::FailedReception(Ptr<const Packet> packet)
 {
     NS_LOG_FUNCTION(this << packet);
-}
-
-void
-GatewayLorawanMac::TxFinished(Ptr<const Packet> packet)
-{
-    NS_LOG_FUNCTION_NOARGS();
-}
-
-Time
-GatewayLorawanMac::GetWaitTime(uint32_t frequencyHz)
-{
-    NS_LOG_FUNCTION_NOARGS();
-    return m_channelHelper->GetWaitTime(frequencyHz);
 }
 
 } // namespace lorawan

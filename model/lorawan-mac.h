@@ -81,26 +81,34 @@ class LorawanMac : public Object
     virtual void Send(Ptr<Packet> packet) = 0;
 
     /**
+     * Perform actions after sending a packet.
+     *
+     * This method is typically registered as a callback in the underlying PHY
+     * layer so that it's called when a packet transmission concludes.
+     *
+     * @param packet The packet that has just been sent.
+     */
+    virtual void TxFinished(Ptr<const Packet> packet) = 0;
+
+    /**
      * Receive a packet from the lower layer.
+     *
+     * This method is typically registered as a callback in the underlying PHY
+     * layer so that it's called when a packet is going up the stack.
      *
      * @param packet The received packet.
      */
     virtual void Receive(Ptr<const Packet> packet) = 0;
 
     /**
-     * Function called by lower layers to inform this layer that reception of a
-     * packet we were locked on failed.
+     * Inform this layer that reception of a packet we were locked on failed.
+     *
+     * This method is typically registered as a callback in the underlying PHY
+     * layer so that it's called when a packet reception fails.
      *
      * @param packet The packet we failed to receive.
      */
     virtual void FailedReception(Ptr<const Packet> packet) = 0;
-
-    /**
-     * Perform actions after sending a packet.
-     *
-     * @param packet The packet that just finished transmission.
-     */
-    virtual void TxFinished(Ptr<const Packet> packet) = 0;
 
     /**
      * Set the callback to be used to notify higher layers when a packet has been

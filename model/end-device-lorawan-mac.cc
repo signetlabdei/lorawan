@@ -94,25 +94,21 @@ EndDeviceLorawanMac::GetTypeId()
 }
 
 EndDeviceLorawanMac::EndDeviceLorawanMac()
-    : m_nbTrans(1),
-      m_dataRate(0),
-      m_txPowerDbm(14),
-      m_codingRate(CodingRate::CR_4_5),
-      // LoraWAN default
-      m_headerDisabled(false),
-      // LoraWAN default
-      m_address(LoraDeviceAddress(0)),
-      // LoraWAN default
-      m_receiveWindowDurationInSymbols(8),
-      // Max initial value
-      m_lastRxSnr(32),
+    : m_address(LoraDeviceAddress(0)), // LoraWAN default
       m_fCnt(0),
       m_adrAckCnt(0),
+      m_dataRate(0),
+      m_txPowerDbm(14),
+      m_nbTrans(1),
+      m_codingRate(CodingRate::CR_4_5),
+      m_headerDisabled(false),
+      m_receiveWindowDurationInSymbols(8),
+      m_lastRxSnr(32), // Max initial value
+      m_fType(LorawanMacHeader::FType::UNCONFIRMED_DATA_UP),
       m_adr(true),
+      m_aggregatedDutyCycle(1),
       m_lastKnownLinkMarginDb(0),
       m_lastKnownGatewayCount(0),
-      m_aggregatedDutyCycle(1),
-      m_fType(LorawanMacHeader::FType::UNCONFIRMED_DATA_UP),
       m_adrAckReq(false)
 {
     NS_LOG_FUNCTION(this);
@@ -127,10 +123,6 @@ EndDeviceLorawanMac::~EndDeviceLorawanMac()
 {
     NS_LOG_FUNCTION_NOARGS();
 }
-
-////////////////////////
-//  Sending methods   //
-////////////////////////
 
 void
 EndDeviceLorawanMac::Send(Ptr<Packet> packet)
@@ -218,10 +210,316 @@ EndDeviceLorawanMac::ValidatePacketForSend(Ptr<const Packet> packet, Time& nextT
 }
 
 void
+EndDeviceLorawanMac::AddMacCommand(Ptr<MacCommand> macCommand)
+{
+    NS_LOG_FUNCTION(this << macCommand);
+
+    m_macCommandList.push_back(macCommand);
+}
+
+void
+EndDeviceLorawanMac::SetUplinkAdrBit(bool adr)
+{
+    NS_LOG_FUNCTION(this << adr);
+    m_adr = adr;
+}
+
+bool
+EndDeviceLorawanMac::GetUplinkAdrBit() const
+{
+    NS_LOG_FUNCTION(this);
+    return m_adr;
+}
+
+void
+EndDeviceLorawanMac::SetMaxNumberOfTransmissions(uint8_t nbTrans)
+{
+    NS_LOG_FUNCTION(this << unsigned(nbTrans));
+    m_nbTrans = nbTrans;
+}
+
+uint8_t
+EndDeviceLorawanMac::GetMaxNumberOfTransmissions()
+{
+    NS_LOG_FUNCTION(this);
+    return m_nbTrans;
+}
+
+void
+EndDeviceLorawanMac::SetDataRate(uint8_t dataRate)
+{
+    NS_LOG_FUNCTION(this << unsigned(dataRate));
+
+    m_dataRate = dataRate;
+}
+
+uint8_t
+EndDeviceLorawanMac::GetDataRate()
+{
+    NS_LOG_FUNCTION(this);
+
+    return m_dataRate;
+}
+
+void
+EndDeviceLorawanMac::SetTransmissionPowerDbm(double txPowerDbm)
+{
+    NS_LOG_FUNCTION(this << txPowerDbm);
+    m_txPowerDbm = txPowerDbm;
+}
+
+double
+EndDeviceLorawanMac::GetTransmissionPowerDbm()
+{
+    NS_LOG_FUNCTION(this);
+    return m_txPowerDbm;
+}
+
+void
+EndDeviceLorawanMac::SetDeviceAddress(LoraDeviceAddress address)
+{
+    NS_LOG_FUNCTION(this << address);
+
+    m_address = address;
+}
+
+LoraDeviceAddress
+EndDeviceLorawanMac::GetDeviceAddress()
+{
+    NS_LOG_FUNCTION(this);
+
+    return m_address;
+}
+
+uint8_t
+EndDeviceLorawanMac::GetLastKnownLinkMarginDb() const
+{
+    return m_lastKnownLinkMarginDb;
+}
+
+uint8_t
+EndDeviceLorawanMac::GetLastKnownGatewayCount() const
+{
+    return m_lastKnownGatewayCount;
+}
+
+double
+EndDeviceLorawanMac::GetAggregatedDutyCycle()
+{
+    NS_LOG_FUNCTION_NOARGS();
+
+    return m_aggregatedDutyCycle;
+}
+
+void
+EndDeviceLorawanMac::SetFType(LorawanMacHeader::FType fType)
+{
+    m_fType = fType;
+    NS_LOG_DEBUG("Message type is set to " << fType);
+}
+
+LorawanMacHeader::FType
+EndDeviceLorawanMac::GetFType()
+{
+    return m_fType;
+}
+
+void
 EndDeviceLorawanMac::PostponeTransmission(Time nextTxDelay, Ptr<Packet> packet)
 {
     NS_LOG_FUNCTION(this << nextTxDelay << packet);
     m_nextTx = Simulator::Schedule(nextTxDelay, &EndDeviceLorawanMac::Send, this, packet);
+}
+
+Ptr<LogicalLoraChannel>
+EndDeviceLorawanMac::GetRandomChannelForTx()
+{
+    NS_LOG_FUNCTION(this);
+    /// @todo possibly move to LogicalChannelHelper
+    auto channels = m_channelHelper->GetRawChannelArray();
+    auto compatible = GetCompatibleTxChannels(channels, m_dataRate, m_txPowerDbm);
+    std::vector<Ptr<LogicalLoraChannel>> candidates;
+    for (const auto& c : compatible)
+    {
+        if (m_channelHelper->GetWaitTime(c).IsZero())
+        {
+            candidates.emplace_back(c);
+        }
+    }
+    if (candidates.empty())
+    {
+        NS_LOG_DEBUG("No suitable TX channel found");
+        return nullptr;
+    }
+    uint8_t i = m_uniformRV->GetInteger(0, candidates.size() - 1);
+    auto channel = candidates.at(i);
+    NS_LOG_DEBUG("Selected channel with frequency=" << channel->GetFrequency() << "Hz");
+    return channel;
+}
+
+void
+EndDeviceLorawanMac::ApplyMACCommands(LoraFrameHeader frameHeader)
+{
+    NS_LOG_FUNCTION(this << frameHeader);
+    // Parse and apply downlink MAC commands, queue answers
+    for (const auto& c : frameHeader.GetCommands())
+    {
+        NS_LOG_DEBUG("Iterating over the MAC commands...");
+        enum MacCommandType type = (c)->GetCommandType();
+        switch (type)
+        {
+        case (LINK_CHECK_ANS): {
+            NS_LOG_DEBUG("Detected a LinkCheckAns command.");
+            auto linkCheckAns = DynamicCast<LinkCheckAns>(c);
+            OnLinkCheckAns(linkCheckAns->GetMargin(), linkCheckAns->GetGwCnt());
+            break;
+        }
+        case (LINK_ADR_REQ): {
+            NS_LOG_DEBUG("Detected a LinkAdrReq command.");
+            auto linkAdrReq = DynamicCast<LinkAdrReq>(c);
+            OnLinkAdrReq(linkAdrReq->GetDataRate(),
+                         linkAdrReq->GetTxPower(),
+                         linkAdrReq->GetChMask(),
+                         linkAdrReq->GetChMaskCntl(),
+                         linkAdrReq->GetNbTrans());
+            break;
+        }
+        case (DUTY_CYCLE_REQ): {
+            NS_LOG_DEBUG("Detected a DutyCycleReq command.");
+            auto dutyCycleReq = DynamicCast<DutyCycleReq>(c);
+            OnDutyCycleReq(dutyCycleReq->GetMaxDutyCycle());
+            break;
+        }
+        case (RX_PARAM_SETUP_REQ): {
+            NS_LOG_DEBUG("Detected a RxParamSetupReq command.");
+            auto rxParamSetupReq = DynamicCast<RxParamSetupReq>(c);
+            OnRxParamSetupReq(rxParamSetupReq->GetRx1DrOffset(),
+                              rxParamSetupReq->GetRx2DataRate(),
+                              rxParamSetupReq->GetFrequency());
+            break;
+        }
+        case (DEV_STATUS_REQ): {
+            NS_LOG_DEBUG("Detected a DevStatusReq command.");
+            auto devStatusReq = DynamicCast<DevStatusReq>(c);
+            OnDevStatusReq();
+            break;
+        }
+        case (NEW_CHANNEL_REQ): {
+            NS_LOG_DEBUG("Detected a NewChannelReq command.");
+            auto newChannelReq = DynamicCast<NewChannelReq>(c);
+            OnNewChannelReq(newChannelReq->GetChannelIndex(),
+                            newChannelReq->GetFrequency(),
+                            newChannelReq->GetMinDataRate(),
+                            newChannelReq->GetMaxDataRate());
+            break;
+        }
+        case (RX_TIMING_SETUP_REQ):
+        case (TX_PARAM_SETUP_REQ):
+        case (DL_CHANNEL_REQ):
+        default: {
+            NS_LOG_ERROR("CID not recognized or supported");
+            break;
+        }
+        }
+    }
+}
+
+void
+EndDeviceLorawanMac::DoExecuteADRBackoff(double& txPowerDbm,
+                                         uint8_t& dataRate,
+                                         uint8_t& nbTrans,
+                                         const std::vector<Ptr<LogicalLoraChannel>>& txChannelArray)
+{
+    // Adapted from: github.com/Lora-net/SWL2001.git v4.8.0
+    // For the time being, this implementation is valid for the EU868 region
+
+    if (txPowerDbm < 14)
+    {
+        txPowerDbm = 14; // Reset transmission power to default
+        return;
+    }
+
+    if (dataRate != 0)
+    {
+        dataRate--;
+        return;
+    }
+
+    // Set nbTrans to 1 and re-enable default channels
+    nbTrans = 1;
+    txChannelArray.at(0)->EnableForUplink();
+    txChannelArray.at(1)->EnableForUplink();
+    txChannelArray.at(2)->EnableForUplink();
+}
+
+bool
+EndDeviceLorawanMac::IsPayloadSizeValid(uint32_t appPayloadSize, uint8_t dataRate) const
+{
+    NS_LOG_FUNCTION(this << appPayloadSize << unsigned(dataRate));
+    uint32_t fOptsLen = 0;
+    for (const auto& c : m_macCommandList)
+    {
+        fOptsLen += c->GetSerializedSize();
+    }
+    /// TODO: FPort could be absent
+    uint32_t macPayloadSize = 7 + fOptsLen + 1 + appPayloadSize;
+    uint32_t maxMacPayloadForDataRate = m_maxMacPayloadForDataRate.at(dataRate);
+    NS_LOG_DEBUG("macPayloadSize=" << macPayloadSize << "B, maxMacPayloadForDataRate="
+                                   << maxMacPayloadForDataRate << "B");
+    return macPayloadSize <= maxMacPayloadForDataRate;
+}
+
+std::vector<Ptr<LogicalLoraChannel>>
+EndDeviceLorawanMac::GetCompatibleTxChannels(
+    const std::vector<Ptr<LogicalLoraChannel>>& txChannelArray,
+    uint8_t dataRate,
+    double txPowerDbm) const
+{
+    NS_LOG_FUNCTION(this);
+    /// @todo possibly move to LogicalChannelHelper
+    std::vector<Ptr<LogicalLoraChannel>> candidates;
+    for (const auto& channel : txChannelArray)
+    {
+        if (channel && channel->IsEnabledForUplink()) // Skip empty frequency channel slots
+        {
+            uint8_t minDr = channel->GetMinimumDataRate();
+            uint8_t maxDr = channel->GetMaximumDataRate();
+            double maxTxPower = m_channelHelper->GetTxPowerForChannel(channel);
+            NS_LOG_DEBUG("Enabled channel: frequency=" << channel->GetFrequency()
+                                                       << "Hz, minDr=" << unsigned(minDr)
+                                                       << ", maxDr=" << unsigned(maxDr)
+                                                       << ", maxTxPower=" << maxTxPower << "dBm");
+            if (dataRate >= minDr && dataRate <= maxDr && txPowerDbm <= maxTxPower)
+            {
+                candidates.emplace_back(channel);
+            }
+        }
+    }
+    return candidates;
+}
+
+Time
+EndDeviceLorawanMac::GetNextTransmissionDelay(
+    const std::vector<Ptr<LogicalLoraChannel>>& txChannelArray) const
+{
+    NS_LOG_FUNCTION(this);
+    // Check duty cycle on provided channels
+    auto waitTime = Time::Max();
+    for (const auto& c : txChannelArray)
+    {
+        auto channelWait = m_channelHelper->GetWaitTime(c);
+        NS_LOG_LOGIC("frequency=" << c->GetFrequency() << "Hz, "
+                                  << "waitTime=" << channelWait.As(Time::S));
+        waitTime = Min(waitTime, channelWait);
+    }
+    NS_LOG_DEBUG("Current minimum duty-cycle wait time is " << waitTime.As(Time::S));
+
+    /// TODO: Check aggregated duty cycle imposed by server
+
+    // Check if we need to postpone more (overridden function!)
+    waitTime = Max(waitTime, GetNextClassTransmissionDelay());
+
+    return waitTime;
 }
 
 void
@@ -331,122 +629,6 @@ EndDeviceLorawanMac::ExecuteADRBackoff()
 }
 
 void
-EndDeviceLorawanMac::DoExecuteADRBackoff(double& txPowerDbm,
-                                         uint8_t& dataRate,
-                                         uint8_t& nbTrans,
-                                         const std::vector<Ptr<LogicalLoraChannel>>& txChannelArray)
-{
-    // Adapted from: github.com/Lora-net/SWL2001.git v4.8.0
-    // For the time being, this implementation is valid for the EU868 region
-
-    if (txPowerDbm < 14)
-    {
-        txPowerDbm = 14; // Reset transmission power to default
-        return;
-    }
-
-    if (dataRate != 0)
-    {
-        dataRate--;
-        return;
-    }
-
-    // Set nbTrans to 1 and re-enable default channels
-    nbTrans = 1;
-    txChannelArray.at(0)->EnableForUplink();
-    txChannelArray.at(1)->EnableForUplink();
-    txChannelArray.at(2)->EnableForUplink();
-}
-
-bool
-EndDeviceLorawanMac::IsPayloadSizeValid(uint32_t appPayloadSize, uint8_t dataRate) const
-{
-    NS_LOG_FUNCTION(this << appPayloadSize << unsigned(dataRate));
-    uint32_t fOptsLen = 0;
-    for (const auto& c : m_macCommandList)
-    {
-        fOptsLen += c->GetSerializedSize();
-    }
-    /// TODO: FPort could be absent
-    uint32_t macPayloadSize = 7 + fOptsLen + 1 + appPayloadSize;
-    uint32_t maxMacPayloadForDataRate = m_maxMacPayloadForDataRate.at(dataRate);
-    NS_LOG_DEBUG("macPayloadSize=" << macPayloadSize << "B, maxMacPayloadForDataRate="
-                                   << maxMacPayloadForDataRate << "B");
-    return macPayloadSize <= maxMacPayloadForDataRate;
-}
-
-//////////////////////////
-//  Receiving methods   //
-//////////////////////////
-
-void
-EndDeviceLorawanMac::ApplyMACCommands(LoraFrameHeader frameHeader)
-{
-    NS_LOG_FUNCTION(this << frameHeader);
-    // Parse and apply downlink MAC commands, queue answers
-    for (const auto& c : frameHeader.GetCommands())
-    {
-        NS_LOG_DEBUG("Iterating over the MAC commands...");
-        enum MacCommandType type = (c)->GetCommandType();
-        switch (type)
-        {
-        case (LINK_CHECK_ANS): {
-            NS_LOG_DEBUG("Detected a LinkCheckAns command.");
-            auto linkCheckAns = DynamicCast<LinkCheckAns>(c);
-            OnLinkCheckAns(linkCheckAns->GetMargin(), linkCheckAns->GetGwCnt());
-            break;
-        }
-        case (LINK_ADR_REQ): {
-            NS_LOG_DEBUG("Detected a LinkAdrReq command.");
-            auto linkAdrReq = DynamicCast<LinkAdrReq>(c);
-            OnLinkAdrReq(linkAdrReq->GetDataRate(),
-                         linkAdrReq->GetTxPower(),
-                         linkAdrReq->GetChMask(),
-                         linkAdrReq->GetChMaskCntl(),
-                         linkAdrReq->GetNbTrans());
-            break;
-        }
-        case (DUTY_CYCLE_REQ): {
-            NS_LOG_DEBUG("Detected a DutyCycleReq command.");
-            auto dutyCycleReq = DynamicCast<DutyCycleReq>(c);
-            OnDutyCycleReq(dutyCycleReq->GetMaxDutyCycle());
-            break;
-        }
-        case (RX_PARAM_SETUP_REQ): {
-            NS_LOG_DEBUG("Detected a RxParamSetupReq command.");
-            auto rxParamSetupReq = DynamicCast<RxParamSetupReq>(c);
-            OnRxParamSetupReq(rxParamSetupReq->GetRx1DrOffset(),
-                              rxParamSetupReq->GetRx2DataRate(),
-                              rxParamSetupReq->GetFrequency());
-            break;
-        }
-        case (DEV_STATUS_REQ): {
-            NS_LOG_DEBUG("Detected a DevStatusReq command.");
-            auto devStatusReq = DynamicCast<DevStatusReq>(c);
-            OnDevStatusReq();
-            break;
-        }
-        case (NEW_CHANNEL_REQ): {
-            NS_LOG_DEBUG("Detected a NewChannelReq command.");
-            auto newChannelReq = DynamicCast<NewChannelReq>(c);
-            OnNewChannelReq(newChannelReq->GetChannelIndex(),
-                            newChannelReq->GetFrequency(),
-                            newChannelReq->GetMinDataRate(),
-                            newChannelReq->GetMaxDataRate());
-            break;
-        }
-        case (RX_TIMING_SETUP_REQ):
-        case (TX_PARAM_SETUP_REQ):
-        case (DL_CHANNEL_REQ):
-        default: {
-            NS_LOG_ERROR("CID not recognized or supported");
-            break;
-        }
-        }
-    }
-}
-
-void
 EndDeviceLorawanMac::ApplyNecessaryOptions(LoraFrameHeader& frameHeader)
 {
     frameHeader.SetAsUplink();
@@ -477,176 +659,6 @@ EndDeviceLorawanMac::ApplyNecessaryOptions(LorawanMacHeader& macHeader)
     macHeader.SetMajor(1);
 
     NS_LOG_DEBUG(macHeader);
-}
-
-void
-EndDeviceLorawanMac::SetFType(LorawanMacHeader::FType fType)
-{
-    m_fType = fType;
-    NS_LOG_DEBUG("Message type is set to " << fType);
-}
-
-LorawanMacHeader::FType
-EndDeviceLorawanMac::GetFType()
-{
-    return m_fType;
-}
-
-std::vector<Ptr<LogicalLoraChannel>>
-EndDeviceLorawanMac::GetCompatibleTxChannels(
-    const std::vector<Ptr<LogicalLoraChannel>>& txChannelArray,
-    uint8_t dataRate,
-    double txPowerDbm) const
-{
-    NS_LOG_FUNCTION(this);
-    /// @todo possibly move to LogicalChannelHelper
-    std::vector<Ptr<LogicalLoraChannel>> candidates;
-    for (const auto& channel : txChannelArray)
-    {
-        if (channel && channel->IsEnabledForUplink()) // Skip empty frequency channel slots
-        {
-            uint8_t minDr = channel->GetMinimumDataRate();
-            uint8_t maxDr = channel->GetMaximumDataRate();
-            double maxTxPower = m_channelHelper->GetTxPowerForChannel(channel);
-            NS_LOG_DEBUG("Enabled channel: frequency=" << channel->GetFrequency()
-                                                       << "Hz, minDr=" << unsigned(minDr)
-                                                       << ", maxDr=" << unsigned(maxDr)
-                                                       << ", maxTxPower=" << maxTxPower << "dBm");
-            if (dataRate >= minDr && dataRate <= maxDr && txPowerDbm <= maxTxPower)
-            {
-                candidates.emplace_back(channel);
-            }
-        }
-    }
-    return candidates;
-}
-
-Time
-EndDeviceLorawanMac::GetNextTransmissionDelay(
-    const std::vector<Ptr<LogicalLoraChannel>>& txChannelArray) const
-{
-    NS_LOG_FUNCTION(this);
-    // Check duty cycle on provided channels
-    auto waitTime = Time::Max();
-    for (const auto& c : txChannelArray)
-    {
-        auto channelWait = m_channelHelper->GetWaitTime(c);
-        NS_LOG_LOGIC("frequency=" << c->GetFrequency() << "Hz, "
-                                  << "waitTime=" << channelWait.As(Time::S));
-        waitTime = Min(waitTime, channelWait);
-    }
-    NS_LOG_DEBUG("Current minimum duty-cycle wait time is " << waitTime.As(Time::S));
-
-    /// TODO: Check aggregated duty cycle imposed by server
-
-    // Check if we need to postpone more (overridden function!)
-    waitTime = Max(waitTime, GetNextClassTransmissionDelay());
-
-    return waitTime;
-}
-
-Ptr<LogicalLoraChannel>
-EndDeviceLorawanMac::GetRandomChannelForTx()
-{
-    NS_LOG_FUNCTION(this);
-    /// @todo possibly move to LogicalChannelHelper
-    auto channels = m_channelHelper->GetRawChannelArray();
-    auto compatible = GetCompatibleTxChannels(channels, m_dataRate, m_txPowerDbm);
-    std::vector<Ptr<LogicalLoraChannel>> candidates;
-    for (const auto& c : compatible)
-    {
-        if (m_channelHelper->GetWaitTime(c).IsZero())
-        {
-            candidates.emplace_back(c);
-        }
-    }
-    if (candidates.empty())
-    {
-        NS_LOG_DEBUG("No suitable TX channel found");
-        return nullptr;
-    }
-    uint8_t i = m_uniformRV->GetInteger(0, candidates.size() - 1);
-    auto channel = candidates.at(i);
-    NS_LOG_DEBUG("Selected channel with frequency=" << channel->GetFrequency() << "Hz");
-    return channel;
-}
-
-/////////////////////////
-// Setters and Getters //
-/////////////////////////
-
-void
-EndDeviceLorawanMac::SetUplinkAdrBit(bool adr)
-{
-    NS_LOG_FUNCTION(this << adr);
-    m_adr = adr;
-}
-
-bool
-EndDeviceLorawanMac::GetUplinkAdrBit() const
-{
-    NS_LOG_FUNCTION(this);
-    return m_adr;
-}
-
-void
-EndDeviceLorawanMac::SetMaxNumberOfTransmissions(uint8_t nbTrans)
-{
-    NS_LOG_FUNCTION(this << unsigned(nbTrans));
-    m_nbTrans = nbTrans;
-}
-
-uint8_t
-EndDeviceLorawanMac::GetMaxNumberOfTransmissions()
-{
-    NS_LOG_FUNCTION(this);
-    return m_nbTrans;
-}
-
-void
-EndDeviceLorawanMac::SetDataRate(uint8_t dataRate)
-{
-    NS_LOG_FUNCTION(this << unsigned(dataRate));
-
-    m_dataRate = dataRate;
-}
-
-uint8_t
-EndDeviceLorawanMac::GetDataRate()
-{
-    NS_LOG_FUNCTION(this);
-
-    return m_dataRate;
-}
-
-void
-EndDeviceLorawanMac::SetTransmissionPowerDbm(double txPowerDbm)
-{
-    NS_LOG_FUNCTION(this << txPowerDbm);
-    m_txPowerDbm = txPowerDbm;
-}
-
-double
-EndDeviceLorawanMac::GetTransmissionPowerDbm()
-{
-    NS_LOG_FUNCTION(this);
-    return m_txPowerDbm;
-}
-
-void
-EndDeviceLorawanMac::SetDeviceAddress(LoraDeviceAddress address)
-{
-    NS_LOG_FUNCTION(this << address);
-
-    m_address = address;
-}
-
-LoraDeviceAddress
-EndDeviceLorawanMac::GetDeviceAddress()
-{
-    NS_LOG_FUNCTION(this);
-
-    return m_address;
 }
 
 void
@@ -944,34 +956,6 @@ EndDeviceLorawanMac::OnNewChannelReq(uint8_t chIndex,
 
     NS_LOG_INFO("Adding NewChannelAns reply");
     m_macCommandList.emplace_back(Create<NewChannelAns>(dataRateRangeOk, channelFrequencyOk));
-}
-
-uint8_t
-EndDeviceLorawanMac::GetLastKnownLinkMarginDb() const
-{
-    return m_lastKnownLinkMarginDb;
-}
-
-uint8_t
-EndDeviceLorawanMac::GetLastKnownGatewayCount() const
-{
-    return m_lastKnownGatewayCount;
-}
-
-double
-EndDeviceLorawanMac::GetAggregatedDutyCycle()
-{
-    NS_LOG_FUNCTION_NOARGS();
-
-    return m_aggregatedDutyCycle;
-}
-
-void
-EndDeviceLorawanMac::AddMacCommand(Ptr<MacCommand> macCommand)
-{
-    NS_LOG_FUNCTION(this << macCommand);
-
-    m_macCommandList.push_back(macCommand);
 }
 
 } // namespace lorawan

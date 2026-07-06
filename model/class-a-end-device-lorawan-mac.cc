@@ -54,9 +54,47 @@ ClassAEndDeviceLorawanMac::~ClassAEndDeviceLorawanMac()
     NS_LOG_FUNCTION_NOARGS();
 }
 
-/////////////////////
-// Sending methods //
-/////////////////////
+uint8_t
+ClassAEndDeviceLorawanMac::GetFirstReceiveWindowDataRate()
+{
+    return m_replyDataRateMatrix.at(m_dataRate).at(m_rx1DrOffset);
+}
+
+void
+ClassAEndDeviceLorawanMac::SetSecondReceiveWindowDataRate(uint8_t dataRate)
+{
+    m_secondReceiveWindowDataRate = dataRate;
+}
+
+uint8_t
+ClassAEndDeviceLorawanMac::GetSecondReceiveWindowDataRate() const
+{
+    return m_secondReceiveWindowDataRate;
+}
+
+void
+ClassAEndDeviceLorawanMac::SetSecondReceiveWindowFrequency(uint32_t frequencyHz)
+{
+    m_secondReceiveWindowFrequencyHz = frequencyHz;
+}
+
+uint32_t
+ClassAEndDeviceLorawanMac::GetSecondReceiveWindowFrequency() const
+{
+    return m_secondReceiveWindowFrequencyHz;
+}
+
+Time
+ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay() const
+{
+    NS_LOG_FUNCTION(this);
+    if (m_busy) // device is in the process of sending and opening RX windows
+    {
+        NS_LOG_WARN("Attempting to send when device is still busy, postponed by 5s.");
+        return Seconds(5);
+    }
+    return Time();
+}
 
 void
 ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
@@ -116,98 +154,6 @@ ClassAEndDeviceLorawanMac::SendToPhy(Ptr<Packet> packetToSend)
                   "Busy PHY device (not in SLEEP or STANDBY state): phyState=" << phyState);
     // Wake up PHY layer and directly send the packet
     m_phy->Send(packetToSend, txChannel->GetFrequency(), IQPolarity::UP, params, m_txPowerDbm);
-}
-
-//////////////////////////
-//  Receiving methods   //
-//////////////////////////
-void
-ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
-{
-    NS_LOG_FUNCTION(this << packet);
-
-    // We should always be in STANDBY mode at this point, as this function is meant to be invoked as
-    // a callback by the PHY on reception end
-    auto phyState = DynamicCast<EndDeviceLoraPhy>(m_phy)->GetState();
-    NS_ASSERT_MSG(phyState == EndDeviceLoraPhy::State::STANDBY,
-                  "Unexpected PHY state on RX end: phyState=" << phyState);
-
-    // Work on a copy of the packet
-    Ptr<Packet> packetCopy = packet->Copy();
-
-    // Remove the Mac Header to get some information
-    LorawanMacHeader mHdr;
-    packetCopy->RemoveHeader(mHdr);
-    NS_ASSERT_MSG(mHdr.IsUplink() == false, "Received uplink package, check PHY polarity");
-    NS_LOG_DEBUG("Downlink Mac Header: " << mHdr);
-    // Remove the Frame Header
-    LoraFrameHeader fHdr;
-    fHdr.SetAsDownlink();
-    packetCopy->RemoveHeader(fHdr);
-    NS_LOG_DEBUG("Downlink Frame Header: " << fHdr);
-
-    /// TODO: early packet filtering at PHY layer
-
-    // Determine whether this packet is for us
-    if (m_address != fHdr.GetAddress())
-    {
-        NS_LOG_DEBUG("The message is intended for another recipient.");
-        FailedReception(packet);
-        return;
-    }
-
-    // Set PHY to sleep
-    DynamicCast<EndDeviceLoraPhy>(m_phy)->Sleep();
-
-    NS_LOG_INFO("The message is for us!");
-    // If it exists, cancel the second receive window event
-    m_secondReceiveWindow.Cancel();
-    // Open the context to new transmissions
-    m_busy = false;
-    // Reset ADR backoff counter
-    m_adrAckCnt = 0;
-    // Clear commands that are re-sent until downlink (DlChannelAns and RxTimingSetupAns)
-    m_macCommandList.clear();
-
-    // Link quality metadata
-    LoraTag tag;
-    packet->PeekPacketTag(tag);
-    /// @see ns3::lorawan::AdrComponent::RxPowerToSNR
-    m_lastRxSnr = tag.GetReceivePower() + 174 - 10 * log10(125000) - 6;
-
-    // Parse the MAC commands
-    ApplyMACCommands(fHdr);
-    // Manage acknowledgement and retransmission
-    ManageRetransmissions(fHdr.GetAck() ? ACK : RECV);
-
-    // Pass the packet up to the NetDevice
-    if (!m_receiveCallback.IsNull())
-    {
-        m_receiveCallback(packetCopy);
-    }
-    // Call the trace source
-    m_receivedPacket(packet);
-}
-
-void
-ClassAEndDeviceLorawanMac::FailedReception(Ptr<const Packet> packet)
-{
-    NS_LOG_FUNCTION(this << packet);
-    // We should always be in STANDBY mode at this point, as this function is meant to be
-    // invoked as a callback by the PHY on reception end
-    auto phyState = DynamicCast<EndDeviceLoraPhy>(m_phy)->GetState();
-    NS_ASSERT_MSG(phyState == EndDeviceLoraPhy::State::STANDBY,
-                  "Unexpected PHY state on RX end: phyState=" << phyState);
-    // Switch to sleep after a failed reception
-    DynamicCast<EndDeviceLoraPhy>(m_phy)->Sleep();
-
-    // Nothing valid was received; if we are past the 2nd RX window, we can reschedule
-    if (m_secondReceiveWindow.IsExpired())
-    {
-        ManageRetransmissions(FAIL);
-        // Open the context to new transmissions
-        m_busy = false;
-    }
 }
 
 void
@@ -378,55 +324,94 @@ ClassAEndDeviceLorawanMac::ManageRetransmissions(RxOutcome outcome)
     }
 }
 
-/////////////////////////
-// Getters and Setters //
-/////////////////////////
-
-Time
-ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay() const
+void
+ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
 {
-    NS_LOG_FUNCTION(this);
-    if (m_busy) // device is in the process of sending and opening RX windows
+    NS_LOG_FUNCTION(this << packet);
+
+    // We should always be in STANDBY mode at this point, as this function is meant to be invoked as
+    // a callback by the PHY on reception end
+    auto phyState = DynamicCast<EndDeviceLoraPhy>(m_phy)->GetState();
+    NS_ASSERT_MSG(phyState == EndDeviceLoraPhy::State::STANDBY,
+                  "Unexpected PHY state on RX end: phyState=" << phyState);
+
+    // Work on a copy of the packet
+    Ptr<Packet> packetCopy = packet->Copy();
+
+    // Remove the Mac Header to get some information
+    LorawanMacHeader mHdr;
+    packetCopy->RemoveHeader(mHdr);
+    NS_ASSERT_MSG(mHdr.IsUplink() == false, "Received uplink package, check PHY polarity");
+    NS_LOG_DEBUG("Downlink Mac Header: " << mHdr);
+    // Remove the Frame Header
+    LoraFrameHeader fHdr;
+    fHdr.SetAsDownlink();
+    packetCopy->RemoveHeader(fHdr);
+    NS_LOG_DEBUG("Downlink Frame Header: " << fHdr);
+
+    /// TODO: early packet filtering at PHY layer
+
+    // Determine whether this packet is for us
+    if (m_address != fHdr.GetAddress())
     {
-        NS_LOG_WARN("Attempting to send when device is still busy, postponed by 5s.");
-        return Seconds(5);
+        NS_LOG_DEBUG("The message is intended for another recipient.");
+        FailedReception(packet);
+        return;
     }
-    return Time();
-}
 
-uint8_t
-ClassAEndDeviceLorawanMac::GetFirstReceiveWindowDataRate()
-{
-    return m_replyDataRateMatrix.at(m_dataRate).at(m_rx1DrOffset);
+    // Set PHY to sleep
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->Sleep();
+
+    NS_LOG_INFO("The message is for us!");
+    // If it exists, cancel the second receive window event
+    m_secondReceiveWindow.Cancel();
+    // Open the context to new transmissions
+    m_busy = false;
+    // Reset ADR backoff counter
+    m_adrAckCnt = 0;
+    // Clear commands that are re-sent until downlink (DlChannelAns and RxTimingSetupAns)
+    m_macCommandList.clear();
+
+    // Link quality metadata
+    LoraTag tag;
+    packet->PeekPacketTag(tag);
+    /// @see ns3::lorawan::AdrComponent::RxPowerToSNR
+    m_lastRxSnr = tag.GetReceivePower() + 174 - 10 * log10(125000) - 6;
+
+    // Parse the MAC commands
+    ApplyMACCommands(fHdr);
+    // Manage acknowledgement and retransmission
+    ManageRetransmissions(fHdr.GetAck() ? ACK : RECV);
+
+    // Pass the packet up to the NetDevice
+    if (!m_receiveCallback.IsNull())
+    {
+        m_receiveCallback(packetCopy);
+    }
+    // Call the trace source
+    m_receivedPacket(packet);
 }
 
 void
-ClassAEndDeviceLorawanMac::SetSecondReceiveWindowDataRate(uint8_t dataRate)
+ClassAEndDeviceLorawanMac::FailedReception(Ptr<const Packet> packet)
 {
-    m_secondReceiveWindowDataRate = dataRate;
-}
+    NS_LOG_FUNCTION(this << packet);
+    // We should always be in STANDBY mode at this point, as this function is meant to be
+    // invoked as a callback by the PHY on reception end
+    auto phyState = DynamicCast<EndDeviceLoraPhy>(m_phy)->GetState();
+    NS_ASSERT_MSG(phyState == EndDeviceLoraPhy::State::STANDBY,
+                  "Unexpected PHY state on RX end: phyState=" << phyState);
+    // Switch to sleep after a failed reception
+    DynamicCast<EndDeviceLoraPhy>(m_phy)->Sleep();
 
-uint8_t
-ClassAEndDeviceLorawanMac::GetSecondReceiveWindowDataRate() const
-{
-    return m_secondReceiveWindowDataRate;
+    // Nothing valid was received; if we are past the 2nd RX window, we can reschedule
+    if (m_secondReceiveWindow.IsExpired())
+    {
+        ManageRetransmissions(FAIL);
+        // Open the context to new transmissions
+        m_busy = false;
+    }
 }
-
-void
-ClassAEndDeviceLorawanMac::SetSecondReceiveWindowFrequency(uint32_t frequencyHz)
-{
-    m_secondReceiveWindowFrequencyHz = frequencyHz;
-}
-
-uint32_t
-ClassAEndDeviceLorawanMac::GetSecondReceiveWindowFrequency() const
-{
-    return m_secondReceiveWindowFrequencyHz;
-}
-
-/////////////////////////
-// MAC command methods //
-/////////////////////////
 
 void
 ClassAEndDeviceLorawanMac::OnRxParamSetupReq(uint8_t rx1DrOffset,
