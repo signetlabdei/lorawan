@@ -423,8 +423,6 @@ HeaderTest::DoRun()
  * @ingroup lorawan
  *
  * It tests a number of cases related to SimpleGatewayLoraPhy's parallel reception paths
- *
- * @todo The test is commented out. To be fixed.
  */
 class ReceivePathTest : public TestCase
 {
@@ -436,8 +434,10 @@ class ReceivePathTest : public TestCase
     void DoRun() override;
     /**
      * Reset counters and gateway PHY for new sub test case.
+     *
+     * @param rxPathNb Number of reception paths to be created on the gateway PHY
      */
-    void Reset();
+    void Reset(uint8_t rxPathNb);
     /**
      * Callback for tracing OccupiedReceptionPaths.
      *
@@ -487,33 +487,40 @@ ReceivePathTest::~ReceivePathTest()
 }
 
 void
-ReceivePathTest::Reset()
+ReceivePathTest::Reset(uint8_t rxPathNb)
 {
-    // FIXME
-    // m_noMoreDemodulatorsCalls = 0;
-    // m_interferenceCalls = 0;
-    // m_receivedPacketCalls = 0;
-    // m_maxOccupiedReceptionPaths = 0;
+    m_noMoreDemodulatorsCalls = 0;
+    m_interferenceCalls = 0;
+    m_receivedPacketCalls = 0;
+    m_maxOccupiedReceptionPaths = 0;
 
-    // gatewayPhy = CreateObject<SimpleGatewayLoraPhy> ();
-    // gatewayPhy->TraceConnectWithoutContext (
-    //     "LostPacketBecauseNoMoreReceivers",
-    //     MakeCallback (&ReceivePathTest::NoMoreDemodulators, this));
-    // gatewayPhy->TraceConnectWithoutContext ("LostPacketBecauseInterference",
-    //                                         MakeCallback (&ReceivePathTest::Interference, this));
-    // gatewayPhy->TraceConnectWithoutContext ("ReceivedPacket",
-    //                                         MakeCallback (&ReceivePathTest::ReceivedPacket,
-    //                                         this));
-    // gatewayPhy->TraceConnectWithoutContext (
-    //     "OccupiedReceptionPaths", MakeCallback (&ReceivePathTest::OccupiedReceptionPaths, this));
+    // The following tests are designed around GOURSAUD signal-to-interference matrix
+    LoraInterferenceHelper::collisionMatrix = LoraInterferenceHelper::GOURSAUD;
 
-    // // Add receive paths
-    // gatewayPhy->AddReceptionPath ();
-    // gatewayPhy->AddReceptionPath ();
-    // gatewayPhy->AddReceptionPath ();
-    // gatewayPhy->AddReceptionPath ();
-    // gatewayPhy->AddReceptionPath ();
-    // gatewayPhy->AddReceptionPath ();
+    gatewayPhy = CreateObject<SimpleGatewayLoraPhy>();
+
+    gatewayPhy->AddFrequency(868'100'000);
+    gatewayPhy->AddFrequency(868'300'000);
+    gatewayPhy->AddFrequency(868'500'000);
+
+    for (uint8_t i = 0; i < rxPathNb; i++)
+    {
+        gatewayPhy->AddReceptionPath();
+    }
+
+    // From GatewayLoraPhy
+    gatewayPhy->TraceConnectWithoutContext(
+        "LostPacketBecauseNoMoreReceivers",
+        MakeCallback(&ReceivePathTest::NoMoreDemodulators, this));
+    gatewayPhy->TraceConnectWithoutContext(
+        "OccupiedReceptionPaths",
+        MakeCallback(&ReceivePathTest::OccupiedReceptionPaths, this));
+
+    // From LoraPhy
+    gatewayPhy->TraceConnectWithoutContext("LostPacketBecauseInterference",
+                                           MakeCallback(&ReceivePathTest::Interference, this));
+    gatewayPhy->TraceConnectWithoutContext("ReceivedPacket",
+                                           MakeCallback(&ReceivePathTest::ReceivedPacket, this));
 }
 
 void
@@ -560,297 +567,582 @@ ReceivePathTest::DoRun()
 
     Ptr<Packet> packet = Create<Packet>();
 
-    Reset();
+    ///////////////////////////////////////////////////////////
+    // If no ReceptionPath is configured, no packet is received
+    ///////////////////////////////////////////////////////////
 
-    // FIXME
-    // //////////////////////////////////////////////////////////////////////////////////
-    // // If no ReceptionPath is configured to listen on a frequency, no packet is received
-    // //////////////////////////////////////////////////////////////////////////////////
+    Reset(0);
 
-    // Simulator::Schedule (Seconds (1), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (1), frequency4);
+    Simulator::Schedule(Seconds(1),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(1));
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 1, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 1, "Unexpected value");
 
-    // Reset ();
+    //////////////////////////////////////////////////////////////////////////////
+    // A ReceptionPath can receive a packet of any SF without any preconfiguration
+    //////////////////////////////////////////////////////////////////////////////
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // // A ReceptionPath can receive a packet of any spreading factor without any preconfiguration
-    // //////////////////////////////////////////////////////////////////////////////
+    Reset(1);
 
-    // Simulator::Schedule (Seconds (1), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (3), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 8,
-    //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (5), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 9,
-    //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (7), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 10,
-    //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (9), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 11,
-    //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (11), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14,
-    //                      12, Seconds (1), frequency1);
+    Simulator::Schedule(Seconds(1),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(1));
+    Simulator::Schedule(Seconds(3),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        8,
+                        14,
+                        Seconds(1));
+    Simulator::Schedule(Seconds(5),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        9,
+                        14,
+                        Seconds(1));
+    Simulator::Schedule(Seconds(7),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        10,
+                        14,
+                        Seconds(1));
+    Simulator::Schedule(Seconds(9),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        11,
+                        14,
+                        Seconds(1));
+    Simulator::Schedule(Seconds(11),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        12,
+                        14,
+                        Seconds(1));
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 6, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacketCalls, 6, "Unexpected value");
 
-    // Reset ();
+    ///////////////////////////////////////////////////////////////////////////////////////
+    // Schedule two overlapping reception events. Each packet should be received correctly.
+    ///////////////////////////////////////////////////////////////////////////////////////
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Schedule two reception events at the first frequency, where there are two
-    // // reception paths listening. Each packet should be received correctly.
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (3), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 9,
-    //                      Seconds (4), frequency1);
+    Reset(2);
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(3),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        9,
+                        14,
+                        Seconds(4));
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 2, "Unexpected value");
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
 
-    // Reset ();
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacketCalls, 2, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_maxOccupiedReceptionPaths, 2, "Unexpected value");
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Interference between packets on the same frequency and different ReceptionPaths
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (3), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
+    //////////////////////////////////////////////////////////////////////////////////
+    // Interference between packets on the same frequency and different ReceptionPaths
+    //////////////////////////////////////////////////////////////////////////////////
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    Reset(2);
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 2, "Unexpected value");
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(3),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
 
-    // Reset ();
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Three receptions where only two receivePaths are available
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (3), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_interferenceCalls, 2, "Unexpected value");
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    /////////////////////////////////////////////////////////////
+    // Three receptions where only two receivePaths are available
+    /////////////////////////////////////////////////////////////
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 1, "Unexpected value");
+    Reset(2);
 
-    // Reset ();
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(3),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Packets that are on different frequencys do not interfere
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency2);
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 1, "Unexpected value");
 
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
+    ///////////////////////////////////////////////////////////////////////////
+    // Packets that are on different frequencys do not interfere
+    ///////////////////////////////////////////////////////////////////////////
 
-    // Reset ();
+    Reset(2);
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Full capacity
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 8,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 9,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 10,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 11,
-    //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 12,
-    //                      Seconds (4), frequency3);
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'300'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 6, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_interferenceCalls, 0, "Unexpected value");
 
-    // Reset ();
+    ///////////////////////////////////////////////////////////////////////////
+    // Full capacity (siw packets, on six SFs, distributed over 3 frequencies)
+    ///////////////////////////////////////////////////////////////////////////
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Full capacity + 1
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 8,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 9,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 10,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 11,
-    //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 12,
-    //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 10,
-    //                      Seconds (4), frequency3);
+    Reset(6);
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        8,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'300'000,
+                        IQPolarity::UP,
+                        9,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'300'000,
+                        IQPolarity::UP,
+                        10,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'500'000,
+                        IQPolarity::UP,
+                        11,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'500'000,
+                        IQPolarity::UP,
+                        12,
+                        14,
+                        Seconds(4));
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 1, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 6, "Unexpected value");
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
 
-    // Reset ();
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_interferenceCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacketCalls, 6, "Unexpected value");
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Receive Paths are correctly freed
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 8,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 9,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 10,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 11,
-    //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 12,
-    //                      Seconds (4), frequency3);
+    ///////////////////////////////////////////////////////////////////////////
+    // Full capacity + 1
+    ///////////////////////////////////////////////////////////////////////////
 
-    // Simulator::Schedule (Seconds (8), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (8), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 8,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (8), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 9,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (8), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 10,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (8), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 11,
-    //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (8), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 12,
-    //                      Seconds (4), frequency3);
+    Reset(6);
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        8,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'300'000,
+                        IQPolarity::UP,
+                        9,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'300'000,
+                        IQPolarity::UP,
+                        10,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'500'000,
+                        IQPolarity::UP,
+                        11,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'500'000,
+                        IQPolarity::UP,
+                        12,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'500'000,
+                        IQPolarity::UP,
+                        10,
+                        14,
+                        Seconds(4));
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 12, "Unexpected value");
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
 
-    // Reset ();
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 1, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_interferenceCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacketCalls, 6, "Unexpected value");
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Receive Paths stay occupied exactly for the necessary time
-    // // Occupy both ReceptionPaths centered at frequency1
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 8,
-    //                      Seconds (4), frequency1);
+    ////////////////////////////////////
+    // Receive Paths are correctly freed
+    ////////////////////////////////////
 
-    // // This packet will find no free ReceptionPaths
-    // Simulator::Schedule (Seconds (2 + 4) - NanoSeconds (1), &SimpleGatewayLoraPhy::StartReceive,
-    //                      gatewayPhy, packet, 14, 9, Seconds (4), frequency1);
+    Reset(6);
 
-    // // This packet will find a free ReceptionPath
-    // Simulator::Schedule (Seconds (2 + 4) + NanoSeconds (1), &SimpleGatewayLoraPhy::StartReceive,
-    //                      gatewayPhy, packet, 14, 10, Seconds (4), frequency1);
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        8,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'300'000,
+                        IQPolarity::UP,
+                        9,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'300'000,
+                        IQPolarity::UP,
+                        10,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'500'000,
+                        IQPolarity::UP,
+                        11,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'500'000,
+                        IQPolarity::UP,
+                        12,
+                        14,
+                        Seconds(4));
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    Simulator::Schedule(Seconds(8),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(8),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        8,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(8),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'300'000,
+                        IQPolarity::UP,
+                        9,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(8),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'300'000,
+                        IQPolarity::UP,
+                        10,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(8),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'500'000,
+                        IQPolarity::UP,
+                        11,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(8),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'500'000,
+                        IQPolarity::UP,
+                        12,
+                        14,
+                        Seconds(4));
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 1, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 3, "Unexpected value");
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
 
-    // Reset ();
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_interferenceCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacketCalls, 12, "Unexpected value");
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Only one ReceivePath locks on the incoming packet
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
+    /////////////////////////////////////////////////////////////
+    // Receive Paths stay occupied exactly for the necessary time
+    /////////////////////////////////////////////////////////////
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    Reset(2);
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 1, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_maxOccupiedReceptionPaths, 1, "Unexpected value");
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        8,
+                        14,
+                        Seconds(4));
+
+    // This packet will find no free ReceptionPaths
+    Simulator::Schedule(Seconds(2 + 4) - NanoSeconds(1),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        9,
+                        14,
+                        Seconds(4));
+
+    // This packet will find a free ReceptionPath
+    Simulator::Schedule(Seconds(2 + 4) + NanoSeconds(1),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        10,
+                        14,
+                        Seconds(4));
+
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
+
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 1, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_interferenceCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacketCalls, 3, "Unexpected value");
+
+    ////////////////////////////////////////////////////
+    // Only one ReceivePath locks on the incoming packet
+    ////////////////////////////////////////////////////
+
+    Reset(6);
+
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
+
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_interferenceCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacketCalls, 1, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_maxOccupiedReceptionPaths, 1, "Unexpected value");
 }
 
 /**
