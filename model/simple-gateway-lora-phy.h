@@ -33,20 +33,24 @@ class SimpleGatewayLoraPhy : public GatewayLoraPhy
     SimpleGatewayLoraPhy();           //!< Default constructor
     ~SimpleGatewayLoraPhy() override; //!< Destructor
 
-    void StartReceive(Ptr<Packet> packet,
-                      double rxPowerDbm,
-                      uint8_t sf,
-                      Time duration,
-                      uint32_t frequencyHz) override;
-
-    void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) override;
-
+    // Implementation of GatewayLoraPhy's pure virtual function
     void Send(Ptr<Packet> packet,
-              LoraTxParameters txParams,
               uint32_t frequencyHz,
+              IQPolarity iqPolarity,
+              const LoraTxParameters& txParams,
               double txPowerDbm) override;
 
+    // Implementation of GatewayLoraPhy's pure virtual function
+    void StartReceive(Ptr<Packet> packet,
+                      uint32_t frequencyHz,
+                      IQPolarity iqPolarity,
+                      uint8_t spreadingFactor,
+                      double rxPowerDbm,
+                      Time duration) override;
+
   private:
+    // Implementation of GatewayLoraPhy's pure virtual function
+    void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) override;
 };
 
 } // namespace lorawan

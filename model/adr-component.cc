@@ -144,7 +144,7 @@ AdrComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status, Ptr<NetworkStatus>
                                                           enabledChannels,
                                                           rep);
                 status->m_reply.frameHeader.SetAsDownlink();
-                status->m_reply.macHeader.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+                status->m_reply.macHeader.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
 
                 status->m_reply.needsReply = true;
             }

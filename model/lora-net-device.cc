@@ -100,6 +100,7 @@ LoraNetDevice::CompleteConfig()
     }
 
     m_mac->SetPhy(m_phy);
+    m_mac->SetReceiveCallback(MakeCallback(&LoraNetDevice::Receive, this));
     m_configComplete = true;
 }
 

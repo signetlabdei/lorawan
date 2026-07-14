@@ -34,71 +34,75 @@ SimpleEndDeviceLoraPhy::GetTypeId()
     return tid;
 }
 
-// Initialize the device with some common settings.
-// These will then be changed by helpers.
 SimpleEndDeviceLoraPhy::SimpleEndDeviceLoraPhy()
 {
+    NS_LOG_FUNCTION(this);
 }
 
 SimpleEndDeviceLoraPhy::~SimpleEndDeviceLoraPhy()
 {
+    NS_LOG_FUNCTION(this);
 }
 
 void
 SimpleEndDeviceLoraPhy::Send(Ptr<Packet> packet,
-                             LoraTxParameters txParams,
                              uint32_t frequencyHz,
+                             IQPolarity iqPolarity,
+                             const LoraTxParameters& txParams,
                              double txPowerDbm)
 {
-    NS_LOG_FUNCTION(this << packet << txParams << frequencyHz << txPowerDbm);
+    NS_LOG_FUNCTION(this << packet << frequencyHz << iqPolarity << txParams << txPowerDbm);
 
-    NS_LOG_INFO("Current state: " << m_state);
-
-    // We must be either in STANDBY or SLEEP mode to send a packet
-    if (m_state != State::STANDBY && m_state != State::SLEEP)
+    // We must be either in SLEEP or STANDBY mode to send a packet
+    if (auto state = GetState(); state != State::SLEEP && state != State::STANDBY)
     {
-        NS_LOG_INFO("Cannot send because device is currently not in STANDBY or SLEEP mode");
+        NS_LOG_ERROR("Cannot send because device is currently not in SLEEP or STANDBY mode");
         return;
     }
 
-    // Compute the duration of the transmission
-    Time duration = GetOnAirTime(packet, txParams);
-
-    // We can send the packet: switch to the TX state
-    SwitchToTx(txPowerDbm);
+    // Write hardware registers of the LoRa chip
+    m_regs.spreadingFactor = txParams.spreadingFactor;
+    m_regs.bandwidthHz = txParams.bandwidthHz;
+    m_regs.codingRate = txParams.codingRate;
+    m_regs.lowDataRateOptimize = txParams.lowDataRateOptimize;
+    m_regs.preambleLenSymb = txParams.preambleLenSymb;
+    m_regs.implicitHeader = txParams.implicitHeader;
+    m_regs.payloadLenBytes = packet->GetSize();
+    m_regs.crcEnabled = txParams.crcEnabled;
+    m_regs.iqPolarity = iqPolarity;
+    m_regs.frequencyHz = frequencyHz;
+    m_regs.txPowerDbm = txPowerDbm;
 
     // Tag the packet with information about its Spreading Factor
     LoraTag tag;
     packet->RemovePacketTag(tag);
-    tag.SetSpreadingFactor(txParams.sf);
+    tag.SetSpreadingFactor(m_regs.spreadingFactor);
     packet->AddPacketTag(tag);
 
-    // Send the packet over the channel
-    NS_LOG_INFO("Sending the packet in the channel");
-    m_channel->Send(this, packet, txPowerDbm, txParams, duration, frequencyHz);
-
-    // Schedule a call to signal the transmission end.
-    Simulator::Schedule(duration, &SimpleEndDeviceLoraPhy::TxFinished, this, packet);
-
+    // Switch to the TX state
+    RequestTxMode();
     // Call the trace source
-    if (m_device)
-    {
-        m_startSending(packet, m_device->GetNode()->GetId());
-    }
-    else
-    {
-        m_startSending(packet, 0);
-    }
+    m_startSending(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
+
+    // Compute the duration of the modulated transmission
+    Time duration = GetTimeOnAir(packet->GetSize(), txParams);
+    // Propagate the transmission over the channel (schedule StartReceive for other nodes)
+    m_channel->Send(this, packet, frequencyHz, iqPolarity, txParams, txPowerDbm, duration);
+
+    // Schedule a call to self to signal the transmission modulation end
+    Simulator::Schedule(duration, &SimpleEndDeviceLoraPhy::TxFinished, this, packet);
 }
 
 void
 SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
+                                     uint32_t frequencyHz,
+                                     IQPolarity iqPolarity,
+                                     uint8_t spreadingFactor,
                                      double rxPowerDbm,
-                                     uint8_t sf,
-                                     Time duration,
-                                     uint32_t frequencyHz)
+                                     Time duration)
 {
-    NS_LOG_FUNCTION(this << packet << rxPowerDbm << unsigned(sf) << duration << frequencyHz);
+    NS_LOG_FUNCTION(this << packet << frequencyHz << iqPolarity << unsigned(spreadingFactor)
+                         << rxPowerDbm << duration);
 
     // Notify the LoraInterferenceHelper of the impinging signal, and remember
     // the event it creates. This will be used then to correctly handle the end
@@ -107,122 +111,78 @@ SimpleEndDeviceLoraPhy::StartReceive(Ptr<Packet> packet,
     // We need to do this regardless of our state or frequency, since these could
     // change (and making the interference relevant) while the interference is
     // still incoming.
+    auto event = m_interference.Add(duration, rxPowerDbm, spreadingFactor, packet, frequencyHz);
 
-    Ptr<LoraInterferenceHelper::Event> event;
-    event = m_interference.Add(duration, rxPowerDbm, sf, packet, frequencyHz);
-
-    // Switch on the current PHY state
-    switch (m_state)
+    // Check that the current PHY state is RX_ENABLED
+    if (auto state = GetState(); state != State::RX_ENABLED)
     {
-    // In the SLEEP, TX and RX cases we cannot receive the packet: we only add
-    // it to the list of interferers and do not schedule an EndReceive event for
-    // it.
-    case State::SLEEP: {
-        NS_LOG_INFO("Dropping packet because device is in SLEEP state");
-        break;
-    }
-    case State::TX: {
-        NS_LOG_INFO("Dropping packet because device is in TX state");
-        break;
-    }
-    case State::RX: {
-        NS_LOG_INFO("Dropping packet because device is already in RX state");
-        break;
-    }
-    // If we are in STANDBY mode, we can potentially lock on the currently
-    // incoming transmission
-    case State::STANDBY: {
-        // There are a series of properties the packet needs to respect in order
-        // for us to be able to lock on it:
-        // - It's on frequency we are listening on
-        // - It uses the spreading factor we are configured to look for
-        // - Its receive power is above the device sensitivity for that spreading factor
-
-        // Flag to signal whether we can receive the packet or not
-        bool canLockOnPacket = true;
-
-        // Save needed sensitivity
-        double sensitivity = EndDeviceLoraPhy::sensitivity[unsigned(sf) - 7];
-
-        // Check frequency
-        //////////////////
-        if (!IsOnFrequency(frequencyHz))
+        if (state == State::RX_ACTIVE)
         {
-            NS_LOG_INFO("Packet lost because it's on frequency "
-                        << frequencyHz << " Hz and we are listening at " << m_frequencyHz << " Hz");
-
-            // Fire the trace source for this event.
-            if (m_device)
-            {
-                m_wrongFrequency(packet, m_device->GetNode()->GetId());
-            }
-            else
-            {
-                m_wrongFrequency(packet, 0);
-            }
-
-            canLockOnPacket = false;
+            NS_LOG_INFO("Device already locked onto another transmission");
         }
-
-        // Check Spreading Factor
-        /////////////////////////
-        if (sf != m_sf)
+        else
         {
-            NS_LOG_INFO("Packet lost because it's using SF"
-                        << unsigned(sf) << ", while we are listening for SF" << unsigned(m_sf));
-
-            // Fire the trace source for this event.
-            if (m_device)
-            {
-                m_wrongSf(packet, m_device->GetNode()->GetId());
-            }
-            else
-            {
-                m_wrongSf(packet, 0);
-            }
-
-            canLockOnPacket = false;
+            NS_LOG_INFO("Dropping packet because device is in " << state << " state");
         }
-
-        // Check Sensitivity
-        ////////////////////
-        if (rxPowerDbm < sensitivity)
-        {
-            NS_LOG_INFO("Dropping packet reception of packet with sf = "
-                        << unsigned(sf) << " because under the sensitivity of " << sensitivity
-                        << " dBm");
-
-            // Fire the trace source for this event.
-            if (m_device)
-            {
-                m_underSensitivity(packet, m_device->GetNode()->GetId());
-            }
-            else
-            {
-                m_underSensitivity(packet, 0);
-            }
-
-            canLockOnPacket = false;
-        }
-
-        // Check if one of the above failed
-        ///////////////////////////////////
-        if (canLockOnPacket)
-        {
-            // Switch to RX state
-            // EndReceive will handle the switch back to STANDBY state
-            SwitchToRx();
-
-            // Schedule the end of the reception of the packet
-            NS_LOG_INFO("Scheduling reception of a packet. End in " << duration.As(Time::S));
-
-            Simulator::Schedule(duration, &LoraPhy::EndReceive, this, packet, event);
-
-            // Fire the beginning of reception trace source
-            m_phyRxBeginTrace(packet);
-        }
+        return;
     }
+
+    // If we are in RX_ENABLED mode, we can potentially lock on the currently incoming
+    // transmission There are a series of properties the packet needs to respect in order
+    // for us to be able to lock on it:
+    // - It's on frequency we are listening on
+    // - It's using the right modulation polarity (uplink or downlink)
+    // - It uses the spreading factor we are configured to look for
+    // - Its receive power is above the device sensitivity for that spreading factor
+
+    // Check frequency
+    if (frequencyHz != m_regs.frequencyHz)
+    {
+        NS_LOG_INFO("Packet ignored because it's on frequency "
+                    << frequencyHz << " Hz and we are listening to " << m_regs.frequencyHz
+                    << " Hz");
+        // Fire the trace source for this event.
+        m_wrongFrequency(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
+        return;
     }
+    // Check modulation I/Q polarity
+    else if (iqPolarity != m_regs.iqPolarity)
+    {
+        NS_LOG_INFO("Packet ignored because it's " << iqPolarity << "LINK and we are listening for "
+                                                   << m_regs.iqPolarity << "LINK transmissions");
+        // Fire the trace source for this event.
+        m_wrongPolarity(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
+        return;
+    }
+    // Check Spreading Factor
+    else if (spreadingFactor != m_regs.spreadingFactor)
+    {
+        NS_LOG_INFO("Packet lost because it's using SF" << unsigned(spreadingFactor)
+                                                        << ", while we are listening for SF"
+                                                        << unsigned(m_regs.spreadingFactor));
+        // Fire the trace source for this event.
+        m_wrongSf(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
+        return;
+    }
+    // Check Sensitivity
+    else if (double sens = EndDeviceLoraPhy::SENSITIVITY[spreadingFactor - 7]; rxPowerDbm < sens)
+    {
+        NS_LOG_INFO("Dropping packet reception of packet with SF"
+                    << unsigned(spreadingFactor) << " because under the sensitivity of " << sens
+                    << " dBm");
+        // Fire the trace source for this event.
+        m_underSensitivity(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
+        return;
+    }
+
+    // Preamble detected, we lock onto the transmission and start receiving
+    DoStartReceive();
+    // Fire the beginning of reception trace source
+    m_phyRxBeginTrace(packet);
+
+    // Schedule the end of the reception of the packet
+    NS_LOG_INFO("Scheduling reception of a packet. End in " << duration.As(Time::S));
+    Simulator::Schedule(duration, &SimpleEndDeviceLoraPhy::EndReceive, this, packet, event);
 }
 
 void
@@ -230,60 +190,40 @@ SimpleEndDeviceLoraPhy::EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelpe
 {
     NS_LOG_FUNCTION(this << packet << event);
 
-    // Automatically switch to Standby in either case
-    SwitchToStandby();
-
+    // The demodulation terminated, automatically switch to Standby
+    DoEndReceive();
     // Fire the trace source
     m_phyRxEndTrace(packet);
 
     // Call the LoraInterferenceHelper to determine whether there was destructive
     // interference on this event.
-    bool packetDestroyed = m_interference.IsDestroyedByInterference(event);
-
-    // Fire the trace source if packet was destroyed
-    if (packetDestroyed)
+    if (m_interference.IsDestroyedByInterference(event))
     {
         NS_LOG_INFO("Packet destroyed by interference");
-
-        if (m_device)
-        {
-            m_interferedPacket(packet, m_device->GetNode()->GetId());
-        }
-        else
-        {
-            m_interferedPacket(packet, 0);
-        }
-
+        // Fire the trace source if packet was destroyed
+        m_interferedPacket(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
         // If there is one, perform the callback to inform the upper layer of the
         // lost packet
         if (!m_rxFailedCallback.IsNull())
         {
             m_rxFailedCallback(packet);
         }
+        return;
     }
-    else
+
+    NS_LOG_INFO("Packet received correctly");
+    m_successfullyReceivedPacket(packet, (m_device) ? m_device->GetNode()->GetId() : 0);
+
+    LoraTag tag;
+    packet->RemovePacketTag(tag);
+    tag.SetReceivePower(event->GetRxPowerDbm());
+    tag.SetFrequency(event->GetFrequency());
+    packet->AddPacketTag(tag);
+
+    // If there is one, perform the callback to inform the upper layer
+    if (!m_rxOkCallback.IsNull())
     {
-        NS_LOG_INFO("Packet received correctly");
-
-        if (m_device)
-        {
-            m_successfullyReceivedPacket(packet, m_device->GetNode()->GetId());
-        }
-        else
-        {
-            m_successfullyReceivedPacket(packet, 0);
-        }
-
-        // If there is one, perform the callback to inform the upper layer
-        if (!m_rxOkCallback.IsNull())
-        {
-            LoraTag tag;
-            packet->RemovePacketTag(tag);
-            tag.SetReceivePower(event->GetRxPowerdBm());
-            tag.SetFrequency(event->GetFrequency());
-            packet->AddPacketTag(tag);
-            m_rxOkCallback(packet);
-        }
+        m_rxOkCallback(packet);
     }
 }
 

@@ -74,7 +74,7 @@ ConfirmedMessagesComponent::OnReceivedPacket(Ptr<const Packet> packet,
     NS_LOG_INFO("Received packet Mac Header: " << mHdr);
     NS_LOG_INFO("Received packet Frame Header: " << fHdr);
 
-    if (mHdr.GetMType() == LorawanMacHeader::CONFIRMED_DATA_UP)
+    if (mHdr.GetFType() == LorawanMacHeader::CONFIRMED_DATA_UP)
     {
         NS_LOG_INFO("Packet requires confirmation");
 
@@ -82,7 +82,7 @@ ConfirmedMessagesComponent::OnReceivedPacket(Ptr<const Packet> packet,
         status->m_reply.frameHeader.SetAsDownlink();
         status->m_reply.frameHeader.SetAck(true);
         status->m_reply.frameHeader.SetAddress(fHdr.GetAddress());
-        status->m_reply.macHeader.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+        status->m_reply.macHeader.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
         status->m_reply.needsReply = true;
 
         // Note that the acknowledgment procedure dies here: "Acknowledgments
@@ -101,7 +101,7 @@ ConfirmedMessagesComponent::OnReceivedPacket(Ptr<const Packet> packet,
         status->m_reply.frameHeader.SetAsDownlink();
         status->m_reply.frameHeader.SetAck(false);
         status->m_reply.frameHeader.SetAddress(fHdr.GetAddress());
-        status->m_reply.macHeader.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+        status->m_reply.macHeader.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
         status->m_reply.needsReply = true;
     }
 }
@@ -202,7 +202,7 @@ LinkCheckComponent::BeforeSendingReply(Ptr<EndDeviceStatus> status,
         auto replyCommand = Create<LinkCheckAns>(margin, gwCount);
         status->m_reply.frameHeader.SetAsDownlink();
         status->m_reply.frameHeader.AddCommand(replyCommand);
-        status->m_reply.macHeader.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+        status->m_reply.macHeader.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
     }
     else
     {

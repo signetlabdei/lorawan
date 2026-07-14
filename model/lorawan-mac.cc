@@ -55,19 +55,25 @@ LorawanMac::~LorawanMac()
 }
 
 void
+LorawanMac::SetReceiveCallback(ReceiveCallback cb)
+{
+    m_receiveCallback = cb;
+}
+
+void
 LorawanMac::SetDevice(Ptr<NetDevice> device)
 {
     m_device = device;
 }
 
 Ptr<NetDevice>
-LorawanMac::GetDevice()
+LorawanMac::GetDevice() const
 {
     return m_device;
 }
 
 Ptr<LoraPhy>
-LorawanMac::GetPhy()
+LorawanMac::GetPhy() const
 {
     return m_phy;
 }
@@ -85,7 +91,7 @@ LorawanMac::SetPhy(Ptr<LoraPhy> phy)
 }
 
 Ptr<LogicalLoraChannelHelper>
-LorawanMac::GetLogicalLoraChannelHelper()
+LorawanMac::GetLogicalLoraChannelHelper() const
 {
     return m_channelHelper;
 }
@@ -97,7 +103,7 @@ LorawanMac::SetLogicalLoraChannelHelper(Ptr<LogicalLoraChannelHelper> helper)
 }
 
 uint8_t
-LorawanMac::GetSfFromDataRate(uint8_t dataRate)
+LorawanMac::GetSfFromDataRate(uint8_t dataRate) const
 {
     NS_LOG_FUNCTION(this << unsigned(dataRate));
 
@@ -110,8 +116,8 @@ LorawanMac::GetSfFromDataRate(uint8_t dataRate)
     return m_sfForDataRate.at(dataRate);
 }
 
-double
-LorawanMac::GetBandwidthFromDataRate(uint8_t dataRate)
+uint32_t
+LorawanMac::GetBandwidthFromDataRate(uint8_t dataRate) const
 {
     NS_LOG_FUNCTION(this << unsigned(dataRate));
 
@@ -125,7 +131,7 @@ LorawanMac::GetBandwidthFromDataRate(uint8_t dataRate)
 }
 
 double
-LorawanMac::GetDbmForTxPower(uint8_t txPower)
+LorawanMac::GetDbmForTxPower(uint8_t txPower) const
 {
     NS_LOG_FUNCTION(this << unsigned(txPower));
 
@@ -144,7 +150,7 @@ LorawanMac::SetSfForDataRate(std::vector<uint8_t> sfForDataRate)
 }
 
 void
-LorawanMac::SetBandwidthForDataRate(std::vector<double> bandwidthForDataRate)
+LorawanMac::SetBandwidthForDataRate(std::vector<uint32_t> bandwidthForDataRate)
 {
     m_bandwidthForDataRate = bandwidthForDataRate;
 }

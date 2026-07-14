@@ -33,7 +33,6 @@ class GatewayLorawanMac : public LorawanMac
     GatewayLorawanMac();           //!< Default constructor
     ~GatewayLorawanMac() override; //!< Destructor
 
-    // Implementation of the LorawanMac interface
     void Send(Ptr<Packet> packet) override;
 
     /**
@@ -42,15 +41,6 @@ class GatewayLorawanMac : public LorawanMac
      * @return True if it is transmitting, false otherwise.
      */
     bool IsTransmitting();
-
-    // Implementation of the LorawanMac interface
-    void Receive(Ptr<const Packet> packet) override;
-
-    // Implementation of the LorawanMac interface
-    void FailedReception(Ptr<const Packet> packet) override;
-
-    // Implementation of the LorawanMac interface
-    void TxFinished(Ptr<const Packet> packet) override;
 
     /**
      * Return the next time at which we will be able to transmit on the specified frequency.
@@ -61,7 +51,9 @@ class GatewayLorawanMac : public LorawanMac
     Time GetWaitTime(uint32_t frequencyHz);
 
   private:
-  protected:
+    void TxFinished(Ptr<const Packet> packet) override;
+    void Receive(Ptr<const Packet> packet) override;
+    void FailedReception(Ptr<const Packet> packet) override;
 };
 
 } // namespace lorawan

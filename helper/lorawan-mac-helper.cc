@@ -217,7 +217,7 @@ LorawanMacHelper::ApplyCommonAlohaConfigurations(Ptr<LorawanMac> lorawanMac) con
     ///////////////////////////////////////////////////////////
     lorawanMac->SetSfForDataRate(std::vector<uint8_t>{12, 11, 10, 9, 8, 7, 7});
     lorawanMac->SetBandwidthForDataRate(
-        std::vector<double>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
+        std::vector<uint32_t>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
     lorawanMac->SetMaxMacPayloadForDataRate(
         std::vector<uint32_t>{59, 59, 59, 123, 230, 230, 230, 230});
 }
@@ -332,7 +332,7 @@ LorawanMacHelper::ApplyCommonEuConfigurations(Ptr<LorawanMac> lorawanMac) const
     ///////////////////////////////////////////////////////////
     lorawanMac->SetSfForDataRate(std::vector<uint8_t>{12, 11, 10, 9, 8, 7, 7});
     lorawanMac->SetBandwidthForDataRate(
-        std::vector<double>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
+        std::vector<uint32_t>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
     lorawanMac->SetMaxMacPayloadForDataRate(
         std::vector<uint32_t>{59, 59, 59, 123, 230, 230, 230, 230});
 }
@@ -438,7 +438,7 @@ LorawanMacHelper::ApplyCommonSingleChannelConfigurations(Ptr<LorawanMac> lorawan
     ///////////////////////////////////////////////////////////
     lorawanMac->SetSfForDataRate(std::vector<uint8_t>{12, 11, 10, 9, 8, 7, 7});
     lorawanMac->SetBandwidthForDataRate(
-        std::vector<double>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
+        std::vector<uint32_t>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
     lorawanMac->SetMaxMacPayloadForDataRate(
         std::vector<uint32_t>{59, 59, 59, 123, 230, 230, 230, 230});
 }
@@ -491,94 +491,41 @@ LorawanMacHelper::SetSpreadingFactorsUp(NodeContainer endDevices,
         // Get the end device sensitivity
         Ptr<EndDeviceLoraPhy> edPhy = DynamicCast<EndDeviceLoraPhy>(loraNetDevice->GetPhy());
 
-        if (rxPower > EndDeviceLoraPhy::sensitivity[0])
+        if (rxPower > EndDeviceLoraPhy::SENSITIVITY[0])
         {
             mac->SetDataRate(5);
             sfQuantity[0]++;
         }
-        else if (rxPower > EndDeviceLoraPhy::sensitivity[1])
+        else if (rxPower > EndDeviceLoraPhy::SENSITIVITY[1])
         {
             mac->SetDataRate(4);
             sfQuantity[1]++;
         }
-        else if (rxPower > EndDeviceLoraPhy::sensitivity[2])
+        else if (rxPower > EndDeviceLoraPhy::SENSITIVITY[2])
         {
             mac->SetDataRate(3);
             sfQuantity[2]++;
         }
-        else if (rxPower > EndDeviceLoraPhy::sensitivity[3])
+        else if (rxPower > EndDeviceLoraPhy::SENSITIVITY[3])
         {
             mac->SetDataRate(2);
             sfQuantity[3]++;
         }
-        else if (rxPower > EndDeviceLoraPhy::sensitivity[4])
+        else if (rxPower > EndDeviceLoraPhy::SENSITIVITY[4])
         {
             mac->SetDataRate(1);
             sfQuantity[4]++;
         }
-        else if (rxPower > EndDeviceLoraPhy::sensitivity[5])
+        else if (rxPower > EndDeviceLoraPhy::SENSITIVITY[5])
         {
             mac->SetDataRate(0);
             sfQuantity[5]++;
         }
         else // Device is out of range. Assign SF12.
         {
-            // NS_LOG_DEBUG ("Device out of range");
             mac->SetDataRate(0);
             sfQuantity[6]++;
-            // NS_LOG_DEBUG ("sfQuantity[6] = " << sfQuantity[6]);
         }
-
-        /*
-
-        // Get the Gw sensitivity
-        Ptr<NetDevice> gatewayNetDevice = bestGateway->GetDevice (0);
-        Ptr<LoraNetDevice> gatewayLoraNetDevice = DynamicCast<LoraNetDevice>(gatewayNetDevice);
-        Ptr<GatewayLoraPhy> gatewayPhy = DynamicCast<GatewayLoraPhy>
-        (gatewayLoraNetDevice->GetPhy ()); const double *gwSensitivity = gatewayPhy->sensitivity;
-
-        if(rxPower > *gwSensitivity)
-          {
-            mac->SetDataRate (5);
-            sfQuantity[0] = sfQuantity[0] + 1;
-
-          }
-        else if (rxPower > *(gwSensitivity+1))
-          {
-            mac->SetDataRate (4);
-            sfQuantity[1] = sfQuantity[1] + 1;
-
-          }
-        else if (rxPower > *(gwSensitivity+2))
-          {
-            mac->SetDataRate (3);
-            sfQuantity[2] = sfQuantity[2] + 1;
-
-          }
-        else if (rxPower > *(gwSensitivity+3))
-          {
-            mac->SetDataRate (2);
-            sfQuantity[3] = sfQuantity[3] + 1;
-          }
-        else if (rxPower > *(gwSensitivity+4))
-          {
-            mac->SetDataRate (1);
-            sfQuantity[4] = sfQuantity[4] + 1;
-          }
-        else if (rxPower > *(gwSensitivity+5))
-          {
-            mac->SetDataRate (0);
-            sfQuantity[5] = sfQuantity[5] + 1;
-
-          }
-        else // Device is out of range. Assign SF12.
-          {
-            mac->SetDataRate (0);
-            sfQuantity[6] = sfQuantity[6] + 1;
-
-          }
-          */
-
     } // end loop on nodes
 
     return sfQuantity;

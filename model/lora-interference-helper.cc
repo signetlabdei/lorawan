@@ -32,7 +32,7 @@ LoraInterferenceHelper::Event::Event(Time duration,
     : m_startTime(Now()),
       m_endTime(m_startTime + duration),
       m_sf(spreadingFactor),
-      m_rxPowerdBm(rxPowerdBm),
+      m_rxPowerDbm(rxPowerdBm),
       m_packet(packet),
       m_frequencyHz(frequencyHz)
 {
@@ -65,9 +65,9 @@ LoraInterferenceHelper::Event::GetDuration() const
 }
 
 double
-LoraInterferenceHelper::Event::GetRxPowerdBm() const
+LoraInterferenceHelper::Event::GetRxPowerDbm() const
 {
-    return m_rxPowerdBm;
+    return m_rxPowerDbm;
 }
 
 uint8_t
@@ -92,7 +92,7 @@ void
 LoraInterferenceHelper::Event::Print(std::ostream& stream) const
 {
     stream << "(" << m_startTime.As(Time::S) << " - " << m_endTime.As(Time::S) << "), SF"
-           << unsigned(m_sf) << ", " << m_rxPowerdBm << " dBm, " << m_frequencyHz << " Hz";
+           << unsigned(m_sf) << ", " << m_rxPowerDbm << " dBm, " << m_frequencyHz << " Hz";
 }
 
 std::ostream&
@@ -249,7 +249,7 @@ LoraInterferenceHelper::IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Ev
     // not.
 
     // Gather information about the event
-    double rxPowerDbm = event->GetRxPowerdBm();
+    double rxPowerDbm = event->GetRxPowerDbm();
     uint8_t sf = event->GetSpreadingFactor();
     uint32_t frequencyHz = event->GetFrequency();
 
@@ -284,7 +284,7 @@ LoraInterferenceHelper::IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Ev
 
         // Gather information about this interferer
         uint8_t interfererSf = interferer->GetSpreadingFactor();
-        double interfererPower = interferer->GetRxPowerdBm();
+        double interfererPower = interferer->GetRxPowerDbm();
         Time interfererStartTime = interferer->GetStartTime();
         Time interfererEndTime = interferer->GetEndTime();
 
@@ -330,7 +330,7 @@ LoraInterferenceHelper::IsDestroyedByInterference(Ptr<LoraInterferenceHelper::Ev
         if (snir >= snirIsolation)
         {
             // Move on and check the rest of the interferers
-            NS_LOG_DEBUG("Packet survived interference with SF " << currentSf);
+            NS_LOG_DEBUG("Packet survived interference with SF " << unsigned(currentSf));
         }
         else
         {

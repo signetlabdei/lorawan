@@ -48,7 +48,7 @@ class LogicalLoraChannelHelper : public SimpleRefCount<LogicalLoraChannelHelper>
      * @return A Time instance containing the wait time before transmission is allowed on the
      * channel.
      */
-    Time GetWaitTime(Ptr<LogicalLoraChannel> channel) const;
+    Time GetWaitTime(Ptr<const LogicalLoraChannel> channel) const;
 
     /**
      * Get the time it is necessary to wait for before transmitting on a given channel.
@@ -65,7 +65,7 @@ class LogicalLoraChannelHelper : public SimpleRefCount<LogicalLoraChannelHelper>
      * @param duration The duration of the transmission event.
      * @param channel The channel the transmission was made on.
      */
-    void AddEvent(Time duration, Ptr<LogicalLoraChannel> channel);
+    void AddEvent(Time duration, Ptr<const LogicalLoraChannel> channel);
 
     /**
      * Register the transmission of a packet.
@@ -108,7 +108,7 @@ class LogicalLoraChannelHelper : public SimpleRefCount<LogicalLoraChannelHelper>
      * @param channel The channel in question.
      * @return The power in dBm.
      */
-    double GetTxPowerForChannel(Ptr<LogicalLoraChannel> channel) const;
+    double GetTxPowerForChannel(Ptr<const LogicalLoraChannel> channel) const;
 
     /**
      * Returns the maximum transmission power [dBm] that is allowed on a channel.

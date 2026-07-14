@@ -66,17 +66,22 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
         return;
     }
 
+    auto sf = GetSfFromDataRate(dataRate);
+    auto bw = GetBandwidthFromDataRate(dataRate);
+    // see SX1272/73 Datasheet, Section 4.1.1.6, Rev. 4, Jan. 2019
+    auto ldro = bool((sf == 11 || sf == 12) && bw == 125'000);
+
     LoraTxParameters params;
-    params.sf = GetSfFromDataRate(dataRate);
-    params.headerDisabled = false;
+    params.spreadingFactor = sf;
+    params.bandwidthHz = bw;
     params.codingRate = CodingRate::CR_4_5;
-    params.bandwidthHz = GetBandwidthFromDataRate(dataRate);
-    params.nPreamble = 8;
+    params.lowDataRateOptimize = ldro;
+    params.preambleLenSymb = 8;
+    params.implicitHeader = false;
     params.crcEnabled = true;
-    params.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(params) > MilliSeconds(16);
 
     // Get the duration
-    Time duration = LoraPhy::GetOnAirTime(packet, params);
+    Time duration = LoraPhy::GetTimeOnAir(packet->GetSize(), params);
 
     NS_LOG_DEBUG("Duration: " << duration.As(Time::S));
 
@@ -87,7 +92,7 @@ GatewayLorawanMac::Send(Ptr<Packet> packet)
     m_channelHelper->AddEvent(duration, frequencyHz);
 
     // Send the packet to the PHY layer to send it on the channel
-    m_phy->Send(packet, params, frequencyHz, sendingPower);
+    m_phy->Send(packet, frequencyHz, IQPolarity::DOWN, params, sendingPower);
 
     m_sentNewPacket(packet);
 }
@@ -96,6 +101,19 @@ bool
 GatewayLorawanMac::IsTransmitting()
 {
     return m_phy->IsTransmitting();
+}
+
+Time
+GatewayLorawanMac::GetWaitTime(uint32_t frequencyHz)
+{
+    NS_LOG_FUNCTION_NOARGS();
+    return m_channelHelper->GetWaitTime(frequencyHz);
+}
+
+void
+GatewayLorawanMac::TxFinished(Ptr<const Packet> packet)
+{
+    NS_LOG_FUNCTION(this << packet);
 }
 
 void
@@ -112,10 +130,12 @@ GatewayLorawanMac::Receive(Ptr<const Packet> packet)
 
     if (macHdr.IsUplink())
     {
-        DynamicCast<LoraNetDevice>(m_device)->Receive(packetCopy);
-
         NS_LOG_DEBUG("Received packet: " << packet);
-
+        // Pass the packet up to the NetDevice
+        if (!m_receiveCallback.IsNull())
+        {
+            m_receiveCallback(packetCopy);
+        }
         m_receivedPacket(packet);
     }
     else
@@ -128,19 +148,6 @@ void
 GatewayLorawanMac::FailedReception(Ptr<const Packet> packet)
 {
     NS_LOG_FUNCTION(this << packet);
-}
-
-void
-GatewayLorawanMac::TxFinished(Ptr<const Packet> packet)
-{
-    NS_LOG_FUNCTION_NOARGS();
-}
-
-Time
-GatewayLorawanMac::GetWaitTime(uint32_t frequencyHz)
-{
-    NS_LOG_FUNCTION_NOARGS();
-    return m_channelHelper->GetWaitTime(frequencyHz);
 }
 
 } // namespace lorawan

@@ -36,13 +36,12 @@ class LorawanMac : public Object
 {
   public:
     /**
-     *  Register this type.
-     *  @return The object TypeId.
+     * This type defines the callback of a higher layer that a LorawanMac(-derived) object invokes
+     * to pass a packet up the stack.
+     *
+     * @param packet the packet that has been received.
      */
-    static TypeId GetTypeId();
-
-    LorawanMac();           //!< Default constructor
-    ~LorawanMac() override; //!< Destructor
+    typedef Callback<void, Ptr<Packet>> ReceiveCallback;
 
     /**
      * Matrix structure to store possible data rate value to be used by a LoRaWAN end device for
@@ -50,6 +49,15 @@ class LorawanMac : public Object
      * RX1DROffset [0:5].
      */
     typedef std::array<std::array<uint8_t, 6>, 8> ReplyDataRateMatrix;
+
+    /**
+     *  Register this type.
+     *  @return The object TypeId.
+     */
+    static TypeId GetTypeId();
+
+    LorawanMac();           //!< Default constructor
+    ~LorawanMac() override; //!< Destructor
 
     /**
      * Set the underlying PHY layer.
@@ -63,7 +71,7 @@ class LorawanMac : public Object
      *
      * @return The PHY layer that this MAC is connected to.
      */
-    Ptr<LoraPhy> GetPhy();
+    Ptr<LoraPhy> GetPhy() const;
 
     /**
      * Send a packet.
@@ -73,26 +81,43 @@ class LorawanMac : public Object
     virtual void Send(Ptr<Packet> packet) = 0;
 
     /**
+     * Perform actions after sending a packet.
+     *
+     * This method is typically registered as a callback in the underlying PHY
+     * layer so that it's called when a packet transmission concludes.
+     *
+     * @param packet The packet that has just been sent.
+     */
+    virtual void TxFinished(Ptr<const Packet> packet) = 0;
+
+    /**
      * Receive a packet from the lower layer.
+     *
+     * This method is typically registered as a callback in the underlying PHY
+     * layer so that it's called when a packet is going up the stack.
      *
      * @param packet The received packet.
      */
     virtual void Receive(Ptr<const Packet> packet) = 0;
 
     /**
-     * Function called by lower layers to inform this layer that reception of a
-     * packet we were locked on failed.
+     * Inform this layer that reception of a packet we were locked on failed.
+     *
+     * This method is typically registered as a callback in the underlying PHY
+     * layer so that it's called when a packet reception fails.
      *
      * @param packet The packet we failed to receive.
      */
     virtual void FailedReception(Ptr<const Packet> packet) = 0;
 
     /**
-     * Perform actions after sending a packet.
+     * Set the callback to be used to notify higher layers when a packet has been
+     * received.
      *
-     * @param packet The packet that just finished transmission.
+     * @param cb callback to invoke whenever a packet has been received and must
+     *        be forwarded to the higher layers.
      */
-    virtual void TxFinished(Ptr<const Packet> packet) = 0;
+    void SetReceiveCallback(ReceiveCallback cb);
 
     /**
      * Set the device this MAC layer is installed on.
@@ -106,14 +131,14 @@ class LorawanMac : public Object
      *
      * @return The NetDevice this MAC layer will refer to.
      */
-    Ptr<NetDevice> GetDevice();
+    Ptr<NetDevice> GetDevice() const;
 
     /**
      * Get the logical lora channel helper associated with this MAC.
      *
      * @return A Ptr to the instance of LogicalLoraChannelHelper that this MAC is using.
      */
-    Ptr<LogicalLoraChannelHelper> GetLogicalLoraChannelHelper();
+    Ptr<LogicalLoraChannelHelper> GetLogicalLoraChannelHelper() const;
 
     /**
      * Set the LogicalLoraChannelHelper this MAC instance will use.
@@ -130,16 +155,16 @@ class LorawanMac : public Object
      * @return The spreading factor that corresponds to a data rate in this MAC's region, or 0
      * if the dataRate is not valid.
      */
-    uint8_t GetSfFromDataRate(uint8_t dataRate);
+    uint8_t GetSfFromDataRate(uint8_t dataRate) const;
 
     /**
      * Get the bandwidth corresponding to a data rate, based on this MAC's region.
      *
      * @param dataRate The data rate we need to convert to a bandwidth value.
-     * @return The bandwidth that corresponds to the parameter data rate in this
+     * @return The bandwidth (Hz) that corresponds to the parameter data rate in this
      * MAC's region, or 0 if the dataRate is not valid.
      */
-    double GetBandwidthFromDataRate(uint8_t dataRate);
+    uint32_t GetBandwidthFromDataRate(uint8_t dataRate) const;
 
     /**
      * Get the transmission power in dBm that corresponds, in this region, to the
@@ -150,7 +175,7 @@ class LorawanMac : public Object
      * @return The corresponding transmission power in dBm ERP, or -1 if the encoded
      * power was not recognized as valid.
      */
-    double GetDbmForTxPower(uint8_t txPower);
+    double GetDbmForTxPower(uint8_t txPower) const;
 
     /**
      * Set the vector to use to check up correspondence between spreading factor and data rate.
@@ -165,9 +190,9 @@ class LorawanMac : public Object
      * data rate.
      *
      * @param bandwidthForDataRate A vector that contains at position i the
-     * bandwidth that should correspond to data rate i in this MAC's region.
+     * bandwidth (Hz) that should correspond to data rate i in this MAC's region.
      */
-    void SetBandwidthForDataRate(std::vector<double> bandwidthForDataRate);
+    void SetBandwidthForDataRate(std::vector<uint32_t> bandwidthForDataRate);
 
     /**
      * Set the maximum LoRaWAN MACPayload size for a set data rate.
@@ -212,6 +237,8 @@ class LorawanMac : public Object
     int GetNPreambleSymbols() const;
 
   protected:
+    ReceiveCallback m_receiveCallback; ///<! Callback to forward to upper layers
+
     /**
      * The trace source that is fired when a packet cannot be sent because of duty
      * cycle limitations.
@@ -252,7 +279,7 @@ class LorawanMac : public Object
     /**
      * A vector holding the bandwidth each data rate corresponds to.
      */
-    std::vector<double> m_bandwidthForDataRate;
+    std::vector<uint32_t> m_bandwidthForDataRate;
 
     /**
      * A vector holding the maximum MACPayload size that corresponds to a

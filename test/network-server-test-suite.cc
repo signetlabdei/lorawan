@@ -125,19 +125,19 @@ class DownlinkPacketTest : public TestCase
     ~DownlinkPacketTest() override; //!< Destructor
 
     /**
-     * Record the exit status of a MAC layer packet retransmission process of an end device.
+     * Trace the outcome of MAC layer's confirmed packet retransmission and acknowledgement.
      *
      * This trace sink is only used here to determine whether an ack was received by the end device
      * after sending a package requiring an acknowledgement.
      *
-     * @param requiredTransmissions Number of transmissions attempted during the process.
-     * @param success Whether the retransmission procedure was successful.
-     * @param time Timestamp of the initial transmission attempt.
+     * @param txCount Number of transmissions attempted during the process.
+     * @param ack Whether the retransmission process led to acknowledgement.
+     * @param firstAttempt Timestamp of the initial transmission attempt.
      * @param packet The packet being retransmitted.
      */
-    void ReceivedPacketAtEndDevice(uint8_t requiredTransmissions,
-                                   bool success,
-                                   Time time,
+    void ReceivedPacketAtEndDevice(uint8_t txCount,
+                                   bool ack,
+                                   Time firstAttempt,
                                    Ptr<Packet> packet);
 
     /**
@@ -167,13 +167,13 @@ DownlinkPacketTest::~DownlinkPacketTest()
 }
 
 void
-DownlinkPacketTest::ReceivedPacketAtEndDevice(uint8_t requiredTransmissions,
-                                              bool success,
-                                              Time time,
+DownlinkPacketTest::ReceivedPacketAtEndDevice(uint8_t txCount,
+                                              bool ack,
+                                              Time firstAttempt,
                                               Ptr<Packet> packet)
 {
     NS_LOG_DEBUG("Received a packet at the end device");
-    m_receivedPacketAtEd = success;
+    m_receivedPacketAtEd = ack;
 }
 
 void
@@ -183,7 +183,7 @@ DownlinkPacketTest::SendPacket(Ptr<Node> endDevice, bool requestAck)
     {
         DynamicCast<EndDeviceLorawanMac>(
             DynamicCast<LoraNetDevice>(endDevice->GetDevice(0))->GetMac())
-            ->SetMType(LorawanMacHeader::CONFIRMED_DATA_UP);
+            ->SetFType(LorawanMacHeader::CONFIRMED_DATA_UP);
     }
     endDevice->GetDevice(0)->Send(Create<Packet>(20), Address(), 0);
 }
@@ -207,7 +207,7 @@ DownlinkPacketTest::DoRun()
     DynamicCast<EndDeviceLorawanMac>(
         DynamicCast<LoraNetDevice>(endDevices.Get(0)->GetDevice(0))->GetMac())
         ->TraceConnectWithoutContext(
-            "RequiredTransmissions",
+            "ConfirmedTransmissionOutcome",
             MakeCallback(&DownlinkPacketTest::ReceivedPacketAtEndDevice, this));
 
     // Send a packet in uplink
@@ -286,7 +286,7 @@ LinkCheckTest::SendPacket(Ptr<Node> endDevice, bool requestAck)
 
     if (requestAck)
     {
-        macLayer->SetMType(LorawanMacHeader::CONFIRMED_DATA_UP);
+        macLayer->SetFType(LorawanMacHeader::CONFIRMED_DATA_UP);
     }
 
     macLayer->AddMacCommand(Create<LinkCheckReq>());

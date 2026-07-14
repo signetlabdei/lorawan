@@ -43,61 +43,36 @@ class EndDeviceLorawanMac : public LorawanMac
     EndDeviceLorawanMac();           //!< Default constructor
     ~EndDeviceLorawanMac() override; //!< Destructor
 
-    /////////////////////
-    // Sending methods //
-    /////////////////////
+    static constexpr uint16_t ADR_ACK_LIMIT = 64; //!< ADRACKCnt threshold for setting ADRACKReq
+    static constexpr uint16_t ADR_ACK_DELAY = 32; //!< ADRACKCnt threshold for ADR backoff action
 
     /**
      * Send a packet.
      *
-     * The MAC layer of the end device will take care of using the right parameters.
+     * The MAC layer of the end device will take care of using the right parameters. This function
+     * may return immediately if the packet cannot be sent with the current MAC parameters, or it
+     * may automatically reschedule itself later on if the device has exhausted it duty cycle budget
+     * or if it is currently busy on another task.
      *
      * @param packet The packet to send.
      */
     void Send(Ptr<Packet> packet) override;
 
     /**
-     * Checking if we are performing the transmission of a new packet or a retransmission, and call
-     * SendToPhy function.
+     * Evaluate whether this packet can be sent in the current device state
      *
-     * @param packet The packet to send.
+     * @param [in] packet The packet to be evaluated
+     * @param [out] nextTxDelay Minimum delay for sending the packet
+     * @return Whether the packet can be sent in the current device state
      */
-    virtual void DoSend(Ptr<Packet> packet);
+    bool ValidatePacketForSend(Ptr<const Packet> packet, Time& nextTxDelay) const;
 
     /**
-     * Add headers and send a packet with the sending function of the physical layer.
+     * Add a MAC command to the list of those that will be sent out in the next packet.
      *
-     * @param packet The packet to send.
+     * @param macCommand A pointer to the MAC command.
      */
-    virtual void SendToPhy(Ptr<Packet> packet);
-
-    /**
-     * Postpone transmission to the specified time and delete previously scheduled transmissions if
-     * present.
-     *
-     * @param nextTxDelay Delay at which the transmission will be performed.
-     * @param packet The packet to delay the transmission of.
-     */
-    virtual void PostponeTransmission(Time nextTxDelay, Ptr<Packet> packet);
-
-    ///////////////////////
-    // Receiving methods //
-    ///////////////////////
-
-    void Receive(Ptr<const Packet> packet) override;
-
-    void FailedReception(Ptr<const Packet> packet) override;
-
-    void TxFinished(Ptr<const Packet> packet) override;
-
-    /////////////////////////
-    // Getters and Setters //
-    /////////////////////////
-
-    /**
-     * Reset retransmission parameters contained in the structure LoraRetxParams.
-     */
-    virtual void ResetRetransmissionParameters();
+    void AddMacCommand(Ptr<MacCommand> macCommand);
 
     /**
      * Signals to the network server that this device will or may not comply with LinkADRReq
@@ -183,10 +158,6 @@ class EndDeviceLorawanMac : public LorawanMac
      */
     LoraDeviceAddress GetDeviceAddress();
 
-    // void SetRx1DrOffset (uint8_t rx1DrOffset);
-
-    // uint8_t GetRx1DrOffset ();
-
     /**
      * Get the last known link margin from the demodulation floor.
      *
@@ -214,9 +185,208 @@ class EndDeviceLorawanMac : public LorawanMac
      */
     double GetAggregatedDutyCycle();
 
-    /////////////////////////
-    // MAC command methods //
-    /////////////////////////
+    /**
+     * Set the frame type to send when the Send method is called.
+     *
+     * @param fType The frame type.
+     */
+    void SetFType(LorawanMacHeader::FType fType);
+
+    /**
+     * Get the frame type to send when the Send method is called.
+     *
+     * @return The frame type.
+     */
+    LorawanMacHeader::FType GetFType();
+
+    /**
+     * Get the current value of the LoRaWAN uplink frame counter (FCnt) of this device
+     *
+     * @return This device's current uplink frame counter (FCnt)
+     */
+    uint16_t GetUplinkFrameCounter() const;
+
+  protected:
+    /**
+     * Current packet transmission context tracking transmissions attempts mandated by the protocol
+     */
+    struct PacketTxContext
+    {
+        Ptr<Packet> packet = nullptr; //!< A pointer to the packet being transmitted
+        Time firstAttempt = Time();   //!< Timestamp of the first transmission of the packet
+        bool needsAck = false;        //!< Whether the packet requires explicit acknowledgment
+        int8_t nbTxLeft = 0;          //!< Number of transmission attempts left for this packet
+    };
+
+    /**
+     * Postpone transmission to the specified time.
+     *
+     * @param nextTxDelay Delay at which the transmission will be performed.
+     * @param packet The packet to delay the transmission of.
+     */
+    void PostponeTransmission(Time nextTxDelay, Ptr<Packet> packet);
+
+    /**
+     * Find a suitable channel for transmission. The channel is chosen randomly among the
+     * ones that are available in the end device, based on their duty cycle limitations.
+     *
+     * @return A pointer to the channel.
+     */
+    Ptr<LogicalLoraChannel> GetRandomChannelForTx();
+
+    /**
+     * Take action on the commands contained on this FrameHeader.
+     *
+     * @param frameHeader The frame header.
+     */
+    void ApplyMACCommands(LoraFrameHeader frameHeader);
+
+    /**
+     * TracedCallback signature for the (re)transmission and acknowledgement process outcome of
+     * confirmed uplink packets.
+     *
+     * @param [in] txCount Number of transmissions attempted during the process.
+     * @param [in] ack Whether the transmission process led to network acknowledgement.
+     * @param [in] firstAttempt Timestamp of the initial transmission attempt.
+     * @param [in] packet The packet being transmitted.
+     */
+    typedef void (*ConfirmedTxOutcomeCallback)(uint8_t txCount,
+                                               bool ack,
+                                               Time firstAttempt,
+                                               Ptr<Packet> packet);
+
+    /// Traced Callback: confirmed transmission process outcome event.
+    TracedCallback<uint8_t, bool, Time, Ptr<Packet>> m_confirmedTxOutcomeCallback;
+
+    PacketTxContext m_txContext; //!< Structure containing the transmission context for the last
+                                 //!< packet sent by this device, used to track retransmissions.
+    /**
+     * @brief The event of transmitting a packet at a later moment.
+     *
+     * A packet transmission is scheduled for the future in the following cases:
+     * - Duty cycle restrictions apply (either legal or imposed by the network)
+     * - The application layer wants to send but the device is currently busy
+     * - A packet needs to be retransmitted later by the LoRaWAN MAC protocol
+     *
+     * This Event is used to cancel postponed transmissions in case the application layer wants to
+     * send a new packet, overwriting the one currently scheduled. Notice that this can be used to
+     * interrupt an ongoing retransmission process. It somewhat acts as a size-1 queue of packets
+     * to be sent.
+     */
+    EventId m_nextTx;
+
+    Ptr<UniformRandomVariable>
+        m_uniformRV; //!< An uniform random variable, used to randomly pick from the channel list
+                     //!< and to sample random retransmission scheduling backoff.
+
+    LoraDeviceAddress m_address;                 //!< The LoRaWAN address of this device.
+    std::list<Ptr<MacCommand>> m_macCommandList; //!< List of the MAC commands that need to be
+                                                 //!< applied to the next UL packet.
+
+    uint16_t m_fCnt;      //!< Current value of the uplink frame counter
+    uint16_t m_adrAckCnt; //!< ADRACKCnt counter of the number of consecutive uplinks without
+                          //!< downlink reply from the server. Reset upon reception of any Class A
+                          //!< downlink destined to the device.
+
+    TracedValue<uint8_t> m_dataRate; //!< The data rate this device is using to transmit.
+    TracedValue<double>
+        m_txPowerDbm;  //!< The transmission ERP [dBm] this device is currently using.
+    uint8_t m_nbTrans; //!< Default number of repeated transmissions of each packet.
+
+    CodingRate m_codingRate; //!< The coding rate used by this device.
+    bool m_headerDisabled; //!< Whether or not the LoRa PHY header is disabled for communications by
+                           //!< this device.
+
+    /**
+     * @brief The duration of reception windows in number of symbols. This is converted to time by
+     * the PHY layer based or the reception parameters used.
+     *
+     * The downlink preamble transmitted by the gateways contains 8 symbols. The receiver requires 5
+     * symbols to detect the preamble and synchronize. Therefore there must be a 5 symbols overlap
+     * between the receive window and the transmitted preamble. (Ref: Recommended SX1272/76 Settings
+     * for EU868 LoRaWAN Network Operation )
+     */
+    uint8_t m_receiveWindowDurationInSymbols;
+
+    double m_lastRxSnr; //!< Record latest reception SNR measurement to provide via DevStatusAns
+
+  private:
+    /**
+     * Apply ADR backoff as in LoRaWAN specification, V1.0.4 (2020) on the provided input
+     * parameters passed by reference. This is useful for testing whether a packet could be sent
+     * without changing the device state or interrupting any ongoing retransmission process.
+     *
+     * @param [in,out] txPowerDbm Output transmission power [dBm]
+     * @param [in,out] dataRate LoRaWAN MAC data rate
+     * @param [in,out] nbTrans Number of redundant packet transmissions
+     * @param [in,out] txChannelArray Array of channels for uplink transmission
+     */
+    static void DoExecuteADRBackoff(double& txPowerDbm,
+                                    uint8_t& dataRate,
+                                    uint8_t& nbTrans,
+                                    const std::vector<Ptr<LogicalLoraChannel>>& txChannelArray);
+
+    /**
+     * Check whether the size of the application payload is under the maximum allowed.
+     *
+     * From LoRaWAN L2 1.0.4 Specification (TS001-1.0.4), Section 4.3.2: "N is the number of octets
+     * of the application payload and SHALL be equal to or less than N ≤ M − 1 − (length of FHDR in
+     * octets), where M is the maximum MACPayload length. The valid ranges of both N and M are
+     * region-specific and defined in the "LoRaWAN Regional Parameters" [RP002] document."
+     *
+     * @param appPayloadSize Number of bytes of the application payload.
+     * @param dataRate Data rate to evaluate the max MACPayload for.
+     * @return Whether the payload size is valid.
+     */
+    bool IsPayloadSizeValid(uint32_t appPayloadSize, uint8_t dataRate) const;
+
+    /**
+     * Get the set of active transmission channels among the provided array which are compatible
+     * with the a certain data rate and transmission power.
+     *
+     * @param txChannelArray Set of transmission channels to evaluate
+     * @param dataRate Data rate that the channels need to be compatible with
+     * @param txPowerDbm Transmission power [dBm] that the channels need to be compatible with
+     * @return A (possibly empty) vector of compatible transmission channels.
+     */
+    std::vector<Ptr<LogicalLoraChannel>> GetCompatibleTxChannels(
+        const std::vector<Ptr<LogicalLoraChannel>>& txChannelArray,
+        uint8_t dataRate,
+        double txPowerDbm) const;
+
+    /**
+     * Find the base minimum wait time before the next possible transmission based on channels legal
+     * duty cycle, server-imposed aggregated duty-cycle, and device class operation.
+     *
+     * @warning This function does not check whether the input channels are compatible with other
+     * device transmission parameters (data rate, output power), filtering is left to the caller
+     *
+     * @param [in] txChannelArray Array of channels to use for duty cycle evaluation
+     *
+     * @return The base minimum wait time.
+     */
+    Time GetNextTransmissionDelay(const std::vector<Ptr<LogicalLoraChannel>>& txChannelArray) const;
+
+    /**
+     * Find the minimum wait time before the next possible transmission based
+     * on end device's Class Type scheduled operations.
+     *
+     * @return The wait Time before the next MAC send.
+     */
+    virtual Time GetNextClassTransmissionDelay() const = 0;
+
+    /**
+     * Perform operations to update the MAC layer with the new packet context and call SendToPhy
+     * function. This function does not fail, only call it after doing the appropriate checks.
+     *
+     * @param packet The packet to send.
+     */
+    virtual void DoSend(Ptr<Packet> packet);
+
+    /**
+     * Execute ADR backoff as in LoRaWAN specification, V1.0.4 (2020) on this device
+     */
+    void ExecuteADRBackoff();
 
     /**
      * Add the necessary options and MAC commands to the LoraFrameHeader.
@@ -233,25 +403,15 @@ class EndDeviceLorawanMac : public LorawanMac
     void ApplyNecessaryOptions(LorawanMacHeader& macHeader);
 
     /**
-     * Set the message type to send when the Send method is called.
+     * Gather PHY transmission parameters and send a packet through the LoRa physical layer.
      *
-     * @param mType The message type.
+     * @param packet The packet to send.
      */
-    void SetMType(LorawanMacHeader::MType mType);
+    virtual void SendToPhy(Ptr<Packet> packet) = 0;
 
-    /**
-     * Get the message type to send when the Send method is called.
-     *
-     * @return The message type.
-     */
-    LorawanMacHeader::MType GetMType();
-
-    /**
-     * Parse and take action on the commands contained on this FrameHeader.
-     *
-     * @param frameHeader The frame header.
-     */
-    void ParseCommands(LoraFrameHeader frameHeader);
+    void TxFinished(Ptr<const Packet> packet) override = 0;
+    void Receive(Ptr<const Packet> packet) override = 0;
+    void FailedReception(Ptr<const Packet> packet) override = 0;
 
     /**
      * Perform the actions that need to be taken when receiving a LinkCheckAns command.
@@ -313,135 +473,8 @@ class EndDeviceLorawanMac : public LorawanMac
                          uint8_t minDataRate,
                          uint8_t maxDataRate);
 
-    /**
-     * Add a MAC command to the list of those that will be sent out in the next
-     * packet.
-     *
-     * @param macCommand A pointer to the MAC command.
-     */
-    void AddMacCommand(Ptr<MacCommand> macCommand);
-
-    static constexpr uint16_t ADR_ACK_LIMIT = 64; //!< ADRACKCnt threshold for setting ADRACKReq
-    static constexpr uint16_t ADR_ACK_DELAY = 32; //!< ADRACKCnt threshold for ADR backoff action
-
-  protected:
-    /**
-     * Structure representing the parameters that will be used in the
-     * retransmission procedure.
-     */
-    struct LoraRetxParameters
-    {
-        Time firstAttempt;            //!< Timestamp of the first transmission of the packet
-        Ptr<Packet> packet = nullptr; //!< A pointer to the packet being retransmitted
-        bool waitingAck = false;      //!< Whether the packet requires explicit acknowledgment
-        uint8_t retxLeft;             //!< Number of retransmission attempts left
-    };
-
-    uint8_t m_nbTrans; //!< Default number of unacknowledged redundant transmissions of each packet.
-    TracedValue<uint8_t> m_dataRate; //!< The data rate this device is using to transmit.
-    TracedValue<double>
-        m_txPowerDbm;        //!< The transmission ERP [dBm] this device is currently using.
-    CodingRate m_codingRate; //!< The coding rate used by this device.
-    bool m_headerDisabled; //!< Whether or not the LoRa PHY header is disabled for communications by
-                           //!< this device.
-    LoraDeviceAddress m_address; //!< The address of this device.
-
-    /**
-     * Find the minimum wait time before the next possible transmission based
-     * on end device's Class Type.
-     *
-     * @param waitTime Currently known minimum wait time, possibly raised by this function.
-     * @return The updated minimum wait time in Time format.
-     */
-    virtual Time GetNextClassTransmissionDelay(Time waitTime);
-
-    /**
-     * Find a suitable channel for transmission. The channel is chosen randomly among the
-     * ones that are available in the end device, based on their duty cycle limitations.
-     *
-     * @return A pointer to the channel.
-     */
-    Ptr<LogicalLoraChannel> GetRandomChannelForTx();
-
-    /**
-     * The duration of a receive window in number of symbols. This should be
-     * converted to time based or the reception parameter used.
-     *
-     * The downlink preamble transmitted by the gateways contains 8 symbols.
-     * The receiver requires 5 symbols to detect the preamble and synchronize.
-     * Therefore there must be a 5 symbols overlap between the receive window
-     * and the transmitted preamble.
-     * (Ref: Recommended SX1272/76 Settings for EU868 LoRaWAN Network Operation )
-     */
-    uint8_t m_receiveWindowDurationInSymbols;
-
-    /**
-     * List of the MAC commands that need to be applied to the next UL packet.
-     */
-    std::list<Ptr<MacCommand>> m_macCommandList;
-
-    /**
-     * Structure containing the retransmission parameters for this device.
-     */
-    struct LoraRetxParameters m_retxParams;
-
-    /**
-     * An uniform random variable, used to randomly pick from the channel list.
-     */
-    Ptr<UniformRandomVariable> m_uniformRV;
-
-    /**
-     * Used to record the last reception SNR measurement to be included in the DevStatusAns.
-     */
-    double m_lastRxSnr;
-
-    uint16_t m_adrAckCnt; //!< ADRACKCnt counter of the number of consecutive uplinks without
-                          //!< downlink reply from the server. Reset upon reception of any Class A
-                          //!< downlink destined to the device.
-
-    /////////////////
-    //  Callbacks  //
-    /////////////////
-
-    /**
-     * The trace source fired when the transmission procedure is finished.
-     */
-    TracedCallback<uint8_t, bool, Time, Ptr<Packet>> m_requiredTxCallback;
-
-  private:
-    /**
-     * Get the set of active transmission channels compatible with the current device data rate and
-     * transmission power.
-     *
-     * @return A (possibly empty) vector of compatible transmission channels.
-     */
-    std::vector<Ptr<LogicalLoraChannel>> GetCompatibleTxChannels();
-
-    /**
-     * Find the base minimum wait time before the next possible transmission.
-     *
-     * @return The base minimum wait time.
-     */
-    Time GetNextTransmissionDelay();
-
-    /**
-     * Execute ADR backoff as in LoRaWAN specification, V1.0.4 (2020)
-     */
-    void ExecuteADRBackoff();
-
-    /**
-     * Check whether the size of the application payload is under the maximum allowed.
-     *
-     * From LoRaWAN L2 1.0.4 Specification (TS001-1.0.4), Section 4.3.2: "N is the number of octets
-     * of the application payload and SHALL be equal to or less than N ≤ M − 1 − (length of FHDR in
-     * octets), where M is the maximum MACPayload length. The valid ranges of both N and M are
-     * region-specific and defined in the “LoRaWAN Regional Parameters” [RP002] document."
-     *
-     * @param appPayloadSize Number of bytes of the application payload.
-     * @param dataRate Data rate to evaluate the max MACPayload for.
-     * @return Whether the payload size is valid.
-     */
-    bool IsPayloadSizeValid(uint32_t appPayloadSize, uint8_t dataRate);
+    LorawanMacHeader::FType
+        m_fType; //!< The frame type to apply to packets sent with the Send method.
 
     bool m_adr; //!< Uplink ADR bit contained in the FCtrl field of the LoRaWAN FHDR.
                 //!< Controlled by the device, if set to false signals the network server
@@ -450,54 +483,13 @@ class EndDeviceLorawanMac : public LorawanMac
                 //!< LinkADRReq commands. This also allows the device's local ADR backoff
                 //!< procedure to reset configurations in case of connectivity loss.
 
-    /**
-     * The event of retransmitting a packet in a consecutive moment if an ACK is not received.
-     *
-     * This Event is used to cancel the retransmission if the ACK is found in ParseCommand function
-     * and if a newer packet is delivered from the application to be sent.
-     */
-    EventId m_nextTx;
+    TracedValue<double> m_aggregatedDutyCycle; //!< The aggregated duty cycle this device needs to
+                                               //!< respect across all sub-bands.
 
-    /**
-     * The event of transmitting a packet in a consecutive moment, when the duty cycle let us
-     * transmit.
-     *
-     * This Event is used to cancel the transmission of this packet if a newer packet is delivered
-     * from the application to be sent.
-     */
-    EventId m_nextRetx;
-
-    /**
-     * The last known link margin in dB from the demodulation floor.
-     *
-     * This value is obtained (and updated) when a LinkCheckAns Mac command is
-     * received.
-     */
-    TracedValue<uint8_t> m_lastKnownLinkMarginDb;
-
-    /**
-     * The last known gateway count (i.e., gateways that are in communication
-     * range with this end device).
-     *
-     * This value is obtained (and updated) when a LinkCheckAns Mac command is
-     * received.
-     */
-    TracedValue<uint8_t> m_lastKnownGatewayCount;
-
-    /**
-     * The aggregated duty cycle this device needs to respect across all sub-bands.
-     */
-    TracedValue<double> m_aggregatedDutyCycle;
-
-    /**
-     * The message type to apply to packets sent with the Send method.
-     */
-    LorawanMacHeader::MType m_mType;
-
-    /**
-     * current value of the device frame counter.
-     */
-    uint16_t m_currentFCnt;
+    TracedValue<uint8_t> m_lastKnownLinkMarginDb; //!< Last known best link margin [dB] from the
+                                                  //!< demodulation floor, obtained via LinkCheckReq
+    TracedValue<uint8_t> m_lastKnownGatewayCount; //!< Last known number of gateways in range of
+                                                  //!< this end device, obtained via LinkCheckReq
 
     bool m_adrAckReq; //!< ADRACKReq bit, set to 1 after ADR_ACK_LIMIT consecutive uplinks without
                       //!< downlink messages received from the server. It requests the server to

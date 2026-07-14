@@ -56,8 +56,8 @@ LorawanMacHeader::Serialize(Buffer::Iterator start) const
     // The header we need to fill
     uint8_t header = 0;
 
-    // The MType
-    header |= m_mtype << 5;
+    // The FType
+    header |= uint8_t(m_fType) << 5;
 
     // Do nothing for the bits that are RFU
 
@@ -83,8 +83,8 @@ LorawanMacHeader::Deserialize(Buffer::Iterator start)
     m_major = byte & 0b11;
 
     // Move the three most significant bits to the least significant positions
-    // to get the MType
-    m_mtype = byte >> 5;
+    // to get the FType
+    m_fType = FType(byte >> 5);
 
     return 1; // the number of bytes consumed.
 }
@@ -92,24 +92,24 @@ LorawanMacHeader::Deserialize(Buffer::Iterator start)
 void
 LorawanMacHeader::Print(std::ostream& os) const
 {
-    os << "MessageType=" << unsigned(m_mtype);
+    os << "FType=" << unsigned(m_fType);
     os << ", Major=" << unsigned(m_major);
 }
 
 void
-LorawanMacHeader::SetMType(enum MType mtype)
+LorawanMacHeader::SetFType(FType fType)
 {
-    NS_LOG_FUNCTION(this << mtype);
+    NS_LOG_FUNCTION(this << fType);
 
-    m_mtype = mtype;
+    m_fType = fType;
 }
 
-uint8_t
-LorawanMacHeader::GetMType() const
+LorawanMacHeader::FType
+LorawanMacHeader::GetFType() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    return m_mtype;
+    return m_fType;
 }
 
 void
@@ -135,8 +135,8 @@ LorawanMacHeader::IsUplink() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    return (m_mtype == JOIN_REQUEST) || (m_mtype == UNCONFIRMED_DATA_UP) ||
-           (m_mtype == CONFIRMED_DATA_UP);
+    return (m_fType == FType::JOIN_REQUEST) || (m_fType == FType::UNCONFIRMED_DATA_UP) ||
+           (m_fType == FType::CONFIRMED_DATA_UP);
 }
 
 bool
@@ -144,7 +144,30 @@ LorawanMacHeader::IsConfirmed() const
 {
     NS_LOG_FUNCTION_NOARGS();
 
-    return (m_mtype == CONFIRMED_DATA_DOWN) || (m_mtype == CONFIRMED_DATA_UP);
+    return (m_fType == FType::CONFIRMED_DATA_DOWN) || (m_fType == FType::CONFIRMED_DATA_UP);
+}
+
+std::ostream&
+operator<<(std::ostream& os, const LorawanMacHeader::FType& fType)
+{
+    switch (fType)
+    {
+    case LorawanMacHeader::FType::JOIN_REQUEST:
+        return (os << "JOIN_REQUEST");
+    case LorawanMacHeader::FType::JOIN_ACCEPT:
+        return (os << "JOIN_ACCEPT");
+    case LorawanMacHeader::FType::UNCONFIRMED_DATA_UP:
+        return (os << "UNCONFIRMED_DATA_UP");
+    case LorawanMacHeader::FType::UNCONFIRMED_DATA_DOWN:
+        return (os << "UNCONFIRMED_DATA_DOWN");
+    case LorawanMacHeader::FType::CONFIRMED_DATA_UP:
+        return (os << "CONFIRMED_DATA_UP");
+    case LorawanMacHeader::FType::CONFIRMED_DATA_DOWN:
+        return (os << "CONFIRMED_DATA_DOWN");
+    case LorawanMacHeader::FType::PROPRIETARY:
+        return (os << "PROPRIETARY");
+    }
+    NS_FATAL_ERROR("Invalid LoRaWAN MAC Header FType");
 }
 
 } // namespace lorawan

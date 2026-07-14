@@ -42,31 +42,38 @@ class GatewayLoraPhy : public LoraPhy
     GatewayLoraPhy();           //!< Default constructor
     ~GatewayLoraPhy() override; //!< Destructor
 
-    void StartReceive(Ptr<Packet> packet,
-                      double rxPowerDbm,
-                      uint8_t sf,
-                      Time duration,
-                      uint32_t frequencyHz) override = 0;
+    static const double SENSITIVITY[6]; //!< The sensitivity vector of this gateway to different SFs
 
-    void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) override = 0;
-
+    // Forward LoraPhy's pure virtual function
     void Send(Ptr<Packet> packet,
-              LoraTxParameters txParams,
               uint32_t frequencyHz,
+              IQPolarity iqPolarity,
+              const LoraTxParameters& txParams,
               double txPowerDbm) override = 0;
 
-    bool IsTransmitting() override;
+    // Forward LoraPhy's pure virtual function
+    void StartReceive(Ptr<Packet> packet,
+                      uint32_t frequencyHz,
+                      IQPolarity iqPolarity,
+                      uint8_t spreadingFactor,
+                      double rxPowerDbm,
+                      Time duration) override = 0;
+
+    // Implementation of LoraPhy's pure virtual function
+    bool IsTransmitting() const override;
 
     /**
+     * Implementation of LoraPhy's pure virtual function
+     *
      * Check whether the GatewayLoraPhy is currently listening to the specified frequency.
      *
      * @param frequencyHz The value of the frequency [Hz].
      * @return True if the frequency is among the one being listened to, false otherwise.
      */
-    bool IsOnFrequency(uint32_t frequencyHz) override;
+    bool IsOnFrequency(uint32_t frequencyHz) const override;
 
     /**
-     * Add a reception path, locked on a specific frequency.
+     * Add a hardware reception path.
      */
     void AddReceptionPath();
 
@@ -84,17 +91,7 @@ class GatewayLoraPhy : public LoraPhy
      */
     void AddFrequency(uint32_t frequencyHz);
 
-    static const double sensitivity[6]; //!< A vector containing the sensitivities required to
-                                        //!< correctly decode different spreading factors.
-
   protected:
-    /**
-     * Signals the end of a transmission by the GatewayLoraPhy.
-     *
-     * @param packet A pointer to the Packet transmitted.
-     */
-    void TxFinished(Ptr<const Packet> packet) override;
-
     /**
      * This class represents a configurable reception path.
      *
@@ -105,10 +102,7 @@ class GatewayLoraPhy : public LoraPhy
     class ReceptionPath : public SimpleRefCount<GatewayLoraPhy::ReceptionPath>
     {
       public:
-        /**
-         * Constructor.
-         */
-        ReceptionPath();
+        ReceptionPath();  //!< Default constructor
         ~ReceptionPath(); //!< Destructor
 
         /**
@@ -174,10 +168,8 @@ class GatewayLoraPhy : public LoraPhy
                                      //!< locked on finishes reception.
     };
 
-    std::list<Ptr<ReceptionPath>> m_receptionPaths; //!< A list containing the various parallel
-                                                    //!< receivers that are managed by this gateway.
-
-    TracedValue<int> m_occupiedReceptionPaths; //!< The number of occupied reception paths.
+    // Implementation of LoraPhy's pure virtual function
+    void TxFinished(Ptr<const Packet> packet) override;
 
     /**
      * Trace source fired when a packet cannot be received because all available ReceivePath
@@ -191,10 +183,17 @@ class GatewayLoraPhy : public LoraPhy
      */
     TracedCallback<Ptr<const Packet>, uint32_t> m_noReceptionBecauseTransmitting;
 
+    std::list<Ptr<ReceptionPath>> m_receptionPaths; //!< A list containing the various parallel
+                                                    //!< receivers that are managed by this gateway.
+    std::list<uint32_t>
+        m_frequenciesHz;   //!< List of frequencies [Hz] the GatewayLoraPhy is listening to.
     bool m_isTransmitting; //!< Flag indicating whether a transmission is going on
 
-    std::list<uint32_t>
-        m_frequenciesHz; //!< List of frequencies [Hz] the GatewayLoraPhy is listening to.
+    TracedValue<int> m_occupiedReceptionPaths; //!< The number of occupied reception paths.
+
+  private:
+    // Forward LoraPhy's pure virtual function
+    void EndReceive(Ptr<Packet> packet, Ptr<LoraInterferenceHelper::Event> event) override = 0;
 };
 
 } // namespace lorawan

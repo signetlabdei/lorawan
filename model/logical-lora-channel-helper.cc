@@ -69,7 +69,7 @@ LogicalLoraChannelHelper::AddSubBand(Ptr<SubBand> subBand)
 }
 
 Time
-LogicalLoraChannelHelper::GetWaitTime(Ptr<LogicalLoraChannel> channel) const
+LogicalLoraChannelHelper::GetWaitTime(Ptr<const LogicalLoraChannel> channel) const
 {
     NS_LOG_FUNCTION(this << channel);
     return GetWaitTime(channel->GetFrequency());
@@ -88,7 +88,7 @@ LogicalLoraChannelHelper::GetWaitTime(uint32_t frequencyHz) const
 }
 
 void
-LogicalLoraChannelHelper::AddEvent(Time duration, Ptr<LogicalLoraChannel> channel)
+LogicalLoraChannelHelper::AddEvent(Time duration, Ptr<const LogicalLoraChannel> channel)
 {
     NS_LOG_FUNCTION(this << channel);
     AddEvent(duration, channel->GetFrequency());
@@ -107,7 +107,7 @@ LogicalLoraChannelHelper::AddEvent(Time duration, uint32_t frequencyHz)
 }
 
 double
-LogicalLoraChannelHelper::GetTxPowerForChannel(Ptr<LogicalLoraChannel> channel) const
+LogicalLoraChannelHelper::GetTxPowerForChannel(Ptr<const LogicalLoraChannel> channel) const
 {
     NS_LOG_FUNCTION(this << channel);
     return GetTxPowerForChannel(channel->GetFrequency());

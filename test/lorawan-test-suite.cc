@@ -305,7 +305,7 @@ HeaderTest::DoRun()
     // Test the LorawanMacHeader class //
     //////////////////////////////////
     LorawanMacHeader macHdr;
-    macHdr.SetMType(LorawanMacHeader::CONFIRMED_DATA_DOWN);
+    macHdr.SetFType(LorawanMacHeader::CONFIRMED_DATA_DOWN);
     macHdr.SetMajor(1);
 
     Buffer macBuf;
@@ -315,12 +315,12 @@ HeaderTest::DoRun()
 
     macHdr.Deserialize(macSerialized);
 
-    NS_TEST_EXPECT_MSG_EQ((macHdr.GetMType() == LorawanMacHeader::CONFIRMED_DATA_DOWN),
+    NS_TEST_EXPECT_MSG_EQ((macHdr.GetFType() == LorawanMacHeader::CONFIRMED_DATA_DOWN),
                           true,
-                          "MType changes in the serialization/deserialization process");
+                          "FType changes in the serialization/deserialization process");
     NS_TEST_EXPECT_MSG_EQ((macHdr.GetMajor() == 1),
                           true,
-                          "MType changes in the serialization/deserialization process");
+                          "FType changes in the serialization/deserialization process");
 
     ////////////////////////////////////
     // Test the LoraFrameHeader class //
@@ -391,8 +391,8 @@ HeaderTest::DoRun()
                           "Wrong size of packet + headers - macHeader - frameHeader");
 
     // Verify contents of removed MAC header
-    NS_TEST_EXPECT_MSG_EQ(macHdr1.GetMType(),
-                          macHdr.GetMType(),
+    NS_TEST_EXPECT_MSG_EQ(macHdr1.GetFType(),
+                          macHdr.GetFType(),
                           "Removed header contents don't match");
     NS_TEST_EXPECT_MSG_EQ(macHdr1.GetMajor(),
                           macHdr.GetMajor(),
@@ -423,8 +423,6 @@ HeaderTest::DoRun()
  * @ingroup lorawan
  *
  * It tests a number of cases related to SimpleGatewayLoraPhy's parallel reception paths
- *
- * @todo The test is commented out. To be fixed.
  */
 class ReceivePathTest : public TestCase
 {
@@ -436,8 +434,10 @@ class ReceivePathTest : public TestCase
     void DoRun() override;
     /**
      * Reset counters and gateway PHY for new sub test case.
+     *
+     * @param rxPathNb Number of reception paths to be created on the gateway PHY
      */
-    void Reset();
+    void Reset(uint8_t rxPathNb);
     /**
      * Callback for tracing OccupiedReceptionPaths.
      *
@@ -487,33 +487,40 @@ ReceivePathTest::~ReceivePathTest()
 }
 
 void
-ReceivePathTest::Reset()
+ReceivePathTest::Reset(uint8_t rxPathNb)
 {
-    // FIXME
-    // m_noMoreDemodulatorsCalls = 0;
-    // m_interferenceCalls = 0;
-    // m_receivedPacketCalls = 0;
-    // m_maxOccupiedReceptionPaths = 0;
+    m_noMoreDemodulatorsCalls = 0;
+    m_interferenceCalls = 0;
+    m_receivedPacketCalls = 0;
+    m_maxOccupiedReceptionPaths = 0;
 
-    // gatewayPhy = CreateObject<SimpleGatewayLoraPhy> ();
-    // gatewayPhy->TraceConnectWithoutContext (
-    //     "LostPacketBecauseNoMoreReceivers",
-    //     MakeCallback (&ReceivePathTest::NoMoreDemodulators, this));
-    // gatewayPhy->TraceConnectWithoutContext ("LostPacketBecauseInterference",
-    //                                         MakeCallback (&ReceivePathTest::Interference, this));
-    // gatewayPhy->TraceConnectWithoutContext ("ReceivedPacket",
-    //                                         MakeCallback (&ReceivePathTest::ReceivedPacket,
-    //                                         this));
-    // gatewayPhy->TraceConnectWithoutContext (
-    //     "OccupiedReceptionPaths", MakeCallback (&ReceivePathTest::OccupiedReceptionPaths, this));
+    // The following tests are designed around GOURSAUD signal-to-interference matrix
+    LoraInterferenceHelper::collisionMatrix = LoraInterferenceHelper::GOURSAUD;
 
-    // // Add receive paths
-    // gatewayPhy->AddReceptionPath ();
-    // gatewayPhy->AddReceptionPath ();
-    // gatewayPhy->AddReceptionPath ();
-    // gatewayPhy->AddReceptionPath ();
-    // gatewayPhy->AddReceptionPath ();
-    // gatewayPhy->AddReceptionPath ();
+    gatewayPhy = CreateObject<SimpleGatewayLoraPhy>();
+
+    gatewayPhy->AddFrequency(868'100'000);
+    gatewayPhy->AddFrequency(868'300'000);
+    gatewayPhy->AddFrequency(868'500'000);
+
+    for (uint8_t i = 0; i < rxPathNb; i++)
+    {
+        gatewayPhy->AddReceptionPath();
+    }
+
+    // From GatewayLoraPhy
+    gatewayPhy->TraceConnectWithoutContext(
+        "LostPacketBecauseNoMoreReceivers",
+        MakeCallback(&ReceivePathTest::NoMoreDemodulators, this));
+    gatewayPhy->TraceConnectWithoutContext(
+        "OccupiedReceptionPaths",
+        MakeCallback(&ReceivePathTest::OccupiedReceptionPaths, this));
+
+    // From LoraPhy
+    gatewayPhy->TraceConnectWithoutContext("LostPacketBecauseInterference",
+                                           MakeCallback(&ReceivePathTest::Interference, this));
+    gatewayPhy->TraceConnectWithoutContext("ReceivedPacket",
+                                           MakeCallback(&ReceivePathTest::ReceivedPacket, this));
 }
 
 void
@@ -560,297 +567,582 @@ ReceivePathTest::DoRun()
 
     Ptr<Packet> packet = Create<Packet>();
 
-    Reset();
+    ///////////////////////////////////////////////////////////
+    // If no ReceptionPath is configured, no packet is received
+    ///////////////////////////////////////////////////////////
 
-    // FIXME
-    // //////////////////////////////////////////////////////////////////////////////////
-    // // If no ReceptionPath is configured to listen on a frequency, no packet is received
-    // //////////////////////////////////////////////////////////////////////////////////
+    Reset(0);
 
-    // Simulator::Schedule (Seconds (1), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (1), frequency4);
+    Simulator::Schedule(Seconds(1),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(1));
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 1, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 1, "Unexpected value");
 
-    // Reset ();
+    //////////////////////////////////////////////////////////////////////////////
+    // A ReceptionPath can receive a packet of any SF without any preconfiguration
+    //////////////////////////////////////////////////////////////////////////////
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // // A ReceptionPath can receive a packet of any spreading factor without any preconfiguration
-    // //////////////////////////////////////////////////////////////////////////////
+    Reset(1);
 
-    // Simulator::Schedule (Seconds (1), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (3), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 8,
-    //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (5), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 9,
-    //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (7), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 10,
-    //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (9), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 11,
-    //                      Seconds (1), frequency1);
-    // Simulator::Schedule (Seconds (11), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14,
-    //                      12, Seconds (1), frequency1);
+    Simulator::Schedule(Seconds(1),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(1));
+    Simulator::Schedule(Seconds(3),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        8,
+                        14,
+                        Seconds(1));
+    Simulator::Schedule(Seconds(5),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        9,
+                        14,
+                        Seconds(1));
+    Simulator::Schedule(Seconds(7),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        10,
+                        14,
+                        Seconds(1));
+    Simulator::Schedule(Seconds(9),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        11,
+                        14,
+                        Seconds(1));
+    Simulator::Schedule(Seconds(11),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        12,
+                        14,
+                        Seconds(1));
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 6, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacketCalls, 6, "Unexpected value");
 
-    // Reset ();
+    ///////////////////////////////////////////////////////////////////////////////////////
+    // Schedule two overlapping reception events. Each packet should be received correctly.
+    ///////////////////////////////////////////////////////////////////////////////////////
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Schedule two reception events at the first frequency, where there are two
-    // // reception paths listening. Each packet should be received correctly.
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (3), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 9,
-    //                      Seconds (4), frequency1);
+    Reset(2);
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(3),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        9,
+                        14,
+                        Seconds(4));
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 2, "Unexpected value");
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
 
-    // Reset ();
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacketCalls, 2, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_maxOccupiedReceptionPaths, 2, "Unexpected value");
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Interference between packets on the same frequency and different ReceptionPaths
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (3), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
+    //////////////////////////////////////////////////////////////////////////////////
+    // Interference between packets on the same frequency and different ReceptionPaths
+    //////////////////////////////////////////////////////////////////////////////////
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    Reset(2);
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 2, "Unexpected value");
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(3),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
 
-    // Reset ();
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Three receptions where only two receivePaths are available
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (3), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_interferenceCalls, 2, "Unexpected value");
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    /////////////////////////////////////////////////////////////
+    // Three receptions where only two receivePaths are available
+    /////////////////////////////////////////////////////////////
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 1, "Unexpected value");
+    Reset(2);
 
-    // Reset ();
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(3),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Packets that are on different frequencys do not interfere
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency2);
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 1, "Unexpected value");
 
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
+    ///////////////////////////////////////////////////////////////////////////
+    // Packets that are on different frequencys do not interfere
+    ///////////////////////////////////////////////////////////////////////////
 
-    // Reset ();
+    Reset(2);
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Full capacity
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 8,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 9,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 10,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 11,
-    //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 12,
-    //                      Seconds (4), frequency3);
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'300'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 6, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_interferenceCalls, 0, "Unexpected value");
 
-    // Reset ();
+    ///////////////////////////////////////////////////////////////////////////
+    // Full capacity (siw packets, on six SFs, distributed over 3 frequencies)
+    ///////////////////////////////////////////////////////////////////////////
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Full capacity + 1
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 8,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 9,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 10,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 11,
-    //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 12,
-    //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 10,
-    //                      Seconds (4), frequency3);
+    Reset(6);
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        8,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'300'000,
+                        IQPolarity::UP,
+                        9,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'300'000,
+                        IQPolarity::UP,
+                        10,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'500'000,
+                        IQPolarity::UP,
+                        11,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'500'000,
+                        IQPolarity::UP,
+                        12,
+                        14,
+                        Seconds(4));
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 1, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 6, "Unexpected value");
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
 
-    // Reset ();
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_interferenceCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacketCalls, 6, "Unexpected value");
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Receive Paths are correctly freed
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 8,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 9,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 10,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 11,
-    //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 12,
-    //                      Seconds (4), frequency3);
+    ///////////////////////////////////////////////////////////////////////////
+    // Full capacity + 1
+    ///////////////////////////////////////////////////////////////////////////
 
-    // Simulator::Schedule (Seconds (8), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (8), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 8,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (8), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 9,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (8), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 10,
-    //                      Seconds (4), frequency2);
-    // Simulator::Schedule (Seconds (8), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 11,
-    //                      Seconds (4), frequency3);
-    // Simulator::Schedule (Seconds (8), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 12,
-    //                      Seconds (4), frequency3);
+    Reset(6);
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        8,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'300'000,
+                        IQPolarity::UP,
+                        9,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'300'000,
+                        IQPolarity::UP,
+                        10,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'500'000,
+                        IQPolarity::UP,
+                        11,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'500'000,
+                        IQPolarity::UP,
+                        12,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'500'000,
+                        IQPolarity::UP,
+                        10,
+                        14,
+                        Seconds(4));
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 12, "Unexpected value");
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
 
-    // Reset ();
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 1, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_interferenceCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacketCalls, 6, "Unexpected value");
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Receive Paths stay occupied exactly for the necessary time
-    // // Occupy both ReceptionPaths centered at frequency1
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 8,
-    //                      Seconds (4), frequency1);
+    ////////////////////////////////////
+    // Receive Paths are correctly freed
+    ////////////////////////////////////
 
-    // // This packet will find no free ReceptionPaths
-    // Simulator::Schedule (Seconds (2 + 4) - NanoSeconds (1), &SimpleGatewayLoraPhy::StartReceive,
-    //                      gatewayPhy, packet, 14, 9, Seconds (4), frequency1);
+    Reset(6);
 
-    // // This packet will find a free ReceptionPath
-    // Simulator::Schedule (Seconds (2 + 4) + NanoSeconds (1), &SimpleGatewayLoraPhy::StartReceive,
-    //                      gatewayPhy, packet, 14, 10, Seconds (4), frequency1);
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        8,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'300'000,
+                        IQPolarity::UP,
+                        9,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'300'000,
+                        IQPolarity::UP,
+                        10,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'500'000,
+                        IQPolarity::UP,
+                        11,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'500'000,
+                        IQPolarity::UP,
+                        12,
+                        14,
+                        Seconds(4));
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    Simulator::Schedule(Seconds(8),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(8),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        8,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(8),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'300'000,
+                        IQPolarity::UP,
+                        9,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(8),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'300'000,
+                        IQPolarity::UP,
+                        10,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(8),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'500'000,
+                        IQPolarity::UP,
+                        11,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(8),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'500'000,
+                        IQPolarity::UP,
+                        12,
+                        14,
+                        Seconds(4));
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 1, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 3, "Unexpected value");
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
 
-    // Reset ();
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_interferenceCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacketCalls, 12, "Unexpected value");
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // // Only one ReceivePath locks on the incoming packet
-    // ///////////////////////////////////////////////////////////////////////////
-    // Simulator::Schedule (Seconds (2), &SimpleGatewayLoraPhy::StartReceive, gatewayPhy, packet,
-    // 14, 7,
-    //                      Seconds (4), frequency1);
+    /////////////////////////////////////////////////////////////
+    // Receive Paths stay occupied exactly for the necessary time
+    /////////////////////////////////////////////////////////////
 
-    // Simulator::Stop (Hours (2));
-    // Simulator::Run ();
-    // Simulator::Destroy ();
+    Reset(2);
 
-    // NS_TEST_EXPECT_MSG_EQ (m_noMoreDemodulatorsCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_interferenceCalls, 0, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_receivedPacketCalls, 1, "Unexpected value");
-    // NS_TEST_EXPECT_MSG_EQ (m_maxOccupiedReceptionPaths, 1, "Unexpected value");
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        8,
+                        14,
+                        Seconds(4));
+
+    // This packet will find no free ReceptionPaths
+    Simulator::Schedule(Seconds(2 + 4) - NanoSeconds(1),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        9,
+                        14,
+                        Seconds(4));
+
+    // This packet will find a free ReceptionPath
+    Simulator::Schedule(Seconds(2 + 4) + NanoSeconds(1),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        10,
+                        14,
+                        Seconds(4));
+
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
+
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 1, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_interferenceCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacketCalls, 3, "Unexpected value");
+
+    ////////////////////////////////////////////////////
+    // Only one ReceivePath locks on the incoming packet
+    ////////////////////////////////////////////////////
+
+    Reset(6);
+
+    Simulator::Schedule(Seconds(2),
+                        &SimpleGatewayLoraPhy::StartReceive,
+                        gatewayPhy,
+                        packet,
+                        868'100'000,
+                        IQPolarity::UP,
+                        7,
+                        14,
+                        Seconds(4));
+
+    Simulator::Stop(Hours(2));
+    Simulator::Run();
+    Simulator::Destroy();
+
+    NS_TEST_EXPECT_MSG_EQ(m_noMoreDemodulatorsCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_interferenceCalls, 0, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacketCalls, 1, "Unexpected value");
+    NS_TEST_EXPECT_MSG_EQ(m_maxOccupiedReceptionPaths, 1, "Unexpected value");
 }
 
 /**
@@ -905,8 +1197,8 @@ LogicalLoraChannelTest::DoRun()
     //////////////////
     // Test SubBand //
     //////////////////
-
     // Setup
+
     auto subBand = Create<SubBand>(868000000, 868600000, 0.01, 14);
     Ptr<LogicalLoraChannel> channel5 = Create<LogicalLoraChannel>(870000000, 0, 5);
 
@@ -970,7 +1262,7 @@ LogicalLoraChannelTest::DoRun()
 /**
  * @ingroup lorawan
  *
- * It tests the correctness of the LoraPhy::GetOnAirTime calculator against a number of pre-sourced
+ * It tests the correctness of the LoraPhy::GetTimeOnAir calculator against a number of pre-sourced
  * time values of known scenarios
  */
 class TimeOnAirTest : public TestCase
@@ -1005,78 +1297,74 @@ TimeOnAirTest::DoRun()
     Ptr<Packet> packet;
     Time duration;
 
-    // Available parameters:
-    // PayloadSize, SF, HeaderDisabled, CodingRate, Bandwidth, nPreambleSyms, crcEnabled,
-    // lowDROptimization
-
     // Starting parameters
     packet = Create<Packet>(10);
     LoraTxParameters txParams;
-    txParams.sf = 7;
-    txParams.headerDisabled = false;
+    txParams.spreadingFactor = 7;
+    txParams.bandwidthHz = 125'000;
     txParams.codingRate = CodingRate::CR_4_5;
-    txParams.bandwidthHz = 125000;
-    txParams.nPreamble = 8;
+    txParams.lowDataRateOptimize = false;
+    txParams.preambleLenSymb = 8;
+    txParams.implicitHeader = false;
     txParams.crcEnabled = true;
-    txParams.lowDataRateOptimizationEnabled = false;
 
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet->GetSize(), txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.041216, 0.0001, "Unexpected duration");
 
-    txParams.sf = 8;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    txParams.spreadingFactor = 8;
+    duration = LoraPhy::GetTimeOnAir(packet->GetSize(), txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.072192, 0.0001, "Unexpected duration");
 
-    txParams.headerDisabled = true;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    txParams.implicitHeader = true;
+    duration = LoraPhy::GetTimeOnAir(packet->GetSize(), txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.072192, 0.0001, "Unexpected duration");
 
     txParams.codingRate = CodingRate::CR_4_6;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet->GetSize(), txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.078336, 0.0001, "Unexpected duration");
 
-    txParams.nPreamble = 10;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    txParams.preambleLenSymb = 10;
+    duration = LoraPhy::GetTimeOnAir(packet->GetSize(), txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.082432, 0.0001, "Unexpected duration");
 
-    txParams.lowDataRateOptimizationEnabled = true;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    txParams.lowDataRateOptimize = true;
+    duration = LoraPhy::GetTimeOnAir(packet->GetSize(), txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.082432, 0.0001, "Unexpected duration");
 
-    txParams.sf = 10;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    txParams.spreadingFactor = 10;
+    duration = LoraPhy::GetTimeOnAir(packet->GetSize(), txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.280576, 0.0001, "Unexpected duration");
 
     txParams.bandwidthHz = 250000;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet->GetSize(), txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.14028, 0.0001, "Unexpected duration");
 
     txParams.bandwidthHz = 500000;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet->GetSize(), txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.070144, 0.0001, "Unexpected duration");
 
-    txParams.headerDisabled = false;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    txParams.implicitHeader = false;
+    duration = LoraPhy::GetTimeOnAir(packet->GetSize(), txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.082432, 0.0001, "Unexpected duration");
 
-    txParams.nPreamble = 8;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    txParams.preambleLenSymb = 8;
+    duration = LoraPhy::GetTimeOnAir(packet->GetSize(), txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.078336, 0.0001, "Unexpected duration");
 
-    txParams.sf = 12;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    txParams.spreadingFactor = 12;
+    duration = LoraPhy::GetTimeOnAir(packet->GetSize(), txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.264192, 0.0001, "Unexpected duration");
 
     packet = Create<Packet>(50);
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet->GetSize(), txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 0.657408, 0.0001, "Unexpected duration");
 
     txParams.bandwidthHz = 125000;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet->GetSize(), txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 2.629632, 0.0001, "Unexpected duration");
 
     txParams.codingRate = CodingRate::CR_4_5;
-    duration = LoraPhy::GetOnAirTime(packet, txParams);
+    duration = LoraPhy::GetTimeOnAir(packet->GetSize(), txParams);
     NS_TEST_EXPECT_MSG_EQ_TOL(duration.GetSeconds(), 2.301952, 0.0001, "Unexpected duration");
 }
 
@@ -1245,10 +1533,6 @@ PhyConnectivityTest::Reset()
     edPhy2 = CreateObject<SimpleEndDeviceLoraPhy>();
     edPhy3 = CreateObject<SimpleEndDeviceLoraPhy>();
 
-    edPhy1->SetFrequency(868100000);
-    edPhy2->SetFrequency(868100000);
-    edPhy3->SetFrequency(868100000);
-
     Ptr<ConstantPositionMobilityModel> mob1 = CreateObject<ConstantPositionMobilityModel>();
     Ptr<ConstantPositionMobilityModel> mob2 = CreateObject<ConstantPositionMobilityModel>();
     Ptr<ConstantPositionMobilityModel> mob3 = CreateObject<ConstantPositionMobilityModel>();
@@ -1261,10 +1545,6 @@ PhyConnectivityTest::Reset()
     edPhy2->SetMobility(mob2);
     edPhy3->SetMobility(mob3);
 
-    edPhy1->SwitchToStandby();
-    edPhy2->SwitchToStandby();
-    edPhy3->SwitchToStandby();
-
     channel->Add(edPhy1);
     channel->Add(edPhy2);
     channel->Add(edPhy3);
@@ -1272,16 +1552,6 @@ PhyConnectivityTest::Reset()
     edPhy1->SetChannel(channel);
     edPhy2->SetChannel(channel);
     edPhy3->SetChannel(channel);
-
-    // Listen for a specific SpreadingFactor
-    edPhy1->SetSpreadingFactor(12);
-    edPhy2->SetSpreadingFactor(12);
-    edPhy3->SetSpreadingFactor(12);
-
-    // Listen on a specific frequency
-    edPhy1->SetFrequency(868100000);
-    edPhy2->SetFrequency(868100000);
-    edPhy3->SetFrequency(868100000);
 
     edPhy1->TraceConnectWithoutContext("ReceivedPacket",
                                        MakeCallback(&PhyConnectivityTest::ReceivedPacket, this));
@@ -1329,13 +1599,19 @@ PhyConnectivityTest::DoRun()
     // Setup
     ////////
 
-    Reset();
-
-    LoraTxParameters txParams;
-    txParams.sf = 12;
-
     uint8_t buffer[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     Ptr<Packet> packet = Create<Packet>(buffer, 10);
+
+    LoraTxParameters txParams;
+    txParams.spreadingFactor = 12;
+    txParams.bandwidthHz = 125'000;
+    txParams.codingRate = CodingRate::CR_4_5;
+    txParams.lowDataRateOptimize = true;
+    txParams.preambleLenSymb = 8;
+    txParams.implicitHeader = false;
+    txParams.crcEnabled = true;
+
+    Reset();
 
     // Testing
     //////////
@@ -1344,11 +1620,32 @@ PhyConnectivityTest::DoRun()
     /////////////////////////////
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::ReceiveSingle,
                         edPhy1,
+                        868'100'000,
+                        IQPolarity::UP,
+                        txParams.spreadingFactor,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2),
+                        &EndDeviceLoraPhy::ReceiveSingle,
+                        edPhy2,
+                        868'100'000,
+                        IQPolarity::UP,
+                        txParams.spreadingFactor,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
+                        &SimpleEndDeviceLoraPhy::Send,
+                        edPhy3,
                         packet,
+                        868'100'000,
+                        IQPolarity::UP,
                         txParams,
-                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1364,14 +1661,25 @@ PhyConnectivityTest::DoRun()
 
     // Sleeping PHYs do not receive the packet
 
-    edPhy2->SwitchToSleep();
+    edPhy1->Sleep();
 
     Simulator::Schedule(Seconds(2),
+                        &EndDeviceLoraPhy::ReceiveSingle,
+                        edPhy2,
+                        868'100'000,
+                        IQPolarity::UP,
+                        txParams.spreadingFactor,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
                         &SimpleEndDeviceLoraPhy::Send,
-                        edPhy1,
+                        edPhy3,
                         packet,
+                        868'100'000,
+                        IQPolarity::UP,
                         txParams,
-                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1381,23 +1689,34 @@ PhyConnectivityTest::DoRun()
     NS_TEST_EXPECT_MSG_EQ(
         m_receivedPacketCalls,
         1,
-        "Packet was received by a PHY in SLEEP mode"); // All PHYs in Standby except the sender
+        "Packet was received by a PHY in SLEEP mode"); // All PHYs in Rx except the sender
 
     Reset();
 
     // Packet that arrives under sensitivity is received correctly if the spreading factor increases
 
-    txParams.sf = 7;
-    edPhy2->SetSpreadingFactor(7);
-    DynamicCast<ConstantPositionMobilityModel>(edPhy2->GetMobility())
+    txParams.spreadingFactor = 7;
+
+    DynamicCast<ConstantPositionMobilityModel>(edPhy1->GetMobility())
         ->SetPosition(Vector(2990, 0, 0));
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::ReceiveSingle,
                         edPhy1,
+                        868'100'000,
+                        IQPolarity::UP,
+                        txParams.spreadingFactor,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
+                        &SimpleEndDeviceLoraPhy::Send,
+                        edPhy2,
                         packet,
+                        868'100'000,
+                        IQPolarity::UP,
                         txParams,
-                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1412,17 +1731,28 @@ PhyConnectivityTest::DoRun()
     Reset();
 
     // Try again using a packet with higher spreading factor
-    txParams.sf = 8;
-    edPhy2->SetSpreadingFactor(8);
-    DynamicCast<ConstantPositionMobilityModel>(edPhy2->GetMobility())
+    txParams.spreadingFactor = 8;
+
+    DynamicCast<ConstantPositionMobilityModel>(edPhy1->GetMobility())
         ->SetPosition(Vector(2990, 0, 0));
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::ReceiveSingle,
                         edPhy1,
+                        868'100'000,
+                        IQPolarity::UP,
+                        txParams.spreadingFactor,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
+                        &SimpleEndDeviceLoraPhy::Send,
+                        edPhy2,
                         packet,
+                        868'100'000,
+                        IQPolarity::UP,
                         txParams,
-                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1437,20 +1767,34 @@ PhyConnectivityTest::DoRun()
 
     // Packets can be destroyed by interference
 
-    txParams.sf = 12;
+    txParams.spreadingFactor = 12;
+
     Simulator::Schedule(Seconds(2),
+                        &EndDeviceLoraPhy::ReceiveSingle,
+                        edPhy2,
+                        868'100'000,
+                        IQPolarity::UP,
+                        txParams.spreadingFactor,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
                         &SimpleEndDeviceLoraPhy::Send,
                         edPhy1,
                         packet,
+                        868'100'000,
+                        IQPolarity::UP,
                         txParams,
-                        868100000,
                         14);
-    Simulator::Schedule(Seconds(2),
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
                         &SimpleEndDeviceLoraPhy::Send,
                         edPhy3,
                         packet,
+                        868'100'000,
+                        IQPolarity::UP,
                         txParams,
-                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1466,11 +1810,22 @@ PhyConnectivityTest::DoRun()
     // Packets can be lost because the PHY is not listening on the right frequency
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::ReceiveSingle,
                         edPhy1,
+                        868'100'000,
+                        IQPolarity::UP,
+                        txParams.spreadingFactor,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
+                        &SimpleEndDeviceLoraPhy::Send,
+                        edPhy2,
                         packet,
+                        868'300'000,
+                        IQPolarity::UP,
                         txParams,
-                        868300000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1478,20 +1833,32 @@ PhyConnectivityTest::DoRun()
     Simulator::Destroy();
 
     NS_TEST_EXPECT_MSG_EQ(m_wrongFrequencyCalls,
-                          2,
+                          1,
                           "Packets were received even though PHY was on a different frequency");
 
     Reset();
 
     // Packets can be lost because the PHY is not listening for the right spreading factor
 
-    txParams.sf = 8; // Send with 8, listening for 12
+    txParams.spreadingFactor = 8; // Send with 8, listening for 12
+
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::ReceiveSingle,
                         edPhy1,
+                        868'100'000,
+                        IQPolarity::UP,
+                        12,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
+                        &SimpleEndDeviceLoraPhy::Send,
+                        edPhy2,
                         packet,
+                        868'100'000,
+                        IQPolarity::UP,
                         txParams,
-                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1500,7 +1867,7 @@ PhyConnectivityTest::DoRun()
 
     NS_TEST_EXPECT_MSG_EQ(
         m_wrongSfCalls,
-        2,
+        1,
         "Packets were received even though PHY was listening for a different spreading factor.");
 
     Reset();
@@ -1509,12 +1876,24 @@ PhyConnectivityTest::DoRun()
     /////////////////////
 
     // The very same packet arrives at the other PHY
+
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::ReceiveSingle,
                         edPhy1,
+                        868'100'000,
+                        IQPolarity::UP,
+                        txParams.spreadingFactor,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
+                        &SimpleEndDeviceLoraPhy::Send,
+                        edPhy2,
                         packet,
+                        868'100'000,
+                        IQPolarity::UP,
                         txParams,
-                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1533,11 +1912,22 @@ PhyConnectivityTest::DoRun()
     // PHY switches to STANDBY after TX and RX
 
     Simulator::Schedule(Seconds(2),
-                        &SimpleEndDeviceLoraPhy::Send,
+                        &EndDeviceLoraPhy::ReceiveSingle,
                         edPhy1,
+                        868'100'000,
+                        IQPolarity::UP,
+                        txParams.spreadingFactor,
+                        txParams.bandwidthHz,
+                        8,
+                        EndDeviceLoraPhy::RxTimeoutCallback());
+
+    Simulator::Schedule(Seconds(2) + MilliSeconds(1),
+                        &SimpleEndDeviceLoraPhy::Send,
+                        edPhy2,
                         packet,
+                        868'100'000,
+                        IQPolarity::UP,
                         txParams,
-                        868100000,
                         14);
 
     Simulator::Stop(Hours(2));
@@ -1651,12 +2041,10 @@ MacCommandTest::RunMacCommand(Ts&&... args)
     auto cmd = Create<T>(args...);
     fhdr.AddCommand(cmd);
     pkt->AddHeader(fhdr);
-    mhdr.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+    mhdr.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
     pkt->AddHeader(mhdr);
     // Trigger MAC layer reception
-    DynamicCast<EndDeviceLoraPhy>(m_mac->GetPhy())
-        ->SwitchToStandby(); // usually done as we open Rx windows
-    m_mac->Receive(pkt);
+    DynamicCast<LorawanMac>(m_mac)->Receive(pkt);
     // Trigger MAC layer send
     pkt = Create<Packet>(0);
     m_mac->Send(pkt);
@@ -2059,10 +2447,18 @@ class AdrBackoffTest : public TestCase
     void SendUplink(Time after, LoraFrameHeader& fhdr);
 
     /**
-     * Create and receive an empty payload downlink destined for the LoRaWAN MAC. This is used to
-     * test resetting the ADR backoff procedure.
+     * Create and schedule the PHY reception of a downlink transmission configured for the LoRaWAN
+     * MAC first reception window. This is used to test resetting the ADR backoff procedure.
+     *
+     * @note This does not call Simulator::Run(), enabling preemptive scheduling, but must be
+     * manually timed to happen during the first reception window
+     *
+     * It constrains the device to a single uplink channel to force-out the first reception window
+     * frequency. The downlink spreading factor is taken from the current MAC configuration.
+     *
+     * @param after Delay to schedule the packet after (must target the first reception window)
      */
-    void ReceiveDownlink();
+    void ScheduleRx1Downlink(Time after);
 
     /**
      * This function resets the simulation and device MAC layer, use before test sub-cases.
@@ -2101,7 +2497,7 @@ AdrBackoffTest::SendUplink(Time after, LoraFrameHeader& fhdr)
 }
 
 void
-AdrBackoffTest::ReceiveDownlink()
+AdrBackoffTest::ScheduleRx1Downlink(Time after)
 {
     Ptr<Packet> pkt;
     LoraFrameHeader fhdr;
@@ -2110,12 +2506,23 @@ AdrBackoffTest::ReceiveDownlink()
     pkt = Create<Packet>(0);
     fhdr.SetAsDownlink();
     pkt->AddHeader(fhdr);
-    mhdr.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+    mhdr.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
     pkt->AddHeader(mhdr);
-    // Trigger MAC layer reception
-    DynamicCast<EndDeviceLoraPhy>(m_mac->GetPhy())
-        ->SwitchToStandby(); // usually done as we open Rx windows
-    m_mac->Receive(pkt);
+    // Force the next RX1 window channel frequency
+    auto chVec = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
+    chVec.at(1)->DisableForUplink();
+    chVec.at(2)->DisableForUplink();
+    // Schedule MAC layer reception through PHY
+    auto phy = DynamicCast<SimpleEndDeviceLoraPhy>(m_mac->GetPhy());
+    Simulator::Schedule(after,
+                        &SimpleEndDeviceLoraPhy::StartReceive,
+                        phy,
+                        pkt,
+                        chVec.at(0)->GetFrequency(),
+                        IQPolarity::DOWN,
+                        12,
+                        -100,
+                        MilliSeconds(10));
 }
 
 void
@@ -2177,7 +2584,7 @@ AdrBackoffTest::DoRun()
             NS_TEST_EXPECT_MSG_EQ(m_mac->GetDataRate(),
                                   expectedDr,
                                   "Unexpected data rate on uplink fCnt=" << fCnt);
-            auto chVec = llch->GetRawChannelArray();
+            const auto chVec = llch->GetRawChannelArray();
             for (uint8_t i = 0; i < 3; ++i)
             {
                 NS_TEST_EXPECT_MSG_EQ(chVec.at(i)->IsEnabledForUplink(),
@@ -2198,7 +2605,7 @@ AdrBackoffTest::DoRun()
         LoraFrameHeader fhdr;
         auto ADR_ACK_LIMIT = EndDeviceLorawanMac::ADR_ACK_LIMIT;
         // Trigger ADRACKReq
-        for (uint16_t fCnt = 0; fCnt <= ADR_ACK_LIMIT; ++fCnt)
+        for (uint16_t fCnt = 0; fCnt <= ADR_ACK_LIMIT + 5; ++fCnt)
         {
             SendUplink(Minutes(20), fhdr);
             NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), fCnt, "Unexpected FCnt value in uplink FHDR");
@@ -2206,15 +2613,605 @@ AdrBackoffTest::DoRun()
                                   fCnt >= ADR_ACK_LIMIT,
                                   "Unexpected ADRACKReq value in FHDR of uplink fCnt=" << fCnt);
         }
-        ReceiveDownlink();
+        // Receive downlink for the next packet RX window
+        ScheduleRx1Downlink(Minutes(20) + Seconds(2));
+        // Trigger reception windows with new uplink
         SendUplink(Minutes(20), fhdr);
         NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(),
-                              ADR_ACK_LIMIT + 1,
+                              ADR_ACK_LIMIT + 5 + 1,
+                              "Unexpected FCnt value in uplink FHDR");
+        NS_TEST_EXPECT_MSG_EQ(
+            fhdr.GetAdrAckReq(),
+            true,
+            "Unexpected ADRACKReq value in FHDR of uplink fCnt=" << fhdr.GetFCnt());
+        // Next uplink should have ADRACKReq unset because a downlink was received
+        SendUplink(Minutes(20), fhdr);
+        NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(),
+                              ADR_ACK_LIMIT + 5 + 2,
                               "Unexpected FCnt value in uplink FHDR");
         NS_TEST_EXPECT_MSG_EQ(
             fhdr.GetAdrAckReq(),
             false,
             "Unexpected ADRACKReq value in FHDR of uplink fCnt=" << fhdr.GetFCnt());
+    }
+}
+
+/**
+ * @ingroup lorawan
+ *
+ * It tests the correct execution of the retransmissions in LoRaWAN devices.
+ * (See, LoRaWAN L2 1.0.4 Specifications (2020), Section 4.3.1.3)
+ */
+class RetransmissionTest : public TestCase
+{
+  public:
+    RetransmissionTest();           //!< Default constructor
+    ~RetransmissionTest() override; //!< Destructor
+
+  private:
+    /**
+     * Create and send an empty app payload unconfirmed frame through the MAC layer NbTrans times.
+     * The sent packet FHDR is returned as argument for validation purposes.
+     *
+     * @param fhdr [out] FHDR of the constructed frame passed to PHY by the MAC
+     */
+    void SendUplink(LoraFrameHeader& fhdr);
+
+    /**
+     * Create and schedule the PHY reception of a downlink transmission configured for the LoRaWAN
+     * MAC first reception window. This is used to test stopping the retransmission process.
+     *
+     * @note This does not call Simulator::Run(), enabling preemptive scheduling, but must be
+     * manually timed to happen during the first reception window
+     *
+     * It constrains the device to a single uplink channel to force-out the first reception window
+     * frequency. The downlink spreading factor is taken from the current MAC configuration.
+     *
+     * @param after Delay to schedule the packet after (must target the first reception window)
+     * @param ack Whether to set the ACK flag in the frame header
+     */
+    void ScheduleRx1Downlink(Time after, bool ack = false);
+
+    /**
+     * Callback for tracing MAC layer SentNewPacket.
+     *
+     * @param packet The packet sent.
+     */
+    void MacSentNewPacket(Ptr<const Packet> packet);
+
+    /**
+     * Callback for tracing the outcome of MAC layer's confirmed packet retransmission and
+     * acknowledgement.
+     *
+     * @note This callback only traces confirmed packets, unused otherwise.
+     *
+     * @param txCount Number of transmissions attempted during the process.
+     * @param ack Whether the retransmission process led to acknowledgement.
+     * @param firstAttempt Timestamp of the initial transmission attempt.
+     * @param packet The packet being retransmitted.
+     */
+    void MacConfirmedTransmissionOutcome(uint8_t txCount,
+                                         bool ack,
+                                         Time firstAttempt,
+                                         Ptr<Packet> packet);
+
+    /**
+     * Callback for tracing PHY layer StartSending.
+     *
+     * @param packet The packet being sent.
+     * @param node The sender node id if any, 0 otherwise.
+     */
+    void PhyStartSending(Ptr<const Packet> packet, uint32_t node);
+
+    /**
+     * Callback for tracing PHY layer ReceivedPacket.
+     *
+     * @param packet The packet being received.
+     * @param node The sender node id if any, 0 otherwise.
+     */
+    void PhyReceivedPacket(Ptr<const Packet> packet, uint32_t node);
+
+    /**
+     * This function resets the simulation and device MAC layer, use before test sub-cases.
+     */
+    void Reset();
+
+    void DoRun() override;
+
+    Ptr<ClassAEndDeviceLorawanMac> m_mac; //!< The end device's MAC layer used in tests.
+    Ptr<Packet> m_packet;                 //!< Target packet for tracing
+
+    int m_macSentNewPacketCalls = 0;  //!< Counter for MacSentNewPacket calls
+    int m_macConfirmedTxOutcome = 0;  //!< Counter for MacConfirmedTransmissionOutcome calls
+    int m_phyStartSendingCalls = 0;   //!< Counter for PhyStartSending calls
+    int m_phyReceivedPacketCalls = 0; //!< Counter for PhyReceivedPacket calls
+
+    uint8_t m_numTransmissions = 0;   //!< Number of confirmed packet transmissions
+    bool m_successfullyAcked = false; //!< Acknowledgement of confirmed packet
+};
+
+RetransmissionTest::RetransmissionTest()
+    : TestCase("Test the retransmission process of the LoRaWAN MAC protocol")
+{
+}
+
+RetransmissionTest::~RetransmissionTest()
+{
+    m_mac = nullptr;
+}
+
+void
+RetransmissionTest::SendUplink(LoraFrameHeader& fhdr)
+{
+    Ptr<Packet> pkt;
+    LorawanMacHeader mhdr;
+    // Send packet through the MAC layer
+    pkt = Create<Packet>(0);
+    m_packet = pkt;
+    Simulator::ScheduleNow(&ClassAEndDeviceLorawanMac::Send, m_mac, pkt);
+    Simulator::Run();
+    // Retrieve uplink FHDR
+    pkt->RemoveHeader(mhdr);
+    fhdr.SetAsUplink();
+    pkt->RemoveHeader(fhdr);
+    NS_LOG_LOGIC("Frame Header: " << fhdr);
+}
+
+void
+RetransmissionTest::ScheduleRx1Downlink(Time after, bool ack)
+{
+    Ptr<Packet> pkt;
+    LoraFrameHeader fhdr;
+    LorawanMacHeader mhdr;
+    // Prepare DL packet
+    pkt = Create<Packet>(0);
+    fhdr.SetAsDownlink();
+    fhdr.SetAck(ack);
+    pkt->AddHeader(fhdr);
+    mhdr.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+    pkt->AddHeader(mhdr);
+    // Force the next RX1 window channel frequency
+    auto chVec = m_mac->GetLogicalLoraChannelHelper()->GetRawChannelArray();
+    chVec.at(1)->DisableForUplink();
+    chVec.at(2)->DisableForUplink();
+    // Schedule MAC layer reception through PHY
+    auto phy = DynamicCast<SimpleEndDeviceLoraPhy>(m_mac->GetPhy());
+    Simulator::Schedule(after,
+                        &SimpleEndDeviceLoraPhy::StartReceive,
+                        phy,
+                        pkt,
+                        chVec.at(0)->GetFrequency(),
+                        IQPolarity::DOWN,
+                        m_mac->GetSfFromDataRate(m_mac->GetDataRate()),
+                        -100,
+                        MilliSeconds(10));
+}
+
+void
+RetransmissionTest::MacSentNewPacket(Ptr<const Packet> packet)
+{
+    m_macSentNewPacketCalls++;
+}
+
+void
+RetransmissionTest::MacConfirmedTransmissionOutcome(uint8_t txCount,
+                                                    bool ack,
+                                                    Time firstAttempt,
+                                                    Ptr<Packet> packet)
+{
+    m_macConfirmedTxOutcome++;
+    if (m_packet == packet)
+    {
+        m_numTransmissions = txCount;
+        m_successfullyAcked = ack;
+    }
+}
+
+void
+RetransmissionTest::PhyStartSending(Ptr<const Packet> packet, uint32_t node)
+{
+    m_phyStartSendingCalls++;
+}
+
+void
+RetransmissionTest::PhyReceivedPacket(Ptr<const Packet> packet, uint32_t node)
+{
+    m_phyReceivedPacketCalls++;
+}
+
+void
+RetransmissionTest::Reset()
+{
+    m_macSentNewPacketCalls = 0;
+    m_macConfirmedTxOutcome = 0;
+    m_phyStartSendingCalls = 0;
+    m_phyReceivedPacketCalls = 0;
+    m_numTransmissions = 0;
+    m_successfullyAcked = false;
+    Simulator::Destroy();
+    // Reset MAC state
+    LorawanMacHelper macHelper;
+    macHelper.SetRegion(LorawanMacHelper::EU);
+    macHelper.SetDeviceType(LorawanMacHelper::ED_A);
+    m_mac = DynamicCast<ClassAEndDeviceLorawanMac>(macHelper.Install(nullptr, nullptr));
+    m_mac->SetDataRate(5);
+    m_mac->TraceConnectWithoutContext("SentNewPacket",
+                                      MakeCallback(&RetransmissionTest::MacSentNewPacket, this));
+    m_mac->TraceConnectWithoutContext(
+        "ConfirmedTransmissionOutcome",
+        MakeCallback(&RetransmissionTest::MacConfirmedTransmissionOutcome, this));
+    NS_TEST_EXPECT_MSG_NE(m_mac, nullptr, "Failed to initialize MAC layer object.");
+    auto phy = CreateObject<SimpleEndDeviceLoraPhy>();
+    phy->SetChannel(CreateObject<LoraChannel>());
+    phy->SetMobility(CreateObject<ConstantPositionMobilityModel>());
+    phy->TraceConnectWithoutContext("StartSending",
+                                    MakeCallback(&RetransmissionTest::PhyStartSending, this));
+    phy->TraceConnectWithoutContext("ReceivedPacket",
+                                    MakeCallback(&RetransmissionTest::PhyReceivedPacket, this));
+    m_mac->SetPhy(phy);
+    m_mac->Initialize();
+}
+
+void
+RetransmissionTest::DoRun()
+{
+    NS_LOG_DEBUG("RetransmissionTest");
+
+    Reset();
+    // Unconfirmed send yields the correct number of retransmissions (base case)
+    { // WARNING: default values are manually set here
+        m_mac->SetFType(LorawanMacHeader::UNCONFIRMED_DATA_UP);
+        LoraFrameHeader fhdr;
+        SendUplink(fhdr);
+        NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), 0, "Unexpected FCnt value in uplink FHDR");
+        NS_TEST_ASSERT_MSG_EQ(m_mac->GetUplinkFrameCounter(),
+                              1,
+                              "Unexpected MAC frame counter value");
+        NS_TEST_ASSERT_MSG_EQ(m_phyStartSendingCalls,
+                              1,
+                              "Unexpected number of PHY layer StartSending calls");
+        NS_TEST_ASSERT_MSG_EQ(m_phyReceivedPacketCalls,
+                              0,
+                              "Unexpected number of PHY layer ReceivedPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macSentNewPacketCalls,
+                              1,
+                              "Unexpected number of MAC layer SendNewPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macConfirmedTxOutcome,
+                              0,
+                              "Unexpected number of MAC layer ConfirmedTransmissionOutcome calls");
+    }
+
+    Reset();
+    // Unconfirmed send yields the correct number of retransmissions
+    {
+        uint8_t nbTrans = 4;
+        m_mac->SetMaxNumberOfTransmissions(nbTrans);
+        m_mac->SetFType(LorawanMacHeader::UNCONFIRMED_DATA_UP);
+        LoraFrameHeader fhdr;
+        SendUplink(fhdr);
+        NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), 0, "Unexpected FCnt value in uplink FHDR");
+        NS_TEST_ASSERT_MSG_EQ(m_mac->GetUplinkFrameCounter(),
+                              1,
+                              "Unexpected FCnt value in MAC layer");
+        NS_TEST_ASSERT_MSG_EQ(m_phyStartSendingCalls,
+                              nbTrans,
+                              "Unexpected number of PHY layer StartSending calls");
+        NS_TEST_ASSERT_MSG_EQ(m_phyReceivedPacketCalls,
+                              0,
+                              "Unexpected number of PHY layer ReceivedPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macSentNewPacketCalls,
+                              1,
+                              "Unexpected number of MAC layer SendNewPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macConfirmedTxOutcome,
+                              0,
+                              "Unexpected number of MAC layer ConfirmedTransmissionOutcome calls");
+    }
+
+    Reset();
+    // Unconfirmed send yields the correct number of retransmissions (limit case)
+    {
+        uint8_t nbTrans = 15;
+        m_mac->SetMaxNumberOfTransmissions(nbTrans);
+        m_mac->SetFType(LorawanMacHeader::UNCONFIRMED_DATA_UP);
+        LoraFrameHeader fhdr;
+        SendUplink(fhdr);
+        NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), 0, "Unexpected FCnt value in uplink FHDR");
+        NS_TEST_ASSERT_MSG_EQ(m_mac->GetUplinkFrameCounter(),
+                              1,
+                              "Unexpected MAC frame counter value");
+        NS_TEST_ASSERT_MSG_EQ(m_phyStartSendingCalls,
+                              nbTrans,
+                              "Unexpected number of physical layer transmissions");
+        NS_TEST_ASSERT_MSG_EQ(m_phyReceivedPacketCalls,
+                              0,
+                              "Unexpected number of PHY layer ReceivedPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macSentNewPacketCalls,
+                              1,
+                              "Unexpected number of MAC layer SendNewPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macConfirmedTxOutcome,
+                              0,
+                              "Unexpected number of MAC layer ConfirmedTransmissionOutcome calls");
+    }
+
+    Reset();
+    // Unconfirmed send interrupted in-between retransmissions
+    {
+        uint8_t nbTrans = 9;
+        m_mac->SetMaxNumberOfTransmissions(nbTrans);
+        m_mac->SetFType(LorawanMacHeader::UNCONFIRMED_DATA_UP);
+        Simulator::Schedule(Seconds(2.5),
+                            &ClassAEndDeviceLorawanMac::Send,
+                            m_mac,
+                            Create<Packet>(0));
+        LoraFrameHeader fhdr;
+        SendUplink(fhdr);
+        NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), 0, "Unexpected FCnt value in uplink FHDR");
+        NS_TEST_ASSERT_MSG_EQ(m_mac->GetUplinkFrameCounter(),
+                              2,
+                              "Unexpected FCnt value in MAC layer");
+        NS_TEST_ASSERT_MSG_EQ(m_phyStartSendingCalls,
+                              1 + nbTrans,
+                              "Unexpected number of PHY layer StartSending calls");
+        NS_TEST_ASSERT_MSG_EQ(m_phyReceivedPacketCalls,
+                              0,
+                              "Unexpected number of PHY layer ReceivedPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macSentNewPacketCalls,
+                              2,
+                              "Unexpected number of MAC layer SendNewPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macConfirmedTxOutcome,
+                              0,
+                              "Unexpected number of MAC layer ConfirmedTransmissionOutcome calls");
+    }
+
+    Reset();
+    // Unconfirmed send retransmissions interrupted while MAC layer busy
+    {
+        uint8_t nbTrans = 8;
+        m_mac->SetMaxNumberOfTransmissions(nbTrans);
+        m_mac->SetFType(LorawanMacHeader::UNCONFIRMED_DATA_UP);
+        Simulator::Schedule(Seconds(7), &ClassAEndDeviceLorawanMac::Send, m_mac, Create<Packet>(0));
+        LoraFrameHeader fhdr;
+        SendUplink(fhdr);
+        NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), 0, "Unexpected FCnt value in uplink FHDR");
+        NS_TEST_ASSERT_MSG_EQ(m_mac->GetUplinkFrameCounter(),
+                              2,
+                              "Unexpected FCnt value in MAC layer");
+        NS_TEST_ASSERT_MSG_EQ(m_phyStartSendingCalls,
+                              2 + nbTrans,
+                              "Unexpected number of PHY layer StartSending calls");
+        NS_TEST_ASSERT_MSG_EQ(m_phyReceivedPacketCalls,
+                              0,
+                              "Unexpected number of PHY layer ReceivedPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macSentNewPacketCalls,
+                              2,
+                              "Unexpected number of MAC layer SendNewPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macConfirmedTxOutcome,
+                              0,
+                              "Unexpected number of MAC layer ConfirmedTransmissionOutcome calls");
+    }
+
+    Reset();
+    // Unconfirmed send retransmissions interrupted after downlink
+    {
+        uint8_t nbTrans = 3;
+        m_mac->SetMaxNumberOfTransmissions(nbTrans);
+        m_mac->SetFType(LorawanMacHeader::UNCONFIRMED_DATA_UP);
+        ScheduleRx1Downlink(MilliSeconds(45) + Seconds(1));
+        LoraFrameHeader fhdr;
+        SendUplink(fhdr);
+        NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), 0, "Unexpected FCnt value in uplink FHDR");
+        NS_TEST_ASSERT_MSG_EQ(m_mac->GetUplinkFrameCounter(),
+                              1,
+                              "Unexpected FCnt value in MAC layer");
+        NS_TEST_ASSERT_MSG_EQ(m_phyStartSendingCalls,
+                              1,
+                              "Unexpected number of PHY layer StartSending calls");
+        NS_TEST_ASSERT_MSG_EQ(m_phyReceivedPacketCalls,
+                              1,
+                              "Unexpected number of PHY layer ReceivedPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macSentNewPacketCalls,
+                              1,
+                              "Unexpected number of MAC layer SendNewPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macConfirmedTxOutcome,
+                              0,
+                              "Unexpected number of MAC layer ConfirmedTransmissionOutcome calls");
+    }
+
+    Reset();
+    // Unconfirmed send retransmissions interrupted after downlink (different params)
+    {
+        uint8_t nbTrans = 13;
+        m_mac->SetMaxNumberOfTransmissions(nbTrans);
+        m_mac->SetFType(LorawanMacHeader::UNCONFIRMED_DATA_UP);
+        ScheduleRx1Downlink(Seconds(27.665));
+        LoraFrameHeader fhdr;
+        SendUplink(fhdr);
+        NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), 0, "Unexpected FCnt value in uplink FHDR");
+        NS_TEST_ASSERT_MSG_EQ(m_mac->GetUplinkFrameCounter(),
+                              1,
+                              "Unexpected FCnt value in MAC layer");
+        NS_TEST_ASSERT_MSG_EQ(m_phyStartSendingCalls,
+                              7,
+                              "Unexpected number of PHY layer StartSending calls");
+        NS_TEST_ASSERT_MSG_EQ(m_phyReceivedPacketCalls,
+                              1,
+                              "Unexpected number of PHY layer ReceivedPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macSentNewPacketCalls,
+                              1,
+                              "Unexpected number of MAC layer SendNewPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macConfirmedTxOutcome,
+                              0,
+                              "Unexpected number of MAC layer ConfirmedTransmissionOutcome calls");
+    }
+
+    Reset();
+    // Confirmed yields the correct number of unacknowledged retransmissions
+    {
+        uint8_t nbTrans = 7;
+        m_mac->SetMaxNumberOfTransmissions(nbTrans);
+        m_mac->SetFType(LorawanMacHeader::CONFIRMED_DATA_UP);
+        LoraFrameHeader fhdr;
+        SendUplink(fhdr);
+        NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), 0, "Unexpected FCnt value in uplink FHDR");
+        NS_TEST_ASSERT_MSG_EQ(m_mac->GetUplinkFrameCounter(),
+                              1,
+                              "Unexpected FCnt value in MAC layer");
+        NS_TEST_ASSERT_MSG_EQ(m_phyStartSendingCalls,
+                              nbTrans,
+                              "Unexpected number of PHY layer StartSending calls");
+        NS_TEST_ASSERT_MSG_EQ(m_phyReceivedPacketCalls,
+                              0,
+                              "Unexpected number of PHY layer ReceivedPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macSentNewPacketCalls,
+                              1,
+                              "Unexpected number of MAC layer SendNewPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macConfirmedTxOutcome,
+                              1,
+                              "Unexpected number of MAC layer ConfirmedTransmissionOutcome calls");
+        NS_TEST_ASSERT_MSG_EQ(m_numTransmissions,
+                              nbTrans,
+                              "Unexpected number of transmissions for confirmed packet");
+        NS_TEST_ASSERT_MSG_EQ(m_successfullyAcked,
+                              false,
+                              "Unexpected acknowledgment state for confirmed packet");
+    }
+
+    Reset();
+    // Confirmed send retransmissions interrupted in-between retransmissions
+    {
+        uint8_t nbTrans = 6;
+        m_mac->SetMaxNumberOfTransmissions(nbTrans);
+        m_mac->SetFType(LorawanMacHeader::CONFIRMED_DATA_UP);
+        Simulator::Schedule(Seconds(8.5),
+                            &ClassAEndDeviceLorawanMac::Send,
+                            m_mac,
+                            Create<Packet>(0));
+        LoraFrameHeader fhdr;
+        SendUplink(fhdr);
+        NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), 0, "Unexpected FCnt value in uplink FHDR");
+        NS_TEST_ASSERT_MSG_EQ(m_mac->GetUplinkFrameCounter(),
+                              2,
+                              "Unexpected FCnt value in MAC layer");
+        NS_TEST_ASSERT_MSG_EQ(m_phyStartSendingCalls,
+                              2 + nbTrans,
+                              "Unexpected number of PHY layer StartSending calls");
+        NS_TEST_ASSERT_MSG_EQ(m_phyReceivedPacketCalls,
+                              0,
+                              "Unexpected number of PHY layer ReceivedPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macSentNewPacketCalls,
+                              2,
+                              "Unexpected number of MAC layer SendNewPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macConfirmedTxOutcome,
+                              2,
+                              "Unexpected number of MAC layer ConfirmedTransmissionOutcome calls");
+        NS_TEST_ASSERT_MSG_EQ(m_numTransmissions,
+                              2,
+                              "Unexpected number of transmissions for confirmed packet");
+        NS_TEST_ASSERT_MSG_EQ(m_successfullyAcked,
+                              false,
+                              "Unexpected acknowledgment state for confirmed packet");
+    }
+
+    Reset();
+    // Confirmed send retransmissions interrupted interrupted while MAC layer busy
+    {
+        uint8_t nbTrans = 9;
+        m_mac->SetMaxNumberOfTransmissions(nbTrans);
+        m_mac->SetFType(LorawanMacHeader::CONFIRMED_DATA_UP);
+        Simulator::Schedule(Seconds(10),
+                            &ClassAEndDeviceLorawanMac::Send,
+                            m_mac,
+                            Create<Packet>(0));
+        LoraFrameHeader fhdr;
+        SendUplink(fhdr);
+        NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), 0, "Unexpected FCnt value in uplink FHDR");
+        NS_TEST_ASSERT_MSG_EQ(m_mac->GetUplinkFrameCounter(),
+                              2,
+                              "Unexpected FCnt value in MAC layer");
+        NS_TEST_ASSERT_MSG_EQ(m_phyStartSendingCalls,
+                              3 + nbTrans,
+                              "Unexpected number of PHY layer StartSending calls");
+        NS_TEST_ASSERT_MSG_EQ(m_phyReceivedPacketCalls,
+                              0,
+                              "Unexpected number of PHY layer ReceivedPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macSentNewPacketCalls,
+                              2,
+                              "Unexpected number of MAC layer SendNewPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macConfirmedTxOutcome,
+                              2,
+                              "Unexpected number of MAC layer ConfirmedTransmissionOutcome calls");
+        NS_TEST_ASSERT_MSG_EQ(m_numTransmissions,
+                              3,
+                              "Unexpected number of transmissions for confirmed packet");
+        NS_TEST_ASSERT_MSG_EQ(m_successfullyAcked,
+                              false,
+                              "Unexpected acknowledgment state for confirmed packet");
+    }
+
+    Reset();
+    // Confirmed send retransmissions not interrupted after downlink without ACK
+    {
+        uint8_t nbTrans = 10;
+        m_mac->SetMaxNumberOfTransmissions(nbTrans);
+        m_mac->SetFType(LorawanMacHeader::CONFIRMED_DATA_UP);
+        ScheduleRx1Downlink(Seconds(31.31));
+        LoraFrameHeader fhdr;
+        SendUplink(fhdr);
+        NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), 0, "Unexpected FCnt value in uplink FHDR");
+        NS_TEST_ASSERT_MSG_EQ(m_mac->GetUplinkFrameCounter(),
+                              1,
+                              "Unexpected FCnt value in MAC layer");
+        NS_TEST_ASSERT_MSG_EQ(m_phyStartSendingCalls,
+                              nbTrans,
+                              "Unexpected number of PHY layer StartSending calls");
+        NS_TEST_ASSERT_MSG_EQ(m_phyReceivedPacketCalls,
+                              1,
+                              "Unexpected number of PHY layer ReceivedPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macSentNewPacketCalls,
+                              1,
+                              "Unexpected number of MAC layer SendNewPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macConfirmedTxOutcome,
+                              1,
+                              "Unexpected number of MAC layer ConfirmedTransmissionOutcome calls");
+        NS_TEST_ASSERT_MSG_EQ(m_numTransmissions,
+                              nbTrans,
+                              "Unexpected number of transmissions for confirmed packet");
+        NS_TEST_ASSERT_MSG_EQ(m_successfullyAcked,
+                              false,
+                              "Unexpected acknowledgment state for confirmed packet");
+    }
+
+    Reset();
+    // Confirmed send retransmissions interrupted after downlink with ACK
+    {
+        uint8_t nbTrans = 14;
+        m_mac->SetMaxNumberOfTransmissions(nbTrans);
+        m_mac->SetFType(LorawanMacHeader::CONFIRMED_DATA_UP);
+        ScheduleRx1Downlink(Seconds(41.28), true);
+        LoraFrameHeader fhdr;
+        SendUplink(fhdr);
+        NS_TEST_EXPECT_MSG_EQ(fhdr.GetFCnt(), 0, "Unexpected FCnt value in uplink FHDR");
+        NS_TEST_ASSERT_MSG_EQ(m_mac->GetUplinkFrameCounter(),
+                              1,
+                              "Unexpected FCnt value in MAC layer");
+        NS_TEST_ASSERT_MSG_EQ(m_phyStartSendingCalls,
+                              10,
+                              "Unexpected number of PHY layer StartSending calls");
+        NS_TEST_ASSERT_MSG_EQ(m_phyReceivedPacketCalls,
+                              1,
+                              "Unexpected number of PHY layer ReceivedPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macSentNewPacketCalls,
+                              1,
+                              "Unexpected number of MAC layer SendNewPacket calls");
+        NS_TEST_ASSERT_MSG_EQ(m_macConfirmedTxOutcome,
+                              1,
+                              "Unexpected number of MAC layer ConfirmedTransmissionOutcome calls");
+        NS_TEST_ASSERT_MSG_EQ(m_numTransmissions,
+                              10,
+                              "Unexpected number of transmissions for confirmed packet");
+        NS_TEST_ASSERT_MSG_EQ(m_successfullyAcked,
+                              true,
+                              "Unexpected acknowledgment state for confirmed packet");
     }
 }
 
@@ -2255,6 +3252,7 @@ LorawanTestSuite::LorawanTestSuite()
     AddTestCase(new PhyConnectivityTest, Duration::QUICK);
     AddTestCase(new MacCommandTest, Duration::QUICK);
     AddTestCase(new AdrBackoffTest, Duration::QUICK);
+    AddTestCase(new RetransmissionTest, Duration::QUICK);
 }
 
 // Do not forget to allocate an instance of this TestSuite

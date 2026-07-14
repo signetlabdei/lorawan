@@ -240,13 +240,14 @@ main(int argc, char* argv[])
     for (uint8_t sf = 7; sf <= 12; sf++)
     {
         LoraTxParameters txParams;
-        txParams.sf = sf;
-        txParams.headerDisabled = false;
+        txParams.spreadingFactor = sf;
+        txParams.bandwidthHz = 125'000;
         txParams.codingRate = CodingRate::CR_4_5;
-        txParams.bandwidthHz = 125000;
-        txParams.nPreamble = 8;
+        txParams.lowDataRateOptimize = (sf == 11 || sf == 12);
+        txParams.preambleLenSymb = 8;
+        txParams.implicitHeader = false;
         txParams.crcEnabled = true;
-        txParams.lowDataRateOptimizationEnabled = LoraPhy::GetTSym(txParams) > MilliSeconds(16);
+
         Ptr<Packet> pkt = Create<Packet>(packetSize);
 
         LoraFrameHeader frameHdr = LoraFrameHeader();
@@ -259,11 +260,11 @@ main(int argc, char* argv[])
         pkt->AddHeader(frameHdr);
 
         LorawanMacHeader macHdr = LorawanMacHeader();
-        macHdr.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_UP);
+        macHdr.SetFType(LorawanMacHeader::UNCONFIRMED_DATA_UP);
         macHdr.SetMajor(1);
         pkt->AddHeader(macHdr);
 
-        outputFile << LoraPhy::GetOnAirTime(pkt, txParams).GetMicroSeconds() << " ";
+        outputFile << LoraPhy::GetTimeOnAir(pkt->GetSize(), txParams).GetMicroSeconds() << " ";
     }
     outputFile.close();
 
