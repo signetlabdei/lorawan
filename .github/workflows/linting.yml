@@ -23,7 +23,7 @@ jobs:
     steps:
       # The following step is required in all jobs that use this repo's actions
       - name: "Retrieve actions from repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           sparse-checkout: .github/actions
       - name: "Install required system packages"
@@ -72,7 +72,7 @@ jobs:
           echo "No clang-tidy errors found"
       - if: failure()
         name: "Upload clang-tidy-output.log"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.CLANG_TIDY_OUTPUT }}
           path: ${{ env.CLANG_TIDY_OUTPUT }}

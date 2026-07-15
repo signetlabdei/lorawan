@@ -15,7 +15,7 @@ jobs:
     steps:
       # The following step is required in all jobs that use this repo's actions
       - name: "Retrieve actions from repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           sparse-checkout: .github/actions
       - name: "Install dependencies and checkout repo in ns-3"
@@ -42,7 +42,7 @@ jobs:
           echo "Doxygen version $(doxygen -v)"
       - name: "Upload doxygen warnings as artifact"
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: doxygen.warnings.log
           path: doc/doxygen.warnings.log
@@ -55,7 +55,7 @@ jobs:
     steps:
       # The following step is required in all jobs that use this repo's actions
       - name: "Retrieve actions from repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           sparse-checkout: .github/actions
       - name: "Install dependencies and checkout repo in ns-3"
