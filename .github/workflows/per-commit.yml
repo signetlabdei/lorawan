@@ -26,6 +26,7 @@ jobs:
           - compiler: clang++
             mode: optimized
             cxxflags: -stdlib=libc++
+            extra_options: --disable-gtk
             stage: test
           - compiler: g++
             mode: debug
@@ -40,7 +41,7 @@ jobs:
             extra_options: --disable-precompiled-headers
           - compiler: clang++
             mode: debug
-            extra_options: --disable-asserts --disable-logs
+            extra_options: --disable-asserts --disable-logs --disable-gtk
     env:
       COMPILER: ${{ matrix.compiler }}
       MODE: ${{ matrix.mode }}
