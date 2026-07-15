@@ -133,10 +133,10 @@ LoraPhy::GetTimeOnAir(uint32_t phyPayloadLen, const LoraTxParameters& txParams)
     // crc = 1 when cyclic redundancy check is present, 0 otherwise
     double de = txParams.lowDataRateOptimize ? 1.0 : 0.0;
     double h = txParams.implicitHeader ? 1.0 : 0.0;
-    double crc = txParams.crcEnabled ? 1.0 : 0.0;
+    double crc2 = txParams.crcEnabled ? 1.0 : 0.0;
 
     // num and den refer to numerator and denominator of the time on air formula
-    double num = 8.0 * pl - 4.0 * sf + 28.0 + 16.0 * crc - 20.0 * h;
+    double num = 8.0 * pl - 4.0 * sf + 28.0 + 16.0 * crc2 - 20.0 * h;
     double den = 4.0 * (sf - 2.0 * de);
     double payloadSymbNb = 8.0 + std::max(std::ceil(num / den) * (cr + 4.0), 0.0);
 
