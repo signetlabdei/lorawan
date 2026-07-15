@@ -19,7 +19,7 @@ jobs:
     steps:
       # The following step is required in all jobs that use this repo's actions
       - name: "Retrieve actions from repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           sparse-checkout: .github/actions
       - name: "Install required system packages"
@@ -51,9 +51,10 @@ jobs:
           mv build/coverage/ns3.info src/lorawan
       - if: env.CACHE_MISSES != '0'
         name: "Submit coverage data to codecov.io"
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7
         with:
           working-directory: src/lorawan
-          file: ns3.info
+          disable_search: true
+          files: ns3.info
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true

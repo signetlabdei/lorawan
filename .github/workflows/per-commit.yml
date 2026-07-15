@@ -50,7 +50,7 @@ jobs:
     steps:
       # The following step is required in all jobs that use this repo's actions
       - name: "Retrieve actions from repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           sparse-checkout: .github/actions
       - name: "Install dependencies and checkout repo in ns-3"

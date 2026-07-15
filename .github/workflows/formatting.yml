@@ -21,7 +21,7 @@ jobs:
     steps:
       # The following step is required in all jobs that use this repo's actions
       - name: "Retrieve actions from repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           sparse-checkout: .github/actions
       - name: "Install required system packages"
@@ -44,7 +44,7 @@ jobs:
     env:
       URL: ${{ github.server_url }}/${{ github.repository }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: pip install codespell
       # Get commit messages
       - run: git config --global --add safe.directory $GITHUB_WORKSPACE
@@ -70,7 +70,7 @@ jobs:
     steps:
       # The following step is required in all jobs that use this repo's actions
       - name: "Retrieve actions from repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           sparse-checkout: .github/actions
       - run: pip install pyyaml cmake cmake-format ninja wget
@@ -96,7 +96,7 @@ jobs:
     steps:
       # The following step is required in all jobs that use this repo's actions
       - name: "Retrieve actions from repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           sparse-checkout: .github/actions
       - run: apt update && DEBIAN_FRONTEND=noninteractive apt install -y wget

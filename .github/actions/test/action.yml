@@ -10,7 +10,7 @@ runs:
         echo "NOW=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
       shell: bash
     - name: "Restore tests placeholder"
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         key: ${{ format('tests-{0}-{1}-', env.BUILD_ID, env.REF_NAME) }}
         restore-keys: ${{ format('tests-{0}-{1}-', env.BUILD_ID, env.REF_NAME) }}
@@ -28,7 +28,7 @@ runs:
         fi;
         fi
     - name: "Update tests placeholder"
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v6
       with:
         key: ${{ format('tests-{0}-{1}-{2}', env.BUILD_ID, env.REF_NAME, env.NOW) }}
         path: build/tests-*.txt

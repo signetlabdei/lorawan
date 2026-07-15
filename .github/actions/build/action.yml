@@ -50,7 +50,7 @@ runs:
         touch build/tests-$BUILD_ID.txt
     - if: env.CACHE_MISS != '0'
       name: "Store tests placeholder"
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v6
       with:
         key: ${{ format('tests-{0}-{1}-{2}', env.BUILD_ID, env.REF_NAME, env.NOW) }}
         path: build/tests-*.txt
@@ -61,7 +61,7 @@ runs:
       run: tar -cf build.tzst --exclude build.tzst -P -C $GITHUB_WORKSPACE --use-compress-program zstdmt build/ .lock-*
     - if: inputs.store-artifacts == 'true'
       name: "Upload build artifacts"
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ env.BUILD_ID }}
         path: build.tzst
