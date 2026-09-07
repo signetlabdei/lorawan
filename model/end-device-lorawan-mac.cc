@@ -656,6 +656,21 @@ EndDeviceLorawanMac::ApplyNecessaryOptions(LoraFrameHeader& frameHeader)
         frameHeader.AddCommand(command);
     }
 
+    // Clear commands that must be sent only once (from specifications, all except
+    // RXParamSetupAns, RXTimingSetupAns, TXParamSetupAns, and DlChannelAns)
+    m_macCommandList.remove_if([](Ptr<const MacCommand> c) {
+        switch (c->GetCommandType())
+        {
+        case RX_PARAM_SETUP_ANS:
+        case RX_TIMING_SETUP_ANS:
+        case TX_PARAM_SETUP_ANS:
+        case DL_CHANNEL_ANS:
+            return false;
+        default:
+            return true;
+        }
+    });
+
     NS_LOG_DEBUG(frameHeader);
 }
 
