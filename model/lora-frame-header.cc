@@ -80,7 +80,7 @@ LoraFrameHeader::Serialize(Buffer::Iterator start) const
     start.WriteU16(m_fCnt);
 
     // FOpts field
-    for (const auto& c : m_macCommands)
+    for (const auto& c : m_fOpts)
     {
         NS_LOG_DEBUG("Serializing a MAC command");
         c->Serialize(start);
@@ -96,7 +96,7 @@ LoraFrameHeader::Deserialize(Buffer::Iterator start)
     NS_LOG_FUNCTION(this);
 
     // Empty the list of MAC commands
-    m_macCommands.clear();
+    m_fOpts.clear();
 
     // Read from buffer and save into local variables
     m_address.Set(start.ReadU32());
@@ -230,7 +230,7 @@ LoraFrameHeader::Deserialize(Buffer::Iterator start)
             }
         }
         byteNumber += command->Deserialize(start);
-        m_macCommands.emplace_back(command);
+        m_fOpts.emplace_back(command);
     }
     m_fPort = start.ReadU8();
     return 8 + m_fOptsLen; // the number of bytes consumed.
@@ -246,7 +246,7 @@ LoraFrameHeader::Print(std::ostream& os) const
     os << ", FPending=" << m_fPending;
     os << ", FOptsLen=" << unsigned(m_fOptsLen);
     os << ", FCnt=" << unsigned(m_fCnt);
-    for (const auto& c : m_macCommands)
+    for (const auto& c : m_fOpts)
     {
         os << ", ";
         c->Print(os);
@@ -346,7 +346,7 @@ uint8_t
 LoraFrameHeader::GetFOptsLen() const
 {
     uint8_t fOptsLen = 0;
-    for (const auto& c : m_macCommands)
+    for (const auto& c : m_fOpts)
     {
         fOptsLen += c->GetSerializedSize();
     }
@@ -370,7 +370,7 @@ LoraFrameHeader::AddLinkCheckReq()
 {
     NS_LOG_FUNCTION(this);
     auto command = Create<LinkCheckReq>();
-    m_macCommands.emplace_back(command);
+    m_fOpts.emplace_back(command);
     m_fOptsLen += command->GetSerializedSize();
 }
 
@@ -379,7 +379,7 @@ LoraFrameHeader::AddLinkCheckAns(uint8_t margin, uint8_t gwCnt)
 {
     NS_LOG_FUNCTION(this << unsigned(margin) << unsigned(gwCnt));
     auto command = Create<LinkCheckAns>(margin, gwCnt);
-    m_macCommands.emplace_back(command);
+    m_fOpts.emplace_back(command);
     m_fOptsLen += command->GetSerializedSize();
 }
 
@@ -398,7 +398,7 @@ LoraFrameHeader::AddLinkAdrReq(uint8_t dataRate,
     }
     /// @todo Implement chMaskCntl field
     auto command = Create<LinkAdrReq>(dataRate, txPower, channelMask, 0, repetitions);
-    m_macCommands.emplace_back(command);
+    m_fOpts.emplace_back(command);
     m_fOptsLen += command->GetSerializedSize();
 }
 
@@ -407,7 +407,7 @@ LoraFrameHeader::AddLinkAdrAns(bool powerAck, bool dataRateAck, bool channelMask
 {
     NS_LOG_FUNCTION(this << powerAck << dataRateAck << channelMaskAck);
     auto command = Create<LinkAdrAns>(powerAck, dataRateAck, channelMaskAck);
-    m_macCommands.emplace_back(command);
+    m_fOpts.emplace_back(command);
     m_fOptsLen += command->GetSerializedSize();
 }
 
@@ -416,7 +416,7 @@ LoraFrameHeader::AddDutyCycleReq(uint8_t dutyCycle)
 {
     NS_LOG_FUNCTION(this << unsigned(dutyCycle));
     auto command = Create<DutyCycleReq>(dutyCycle);
-    m_macCommands.emplace_back(command);
+    m_fOpts.emplace_back(command);
     m_fOptsLen += command->GetSerializedSize();
 }
 
@@ -425,7 +425,7 @@ LoraFrameHeader::AddDutyCycleAns()
 {
     NS_LOG_FUNCTION(this);
     auto command = Create<DutyCycleAns>();
-    m_macCommands.emplace_back(command);
+    m_fOpts.emplace_back(command);
     m_fOptsLen += command->GetSerializedSize();
 }
 
@@ -436,7 +436,7 @@ LoraFrameHeader::AddRxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, ui
     // Evaluate whether to eliminate this assert in case new offsets can be defined.
     NS_ASSERT(0 <= rx1DrOffset && rx1DrOffset <= 5);
     auto command = Create<RxParamSetupReq>(rx1DrOffset, rx2DataRate, frequencyHz);
-    m_macCommands.emplace_back(command);
+    m_fOpts.emplace_back(command);
     m_fOptsLen += command->GetSerializedSize();
 }
 
@@ -445,7 +445,7 @@ LoraFrameHeader::AddRxParamSetupAns()
 {
     NS_LOG_FUNCTION(this);
     auto command = Create<RxParamSetupAns>();
-    m_macCommands.emplace_back(command);
+    m_fOpts.emplace_back(command);
     m_fOptsLen += command->GetSerializedSize();
 }
 
@@ -454,7 +454,7 @@ LoraFrameHeader::AddDevStatusReq()
 {
     NS_LOG_FUNCTION(this);
     auto command = Create<DevStatusReq>();
-    m_macCommands.emplace_back(command);
+    m_fOpts.emplace_back(command);
     m_fOptsLen += command->GetSerializedSize();
 }
 
@@ -467,7 +467,7 @@ LoraFrameHeader::AddNewChannelReq(uint8_t chIndex,
     NS_LOG_FUNCTION(this << unsigned(chIndex) << frequencyHz << unsigned(minDataRate)
                          << unsigned(maxDataRate));
     auto command = Create<NewChannelReq>(chIndex, frequencyHz, minDataRate, maxDataRate);
-    m_macCommands.emplace_back(command);
+    m_fOpts.emplace_back(command);
     m_fOptsLen += command->GetSerializedSize();
 }
 
@@ -475,14 +475,14 @@ std::vector<Ptr<MacCommand>>
 LoraFrameHeader::GetCommands()
 {
     NS_LOG_FUNCTION(this);
-    return m_macCommands;
+    return m_fOpts;
 }
 
 void
 LoraFrameHeader::AddCommand(Ptr<MacCommand> macCommand)
 {
     NS_LOG_FUNCTION(this << macCommand);
-    m_macCommands.emplace_back(macCommand);
+    m_fOpts.emplace_back(macCommand);
     m_fOptsLen += macCommand->GetSerializedSize();
 }
 

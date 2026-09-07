@@ -369,7 +369,8 @@ ClassAEndDeviceLorawanMac::Receive(Ptr<const Packet> packet)
     m_busy = false;
     // Reset ADR backoff counter
     m_adrAckCnt = 0;
-    // Clear commands that are re-sent until downlink (DlChannelAns and RxTimingSetupAns)
+    // Clear commands to be re-sent until downlink rx (i.e., RXParamSetupAns,
+    // RXTimingSetupAns, TXParamSetupAns, and DlChannelAns)
     m_macCommandList.clear();
 
     // Link quality metadata

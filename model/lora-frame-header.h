@@ -324,9 +324,8 @@ class LoraFrameHeader : public Header
 
     uint16_t m_fCnt; //!< The FCnt field
 
-    Buffer m_fOpts;                             //!< The FOpts field
-    std::vector<Ptr<MacCommand>> m_macCommands; //!< Vector containing all the MacCommand instances
-                                                //!< that are contained in this LoraFrameHeader
+    std::vector<Ptr<MacCommand>> m_fOpts; //!< The FOpts field as a vector of all the MacCommands
+                                          //!< contained in this LoraFrameHeader
 
     bool m_isUplink; //!< Whether this frame header is uplink or not
 };
@@ -336,7 +335,7 @@ Ptr<T>
 LoraFrameHeader::GetMacCommand()
 {
     // Iterate on MAC commands and try casting
-    for (const auto& cmd : m_macCommands)
+    for (const auto& cmd : m_fOpts)
     {
         if (auto c = DynamicCast<T>(cmd); c)
         {
