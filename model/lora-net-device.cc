@@ -12,6 +12,7 @@
 #include "lora-phy.h"
 #include "lorawan-mac.h"
 
+#include "ns3/log.h"
 #include "ns3/node.h"
 #include "ns3/pointer.h"
 

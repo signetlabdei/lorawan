@@ -10,6 +10,8 @@
 
 #include "class-a-end-device-lorawan-mac.h"
 
+#include "ns3/log.h"
+
 namespace ns3
 {
 namespace lorawan

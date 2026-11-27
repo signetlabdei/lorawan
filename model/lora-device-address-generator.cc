@@ -8,6 +8,8 @@
 
 #include "lora-device-address-generator.h"
 
+#include "ns3/log.h"
+
 namespace ns3
 {
 namespace lorawan

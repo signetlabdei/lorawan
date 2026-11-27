@@ -8,6 +8,8 @@
 
 #include "mac-command.h"
 
+#include "ns3/log.h"
+
 #include <bitset>
 
 namespace ns3

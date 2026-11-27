@@ -12,6 +12,8 @@
 #include "class-a-end-device-lorawan-mac.h"
 #include "lora-tag.h"
 
+#include "ns3/log.h"
+
 namespace ns3
 {
 namespace lorawan

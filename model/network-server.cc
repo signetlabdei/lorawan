@@ -17,6 +17,8 @@
 #include "network-scheduler.h"
 #include "network-status.h"
 
+#include "ns3/log.h"
+
 namespace ns3
 {
 namespace lorawan
