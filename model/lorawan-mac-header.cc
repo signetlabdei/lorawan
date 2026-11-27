@@ -8,6 +8,8 @@
 
 #include "lorawan-mac-header.h"
 
+#include "ns3/log.h"
+
 #include <bitset>
 
 namespace ns3

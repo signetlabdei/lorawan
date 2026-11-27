@@ -7,6 +7,7 @@
  */
 
 // An essential include is test.h
+#include "ns3/log.h"
 #include "ns3/test.h"
 
 // Include headers of classes to test

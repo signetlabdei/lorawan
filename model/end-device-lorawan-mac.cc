@@ -14,6 +14,7 @@
 #include "lora-phy.h"
 
 #include "ns3/energy-source-container.h"
+#include "ns3/log.h"
 #include "ns3/simulator.h"
 
 #include <bitset>

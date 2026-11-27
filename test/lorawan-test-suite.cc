@@ -8,6 +8,7 @@
 
 // An essential include is test.h
 #include "ns3/constant-position-mobility-model.h"
+#include "ns3/log.h"
 #include "ns3/simulator.h"
 #include "ns3/test.h"
 

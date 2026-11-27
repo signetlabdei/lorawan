@@ -13,6 +13,8 @@
 #include "lora-tag.h"
 #include "lorawan-mac-header.h"
 
+#include "ns3/log.h"
+
 namespace ns3
 {
 namespace lorawan
