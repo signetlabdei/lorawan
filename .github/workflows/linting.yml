@@ -49,6 +49,7 @@ jobs:
           fi &&
           $git remote add -t $DEFAULT_BRANCH --no-tags -f upstream $URL
       - name: "Select files to check"
+        shell: bash
         run: >
           if [[ $GITHUB_REF_NAME == $DEFAULT_BRANCH ]] ; then
             echo "FILES_TO_CHECK=src/lorawan/" >> $GITHUB_ENV;
