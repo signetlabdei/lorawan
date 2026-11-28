@@ -17,9 +17,8 @@ jobs:
     timeout-minutes: 180
     env:
       CLANG_TIDY_VERSION: 22
-      CLANG_TIDY_OUTPUT: clang-tidy-output.log
-      FILES_CHANGED: git-diff-name-only.log
       URL: ${{ github.server_url }}/${{ github.repository }}
+      git: "git -C src/lorawan"
     steps:
       # The following step is required in all jobs that use this repo's actions
       - name: "Retrieve actions from repository"
@@ -42,37 +41,24 @@ jobs:
           --enable-modules lorawan
       - name: "Store default branch"
         run: >
-          echo "DEFAULT_BRANCH=$(
-            git -C src/lorawan/ remote show $URL | sed -n '/HEAD branch:/s/.*: //p'
-          )" >> $GITHUB_ENV
+          echo "DEFAULT_BRANCH=$($git remote show $URL | sed -n '/HEAD branch:/s/.*: //p')" >> $GITHUB_ENV
       - name: "Prepare git environment"
         run: >
-          if (git -C src/lorawan/ remote | grep -qw upstream) ; then
-          git -C src/lorawan/ remote remove upstream ;
+          if ($git remote | grep -qw upstream) ; then
+          $git remote remove upstream ;
           fi &&
-          git -C src/lorawan/ remote add -t $DEFAULT_BRANCH --no-tags -f upstream $URL &&
-          git -C src/lorawan/ diff --name-only --line-prefix=src/lorawan/ upstream/$DEFAULT_BRANCH | tr '\n' ' ' > $FILES_CHANGED
-      - name: "Running clang-tidy"
-        shell: bash
+          $git remote add -t $DEFAULT_BRANCH --no-tags -f upstream $URL
+      - name: "Select files to check"
         run: >
           if [[ $GITHUB_REF_NAME == $DEFAULT_BRANCH ]] ; then
             echo "FILES_TO_CHECK=src/lorawan/" >> $GITHUB_ENV;
             echo "Running clang-tidy on all files";
           else
-            echo "FILES_TO_CHECK=$(cat $FILES_CHANGED)" >> $GITHUB_ENV;
+            FILES_TO_CHECK=$($git diff --name-only --line-prefix=src/lorawan/ upstream/$DEFAULT_BRANCH);
+            echo "FILES_TO_CHECK=\"$FILES_TO_CHECK\"" >> $GITHUB_ENV;
             echo "Running clang-tidy on the following changed files:";
-            echo $(cat $FILES_CHANGED);
+            echo $FILES_TO_CHECK | fmt -w1;
           fi
       - name: "Run clang-tidy"
-        shell: bash
-        run: run-clang-tidy-$CLANG_TIDY_VERSION -p cmake-cache/ -quiet $FILES_TO_CHECK > $CLANG_TIDY_OUTPUT
-      - name: "Check job results"
-        run: |
-          (! egrep -v "file not found \[clang-diagnostic-error\]" $CLANG_TIDY_OUTPUT | egrep -A3 "error:|warning:|note:")
-          echo "No clang-tidy errors found"
-      - if: failure()
-        name: "Upload clang-tidy-output.log"
-        uses: actions/upload-artifact@v7
-        with:
-          name: ${{ env.CLANG_TIDY_OUTPUT }}
-          path: ${{ env.CLANG_TIDY_OUTPUT }}
+        run: run-clang-tidy-$CLANG_TIDY_VERSION -p cmake-cache/ -quiet -hide-progress -use-color=true -warnings-as-errors=* $FILES_TO_CHECK
+      - run: echo "No clang-tidy errors found"
