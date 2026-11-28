@@ -13,10 +13,7 @@ runs:
   using: "composite"
   steps:
     # Pre-configuration steps
-    # (skip ccache for --disable-precompiled-headers because it won't use it)
-    # (skip ccache for optimized because built files are architecture dependent)
-    - if: env.MODE != 'optimized' && ( ! contains(env.EXTRA_OPTIONS, '--disable-precompiled-headers') )
-      name: "Restore build cache of this job"
+    - name: "Restore build cache of this job"
       uses: hendrikmuhs/ccache-action@v1.2
       with:
         key: ${{ env.BUILD_ID }}

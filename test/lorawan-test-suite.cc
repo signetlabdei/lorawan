@@ -8,11 +8,16 @@
 
 // An essential include is test.h
 #include "ns3/constant-position-mobility-model.h"
+#include "ns3/propagation-delay-model.h"
+#include "ns3/propagation-loss-model.h"
 #include "ns3/simulator.h"
 #include "ns3/test.h"
 
 // Include headers of classes to test
-#include "ns3/lorawan-module.h"
+#include "ns3/class-a-end-device-lorawan-mac.h"
+#include "ns3/lorawan-mac-helper.h"
+#include "ns3/simple-end-device-lora-phy.h"
+#include "ns3/simple-gateway-lora-phy.h"
 
 using namespace ns3;
 using namespace lorawan;

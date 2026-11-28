@@ -24,7 +24,7 @@ jobs:
       matrix:
         include:
           - compiler: clang++
-            mode: optimized
+            mode: release
             cxxflags: -stdlib=libc++
             extra_options: --disable-gtk
             stage: test
@@ -34,7 +34,7 @@ jobs:
             mode: default
             stage: test
           - compiler: g++
-            mode: optimized
+            mode: release
             stage: test
           - compiler: g++
             mode: debug
